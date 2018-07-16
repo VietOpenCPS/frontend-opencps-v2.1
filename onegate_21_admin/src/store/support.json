@@ -1,0 +1,352 @@
+{
+    "renderURLInit": "?p_p_id=FrontEndSuperadmin&p_p_lifecycle=2&p_p_state=exclusive&p_p_mode=view&p_p_resource_id=renderURLInit",
+    "trangThaiHoSoList": [
+        {
+          "title": "opencps_actionconfig",
+          "id": "1",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "Định nghĩa các thao tác xử lý hồ sơ chuẩn trong hệ thống, dùng làm cơ sở để tạo ra cá dữ liệu DossierAction, DossierSync và DossierDocument"
+        },
+        {
+          "title": "opencps_menuconfig",
+          "id": "2",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "Định nghĩa các bước xử lý chuẩn dùng để hiển thị trên menu xử lý của chương trình"
+        },
+        {
+          "title": "opencps_stepconfig",
+          "id": "3",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "Định nghĩa các bước xử lý chuẩn dùng để hiển thị trên menu xử lý của chương trình"
+        },
+        {
+          "title": "opencps_serviceinfo",
+          "id": "4",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "opencps_serviceinfo"
+        },
+        {
+          "title": "opencps_dossiertemplate",
+          "id": "5",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "opencps_dossiertemplate"
+        },
+        {
+          "title": "opencps_serviceprocess",
+          "id": "6",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "opencps_serviceprocess"
+        },
+        {
+          "title": "opencps_serviceconfig",
+          "id": "7",
+          "action": "subtitles",
+          "action_active": "play_arrow",
+          "active": true,
+          "link": "/",
+          "desc": "opencps_serviceconfig"
+        }
+    ],
+    "colHeaders": {
+        "1": [
+            "ID",
+            "actionCode",
+            "actionName",
+            "extraForm",
+            "formScript",
+            "sampleData",
+            "insideProcess",
+            "userNote",
+            "syncType",
+            "pending",
+            "rollbackable",
+            "notificationType",
+            "documentType"
+        ],
+        "2": [
+          "ID",
+          "menuGroup",
+          "menuName",
+          "order",
+          "menuType",
+          "queryParams",
+          "tableConfig",
+          "buttonConfig"
+        ],
+        "3": [
+          "ID",
+          "stepCode",
+          "stepName",
+          "stepType",
+          "dossierStatus",
+          "dossierSubStatus",
+          "menuGroup",
+          "menuStepName",
+          "buttonConfig"
+        ],
+        "4": [
+          "serviceInfoId",
+          "serviceCode",
+          "serviceName",
+          "administrationCode",
+          "administrationName",
+          "domainCode",
+          "domainName"
+        ],
+        "5": [
+          "dossierTemplateId",
+          "templateNo",
+          "templateName",
+          "description"
+        ],
+        "6": [
+          "serviceProcessId",
+          "processNo",
+          "processName",
+          "description"
+        ],
+        "7": [
+          "serviceConfigId",
+          "serviceInfoId",
+          "govAgencyCode",
+          "govAgencyName"
+        ]
+    },
+    "columns": {
+        "1": [
+          {
+            "data": "actionConfigId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "actionCode",
+            "type": "text"
+          },
+          {
+            "data": "actionName",
+            "type": "text"
+          },
+          {
+            "data": "extraForm",
+            "type": "checkbox"
+          },
+          {
+            "data": "formScript",
+            "type": "text"
+          },
+          {
+            "data": "sampleData",
+            "type": "text"
+          },
+          {
+            "data": "insideProcess",
+            "type": "checkbox"
+          },
+          {
+            "data": "userNote",
+            "type": "numeric"
+          },
+          {
+            "data": "syncType",
+            "type": "numeric"
+          },
+          {
+            "data": "pending",
+            "type": "checkbox"
+          },
+          {
+            "data": "rollbackable",
+            "type": "checkbox"
+          },
+          {
+            "data": "notificationType",
+            "type": "text"
+          },
+          {
+            "data": "documentType",
+            "type": "text"
+          }
+        ],
+        "2": [
+          {
+            "data": "menuConfigId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "menuGroup",
+            "type": "text"
+          },
+          {
+            "data": "menuName",
+            "type": "text"
+          },
+          {
+            "data": "order",
+            "type": "numeric"
+          },
+          {
+            "data": "menuType",
+            "type": "numeric"
+          },
+          {
+            "data": "queryParams",
+            "type": "text"
+          },
+          {
+            "data": "tableConfig",
+            "type": "text"
+          },
+          {
+            "data": "buttonConfig",
+            "type": "text"
+          }
+        ],
+        "3": [
+          {
+            "data": "stepConfigId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "stepCode",
+            "type": "text"
+          },
+          {
+            "data": "stepName",
+            "type": "text"
+          },
+          {
+            "data": "stepType",
+            "type": "numeric"
+          },
+          {
+            "data": "dossierStatus",
+            "type": "text"
+          },
+          {
+            "data": "dossierSubStatus",
+            "type": "text"
+          },
+          {
+            "data": "menuGroup",
+            "type": "text"
+          },
+          {
+            "data": "menuStepName",
+            "type": "text"
+          },
+          {
+            "data": "buttonConfig",
+            "type": "text"
+          }
+        ],
+        "4": [
+          {
+            "data": "serviceInfoId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "serviceCode",
+            "type": "text"
+          },
+          {
+            "data": "serviceName",
+            "type": "text"
+          },
+          {
+            "data": "administrationCode",
+            "type": "text"
+          },
+          {
+            "data": "administrationName",
+            "type": "text"
+          },
+          {
+            "data": "domainCode",
+            "type": "text"
+          },
+          {
+            "data": "domainName",
+            "type": "text"
+          }
+        ],
+        "5": [
+          {
+            "data": "dossierTemplateId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "templateNo",
+            "type": "text"
+          },
+          {
+            "data": "templateName",
+            "type": "text"
+          },
+          {
+            "data": "description",
+            "type": "text"
+          }
+        ],
+        "6": [
+          {
+            "data": "serviceProcessId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "processNo",
+            "type": "text"
+          },
+          {
+            "data": "processName",
+            "type": "text"
+          },
+          {
+            "data": "description",
+            "type": "text"
+          }
+        ],
+        "7": [
+          {
+            "data": "serviceConfigId",
+            "type": "numeric",
+            "readOnly": true
+          },
+          {
+            "data": "serviceInfoId",
+            "type": "numeric"
+          },
+          {
+            "data": "govAgencyCode",
+            "type": "text"
+          },
+          {
+            "data": "govAgencyName",
+            "type": "text"
+          }
+        ]
+    }
+}
