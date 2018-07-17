@@ -16,6 +16,7 @@
                   <v-flex xs12 class="text-xs-right">
                     <div :id="'formAlpaca' + item.partNo">
                     </div>
+                    <v-btn class="text-xs-right" color="primary" @click="saveAlpacaForm(item)">Lưu lại</v-btn>
                   </v-flex>
                 </v-layout>
               </v-card-text>
@@ -98,7 +99,7 @@
 </template>
 
 <script>
-// import $ from 'jquery'
+import $ from 'jquery'
 // import * as utils from '../store/onegate_utils'
 export default {
   data: () => ({
@@ -186,15 +187,65 @@ export default {
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
         setTimeout(function (argument) {
-          dossierFiles.forEach(val => {
-            if (val.eForm) {
-              vm.$store.dispatch('loadAlpcaForm', val)
-            }
-          })
+          if (dossierFiles.length > 0) {
+            dossierFiles.forEach(itemFiles => {
+              if (itemFiles.eForm) {
+                vm.$store.dispatch('loadAlpcaForm', itemFiles)
+              }
+            })
+          } else {
+            dossierTemplateItems.forEach(val => {
+              if (val.hasForm) {
+                val['templateFileNo'] = data.dossierTemplateNo
+                vm.showAlpacaJSFORM(val)
+              }
+            })
+          }
         }, 500)
         console.log('dossierTemplateItems', vm.dossierTemplateItems)
       }).catch(reject => {
       })
+    },
+    showAlpacaJSFORM (item) {
+      var vm = this
+      vm.$store.dispatch('loadFormScript', item).then(resScript => {
+        vm.$store.dispatch('loadFormData', item).then(resData => {
+          var formScript, formData
+          /* eslint-disable */
+          if (resScript) {
+            formScript = eval('(' + resScript + ')')
+          } else {
+            formScript = {}
+          }
+          if (resData) {
+            formData = eval('(' + resData + ')')
+          } else {
+            formData = {}
+          }
+          /* eslint-disable */
+          formScript.data = formData
+          $('#formAlpaca' + item.partNo).alpaca(formScript)
+        })
+      })
+    },
+    saveAlpacaForm (item) {
+      var vm = this
+      if (vm.dossierFilesItems.length === 0) {
+        item['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('postEform', item).then(resPostEform => {
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+            vm.dossierFilesItems = resFiles
+          })
+        })
+      } else {
+        vm.dossierFilesItems.forEach(files => {
+          if (files.dossierPartNo === item.partNo) {
+            files['dossierId'] = vm.thongTinHoSo.dossierId
+            vm.$store.dispatch('putAlpacaForm', files).then(resData => {
+            })
+          }
+        })
+      }
     },
     onDeleteAttackFiles (item) {
       var vm = this
@@ -232,11 +283,28 @@ export default {
     },
     loadAlpcaForm (data) {
       var vm = this
-      vm.dossierFilesItems.forEach(val => {
-        if (val.dossierPartNo === data.partNo) {
-          this.$store.dispatch('loadAlpcaForm', val)
-        }
+      // vm.dossierFilesItems.forEach(val => {
+      //   if (val.dossierPartNo === data.partNo) {
+      //     this.$store.dispatch('loadAlpcaForm', val)
+      //   }
+      // })
+      var indexEform = vm.dossierTemplateItems.findIndex(item => {
+        return item.hasForm === true
       })
+      if (vm.dossierFilesItems.length > 0) {
+        vm.dossierFilesItems.forEach(itemFiles => {
+          if (itemFiles.eForm && data.partNo === itemFiles.dossierPartNo) {
+            vm.$store.dispatch('loadAlpcaForm', itemFiles)
+          }
+        })
+      } else {
+        vm.dossierTemplateItems.forEach(val => {
+          if (val.hasForm && data.partNo === val.partNo) {
+            val['templateFileNo'] = data.dossierTemplateNo
+            vm.showAlpacaJSFORM(val)
+          }
+        })
+      }
     },
     viewFile (data) {
       var vm = this

@@ -479,31 +479,40 @@ export default {
         })
         setTimeout(function () {
           if (data.cityCode) {
-            filter.parent = data.cityCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.districts = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.cityCode
+            }).then(function (resultDistricts) {
+              vm.districts = resultDistricts.data
             })
           }
+          console.log('districtCode-----------', data.districtCode)
           if (data.districtCode) {
-            filter.parent = data.districtCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.wards = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.districtCode
+            }).then(function (resultWards) {
+              vm.wards = resultWards.data
             })
           }
           if (data.delegateCityCode) {
-            filter.parent = data.delegateCityCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.delegateDistricts = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.delegateCityCode
+            }).then(function (resultDeDistricts) {
+              vm.delegateDistricts = resultDeDistricts.data
             })
           }
           if (data.delegateDistrictCode) {
-            filter.parent = data.delegateDistrictCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.delegateWards = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.delegateDistrictCode
+            }).then(function (resultDeWards) {
+              vm.delegateWards = resultDeWards.data
             })
           }
         }, 200)

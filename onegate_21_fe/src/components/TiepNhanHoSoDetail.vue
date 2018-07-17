@@ -49,13 +49,13 @@
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab>
-      <v-tab href="#tab-2" @click="tiepNhanHoSo"> 
+      <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Tiếp nhận &nbsp;
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab>
-      <v-tab href="#tab-3" @click="boSungHoSo">
+      <!-- <v-tab href="#tab-3" @click="boSungHoSo">
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Bổ sung &nbsp;
           <v-icon>save</v-icon>
@@ -66,7 +66,7 @@
           Trả kết quả &nbsp;
           <v-icon>send</v-icon>
         </v-btn>
-      </v-tab>
+      </v-tab> -->
       <v-tab href="#tab-5" @click="goBack">
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Quay lại &nbsp;
@@ -79,6 +79,7 @@
 
 <script>
 import router from '@/router'
+import toastr from 'toastr'
 // import * as utils from '../store/onegate_utils'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
@@ -98,7 +99,8 @@ export default {
   data: () => ({
     validTNHS: false,
     dossierId: '',
-    mark: true
+    mark: true,
+    tiepNhanState: true
   }),
   computed: {
     loading () {
@@ -175,6 +177,9 @@ export default {
           console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          }).catch(function (xhr) {
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         }).catch(reject => {
           console.log('reject=============', reject)
@@ -196,7 +201,7 @@ export default {
       let dataPostAction = {
         dossierId: vm.dossierId,
         actionCode: 1100,
-        actionNode: '',
+        actionNote: '',
         actionUser: '',
         payload: '',
         security: '',
@@ -205,6 +210,16 @@ export default {
         createDossiers: ''
       }
       vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+        let currentQuery = vm.$router.history.current.query
+        router.push({
+          path: vm.$router.history.current.path,
+          query: {
+            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            q: currentQuery['q']
+          }
+        })
+        vm.tiepNhanState = false
       })
     },
     boSungHoSo () {

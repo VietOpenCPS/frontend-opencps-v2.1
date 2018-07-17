@@ -155,7 +155,18 @@
 </template>
 <script>
   export default {
-    props: ['index', 'id'],
+    props: {
+      detailDossier: {
+        type: Object,
+        default: () => {}
+      }
+    },
+    watch: {
+      detailDossier (val) {
+        var vm = this
+        vm.thongTinChiTietHoSo = val
+      }
+    },
     components: {
     },
     data: () => ({
@@ -168,16 +179,7 @@
         return this.$store.getters.loading
       }
     },
-    watch: {
-      id: function (newVal, oldVal) {
-        var vm = this
-        console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-        vm.initData(newVal)
-      }
-    },
     created () {
-      var vm = this
-      vm.initData(vm.id)
     },
     methods: {
       initData (data) {

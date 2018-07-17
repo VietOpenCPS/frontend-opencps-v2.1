@@ -110,8 +110,8 @@ export const store = new Vuex.Store({
           if (coma > 0) {
             orginURL = window.location.href.substr(0, coma)
           }
-          /* test local */
-          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          // /* test local */
+          // orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -867,6 +867,51 @@ export const store = new Vuex.Store({
           dataPutAlpacaForm.append('formdata', JSON.stringify(formData))
           let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
           axios.put(url, dataPutAlpacaForm, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    rollBack ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        try {
+          var dataRollBack = new URLSearchParams()
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/rollback'
+          axios.put(url, dataRollBack, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    postEform ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        try {
+          var dataPostEform = new URLSearchParams()
+          var control = $('#formAlpaca' + data.partNo).alpaca('get')
+          var formData = control.getValue()
+          dataPostEform.append('formdata', JSON.stringify(formData))
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
+          axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {
             reject(data)

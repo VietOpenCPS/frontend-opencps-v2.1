@@ -139,9 +139,9 @@
       <v-btn color="primary" v-on:click.native="daBoSung">
         Hoàn thành bổ sung&nbsp;
       </v-btn>
-      <v-btn color="primary" @click="goBack">
+      <!-- <v-btn color="primary" @click="goBack">
         Lưu &nbsp;
-      </v-btn>
+      </v-btn> -->
       <v-btn color="primary" @click.native="goBack"
         :loading="loadingAction"
         :disabled="loadingAction"
@@ -152,7 +152,7 @@
       </v-btn>
     </div>
     <!-- dialog bổ sung hồ sơ -->
-    <v-dialog v-model="dialog_addTHPHS" scrollable persistent max-width="700px">
+    <!-- <v-dialog v-model="dialog_addTHPHS" scrollable persistent max-width="700px">
       <v-card>
         <v-card-title class="headline">
           Bổ sung hồ sơ
@@ -185,7 +185,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!--  -->
     <!-- <v-btn color="primary" @click.native="dialog_addTHPHS = true">
       TEST BSHS &nbsp;
@@ -195,8 +195,10 @@
   </div>
 </template>
 <script>
+  import router from '@/router'
   import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
   export default {
+    props: ['index', 'id'],
     data: () => ({
       dialog_addTHPHS: false,
       loadingAction: false,
@@ -210,7 +212,10 @@
     components: {
       'thanh-phan-ho-so': ThanhPhanHoSo
     },
-    created () {},
+    created () {
+      var vm = this
+      vm.initData(vm.id)
+    },
     watch: {
     },
     methods: {
@@ -226,6 +231,62 @@
       },
       daBoSung () {
         console.log('Đã bổ sung')
+        var vm = this
+        console.log('luu Ho So--------------------')
+        vm.$store.commit('setPrintPH', false)
+        let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+        let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+        let dossierTemplates = thanhphanhoso
+        let listAction = []
+        let listDossierMark = []
+        if (dossierTemplates) {
+          dossierTemplates.forEach(function (val, index) {
+            if (val.partType === 1) {
+              val['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
+            }
+          })
+          dossierFiles.forEach(function (value, index) {
+            if (value.eForm) {
+              value['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+            }
+          })
+        }
+        Promise.all(listDossierMark).then(values => {
+        }).catch(function (xhr) {
+        })
+        Promise.all(listAction).then(values => {
+          console.log(values)
+          // let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+          // console.log('data put dossier -->', tempData)
+          // tempData['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+          // vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          //   toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // }).catch(function (xhr) {
+          //   toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          // })
+          let dataPostAction = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: 7100,
+            actionNote: '',
+            actionUser: ''
+          }
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            let currentQuery = vm.$router.history.current.query
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+            vm.tiepNhanState = false
+          })
+        }).catch(reject => {
+          console.log('reject=============', reject)
+        })
       }
     }
   }
