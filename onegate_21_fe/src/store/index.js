@@ -111,7 +111,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          /* orginURL = 'http://127.0.0.1:8081/api/initdata' */
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
