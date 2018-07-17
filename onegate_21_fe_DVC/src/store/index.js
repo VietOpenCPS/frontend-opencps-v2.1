@@ -110,8 +110,8 @@ export const store = new Vuex.Store({
           if (coma > 0) {
             orginURL = window.location.href.substr(0, coma)
           }
-          /* test local */
-          /* orginURL = 'http://127.0.0.1:8081/api/initdata' */
+          // /* test local */
+          // orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -496,7 +496,6 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          console.log('run')
           if (data > 0) {
             commit('setLoading', true)
             axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
