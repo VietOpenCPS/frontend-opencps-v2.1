@@ -2,7 +2,6 @@
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex xs12 class="px-2">
-        
         <v-select
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
