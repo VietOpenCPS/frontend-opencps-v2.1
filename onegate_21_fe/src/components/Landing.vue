@@ -197,7 +197,7 @@
           <v-progress-linear v-if="loadingActionProcess" class="my-0" :indeterminate="true"></v-progress-linear>
           <v-card-text class="py-0 px-0">
             <v-layout wrap>
-              <thong-tin-co-ban-ho-so v-if="dialogActionProcess" ref="thong-tin-co-ban-ho-so" :id="dossierId"></thong-tin-co-ban-ho-so>
+              <thong-tin-co-ban-ho-so v-if="dialogActionProcess" :detailDossier="thongtinhoso"></thong-tin-co-ban-ho-so>
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
               <phan-cong v-if="dialogActionProcess && showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
@@ -368,7 +368,8 @@ export default {
       }
     ],
     selectedReaction: [],
-    //
+    /** */
+    thongtinhoso: {},
     dossierId: 0,
     valid: true,
     isCallBack: true,
@@ -561,10 +562,6 @@ export default {
     }
   },
   methods: {
-    expDataPC () {
-      // this.data_pc = data
-      console.log('dataPKKKK', this.assign_items)
-    },
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
@@ -626,21 +623,21 @@ export default {
       let currentQuery = router.history.current.query
       console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        let filter = {
+        /* let filter = {
           queryParams: currentQuery.q,
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
           template: vm.templateNo
-        }
+        } */
         /*  test Local */
-        /* let filter = {
+        let filter = {
           queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
           template: vm.templateNo
-        } */
+        }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -946,9 +943,12 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      console.log('result processAction', result)
+      console.log('assignItems', vm.assign_items)
       let filter = {
         dossierId: dossierItem.dossierId,
-        actionCode: result.actionCode
+        actionCode: result.actionCode,
+        toUsers: vm.assign_items
       }
       var dossierInfo = {
         dossierNo: dossierItem.dossierNo,
@@ -977,39 +977,75 @@ export default {
           return false
         }
       } else {
-        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          vm.dialogActionProcess = false
-          vm.loadingActionProcess = false
-          //
-          dossierInfo.statusAction = true
-          vm.dossierSelected.push(dossierInfo)
-          vm.countSelected += 1
-          if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-            vm.dialog_statusAction = true
-          }
-          vm.selected.splice(index, 1)
-          //
-          if (String(item.form) === 'ACTIONS') {
-            // get dossier submit fail and show on dialog
-          } else {
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
+        if (vm.showPhanCongNguoiThucHien) {
+          vm.$store.dispatch('reassignDossier', filter).then(function (result) {
+            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+              vm.dialogActionProcess = false
+              vm.loadingActionProcess = false
+              //
+              dossierInfo.statusAction = true
+              vm.dossierSelected.push(dossierInfo)
+              vm.countSelected += 1
+              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+                vm.dialog_statusAction = true
+              }
+              //
+              if (String(item.form) === 'ACTIONS') {
+                // get dossier submit fail and show on dialog
+              } else {
+                router.push({
+                  path: vm.$router.history.current.path,
+                  query: {
+                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    q: currentQuery['q']
+                  }
+                })
+              }
+            }).catch(function () {
+              vm.countSelected += 1
+              vm.actionStatus += 1
+              dossierInfo.statusAction = false
+              vm.dossierSelected.push(dossierInfo)
+              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+                vm.dialog_statusAction = true
               }
             })
-          }
-        }).catch(function () {
-          vm.countSelected += 1
-          vm.actionStatus += 1
-          dossierInfo.statusAction = false
-          vm.dossierSelected.push(dossierInfo)
-          if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-            vm.dialog_statusAction = true
-          }
-        })
+          })
+        } else {
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.dialogActionProcess = false
+            vm.loadingActionProcess = false
+            //
+            dossierInfo.statusAction = true
+            vm.dossierSelected.push(dossierInfo)
+            vm.countSelected += 1
+            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+              vm.dialog_statusAction = true
+            }
+            //
+            if (String(item.form) === 'ACTIONS') {
+              // get dossier submit fail and show on dialog
+            } else {
+              router.push({
+                path: vm.$router.history.current.path,
+                query: {
+                  recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                  q: currentQuery['q']
+                }
+              })
+            }
+          }).catch(function () {
+            vm.countSelected += 1
+            vm.actionStatus += 1
+            dossierInfo.statusAction = false
+            vm.dossierSelected.push(dossierInfo)
+            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+              vm.dialog_statusAction = true
+            }
+          })
+        }
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {
@@ -1087,6 +1123,10 @@ export default {
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(dossierItem, item, result, index)
+      })
+      vm.$store.dispatch('getDetailDossier', filter.dossierId).then(function (result) {
+        vm.thongtinhoso = result
+        console.log('thongtinhoso', vm.thongtinhoso)
       })
     },
     goBack () {
