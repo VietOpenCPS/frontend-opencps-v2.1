@@ -935,7 +935,7 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: 3
+        originality: 1
       }
       vm.loadingAction = true
       vm.$store.dispatch('postDossier', data).then(function (result) {
