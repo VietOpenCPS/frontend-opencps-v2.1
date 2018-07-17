@@ -28,7 +28,7 @@
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.submitDate|dateTimeView}} </v-subheader>
+              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.submitDate}} </v-subheader>
             </v-flex>
             <!--  -->
             <v-flex xs12 sm2>
@@ -169,8 +169,15 @@
       }
     },
     watch: {
+      id: function (newVal, oldVal) {
+        var vm = this
+        console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+        vm.initData(newVal)
+      }
     },
     created () {
+      var vm = this
+      vm.initData(vm.id)
     },
     methods: {
       initData (data) {

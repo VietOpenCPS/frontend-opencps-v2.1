@@ -160,7 +160,7 @@
             </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="2" reverse-transition="fade-transition" transition="fade-transition">
-            <div class="btn_wrap_actions">
+            <div class="">
               <v-btn color="primary" v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
@@ -178,6 +178,17 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </div>
+            <v-layout wrap>
+              <!-- <thong-tin-co-ban-ho-so v-if="dialogActionProcess" ref="thong-tin-co-ban-ho-so" :id="dossierId"></thong-tin-co-ban-ho-so> -->
+              <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
+              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
+              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
+              <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
+              <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
+              <xac-nhan-thu-phi v-if="showXacNhanThuPhi" :payments="payments" :payment_type="payment_type"></xac-nhan-thu-phi>
+              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <y-kien-can-bo v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
+            </v-layout>
           </v-tab-item>
           <v-tab-item id="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -282,6 +293,7 @@
 </template>
 
 <script>
+import router from '@/router'
 import $ from 'jquery'
 import '../store/jquery_comment'
 import Comment from './Comment.vue'
@@ -319,6 +331,21 @@ export default {
     stepModel: null,
     actionNote: '',
     actionsSubmitLoading: false,
+    showThongTinCoBanHoSo: false,
+    showYkienCanBoThucHien: false,
+    showFormBoSungThongTinNgan: false,
+    showPhanCongNguoiThucHien: false,
+    showTaoTaiLieuKetQua: false,
+    showKyPheDuyetTaiLieu: false,
+    showTraKetQua: false,
+    showXacNhanThuPhi: false,
+    showThucHienThanhToanDienTu: false,
+    dossierItemDialogPick: '',
+    userNote: 0,
+    payment_type: 0,
+    type_assign: 0,
+    returnFiles: [],
+    assign_items: [],
     headers: [{
       text: 'Vai trò',
       align: 'center',
@@ -566,14 +593,294 @@ export default {
         })
       }
     },
+    processPullBtnDetailRouter (dossierItem, item, result, index) {
+      console.log('result Nextaction', result)
+      let vm = this
+      let isPopup = false
+      vm.dossierId = dossierItem.dossierId
+      vm.showYkienCanBoThucHien = false
+      vm.showFormBoSungThongTinNgan = false
+      vm.showPhanCongNguoiThucHien = false
+      vm.showTaoTaiLieuKetQua = false
+      vm.showKyPheDuyetTaiLieu = false
+      vm.showTraKetQua = false
+      vm.showXacNhanThuPhi = false
+      vm.showThucHienThanhToanDienTu = false
+      vm.dossierItemDialogPick = dossierItem
+      vm.itemDialogPick = item
+      vm.resultDialogPick = result
+      vm.indexDialogPick = index
+      vm.userNote = 0
+      if (result !== null && result !== undefined && result !== 'undefined' &&
+        (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
+        result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
+        result.hasOwnProperty('payment'))) {
+        if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
+          isPopup = true
+          vm.showYkienCanBoThucHien = true
+          vm.userNote = result.userNote
+        }
+        if (result.hasOwnProperty('extraForm') && result.extraForm) {
+          isPopup = true
+          vm.showFormBoSungThongTinNgan = true
+        }
+        if (result.hasOwnProperty('allowAssignUser') && result.allowAssignUser !== 0) {
+          vm.assign_items = result.toUsers
+          vm.type_assign = result.allowAssignUser
+          isPopup = true
+          vm.showPhanCongNguoiThucHien = true
+        }
+        if (result.hasOwnProperty('returnFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+          isPopup = true
+          vm.showTaoTaiLieuKetQua = true
+        }
+        if (result.hasOwnProperty('eSignature') && result.eSignature) {
+          isPopup = true
+          vm.showKyPheDuyetTaiLieu = true
+        }
+        if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined' && result.returnFiles.length > 0) {
+          isPopup = true
+          vm.showTraKetQua = true
+          vm.returnFiles = result.returnFiles
+        }
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
+          isPopup = true
+          vm.showXacNhanThuPhi = true
+          vm.payments = result.payment
+          vm.payment_type = result.payment.requestPayment
+        }
+      }
+      if (isPopup) {
+        vm.dialogActionProcess = true
+        vm.loadingActionProcess = false
+      } else {
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+      }
+    },
+    processPullBtnDetail (item, index) {
+      let vm = this
+      vm.itemAction = item
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        actionId: item.processActionId
+      }
+      vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.loadingActionProcess = true
+      vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
+      })
+    },
+    btnActionEvent (item, index, isGroup) {
+      let vm = this
+      vm.itemAction = item
+      vm.indexAction = index
+      if (String(item.form) === 'NEW') {
+        let isOpenDialog = true
+        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+          isOpenDialog = false
+        }
+        if (isOpenDialog) {
+          vm.dialogAction = true
+        } else {
+          vm.doCreateDossier()
+        }
+      } else if (String(item.form) === 'UPDATE') {
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + vm.thongTinChiTietHoSo.dossierId + '/' + vm.itemAction.form,
+          query: vm.$router.history.current.query
+        })
+      } else if (String(item.form) === 'ADD') {
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + vm.thongTinChiTietHoSo.dossierId,
+          query: vm.$router.history.current.query
+        })
+      } else if (String(item.form) === 'COPY') {
+        vm.doCopy(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'CANCEL') {
+        vm.doCancel(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'PRINT_01') {
+        // Xem trước phiếu của một hồ sơ
+        vm.doPrint01(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'PRINT_02') {
+        // Xem trước phiếu gộp của nhiều hồ sơ
+        vm.doPrint02(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'PRINT_03') {
+        // In văn bản mới nhất đã phê duyệt
+        vm.doPrint03(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'GUIDE') {
+        vm.doGuiding(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'PREVIEW') {
+        vm.doPreview(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'ACTIONS') {
+        vm.doActions(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'DELETE') {
+        vm.doDeleteDossier(vm.thongTinChiTietHoSo, item, index, isGroup)
+      } else if (String(item.form) === 'ROLLBACK_01') {
+        let result = {
+          actionCode: 9000
+        }
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+      } else if (String(item.form) === 'ROLLBACK_02') {
+        let result = {
+          actionCode: 9000
+        }
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+      } else if (String(item.form) === 'OVERDUE') {
+        let result = {
+          actionCode: 8500
+        }
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+      } else if (String(item.form) === 'BETIMES') {
+        let result = {
+          actionCode: 8400
+        }
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+      }
+    },
+    doCopy (dossierItem, item, index, isGroup) {
+      let vm = this
+      let filter = {
+        dossierId: dossierItem.dossierId
+      }
+      vm.loadingAction = true
+      vm.$store.dispatch('doCopy', filter).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+          query: vm.$router.history.current.query
+        })
+      })
+    },
+    doCancel (dossierItem, item, index, isGroup) {
+      let vm = this
+      vm.loadingAction = true
+      if (isGroup) {
+        console.log(vm.selected)
+      } else {
+        let filter = {
+          dossierId: dossierItem.dossierId
+        }
+        vm.$store.dispatch('doCancel', filter).then(function (result) {
+          vm.loadingAction = false
+          vm.indexAction = -1
+          router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+            query: vm.$router.history.current.query
+          })
+        })
+      }
+    },
+    processAction (dossierItem, item, result, index, isConfirm) {
+      let vm = this
+      let filter = {
+        dossierId: dossierItem.dossierId,
+        actionCode: result.actionCode
+      }
+      vm.dossierId = dossierItem.dossierId
+      let currentQuery = vm.$router.history.current.query
+      vm.loadingActionProcess = true
+      if (isConfirm) {
+        let x = confirm('Bạn có muốn thực hiện hành động này?')
+        if (x) {
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.dialogActionProcess = false
+            vm.loadingActionProcess = false
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+          })
+        } else {
+          return false
+        }
+      } else {
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          if (String(item.form) === 'ACTIONS') {
+            // get dossier submit fail and show on dialog
+          } else {
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+          }
+        })
+      }
+    },
+    doPrint02 (dossierItem, item, index, isGroup) {
+      let vm = this
+      if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+        alert('Loại thủ tục bắt buộc phải chọn')
+      } else {
+        let filter = {
+          document: item.document,
+          'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
+          'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
+          dossiers: JSON.stringify(vm.selected)
+        }
+        vm.dialogPDFLoading = true
+        vm.dialogPDF = true
+        vm.$store.dispatch('doPrint02', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPDFPreview').src = result
+        })
+      }
+    },
+    doPrint03 (dossierItem, item, index, isGroup) {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: dossierItem.dossierId,
+        document: item.document
+      }
+      vm.$store.dispatch('doPrint03', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
+    },
+    doGuiding (dossierItem, item, index, isGroup) {
+      let vm = this
+      if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
+        alert('Loại thủ tục bắt buộc phải chọn')
+      } else {
+        let filter = {
+          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId
+        }
+        vm.dialogPDFLoading = true
+        vm.dialogPDF = true
+        vm.$store.dispatch('doGuiding', filter).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPDFPreview').src = result
+        })
+      }
+    },
     getNextActions () {
-      var vm = this
-      let params = {
+      // var vm = this
+      // let params = {
+      //   dossierId: vm.thongTinChiTietHoSo.dossierId
+      // }
+      // vm.$store.dispatch('loadProcessStep', params).then(resultNextActions => {
+      //   console.log('resultNextActions++++++++++++', resultNextActions)
+      //   vm.nextActions = resultNextActions
+      // })
+      let vm = this
+      let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
-      vm.$store.dispatch('loadProcessStep', params).then(resultNextActions => {
-        console.log('resultNextActions++++++++++++', resultNextActions)
-        vm.nextActions = resultNextActions
+      vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+        vm.btnDossierDynamics = result
       })
     },
     showAlpacaJSFORM (item) {
