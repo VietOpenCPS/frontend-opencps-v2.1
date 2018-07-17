@@ -155,12 +155,22 @@
 </template>
 <script>
   export default {
-    props: ['index', 'id'],
+    props: {
+      detailDossier: {
+        type: Object,
+        default: () => {}
+      }
+    },
     components: {
     },
+    watch: {
+      detailDossier (val) {
+        var vm = this
+        vm.thongTinChiTietHoSo = val
+      }
+    },
     data: () => ({
-      thongTinChiTietHoSo: {
-      },
+      thongTinChiTietHoSo: {},
       showContactDetail: false
     }),
     computed: {
@@ -168,15 +178,13 @@
         return this.$store.getters.loading
       }
     },
-    watch: {
-    },
-    created () {
-    },
+    created () {},
     methods: {
       initData (data) {
         var vm = this
         vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
           vm.thongTinChiTietHoSo = resultDossier
+          console.log('thongTinChiTietHoSo', vm.thongTinChiTietHoSo)
         })
       },
       goBack () {

@@ -264,18 +264,18 @@
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
               <v-flex xs11>
                 <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                <div class="ml-4">{{item.dossierIdCTN}} - {{item.serviceName}}</div>
+                <div class="ml-4"><span class="text-bold">{{item.dossierNo}}</span> - {{item.serviceName}}</div>
               </v-flex>
               <v-flex xs1 class="text-right">
                 <v-tooltip top v-if="item.statusAction">
-                  <v-icon color="primary" slot="activator">
+                  <v-icon size="20" color="primary" slot="activator">
                     check
                   </v-icon>
                   <span>Thành công</span>
                 </v-tooltip>
                 <v-tooltip top v-else>
-                  <v-icon color="red darken-3" slot="activator">
-                    clear
+                  <v-icon size="20" color="red darken-3" slot="activator">
+                    block
                   </v-icon>
                   <span>Thất bại</span>
                 </v-tooltip>
@@ -285,13 +285,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat="flat" @click.native="resend" 
+          <!-- <v-btn color="primary" flat="flat" @click.native="resend" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
             Thử lại &nbsp;
             <span slot="loader">Loading...</span>
-          </v-btn>
+          </v-btn> -->
           <v-btn color="red darken-3" flat="flat" @click.native="dialog_statusAction = false"
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -357,39 +357,18 @@ export default {
     payments: {},
     payment_type: '',
     /* */
+    countSelected: 0,
+    actionStatus: 0,
     dialog_statusAction: false,
     dossierSelected: [
       {
-        dossierIdCTN: '18ACE289',
+        dossierNo: '18ACE289',
         serviceName: 'Đăng ký, cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất lần đầu đối với tài sản gắn liền với đất mà chủ sở hữu không đồng thời là người sử dụng đất',
-        statusAction: false
-      },
-      {
-        dossierIdCTN: '18EC6501',
-        serviceName: 'Thủ tục Điều chỉnh quyết định thu hồi đất, giao đất, cho thuê đất, cho phép chuyển mục đích sử dụng đất của Thủ tướng Chính phủ đã ban hành trước ngày 01/7/2004',
-        statusAction: true
-      },
-      {
-        dossierIdCTN: '18EC6312',
-        serviceName: 'Thủ tục Điều chỉnh quyết định thu hồi đất, giao đất, cho thuê đất, cho phép chuyển mục đích sử dụng đất của Thủ tướng Chính phủ đã ban hành trước ngày 01/7/2004',
-        statusAction: false
-      },
-      {
-        dossierIdCTN: '18ACE299',
-        serviceName: 'Đăng ký, cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất lần đầu đối với tài sản gắn liền với đất mà chủ sở hữu không đồng thời là người sử dụng đất',
-        statusAction: false
-      },
-      {
-        dossierIdCTN: '20AA6501',
-        serviceName: 'Thủ tục Điều chỉnh quyết định thu hồi đất, giao đất, cho thuê đất, cho phép chuyển mục đích sử dụng đất của Thủ tướng Chính phủ đã ban hành trước ngày 01/7/2004',
-        statusAction: true
-      },
-      {
-        dossierIdCTN: '20EC6312',
-        serviceName: 'Thủ tục Điều chỉnh quyết định thu hồi đất, giao đất, cho thuê đất, cho phép chuyển mục đích sử dụng đất của Thủ tướng Chính phủ đã ban hành trước ngày 01/7/2004',
         statusAction: false
       }
     ],
+    selectedReaction: [],
+    //
     dossierId: 0,
     valid: true,
     isCallBack: true,
@@ -647,21 +626,21 @@ export default {
       let currentQuery = router.history.current.query
       console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        /* let filter = {
+        let filter = {
           queryParams: currentQuery.q,
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
           template: vm.templateNo
-        } */
+        }
         /*  test Local */
-        let filter = {
+        /* let filter = {
           queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
           template: vm.templateNo
-        }
+        } */
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -847,12 +826,12 @@ export default {
     doActions (dossierItem, item, index, isGroup) {
       let vm = this
       let currentQuery = vm.$router.history.current.query
-      console.log('doActions', item.action)
       let result = {
         actionCode: item.action
       }
       if (isGroup) {
-        console.log(vm.selected)
+        vm.countSelected = 0
+        vm.dossierSelected = []
         for (let key in vm.selected) {
           let actionDossierItem = vm.selected[key]
           vm.processAction(actionDossierItem, item, result, index, false)
@@ -909,6 +888,7 @@ export default {
           dossierId: dossierItem.dossierId
         }
         let currentQuery = vm.$router.history.current.query
+        //
         if (isGroup) {
           console.log(vm.selected)
         } else {
@@ -970,6 +950,11 @@ export default {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode
       }
+      var dossierInfo = {
+        dossierNo: dossierItem.dossierNo,
+        serviceName: dossierItem.serviceName,
+        statusAction: true
+      }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
       vm.loadingActionProcess = true
@@ -995,6 +980,15 @@ export default {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
+          //
+          dossierInfo.statusAction = true
+          vm.dossierSelected.push(dossierInfo)
+          vm.countSelected += 1
+          if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+            vm.dialog_statusAction = true
+          }
+          vm.selected.splice(index, 1)
+          //
           if (String(item.form) === 'ACTIONS') {
             // get dossier submit fail and show on dialog
           } else {
@@ -1006,6 +1000,14 @@ export default {
                 q: currentQuery['q']
               }
             })
+          }
+        }).catch(function () {
+          vm.countSelected += 1
+          vm.actionStatus += 1
+          dossierInfo.statusAction = false
+          vm.dossierSelected.push(dossierInfo)
+          if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+            vm.dialog_statusAction = true
           }
         })
       }
@@ -1089,9 +1091,6 @@ export default {
     },
     goBack () {
       window.history.back()
-    },
-    resend () {
-      alert('Thử lại')
     },
     viewDetail (item, indexItem) {
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
