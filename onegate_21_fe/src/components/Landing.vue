@@ -101,7 +101,7 @@
           <content-placeholders v-if="loadingTable">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
-          <v-menu bottom left :nudge-left="50" :nudge-top="15" 
+          <v-menu left :nudge-left="50" :nudge-top="15" 
             v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
               (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
             <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
@@ -634,13 +634,13 @@ export default {
           template: vm.templateNo
         }
         /*  test Local */
-        /* let filter = {
-          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
-          page: vm.hosoDatasPage,
-          agency: vm.govAgencyCode,
-          service: vm.serviceCode,
-          template: vm.templateNo
-        } */
+        // let filter = {
+        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+        //   page: vm.hosoDatasPage,
+        //   agency: vm.govAgencyCode,
+        //   service: vm.serviceCode,
+        //   template: vm.templateNo
+        // }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
