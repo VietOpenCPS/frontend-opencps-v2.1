@@ -13,7 +13,7 @@
           <v-subheader class="pl-0 text-header">Ngày tiếp nhận: </v-subheader>
         </v-flex>
         <v-flex xs12 sm4>
-          <v-subheader class="pl-0 text-header header-text-field"> {{thongTinChiTietHoSo.receiveDate|dateTimeView}}</v-subheader>
+          <v-subheader class="pl-0 text-header header-text-field"> {{thongTinChiTietHoSo.receiveDate}}</v-subheader>
         </v-flex>
         <!--  -->
         <v-flex xs12 sm2>

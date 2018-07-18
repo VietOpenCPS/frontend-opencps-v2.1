@@ -3,151 +3,72 @@
     <v-expansion-panel-content hide-actions value="1">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>THÔNG TIN CHUNG HỒ SƠ</div>
       <v-card>
-        <v-card-text class="py-2 px-2">
-          <v-layout wrap>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Tên doanh nghiệp: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.applicantName}}</v-subheader>
-            </v-flex>
+        <v-card-text class="py-0">
+          <v-layout wrap class="px-2 py-2">
+          <v-flex xs12 sm4>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Tên doanh nghiệp: </span>
+              <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Thời gian gửi: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.submitDate}} </v-subheader>
-            </v-flex>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Mã hồ sơ: </span>
+              <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierIdCTN}} </span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Mã hồ sơ: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field">  {{thongTinChiTietHoSo.dossierIdCTN}} </v-subheader>
-            </v-flex>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Số hồ sơ: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierNo}} </span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Thời gian tiếp nhận: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.receiveDate|dateTimeView}}</v-subheader>
-            </v-flex>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Trạng thái: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+            </div>
+          </v-flex>
+          <!--  -->
+          <v-flex xs12 sm4>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Thời gian gửi: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.submitDate}} </span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Số hồ sơ: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.dossierNo}} </v-subheader>
-            </v-flex>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Thời gian tiếp nhận: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Thời hạn xử lý: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> <i>{{thongTinChiTietHoSo.durationDate}} làm việc</i> </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader :title="!showContactDetail?'Chi tiết liên hệ':'Thu gọn'" v-else class="pl-0 hover-pointer" @click.prevent.stop="showContactDetail = !showContactDetail">
-                Thông tin liên hệ:
-              </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field hover-pointer"> 
-                <span :title="!showContactDetail?'Chi tiết liên hệ':'Thu gọn'" @click.prevent.stop="showContactDetail = !showContactDetail">
-                  <v-icon color="primary" v-if="!showContactDetail">keyboard_arrow_down</v-icon>
-                  <v-icon color="primary" v-if="showContactDetail">keyboard_arrow_up</v-icon>
-                </span>
-              </v-subheader>
-            </v-flex>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Thời hạn xử lý: </span>
+              <span class="pl-0 text-bold "> 
+                {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
+              </span>
+            </div>
+          </v-flex>
+          <!--  -->
+          <v-flex xs12 sm4>
+            <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Tên doanh nghiệp: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.applicantName}} </span>
+            </div>
             <!--  -->
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Trạng thái: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> {{thongTinChiTietHoSo.dossierStatusText}} </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm12>
-              <v-slide-y-transition>
-                <div v-if="showContactDetail">
-                  <v-layout wrap>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0"><i>Tên doanh nghiệp: </i></v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 header-text-field"> {{thongTinChiTietHoSo.applicantName}} </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0"><i>Địa chỉ Email: </i></v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 header-text-field"> {{thongTinChiTietHoSo.contactEmail}} </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0"><i>Số điện thoại: </i></v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 header-text-field"> {{thongTinChiTietHoSo.contactTelNo}} </v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm2>
-                      <v-subheader class="pl-0"><i>Địa chỉ: </i></v-subheader>
-                    </v-flex>
-                    <v-flex xs12 sm4>
-                      <v-subheader class="pl-0 header-text-field"> {{thongTinChiTietHoSo.address}} </v-subheader>
-                    </v-flex>
-                  </v-layout>
-                </div>
-              </v-slide-y-transition>
-            </v-flex>
-
-          </v-layout>
+            <div class="xs12 sm12 pb-1">
+              <span class="pl-0">Địa chỉ Email: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
+            </div>
+            <!--  -->
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Số điện thoại: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
+            </div>
+            <!--  -->
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Địa chỉ: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.address}} </span>
+            </div>
+          </v-flex>
+        </v-layout>
         </v-card-text>
       </v-card>
     </v-expansion-panel-content>
@@ -161,17 +82,10 @@
         default: () => {}
       }
     },
-    watch: {
-      detailDossier (val) {
-        var vm = this
-        vm.thongTinChiTietHoSo = val
-      }
-    },
     components: {
     },
     data: () => ({
-      thongTinChiTietHoSo: {
-      },
+      thongTinChiTietHoSo: {},
       showContactDetail: false
     }),
     computed: {
@@ -179,17 +93,35 @@
         return this.$store.getters.loading
       }
     },
-    created () {
-    },
+    created () {},
     methods: {
       initData (data) {
         var vm = this
         vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
           vm.thongTinChiTietHoSo = resultDossier
+          console.log('thongTinChiTietHoSo', vm.thongTinChiTietHoSo)
         })
       },
       goBack () {
         window.history.back()
+      },
+      durationText (durationUnit, durationCount) {
+        var durationText
+        if (durationUnit === 1 && durationCount > 8) {
+          let day = Math.floor(durationCount / 8) + ' ngày'
+          let hours
+          if (durationCount % 8 !== 0) {
+            hours = ((durationCount / 8) - Math.floor(durationCount / 8)) * 8 + ' giờ'
+          } else {
+            hours = ''
+          }
+          durationText = `${day} ${hours}`
+        } else if (durationUnit === 0) {
+          durationText = durationCount + ' ngày'
+        } else if (durationUnit === 1 && durationCount <= 8) {
+          durationText = durationCount + ' giờ'
+        }
+        return durationText
       }
     },
     filters: {
