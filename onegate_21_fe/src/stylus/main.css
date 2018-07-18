@@ -2405,6 +2405,11 @@ body .fade-transition-leave-active {
 body .tabs__content {
     background: #fff;
 }
+/*  */
+.payment-info .input-group--text-field__suffix {
+    color: #da3232 !important;
+    font-size: 13px
+}
 /* style table */
 .table-landing table.datatable--select-all thead th:nth-child(1), 
 .table-landing table.datatable--select-all tbody td:nth-child(1){
