@@ -10,9 +10,7 @@ import router from './router'
 import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
-import VueMoment from 'vue-moment'
 
-Vue.use(VueMoment)
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
