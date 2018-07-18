@@ -110,7 +110,7 @@ export const store = new Vuex.Store({
           if (coma > 0) {
             orginURL = window.location.href.substr(0, coma)
           }
-          // /* test local */
+          /* test local */
           // orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
@@ -364,7 +364,11 @@ export const store = new Vuex.Store({
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/marks', paramDossierMark).then(function (response) {
           let serializable = response.data
-          resolve(serializable.data)
+          if (serializable.data) {
+            resolve(serializable.data)
+          } else {
+            resolve([])
+          }
         }, error => {
           reject(error)
         })
@@ -496,6 +500,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          console.log('run')
           if (data > 0) {
             commit('setLoading', true)
             axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
@@ -799,6 +804,8 @@ export const store = new Vuex.Store({
         dataPostActionDossier.append('assignUsers', data.assignUsers)
         dataPostActionDossier.append('payment', data.payment)
         dataPostActionDossier.append('createDossiers', data.createDossiers)
+        dataPostActionDossier.append('dossierFiles', data.dossierFiles)
+        dataPostActionDossier.append('dossierMarks', data.dossierMarks)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
@@ -813,22 +820,27 @@ export const store = new Vuex.Store({
     },
     getUserInfoFromApplicantIdNo ({ commit, state }, data) {
       store.dispatch('loadInitResource').then(function (result) {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        return new Promise((resolve, reject) => {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: 0,
+              end: 5,
+              idNo: data.idNo
+            }
           }
-        }
-        axios.get(state.initData.applicantApi + '/' + data, param).then(function (response) {
-          // state.thongTinChuHoSo.applicantIdNo = response.data.applicantIdNo
-          // state.thongTinChuHoSo.applicantName = response.data.applicantName
-          // state.thongTinChuHoSo.address = response.data.address
-          // state.thongTinChuHoSo.contactEmail = response.data.contactEmail
-          // state.thongTinChuHoSo.contactTelNo = response.data.contactTelNo
-          // state.thongTinChuHoSo.city = response.data.city
-          // state.thongTinChuHoSo.district = response.data.district
-          // state.thongTinChuHoSo.ward = response.data.ward
-        }).catch(function (xhr) {
-          console.log(xhr)
+          axios.get(state.initData.applicantApi, param).then(function (response) {
+            if (response.data.data) {
+              resolve(response.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+            reject(xhr)
+          })
         })
       })
     },
@@ -1587,7 +1599,10 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId
             },
-            responseType: 'blob'
+            responseType: 'blob',
+            params: {
+              payload: filter.payload
+            }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/preview/' + filter.document, param).then(function (response) {
             let serializable = response.data
@@ -1608,7 +1623,10 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId
             },
-            responseType: 'blob'
+            responseType: 'blob',
+            params: {
+              payload: filter.payload
+            }
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
@@ -1656,6 +1674,7 @@ export const store = new Vuex.Store({
           formData.append('serviceCode', filter.serviceCode)
           formData.append('govAgencyCode', filter.govAgencyCode)
           formData.append('dossiers', filter.dossiers)
+          formData.append('payload', filter.payload)
           axios.post(state.initData.getNextAction + '/preview/' + filter.document ,formData , param).then(function (response) {
             let serializable = response.data
             let file = window.URL.createObjectURL(serializable)
