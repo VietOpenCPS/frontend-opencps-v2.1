@@ -204,7 +204,7 @@
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
               <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <xac-nhan-thu-phi v-if="dialogActionProcess && showXacNhanThuPhi" :payments="payments" :payment_type="payment_type"></xac-nhan-thu-phi>
+              <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
@@ -320,6 +320,7 @@ import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
+import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 export default {
   props: ['index'],
@@ -329,6 +330,7 @@ export default {
     'phan-cong': PhanCong,
     'tra-ket-qua': TraKetQua,
     'xac-nhan-thu-phi': XacNhanThuPhi,
+    'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien
   },
   data: () => ({
@@ -357,8 +359,8 @@ export default {
     /* data TraKetQua */
     returnFiles: [],
     /* data XacNhanThuPhi */
-    payments: {},
-    payment_type: '',
+    payments: '',
+    viaPortalDetail: 0,
     /* */
     countSelected: 0,
     actionStatus: 0,
@@ -411,6 +413,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showXacNhanThuPhi: false,
+    showThuPhi: false,
     showThucHienThanhToanDienTu: false,
     dossierItemDialogPick: null,
     itemDialogPick: null,
@@ -560,7 +563,6 @@ export default {
         } else {
           vm.doLoadingDataHoSo()
         }
-        console.log('headers', vm.headers)
       }
     }
   },
@@ -946,12 +948,18 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      console.log('result processAction', result)
-      console.log('assignItems', vm.assign_items)
+      let paymentsOut = {
+        requestPayment: vm.payments.requestPayment,
+        advanceAmount: Number(vm.payments.advanceAmount.replace(/\./g, '')),
+        feeAmount: Number(vm.payments.feeAmount.replace(/\./g, '')),
+        serviceAmount: Number(vm.payments.serviceAmount.replace(/\./g, '')),
+        shipAmount: Number(vm.payments.shipAmount.replace(/\./g, ''))
+      }
       let filter = {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
-        toUsers: vm.assign_items
+        toUsers: vm.assign_items,
+        payment: paymentsOut
       }
       var dossierInfo = {
         dossierNo: dossierItem.dossierNo,
@@ -985,14 +993,6 @@ export default {
             vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
               vm.dialogActionProcess = false
               vm.loadingActionProcess = false
-              //
-              dossierInfo.statusAction = true
-              vm.dossierSelected.push(dossierInfo)
-              vm.countSelected += 1
-              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-                vm.dialog_statusAction = true
-              }
-              //
               if (String(item.form) === 'ACTIONS') {
                 // get dossier submit fail and show on dialog
               } else {
@@ -1006,14 +1006,10 @@ export default {
                 })
               }
             }).catch(function () {
-              vm.countSelected += 1
-              vm.actionStatus += 1
-              dossierInfo.statusAction = false
-              vm.dossierSelected.push(dossierInfo)
-              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-                vm.dialog_statusAction = true
-              }
+              vm.loadingActionProcess = false
             })
+          }).catch(function () {
+            vm.loadingActionProcess = false
           })
         } else {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
@@ -1052,7 +1048,6 @@ export default {
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {
-      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -1063,6 +1058,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showXacNhanThuPhi = false
+      vm.showThuPhi = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -1101,16 +1097,18 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment !== '') {
           isPopup = true
-          vm.showXacNhanThuPhi = true
+          vm.showThuPhi = true
           vm.payments = result.payment
-          vm.payment_type = result.payment.requestPayment
+          vm.viaPortalDetail = dossierItem.viaPostal
         }
       }
       if (isPopup) {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
+        vm.thongtinhoso = dossierItem
+        console.log('thongtinhoso', vm.thongtinhoso)
       } else {
         vm.processAction(dossierItem, item, result, index, true)
       }
@@ -1126,10 +1124,6 @@ export default {
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(dossierItem, item, result, index)
-      })
-      vm.$store.dispatch('getDetailDossier', filter.dossierId).then(function (result) {
-        vm.thongtinhoso = result
-        console.log('thongtinhoso', vm.thongtinhoso)
       })
     },
     goBack () {

@@ -1548,6 +1548,7 @@ export const store = new Vuex.Store({
           }
           let formData = new URLSearchParams()
           formData.append('actionCode', filter.actionCode)
+          formData.append('payment', filter.payment?JSON.stringify(filter.payment):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
             toastr.success('Yêu cầu của bạn được thực hiện thành công.')

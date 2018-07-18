@@ -84,6 +84,7 @@
     },
     watch: {
       detailDossier (val) {
+        console.log('watch', val)
         var vm = this
         vm.thongTinChiTietHoSo = val
       }
@@ -99,7 +100,14 @@
         return this.$store.getters.loading
       }
     },
-    created () {},
+    created () {
+      var vm = this
+      vm.thongTinChiTietHoSo = vm.detailDossier
+    },
+    mounted () {
+      var vm = this
+      vm.thongTinChiTietHoSo = vm.detailDossier
+    },
     methods: {
       initData (data) {
         var vm = this
