@@ -828,7 +828,7 @@ export const store = new Vuex.Store({
             params: {
               start: 0,
               end: 5,
-              idNo: data.applicantIdNo
+              idNo: data.idNo
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
