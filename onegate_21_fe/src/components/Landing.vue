@@ -2,12 +2,13 @@
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex xs12 class="px-2">
+        <div class="px-0" style="color:#3563c1">Thủ tục: </div>
         <v-select
+          class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
-          label="Thủ tục:"
           autocomplete
-          placeholder="chọn thủ tục hành chính"
+          placeholder="Chọn thủ tục hành chính"
           item-text="serviceName"
           item-value="serviceConfigId"
           return-object
@@ -187,7 +188,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogActionProcess" max-width="900" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogActionProcess" max-width="1000" transition="fade-transition" persistent>
       <v-card>
         <v-form ref="form" v-model="validProcess" lazy-validation>
           <v-card-title class="headline">{{itemAction.actionName}}</v-card-title>
@@ -210,17 +211,19 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" flat="flat" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
+            <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
+            <v-icon>save</v-icon>&nbsp;
             Xác nhận
             <span slot="loader">Loading...</span>
             </v-btn>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogActionProcess = false"
+            <v-btn color="red" dark @click.native="dialogActionProcess = false"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
+            <v-icon>undo</v-icon>&nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
             </v-btn>
@@ -631,13 +634,13 @@ export default {
           template: vm.templateNo
         }
         /*  test Local */
-        // let filter = {
-        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
-        //   page: vm.hosoDatasPage,
-        //   agency: vm.govAgencyCode,
-        //   service: vm.serviceCode,
-        //   template: vm.templateNo
-        // }
+        /* let filter = {
+          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          page: vm.hosoDatasPage,
+          agency: vm.govAgencyCode,
+          service: vm.serviceCode,
+          template: vm.templateNo
+        } */
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total

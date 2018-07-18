@@ -80,7 +80,7 @@
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <v-subheader v-else class="pl-0 header-text-field"> <i>{{durationText(thongTinChiTietHoSo.processUnit, thongTinChiTietHoSo.processBlock)}} làm việc</i> </v-subheader>
+              <v-subheader v-else class="pl-0 header-text-field"> <i>{{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc</i> </v-subheader>
             </v-flex>
             <v-flex xs12 sm2>
               <content-placeholders class="mt-1" v-if="loading">
@@ -168,12 +168,6 @@
       }
     },
     components: {
-    },
-    watch: {
-      detailDossier (val) {
-        var vm = this
-        vm.thongTinChiTietHoSo = val
-      }
     },
     data: () => ({
       thongTinChiTietHoSo: {},
