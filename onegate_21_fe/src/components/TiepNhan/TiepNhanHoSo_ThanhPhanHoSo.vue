@@ -14,9 +14,9 @@
               <v-card-text>
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right">
+                    <v-btn color="primary" @click="saveAlpacaForm(item)">Lưu lại</v-btn>
                     <div :id="'formAlpaca' + item.partNo">
                     </div>
-                    <v-btn class="text-xs-right" color="primary" @click="saveAlpacaForm(item)">Lưu lại</v-btn>
                   </v-flex>
                 </v-layout>
               </v-card-text>
@@ -188,14 +188,40 @@ export default {
         vm.dossierMarksItems = dossierMarks
         setTimeout(function (argument) {
           if (dossierFiles.length > 0) {
-            dossierFiles.forEach(itemFiles => {
-              if (itemFiles.eForm) {
-                vm.$store.dispatch('loadAlpcaForm', itemFiles)
-              }
+            var dossierFilesEform = dossierFiles.filter(file => {
+              return file.eForm
             })
+            var dossierTemplatesHasForm = dossierTemplateItems.filter(template => {
+              return template.hasForm && template.partType === 1
+            })
+            if (dossierFilesEform.length > 0) {
+              dossierFilesEform.forEach(itemFiles => {
+                if (itemFiles.eForm) {
+                  vm.$store.dispatch('loadAlpcaForm', itemFiles)
+                }
+              })
+            } else {
+              dossierTemplateItems.forEach(val => {
+                if (val.hasForm && val.partType === 1) {
+                  val['templateFileNo'] = data.dossierTemplateNo
+                  vm.showAlpacaJSFORM(val)
+                }
+              })
+            }
+            if (dossierTemplatesHasForm.length !== dossierFilesEform.length) {
+              dossierTemplatesHasForm.forEach(template => {
+                let indexFromFile = dossierFilesEform.findIndex(item => {
+                  return template.partNo === item.dossierPartNo
+                })
+                if (indexFromFile === -1) {
+                  template['templateFileNo'] = data.dossierTemplateNo
+                  vm.showAlpacaJSFORM(template)
+                }
+              })
+            }
           } else {
             dossierTemplateItems.forEach(val => {
-              if (val.hasForm) {
+              if (val.hasForm && val.partType === 1) {
                 val['templateFileNo'] = data.dossierTemplateNo
                 vm.showAlpacaJSFORM(val)
               }
@@ -230,40 +256,38 @@ export default {
     },
     saveAlpacaForm (item) {
       var vm = this
-      if (vm.dossierFilesItems.length === 0) {
+      var fileFind = vm.dossierFilesItems.find(itemFile => {
+        return itemFile.dossierPartNo === item.partNo
+      })
+      if (fileFind) {
+        fileFind['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('putAlpacaForm', files).then(resData => {
+        })
+      } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           })
         })
-      } else {
-        vm.dossierFilesItems.forEach(files => {
-          if (files.dossierPartNo === item.partNo) {
-            files['dossierId'] = vm.thongTinHoSo.dossierId
-            vm.$store.dispatch('putAlpacaForm', files).then(resData => {
-            })
-          }
-        })
       }
     },
     onDeleteAttackFiles (item) {
       var vm = this
       console.log('delete')
-      vm.dossierFilesItems.forEach(val => {
-        if (val.dossierPartNo === item.partNo) {
-          val['dossierId'] = vm.thongTinHoSo.dossierId
-          vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
-            vm.resetCounterTemplate(item)
-            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId)
-          }).catch(function (xhr) {
-          })
-        }
-      })
-      // vm.$root.$confirm.open('Xóa', 'Bạn có muốn xoá thành phần hồ sơ này?', { color: 'red' }).then((confirm) => {
-      // }).catch(function (xhr) {
-      //   console.log('kkk')
-      // })
+      let x = confirm('Bạn có muốn xóa toàn bộ file trong thành phần hồ sơ này?')
+      if (x) {
+        vm.dossierFilesItems.forEach(val => {
+          if (val.dossierPartNo === item.partNo) {
+            val['dossierId'] = vm.thongTinHoSo.dossierId
+            vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
+              vm.resetCounterTemplate(item)
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId)
+            }).catch(function (xhr) {
+            })
+          }
+        })
+      }
     },
     pickFile (item) {
       document.getElementById('file' + item.partNo).click()
@@ -283,24 +307,15 @@ export default {
     },
     loadAlpcaForm (data) {
       var vm = this
-      // vm.dossierFilesItems.forEach(val => {
-      //   if (val.dossierPartNo === data.partNo) {
-      //     this.$store.dispatch('loadAlpcaForm', val)
-      //   }
-      // })
-      var indexEform = vm.dossierTemplateItems.findIndex(item => {
-        return item.hasForm === true
+      var fileFind = vm.dossierFilesItems.find(itemFile => {
+        return itemFile.dossierPartNo === item.partNo && itemFile.eForm
       })
-      if (vm.dossierFilesItems.length > 0) {
-        vm.dossierFilesItems.forEach(itemFiles => {
-          if (itemFiles.eForm && data.partNo === itemFiles.dossierPartNo) {
-            vm.$store.dispatch('loadAlpcaForm', itemFiles)
-          }
-        })
+      if (fileFind) {
+        vm.$store.dispatch('loadAlpcaForm', fileFind)
       } else {
         vm.dossierTemplateItems.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
-            val['templateFileNo'] = data.dossierTemplateNo
+            val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
             vm.showAlpacaJSFORM(val)
           }
         })

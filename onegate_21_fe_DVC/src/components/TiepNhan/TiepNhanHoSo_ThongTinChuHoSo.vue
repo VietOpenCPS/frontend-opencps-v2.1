@@ -20,9 +20,19 @@
                     </content-placeholders>
                     <v-text-field
                     v-else
-                    @change="onChangeApplicantIdNo"
                     v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field>
+                    <!-- <v-select
+                    autocomplete
+                    cache-items
+                    chips
+                    :items="applicants"
+                    item-text="applicantIdNo"
+                    item-value="applicantIdNo"
+                    @change="onChangeApplicantIdNo"
+                    :search-input.sync="applicantIdNo"
+                    v-model="thongTinChuHoSo.applicantIdNo"
+                    ></v-select> -->
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -348,6 +358,8 @@ export default {
     districts: [],
     delegateWards: [],
     wards: [],
+    applicants: [],
+    applicantIdNo: '',
     labelSwitch: {
       'true': {
         cmtnd: 'CMND/ Hộ chiếu',
@@ -430,6 +442,11 @@ export default {
         }
       },
       deep: true
+    },
+    applicantIdNo (val) {
+      if (val.length >= 3) {
+        val && this.querySelections(val)
+      }
     }
   },
   methods: {
@@ -554,7 +571,46 @@ export default {
       this.$store.commit('setWardVal', data)
     },
     onChangeApplicantIdNo (data) {
+      var vm = this
+      if (vm.applicants) {
+        var applicant = vm.applicants.find(item => {
+          return item.applicantIdNo === data
+        })
+        if (applicant) {
+          let userTypeCondition = true
+          if (applicant.applicantIdType === 'business') {
+            userTypeCondition = false
+          }
+          let tempDataChuHs = {
+            userType: userTypeCondition,
+            cityCode: applicant.cityCode,
+            districtCode: applicant.districtCode,
+            wardCode: applicant.wardCode,
+            applicantNote: applicant.applicantNote,
+            applicantIdNo: applicant.applicantIdNo,
+            contactEmail: applicant.contactEmail,
+            contactName: applicant.contactName,
+            address: applicant.address,
+            applicantName: applicant.applicantName
+          }
+          vm.thongTinChuHoSo = tempDataChuHs
+        }
+      }
       // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
+    },
+    querySelections (val) {
+      var vm = this
+      let params = {
+        idNo: val
+      }
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(function (resApplicant) {
+        vm.applicants = resApplicant
+        if (resApplicant.length === 0) {
+          vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
+        }
+      }).catch(xhr => {
+        vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
+      })
     },
     onChangeDelegateCity (data) {
       var vm = this
