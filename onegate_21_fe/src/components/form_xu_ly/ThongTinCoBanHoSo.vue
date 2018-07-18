@@ -161,12 +161,6 @@
         default: () => {}
       }
     },
-    watch: {
-      detailDossier (val) {
-        var vm = this
-        vm.thongTinChiTietHoSo = val
-      }
-    },
     components: {
     },
     watch: {
