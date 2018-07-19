@@ -15,7 +15,7 @@
           @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
+      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
         <v-select
           :items="listDichVu"
           v-model="dichVuSelected"
@@ -724,6 +724,7 @@ export default {
           isOpenDialog = false
         }
         if (isOpenDialog) {
+          vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
           vm.doCreateDossier()
@@ -1160,7 +1161,8 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      let query = vm.$router.history.current.query
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
     }
   }
 }
