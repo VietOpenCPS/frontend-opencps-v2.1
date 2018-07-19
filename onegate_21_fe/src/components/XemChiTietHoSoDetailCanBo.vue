@@ -54,7 +54,7 @@
         </v-tab>
         <v-tabs-items>
           <v-tab-item id="1" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
@@ -80,7 +80,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
@@ -106,7 +106,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> III.</div>
@@ -132,7 +132,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <!-- <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <!-- <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> IV.</div>
