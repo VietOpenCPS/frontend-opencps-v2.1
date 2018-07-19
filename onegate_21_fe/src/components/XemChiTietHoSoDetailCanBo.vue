@@ -925,7 +925,7 @@ export default {
         vm.btnDossierDynamics = result
       })
       vm.$store.dispatch('pullProcessSteps', {
-        stepCode: query['step']
+        stepCode: vm.thongTinChiTietHoSo.stepCode
       }).then(resProSteps => {
         vm.btnStepsDynamics = resProSteps
       })
