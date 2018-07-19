@@ -18,6 +18,7 @@
                   v-model.lazy="data_payment.feeAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?inputDisable:''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
@@ -114,3 +115,12 @@ export default {
   }
 }
 </script>
+<style>
+.inputDisable {
+  pointer-events: none
+}
+.inputDisable .input-group__details {
+  display: none
+}
+</style>
+
