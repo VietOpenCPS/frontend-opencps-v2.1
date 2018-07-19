@@ -259,11 +259,11 @@
         <v-card-title class="headline">
           Trạng thái xử lý
         </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_statusAction = false">
-            <v-icon>clear</v-icon>
-          </v-btn>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
+          <v-icon>clear</v-icon>
+        </v-btn>
         <v-card-text style="max-height: 350px">
-          <div v-for="(item, index) in dossierSelected" v-bind:key="item.dossierIdCTN">
+          <div v-for="(item, index) in selected" v-bind:key="item.dossierIdCTN">
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
               <v-flex xs11>
                 <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
@@ -288,18 +288,20 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat="flat" @click.native="resend" 
+          <v-btn color="primary" @click.native="resend" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            Thử lại &nbsp;
+            <v-icon size="20">refresh</v-icon>&nbsp;
+            Thử lại
             <span slot="loader">Loading...</span>
           </v-btn>
-          <v-btn color="red darken-3" flat="flat" @click.native="dialog_statusAction = false"
+          <v-btn color="red" dark @click.native="closeDialogStatusAction"
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            Thoát &nbsp;
+            <v-icon>undo</v-icon>&nbsp;
+            Thoát
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-card-actions>
@@ -573,6 +575,13 @@ export default {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
     },
+    closeDialogStatusAction () {
+      var vm = this
+      vm.dialog_statusAction = false
+      vm.selected = vm.selected.filter(function (item) {
+        return !item.statusAction
+      })
+    },
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
@@ -838,24 +847,17 @@ export default {
     },
     doActions (dossierItem, item, index, isGroup) {
       console.log('doActions')
-      console.log('item', item)
-      console.log('index', index)
-      console.log('isGroup', isGroup)
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
         actionCode: item.action
       }
       if (isGroup) {
-        console.log('run docActions isGroup')
         vm.countSelected = 0
-        // vm.dossierSelected = []
         if (vm.selected.length > 0) {
           for (let key in vm.selected) {
             let actionDossierItem = vm.selected[key]
-            if (actionDossierItem.statusAction === false) {
-              vm.processAction(actionDossierItem, item, result, index, false)
-            }
+            vm.processAction(actionDossierItem, item, result, key, false)
           }
         } else {
           alert('Chọn hồ sơ để thao tác')
@@ -962,28 +964,22 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
-      let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
-      let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
-      let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
-      let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
-      let paymentsOut = {
-        requestPayment: requestPayment,
-        advanceAmount: Number(advanceAmount.toString().replace(/\./g, '')),
-        feeAmount: Number(feeAmount.toString().replace(/\./g, '')),
-        serviceAmount: Number(serviceAmount.toString().replace(/\./g, '')),
-        shipAmount: Number(shipAmount.toString().replace(/\./g, ''))
+      var paymentsOut = null
+      if (vm.payments) {
+        paymentsOut = {
+          requestPayment: vm.payments.requestPayment,
+          advanceAmount: Number(vm.payments.advanceAmount.toString().replace(/\./g, '')),
+          feeAmount: Number(vm.payments.feeAmount.toString().replace(/\./g, '')),
+          serviceAmount: Number(vm.payments.serviceAmount.toString().replace(/\./g, '')),
+          shipAmount: Number(vm.payments.shipAmount.toString().replace(/\./g, ''))
+        }
       }
       let filter = {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
         toUsers: vm.assign_items,
-        payment: paymentsOut
-      }
-      var dossierInfo = {
-        dossierNo: dossierItem.dossierNo,
-        serviceName: dossierItem.serviceName,
-        statusAction: true
+        payment: paymentsOut,
+        userNote: ''
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
@@ -1007,19 +1003,30 @@ export default {
           return false
         }
       } else {
-        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          vm.dialogActionProcess = false
-          vm.loadingActionProcess = false
-          //
-          if (String(item.form) === 'ACTIONS') {
-            // get dossier submit fail and show on dialog
-            // dossierInfo.statusAction = true
-            // vm.dossierSelected.push(dossierInfo)
-            vm.selected[index].statusAction = true
-            vm.countSelected += 1
-            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
-              vm.dialog_statusAction = true
-            } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+        if (!dossierItem.statusAction) {
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.dialogActionProcess = false
+            vm.loadingActionProcess = false
+            //
+            if (String(item.form) === 'ACTIONS') {
+              // get dossier submit fail and show on dialog
+              vm.hosoDatas.splice(index, 1)
+              vm.selected[index].statusAction = true
+              vm.countSelected += 1
+              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                vm.dialog_statusAction = true
+              } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+                console.log('router')
+                router.push({
+                  path: vm.$router.history.current.path,
+                  query: {
+                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    q: currentQuery['q']
+                  }
+                })
+              }
+            } else {
               router.push({
                 path: vm.$router.history.current.path,
                 query: {
@@ -1029,26 +1036,15 @@ export default {
                 }
               })
             }
-          } else {
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
-            })
-          }
-        }).catch(function () {
-          vm.countSelected += 1
-          vm.statusFailed += 1
-          // dossierInfo.statusAction = false
-          // vm.dossierSelected.push(dossierInfo)
-          vm.selected[index].statusAction = false
-          if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
-            vm.dialog_statusAction = true
-          }
-        })
+          }).catch(function () {
+            vm.countSelected += 1
+            vm.statusFailed += 1
+            vm.selected[index].statusAction = false
+            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+              vm.dialog_statusAction = true
+            }
+          })
+        }
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {

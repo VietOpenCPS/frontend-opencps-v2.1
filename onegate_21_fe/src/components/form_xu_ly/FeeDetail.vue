@@ -18,7 +18,7 @@
                   v-model.lazy="data_payment.feeAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?inputDisable:''"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
@@ -30,6 +30,7 @@
                   v-model.lazy="data_payment.advanceAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
@@ -41,6 +42,7 @@
                   v-model.lazy="data_payment.serviceAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
@@ -52,6 +54,7 @@
                   v-model.lazy="data_payment.shipAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
             </v-layout>
