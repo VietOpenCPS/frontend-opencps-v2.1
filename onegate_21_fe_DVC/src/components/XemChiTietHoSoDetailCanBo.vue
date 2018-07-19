@@ -366,6 +366,7 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    dialogActionProcess: false,
     headers: [{
       text: 'Vai trò',
       align: 'center',

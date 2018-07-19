@@ -136,8 +136,9 @@
     </v-expansion-panel>
     <!--  -->
     <div class="text-center mt-2">
-      <v-btn color="primary" v-on:click.native="daBoSung">
-        Hoàn thành bổ sung&nbsp;
+      <v-btn color="primary" v-for="(item, index) in btnDossierDynamics" v-bind:key="index" @click="nextAction(item, index)" v-if="visibleBtnNextAction">
+        {{item.actionName}}
+        <span slot="loader">Loading...</span>
       </v-btn>
       <!-- <v-btn color="primary" @click="goBack">
         Lưu &nbsp;
@@ -202,7 +203,9 @@
     data: () => ({
       dialog_addTHPHS: false,
       loadingAction: false,
-      thongTinChiTietHoSo: {}
+      thongTinChiTietHoSo: {},
+      btnDossierDynamics: [],
+      visibleBtnNextAction: true
     }),
     computed: {
       loading () {
@@ -215,6 +218,7 @@
     created () {
       var vm = this
       vm.initData(vm.id)
+      vm.getNextActions(vm.id)
     },
     watch: {
     },
@@ -229,7 +233,16 @@
       goBack () {
         window.history.back()
       },
-      daBoSung () {
+      getNextActions (dossierId) {
+        let vm = this
+        let filter = {
+          dossierId: dossierId
+        }
+        vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+          vm.btnDossierDynamics = result
+        })
+      },
+      nextAction (item, index) {
         console.log('Đã bổ sung')
         var vm = this
         console.log('luu Ho So--------------------')
@@ -246,34 +259,35 @@
               listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
             }
           })
-          dossierFiles.forEach(function (value, index) {
-            if (value.eForm) {
-              value['dossierId'] = vm.thongTinChiTietHoSo.dossierId
-              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-            }
-          })
+          if (dossierFiles.length !== 0) {
+            dossierFiles.forEach(function (value, index) {
+              if (value.eForm) {
+                value['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+              }
+            })
+          } else {
+            dossierTemplates.forEach(function (val, index) {
+              if (val.partType === 1 && val.hasForm) {
+                val['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                listAction.push(vm.$store.dispatch('postEform', val))
+              }
+            })
+          }
         }
         Promise.all(listDossierMark).then(values => {
         }).catch(function (xhr) {
         })
         Promise.all(listAction).then(values => {
           console.log(values)
-          // let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
-          // console.log('data put dossier -->', tempData)
-          // tempData['dossierId'] = vm.thongTinChiTietHoSo.dossierId
-          // vm.$store.dispatch('putDossier', tempData).then(function (result) {
-          //   toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          // }).catch(function (xhr) {
-          //   toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          // })
-          let dataPostAction = {
+          let filter = {
             dossierId: vm.thongTinChiTietHoSo.dossierId,
-            actionCode: 7100,
-            actionNote: '',
-            actionUser: ''
+            actionCode: item.actionCode
           }
-          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-            let currentQuery = vm.$router.history.current.query
+          let currentQuery = vm.$router.history.current.query
+          vm.loadingActionProcess = true
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.visibleBtnNextAction = false
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -282,7 +296,6 @@
                 q: currentQuery['q']
               }
             })
-            vm.tiepNhanState = false
           })
         }).catch(reject => {
           console.log('reject=============', reject)
