@@ -1169,7 +1169,7 @@ export default {
     },
     viewDetail (item, indexItem) {
       let query = this.$router.history.current.query
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
 }
