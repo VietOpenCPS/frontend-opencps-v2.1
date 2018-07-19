@@ -288,13 +288,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn color="primary" flat="flat" @click.native="resend" 
+          <v-btn color="primary" flat="flat" @click.native="resend" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
             Thử lại &nbsp;
             <span slot="loader">Loading...</span>
-          </v-btn> -->
+          </v-btn>
           <v-btn color="red darken-3" flat="flat" @click.native="dialog_statusAction = false"
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -363,7 +363,7 @@ export default {
     viaPortalDetail: 0,
     /* */
     countSelected: 0,
-    actionStatus: 0,
+    statusFailed: 0,
     dialog_statusAction: false,
     dossierSelected: [
       {
@@ -374,6 +374,7 @@ export default {
     ],
     selectedReaction: [],
     /** */
+    buttonConfigItem: {},
     thongtinhoso: {},
     dossierId: 0,
     valid: true,
@@ -496,6 +497,7 @@ export default {
                   }
                 }
               }
+              console.log('btnDynamics', vm.btnDynamics)
               vm.$store.commit('setLoadingDynamicBtn', false)
             })
           }, 200)
@@ -567,6 +569,10 @@ export default {
     }
   },
   methods: {
+    resend () {
+      var vm = this
+      vm.doActions(null, vm.buttonConfigItem, null, true)
+    },
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
@@ -686,8 +692,13 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
+      // set info buttonConfig
+      vm.buttonConfigItem = {}
+      vm.buttonConfigItem = item
+      //
       vm.itemAction = item
       vm.indexAction = index
+      console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
@@ -826,26 +837,29 @@ export default {
       })
     },
     doActions (dossierItem, item, index, isGroup) {
+      console.log('doActions')
+      console.log('item', item)
+      console.log('index', index)
+      console.log('isGroup', isGroup)
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
         actionCode: item.action
       }
       if (isGroup) {
+        console.log('run docActions isGroup')
         vm.countSelected = 0
-        vm.dossierSelected = []
-        for (let key in vm.selected) {
-          let actionDossierItem = vm.selected[key]
-          vm.processAction(actionDossierItem, item, result, index, false)
-        }
-        router.push({
-          path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
+        // vm.dossierSelected = []
+        if (vm.selected.length > 0) {
+          for (let key in vm.selected) {
+            let actionDossierItem = vm.selected[key]
+            if (actionDossierItem.statusAction === false) {
+              vm.processAction(actionDossierItem, item, result, index, false)
+            }
           }
-        })
+        } else {
+          alert('Chọn hồ sơ để thao tác')
+        }
       }
     },
     doCopy (dossierItem, item, index, isGroup) {
@@ -948,12 +962,17 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
+      let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
+      let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
+      let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
+      let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
       let paymentsOut = {
-        requestPayment: vm.payments.requestPayment,
-        advanceAmount: Number(vm.payments.advanceAmount.replace(/\./g, '')),
-        feeAmount: Number(vm.payments.feeAmount.replace(/\./g, '')),
-        serviceAmount: Number(vm.payments.serviceAmount.replace(/\./g, '')),
-        shipAmount: Number(vm.payments.shipAmount.replace(/\./g, ''))
+        requestPayment: requestPayment,
+        advanceAmount: Number(advanceAmount.toString().replace(/\./g, '')),
+        feeAmount: Number(feeAmount.toString().replace(/\./g, '')),
+        serviceAmount: Number(serviceAmount.toString().replace(/\./g, '')),
+        shipAmount: Number(shipAmount.toString().replace(/\./g, ''))
       }
       let filter = {
         dossierId: dossierItem.dossierId,
@@ -988,44 +1007,19 @@ export default {
           return false
         }
       } else {
-        if (vm.showPhanCongNguoiThucHien) {
-          vm.$store.dispatch('reassignDossier', filter).then(function (result) {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              if (String(item.form) === 'ACTIONS') {
-                // get dossier submit fail and show on dialog
-              } else {
-                router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
-                  }
-                })
-              }
-            }).catch(function () {
-              vm.loadingActionProcess = false
-            })
-          }).catch(function () {
-            vm.loadingActionProcess = false
-          })
-        } else {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            //
-            dossierInfo.statusAction = true
-            vm.dossierSelected.push(dossierInfo)
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          //
+          if (String(item.form) === 'ACTIONS') {
+            // get dossier submit fail and show on dialog
+            // dossierInfo.statusAction = true
+            // vm.dossierSelected.push(dossierInfo)
+            vm.selected[index].statusAction = true
             vm.countSelected += 1
-            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
               vm.dialog_statusAction = true
-            }
-            //
-            if (String(item.form) === 'ACTIONS') {
-              // get dossier submit fail and show on dialog
-            } else {
+            } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
               router.push({
                 path: vm.$router.history.current.path,
                 query: {
@@ -1035,16 +1029,26 @@ export default {
                 }
               })
             }
-          }).catch(function () {
-            vm.countSelected += 1
-            vm.actionStatus += 1
-            dossierInfo.statusAction = false
-            vm.dossierSelected.push(dossierInfo)
-            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-              vm.dialog_statusAction = true
-            }
-          })
-        }
+          } else {
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+          }
+        }).catch(function () {
+          vm.countSelected += 1
+          vm.statusFailed += 1
+          // dossierInfo.statusAction = false
+          // vm.dossierSelected.push(dossierInfo)
+          vm.selected[index].statusAction = false
+          if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
+            vm.dialog_statusAction = true
+          }
+        })
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {

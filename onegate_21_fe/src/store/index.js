@@ -111,7 +111,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          /* orginURL = 'http://127.0.0.1:8081/api/initdata' */
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -1549,6 +1549,7 @@ export const store = new Vuex.Store({
           let formData = new URLSearchParams()
           formData.append('actionCode', filter.actionCode)
           formData.append('payment', filter.payment?JSON.stringify(filter.payment):null)
+          formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
             toastr.success('Yêu cầu của bạn được thực hiện thành công.')
