@@ -15,7 +15,7 @@
           @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
+      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
         <v-select
           :items="listDichVu"
           v-model="dichVuSelected"
@@ -686,6 +686,7 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       newQuery['service_config'] = ''
+      newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -700,6 +701,7 @@ export default {
     },
     changeDichVuConfigs (item) {
       let vm = this
+      console.log('item dich vu: ', item)
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1161,7 +1163,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      let query = vm.$router.history.current.query
+      let query = this.$router.history.current.query
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
     }
   }
