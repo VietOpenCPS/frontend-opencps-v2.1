@@ -804,8 +804,6 @@ export const store = new Vuex.Store({
         dataPostActionDossier.append('assignUsers', data.assignUsers)
         dataPostActionDossier.append('payment', data.payment)
         dataPostActionDossier.append('createDossiers', data.createDossiers)
-        dataPostActionDossier.append('dossierFiles', data.dossierFiles)
-        dataPostActionDossier.append('dossierMarks', data.dossierMarks)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
