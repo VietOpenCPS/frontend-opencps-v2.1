@@ -19,7 +19,7 @@ Vue.config.productionTip = false
 Vue.mixin({
   methods: {
     getOriginality: function () {
-      return 3
+      return 1
     }
   }
 })

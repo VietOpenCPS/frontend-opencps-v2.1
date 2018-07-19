@@ -54,7 +54,7 @@
         </v-tab>
         <v-tabs-items>
           <v-tab-item id="1" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
@@ -80,7 +80,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
@@ -106,7 +106,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> III.</div>
@@ -132,7 +132,7 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <!-- <v-expansion-panel expand class="my-0 expansion-pl-transparent" style="border: none">
+            <!-- <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> IV.</div>
@@ -814,6 +814,9 @@ export default {
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x) {
+          if (vm.showPhanCongNguoiThucHien) {
+            filter['toUsers'] = vm.assign_items
+          }
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -834,53 +837,25 @@ export default {
           return false
         }
       } else {
-        if (vm.showPhanCongNguoiThucHien) {
-          let params = {
-            dossierId: vm.thongTinChiTietHoSo.dossierId,
-            toUsers: vm.assign_items
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          vm.btnStateVisible = false
+          if (result.rollbackable) {
+            vm.rollbackable = true
           }
-          vm.$store.dispatch('reassignDossier', params).then(res => {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              vm.btnStateVisible = false
-              if (result.rollbackable) {
-                vm.rollbackable = true
-              }
-              if (String(item.form) === 'ACTIONS') {
-              } else {
-                router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
-                  }
-                })
+          if (String(item.form) === 'ACTIONS') {
+          } else {
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
               }
             })
-          })
-        } else {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            vm.btnStateVisible = false
-            if (result.rollbackable) {
-              vm.rollbackable = true
-            }
-            if (String(item.form) === 'ACTIONS') {
-            } else {
-              router.push({
-                path: vm.$router.history.current.path,
-                query: {
-                  recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  q: currentQuery['q']
-                }
-              })
-            }
-          })
-        }
+          }
+        })
       }
     },
     doPrint02 (dossierItem, item, index, isGroup) {
@@ -941,12 +916,18 @@ export default {
       //   vm.nextActions = resultNextActions
       // })
       let vm = this
+      let query = vm.$router.history.current.query
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
+      })
+      vm.$store.dispatch('pullProcessSteps', {
+        stepCode: query['step']
+      }).then(resProSteps => {
+        vm.btnStepsDynamics = resProSteps
       })
     },
     showAlpacaJSFORM (item) {

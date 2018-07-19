@@ -804,8 +804,6 @@ export const store = new Vuex.Store({
         dataPostActionDossier.append('assignUsers', data.assignUsers)
         dataPostActionDossier.append('payment', data.payment)
         dataPostActionDossier.append('createDossiers', data.createDossiers)
-        dataPostActionDossier.append('dossierFiles', data.dossierFiles)
-        dataPostActionDossier.append('dossierMarks', data.dossierMarks)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
@@ -828,7 +826,7 @@ export const store = new Vuex.Store({
             params: {
               start: 0,
               end: 5,
-              idNo: data.applicantIdNo
+              idNo: data.idNo
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
@@ -1803,6 +1801,27 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             console.log(error)
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            reject(error)
+          })
+        })
+      })
+    },
+    pullProcessSteps ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              stepCode: data.stepCode
+            }
+          }
+          axios.get(state.initData.serviceProcessesApi + '/' + data.dossierId + '/steps', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
             reject(error)
           })
         })

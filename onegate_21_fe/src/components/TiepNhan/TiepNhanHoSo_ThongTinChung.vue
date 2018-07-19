@@ -74,7 +74,7 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading&&thongTinChungHoSo.durationDate" style="float:left"><i>{{thongTinChungHoSo.durationDate}} làm việc</i></v-subheader>
+            <v-subheader v-if="!loading&&thongTinChungHoSo.durationDate" style="float:left"><i>{{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc</i></v-subheader>
           </v-flex>
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -201,6 +201,24 @@
           return 1
         }
         return Math.ceil(dueDateMs / 1000 / 60 / 60 / 24)
+      },
+      durationText (durationUnit, durationCount) {
+        var durationText
+        if (durationUnit === 1 && durationCount > 8) {
+          let day = Math.floor(durationCount / 8) + ' ngày'
+          let hours
+          if (durationCount % 8 !== 0) {
+            hours = ((durationCount / 8) - Math.floor(durationCount / 8)) * 8 + ' giờ'
+          } else {
+            hours = ''
+          }
+          durationText = `${day} ${hours}`
+        } else if (durationUnit === 0) {
+          durationText = durationCount + ' ngày'
+        } else if (durationUnit === 1 && durationCount <= 8) {
+          durationText = durationCount + ' giờ'
+        }
+        return durationText
       }
     },
     filters: {
