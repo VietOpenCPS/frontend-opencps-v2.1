@@ -2,11 +2,11 @@
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex class="px-2">
+        <div class="px-0" style="color:#3563c1">Thủ tục: </div>
         <v-select
           class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
-          label="Thủ tục:"
           autocomplete
           placeholder="Chọn thủ tục hành chính"
           item-text="serviceName"
@@ -224,12 +224,12 @@
               <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
-              <y-kien-can-bo v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
+              <y-kien-can-bo ref="ykiencanbo" v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
+            <v-btn color="primary" @click.native="submitFormXuLy(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
@@ -334,7 +334,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import router from '@/router'
+import toastr from 'toastr'
 import TinyPagination from './pagging/hanghai_pagination.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -342,6 +344,7 @@ import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
+Vue.use(toastr)
 export default {
   props: ['index'],
   components: {
@@ -392,9 +395,11 @@ export default {
         statusAction: false
       }
     ],
-    selectedReaction: [],
     /** */
     buttonConfigItem: {},
+    /* ý kiến cán bộ */
+    textNote: '',
+    /** */
     thongtinhoso: {},
     dossierId: 0,
     valid: true,
@@ -599,6 +604,18 @@ export default {
       vm.selected = vm.selected.filter(function (item) {
         return !item.statusAction
       })
+    },
+    submitFormXuLy (dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, isGroup) {
+      var vm = this
+      if (vm.showYkienCanBoThucHien) {
+        let result = vm.$refs.ykiencanbo.doExport()
+        if (result.valid) {
+          vm.textNote = result.text
+          vm.processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)
+        }
+      } else {
+        vm.processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)
+      }
     },
     processListTTHC (currentQuery) {
       let vm = this
@@ -1013,7 +1030,7 @@ export default {
         actionCode: result.actionCode,
         toUsers: vm.assign_items,
         payment: paymentsOut,
-        userNote: ''
+        userNote: vm.textNote ? vm.textNote : ''
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
@@ -1071,12 +1088,16 @@ export default {
               })
             }
           }).catch(function () {
-            vm.countSelected += 1
-            vm.statusFailed += 1
-            vm.selected[index].statusAction = false
-            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
-              vm.dialog_statusAction = true
-            }
+            vm.loadingActionProcess = false
+            //
+            if (String(item.form) === 'ACTIONS') {
+              vm.countSelected += 1
+              vm.statusFailed += 1
+              vm.selected[index].statusAction = false
+              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                vm.dialog_statusAction = true
+              }
+            } else {}
           })
         }
       }
