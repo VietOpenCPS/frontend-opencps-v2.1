@@ -12,7 +12,7 @@
           item-value="serviceConfigId"
           return-object
           :hide-selected="true"
-          @change = "changeServiceConfigs"
+          @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
       <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
@@ -26,8 +26,7 @@
           item-value="processOptionId"
           return-object
           :hide-selected="true"
-          :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
-          required
+          @change="changeDichVuConfigs"
         ></v-select>
       </v-flex>
     </v-layout>
@@ -85,6 +84,7 @@
       <template slot="items" slot-scope="props">
         <td>
           <v-checkbox
+            :disabled="props.item['assigned'] === 0"
             v-model="props.selected"
             primary
             hide-details
@@ -122,11 +122,14 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" @click="processPullBtnDetail(props.item, item, props.index)">
+              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
+                @click="processPullBtnDetail(props.item, item, props.index)" 
+                :disabled="props.item['assigned'] === 0">
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
               <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
+                :disabled="props.item['assigned'] === 0"
               >
                 <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
               </v-list-tile>
@@ -660,40 +663,49 @@ export default {
       }
     },
     changeServiceConfigs (item) {
-      /*
       if (item.hasOwnProperty('options')) {
         this.listDichVu = item.options
+        this.listDichVu.unshift({
+          'instructionNote': '',
+          'optionName': 'Toàn bộ',
+          'processOptionId': '0',
+          'templateName': 'Toàn bộ',
+          'templateNo': ''
+        })
       } else {
         this.listDichVu = []
-      }
-      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
-        this.dichVuSelected = this.listDichVu[0]
-        this.templateNo = this.dichVuSelected.templateNo
-      } else {
         this.dichVuSelected = null
+        this.templateNo = ''
       }
-      */
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
       newQuery['service_config'] = ''
-      // newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
       queryString += 'service_config=' + item.serviceConfigId
-      /*
-      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
-        queryString += '&template_no=' + this.dichVuSelected.templateNo
-      } else {
-        vm.templateNo = ''
-      }
-      */
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
+      vm.$router.push({
+        path: current.path + queryString
+      })
+    },
+    changeDichVuConfigs (item) {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['template_no'] = ''
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      queryString += 'template_no=' + item.templateNo
       vm.$router.push({
         path: current.path + queryString
       })
