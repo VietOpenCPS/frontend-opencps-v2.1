@@ -683,6 +683,7 @@ export default {
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
+      vm.templateNo = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -708,6 +709,7 @@ export default {
         }
       }
       queryString += 'template_no=' + item.templateNo
+      vm.templateNo = item.templateNo
       vm.$router.push({
         path: current.path + queryString
       })
