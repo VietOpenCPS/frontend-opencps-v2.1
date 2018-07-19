@@ -169,12 +169,6 @@
     },
     components: {
     },
-    watch: {
-      detailDossier (val) {
-        var vm = this
-        vm.thongTinChiTietHoSo = val
-      }
-    },
     data: () => ({
       thongTinChiTietHoSo: {},
       showContactDetail: false

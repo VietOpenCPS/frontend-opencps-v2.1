@@ -16,6 +16,14 @@ Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
 
+Vue.mixin({
+  methods: {
+    getOriginality: function() {
+      return 1
+    }
+  }
+})
+
 new Vue({ // eslint-disable-line no-new
   el: '#app',
   router,
