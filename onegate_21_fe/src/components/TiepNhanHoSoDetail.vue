@@ -159,45 +159,35 @@ export default {
               listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
             }
           })
-          dossierFiles.forEach(function (value, index) {
-            if (value.eForm) {
-              value['dossierId'] = vm.dossierId
-              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-            }
-          })
+          // dossierFiles.forEach(function (value, index) {
+          //   if (value.eForm) {
+          //     value['dossierId'] = vm.dossierId
+          //     listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          //   }
+          // })
         }
         vm.$store.dispatch('postDossierPayments', lephi).then(resultLePhi => {
         })
         Promise.all(listDossierMark).then(values => {
         }).catch(function (xhr) {
         })
-        Promise.all(listAction).then(values => {
-          console.log(values)
-          let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
-          console.log('data put dossier -->', tempData)
-          tempData['dossierId'] = vm.dossierId
-          vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          }).catch(function (xhr) {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        }).catch(reject => {
-          console.log('reject=============', reject)
+        let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        console.log('data put dossier -->', tempData)
+        tempData['dossierId'] = vm.dossierId
+        vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+        }).catch(function (xhr) {
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       }
     },
     tiepNhanHoSo () {
       var vm = this
       vm.$store.commit('setPrintPH', false)
-      let thongtinchung = this.$refs.thongtinchung.thongTinChungHoSo
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let lephi = this.$refs.lephi.lePhi
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
-      let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, lephi, dichvuchuyenphatketqua)
-      console.log('tempData------------', tempData)
+      let dossierFiles = this.$refs.thanhphanhoso.dossierFilesItems
+      console.log('dossierTemplateItems------------', thanhphanhoso)
+      console.log('dossierFilesItems------------', dossierFiles)
       let dataPostAction = {
         dossierId: vm.dossierId,
         actionCode: 1100,
@@ -208,6 +198,8 @@ export default {
         assignUsers: '',
         payment: '',
         createDossiers: ''
+        // dossierFiles: JSON.stringify(dossierFiles),
+        // dossierMarks: JSON.stringify(thanhphanhoso)
       }
       vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
         let currentQuery = vm.$router.history.current.query
