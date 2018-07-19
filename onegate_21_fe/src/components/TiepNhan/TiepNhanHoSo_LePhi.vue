@@ -78,10 +78,22 @@ export default {
       let params = {
         dossierId: data.dossierId
       }
-      vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
-        vm.lePhi = resultPayment
-        vm.lePhi['dossierId'] = data.dossierId
-      })
+      if (data.dossierStatus === '') {
+        vm.$store.dispatch('processPullBtnDetail', {
+          dossierId: data.dossierId,
+          actionId: 1100
+        }).then(resAction => {
+          if (resAction && resAction.payment) {
+            vm.lePhi = resAction.payment
+            vm.lePhi['dossierId'] = data.dossierId
+          }
+        })
+      } else {
+        vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
+          vm.lePhi = resultPayment
+          vm.lePhi['dossierId'] = data.dossierId
+        })
+      }
     }
   },
   filters: {

@@ -1805,6 +1805,27 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    pullProcessSteps ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              stepCode: data.stepCode
+            }
+          }
+          axios.get(state.initData.serviceProcessesApi + '/' + data.dossierId + '/steps', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
     // ----End---------
   },

@@ -6,6 +6,7 @@
           class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
+          label="Thủ tục:"
           autocomplete
           placeholder="Chọn thủ tục hành chính"
           item-text="serviceName"
@@ -15,7 +16,7 @@
           @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
+      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
         <v-select
           :items="listDichVu"
           v-model="dichVuSelected"
@@ -995,23 +996,23 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
-      let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
-      let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
-      let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
-      let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
-      let paymentsOut = {
-        requestPayment: requestPayment,
-        advanceAmount: Number(advanceAmount.toString().replace(/\./g, '')),
-        feeAmount: Number(feeAmount.toString().replace(/\./g, '')),
-        serviceAmount: Number(serviceAmount.toString().replace(/\./g, '')),
-        shipAmount: Number(shipAmount.toString().replace(/\./g, ''))
-      }
+      // let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
+      // let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
+      // let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
+      // let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
+      // let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
+      // let paymentsOut = {
+      //   requestPayment: requestPayment,
+      //   advanceAmount: Number(advanceAmount).toString().replace(/\./g, ''),
+      //   feeAmount: Number(feeAmount).toString().replace(/\./g, ''),
+      //   serviceAmount: Number(serviceAmount).toString().replace(/\./g, ''),
+      //   shipAmount: Number(shipAmount).toString().replace(/\./g, '')
+      // }
       let filter = {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
-        toUsers: vm.assign_items,
-        payment: paymentsOut
+        toUsers: vm.assign_items
+        // payment: paymentsOut
       }
       var dossierInfo = {
         dossierNo: dossierItem.dossierNo,
