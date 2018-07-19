@@ -16,7 +16,7 @@
           @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
+      <!-- <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
         <v-select
           :items="listDichVu"
           v-model="dichVuSelected"
@@ -28,7 +28,7 @@
           return-object
           :hide-selected="true"
           @change="changeDichVuConfigs"
-        ></v-select>
+        ></v-select> -->
       </v-flex>
     </v-layout>
     <v-layout wrap v-if="loadingDynamicBtn">
@@ -181,6 +181,7 @@
                   return-object
                   :hide-selected="true"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  @change = "changeDichVuConfigs"
                   required
                 ></v-select>
               </v-flex>
@@ -683,26 +684,34 @@ export default {
       }
     },
     changeServiceConfigs (item) {
+      let vm = this
+      console.log('serviceConfigItem+++++++', item)
       if (item.hasOwnProperty('options')) {
+        console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
-        this.listDichVu.unshift({
-          'instructionNote': '',
-          'optionName': 'Toàn bộ',
-          'processOptionId': '0',
-          'templateName': 'Toàn bộ',
-          'templateNo': ''
-        })
+        // this.listDichVu.unshift({
+        //   'instructionNote': '',
+        //   'optionName': 'Toàn bộ',
+        //   'processOptionId': '0',
+        //   'templateName': 'Toàn bộ',
+        //   'templateNo': ''
+        // })
       } else {
         this.listDichVu = []
         this.dichVuSelected = null
         this.templateNo = ''
       }
-      let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['service_config'] = ''
-      newQuery['template_no'] = ''
+      // newQuery['service_config'] = ''
+      // newQuery['template_no'] = ''
+      // vm.templateNo = ''
+      if (vm.listDichVu.length === 1) {
+        vm.templateNo = vm.listDichVu[0].templateNo
+        vm.dichVuSelected = vm.listDichVu[0]
+        // newQuery['template_no'] = item
+      }
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -714,6 +723,7 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+      console.log('vm.listDichVu+++++++++', vm.listDichVu)
     },
     changeDichVuConfigs (item) {
       let vm = this
@@ -728,6 +738,7 @@ export default {
         }
       }
       queryString += 'template_no=' + item.templateNo
+      vm.templateNo = item.templateNo
       vm.$router.push({
         path: current.path + queryString
       })
@@ -739,6 +750,7 @@ export default {
       vm.buttonConfigItem = item
       //
       vm.itemAction = item
+      console.log('itemAction++++++++++++', item)
       vm.indexAction = index
       console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
@@ -752,6 +764,7 @@ export default {
         } else {
           vm.doCreateDossier()
         }
+        console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
@@ -983,6 +996,7 @@ export default {
       let vm = this
       if (vm.$refs.form.validate()) {
         console.log('yes-----')
+        console.log('item++++++++', item)
         vm.doCreateDossier()
       }
     },
@@ -1165,7 +1179,7 @@ export default {
     },
     viewDetail (item, indexItem) {
       let query = this.$router.history.current.query
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
 }
