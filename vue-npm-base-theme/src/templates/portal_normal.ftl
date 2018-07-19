@@ -29,16 +29,16 @@
 						<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 						<div class="text-logo">
 							Cổng dịch vụ công trực tuyến
-							<span>Bộ Văn hóa, Thể thao và Du lịch</span>
+							<span>Ủy ban nhân dân Tỉnh Phú Thọ</span>
 						</div>
 					</a>
 				</div>
 			</div>
-		</header>
 		
-		<#if has_navigation && is_setup_complete>
-			<#include "${full_templates_path}/navigation.ftl" />
-		</#if>
+			<#if has_navigation && is_setup_complete>
+				<#include "${full_templates_path}/navigation.ftl" />
+			</#if>
+		</header>
 
 		<section id="main-content">
 			<div class="container-fluid">
@@ -57,23 +57,13 @@
 		</section>
 
 		<footer id="footer">
-			<div class="container align-middle-lg">
-				<div>
-					<div class="site-name">
-						Cổng dịch vụ công trực tuyến
-						<span>Bộ Văn hóa, Thể thao và Du lịch</span>
-					</div>
-					<div>Chịu trách nhiệm chính: Nguyễn Thanh Liêm, Giám đốc Trung tâm Công nghệ thông tin</div>
-				</div>
-				<div class="contact">
-					<p>Địa chỉ: <b>Số 20, ngõ 2, Hoa Lư, Q.Hai Bà Trưng, TP.Hà Nội</b></p>
-					<p>Điện thoại: <b>0243.9745845 - 0243.9745846</b></p>
-					<p>Email: <b>ttcntt@cntt.gov.vn</b></p>
-				</div>
+			<div>
+				<div class="site-name">Cổng dịch vụ công trực tuyến <span>Ủy ban nhân dân Tỉnh Phú Thọ</span> </div>
 			</div>
-			
-			<div class="text-center last">
-				Ghi rõ nguồn "Cổng Dịch vụ công trực tuyến của Bộ VHTTDL", dichvucong.bvhttdl.gov.vn khi phát hành lại thông tin từ website này
+			<div class="contact">
+				<p>Địa chỉ: <b>Đường Nguyễn Tất Thành, phường Tân Dân, thành phố Việt Trì, tỉnh Phú Thọ</b></p>
+				<p>Điện thoại: <b>0210.3811486</b> | Fax: <b>0210.3811485</b></p>
+				<p>Email: <b>sotttt@phutho.gov.vn</b></p>
 			</div>
 		</footer>
 	</div>

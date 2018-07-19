@@ -1164,7 +1164,8 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      let query = vm.$router.history.current.query
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
     }
   }
 }
