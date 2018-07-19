@@ -15,7 +15,7 @@
           @change="changeServiceConfigs"
         ></v-select>
       </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
+      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
         <v-select
           :items="listDichVu"
           v-model="dichVuSelected"
