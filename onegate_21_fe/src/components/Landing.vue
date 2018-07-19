@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <v-flex xs12 class="px-2">
+      <v-flex class="px-2">
         <v-select
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
@@ -13,6 +13,21 @@
           return-object
           :hide-selected="true"
           @change = "changeServiceConfigs"
+        ></v-select>
+      </v-flex>
+      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 1">
+        <v-select
+          :items="listDichVu"
+          v-model="dichVuSelected"
+          label="Dịch vụ:"
+          autocomplete
+          placeholder="chọn dịch vụ"
+          item-text="optionName"
+          item-value="processOptionId"
+          return-object
+          :hide-selected="true"
+          :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+          required
         ></v-select>
       </v-flex>
     </v-layout>
@@ -645,6 +660,7 @@ export default {
       }
     },
     changeServiceConfigs (item) {
+      /*
       if (item.hasOwnProperty('options')) {
         this.listDichVu = item.options
       } else {
@@ -656,23 +672,26 @@ export default {
       } else {
         this.dichVuSelected = null
       }
+      */
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
       newQuery['service_config'] = ''
-      newQuery['template_no'] = ''
+      // newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
       queryString += 'service_config=' + item.serviceConfigId
+      /*
       if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
         queryString += '&template_no=' + this.dichVuSelected.templateNo
       } else {
         vm.templateNo = ''
       }
+      */
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
       vm.$router.push({
