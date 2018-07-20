@@ -3,11 +3,12 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex xs12 class="px-2">
         <v-select
+          class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
           label="Thủ tục:"
           autocomplete
-          placeholder="chọn thủ tục hành chính"
+          placeholder="Chọn thủ tục hành chính"
           item-text="serviceName"
           item-value="serviceConfigId"
           return-object
@@ -101,7 +102,7 @@
           <content-placeholders v-if="loadingTable">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
-          <v-menu bottom left :nudge-left="50" :nudge-top="15" 
+          <v-menu left :nudge-left="50" :nudge-top="15" 
             v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
               (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
             <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
@@ -166,6 +167,7 @@
                   return-object
                   :hide-selected="true"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  @change = "changeDichVuConfigs"
                   required
                 ></v-select>
               </v-flex>
@@ -191,7 +193,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogActionProcess" max-width="900" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogActionProcess" max-width="1000" transition="fade-transition" persistent>
       <v-card>
         <v-form ref="form" v-model="validProcess" lazy-validation>
           <v-card-title class="headline">{{itemAction.actionName}}</v-card-title>
@@ -207,24 +209,26 @@
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
               <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <xac-nhan-thu-phi v-if="dialogActionProcess && showXacNhanThuPhi" :payments="payments" :payment_type="payment_type"></xac-nhan-thu-phi>
+              <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" flat="flat" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
+            <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
+            <v-icon>save</v-icon>&nbsp;
             Xác nhận
             <span slot="loader">Loading...</span>
             </v-btn>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogActionProcess = false"
+            <v-btn color="red" dark @click.native="dialogActionProcess = false"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
+            <v-icon>undo</v-icon>&nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
             </v-btn>
@@ -289,13 +293,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn color="primary" flat="flat" @click.native="resend" 
+          <v-btn color="primary" flat="flat" @click.native="resend" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
             Thử lại &nbsp;
             <span slot="loader">Loading...</span>
-          </v-btn> -->
+          </v-btn>
           <v-btn color="red darken-3" flat="flat" @click.native="dialog_statusAction = false"
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -321,6 +325,7 @@ import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
+import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 export default {
   props: ['index'],
@@ -330,6 +335,7 @@ export default {
     'phan-cong': PhanCong,
     'tra-ket-qua': TraKetQua,
     'xac-nhan-thu-phi': XacNhanThuPhi,
+    'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien
   },
   data: () => ({
@@ -358,11 +364,11 @@ export default {
     /* data TraKetQua */
     returnFiles: [],
     /* data XacNhanThuPhi */
-    payments: {},
-    payment_type: '',
+    payments: '',
+    viaPortalDetail: 0,
     /* */
     countSelected: 0,
-    actionStatus: 0,
+    statusFailed: 0,
     dialog_statusAction: false,
     dossierSelected: [
       {
@@ -373,6 +379,7 @@ export default {
     ],
     selectedReaction: [],
     /** */
+    buttonConfigItem: {},
     thongtinhoso: {},
     dossierId: 0,
     valid: true,
@@ -412,6 +419,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showXacNhanThuPhi: false,
+    showThuPhi: false,
     showThucHienThanhToanDienTu: false,
     dossierItemDialogPick: null,
     itemDialogPick: null,
@@ -494,6 +502,7 @@ export default {
                   }
                 }
               }
+              console.log('btnDynamics', vm.btnDynamics)
               vm.$store.commit('setLoadingDynamicBtn', false)
             })
           }, 200)
@@ -561,11 +570,14 @@ export default {
         } else {
           vm.doLoadingDataHoSo()
         }
-        console.log('headers', vm.headers)
       }
     }
   },
   methods: {
+    resend () {
+      var vm = this
+      vm.doActions(null, vm.buttonConfigItem, null, true)
+    },
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
@@ -649,7 +661,10 @@ export default {
       }
     },
     changeServiceConfigs (item) {
+      let vm = this
+      console.log('serviceConfigItem+++++++', item)
       if (item.hasOwnProperty('options')) {
+        console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
       } else {
         this.listDichVu = []
@@ -660,7 +675,6 @@ export default {
       } else {
         this.dichVuSelected = null
       }
-      let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -682,6 +696,7 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+      console.log('vm.listDichVu+++++++++', vm.listDichVu)
     },
     changeDichVuConfigs (item) {
       let vm = this
@@ -703,8 +718,14 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
+      // set info buttonConfig
+      vm.buttonConfigItem = {}
+      vm.buttonConfigItem = item
+      //
       vm.itemAction = item
+      console.log('itemAction++++++++++++', item)
       vm.indexAction = index
+      console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
@@ -716,6 +737,7 @@ export default {
         } else {
           vm.doCreateDossier()
         }
+        console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
@@ -844,26 +866,29 @@ export default {
       })
     },
     doActions (dossierItem, item, index, isGroup) {
+      console.log('doActions')
+      console.log('item', item)
+      console.log('index', index)
+      console.log('isGroup', isGroup)
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
         actionCode: item.action
       }
       if (isGroup) {
+        console.log('run docActions isGroup')
         vm.countSelected = 0
-        vm.dossierSelected = []
-        for (let key in vm.selected) {
-          let actionDossierItem = vm.selected[key]
-          vm.processAction(actionDossierItem, item, result, index, false)
-        }
-        router.push({
-          path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
+        // vm.dossierSelected = []
+        if (vm.selected.length > 0) {
+          for (let key in vm.selected) {
+            let actionDossierItem = vm.selected[key]
+            if (actionDossierItem.statusAction === false) {
+              vm.processAction(actionDossierItem, item, result, index, false)
+            }
           }
-        })
+        } else {
+          alert('Chọn hồ sơ để thao tác')
+        }
       }
     },
     doCopy (dossierItem, item, index, isGroup) {
@@ -951,6 +976,7 @@ export default {
       let vm = this
       if (vm.$refs.form.validate()) {
         console.log('yes-----')
+        console.log('item++++++++', item)
         vm.doCreateDossier()
       }
     },
@@ -966,12 +992,23 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      console.log('result processAction', result)
-      console.log('assignItems', vm.assign_items)
+      // let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
+      // let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
+      // let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
+      // let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
+      // let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
+      // let paymentsOut = {
+      //   requestPayment: requestPayment,
+      //   advanceAmount: Number(advanceAmount).toString().replace(/\./g, ''),
+      //   feeAmount: Number(feeAmount).toString().replace(/\./g, ''),
+      //   serviceAmount: Number(serviceAmount).toString().replace(/\./g, ''),
+      //   shipAmount: Number(shipAmount).toString().replace(/\./g, '')
+      // }
       let filter = {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
         toUsers: vm.assign_items
+        // payment: paymentsOut
       }
       var dossierInfo = {
         dossierNo: dossierItem.dossierNo,
@@ -1000,56 +1037,19 @@ export default {
           return false
         }
       } else {
-        if (vm.showPhanCongNguoiThucHien) {
-          vm.$store.dispatch('reassignDossier', filter).then(function (result) {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              //
-              dossierInfo.statusAction = true
-              vm.dossierSelected.push(dossierInfo)
-              vm.countSelected += 1
-              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-                vm.dialog_statusAction = true
-              }
-              //
-              if (String(item.form) === 'ACTIONS') {
-                // get dossier submit fail and show on dialog
-              } else {
-                router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
-                  }
-                })
-              }
-            }).catch(function () {
-              vm.countSelected += 1
-              vm.actionStatus += 1
-              dossierInfo.statusAction = false
-              vm.dossierSelected.push(dossierInfo)
-              if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-                vm.dialog_statusAction = true
-              }
-            })
-          })
-        } else {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            //
-            dossierInfo.statusAction = true
-            vm.dossierSelected.push(dossierInfo)
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          //
+          if (String(item.form) === 'ACTIONS') {
+            // get dossier submit fail and show on dialog
+            // dossierInfo.statusAction = true
+            // vm.dossierSelected.push(dossierInfo)
+            vm.selected[index].statusAction = true
             vm.countSelected += 1
-            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
+            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
               vm.dialog_statusAction = true
-            }
-            //
-            if (String(item.form) === 'ACTIONS') {
-              // get dossier submit fail and show on dialog
-            } else {
+            } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
               router.push({
                 path: vm.$router.history.current.path,
                 query: {
@@ -1059,16 +1059,26 @@ export default {
                 }
               })
             }
-          }).catch(function () {
-            vm.countSelected += 1
-            vm.actionStatus += 1
-            dossierInfo.statusAction = false
-            vm.dossierSelected.push(dossierInfo)
-            if (vm.countSelected === vm.selected.length && vm.actionStatus > 0) {
-              vm.dialog_statusAction = true
-            }
-          })
-        }
+          } else {
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+          }
+        }).catch(function () {
+          vm.countSelected += 1
+          vm.statusFailed += 1
+          // dossierInfo.statusAction = false
+          // vm.dossierSelected.push(dossierInfo)
+          vm.selected[index].statusAction = false
+          if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
+            vm.dialog_statusAction = true
+          }
+        })
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
@@ -1083,6 +1093,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showXacNhanThuPhi = false
+      vm.showThuPhi = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -1121,11 +1132,11 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment !== '') {
           isPopup = true
-          vm.showXacNhanThuPhi = true
+          vm.showThuPhi = true
           vm.payments = result.payment
-          vm.payment_type = result.payment.requestPayment
+          vm.viaPortalDetail = dossierItem.viaPostal
         }
       }
       if (isPopup) {
@@ -1156,10 +1167,6 @@ export default {
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
-      })
-      vm.$store.dispatch('getDetailDossier', filter.dossierId).then(function (result) {
-        vm.thongtinhoso = result
-        console.log('thongtinhoso', vm.thongtinhoso)
       })
     },
     goBack () {

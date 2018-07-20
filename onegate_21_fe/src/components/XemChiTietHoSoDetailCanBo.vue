@@ -164,13 +164,14 @@
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
-                :disabled="loadingAction && index === indexAction"
+                :disabled="item.enable === 2"
+                v-if="item.enable > 0"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
               <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
-                v-on:click.native="btnActionEvent(item, index, true)" 
+                v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
                 :disabled="loadingAction && index === indexActionStep"
               >
@@ -669,7 +670,7 @@ export default {
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
         }
-        if (result.hasOwnProperty('returnFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
           isPopup = true
           vm.showTaoTaiLieuKetQua = true
         }
@@ -833,6 +834,9 @@ export default {
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x) {
+          if (vm.showPhanCongNguoiThucHien) {
+            filter['toUsers'] = vm.assign_items
+          }
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -853,53 +857,25 @@ export default {
           return false
         }
       } else {
-        if (vm.showPhanCongNguoiThucHien) {
-          let params = {
-            dossierId: vm.thongTinChiTietHoSo.dossierId,
-            toUsers: vm.assign_items
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          vm.btnStateVisible = false
+          if (result.rollbackable) {
+            vm.rollbackable = true
           }
-          vm.$store.dispatch('reassignDossier', params).then(res => {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              vm.btnStateVisible = false
-              if (result.rollbackable) {
-                vm.rollbackable = true
-              }
-              if (String(item.form) === 'ACTIONS') {
-              } else {
-                router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
-                  }
-                })
+          if (String(item.form) === 'ACTIONS') {
+          } else {
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
               }
             })
-          })
-        } else {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            vm.btnStateVisible = false
-            if (result.rollbackable) {
-              vm.rollbackable = true
-            }
-            if (String(item.form) === 'ACTIONS') {
-            } else {
-              router.push({
-                path: vm.$router.history.current.path,
-                query: {
-                  recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  q: currentQuery['q']
-                }
-              })
-            }
-          })
-        }
+          }
+        })
       }
     },
     doPrint02 (dossierItem, item, index, isGroup) {
@@ -960,6 +936,7 @@ export default {
       //   vm.nextActions = resultNextActions
       // })
       let vm = this
+      let query = vm.$router.history.current.query
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
@@ -972,6 +949,11 @@ export default {
           vm.dialogActionProcess = true
           vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
         }
+      })
+      vm.$store.dispatch('pullProcessSteps', {
+        stepCode: vm.thongTinChiTietHoSo.stepCode
+      }).then(resProSteps => {
+        vm.btnStepsDynamics = resProSteps
       })
     },
     showAlpacaJSFORM (item) {

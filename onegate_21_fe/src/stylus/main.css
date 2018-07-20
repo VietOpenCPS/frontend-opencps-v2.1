@@ -1920,7 +1920,7 @@ body .navigation-drawer .list__group__header__prepend-icon .icon{
     margin: 6px 4px;
     font-size: 13px;
 }
-.btn.accent, .btn.error, .btn.info, .btn.primary, .btn.secondary, .btn.success, .btn.warning {
+.btn.accent, .btn.error, .btn.info, .btn.primary, .btn.secondary, .btn.success, .btn.warning, .btn.red {
     height: 30px;
     min-width: inherit;
 }
