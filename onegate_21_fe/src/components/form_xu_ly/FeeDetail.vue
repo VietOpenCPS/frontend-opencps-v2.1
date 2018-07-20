@@ -64,7 +64,9 @@
           </v-card-text>
           <v-card-text class="pt-0">
             <div class="pl-5 fee-info" v-if="data_payment.requestPayment === 5">
-              <v-checkbox :label="`Phí phải nộp: ${currency(totalFee.toString().replace(/\./g, ''))} VNĐ`" v-model="checkPaid"></v-checkbox>
+              <v-layout wrap>
+                <v-checkbox disabled :label="`Phí phải nộp: ${currency(totalFee.toString().replace(/\./g, ''))} VNĐ`" v-model="checkPaid"></v-checkbox>
+              </v-layout>
               <span class="red--text">* </span> Người làm thủ tục đã hoàn thành nộp phí.
             </div>
           </v-card-text>
