@@ -437,6 +437,22 @@ export const store = new Vuex.Store({
         }
       })
     },
+    deleteDossierFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.delete(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          console.log('success!')
+          resolve(response)
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     resetCounterTemplate ({commit, state}, data) {
       state.dossierTemplates.forEach(val => {
         if (val.partNo === data.partNo) {
@@ -477,6 +493,26 @@ export const store = new Vuex.Store({
         formData.append('formData', '')
         formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + e.dossierId + '/files', formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(function (response) {
+          resolve(response.data)
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          console.log('upload file success!')
+        }).catch(function (xhr) {
+          console.log(xhr)
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          reject(xhr)
+        })
+      })
+    },
+    uploadSingleOtherFile ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let formData = new FormData()
+        formData.append('partName', data.partName)
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
             'Content-Type': 'multipart/form-data'

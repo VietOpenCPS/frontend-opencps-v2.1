@@ -495,9 +495,9 @@ export default {
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           vm.documents = resultDocuments
         })
-        vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
-          vm.payments = resultPayments
-        })
+        // vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
+        //   vm.payments = resultPayments
+        // })
       })
     },
     recountFileTemplates () {
