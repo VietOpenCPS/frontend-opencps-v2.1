@@ -8,9 +8,20 @@
           </div>{{title_asign[type]}}
         </div>
         <v-card>
-          <v-card-text>
+          <v-card-text v-if="type === 1">
+            <v-layout wrap>
+              <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
+              v-model="item.assigned"
+              :label="item.userName"
+              @change = 'changeAssigned($event, index)'
+              style="display:inline-block"
+              ></v-checkbox>
+            </v-layout>
+          </v-card-text>
+          <!--  -->
+          <v-card-text v-else>
             <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId" style="display: inline-block">
-              <v-layout wrap v-if="type === 1">
+              <!-- <v-layout wrap v-if="type === 1">
                 <v-flex>
                   <v-checkbox v-model="item.assigned"
                   @change = 'changeAssigned($event, index)'
@@ -19,9 +30,9 @@
                 <v-flex class="pt-1">
                   <span>{{item.userName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </v-flex>
-              </v-layout>
+              </v-layout> -->
 
-              <v-layout wrap v-else class="my-1">
+              <v-layout wrap class="my-1">
                 <v-flex class="pt-1">{{item.userName}}</v-flex> &nbsp; &nbsp;
                 <v-flex>
                   <v-select
@@ -40,7 +51,6 @@
             </div>
           </v-card-text>
         </v-card>
-        
       </v-expansion-panel-content>
     </v-expansion-panel>
   </div>
