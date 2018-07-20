@@ -28,8 +28,8 @@
           return-object
           :hide-selected="true"
           @change="changeDichVuConfigs"
-        ></v-select> -->
-      </v-flex>
+        ></v-select> 
+      </v-flex>-->
     </v-layout>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
