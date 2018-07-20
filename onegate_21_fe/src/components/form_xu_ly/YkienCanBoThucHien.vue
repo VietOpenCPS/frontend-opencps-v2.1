@@ -9,12 +9,13 @@
           <v-layout wrap>
             <v-flex xs12>
               <v-form v-model="valid" ref="userNoteForm">
-                  <v-text-field
-                    v-model="ykien"
-                    textarea
-                    :rows="2"
-                    :rules="user_note === 2 ? [v => !!v || 'lý do bắt buộc phải nhập'] : []"
-                  ></v-text-field>
+                <v-text-field
+                  v-model.lazy="noteYkien"
+                  textarea
+                  :rows="2"
+                  :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
+                  required
+                ></v-text-field>
               </v-form>
             </v-flex>
           </v-layout>
@@ -32,8 +33,8 @@
       }
     },
     data: () => ({
-      ykien: '',
-      valid: true
+      noteYkien: '',
+      valid: false
     }),
     methods: {
       initData (data) {
@@ -42,13 +43,13 @@
           vm.thongTinChiTietHoSo = resultDossier
         })
       },
-      doValidate () {
+      doExport () {
         let vm = this
-        let result = false
-        if (vm.$refs.userNoteForm.validate()) {
-          result = true
+        let exportData = {
+          text: vm.noteYkien,
+          valid: vm.$refs.userNoteForm.validate()
         }
-        return result
+        return exportData
       }
     }
   }

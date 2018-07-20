@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <v-flex class="px-2">
+      <v-flex xs12 class="px-2">
         <v-select
           class="py-0"
           :items="listThuTucHanhChinh"
@@ -15,20 +15,6 @@
           :hide-selected="true"
           @change="changeServiceConfigs"
         ></v-select>
-      </v-flex>
-      <!-- <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
-        <v-select
-          :items="listDichVu"
-          v-model="dichVuSelected"
-          label="Dịch vụ:"
-          autocomplete
-          placeholder="chọn dịch vụ"
-          item-text="optionName"
-          item-value="processOptionId"
-          return-object
-          :hide-selected="true"
-          @change="changeDichVuConfigs"
-        ></v-select> -->
       </v-flex>
     </v-layout>
     <v-layout wrap v-if="loadingDynamicBtn">
@@ -124,7 +110,7 @@
             </v-btn>
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
-                @click="processPullBtnDetail(props.item, item, props.index)" 
+                @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 :disabled="props.item['assigned'] === 0">
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -225,12 +211,12 @@
               <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
-              <y-kien-can-bo v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
+              <y-kien-can-bo ref="ykiencanbo" v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
+            <v-btn color="primary" @click.native="submitFormXuLy(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)"
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
@@ -278,11 +264,11 @@
         <v-card-title class="headline">
           Trạng thái xử lý
         </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_statusAction = false">
-            <v-icon>clear</v-icon>
-          </v-btn>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
+          <v-icon>clear</v-icon>
+        </v-btn>
         <v-card-text style="max-height: 350px">
-          <div v-for="(item, index) in dossierSelected" v-bind:key="item.dossierIdCTN">
+          <div v-for="(item, index) in selected" v-bind:key="item.dossierIdCTN">
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
               <v-flex xs11>
                 <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
@@ -307,18 +293,20 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat="flat" @click.native="resend" 
+          <v-btn color="primary" @click.native="resend" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            Thử lại &nbsp;
+            <v-icon size="20">refresh</v-icon>&nbsp;
+            Thử lại
             <span slot="loader">Loading...</span>
           </v-btn>
-          <v-btn color="red darken-3" flat="flat" @click.native="dialog_statusAction = false"
+          <v-btn color="red" dark @click.native="closeDialogStatusAction"
             :loading="loadingAction"
             :disabled="loadingAction"
           >
-            Thoát &nbsp;
+            <v-icon>undo</v-icon>&nbsp;
+            Thoát
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-card-actions>
@@ -333,7 +321,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import router from '@/router'
+import toastr from 'toastr'
 import TinyPagination from './pagging/hanghai_pagination.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -341,6 +331,7 @@ import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
+Vue.use(toastr)
 export default {
   props: ['index'],
   components: {
@@ -391,9 +382,11 @@ export default {
         statusAction: false
       }
     ],
-    selectedReaction: [],
     /** */
     buttonConfigItem: {},
+    /* ý kiến cán bộ */
+    textNote: '',
+    /** */
     thongtinhoso: {},
     dossierId: 0,
     valid: true,
@@ -592,6 +585,25 @@ export default {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
     },
+    closeDialogStatusAction () {
+      var vm = this
+      vm.dialog_statusAction = false
+      vm.selected = vm.selected.filter(function (item) {
+        return !item.statusAction
+      })
+    },
+    submitFormXuLy (dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, isGroup) {
+      var vm = this
+      if (vm.showYkienCanBoThucHien) {
+        let result = vm.$refs.ykiencanbo.doExport()
+        if (result.valid) {
+          vm.textNote = result.text
+          vm.processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)
+        }
+      } else {
+        vm.processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)
+      }
+    },
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
@@ -680,35 +692,31 @@ export default {
       if (item.hasOwnProperty('options')) {
         console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
-        // this.listDichVu.unshift({
-        //   'instructionNote': '',
-        //   'optionName': 'Toàn bộ',
-        //   'processOptionId': '0',
-        //   'templateName': 'Toàn bộ',
-        //   'templateNo': ''
-        // })
       } else {
         this.listDichVu = []
+      }
+      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+        this.dichVuSelected = this.listDichVu[0]
+        this.templateNo = this.dichVuSelected.templateNo
+      } else {
         this.dichVuSelected = null
-        this.templateNo = ''
       }
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      // newQuery['service_config'] = ''
-      // newQuery['template_no'] = ''
-      // vm.templateNo = ''
-      if (vm.listDichVu.length === 1) {
-        vm.templateNo = vm.listDichVu[0].templateNo
-        vm.dichVuSelected = vm.listDichVu[0]
-        // newQuery['template_no'] = item
-      }
+      newQuery['service_config'] = ''
+      newQuery['template_no'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
       queryString += 'service_config=' + item.serviceConfigId
+      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+        queryString += '&template_no=' + this.dichVuSelected.templateNo
+      } else {
+        vm.templateNo = ''
+      }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
       vm.$router.push({
@@ -885,24 +893,17 @@ export default {
     },
     doActions (dossierItem, item, index, isGroup) {
       console.log('doActions')
-      console.log('item', item)
-      console.log('index', index)
-      console.log('isGroup', isGroup)
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
         actionCode: item.action
       }
       if (isGroup) {
-        console.log('run docActions isGroup')
         vm.countSelected = 0
-        // vm.dossierSelected = []
         if (vm.selected.length > 0) {
           for (let key in vm.selected) {
             let actionDossierItem = vm.selected[key]
-            if (actionDossierItem.statusAction === false) {
-              vm.processAction(actionDossierItem, item, result, index, false)
-            }
+            vm.processAction(actionDossierItem, item, result, key, false)
           }
         } else {
           alert('Chọn hồ sơ để thao tác')
@@ -1010,28 +1011,22 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      // let requestPayment = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.requestPayment : ''
-      // let advanceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.advanceAmount : ''
-      // let feeAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.feeAmount : ''
-      // let serviceAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.serviceAmount : ''
-      // let shipAmount = (vm.payments !== null && vm.payments !== 'undefined') ? vm.payments.shipAmount : ''
-      // let paymentsOut = {
-      //   requestPayment: requestPayment,
-      //   advanceAmount: Number(advanceAmount).toString().replace(/\./g, ''),
-      //   feeAmount: Number(feeAmount).toString().replace(/\./g, ''),
-      //   serviceAmount: Number(serviceAmount).toString().replace(/\./g, ''),
-      //   shipAmount: Number(shipAmount).toString().replace(/\./g, '')
-      // }
+      var paymentsOut = null
+      if (vm.payments) {
+        paymentsOut = {
+          requestPayment: vm.payments.requestPayment,
+          advanceAmount: Number(vm.payments.advanceAmount.toString().replace(/\./g, '')),
+          feeAmount: Number(vm.payments.feeAmount.toString().replace(/\./g, '')),
+          serviceAmount: Number(vm.payments.serviceAmount.toString().replace(/\./g, '')),
+          shipAmount: Number(vm.payments.shipAmount.toString().replace(/\./g, ''))
+        }
+      }
       let filter = {
         dossierId: dossierItem.dossierId,
         actionCode: result.actionCode,
-        toUsers: vm.assign_items
-        // payment: paymentsOut
-      }
-      var dossierInfo = {
-        dossierNo: dossierItem.dossierNo,
-        serviceName: dossierItem.serviceName,
-        statusAction: true
+        toUsers: vm.assign_items,
+        payment: paymentsOut,
+        userNote: vm.textNote ? vm.textNote : ''
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
@@ -1055,19 +1050,30 @@ export default {
           return false
         }
       } else {
-        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          vm.dialogActionProcess = false
-          vm.loadingActionProcess = false
-          //
-          if (String(item.form) === 'ACTIONS') {
-            // get dossier submit fail and show on dialog
-            // dossierInfo.statusAction = true
-            // vm.dossierSelected.push(dossierInfo)
-            vm.selected[index].statusAction = true
-            vm.countSelected += 1
-            if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
-              vm.dialog_statusAction = true
-            } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+        if (!dossierItem.statusAction) {
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.dialogActionProcess = false
+            vm.loadingActionProcess = false
+            //
+            if (String(item.form) === 'ACTIONS') {
+              // get dossier submit fail and show on dialog
+              vm.hosoDatas.splice(index, 1)
+              vm.selected[index].statusAction = true
+              vm.countSelected += 1
+              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                vm.dialog_statusAction = true
+              } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+                console.log('router')
+                router.push({
+                  path: vm.$router.history.current.path,
+                  query: {
+                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    q: currentQuery['q']
+                  }
+                })
+              }
+            } else {
               router.push({
                 path: vm.$router.history.current.path,
                 query: {
@@ -1077,29 +1083,23 @@ export default {
                 }
               })
             }
-          } else {
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
+          }).catch(function () {
+            vm.loadingActionProcess = false
+            //
+            if (String(item.form) === 'ACTIONS') {
+              vm.countSelected += 1
+              vm.statusFailed += 1
+              vm.selected[index].statusAction = false
+              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                vm.dialog_statusAction = true
               }
-            })
-          }
-        }).catch(function () {
-          vm.countSelected += 1
-          vm.statusFailed += 1
-          // dossierInfo.statusAction = false
-          // vm.dossierSelected.push(dossierInfo)
-          vm.selected[index].statusAction = false
-          if (vm.countSelected === vm.selected.length && vm.statusFailed > 0) {
-            vm.dialog_statusAction = true
-          }
-        })
+            } else {}
+          })
+        }
       }
     },
-    processPullBtnDetailRouter (dossierItem, item, result, index) {
+    processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
+      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -1157,15 +1157,23 @@ export default {
         }
       }
       if (isPopup) {
+        /*
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
-        vm.thongtinhoso = dossierItem
-        console.log('thongtinhoso', vm.thongtinhoso)
+        */
+        console.log('index', index)
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
+          query: {
+            activeTab: 'tabs-2',
+            btnIndex: btnIndex
+          }
+        })
       } else {
         vm.processAction(dossierItem, item, result, index, true)
       }
     },
-    processPullBtnDetail (dossierItem, item, index) {
+    processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
       vm.itemAction = item
       let filter = {
@@ -1175,14 +1183,13 @@ export default {
       vm.dossierId = dossierItem.dossierId
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.processPullBtnDetailRouter(dossierItem, item, result, index)
+        vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
       })
     },
     goBack () {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      let query = this.$router.history.current.query
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
