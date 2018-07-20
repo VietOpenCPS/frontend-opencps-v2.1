@@ -1818,9 +1818,42 @@ export const store = new Vuex.Store({
               stepCode: data.stepCode
             }
           }
-          axios.get(state.initData.serviceProcessesApi + '/' + data.dossierId + '/steps', param).then(function (response) {
+          axios.get(state.initData.stepConfigAPI + '/' + data.dossierId + '/steps', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    processCheckNextActions ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let allActionCode = filter.actionCode.split(',')
+          axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
+            let serializable = response.data
+            let nextActionData = serializable.data
+            let newFilter = filter
+            let isBreak = false
+            for (let key in allActionCode) {
+              if (!isBreak) {
+                for (let keyNext in nextActionData) {
+                  if (String(allActionCode[key]) === String(nextActionData[keyNext].actionCode)) {
+                    newFilter.actionCode = nextActionData[keyNext].actionCode
+                    isBreak = true
+                    break
+                  }
+                }
+              }
+            }
+            resolve(newFilter)
           }).catch(function (error) {
             console.log(error)
             reject(error)

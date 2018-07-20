@@ -14,7 +14,6 @@
                   textarea
                   :rows="2"
                   :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
-                  required
                 ></v-text-field>
               </v-form>
             </v-flex>
