@@ -164,13 +164,14 @@
               <v-btn color="primary" v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
-                :disabled="loadingAction && index === indexAction"
+                :disabled="item.enable === 2"
+                v-if="item.enable > 0"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
               <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
-                v-on:click.native="btnActionEvent(item, index, true)" 
+                v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
                 :disabled="loadingAction && index === indexActionStep"
               >
@@ -651,7 +652,7 @@ export default {
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
         }
-        if (result.hasOwnProperty('returnFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
           isPopup = true
           vm.showTaoTaiLieuKetQua = true
         }
