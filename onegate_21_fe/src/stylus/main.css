@@ -2405,3 +2405,9 @@ body .fade-transition-leave-active {
 body .tabs__content {
     background: #fff;
 }
+#tabs-2 {
+    border-bottom: 1px solid #ddd;
+}
+body .btn.primary.deactive__btn {
+    background-color: #648ca9 !important
+}

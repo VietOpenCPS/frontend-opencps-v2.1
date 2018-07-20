@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <v-flex class="px-2">
+      <v-flex xs12 class="px-2">
         <v-select
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
@@ -13,20 +13,6 @@
           return-object
           :hide-selected="true"
           @change="changeServiceConfigs"
-        ></v-select>
-      </v-flex>
-      <v-flex class="px-2" v-if="listDichVu !== null && listDichVu.length > 2">
-        <v-select
-          :items="listDichVu"
-          v-model="dichVuSelected"
-          label="Dịch vụ:"
-          autocomplete
-          placeholder="chọn dịch vụ"
-          item-text="optionName"
-          item-value="processOptionId"
-          return-object
-          :hide-selected="true"
-          @change="changeDichVuConfigs"
         ></v-select>
       </v-flex>
     </v-layout>
@@ -123,7 +109,7 @@
             </v-btn>
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
-                @click="processPullBtnDetail(props.item, item, props.index)" 
+                @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 :disabled="props.item['assigned'] === 0">
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -665,17 +651,14 @@ export default {
     changeServiceConfigs (item) {
       if (item.hasOwnProperty('options')) {
         this.listDichVu = item.options
-        this.listDichVu.unshift({
-          'instructionNote': '',
-          'optionName': 'Toàn bộ',
-          'processOptionId': '0',
-          'templateName': 'Toàn bộ',
-          'templateNo': ''
-        })
       } else {
         this.listDichVu = []
+      }
+      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+        this.dichVuSelected = this.listDichVu[0]
+        this.templateNo = this.dichVuSelected.templateNo
+      } else {
         this.dichVuSelected = null
-        this.templateNo = ''
       }
       let vm = this
       let current = vm.$router.history.current
@@ -683,13 +666,17 @@ export default {
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
-      vm.templateNo = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
       queryString += 'service_config=' + item.serviceConfigId
+      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+        queryString += '&template_no=' + this.dichVuSelected.templateNo
+      } else {
+        vm.templateNo = ''
+      }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
       vm.$router.push({
@@ -1084,7 +1071,7 @@ export default {
         }
       }
     },
-    processPullBtnDetailRouter (dossierItem, item, result, index) {
+    processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
       console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
@@ -1142,13 +1129,23 @@ export default {
         }
       }
       if (isPopup) {
+        /*
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
+        */
+        console.log('index', index)
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
+          query: {
+            activeTab: 'tabs-2',
+            btnIndex: btnIndex
+          }
+        })
       } else {
         vm.processAction(dossierItem, item, result, index, true)
       }
     },
-    processPullBtnDetail (dossierItem, item, index) {
+    processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
       vm.itemAction = item
       let filter = {
@@ -1158,7 +1155,7 @@ export default {
       vm.dossierId = dossierItem.dossierId
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.processPullBtnDetailRouter(dossierItem, item, result, index)
+        vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
       })
       vm.$store.dispatch('getDetailDossier', filter.dossierId).then(function (result) {
         vm.thongtinhoso = result
@@ -1169,8 +1166,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      let query = this.$router.history.current.query
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'] + '/' + query['step'])
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
 }
