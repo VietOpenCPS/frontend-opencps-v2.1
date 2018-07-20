@@ -20,40 +20,40 @@
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
-      <v-tabs icons-and-text centered class="mb-4">
+      <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab :key="1" href="#1">
+        <v-tab :key="1" href="#tabs-1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THÀNH PHẦN HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="2" href="#2" @click="getNextActions()"> 
+        <v-tab :key="2" href="#tabs-2" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THỤ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="3" href="#3" @click="loadDossierActions()">
+        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#4" @click="loadDossierLogs()">
+        <v-tab :key="4" href="#tabs-4" @click="loadDossierLogs()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             NHẬT KÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="5" href="#5">
+        <v-tab :key="5" href="#tabs-5">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI THẢO LUẬN
           </v-btn>
         </v-tab>
-        <v-tab :key="6" href="#6" @click="loadDossierSyncs()">
+        <v-tab :key="6" href="#tabs-6" @click="loadDossierSyncs()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
-        <v-tabs-items>
-          <v-tab-item id="1" reverse-transition="fade-transition" transition="fade-transition">
+        <v-tabs-items v-model="activeTab">
+          <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
@@ -159,9 +159,9 @@
               </v-expansion-panel-content>
             </v-expansion-panel> -->
           </v-tab-item>
-          <v-tab-item id="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <div class="" v-if="btnStateVisible">
-              <v-btn color="primary" v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
                 :disabled="item.enable === 2"
@@ -180,7 +180,6 @@
               </v-btn>
             </div>
             <v-layout wrap v-if="dialogActionProcess">
-              <!-- <thong-tin-co-ban-ho-so v-if="dialogActionProcess" ref="thong-tin-co-ban-ho-so" :id="dossierId"></thong-tin-co-ban-ho-so> -->
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
               <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
@@ -190,16 +189,16 @@
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
               <v-btn color="primary" flat="flat" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
-              :loading="loadingActionProcess"
-              :disabled="loadingActionProcess"
-              >
-              Xác nhận
-              <span slot="loader">Loading...</span>
-            </v-btn>
+                :loading="loadingActionProcess"
+                :disabled="loadingActionProcess"
+                >
+                Xác nhận
+                <span slot="loader">Loading...</span>
+              </v-btn>
               <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
             </v-layout>
           </v-tab-item>
-          <v-tab-item id="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
               <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
@@ -241,7 +240,7 @@
             </v-data-table>
           </div>
           </v-tab-item>
-          <v-tab-item id="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">
@@ -264,10 +263,10 @@
               </td>
             </div>
           </v-tab-item>
-          <v-tab-item id="5" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <comment :classPK="dossierId" :className="className"></comment>
           </v-tab-item>
-          <v-tab-item id="6" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <v-layout row wrap>
               <v-flex xs12 sm3>
               </v-flex>
@@ -322,6 +321,8 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien
   },
   data: () => ({
+    btnIndex: -1,
+    activeTab: 'tabs-1',
     btnDossierDynamics: [],
     btnStepsDynamics: [],
     loadingAction: false,
@@ -440,6 +441,15 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       vm.initData(vm.id)
+      vm.btnIndex = -1
+      let currentQuery = vm.$router.history.current.query
+      if (currentQuery.hasOwnProperty('activeTab')) {
+        vm.activeTab = currentQuery.activeTab
+        vm.btnIndex = currentQuery['btnIndex']
+        console.log('vm.btnIndex', vm.btnIndex)
+        vm.thongTinChiTietHoSo['dossierId'] = vm.id
+        vm.getNextActions()
+      }
     })
   },
   updated () {
@@ -451,6 +461,14 @@ export default {
         vm.isCallBack = false
         vm.btnDossierDynamics = []
         vm.btnStepsDynamics = []
+        vm.btnIndex = -1
+        if (currentQuery.hasOwnProperty('activeTab')) {
+          vm.activeTab = currentQuery.activeTab
+          vm.btnIndex = currentQuery['btnIndex']
+          console.log('vm.btnIndex', vm.btnIndex)
+          vm.thongTinChiTietHoSo['dossierId'] = vm.id
+          vm.getNextActions()
+        }
       }
     })
   },
@@ -681,6 +699,7 @@ export default {
     },
     processPullBtnDetail (item, index) {
       let vm = this
+      vm.btnIndex = index
       vm.itemAction = item
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId,
@@ -921,9 +940,15 @@ export default {
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
+      let currentQuery = vm.$router.history.current.query
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
+        if (currentQuery.hasOwnProperty('btnIndex')) {
+          vm.btnStateVisible = true
+          vm.dialogActionProcess = true
+          vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+        }
       })
       vm.$store.dispatch('pullProcessSteps', {
         stepCode: vm.thongTinChiTietHoSo.stepCode
