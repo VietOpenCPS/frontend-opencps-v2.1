@@ -5,20 +5,21 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>Thu phí, lệ phí
+          </div>Thanh toán, lệ phí
         </div>
         <v-card>
           <v-card-text>
             <v-layout wrap>
               <v-flex xs12 sm2>
-                <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tiền phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field
+                  v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5"
                   v-model.lazy="data_payment.feeAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?inputDisable:''"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
@@ -27,31 +28,36 @@
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field
+                  v-if="data_payment.requestPayment === 1 || data_payment.advanceAmount !== 0"
                   v-model.lazy="data_payment.advanceAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2>
-                <v-subheader class="pl-0 text-right">Lệ phí dịch vụ: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tiền lệ phí dịch vụ: </v-subheader>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field
+                  v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5"
                   v-model.lazy="data_payment.serviceAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="viaPortal === 2">
-                <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
+                <v-subheader class="pl-0 text-right">Phí chuyển phát hồ sơ: </v-subheader>
               </v-flex>
               <v-flex xs12 sm4 v-if="viaPortal === 2">
                 <v-text-field
                   v-model.lazy="data_payment.shipAmount"
                   v-money="money"
                   suffix="đ"
+                  :class="data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
             </v-layout>
