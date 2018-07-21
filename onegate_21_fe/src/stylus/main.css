@@ -2414,3 +2414,6 @@ body .btn.primary.deactive__btn {
 body .menu_header_list .input-group__input {
     margin-top: 20px;
 }
+table.datatable p {
+    margin-bottom: 0;
+}

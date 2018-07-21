@@ -87,16 +87,19 @@
           </span>
         </td>
 
-        <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader"
+        <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
           :class="itemHeader['class_column']"
           v-if="itemHeader.hasOwnProperty('value')"
         >
           <content-placeholders v-if="loadingTable">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
-          <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
-            {{ props.item[itemHeader.value] }}
-          </span>
+          <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
+            <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+            <span v-else>
+              {{ props.item[itemHeader.value] }}
+            </span>
+          </div>
         </td>
         <td class="text-xs-center px-0 py-0" v-if="!hideAction">
           <content-placeholders v-if="loadingTable">
@@ -109,14 +112,14 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
+              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 :disabled="item['enable'] === 2"
                 v-if="item['enable'] > 0"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
-              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i" v-if="String(item.form) !== 'NEW'"
+              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
               >
                 <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
@@ -322,9 +325,9 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.js'
 import router from '@/router'
-import toastr from 'toastr'
+import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -332,7 +335,7 @@ import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
-Vue.use(toastr)
+
 export default {
   props: ['index'],
   components: {
@@ -342,7 +345,8 @@ export default {
     'tra-ket-qua': TraKetQua,
     'xac-nhan-thu-phi': XacNhanThuPhi,
     'thu-phi': ThuPhi,
-    'y-kien-can-bo': YkienCanBoThucHien
+    'y-kien-can-bo': YkienCanBoThucHien,
+    'template-rendering': TemplateRendering
   },
   data: () => ({
     /* data PhanCongThucHien */
