@@ -43,7 +43,7 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading&&thongTinChungHoSo.durationDate" style="float:left"><i>{{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc</i></v-subheader>
+            <v-subheader v-if="!loading" style="float:left"><i>{{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc</i></v-subheader>
           </v-flex>
           <!-- <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -120,7 +120,9 @@
         dossierId: '',
         dossierIdCTN: '',
         dossierStatus: '',
-        dossierStatusText: ''
+        dossierStatusText: '',
+        durationUnit: '',
+        durationCount: ''
       }
     }),
     created () {
@@ -154,7 +156,9 @@
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
           dossierStatus: data.dossierStatus,
-          dossierStatusText: data.dossierStatusText
+          dossierStatusText: data.dossierStatusText,
+          durationUnit: data.durationUnit,
+          durationCount: data.durationCount
         }
         console.log('thongTinChungHoSoTemp++++++++++', thongTinChungHoSoTemp)
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
