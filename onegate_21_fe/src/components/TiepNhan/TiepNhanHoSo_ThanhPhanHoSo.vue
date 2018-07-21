@@ -4,7 +4,7 @@
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 1" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
           <v-expansion-panel-content hide-actions :value="false">
-            <div slot="header">
+            <div slot="header" @click="stateView = false">
               <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                 <span class="text-bold mr-2">{{index + 1}}.</span>
                 <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
@@ -13,7 +13,7 @@
             <v-card>
               <v-card-text>
                 <v-layout wrap>
-                  <v-flex xs12 class="text-xs-right">
+                  <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm">Xóa</v-btn>
                     <div :id="'formAlpaca' + item.partNo">
@@ -67,6 +67,21 @@
                 </v-btn>
                 <span>Xóa</span>
               </v-tooltip> -->
+            </v-flex>
+          </v-layout>
+        </div>
+        <div v-if="item.partNo === partView && stateView">
+          <v-layout row wrap>
+            <v-flex xs12 sm12>
+              <div v-for="(itemFileView, index) in fileViews">
+                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                  <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
+                    <v-icon style="color: red">delete_outline</v-icon>
+                  </v-btn>
+                </div>
+              </div>
             </v-flex>
           </v-layout>
         </div>
@@ -132,12 +147,9 @@
                   <span @click="viewFile2(item)" style="cursor: pointer; font-weight: bold">{{ item.displayName }}</span>
                 </v-list-tile-title>
                 <v-list-tile-action>
-                  <v-tooltip top>
-                    <v-btn icon ripple @click="deleteSingleFile(item, index)">
-                      <v-icon color="red darken-3">delete_outline</v-icon>
-                    </v-btn>
-                    <span>Xóa</span>
-                  </v-tooltip>
+                  <v-btn icon ripple @click="deleteSingleFile(item, index)">
+                    <v-icon style="color: red">delete_outline</v-icon>
+                  </v-btn>
                 </v-list-tile-action>
               </v-list-tile>
             </v-list>
@@ -147,13 +159,13 @@
         </v-flex>
       </v-layout>
 
-      <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierFilesItems" v-if="item.partType === 1 && item.partNo === ''" v-bind:key="item.dossierFileId">
+      <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 3" v-bind:key="item.partNo">
         <v-expansion-panel class="no_acction__event expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
-            <div slot="header">
+            <div slot="header" @click="stateView = false">
               <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                 <span class="text-bold mr-2">{{index + 1}}.</span>
-                <span>{{item.displayName}}</span>
+                <span>{{item.partName}}</span>
               </div>
             </div>
             <v-card>
@@ -172,7 +184,7 @@
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
             <v-flex style="width: 260px;" class="layout wrap">
-              <v-radio-group v-model="dossierTemplateItems[index].fileType" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -195,17 +207,32 @@
                 <span>Tải file lên</span>
               </v-tooltip>
               <v-tooltip top>
-                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFile(item)" style="height:20px;width:20px">
+                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
                   {{item.count}}
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
-              <v-tooltip top>
+              <!-- <v-tooltip top>
                 <v-btn slot="activator" @click="onDeleteSingleFiles(item)" icon class="mx-0 my-0">
-                  <v-icon size="16" class="mx-0" color="red darken-3">delete</v-icon>
+                  <v-icon size="16" class="mx-0" style="color: red">delete</v-icon>
                 </v-btn>
                 <span>Xóa</span>
-              </v-tooltip>
+              </v-tooltip> -->
+            </v-flex>
+          </v-layout>
+        </div>
+        <div v-if="item.partNo === partView && stateView && item.partType === 3">
+          <v-layout row wrap>
+            <v-flex xs12 sm12>
+              <div v-for="(itemFileView, index) in fileViews">
+                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                  <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
+                    <v-icon style="color: red">delete_outline</v-icon>
+                  </v-btn>
+                </div>
+              </div>
             </v-flex>
           </v-layout>
         </div>
@@ -234,6 +261,7 @@
     </v-card>
     <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
     <div class="absolute-lable" style="font-size: 12px">
+      <span>Không chọn</span>
       <span>Bản chính</span>
       <span>Bản chụp</span>
       <span>Công chứng</span>
@@ -252,10 +280,12 @@ export default {
     dossierFilesItems: [],
     thongTinHoSo: {},
     valid: true,
+    stateView: false,
     dialogAddOtherTemp: false,
     loadingAddOther: false,
     otherDossierTemplate: '',
     sheet: false,
+    partView: '',
     fileViews: [{
       dossierFileId: 12121,
       displayName: 'THanh phan 1'
@@ -534,6 +564,12 @@ export default {
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
                 vm.recountFileTemplates()
+                var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+                  return file.dossierPartNo === item.partNo
+                })
+                if (fileViewsTemp) {
+                  vm.fileViews = fileViewsTemp
+                }
               })
             })
           }
@@ -550,6 +586,14 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
+            var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+              return file.dossierPartNo === item.partNo
+            })
+            if (fileViewsTemp) {
+              vm.fileViews = fileViewsTemp
+            } else {
+              return
+            }
           })
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
@@ -578,7 +622,9 @@ export default {
         })
         if (fileViewsTemp) {
           vm.fileViews = fileViewsTemp
-          vm.sheet = true
+          // vm.sheet = true
+          vm.partView = item.partNo
+          vm.stateView = !vm.stateView
         } else {
           return
         }
@@ -590,7 +636,7 @@ export default {
       vm.loadingAddOther = true
       vm.$store.dispatch('uploadSingleOtherFile', {
         dossierId: vm.thongTinHoSo.dossierId,
-        partName: data
+        displayName: data
       }).then(resFile => {
         vm.loadingAddOther = false
         vm.dialogAddOtherTemp = false

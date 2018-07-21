@@ -157,7 +157,7 @@ export default {
       }).catch(reject => {
       })
     },
-    luuHoSo () {
+    tiepNhanHoSo () {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
@@ -165,75 +165,52 @@ export default {
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let lephi = this.$refs.lephi.lePhi
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
+      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        if (dossierTemplates) {
-          dossierTemplates.forEach(function (val, index) {
-            if (val.partType === 1) {
-              val['dossierId'] = vm.dossierId
-              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
-            }
-          })
-          // dossierFiles.forEach(function (value, index) {
-          //   if (value.eForm) {
-          //     value['dossierId'] = vm.dossierId
-          //     listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          //   }
-          // })
-        }
-        vm.$store.dispatch('postDossierPayments', lephi).then(resultLePhi => {
-        })
-        Promise.all(listDossierMark).then(values => {
-        }).catch(function (xhr) {
+        dossierFiles.forEach(function (value, index) {
+          if (value.eForm) {
+            value['dossierId'] = vm.dossierId
+            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          }
         })
         let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
         console.log('data put dossier -->', tempData)
         tempData['dossierId'] = vm.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          let dataPostAction = {
+            dossierId: vm.dossierId,
+            actionCode: 1100,
+            actionNote: '',
+            actionUser: '',
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: vm.payments,
+            createDossiers: ''
+          }
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            let currentQuery = vm.$router.history.current.query
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+            vm.tiepNhanState = false
+          })
         }).catch(function (xhr) {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       }
-    },
-    tiepNhanHoSo () {
-      var vm = this
-      vm.$store.commit('setPrintPH', false)
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dossierFiles = this.$refs.thanhphanhoso.dossierFilesItems
-      console.log('dossierTemplateItems------------', thanhphanhoso)
-      console.log('dossierFilesItems------------', dossierFiles)
-      let dataPostAction = {
-        dossierId: vm.dossierId,
-        actionCode: 1100,
-        actionNote: '',
-        actionUser: '',
-        payload: '',
-        security: '',
-        assignUsers: '',
-        payment: '',
-        createDossiers: ''
-        // dossierFiles: JSON.stringify(dossierFiles),
-        // dossierMarks: JSON.stringify(thanhphanhoso)
-      }
-      vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-        let currentQuery = vm.$router.history.current.query
-        router.push({
-          path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
-          }
-        })
-        vm.tiepNhanState = false
-      })
     },
     boSungHoSo () {
       var vm = this

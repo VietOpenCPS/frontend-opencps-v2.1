@@ -511,7 +511,7 @@ export const store = new Vuex.Store({
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('partName', data.partName)
+        formData.append('displayName', data.displayName)
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -1870,12 +1870,9 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {
-              stepCode: data.stepCode
             }
           }
-          axios.get(state.initData.stepConfigAPI + '/' + data.dossierId + '/steps', param).then(function (response) {
+          axios.get(state.initData.stepConfigsApi + '/' + data.stepCode, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
