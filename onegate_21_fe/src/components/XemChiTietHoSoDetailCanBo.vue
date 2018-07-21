@@ -164,7 +164,7 @@
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
-                :disabled="item.enable === 3"
+                :disabled="item.enable === 2"
                 v-if="item.enable > 0"
               >
                 {{item.actionName}}
@@ -182,6 +182,7 @@
             <v-layout wrap v-if="dialogActionProcess">
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
               <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
+              <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
@@ -310,6 +311,7 @@ import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -318,7 +320,8 @@ export default {
     'phan-cong': PhanCong,
     'tra-ket-qua': TraKetQua,
     'thu-phi': ThuPhi,
-    'y-kien-can-bo': YkienCanBoThucHien
+    'y-kien-can-bo': YkienCanBoThucHien,
+    'tai-lieu-ket-qua': TaoTaiLieuKetQua
   },
   data: () => ({
     btnIndex: -1,
@@ -340,6 +343,7 @@ export default {
     },
     loadingAlpacajsForm: false,
     nextActions: [],
+    createFiles: [],
     processSteps: [],
     documents: [],
     payments: '',
@@ -666,6 +670,7 @@ export default {
         if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
           isPopup = true
           vm.showTaoTaiLieuKetQua = true
+          vm.createFiles = result.createFiles
         }
         if (result.hasOwnProperty('eSignature') && result.eSignature) {
           isPopup = true
@@ -970,8 +975,7 @@ export default {
         }
       })
       vm.$store.dispatch('pullProcessSteps', {
-        stepCode: vm.thongTinChiTietHoSo.stepCode,
-        dossierId: vm.thongTinChiTietHoSo.dossierId
+        stepCode: vm.thongTinChiTietHoSo.stepCode
       }).then(resProSteps => {
         vm.btnStepsDynamics = resProSteps
       })

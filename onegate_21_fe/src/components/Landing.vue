@@ -110,7 +110,7 @@
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2"
+                :disabled="item['enable'] === 2 && props.item['assigned'] === 0"
                 v-if="item['enable'] > 0"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>

@@ -166,30 +166,18 @@ export default {
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let lephi = this.$refs.lephi.lePhi
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
+      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        // if (dossierTemplates) {
-        //   dossierTemplates.forEach(function (val, index) {
-        //     if (val.partType === 1) {
-        //       val['dossierId'] = vm.dossierId
-        //       listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
-        //     }
-        //   })
-        // }
         dossierFiles.forEach(function (value, index) {
           if (value.eForm) {
             value['dossierId'] = vm.dossierId
             listAction.push(vm.$store.dispatch('putAlpacaForm', value))
           }
-        })
-        Promise.all(listDossierMark).then(values => {
-        }).catch(function (xhr) {
         })
         let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
         console.log('data put dossier -->', tempData)
