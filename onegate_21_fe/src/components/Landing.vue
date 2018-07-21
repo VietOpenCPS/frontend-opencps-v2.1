@@ -108,14 +108,10 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <!-- <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
+              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 :disabled="item['enable'] === 2"
                 v-if="item['enable'] > 0"
-                > -->
-                <!-- test local -->
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
-                @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -317,11 +313,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- <v-btn color="primary" @click.native="dialog_statusAction = true">
-      TEST StatusAction &nbsp;
-      <v-icon>save</v-icon>
-    </v-btn> -->
   </div>
 </template>
 
@@ -670,21 +661,21 @@ export default {
       let currentQuery = router.history.current.query
       console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        // let filter = {
-        //   queryParams: currentQuery.q,
-        //   page: vm.hosoDatasPage,
-        //   agency: vm.govAgencyCode,
-        //   service: vm.serviceCode,
-        //   template: vm.templateNo
-        // }
-        /*  test Local */
         let filter = {
-          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          queryParams: currentQuery.q,
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
           template: vm.templateNo
         }
+        /*  test Local */
+        // let filter = {
+        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+        //   page: vm.hosoDatasPage,
+        //   agency: vm.govAgencyCode,
+        //   service: vm.serviceCode,
+        //   template: vm.templateNo
+        // }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -1013,6 +1004,10 @@ export default {
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
       })
+      // add menuconfig
+      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
+      //   vm.btnDossierDynamics = result
+      // })
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
@@ -1182,19 +1177,18 @@ export default {
     },
     processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
-      /** test local */
-      // if (item['enable'] === 1 || item['enable'] === 2) {
-      vm.itemAction = item
-      let filter = {
-        dossierId: dossierItem.dossierId,
-        actionId: item.processActionId
+      if (item['enable'] === 1 || item['enable'] === 2) {
+        vm.itemAction = item
+        let filter = {
+          dossierId: dossierItem.dossierId,
+          actionId: item.processActionId
+        }
+        vm.dossierId = dossierItem.dossierId
+        vm.loadingActionProcess = true
+        vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+          vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
+        })
       }
-      vm.dossierId = dossierItem.dossierId
-      vm.loadingActionProcess = true
-      vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
-      })
-      // }
     },
     goBack () {
       window.history.back()

@@ -111,7 +111,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          // orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -626,16 +626,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          // headers: {
-          //   'groupId': state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            'groupId': state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   'groupId': state.initData.groupId
+          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -1466,6 +1466,22 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
+          })
+        })
+      },
+      pullBtnConfigStep ({commit, state}, filter) {
+        return new Promise((resolve, reject) => {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
           })
         })
       },

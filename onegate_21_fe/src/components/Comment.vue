@@ -61,34 +61,34 @@ export default {
     }
   },
   watch: {
-    // classPK (val) {
-    //   var vm = this
-    //   vm.$store.dispatch('loadUsersComment', val).then(result => {
-    //     vm.usersComment = result
-    //     vm.initComment()
-    //   }).catch(reject => {
-    //     vm.initComment()
-    //   })
-    // }
+    classPK (val) {
+      var vm = this
+      vm.$store.dispatch('loadUsersComment', val).then(result => {
+        vm.usersComment = result
+        vm.initComment()
+      }).catch(reject => {
+        vm.initComment()
+      })
+    }
   },
   created () {
-    // var vm = this
-    // vm.$nextTick(function () {
-    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-    //     vm.usersComment = result
-    //   })
-    // })
+    var vm = this
+    vm.$nextTick(function () {
+      vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+        vm.usersComment = result
+      })
+    })
   },
   mounted () {
     var vm = this
-    // if (vm.classPK) {
-    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-    //     vm.usersComment = result
-    //     vm.initComment()
-    //   }).catch(reject => {
-    //     vm.initComment()
-    //   })
-    // }
+    if (vm.classPK) {
+      vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+        vm.usersComment = result
+        vm.initComment()
+      }).catch(reject => {
+        vm.initComment()
+      })
+    }
   },
   methods: {
     initComment: function () {
@@ -152,28 +152,28 @@ export default {
             return ''
           }
         },
-        // getUsers: function (onSuccess, onError) {
-        //   onSuccess(vm.usersComment)
-        // },
-        // getComments: function (onSuccess, onError) {
-        //   var dataGet = {
-        //     'classPK': vm.classPK,
-        //     'className': vm.className
-        //   }
-        //   let promise = vm.$store.dispatch('loadCommentItems', dataGet)
-        //   promise.then(result => {
-        //     var data = []
-        //     $.each(result, function (index, item) {
-        //       vm.comment = item
-        //       vm.formatComment(vm.comment)
-        //       data.push(vm.comment)
-        //     })
-        //     onSuccess(data)
-        //   }).catch(reject => {
-        //     onSuccess([])
-        //     onError()
-        //   })
-        // },
+        getUsers: function (onSuccess, onError) {
+          onSuccess(vm.usersComment)
+        },
+        getComments: function (onSuccess, onError) {
+          var dataGet = {
+            'classPK': vm.classPK,
+            'className': vm.className
+          }
+          let promise = vm.$store.dispatch('loadCommentItems', dataGet)
+          promise.then(result => {
+            var data = []
+            $.each(result, function (index, item) {
+              vm.comment = item
+              vm.formatComment(vm.comment)
+              data.push(vm.comment)
+            })
+            onSuccess(data)
+          }).catch(reject => {
+            onSuccess([])
+            onError()
+          })
+        },
         postComment: function (data, onSuccess, onError) {
           data.classPK = vm.classPK
           data.className = vm.className
