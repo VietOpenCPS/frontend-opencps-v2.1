@@ -437,6 +437,22 @@ export const store = new Vuex.Store({
         }
       })
     },
+    deleteDossierFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.delete(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          console.log('success!')
+          resolve(response)
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     resetCounterTemplate ({commit, state}, data) {
       state.dossierTemplates.forEach(val => {
         if (val.partNo === data.partNo) {
@@ -477,6 +493,26 @@ export const store = new Vuex.Store({
         formData.append('formData', '')
         formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + e.dossierId + '/files', formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(function (response) {
+          resolve(response.data)
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          console.log('upload file success!')
+        }).catch(function (xhr) {
+          console.log(xhr)
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          reject(xhr)
+        })
+      })
+    },
+    uploadSingleOtherFile ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let formData = new FormData()
+        formData.append('partName', data.partName)
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
             'Content-Type': 'multipart/form-data'
@@ -772,7 +808,6 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileCheck', data.fileCheck)
         dataPostdossierMark.append('fileType', data.fileType)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
@@ -1818,9 +1853,90 @@ export const store = new Vuex.Store({
               stepCode: data.stepCode
             }
           }
-          axios.get(state.initData.serviceProcessesApi + '/' + data.dossierId + '/steps', param).then(function (response) {
+          axios.get(state.initData.stepConfigAPI + '/' + data.dossierId + '/steps', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    loadServiceConfigsGov ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.serviceConfigByGovApi, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.govAgencies) {
+              resolve(serializable.govAgencies)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    processCheckNextActions ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let allActionCode = filter.actionCode.split(',')
+          axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
+            let serializable = response.data
+            let nextActionData = serializable.data
+            let newFilter = filter
+            let isBreak = false
+            for (let key in allActionCode) {
+              if (!isBreak) {
+                for (let keyNext in nextActionData) {
+                  if (String(allActionCode[key]) === String(nextActionData[keyNext].actionCode)) {
+                    newFilter.actionCode = nextActionData[keyNext].actionCode
+                    isBreak = true
+                    break
+                  }
+                }
+              }
+            }
+            resolve(newFilter)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceOpionByProcess ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.serviceConfigApi + data.serviceInfoId + '/processes', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve({})
+            }
           }).catch(function (error) {
             console.log(error)
             reject(error)

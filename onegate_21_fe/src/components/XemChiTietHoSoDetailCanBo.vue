@@ -164,7 +164,7 @@
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
-                :disabled="item.enable === 2"
+                :disabled="item.enable === 3"
                 v-if="item.enable > 0"
               >
                 {{item.actionName}}
@@ -433,7 +433,8 @@ export default {
       value: '2'
     }],
     filterDossierSync: null,
-    messageChat: ''
+    messageChat: '',
+    isCallBack: true
   }),
   computed: {
     loading () {
@@ -449,8 +450,8 @@ export default {
       if (currentQuery.hasOwnProperty('activeTab')) {
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
-        console.log('vm.btnIndex', vm.btnIndex)
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
+        vm.btnStateVisible = true
         vm.getNextActions()
       }
     })
@@ -460,18 +461,16 @@ export default {
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
-      if (currentParams.hasOwnProperty('step') && vm.isCallBack) {
+      if (currentParams.hasOwnProperty('activeTab') && vm.isCallBack) {
         vm.isCallBack = false
         vm.btnDossierDynamics = []
         vm.btnStepsDynamics = []
         vm.btnIndex = -1
-        if (currentQuery.hasOwnProperty('activeTab')) {
-          vm.activeTab = currentQuery.activeTab
-          vm.btnIndex = currentQuery['btnIndex']
-          console.log('vm.btnIndex', vm.btnIndex)
-          vm.thongTinChiTietHoSo['dossierId'] = vm.id
-          vm.getNextActions()
-        }
+        vm.activeTab = currentQuery.activeTab
+        vm.btnIndex = currentQuery['btnIndex']
+        vm.thongTinChiTietHoSo['dossierId'] = vm.id
+        vm.btnStateVisible = true
+        vm.getNextActions()
       }
     })
   },
@@ -479,26 +478,19 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
-      if (currentQuery.hasOwnProperty('step')) {
-        vm.btnDossierDynamics = []
-        vm.btnStepsDynamics = []
-      }
     }
   },
   methods: {
     initData (data) {
       var vm = this
       vm.dossierId = data
-      console.log(data)
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         var arrTemp = []
-        console.log(resultDossier.dossierId)
         arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
         arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
         vm.thongTinHoSo = resultDossier
         Promise.all(arrTemp).then(values => {
-          console.log(values)
           let dossierTemplates = values[0]
           let dossierFiles = values[1]
           dossierTemplates.forEach(item => {
@@ -709,6 +701,7 @@ export default {
         actionId: item.processActionId
       }
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.dialogActionProcess = false
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
@@ -974,11 +967,16 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex')) {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
+            vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          } else {
+            vm.dialogActionProcess = false
+          }
         }
       })
       vm.$store.dispatch('pullProcessSteps', {
-        stepCode: vm.thongTinChiTietHoSo.stepCode
+        stepCode: vm.thongTinChiTietHoSo.stepCode,
+        dossierId: vm.thongTinChiTietHoSo.dossierId
       }).then(resProSteps => {
         vm.btnStepsDynamics = resProSteps
       })

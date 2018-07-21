@@ -110,12 +110,13 @@
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="props.item['assigned'] === 0">
+                :disabled="item['enable'] === 2"
+                v-if="item['enable'] > 0"
+                >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
               <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
-                :disabled="props.item['assigned'] === 0"
               >
                 <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
               </v-list-tile>
@@ -165,6 +166,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
+                  v-if="thuTucHanhChinhSelected"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
@@ -1050,19 +1052,30 @@ export default {
         }
       } else {
         if (!dossierItem.statusAction) {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            //
-            if (String(item.form) === 'ACTIONS') {
-              // get dossier submit fail and show on dialog
-              vm.hosoDatas.splice(index, 1)
-              vm.selected[index].statusAction = true
-              vm.countSelected += 1
-              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
-                vm.dialog_statusAction = true
-              } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
-                console.log('router')
+          vm.$store.dispatch('processCheckNextActions', filter).then(function (newFilter) {
+            vm.$store.dispatch('processDossierRouter', newFilter).then(function (result) {
+              vm.dialogActionProcess = false
+              vm.loadingActionProcess = false
+              //
+              if (String(item.form) === 'ACTIONS') {
+                // get dossier submit fail and show on dialog
+                vm.hosoDatas.splice(index, 1)
+                vm.selected[index].statusAction = true
+                vm.countSelected += 1
+                if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                  vm.dialog_statusAction = true
+                } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+                  console.log('router')
+                  router.push({
+                    path: vm.$router.history.current.path,
+                    query: {
+                      recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                      q: currentQuery['q']
+                    }
+                  })
+                }
+              } else {
                 router.push({
                   path: vm.$router.history.current.path,
                   query: {
@@ -1072,27 +1085,18 @@ export default {
                   }
                 })
               }
-            } else {
-              router.push({
-                path: vm.$router.history.current.path,
-                query: {
-                  recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  q: currentQuery['q']
+            }).catch(function () {
+              vm.loadingActionProcess = false
+              //
+              if (String(item.form) === 'ACTIONS') {
+                vm.countSelected += 1
+                vm.statusFailed += 1
+                vm.selected[index].statusAction = false
+                if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                  vm.dialog_statusAction = true
                 }
-              })
-            }
-          }).catch(function () {
-            vm.loadingActionProcess = false
-            //
-            if (String(item.form) === 'ACTIONS') {
-              vm.countSelected += 1
-              vm.statusFailed += 1
-              vm.selected[index].statusAction = false
-              if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
-                vm.dialog_statusAction = true
-              }
-            } else {}
+              } else {}
+            })
           })
         }
       }
@@ -1174,16 +1178,18 @@ export default {
     },
     processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
-      vm.itemAction = item
-      let filter = {
-        dossierId: dossierItem.dossierId,
-        actionId: item.processActionId
+      if (item['enable'] === 1 || item['enable'] === 2) {
+        vm.itemAction = item
+        let filter = {
+          dossierId: dossierItem.dossierId,
+          actionId: item.processActionId
+        }
+        vm.dossierId = dossierItem.dossierId
+        vm.loadingActionProcess = true
+        vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+          vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
+        })
       }
-      vm.dossierId = dossierItem.dossierId
-      vm.loadingActionProcess = true
-      vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
-      })
     },
     goBack () {
       window.history.back()
