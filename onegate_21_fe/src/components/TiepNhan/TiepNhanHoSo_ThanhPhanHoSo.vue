@@ -7,14 +7,15 @@
             <div slot="header">
               <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                 <span class="text-bold mr-2">{{index + 1}}.</span>
-                <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i></span>
+                <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
               </div>
             </div>
             <v-card>
               <v-card-text>
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right">
-                    <v-btn color="primary" @click="saveAlpacaForm(item)">Lưu lại</v-btn>
+                    <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm">Lưu lại</v-btn>
+                    <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm">Xóa</v-btn>
                     <div :id="'formAlpaca' + item.partNo">
                     </div>
                   </v-flex>
@@ -29,11 +30,153 @@
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
             <v-flex style="width: 260px;" class="layout wrap">
-              <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileCheck"></v-checkbox>
+              <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
+              <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
+              <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
+              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
+                <v-radio :value="0"></v-radio>
+                <v-radio :value="1"></v-radio>
+                <v-radio :value="2"></v-radio>
+                <v-radio :value="3"></v-radio>
+              </v-radio-group>
+            </v-flex>
+            <v-flex style="width: 110px;background: #fff;" class="text-xs-center">
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0 my-0">
+                  <v-badge>
+                    <input
+                    type="file"
+                    style="display: none"
+                    :id="'file' + item.partNo"
+                    @change="onUploadSingleFile($event,item)"
+                    >
+                    <v-icon size="16" color="primary" @click="pickFile(item)">attach_file</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Tải file lên</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
+                  {{item.count}}
+                </v-btn>
+                <span>Xem</span>
+              </v-tooltip>
+              <!-- <v-tooltip top>
+                <v-btn slot="activator" @click="onDeleteAttackFiles(item)" icon class="mx-0 my-0">
+                  <v-icon size="16" class="mx-0" color="red darken-3">delete</v-icon>
+                </v-btn>
+                <span>Xóa</span>
+              </v-tooltip> -->
+            </v-flex>
+          </v-layout>
+        </div>
+      </div>
+      <v-layout row wrap>
+        <v-flex xs12 sm6>
+          <v-subheader style="float: left;">Thêm giấy tờ khác</v-subheader>
+        </v-flex>
+        <v-flex xs12 sm6 class="text-xs-right">
+          <v-btn color="primary" @click="dialogAddOtherTemp = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </v-flex>
+      </v-layout>
+      <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
+        <v-card>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-card-title class="headline">Thêm thành phần hồ sơ</v-card-title>
+            <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogAddOtherTemp = false">
+              <v-icon>clear</v-icon>
+            </v-btn>
+            <v-progress-linear v-if="loadingAddOther" class="my-0" :indeterminate="true"></v-progress-linear>
+            <v-card-text class="pb-0 pt-4">
+              <v-layout wrap>
+                <v-flex xs12 class="px-2 pb-3">
+                  <v-text-field
+                  label="Tên thành phần:"
+                  v-model="otherDossierTemplate"
+                  @change = "changeOtherDossierTemp"
+                  :rules="[v => !!v || 'Bạn phải điền tên thành phần.']"
+                  required
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="red darken-3" flat="flat" @click.native="dialogAddOtherTemp = false">
+                Quay lại
+              </v-btn>
+              <v-btn color="primary" flat="flat" @click.native="addOtherTemplate"
+              :loading="loadingAddOther"
+              >
+              Đồng ý
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+
+        <v-layout row wrap>
+          <v-flex xs12 sm8>
+            <v-bottom-sheet v-model="sheet">
+              <v-list>
+                <v-subheader>Danh sách file</v-subheader>
+                <v-list-tile
+                v-for="(item, index) in fileViews"
+                :key="item.dossierFileId">
+                <v-list-tile-avatar>
+                </v-list-tile-avatar>
+                <v-list-tile-title>
+                  <span @click="viewFile2(item)" style="cursor: pointer; font-weight: bold">{{ item.displayName }}</span>
+                </v-list-tile-title>
+                <v-list-tile-action>
+                  <v-tooltip top>
+                    <v-btn icon ripple @click="deleteSingleFile(item, index)">
+                      <v-icon color="red darken-3">delete_outline</v-icon>
+                    </v-btn>
+                    <span>Xóa</span>
+                  </v-tooltip>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list>
+          </v-bottom-sheet>
+        </v-flex>
+        <v-flex xs12 sm4>
+        </v-flex>
+      </v-layout>
+
+      <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierFilesItems" v-if="item.partType === 1 && item.partNo === ''" v-bind:key="item.dossierFileId">
+        <v-expansion-panel class="no_acction__event expaned__list__data">
+          <v-expansion-panel-content hide-actions :value="false">
+            <div slot="header">
+              <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                <span class="text-bold mr-2">{{index + 1}}.</span>
+                <span>{{item.displayName}}</span>
+              </div>
+            </div>
+            <v-card>
+              <v-card-text>
+                <v-layout wrap>
+                  <v-flex xs12 class="text-xs-right">
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <div class="absolute__btn group__thanh_phan">
+          <content-placeholders class="mt-1" v-if="loading">
+            <content-placeholders-text :lines="1" />
+          </content-placeholders>
+          <v-layout row wrap class="flex__checkbox" v-else>
+            <v-flex style="width: 260px;" class="layout wrap">
               <v-radio-group v-model="dossierTemplateItems[index].fileType" row>
-                <v-radio :value="2" :disabled="!dossierTemplateItems[index].fileCheck" ></v-radio>
-                <v-radio :value="0" :disabled="!dossierTemplateItems[index].fileCheck" ></v-radio>
-                <v-radio :value="1" :disabled="!dossierTemplateItems[index].fileCheck" ></v-radio>
+                <v-radio :value="0"></v-radio>
+                <v-radio :value="1"></v-radio>
+                <v-radio :value="2"></v-radio>
+                <v-radio :value="3"></v-radio>
               </v-radio-group>
             </v-flex>
             <v-flex style="width: 110px;background: #fff;">
@@ -58,7 +201,7 @@
                 <span>Xem</span>
               </v-tooltip>
               <v-tooltip top>
-                <v-btn slot="activator" @click="onDeleteAttackFiles(item)" icon class="mx-0 my-0">
+                <v-btn slot="activator" @click="onDeleteSingleFiles(item)" icon class="mx-0 my-0">
                   <v-icon size="16" class="mx-0" color="red darken-3">delete</v-icon>
                 </v-btn>
                 <span>Xóa</span>
@@ -101,12 +244,25 @@
 <script>
 import $ from 'jquery'
 // import * as utils from '../store/onegate_utils'
+import toastr from 'toastr'
 export default {
   data: () => ({
     dossierTemplateItems: [],
     dossierMarksItems: [],
     dossierFilesItems: [],
-    thongTinHoSo: {}
+    thongTinHoSo: {},
+    valid: true,
+    dialogAddOtherTemp: false,
+    loadingAddOther: false,
+    otherDossierTemplate: '',
+    sheet: false,
+    fileViews: [{
+      dossierFileId: 12121,
+      displayName: 'THanh phan 1'
+    }, {
+      dossierFileId: 12122,
+      displayName: 'THanh phan 2'
+    }]
   }),
   computed: {
     loading () {
@@ -146,91 +302,130 @@ export default {
     initData (data) {
       var vm = this
       var arrTemp = []
-      console.log(data.dossierId)
+      console.log('dossierId++++++++', data.dossierId)
       arrTemp.push(vm.$store.dispatch('loadDossierTemplates', data))
       arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
       arrTemp.push(vm.$store.dispatch('loadDossierFiles', data.dossierId))
       vm.thongTinHoSo = data
       Promise.all(arrTemp).then(values => {
-        let dossierTemplates = values[0]
-        let dossierMarks = values[1]
-        let dossierFiles = values[2]
-        var dossierTemplateItems = []
-        if (dossierMarks) {
-          dossierTemplateItems = dossierTemplates.map(itemTemplate => {
-            if (itemTemplate.hasForm) {
-              itemTemplate.count = 1
-            } else {
-              itemTemplate.count = 0
-            }
-            dossierMarks.forEach(function (val, index) {
-              if (val.dossierPartNo === itemTemplate.partNo) {
-                itemTemplate.fileType = val.fileType
-                itemTemplate.fileCheck = val.fileCheck
-              }
-            })
-            return itemTemplate
-          })
-        } else {
-          dossierTemplateItems = dossierTemplates.map(itemTemplate => {
-            if (itemTemplate.hasForm) {
-              itemTemplate.count = 1
-            } else {
-              itemTemplate.count = 0
-            }
-            itemTemplate.fileType = 0
-            itemTemplate.fileCheck = false
-            return itemTemplate
-          })
-        }
+        var dossierTemplates = values[0]
+        var dossierMarks = values[1]
+        var dossierFiles = values[2]
+        console.log('dossierTemplates++++++', dossierTemplates)
+        console.log('dossierMarks++++++', dossierMarks)
+        console.log('dossierFiles++++++', dossierFiles)
+        var dossierTemplateItems = vm.mergeDossierTemplateVsDossierFiles(dossierTemplates, dossierFiles)
+        console.log('dossierTemplateItems++++++MERGER++++file', dossierTemplateItems)
+        dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
+        console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
         vm.dossierTemplateItems = dossierTemplateItems
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
         setTimeout(function (argument) {
-          if (dossierFiles.length > 0) {
-            var dossierFilesEform = dossierFiles.filter(file => {
-              return file.eForm
-            })
-            var dossierTemplatesHasForm = dossierTemplateItems.filter(template => {
-              return template.hasForm && template.partType === 1
-            })
-            if (dossierFilesEform.length > 0) {
-              dossierFilesEform.forEach(itemFiles => {
-                if (itemFiles.eForm) {
-                  vm.$store.dispatch('loadAlpcaForm', itemFiles)
-                }
-              })
-            } else {
-              dossierTemplateItems.forEach(val => {
-                if (val.hasForm && val.partType === 1) {
-                  val['templateFileNo'] = data.dossierTemplateNo
-                  vm.showAlpacaJSFORM(val)
-                }
-              })
-            }
-            if (dossierTemplatesHasForm.length !== dossierFilesEform.length) {
-              dossierTemplatesHasForm.forEach(template => {
-                let indexFromFile = dossierFilesEform.findIndex(item => {
-                  return template.partNo === item.dossierPartNo
-                })
-                if (indexFromFile === -1) {
-                  template['templateFileNo'] = data.dossierTemplateNo
-                  vm.showAlpacaJSFORM(template)
-                }
-              })
-            }
-          } else {
-            dossierTemplateItems.forEach(val => {
-              if (val.hasForm && val.partType === 1) {
-                val['templateFileNo'] = data.dossierTemplateNo
-                vm.showAlpacaJSFORM(val)
-              }
-            })
-          }
+          vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
+          vm.recountFileTemplates()
         }, 500)
         console.log('dossierTemplateItems', vm.dossierTemplateItems)
       }).catch(reject => {
       })
+    },
+    genAllAlpacaForm (dossierFiles, dossierTemplateItems) {
+      var vm = this
+      if (dossierFiles.length > 0) {
+        var dossierFilesEform = dossierFiles.filter(file => {
+          return file.eForm
+        })
+        var dossierTemplatesHasForm = dossierTemplateItems.filter(template => {
+          return template.hasForm && template.partType === 1
+        })
+        if (dossierFilesEform.length > 0) {
+          dossierFilesEform.forEach(itemFiles => {
+            if (itemFiles.eForm) {
+              vm.$store.dispatch('loadAlpcaForm', itemFiles)
+            }
+          })
+        } else {
+          dossierTemplateItems.forEach(val => {
+            if (val.hasForm && val.partType === 1) {
+              val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
+              vm.showAlpacaJSFORM(val)
+            }
+          })
+        }
+        if (dossierTemplatesHasForm.length !== dossierFilesEform.length) {
+          dossierTemplatesHasForm.forEach(template => {
+            let indexFromFile = dossierFilesEform.findIndex(item => {
+              return template.partNo === item.dossierPartNo
+            })
+            if (indexFromFile === -1) {
+              template['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
+              vm.showAlpacaJSFORM(template)
+            }
+          })
+        }
+      } else {
+        dossierTemplateItems.forEach(val => {
+          if (val.hasForm && val.partType === 1) {
+            val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
+            vm.showAlpacaJSFORM(val)
+          }
+        })
+      }
+    },
+    postDossierMark (item, index) {
+      var vm = this
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      vm.$store.dispatch('postDossierMark', item).then(resultMark => {
+      }).catch(reject => {
+      })
+      //   dossierTemplates.forEach(function (val, index) {
+        //     if (val.partType === 1) {
+        //       val['dossierId'] = vm.dossierId
+        //       listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
+        //     }
+        //   })
+    },
+    mergeDossierTemplateVsDossierFiles (dossierTemplates, dossierFiles) {
+      if (dossierFiles) {
+        dossierTemplates.forEach(template => {
+          var itemFind = dossierFiles.find(file => {
+            return template.partNo === file.dossierPartNo && template.partType === 0 && template.hasForm
+          })
+          if (itemFind) {
+            template['daKhai'] = true
+          } else if (!itemFind && template.hasForm) {
+            template['daKhai'] = false
+          }
+        })
+      } else {
+        dossierTemplates.forEach(template => {
+          if (template.hasForm) {
+            template['daKhai'] = false
+          }
+        })
+      }
+      return dossierTemplates
+    },
+    mergeDossierTemplateVsDossierMark (dossierTemplates, dossierMarks) {
+      if (dossierMarks) {
+        dossierTemplates = dossierTemplates.map(itemTemplate => {
+          itemTemplate.count = 0
+          dossierMarks.forEach(function (val, index) {
+            if (val.dossierPartNo === itemTemplate.partNo) {
+              itemTemplate.fileType = val.fileType
+                // itemTemplate.fileCheck = val.fileCheck
+            }
+          })
+          return itemTemplate
+        })
+      } else {
+        dossierTemplates = dossierTemplates.map(itemTemplate => {
+          itemTemplate.count = 0
+          itemTemplate.fileType = 0
+          return itemTemplate
+        })
+      }
+      return dossierTemplates
     },
     showAlpacaJSFORM (item) {
       var vm = this
@@ -254,23 +449,30 @@ export default {
         })
       })
     },
-    saveAlpacaForm (item) {
+    saveAlpacaForm (item, index) {
       var vm = this
       var fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === item.partNo
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
-        vm.$store.dispatch('putAlpacaForm', files).then(resData => {
+        vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+        }).catch(reject => {
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('postEform', item).then(resPostEform => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
+          }).catch(reject => {
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       }
+      vm.dossierTemplateItems[index].daKhai = true
     },
     onDeleteAttackFiles (item) {
       var vm = this
@@ -308,7 +510,7 @@ export default {
     loadAlpcaForm (data) {
       var vm = this
       var fileFind = vm.dossierFilesItems.find(itemFile => {
-        return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+        return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
       if (fileFind) {
         vm.$store.dispatch('loadAlpcaForm', fileFind)
@@ -321,6 +523,39 @@ export default {
         })
       }
     },
+    deleteSingleFileEform (item, index) {
+      var vm = this
+      let x = confirm('Bạn có muốn xóa?')
+      if (x) {
+        vm.dossierFilesItems.forEach(file => {
+          if (file.dossierPartNo === item.partNo && file.eForm) {
+            vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
+              console.log('success!')
+              vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+                vm.dossierFilesItems = result
+                vm.recountFileTemplates()
+              })
+            })
+          }
+        })
+        vm.dossierTemplateItems[index].daKhai = false
+      }
+    },
+    deleteSingleFile (item, index) {
+      var vm = this
+      let x = confirm('Bạn có muốn xóa?')
+      if (x) {
+        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+        }).catch(reject => {
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+        })
+      }
+    },
     viewFile (data) {
       var vm = this
       vm.dossierFilesItems.forEach(val => {
@@ -329,6 +564,45 @@ export default {
           this.$store.dispatch('viewFile', val)
         }
       })
+    },
+    viewFile2 (data) {
+      var vm = this
+      data['dossierId'] = vm.thongTinHoSo.dossierId
+      vm.$store.dispatch('viewFile', data)
+    },
+    viewFileWithPartNo (item) {
+      var vm = this
+      if (vm.dossierFilesItems) {
+        var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+          return file.dossierPartNo === item.partNo
+        })
+        if (fileViewsTemp) {
+          vm.fileViews = fileViewsTemp
+          vm.sheet = true
+        } else {
+          return
+        }
+      }
+      return
+    },
+    changeOtherDossierTemp (data) {
+      var vm = this
+      vm.loadingAddOther = true
+      vm.$store.dispatch('uploadSingleOtherFile', {
+        dossierId: vm.thongTinHoSo.dossierId,
+        partName: data
+      }).then(resFile => {
+        vm.loadingAddOther = false
+        vm.dialogAddOtherTemp = false
+      }).catch(reject => {
+        vm.loadingAddOther = false
+      })
+    },
+    addOtherTemplate () {
+      var vm = this
+      if (vm.$refs.form.validate()) {
+        vm.changeOtherDossierTemp(vm.otherDossierTemplate)
+      }
     }
   }
 }
