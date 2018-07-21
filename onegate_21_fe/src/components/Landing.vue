@@ -666,21 +666,21 @@ export default {
       let currentQuery = router.history.current.query
       console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        let filter = {
-          queryParams: currentQuery.q,
-          page: vm.hosoDatasPage,
-          agency: vm.govAgencyCode,
-          service: vm.serviceCode,
-          template: vm.templateNo
-        }
-        // /*  test Local */
         // let filter = {
-        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+        //   queryParams: currentQuery.q,
         //   page: vm.hosoDatasPage,
         //   agency: vm.govAgencyCode,
         //   service: vm.serviceCode,
         //   template: vm.templateNo
         // }
+        /*  test Local */
+        let filter = {
+          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          page: vm.hosoDatasPage,
+          agency: vm.govAgencyCode,
+          service: vm.serviceCode,
+          template: vm.templateNo
+        }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
