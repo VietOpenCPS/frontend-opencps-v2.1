@@ -156,6 +156,8 @@
         v-else
         label="Đăng ký kết quả tại nhà"
         v-model="dichVuChuyenPhatKetQua.viaPostal"
+        :value="2"
+        @change="changeViaPostal"
       ></v-checkbox>
     </div>
   </div>
@@ -269,6 +271,9 @@ export default {
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultWards = result.data
       })
+    },
+    changeViaPostal (event) {
+      this.$emit('changeViapostal', event)
     }
   }
 }

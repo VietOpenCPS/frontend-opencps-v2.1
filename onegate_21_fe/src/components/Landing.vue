@@ -108,10 +108,14 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
+              <!-- <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 :disabled="item['enable'] === 2"
                 v-if="item['enable'] > 0"
+                > -->
+                <!-- test local -->
+              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i" 
+                @click="processPullBtnDetail(props.item, item, props.index, i)" 
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -1178,18 +1182,19 @@ export default {
     },
     processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
-      if (item['enable'] === 1 || item['enable'] === 2) {
-        vm.itemAction = item
-        let filter = {
-          dossierId: dossierItem.dossierId,
-          actionId: item.processActionId
-        }
-        vm.dossierId = dossierItem.dossierId
-        vm.loadingActionProcess = true
-        vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-          vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
-        })
+      /** test local */
+      // if (item['enable'] === 1 || item['enable'] === 2) {
+      vm.itemAction = item
+      let filter = {
+        dossierId: dossierItem.dossierId,
+        actionId: item.processActionId
       }
+      vm.dossierId = dossierItem.dossierId
+      vm.loadingActionProcess = true
+      vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+        vm.processPullBtnDetailRouter(dossierItem, item, result, index, btnIndex)
+      })
+      // }
     },
     goBack () {
       window.history.back()

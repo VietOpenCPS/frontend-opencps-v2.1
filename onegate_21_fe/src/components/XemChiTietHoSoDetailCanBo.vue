@@ -161,11 +161,16 @@
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <div class="" v-if="btnStateVisible">
-              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+              <!-- <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
                 :disabled="item.enable === 3"
                 v-if="item.enable > 0"
+              > -->
+              <!-- test local -->
+              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                v-on:click.native="processPullBtnDetail(item, index)" 
+                :loading="loadingAction && index === indexAction"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
@@ -967,11 +972,13 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex')) {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
-            vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
-          } else {
-            vm.dialogActionProcess = false
-          }
+          // if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
+          //   vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          // } else {
+          //   vm.dialogActionProcess = false
+          // }
+          // test local
+          vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
         }
       })
       vm.$store.dispatch('pullProcessSteps', {

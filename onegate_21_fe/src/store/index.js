@@ -626,11 +626,15 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
+          // headers: {
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
+          // }
+          // test local
           headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
+            'groupId': state.initData.groupId
           }
         }
         var dataPostdossier = new URLSearchParams()
