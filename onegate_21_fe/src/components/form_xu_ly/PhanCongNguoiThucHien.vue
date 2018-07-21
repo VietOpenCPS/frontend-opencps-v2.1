@@ -7,7 +7,7 @@
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>{{title_asign[type]}}
         </div>
-        <v-card>
+        <v-card >
           <v-card-text v-if="type === 1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
@@ -23,13 +23,17 @@
             <v-layout wrap class="my-1">
               <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId">
                 <v-layout wrap>
-                  <v-checkbox 
-                    v-model="item.assigned"
-                    :label="item.userName"
-                    @change = 'checkAsign($event, index)'
-                    style="min-width:150px"
-                  ></v-checkbox>
-
+                  <v-tooltip top>
+                    <v-checkbox 
+                      slot="activator"
+                      v-model="item.assigned"
+                      :label="item.userName"
+                      @change = 'checkAsign($event, index)'
+                      style="min-width:150px"
+                    ></v-checkbox>
+                    <span class="pl-0"> {{item.userName}} </span>
+                  </v-tooltip>
+                  
                   <toggle-button class="mx-1 btn-tgl"
                   :id="`btn-${index}`"                                           
                   v-model="presenterAddGroup"
@@ -90,11 +94,14 @@ export default {
     },
     presenterAddGroup: true
   }),
-  mounted () {
-    this.data_phancong = this.assign_items
+  created () {
+    var vm = this
     setTimeout(function () {
       $('.btn-tgl').addClass('btn-hidden')
     }, 300)
+  },
+  mounted () {
+    this.data_phancong = this.assign_items
   },
   methods: {
     changeAssigned (event, index) {

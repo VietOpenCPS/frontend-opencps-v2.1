@@ -44,14 +44,14 @@
         </v-tab>
         <v-tab :key="5" href="#tabs-5">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TRAO ĐỔI THẢO LUẬN
-          </v-btn>
-        </v-tab>
-        <v-tab :key="6" href="#tabs-6" @click="loadDossierSyncs()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
+        <!-- <v-tab :key="6" href="#tabs-6" @click="loadDossierSyncs()">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            TRAO ĐỔI THẢO LUẬN
+          </v-btn>
+        </v-tab> -->
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
@@ -160,7 +160,7 @@
             </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <div class="" v-if="btnStateVisible">
+            <div class="py-3" v-if="btnStateVisible">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
@@ -170,6 +170,7 @@
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
+
               <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
                 v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
@@ -189,10 +190,11 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
-              <v-btn color="primary" flat="flat" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
                 :disabled="loadingActionProcess"
                 >
+                <v-icon>save</v-icon>&nbsp;
                 Xác nhận
                 <span slot="loader">Loading...</span>
               </v-btn>
@@ -267,7 +269,7 @@
           <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <comment :classPK="dossierId" :className="className"></comment>
           </v-tab-item>
-          <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
+          <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <v-layout row wrap>
               <v-flex xs12 sm3>
               </v-flex>
@@ -294,7 +296,7 @@
               <v-flex xs12 sm3>
               </v-flex>
             </v-layout>
-          </v-tab-item>
+          </v-tab-item> -->
         </v-tabs-items>
       </v-tabs>
     </div>
@@ -324,6 +326,7 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua
   },
   data: () => ({
+    validateAction: true,
     btnIndex: -1,
     activeTab: 'tabs-1',
     btnDossierDynamics: [],
@@ -374,6 +377,7 @@ export default {
     assign_items: [],
     btnStateVisible: true,
     dialogActionProcess: false,
+    rollbackable: false,
     headers: [{
       text: 'Vai trò',
       align: 'center',
@@ -847,7 +851,10 @@ export default {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
         if (result.valid) {
+          vm.validateAction = true
           note = result.text
+        } else {
+          vm.validateAction = false
         }
         filter['userNote'] = note
       }
@@ -856,7 +863,7 @@ export default {
       vm.loadingActionProcess = true
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
-        if (x) {
+        if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -876,7 +883,7 @@ export default {
         } else {
           return false
         }
-      } else {
+      } else if (vm.validateAction) {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false

@@ -313,11 +313,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- <v-btn color="primary" @click.native="dialog_statusAction = true">
-      TEST StatusAction &nbsp;
-      <v-icon>save</v-icon>
-    </v-btn> -->
   </div>
 </template>
 
@@ -673,7 +668,7 @@ export default {
           service: vm.serviceCode,
           template: vm.templateNo
         }
-        // /*  test Local */
+        /*  test Local */
         // let filter = {
         //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
         //   page: vm.hosoDatasPage,
@@ -1009,6 +1004,10 @@ export default {
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
       })
+      // add menuconfig
+      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
+      //   vm.btnDossierDynamics = result
+      // })
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
