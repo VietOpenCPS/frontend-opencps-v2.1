@@ -632,6 +632,10 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded',
             'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   'groupId': state.initData.groupId
+          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -1462,6 +1466,22 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
+          })
+        })
+      },
+      pullBtnConfigStep ({commit, state}, filter) {
+        return new Promise((resolve, reject) => {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
           })
         })
       },
