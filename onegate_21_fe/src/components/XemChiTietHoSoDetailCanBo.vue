@@ -188,10 +188,11 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
-              <v-btn color="primary" flat="flat" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
                 :disabled="loadingActionProcess"
                 >
+                <v-icon>save</v-icon>&nbsp;
                 Xác nhận
                 <span slot="loader">Loading...</span>
               </v-btn>
@@ -321,6 +322,7 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien
   },
   data: () => ({
+    validateAction: true,
     btnIndex: -1,
     activeTab: 'tabs-1',
     btnDossierDynamics: [],
@@ -849,7 +851,10 @@ export default {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
         if (result.valid) {
+          vm.validateAction = true
           note = result.text
+        } else {
+          vm.validateAction = false
         }
         filter['userNote'] = note
       }
@@ -858,7 +863,7 @@ export default {
       vm.loadingActionProcess = true
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
-        if (x) {
+        if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -878,7 +883,7 @@ export default {
         } else {
           return false
         }
-      } else {
+      } else if (vm.validateAction) {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
