@@ -23,7 +23,7 @@
       </v-expansion-panel>
     </div>
     <!--  -->
-    <div style="position: relative;">
+    <div style="position: relative;" v-if="showPayment">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header"><div class="background-triangle-small"> V. </div>LỆ PHÍ</div>
@@ -32,7 +32,7 @@
       </v-expansion-panel>
     </div>
     <!--  -->
-    <div style="position: relative;">
+    <div style="position: relative;" v-if="viaPostal > 0">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header"><div class="background-triangle-small"> VI. </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
@@ -43,12 +43,12 @@
     <!--  -->
     <v-tabs icons-and-text centered class="mb-4">
       <v-tabs-slider color="primary"></v-tabs-slider>
-      <v-tab href="#tab-1" @click="luuHoSo">
+      <!-- <v-tab href="#tab-1" @click="luuHoSo">
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Lưu &nbsp;
           <v-icon>save</v-icon>
         </v-btn>
-      </v-tab>
+      </v-tab> -->
       <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Tiếp nhận &nbsp;
@@ -99,8 +99,12 @@ export default {
   data: () => ({
     validTNHS: false,
     dossierId: '',
+    viaPostal: 0,
     mark: true,
-    tiepNhanState: true
+    tiepNhanState: true,
+    showPayment: false,
+    thongTinHoSo: {},
+    payment: null
   }),
   computed: {
     loading () {
@@ -127,16 +131,34 @@ export default {
         // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
-        vm.$refs.dichvuchuyenphatketqua.initData(result)
-
         vm.$refs.thongtinchung.initData(result)
-
-        vm.$refs.lephi.initData(result)
+        if (result.dossierStatus === '') {
+          vm.$store.dispatch('processPullBtnDetail', {
+            dossierId: result.dossierId,
+            actionId: 1100
+          }).then(resAction => {
+            if (resAction && resAction.payment) {
+              let lePhi = resAction.payment
+              vm.showPayment = true
+              vm.payment = resAction.payment
+              lePhi['dossierId'] = result.dossierId
+              vm.$refs.lephi.initData(lePhi)
+            }
+          })
+        } else {
+          // vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
+          //   let lePhi = resultPayment
+          //   lePhi['dossierId'] = result.dossierId
+          //   vm.$refs.lephi.initData(lePhi)
+          // })
+        }
         vm.dossierId = data
+        vm.viaPostal = result.viaPostal
+        vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
     },
-    luuHoSo () {
+    tiepNhanHoSo () {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
@@ -152,21 +174,19 @@ export default {
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        if (dossierTemplates) {
-          dossierTemplates.forEach(function (val, index) {
-            if (val.partType === 1) {
-              val['dossierId'] = vm.dossierId
-              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
-            }
-          })
-          // dossierFiles.forEach(function (value, index) {
-          //   if (value.eForm) {
-          //     value['dossierId'] = vm.dossierId
-          //     listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          //   }
-          // })
-        }
-        vm.$store.dispatch('postDossierPayments', lephi).then(resultLePhi => {
+        // if (dossierTemplates) {
+        //   dossierTemplates.forEach(function (val, index) {
+        //     if (val.partType === 1) {
+        //       val['dossierId'] = vm.dossierId
+        //       listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
+        //     }
+        //   })
+        // }
+        dossierFiles.forEach(function (value, index) {
+          if (value.eForm) {
+            value['dossierId'] = vm.dossierId
+            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          }
         })
         Promise.all(listDossierMark).then(values => {
         }).catch(function (xhr) {
@@ -175,45 +195,68 @@ export default {
         console.log('data put dossier -->', tempData)
         tempData['dossierId'] = vm.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          let dataPostAction = {
+            dossierId: vm.dossierId,
+            actionCode: 1100,
+            actionNote: '',
+            actionUser: '',
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: vm.payment,
+            createDossiers: ''
+          }
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            let currentQuery = vm.$router.history.current.query
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+            vm.tiepNhanState = false
+          })
         }).catch(function (xhr) {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       }
     },
-    tiepNhanHoSo () {
-      var vm = this
-      vm.$store.commit('setPrintPH', false)
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dossierFiles = this.$refs.thanhphanhoso.dossierFilesItems
-      console.log('dossierTemplateItems------------', thanhphanhoso)
-      console.log('dossierFilesItems------------', dossierFiles)
-      let dataPostAction = {
-        dossierId: vm.dossierId,
-        actionCode: 1100,
-        actionNote: '',
-        actionUser: '',
-        payload: '',
-        security: '',
-        assignUsers: '',
-        payment: '',
-        createDossiers: ''
-        // dossierFiles: JSON.stringify(dossierFiles),
-        // dossierMarks: JSON.stringify(thanhphanhoso)
-      }
-      vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-        let currentQuery = vm.$router.history.current.query
-        router.push({
-          path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
-          }
-        })
-        vm.tiepNhanState = false
-      })
-    },
+    // tiepNhanHoSo () {
+    //   var vm = this
+    //   vm.$store.commit('setPrintPH', false)
+    //   let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+    //   let dossierFiles = this.$refs.thanhphanhoso.dossierFilesItems
+    //   console.log('dossierTemplateItems------------', thanhphanhoso)
+    //   console.log('dossierFilesItems------------', dossierFiles)
+    //   let dataPostAction = {
+    //     dossierId: vm.dossierId,
+    //     actionCode: 1100,
+    //     actionNote: '',
+    //     actionUser: '',
+    //     payload: '',
+    //     security: '',
+    //     assignUsers: '',
+    //     payment: '',
+    //     createDossiers: ''
+    //     // dossierFiles: JSON.stringify(dossierFiles),
+    //     // dossierMarks: JSON.stringify(thanhphanhoso)
+    //   }
+    //   vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+    //     let currentQuery = vm.$router.history.current.query
+    //     router.push({
+    //       path: vm.$router.history.current.path,
+    //       query: {
+    //         recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+    //         renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+    //         q: currentQuery['q']
+    //       }
+    //     })
+    //     vm.tiepNhanState = false
+    //   })
+    // },
     boSungHoSo () {
       var vm = this
       console.log('luu Ho So--------------------')

@@ -193,7 +193,7 @@
         })
       },
       doAddDVC () {
-        router.push('/danh-sach-ho-so/add-dvc')
+        router.push('/danh-sach-ho-so/add-dvc/gov')
       }
     }
   }

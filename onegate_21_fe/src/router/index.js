@@ -9,7 +9,7 @@ const routerOptions = [
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', component: 'HoanThienBoSungHoSoDetail', props: true },
   { path: '/danh-sach-ho-so/:index/tra-ket-qua/:id', component: 'TraKetQuaDetail', props: true },
   { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', component: 'DetailForward', props: true },
-  { path: '/danh-sach-ho-so/add-dvc', component: 'DetailForward', props: true },
+  { path: '/danh-sach-ho-so/add-dvc/gov', component: 'DanhSachThuTuc', props: true },
   { path: '*', component: 'NotFound' }
 ]
 
