@@ -33,7 +33,7 @@
           <v-flex xs12 sm4>
             <div class="xs12 sm12 pb-1">
               <span class="pr-2">Ngày gửi trực tuyến: </span>
-              <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.submitDate"> {{thongTinChiTietHoSo.submitDate}} </span>
+              <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
               <span class="pl-0 text-bold" v-else> Một cửa </span>
             </div>
             <!--  -->

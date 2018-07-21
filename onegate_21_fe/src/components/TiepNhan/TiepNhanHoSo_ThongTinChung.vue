@@ -9,25 +9,13 @@
             </content-placeholders>
             <v-subheader v-else class="pl-0">Thủ tục: </v-subheader>
           </v-flex>
-          <v-flex xs12 sm6>
+          <v-flex xs12 sm10>
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <v-subheader v-if="loading === false" style="float:left;height: 100%">
               <i>{{thongTinChungHoSo.serviceName}}</i>
             </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0">Thời gian giải quyết: </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-if="!loading&&thongTinChungHoSo.durationDate" style="float:left"><i>{{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc</i></v-subheader>
           </v-flex>
           <v-flex xs12></v-flex>
           <!--  -->
@@ -49,6 +37,18 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
+            <v-subheader v-else class="pl-0">Thời gian giải quyết: </v-subheader>
+          </v-flex>
+          <v-flex xs12 sm4>
+            <content-placeholders class="mt-1" v-if="loading">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <v-subheader v-if="!loading" style="float:left"><i>{{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc</i></v-subheader>
+          </v-flex>
+          <!-- <v-flex xs12 sm2>
+            <content-placeholders class="mt-1" v-if="loading">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
             <v-subheader v-else class="pl-0" >
               Mã tham chiếu: 
             </v-subheader>
@@ -58,7 +58,7 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.dossierIdCTN}}</i></v-subheader>
-          </v-flex>
+          </v-flex> -->
           <v-flex xs12></v-flex>
           <!--  -->
           <!--  -->
@@ -91,9 +91,9 @@
         </v-layout>
       </v-card-text>
     </v-card>
-    <v-btn flat class="absolute__btn">
-      Hướng dẫn &nbsp;
-      <v-icon>file_copy</v-icon>
+    <v-btn flat class="absolute__btn" @click="goBack">
+      Quay lại &nbsp;
+      <v-icon>undo</v-icon>
     </v-btn>
   </div>
 </template>
@@ -114,13 +114,15 @@
         serviceConfig: '',
         serviceOption: '',
         dossierNo: '',
-        receiveDate: new Date(),
-        dueDate: (new Date()).toString(),
+        receiveDate: '',
+        dueDate: '',
         durationDate: '',
         dossierId: '',
         dossierIdCTN: '',
         dossierStatus: '',
-        dossierStatusText: ''
+        dossierStatusText: '',
+        durationUnit: '',
+        durationCount: ''
       }
     }),
     created () {
@@ -154,8 +156,11 @@
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
           dossierStatus: data.dossierStatus,
-          dossierStatusText: data.dossierStatusText
+          dossierStatusText: data.dossierStatusText,
+          durationUnit: data.durationUnit,
+          durationCount: data.durationCount
         }
+        console.log('thongTinChungHoSoTemp++++++++++', thongTinChungHoSoTemp)
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
       },
       getCurentDateTime (type) {
@@ -191,6 +196,15 @@
           durationText = durationCount + ' giờ'
         }
         return durationText
+      },
+      goBack () {
+        let vm = this
+        let currentParams = vm.$router.history.current.params
+        let currentQuery = vm.$router.history.current.query
+        vm.$router.push({
+          path: '/danh-sach-ho-so/' + currentParams.index,
+          query: currentQuery
+        })
       }
     },
     filters: {

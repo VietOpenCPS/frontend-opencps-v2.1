@@ -37,7 +37,9 @@
             v-model="lePhi.paymentNote"
             multi-line
             rows="2"
+            v-if="lePhi.editable"
           ></v-text-field>
+          <span v-else>{{lePhi.paymentNote}}</span>
         </v-flex>
       </v-layout>
     </v-card-text>
@@ -58,8 +60,6 @@ export default {
       masked: false
     },
     lePhi: {
-      paymentFee: '',
-      paymentNote: ''
     }
   }),
   directives: {money: VMoney},
@@ -75,25 +75,7 @@ export default {
     },
     initData (data) {
       var vm = this
-      let params = {
-        dossierId: data.dossierId
-      }
-      if (data.dossierStatus === '') {
-        vm.$store.dispatch('processPullBtnDetail', {
-          dossierId: data.dossierId,
-          actionId: 1100
-        }).then(resAction => {
-          if (resAction && resAction.payment) {
-            vm.lePhi = resAction.payment
-            vm.lePhi['dossierId'] = data.dossierId
-          }
-        })
-      } else {
-        vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
-          vm.lePhi = resultPayment
-          vm.lePhi['dossierId'] = data.dossierId
-        })
-      }
+      vm.lePhi = data
     }
   },
   filters: {

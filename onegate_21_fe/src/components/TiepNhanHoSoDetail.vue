@@ -3,8 +3,7 @@
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <div slot="header"><div class="background-triangle-small"> I. </div>THÔNG TIN CHUNG</div>
-          <thong-tin-chung ref="thongtinchung"></thong-tin-chung>
+          <thong-tin-co-ban :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -15,7 +14,7 @@
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
-            <div class="background-triangle-small"> IV.</div>
+            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
@@ -26,8 +25,8 @@
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <div slot="header"><div class="background-triangle-small"> V. </div>LỆ PHÍ</div>
-          <le-phi ref="lephi"></le-phi>
+          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
+          <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -35,20 +34,20 @@
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <div slot="header"><div class="background-triangle-small"> VI. </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
-          <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua"></dich-vu-chuyen-phat-ket-qua>
+          <!-- <le-phi ref="lephi"></le-phi> -->
+          <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
     <!--  -->
     <v-tabs icons-and-text centered class="mb-4">
       <v-tabs-slider color="primary"></v-tabs-slider>
-      <v-tab href="#tab-1" @click="luuHoSo">
+      <!-- <v-tab href="#tab-1" @click="luuHoSo">
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Lưu &nbsp;
           <v-icon>save</v-icon>
         </v-btn>
-      </v-tab>
+      </v-tab> -->
       <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Tiếp nhận &nbsp;
@@ -81,26 +80,30 @@
 import router from '@/router'
 import toastr from 'toastr'
 // import * as utils from '../store/onegate_utils'
-import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
+import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
-import LePhi from './TiepNhan/TiepNhanHoSo_LePhi.vue'
+import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
-    'thong-tin-chung': ThongTinChung,
+    'thong-tin-co-ban': ThongTinCoBanHoSo,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
-    'le-phi': LePhi,
+    'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
     validTNHS: false,
     dossierId: '',
     mark: true,
-    tiepNhanState: true
+    tiepNhanState: true,
+    thongTinChiTietHoSo: {},
+    payments: {},
+    viaPortalDetail: false,
+    showThuPhi: false
   }),
   computed: {
     loading () {
@@ -128,15 +131,33 @@ export default {
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
         vm.$refs.dichvuchuyenphatketqua.initData(result)
-
-        vm.$refs.thongtinchung.initData(result)
-
-        vm.$refs.lephi.initData(result)
+        // vm.$refs.thongtinchung.initData(result)
+        vm.thongTinChiTietHoSo = result
+        vm.viaPortalDetail = result.viaPostal
+        // vm.$refs.lephi.initData(result)
+        console.log('result.dossierStatus', result.dossierStatus)
+        if (result.dossierStatus === '') {
+          vm.$store.dispatch('processPullBtnDetail', {
+            dossierId: result.dossierId,
+            actionId: 1100
+          }).then(resAction => {
+            if (resAction && resAction.payment) {
+              vm.showThuPhi = true
+              vm.payments = resAction.payment
+            }
+          })
+        } else {
+          // vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
+          //   let lePhi = resultPayment
+          //   lePhi['dossierId'] = result.dossierId
+          //   vm.$refs.lephi.initData(lePhi)
+          // })
+        }
         vm.dossierId = data
       }).catch(reject => {
       })
     },
-    luuHoSo () {
+    tiepNhanHoSo () {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
@@ -144,75 +165,52 @@ export default {
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let lephi = this.$refs.lephi.lePhi
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
+      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        if (dossierTemplates) {
-          dossierTemplates.forEach(function (val, index) {
-            if (val.partType === 1) {
-              val['dossierId'] = vm.dossierId
-              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
-            }
-          })
-          // dossierFiles.forEach(function (value, index) {
-          //   if (value.eForm) {
-          //     value['dossierId'] = vm.dossierId
-          //     listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          //   }
-          // })
-        }
-        vm.$store.dispatch('postDossierPayments', lephi).then(resultLePhi => {
-        })
-        Promise.all(listDossierMark).then(values => {
-        }).catch(function (xhr) {
+        dossierFiles.forEach(function (value, index) {
+          if (value.eForm) {
+            value['dossierId'] = vm.dossierId
+            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          }
         })
         let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
         console.log('data put dossier -->', tempData)
         tempData['dossierId'] = vm.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          let dataPostAction = {
+            dossierId: vm.dossierId,
+            actionCode: 1100,
+            actionNote: '',
+            actionUser: '',
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: vm.payments,
+            createDossiers: ''
+          }
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            let currentQuery = vm.$router.history.current.query
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+            vm.tiepNhanState = false
+          })
         }).catch(function (xhr) {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       }
-    },
-    tiepNhanHoSo () {
-      var vm = this
-      vm.$store.commit('setPrintPH', false)
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dossierFiles = this.$refs.thanhphanhoso.dossierFilesItems
-      console.log('dossierTemplateItems------------', thanhphanhoso)
-      console.log('dossierFilesItems------------', dossierFiles)
-      let dataPostAction = {
-        dossierId: vm.dossierId,
-        actionCode: 1100,
-        actionNote: '',
-        actionUser: '',
-        payload: '',
-        security: '',
-        assignUsers: '',
-        payment: '',
-        createDossiers: ''
-        // dossierFiles: JSON.stringify(dossierFiles),
-        // dossierMarks: JSON.stringify(thanhphanhoso)
-      }
-      vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-        let currentQuery = vm.$router.history.current.query
-        router.push({
-          path: vm.$router.history.current.path,
-          query: {
-            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-            q: currentQuery['q']
-          }
-        })
-        vm.tiepNhanState = false
-      })
     },
     boSungHoSo () {
       var vm = this
@@ -266,8 +264,14 @@ export default {
             })
           })
         }).catch(reject => {
-          console.log('reject=============', reject)
         })
+      }
+    },
+    changeViapostal (viapostal) {
+      if (viapostal) {
+        this.viaPortalDetail = 2
+      } else {
+        this.viaPortalDetail = 1
       }
     },
     goBack () {
