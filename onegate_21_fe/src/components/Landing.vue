@@ -118,7 +118,7 @@
               <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
               >
-                <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile>
             </v-list>
           </v-menu>
@@ -484,6 +484,7 @@ export default {
               vm.btnDynamics = []
               vm.btnDynamics = btnDynamicsView
               vm.btnStepsDynamics = []
+              // convert button configs
               if (currentQuery.hasOwnProperty('step')) {
                 for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
                   let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
@@ -505,7 +506,6 @@ export default {
                   }
                 }
               }
-              console.log('btnDynamics', vm.btnDynamics)
               vm.$store.commit('setLoadingDynamicBtn', false)
             })
           }, 200)
@@ -659,23 +659,22 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        let filter = {
-          queryParams: currentQuery.q,
-          page: vm.hosoDatasPage,
-          agency: vm.govAgencyCode,
-          service: vm.serviceCode,
-          template: vm.templateNo
-        }
-        /*  test Local */
         // let filter = {
-        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+        //   queryParams: currentQuery.q,
         //   page: vm.hosoDatasPage,
         //   agency: vm.govAgencyCode,
         //   service: vm.serviceCode,
         //   template: vm.templateNo
         // }
+        /*  test Local */
+        let filter = {
+          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          page: vm.hosoDatasPage,
+          agency: vm.govAgencyCode,
+          service: vm.serviceCode,
+          template: vm.templateNo
+        }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -747,7 +746,6 @@ export default {
       vm.itemAction = item
       console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
@@ -888,7 +886,6 @@ export default {
       })
     },
     doActions (dossierItem, item, index, isGroup) {
-      console.log('doActions')
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
@@ -997,17 +994,29 @@ export default {
     },
     processPullBtnDynamics (item) {
       let vm = this
+      vm.btnDossierDynamics = []
       let filter = {
-        dossierId: item.dossierId
+        dossierId: item.dossierId,
+        dossierStatus: item.dossierStatus,
+        dossierSubStatus: item.dossierSubStatus
       }
       vm.dossierId = item.dossierId
-      vm.$store.dispatch('pullNextactions', filter).then(function (result) {
-        vm.btnDossierDynamics = result
-      })
-      // add menuconfig
-      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
-      //   vm.btnDossierDynamics = result
-      // })
+      if (vm.$router.history.current.query.hasOwnProperty('step')) {
+        vm.$store.dispatch('pullNextactions', filter).then(result => {
+          vm.btnDossierDynamics = result
+        })
+      } else {
+        vm.btnStepsDynamics = []
+        var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
+        Promise.all(getbuttonAction).then(result => {
+          vm.btnDossierDynamics = result[0]
+          vm.btnStepsDynamics = result[1]
+        }).catch(reject => {
+          vm.$store.dispatch('pullNextactions', filter).then(result => {
+            vm.btnDossierDynamics = result
+          })
+        })
+      }
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
@@ -1101,7 +1110,6 @@ export default {
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
-      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -1163,7 +1171,6 @@ export default {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
         */
-        console.log('index', index)
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: {

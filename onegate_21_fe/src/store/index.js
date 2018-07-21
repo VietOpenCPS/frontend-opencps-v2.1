@@ -111,7 +111,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -1477,8 +1477,10 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, param).then(function (response) {
-            let serializable = response.data
-            resolve(serializable.data)
+          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5').then(function (response) {
+            let serializable = response.data.data
+            let buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons']
+            resolve(buttonConfig)
           }).catch(function (error) {
             console.log(error)
             reject(error)
