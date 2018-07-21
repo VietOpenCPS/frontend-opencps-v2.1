@@ -5,20 +5,23 @@
       <v-card>
         <v-card-text class="py-0">
           <v-layout wrap class="px-2 py-2">
-          <v-flex xs12 sm4>
+          <v-flex xs12 sm4 class="pr-3">
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Tên doanh nghiệp: </span>
+              <span class="pr-2">Chủ hồ sơ: </span>
               <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
+            </div>
+            <!--  -->
+            <div class="xs12 sm12 pb-1 overHidden">
+              <span class="pr-2">Địa chỉ: </span>
+              <v-tooltip top>
+                <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }}</span>
+                <span class="pl-0"> {{thongTinChiTietHoSo.address}} </span>
+              </v-tooltip>
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
               <span class="pr-2">Mã hồ sơ: </span>
-              <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierIdCTN}} </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Số hồ sơ: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierNo}} </span>
+              <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
@@ -29,43 +32,39 @@
           <!--  -->
           <v-flex xs12 sm4>
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Thời gian gửi: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.submitDate}} </span>
+              <span class="pr-2">Ngày gửi trực tuyến: </span>
+              <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
+              <span class="pl-0 text-bold" v-else> Một cửa </span>
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Thời gian tiếp nhận: </span>
+              <span class="pr-2">Ngày tiếp nhận: </span>
               <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Thời hạn xử lý: </span>
+              <span class="pr-2">Thời hạn quy định: </span>
               <span class="pl-0 text-bold "> 
                 {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
               </span>
+            </div>
+            <!--  -->
+            <div class="xs12 sm12 pb-1">
+              <span class="pr-2">Ngày hẹn trả: </span>
+              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
             </div>
           </v-flex>
           <!--  -->
           <v-flex xs12 sm4>
             <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Tên doanh nghiệp: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.applicantName}} </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pl-0">Địa chỉ Email: </span>
+              <span class="pl-0">Thư điện tử: </span>
               <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Số điện thoại: </span>
+              <span class="pr-2">Điện thoại: </span>
               <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Địa chỉ: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.address}} </span>
             </div>
           </v-flex>
         </v-layout>
@@ -150,3 +149,11 @@
     }
   }
 </script>
+<style>
+  .overHidden {
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    white-space: nowrap
+  }
+</style>
+

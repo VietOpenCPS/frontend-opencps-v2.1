@@ -3,7 +3,6 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex xs12 class="px-2">
         <v-select
-          class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
           label="Thủ tục:"
@@ -114,7 +113,7 @@
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2"
+                :disabled="item['enable'] === 2 && props.item['assigned'] === 0"
                 v-if="item['enable'] > 0"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
@@ -170,6 +169,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
+                  v-if="thuTucHanhChinhSelected"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
@@ -316,11 +316,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- <v-btn color="primary" @click.native="dialog_statusAction = true">
-      TEST StatusAction &nbsp;
-      <v-icon>save</v-icon>
-    </v-btn> -->
   </div>
 </template>
 
@@ -1013,17 +1008,21 @@ export default {
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
       })
+      // add menuconfig
+      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
+      //   vm.btnDossierDynamics = result
+      // })
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
       var paymentsOut = null
       if (vm.payments) {
         paymentsOut = {
-          requestPayment: vm.payments.requestPayment,
-          advanceAmount: Number(vm.payments.advanceAmount.toString().replace(/\./g, '')),
-          feeAmount: Number(vm.payments.feeAmount.toString().replace(/\./g, '')),
-          serviceAmount: Number(vm.payments.serviceAmount.toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments.shipAmount.toString().replace(/\./g, ''))
+          requestPayment: vm.payments['requestPayment'],
+          advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+          feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+          serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
         }
       }
       let filter = {

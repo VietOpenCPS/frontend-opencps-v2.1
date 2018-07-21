@@ -10,62 +10,67 @@
         <v-card>
           <v-card-text>
             <v-layout wrap>
-              <v-flex xs12 sm2>
-                <v-subheader class="pl-0 text-right">Tiền phí: </v-subheader>
+              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
+                <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
                 <v-text-field
-                  v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5"
-                  v-model.lazy="data_payment.feeAmount"
+                  @change="changeFee"
+                  v-model="data_payment.feeAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?'inputDisable':''"
+                  :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1 || data_payment.advanceAmount !== 0">
                 <v-subheader class="pl-0 text-right">Đã tạm thu: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1 || data_payment.advanceAmount !== 0">
                 <v-text-field
-                  v-if="data_payment.requestPayment === 1 || data_payment.advanceAmount !== 0"
-                  v-model.lazy="data_payment.advanceAmount"
+                  @change="changeFee"
+                  v-model="data_payment.advanceAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?'inputDisable':''"
+                  :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
+              <v-flex xs12 sm2></v-flex>
               <!--  -->
-              <v-flex xs12 sm2>
-                <v-subheader class="pl-0 text-right">Tiền lệ phí dịch vụ: </v-subheader>
+              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
+                <v-subheader class="pl-0 text-right">Phí dịch vụ: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4>
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
                 <v-text-field
-                  v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5"
-                  v-model.lazy="data_payment.serviceAmount"
+                  @change="changeFee"
+                  v-model="data_payment.serviceAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?'inputDisable':''"
+                  :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="viaPortal === 2">
-                <v-subheader class="pl-0 text-right">Phí chuyển phát hồ sơ: </v-subheader>
+                <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm4 v-if="viaPortal === 2">
+              <v-flex xs12 sm3 v-if="viaPortal === 2">
                 <v-text-field
-                  v-model.lazy="data_payment.shipAmount"
+                  @change="changeFee"
+                  v-model="data_payment.shipAmount"
                   v-money="money"
                   suffix="đ"
-                  :class="data_payment.editable?'inputDisable':''"
+                  :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
+              <v-flex xs12 sm2></v-flex>
             </v-layout>
           </v-card-text>
           <v-card-text class="pt-0">
             <div class="pl-5 fee-info" v-if="data_payment.requestPayment === 5">
-              <v-checkbox :label="`Phí phải nộp: ${currency(data_payment.feeAmount.toString().replace(/\./g, ''))} VNĐ`" v-model="checkPaid"></v-checkbox>
-              <span class="red--text">* </span> Đánh dấu để xác định người làm thủ tục đã hoàn thành nộp phí.
+              <v-layout wrap>
+                <v-checkbox disabled :label="`Phí phải nộp: ${currency(totalFee.toString().replace(/\./g, ''))} VNĐ`" v-model="checkPaid"></v-checkbox>
+              </v-layout>
+              <span class="red--text">* </span> Người làm thủ tục đã hoàn thành nộp phí.
             </div>
           </v-card-text>
         </v-card>
@@ -101,13 +106,39 @@ export default {
       precision: 0,
       masked: false
     },
-    checkPaid: false
+    totalFee: 0,
+    checkPaid: true
   }),
   directives: {money: VMoney},
   created () {
-    this.data_payment = this.payments
+    var vm = this
+    vm.data_payment = vm.payments
+    if (vm.payments) {
+      setTimeout(function () {
+        let feeAmount = vm.payments.feeAmount ? Number(vm.payments.feeAmount.replace(/\./g, '')) : 0
+        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.replace(/\./g, '')) : 0
+        let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.replace(/\./g, '')) : 0
+        let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.replace(/\./g, '')) : 0
+        vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
+        if (vm.totalFee < 0) {
+          vm.totalFee = 0
+        }
+      }, 200)
+    }
   },
   methods: {
+    changeFee () {
+      var vm = this
+      let val = vm.data_payment
+      let feeAmount = Number(val.feeAmount.replace(/\./g, ''))
+      let serviceAmount = Number(val.serviceAmount.replace(/\./g, ''))
+      let shipAmount = Number(val.shipAmount.replace(/\./g, ''))
+      let advanceAmount = Number(val.advanceAmount.replace(/\./g, ''))
+      this.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
+      if (this.totalFee < 0) {
+        this.totalFee = 0
+      }
+    },
     currency (value) {
       if (value) {
         let moneyCur = (value / 1).toFixed(0).replace('.', ',')
@@ -118,15 +149,19 @@ export default {
     goBack () {
       window.history.back()
     }
-  }
+  },
+  filters: {}
 }
 </script>
 <style>
-.inputDisable {
+.inputDisable, .inputDisable label {
   pointer-events: none
 }
 .inputDisable .input-group__details {
   display: none
+}
+.payment-info .input-group--disabled label {
+  color: #000 !important
 }
 </style>
 

@@ -5,12 +5,9 @@
       <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId" style="display: inline-block">
         <v-layout wrap v-if="type === 1">
           <v-flex>
-            <v-checkbox v-model="item.assigned"
+            <v-checkbox :label="item.userName" v-model="item.assigned"
             @change = 'changeAssigned($event, index)'
             ></v-checkbox>
-          </v-flex>
-          <v-flex class="pt-1">
-            <span>{{item.userName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </v-flex>
         </v-layout>
 
