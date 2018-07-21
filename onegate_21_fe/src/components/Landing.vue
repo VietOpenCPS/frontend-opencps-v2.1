@@ -3,7 +3,6 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-flex xs12 class="px-2">
         <v-select
-          class="py-0"
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
           label="Thủ tục:"
@@ -1016,11 +1015,11 @@ export default {
       var paymentsOut = null
       if (vm.payments) {
         paymentsOut = {
-          requestPayment: vm.payments.requestPayment,
-          advanceAmount: Number(vm.payments.advanceAmount.toString().replace(/\./g, '')),
-          feeAmount: Number(vm.payments.feeAmount.toString().replace(/\./g, '')),
-          serviceAmount: Number(vm.payments.serviceAmount.toString().replace(/\./g, '')),
-          shipAmount: Number(vm.payments.shipAmount.toString().replace(/\./g, ''))
+          requestPayment: vm.payments['requestPayment'],
+          advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+          feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+          serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
         }
       }
       let filter = {
