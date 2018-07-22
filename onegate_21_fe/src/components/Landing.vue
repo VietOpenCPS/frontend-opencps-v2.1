@@ -70,6 +70,7 @@
       <template slot="items" slot-scope="props">
         <td>
           <v-checkbox
+            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             :disabled="props.item['assigned'] === 0"
             v-model="props.selected"
             primary
@@ -113,8 +114,9 @@
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2 && props.item['assigned'] === 0"
+                :disabled="item['enable'] === 2 || props.item['assigned'] === 0"
                 v-if="item['enable'] > 0"
+                :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -155,7 +157,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change = "changeServiceConfigs"
+                  @change = "changeServiceConfigs2"
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -183,6 +185,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>undo</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -190,6 +193,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>save</v-icon>&nbsp;
               Đồng ý
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -724,6 +728,15 @@ export default {
       })
       console.log('vm.listDichVu+++++++++', vm.listDichVu)
     },
+    changeServiceConfigs2 (item) {
+      var vm = this
+      vm.changeServiceConfigs(item)
+      if (item.options) {
+        if (item.options.length === 1) {
+          vm.doCreateDossier()
+        }
+      }
+    },
     changeDichVuConfigs (item) {
       let vm = this
       console.log('item dich vu: ', item)
@@ -1001,17 +1014,35 @@ export default {
     },
     processPullBtnDynamics (item) {
       let vm = this
+      vm.btnDossierDynamics = []
       let filter = {
-        dossierId: item.dossierId
+        dossierId: item.dossierId,
+        dossierStatus: item.dossierStatus,
+        dossierSubStatus: item.dossierSubStatus
       }
       vm.dossierId = item.dossierId
-      vm.$store.dispatch('pullNextactions', filter).then(function (result) {
-        vm.btnDossierDynamics = result
-      })
-      // add menuconfig
-      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
-      //   vm.btnDossierDynamics = result
-      // })
+      if (vm.$router.history.current.query.hasOwnProperty('step')) {
+        vm.$store.dispatch('pullNextactions', filter).then(result => {
+          vm.btnDossierDynamics = result
+        })
+      } else {
+        if (item.dossierStatus === '' || item.dossierSubStatus === '') {
+          vm.$store.dispatch('pullNextactions', filter).then(result => {
+            vm.btnDossierDynamics = result
+          })
+        } else {
+          vm.btnStepsDynamics = []
+          var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
+          Promise.all(getbuttonAction).then(result => {
+            vm.btnDossierDynamics = result[0]
+            vm.btnStepsDynamics = result[1]
+          }).catch(reject => {
+            vm.$store.dispatch('pullNextactions', filter).then(result => {
+              vm.btnDossierDynamics = result
+            })
+          })
+        }
+      }
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this

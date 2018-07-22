@@ -1870,7 +1870,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.initData.stepConfigsApi + '/' + data.stepCode, param).then(function (response) {
+          axios.get(state.initData.stepConfigApi + '/' + data.stepCode, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
