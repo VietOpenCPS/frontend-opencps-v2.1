@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.js'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
@@ -158,7 +158,7 @@ export const store = new Vuex.Store({
                 let tableConfig = current['tableConfig']
                 let buttonConfig = current['buttonConfig']
                 if (tableConfig !== '' && tableConfig !== undefined && tableConfig !== 'undefined' && String(tableConfig).indexOf('{') !== -1 && String(tableConfig).indexOf('}') !== -1) {
-                  menuDetail['tableConfig'] = JSON.parse(tableConfig)
+                  menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
                   menuDetail['buttonConfig'] = JSON.parse(buttonConfig)
