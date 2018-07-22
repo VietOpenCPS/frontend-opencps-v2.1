@@ -43,7 +43,7 @@
             </div>
             <!--  -->
             <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Thời hạn quy định: </span>
+              <span class="pr-2">Thời hạn giải quyết: </span>
               <span class="pl-0 text-bold "> 
                 {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
               </span>

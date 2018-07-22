@@ -3,20 +3,6 @@
     <v-card-text class="pb-0">
       <v-layout wrap>
         <v-flex xs12 sm2>
-          <v-subheader class="pl-0 text-header">Mã số hồ sơ: </v-subheader>
-        </v-flex>
-        <v-flex xs12 sm4>
-          <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.dossierIdCTN}} </v-subheader>
-        </v-flex>
-        <!--  -->
-        <v-flex xs12 sm2>
-          <v-subheader class="pl-0 text-header">Ngày tiếp nhận: </v-subheader>
-        </v-flex>
-        <v-flex xs12 sm4>
-          <v-subheader class="pl-0 text-header header-text-field"> {{thongTinChiTietHoSo.receiveDate}}</v-subheader>
-        </v-flex>
-        <!--  -->
-        <v-flex xs12 sm2>
           <v-subheader class="pl-0 text-header">Thủ tục: </v-subheader>
         </v-flex>
         <v-flex xs12 sm10>
@@ -24,33 +10,38 @@
         </v-flex>
         <!--  -->
         <v-flex xs12 sm2>
-          <v-subheader class="pl-0 text-header">Chủ hồ sơ: </v-subheader>
-        </v-flex>
-        <v-flex xs12 sm4>
-          <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.applicantName}} </v-subheader>
-        </v-flex>
-        <!--  -->
-        <v-flex xs12 sm2>
-          <v-subheader class="pl-0 text-header">Mã số: </v-subheader>
+          <v-subheader class="pl-0 text-header">Mã số hồ sơ: </v-subheader>
         </v-flex>
         <v-flex xs12 sm4>
           <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.dossierNo}} </v-subheader>
         </v-flex>
         <!--  -->
         <v-flex xs12 sm2>
-          <v-subheader class="pl-0 text-header">Địa chỉ: </v-subheader>
+          <v-subheader class="pl-0 text-header">Thời hạn giải quyết: </v-subheader>
         </v-flex>
-        <v-flex xs12 sm10>
-          <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.address}} </v-subheader>
+        <v-flex xs12 sm4>
+          <v-subheader class="pl-0 text-header header-text-field">  {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc  </v-subheader>
         </v-flex>
         <!--  -->
+        <v-flex xs12 sm2>
+          <v-subheader class="pl-0 text-header">Ngày tiếp nhận: </v-subheader>
+        </v-flex>
+        <v-flex xs12 sm4>
+          <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.receiveDate}} </v-subheader>
+        </v-flex>
+        <!--  -->
+        <v-flex xs12 sm2>
+          <v-subheader class="pl-0 text-header">Ngày hẹn trả: </v-subheader>
+        </v-flex>
+        <v-flex xs12 sm4>
+          <v-subheader class="pl-0 text-header header-text-field">  {{thongTinChiTietHoSo.dueDate}} </v-subheader>
+        </v-flex>
       </v-layout>
     </v-card-text>
   </v-card>
 </template>
 <script>
   export default {
-    props: ['dataDetail'],
     data: () => ({
       thongTinChiTietHoSo: {}
     }),
@@ -59,21 +50,30 @@
         return this.$store.getters.loading
       }
     },
-    watch: {
-      dataDetail (val) {
-        var vm = this
-        vm.thongTinChiTietHoSo = val
+    created () {},
+    methods: {
+      initData (result) {
+        this.thongTinChiTietHoSo = result
+      },
+      durationText (durationUnit, durationCount) {
+        var durationText
+        if (durationUnit === 1 && durationCount > 8) {
+          let day = Math.floor(durationCount / 8) + ' ngày'
+          let hours
+          if (durationCount % 8 !== 0) {
+            hours = ((durationCount / 8) - Math.floor(durationCount / 8)) * 8 + ' giờ'
+          } else {
+            hours = ''
+          }
+          durationText = `${day} ${hours}`
+        } else if (durationUnit === 0) {
+          durationText = durationCount + ' ngày'
+        } else if (durationUnit === 1 && durationCount <= 8) {
+          durationText = durationCount + ' giờ'
+        }
+        return durationText
       }
     },
-    created () {
-      var vm = this
-      vm.$nextTick(function () {
-        if (vm.dataDetail) {
-          vm.thongTinChiTietHoSo = vm.dataDetail
-        }
-      })
-    },
-    methods: {},
     filters: {
       dateTimeView (arg) {
         if (arg) {

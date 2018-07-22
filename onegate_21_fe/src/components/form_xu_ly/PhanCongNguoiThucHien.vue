@@ -19,7 +19,7 @@
             </v-layout>
           </v-card-text>
           <!--  -->
-          <v-card-text v-else class="px-2">
+          <v-card-text v-else class="px-2 py-1">
             <v-layout wrap class="my-1">
               <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId">
                 <v-layout wrap>
@@ -98,7 +98,7 @@ export default {
     var vm = this
     setTimeout(function () {
       $('.btn-tgl').addClass('btn-hidden')
-    }, 300)
+    }, 200)
   },
   mounted () {
     this.data_phancong = this.assign_items

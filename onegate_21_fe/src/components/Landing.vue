@@ -75,6 +75,7 @@
           <v-checkbox
             :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             :disabled="props.item['assigned'] === 0"
+            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             v-model="props.selected"
             primary
             hide-details
@@ -1111,7 +1112,6 @@ export default {
                 if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
                   vm.dialog_statusAction = true
                 } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
-                  console.log('router')
                   router.push({
                     path: vm.$router.history.current.path,
                     query: {

@@ -666,7 +666,12 @@ export default {
           vm.showFormBoSungThongTinNgan = true
         }
         if (result.hasOwnProperty('allowAssignUser') && result.allowAssignUser !== 0) {
-          vm.assign_items = result.toUsers
+          console.log('allowAssignUser', result.toUsers)
+          if (Array.isArray(result.toUsers)) {
+            vm.assign_items = result.toUsers
+          } else {
+            vm.assign_items = [result.toUsers]
+          }
           vm.type_assign = result.allowAssignUser
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
