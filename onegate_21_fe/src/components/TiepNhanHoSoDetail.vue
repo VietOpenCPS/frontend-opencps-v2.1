@@ -90,7 +90,6 @@ import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQ
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
-    'thong-tin-chung': ThongTinChungHoSo,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'thong-tin-chung': ThongTinChung,
