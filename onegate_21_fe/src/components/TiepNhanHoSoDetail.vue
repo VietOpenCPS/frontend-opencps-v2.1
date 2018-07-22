@@ -1,5 +1,19 @@
 <template>
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
+    <div class="row-header">
+      <div class="background-triangle-big"> <span>THÊM MỚI HỒ SƠ</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+          {{thongTinChiTietHoSo.serviceName}}
+        </div>
+        <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+          <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+            Quay lại &nbsp;
+            <v-icon size="16">undo</v-icon>
+          </v-btn>
+        </div>
+      </div> 
+    </div>
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
@@ -122,6 +136,7 @@ export default {
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
+        vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so
         vm.$refs.thongtinchuhoso.initData(result)
         // call initData thanh phan ho so
