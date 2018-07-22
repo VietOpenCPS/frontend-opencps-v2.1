@@ -20,10 +20,10 @@
             @click="toTableIndexing(item, index)" >
             <v-list-tile-content>
               <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1" class="status__counter_group status__counter">
+              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1 && item['menuType'] !== 3" class="status__counter_group status__counter">
                 {{item.counter}}
               </span>
-              <span v-else class="status__counter_group status__counter">
+              <span v-else-if="item['menuType'] !== 3" class="status__counter_group status__counter">
                 <v-progress-circular :width="1" :size="16" indeterminate color="red"></v-progress-circular>
               </span>
             </v-list-tile-content>

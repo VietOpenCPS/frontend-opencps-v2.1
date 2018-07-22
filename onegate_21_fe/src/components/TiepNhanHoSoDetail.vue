@@ -36,7 +36,7 @@
       </v-expansion-panel>
     </div>
     <!--  -->
-    <div style="position: relative;">
+    <div style="position: relative;" v-if="viaPortalDetail > 0">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
@@ -97,6 +97,7 @@ import toastr from 'toastr'
 import ThongTinChungHoSo from './form_xu_ly/ThongTinChungHoSo.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 
@@ -106,6 +107,7 @@ export default {
     'thong-tin-chung': ThongTinChungHoSo,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
+    'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
@@ -116,7 +118,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
-    viaPortalDetail: false,
+    viaPortalDetail: 0,
     showThuPhi: false
   }),
   computed: {
@@ -164,7 +166,7 @@ export default {
           //   vm.$refs.lephi.initData(lePhi)
           // })
         }
-        vm.dossierId = data
+        vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
     },
@@ -172,7 +174,6 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchung = this.$refs.thongtinchung.thongTinChungHoSo
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -189,16 +190,18 @@ export default {
             listAction.push(vm.$store.dispatch('putAlpacaForm', value))
           }
         })
-        let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
-        console.log('data put dossier -->', tempData)
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
         tempData['dossierId'] = vm.dossierId
+        console.log('data put dossier -->', tempData)
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          var initData = vm.$store.getters.loadingInitData
+          let actionUser = initData.user.userName ? initData.user.userName : ''
           let dataPostAction = {
             dossierId: vm.dossierId,
             actionCode: 1100,
             actionNote: '',
-            actionUser: '',
+            actionUser: actionUser,
             payload: '',
             security: '',
             assignUsers: '',
@@ -227,7 +230,6 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchung = this.$refs.thongtinchung.thongTinChungHoSo
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -258,7 +260,7 @@ export default {
         })
         Promise.all(listAction).then(values => {
           console.log(values)
-          let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
           console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {

@@ -33,7 +33,7 @@
               <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
-              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -76,7 +76,7 @@
               <div v-for="(itemFileView, index) in fileViews">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                     <v-icon style="color: red">delete_outline</v-icon>
                   </v-btn>
@@ -184,7 +184,7 @@
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
             <v-flex style="width: 260px;" class="layout wrap">
-              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -227,7 +227,7 @@
               <div v-for="(itemFileView, index) in fileViews">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                     <v-icon style="color: red">delete_outline</v-icon>
                   </v-btn>
@@ -442,7 +442,7 @@ export default {
           itemTemplate.count = 0
           dossierMarks.forEach(function (val, index) {
             if (val.dossierPartNo === itemTemplate.partNo) {
-              itemTemplate.fileType = val.fileType
+              itemTemplate.fileMark = val.fileMark
                 // itemTemplate.fileCheck = val.fileCheck
             }
           })
@@ -451,7 +451,7 @@ export default {
       } else {
         dossierTemplates = dossierTemplates.map(itemTemplate => {
           itemTemplate.count = 0
-          itemTemplate.fileType = 0
+          itemTemplate.fileMark = 0
           return itemTemplate
         })
       }
@@ -581,6 +581,7 @@ export default {
       var vm = this
       let x = confirm('Bạn có muốn xóa?')
       if (x) {
+        item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
