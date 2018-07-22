@@ -484,7 +484,6 @@ export default {
               vm.btnDynamics = []
               vm.btnDynamics = btnDynamicsView
               vm.btnStepsDynamics = []
-              // convert button configs
               if (currentQuery.hasOwnProperty('step')) {
                 for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
                   let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
@@ -1006,16 +1005,22 @@ export default {
           vm.btnDossierDynamics = result
         })
       } else {
-        vm.btnStepsDynamics = []
-        var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
-        Promise.all(getbuttonAction).then(result => {
-          vm.btnDossierDynamics = result[0]
-          vm.btnStepsDynamics = result[1]
-        }).catch(reject => {
+        if (item.dossierStatus === '' || item.dossierSubStatus === '') {
           vm.$store.dispatch('pullNextactions', filter).then(result => {
             vm.btnDossierDynamics = result
           })
-        })
+        } else {
+          vm.btnStepsDynamics = []
+          var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
+          Promise.all(getbuttonAction).then(result => {
+            vm.btnDossierDynamics = result[0]
+            vm.btnStepsDynamics = result[1]
+          }).catch(reject => {
+            vm.$store.dispatch('pullNextactions', filter).then(result => {
+              vm.btnDossierDynamics = result
+            })
+          })
+        }
       }
     },
     processAction (dossierItem, item, result, index, isConfirm) {
