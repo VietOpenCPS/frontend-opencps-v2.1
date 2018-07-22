@@ -123,7 +123,7 @@
               <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
               >
-                <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile>
             </v-list>
           </v-menu>
@@ -513,7 +513,6 @@ export default {
                   }
                 }
               }
-              console.log('btnDynamics', vm.btnDynamics)
               vm.$store.commit('setLoadingDynamicBtn', false)
             })
           }, 200)
@@ -667,7 +666,6 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let filter = {
           queryParams: currentQuery.q,
@@ -764,7 +762,6 @@ export default {
       vm.itemAction = item
       console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
@@ -905,7 +902,6 @@ export default {
       })
     },
     doActions (dossierItem, item, index, isGroup) {
-      console.log('doActions')
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
@@ -1136,7 +1132,6 @@ export default {
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
-      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -1198,7 +1193,6 @@ export default {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
         */
-        console.log('index', index)
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: {
