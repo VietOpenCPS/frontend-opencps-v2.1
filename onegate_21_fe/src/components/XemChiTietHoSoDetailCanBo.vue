@@ -171,14 +171,14 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
 
-              <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
+              <!-- <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
                 v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
                 :disabled="loadingAction && index === indexActionStep"
               >
                 {{ item.title }}{{ item.tiltle }}
                 <span slot="loader">Loading...</span>
-              </v-btn>
+              </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
@@ -832,9 +832,12 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      var initData = vm.$store.getters.loadingInitData
+      let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
         dossierId: dossierItem.dossierId,
-        actionCode: result.actionCode
+        actionCode: result.actionCode,
+        actionUser: actionUser
       }
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items

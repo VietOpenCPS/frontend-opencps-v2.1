@@ -152,6 +152,7 @@ export const store = new Vuex.Store({
                   'action': 'description',
                   'action_active': 'play_arrow',
                   'counter': -1,
+                  'menuType': parseInt(current['menuType']),
                   'queryParams': current['queryParams']
                 }
                 index = index + 1
@@ -161,7 +162,7 @@ export const store = new Vuex.Store({
                   menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                  menuDetail['buttonConfig'] = JSON.parse(buttonConfig)
+                  menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
                 }
                 if (current.hasOwnProperty('steps')) {
                   if (current.steps.length > 1) {
@@ -611,12 +612,12 @@ export const store = new Vuex.Store({
       let param = {
         headers: {
           groupId: state.initData.groupId
-        },
-        responseType: 'blob'
+        }
+        // responseType: 'blob'
       }
       axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-        var url = window.URL.createObjectURL(response.data)
-        window.open(url, '_blank')
+        // var url = window.URL.createObjectURL(response.data)
+        // window.open(url, '_blank')
       }).catch(function (xhr) {
         console.log(xhr)
       })
@@ -812,7 +813,7 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileType', data.fileType)
+        dataPostdossierMark.append('fileMark', data.fileMark)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -1873,7 +1874,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.initData.stepConfigsApi + '/' + data.stepCode, param).then(function (response) {
+          axios.get(state.initData.stepConfigApi + '/' + data.stepCode, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

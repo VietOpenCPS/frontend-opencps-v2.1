@@ -36,15 +36,18 @@
       </v-flex>
     </v-layout>
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
-      <v-btn color="primary" v-for="(item, index) in btnDynamics" v-bind:key="index" 
-        v-on:click.native="btnActionEvent(null, item, index, true)" 
-        v-if="String(item.form).indexOf('VIEW') < 0"
-        :loading="loadingAction && index === indexAction"
-        :disabled="loadingAction && index === indexAction"
+      <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
+        v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
+        v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
+        :loading="loadingAction && indexBTN === indexAction"
+        :disabled="loadingAction && indexBTN === indexAction"
       >
         {{item.title}}{{item.tiltle}}
         <span slot="loader">Loading...</span>
       </v-btn>
+      <div v-if="menuType === 3">
+        <template-rendering :layout_view="filterForm"></template-rendering>
+      </div>
     </div>
     
     <v-data-table
@@ -70,6 +73,7 @@
       <template slot="items" slot-scope="props">
         <td>
           <v-checkbox
+            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             :disabled="props.item['assigned'] === 0"
             :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             v-model="props.selected"
@@ -114,8 +118,9 @@
             <v-list>
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2 && props.item['assigned'] === 0"
+                :disabled="item['enable'] === 2 || props.item['assigned'] === 0"
                 v-if="item['enable'] > 0"
+                :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
               </v-list-tile>
@@ -170,7 +175,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  v-if="thuTucHanhChinhSelected"
+                  v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
@@ -184,6 +189,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>undo</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -191,6 +197,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>save</v-icon>&nbsp;
               Đồng ý
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -346,6 +353,7 @@ export default {
   },
   data: () => ({
     /* data PhanCongThucHien */
+    menuType: 0,
     type_assign: '',
     assign_items: [
       {
@@ -435,7 +443,8 @@ export default {
     indexDialogPick: 0,
     userNote: 0,
     dialogPDF: false,
-    dialogPDFLoading: true
+    dialogPDFLoading: true,
+    filterForm: null
   }),
   computed: {
     loadingDynamicBtn () {
@@ -449,8 +458,8 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
-      if (query.hasOwnProperty('page') && query['page'] !== 1) {
-        vm.hosoDatasPage = query['page']
+      if (query.hasOwnProperty('page') && query['page'] !== '1') {
+        vm.hosoDatasPage = parseInt(query['page'])
       } else {
         vm.hosoDatasPage = 1
       }
@@ -470,12 +479,19 @@ export default {
             vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
               vm.btnDynamics = []
               vm.trangThaiHoSoList = result
+              vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
+              console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
               if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
                 vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
               }
               if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
                 vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
+              }
+              if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
+                vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
+                console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
+                console.log('filterForm', vm.filterForm)
               }
               let btnDynamicsOnlySteps = []
               let btnDynamicsView = []
@@ -525,12 +541,19 @@ export default {
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
+        vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
+        console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
         vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
           vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
         }
         if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
           vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
+        }
+        if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
+          vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
+          console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
+          console.log('filterForm', vm.filterForm)
         }
         let btnDynamicsOnlySteps = []
         let btnDynamicsView = []
@@ -566,7 +589,7 @@ export default {
           }
         }
         if (currentQuery.hasOwnProperty('page')) {
-          vm.hosoDatasPage = currentQuery.page
+          vm.hosoDatasPage = parseInt(currentQuery.page)
         } else {
           vm.hosoDatasPage = 1
         }
@@ -920,6 +943,8 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(reject => {
+        vm.loadingAction = false
       })
     },
     doCancel (dossierItem, item, index, isGroup) {
@@ -938,6 +963,8 @@ export default {
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query
           })
+        }).catch(reject => {
+          vm.loadingAction = false
         })
       }
     },
