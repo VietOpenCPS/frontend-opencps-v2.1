@@ -478,6 +478,7 @@ export default {
         applicantIdNo: data.applicantIdNo,
         contactEmail: data.contactEmail,
         contactName: data.contactName,
+        contactTelNo: data.contactTelNo,
         address: data.address,
         applicantName: data.applicantName
       }

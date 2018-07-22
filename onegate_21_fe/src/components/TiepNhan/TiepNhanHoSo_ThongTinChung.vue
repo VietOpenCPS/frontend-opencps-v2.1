@@ -3,7 +3,7 @@
     <v-card>
       <v-card-text>
         <v-layout wrap>
-          <v-flex xs12 sm2>
+          <!-- <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -14,9 +14,9 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <v-subheader v-if="loading === false" style="float:left;height: 100%">
-              <i>{{thongTinChungHoSo.serviceName}}</i>
+              {{thongTinChungHoSo.serviceName}}
             </v-subheader>
-          </v-flex>
+          </v-flex> -->
           <v-flex xs12></v-flex>
           <!--  -->
           <v-flex xs12 sm2>
@@ -91,10 +91,6 @@
         </v-layout>
       </v-card-text>
     </v-card>
-    <v-btn flat class="absolute__btn" @click="goBack">
-      Quay lại &nbsp;
-      <v-icon>undo</v-icon>
-    </v-btn>
   </div>
 </template>
 
