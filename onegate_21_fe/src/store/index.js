@@ -152,6 +152,7 @@ export const store = new Vuex.Store({
                   'action': 'description',
                   'action_active': 'play_arrow',
                   'counter': -1,
+                  'menuType': parseInt(current['menuType']),
                   'queryParams': current['queryParams']
                 }
                 index = index + 1
@@ -161,7 +162,7 @@ export const store = new Vuex.Store({
                   menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                  menuDetail['buttonConfig'] = JSON.parse(buttonConfig)
+                  menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
                 }
                 if (current.hasOwnProperty('steps')) {
                   if (current.steps.length > 1) {

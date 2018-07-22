@@ -2411,9 +2411,6 @@ body .tabs__content {
 body .btn.primary.deactive__btn {
     background-color: #495c61f2!important
 }
-body .menu_header_list .input-group__input {
-    margin-top: 20px;
-}
 table.datatable p {
     margin-bottom: 0;
 }

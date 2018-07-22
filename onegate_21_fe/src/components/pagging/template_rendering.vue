@@ -1,5 +1,5 @@
 <template>
-    <my-dynamic-view></my-dynamic-view>
+    <my-dynamic-view v-if="(layout_view !== null && layout_view !== undefined && layout_view !== 'undefined')"></my-dynamic-view>
 </template>
 
 <script>
@@ -20,12 +20,15 @@ export default {
   },
   created () {
     let vm = this
-    Vue.component('my-dynamic-view', {
-      template: vm.layout_view['template'],
-      data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
-      created: eval(' ( ' + vm.layout_view['created'] + ' ) '),
-      methods: eval(' ( ' + vm.layout_view['methods'] + ' ) ')
-    })
+    console.log('filterFormfilterFormfilterForm', vm.layout_view)
+    if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
+      Vue.component('my-dynamic-view', {
+        template: vm.layout_view['template'],
+        data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
+        created: eval(' ( ' + vm.layout_view['created'] + ' ) '),
+        methods: eval(' ( ' + vm.layout_view['methods'] + ' ) ')
+      })
+    }
   }
 }
 </script>
