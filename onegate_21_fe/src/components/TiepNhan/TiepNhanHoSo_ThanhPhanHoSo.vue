@@ -581,6 +581,7 @@ export default {
       var vm = this
       let x = confirm('Bạn có muốn xóa?')
       if (x) {
+        item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {

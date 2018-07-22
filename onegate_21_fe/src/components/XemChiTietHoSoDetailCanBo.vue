@@ -29,7 +29,7 @@
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            THỤ LÝ HỒ SƠ
+            XỬ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
         <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
@@ -171,14 +171,14 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
 
-              <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
+              <!-- <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
                 v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
                 :disabled="loadingAction && index === indexActionStep"
               >
                 {{ item.title }}{{ item.tiltle }}
                 <span slot="loader">Loading...</span>
-              </v-btn>
+              </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
