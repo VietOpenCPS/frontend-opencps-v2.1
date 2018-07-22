@@ -33,7 +33,7 @@
               <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
-              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -184,7 +184,7 @@
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
             <v-flex style="width: 260px;" class="layout wrap">
-              <v-radio-group v-model="dossierTemplateItems[index].fileType" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -442,7 +442,7 @@ export default {
           itemTemplate.count = 0
           dossierMarks.forEach(function (val, index) {
             if (val.dossierPartNo === itemTemplate.partNo) {
-              itemTemplate.fileType = val.fileType
+              itemTemplate.fileMark = val.fileMark
                 // itemTemplate.fileCheck = val.fileCheck
             }
           })
@@ -451,7 +451,7 @@ export default {
       } else {
         dossierTemplates = dossierTemplates.map(itemTemplate => {
           itemTemplate.count = 0
-          itemTemplate.fileType = 0
+          itemTemplate.fileMark = 0
           return itemTemplate
         })
       }

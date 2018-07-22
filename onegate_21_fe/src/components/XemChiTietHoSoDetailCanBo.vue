@@ -827,9 +827,12 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      var initData = vm.$store.getters.loadingInitData
+      let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
         dossierId: dossierItem.dossierId,
-        actionCode: result.actionCode
+        actionCode: result.actionCode,
+        actionUser: actionUser
       }
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items

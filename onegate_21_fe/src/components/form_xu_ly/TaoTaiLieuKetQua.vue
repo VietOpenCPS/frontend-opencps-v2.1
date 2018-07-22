@@ -37,7 +37,7 @@
               </content-placeholders>
               <v-layout row wrap class="flex__checkbox" v-else>
                 <v-flex style="width: 260px;" class="layout wrap">
-                  <v-radio-group v-model="createFiles[index].fileType" @change="postDossierMark(item, index)" row>
+                  <v-radio-group v-model="createFiles[index].fileMark" @change="postDossierMark(item, index)" row>
                     <v-radio :value="0"></v-radio>
                     <v-radio :value="1"></v-radio>
                     <v-radio :value="2"></v-radio>

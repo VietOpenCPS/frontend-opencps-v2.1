@@ -183,11 +183,13 @@ export default {
         console.log('data put dossier -->', tempData)
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          var initData = vm.$store.getters.loadingInitData
+          let actionUser = initData.user.userName ? initData.user.userName : ''
           let dataPostAction = {
             dossierId: vm.dossierId,
             actionCode: 1100,
             actionNote: '',
-            actionUser: '',
+            actionUser: actionUser,
             payload: '',
             security: '',
             assignUsers: '',
