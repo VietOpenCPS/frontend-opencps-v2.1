@@ -76,7 +76,7 @@
               <div v-for="(itemFileView, index) in fileViews">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                     <v-icon style="color: red">delete_outline</v-icon>
                   </v-btn>
@@ -227,7 +227,7 @@
               <div v-for="(itemFileView, index) in fileViews">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                     <v-icon style="color: red">delete_outline</v-icon>
                   </v-btn>
