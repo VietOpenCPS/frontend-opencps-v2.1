@@ -29,7 +29,7 @@
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            THỤ LÝ HỒ SƠ
+            XỬ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
         <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
@@ -666,7 +666,12 @@ export default {
           vm.showFormBoSungThongTinNgan = true
         }
         if (result.hasOwnProperty('allowAssignUser') && result.allowAssignUser !== 0) {
-          vm.assign_items = result.toUsers
+          console.log('allowAssignUser', result.toUsers)
+          if (Array.isArray(result.toUsers)) {
+            vm.assign_items = result.toUsers
+          } else {
+            vm.assign_items = [result.toUsers]
+          }
           vm.type_assign = result.allowAssignUser
           isPopup = true
           vm.showPhanCongNguoiThucHien = true

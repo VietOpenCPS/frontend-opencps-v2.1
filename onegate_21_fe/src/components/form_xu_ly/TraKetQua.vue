@@ -40,36 +40,6 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
   </div>
-  <!-- <v-dialog v-model="dialog_add_dined" persistent max-width="500px">
-    <v-card>
-      <v-card-text>
-        <v-container grid-list-md>
-          <v-layout wrap>
-            <v-flex xs12>
-              <v-text-field v-model="note_reason" placeholder="Nhập lý do từ chối" multi-line></v-text-field>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" flat="flat" @click.native="submitAddReason(note_reason)"
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          Chấp nhận &nbsp;
-          <span slot="loader">Loading...</span>
-        </v-btn>
-        <v-btn color="red darken-3" flat="flat" @click.native="dialog_add_dined = false"
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          Bỏ qua &nbsp;
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog> -->
 </template>
 
 <script>

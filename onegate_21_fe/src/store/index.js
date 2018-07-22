@@ -1471,15 +1471,16 @@ export const store = new Vuex.Store({
       },
       pullBtnConfigStep ({commit, state}, filter) {
         return new Promise((resolve, reject) => {
-          let param = {
+          const config = {
             headers: {
-              groupId: state.initData.groupId
+              'groupId': state.initData.groupId
             }
           }
-          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, param).then(function (response) {
-          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5').then(function (response) {
-            let serializable = response.data.data
-            let buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons']
+          var params = new URLSearchParams()
+          axios.post(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, params, config).then(function (response) {
+          // axios.post('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+            let serializable = response.data
+            let buttonConfig = JSON.parse(serializable.buttonConfig)['buttons']
             resolve(buttonConfig)
           }).catch(function (error) {
             console.log(error)
