@@ -157,7 +157,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change = "changeServiceConfigs2"
+                  @change = "changeServiceConfigs"
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -171,7 +171,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  v-if="thuTucHanhChinhSelected"
+                  v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
@@ -726,15 +726,6 @@ export default {
       })
       console.log('vm.listDichVu+++++++++', vm.listDichVu)
     },
-    changeServiceConfigs2 (item) {
-      var vm = this
-      vm.changeServiceConfigs(item)
-      if (item.options) {
-        if (item.options.length === 1) {
-          vm.doCreateDossier()
-        }
-      }
-    },
     changeDichVuConfigs (item) {
       let vm = this
       console.log('item dich vu: ', item)
@@ -932,6 +923,8 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(reject => {
+        vm.loadingAction = false
       })
     },
     doCancel (dossierItem, item, index, isGroup) {
@@ -950,6 +943,8 @@ export default {
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query
           })
+        }).catch(reject => {
+          vm.loadingAction = false
         })
       }
     },
@@ -998,6 +993,8 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(reject => {
+        vm.loadingAction = false
       })
     },
     doSubmitDialogAction (item) {

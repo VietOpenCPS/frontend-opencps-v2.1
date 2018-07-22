@@ -611,12 +611,12 @@ export const store = new Vuex.Store({
       let param = {
         headers: {
           groupId: state.initData.groupId
-        },
-        responseType: 'blob'
+        }
+        // responseType: 'blob'
       }
       axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-        var url = window.URL.createObjectURL(response.data)
-        window.open(url, '_blank')
+        // var url = window.URL.createObjectURL(response.data)
+        // window.open(url, '_blank')
       }).catch(function (xhr) {
         console.log(xhr)
       })
