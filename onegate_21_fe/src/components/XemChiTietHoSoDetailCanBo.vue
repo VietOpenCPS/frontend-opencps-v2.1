@@ -269,7 +269,7 @@
             </div>
           </v-tab-item>
           <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <comment :classPK="dossierId" :className="className"></comment>
+            <comment :classPK="id" :className="className"></comment>
           </v-tab-item>
           <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <v-layout row wrap>
@@ -858,6 +858,13 @@ export default {
       }
       if (vm.showThuPhi) {
         filter['payment'] = paymentsOut
+      }
+      if (vm.showFormBoSungThongTinNgan) {
+        filter['payload'] = vm.$refs.
+      }
+      if (vm.showKyPheDuyetTaiLieu) {
+        let result = vm.$refs.kypheduyettailieu.doExport()
+        console.log('resultKSKS', result)
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
