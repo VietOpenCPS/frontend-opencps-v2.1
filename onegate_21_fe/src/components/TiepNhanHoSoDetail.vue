@@ -94,7 +94,6 @@
 import router from '@/router'
 import toastr from 'toastr'
 // import * as utils from '../store/onegate_utils'
-import ThongTinChungHoSo from './form_xu_ly/ThongTinChungHoSo.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
