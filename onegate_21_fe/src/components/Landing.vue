@@ -1,7 +1,8 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <v-flex xs12 class="px-2">
+      <template-rendering v-if="menuType === 3" :layout_view="filterForm"></template-rendering>
+      <v-flex xs12 class="px-2" v-else>
         <v-select
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
@@ -45,9 +46,6 @@
         {{item.title}}{{item.tiltle}}
         <span slot="loader">Loading...</span>
       </v-btn>
-      <div v-if="menuType === 3">
-        <template-rendering :layout_view="filterForm"></template-rendering>
-      </div>
     </div>
     
     <v-data-table
@@ -1217,7 +1215,9 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      if (this.menuType !== 3) {
+        router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      }
     }
   }
 }

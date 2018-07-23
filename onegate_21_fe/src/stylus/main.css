@@ -216,9 +216,6 @@ body .application .theme--light.subheader, body .theme--light .subheader {
     font-weight: normal;
     height: 32px;
 }
-body .input-group {
-    padding: 0;
-}
 .input-group.input-group--selection-controls:not(.input-group--disabled) label {
     pointer-events: all;
     font-size: 14px;
