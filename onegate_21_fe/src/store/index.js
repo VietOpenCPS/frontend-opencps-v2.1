@@ -241,7 +241,7 @@ export const store = new Vuex.Store({
               agency: filter.agency,
               service: filter.service,
               template: filter.template,
-              status: filter.statusSearch,
+              status: filter.status,
               dueCode: filter.dueSearch,
               register: filter.register,
               keyword: filter.keyword,
