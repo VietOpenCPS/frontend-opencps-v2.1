@@ -125,6 +125,9 @@
               >
                 <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile>
+              <v-list-tile @click="viewDetail(props.item, props.index)">
+                Xem chi tiết
+              </v-list-tile>
             </v-list>
           </v-menu>
         </td>
@@ -251,7 +254,7 @@
           <v-icon>clear</v-icon>
         </v-btn>
         <div v-if="dialogPDFLoading" style="
-            min-height: 400px;
+            min-height: 600px;
             text-align: center;
             margin: auto;
             padding: 25%;
