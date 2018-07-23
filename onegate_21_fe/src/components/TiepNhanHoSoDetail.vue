@@ -94,7 +94,6 @@
 import router from '@/router'
 import toastr from 'toastr'
 // import * as utils from '../store/onegate_utils'
-import ThongTinChungHoSo from './form_xu_ly/ThongTinChungHoSo.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
@@ -104,7 +103,6 @@ import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQ
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
-    'thong-tin-chung': ThongTinChungHoSo,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'thong-tin-chung': ThongTinChung,

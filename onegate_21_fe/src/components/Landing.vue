@@ -686,37 +686,37 @@ export default {
       let vm = this
       let currentQuery = router.history.current.query
       if (currentQuery.hasOwnProperty('q')) {
-        let filter = {
-          queryParams: currentQuery.q,
-          page: vm.hosoDatasPage,
-          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
-          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
-          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
-          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
-          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
-          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
-          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
-          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
-          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
-          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
-        }
-        /*  test Local */
         // let filter = {
-        //   queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+        //   queryParams: currentQuery.q,
         //   page: vm.hosoDatasPage,
-        //   agency: vm.govAgencyCode,
-        //   service: vm.serviceCode,
-        //   template: vm.templateNo,
+        //   agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+        //   service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+        //   template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
         //   domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
         //   status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
         //   substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
-        //   year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
-        //   month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+        //   year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+        //   month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
         //   top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
         //   keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         //   register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
         // }
+        /*  test Local */
+        let filter = {
+          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          page: vm.hosoDatasPage,
+          agency: vm.govAgencyCode,
+          service: vm.serviceCode,
+          template: vm.templateNo,
+          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
+          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+        }
         console.log('filter', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
