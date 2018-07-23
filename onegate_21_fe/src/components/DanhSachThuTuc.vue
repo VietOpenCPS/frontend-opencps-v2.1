@@ -1,38 +1,41 @@
 <template>
   <div>
-    <v-expansion-panel expand>
-      <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
-        <div slot='header' class="ml-3"><v-icon>fas fa-lock</v-icon> {{itemGov.govAgencyName}}</div>
+    <v-expansion-panel expand class="expand__select__gov">
+      <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index' value="1">
+        <div slot='header' class="ml-3"><v-icon>account_balance</v-icon> {{itemGov.govAgencyName}}</div>
         <v-card>
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <!-- Cap 2 -->
-            <v-expansion-panel expand>
-              <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains'>
-                <div slot='header' class="ml-4">{{itemDomain.domainName}}</div>
+            <v-expansion-panel expand class="expand__select__domain">
+              <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' value="1">
+                <div slot='header' style="margin-left: 40px;">{{itemDomain.domainName}}</div>
                 <v-card>
-                  <v-card-text class='' style="font-size: 13px; margin-left: 24px;">
+                  <v-card-text class="card__text__gov" style="font-size: 13px; margin-left: 38px;">
                     <!-- Cap 3 -->
                     <div slot="header">
                       <v-layout row wrap v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
                         <v-flex xs12 sm9>
-                          <span style="font-weight: bold">{{index3 + 1}}. </span>{{itemServiceConfig.serviceInfoName}}
+                          <v-subheader style="font-size: 13px; float: left;">
+                            <span style="font-weight: bold">{{index3 + 1}}. </span>{{itemServiceConfig.serviceInfoName}}
+                          </v-subheader>
                         </v-flex>
                         <v-flex xs12 sm1>
-                          Mức {{itemServiceConfig.level}}
+                          <v-subheader style="font-size: 13px; float: left;">
+                            Mức {{itemServiceConfig.level}}
+                          </v-subheader>
                         </v-flex>
                         <v-flex xs12 sm2 class="text-xs-center">
-                          <v-btn outline small color='primary' @click='selectServiceConfig(itemServiceConfig)'>Chọn</v-btn>
-                            <v-menu left>
-                                <v-btn class="mx-0 my-0" slot="activator" icon @click="pullServiceOptions(props.item)">
-                                  <v-icon>Chọn</v-icon>
-                                </v-btn>
-                                <v-list v-if="serviceOptions.length > 1">
-                                  <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                                  @click="selectServiceOption(itemOption)">
-                                  <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                                </v-list-tile>
-                              </v-list>
-                          </v-menu>
+                          <v-menu left>
+                          <v-btn class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
+                              Chọn
+                            </v-btn>
+                            <v-list v-if="serviceOptions.length > 1">
+                              <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                              @click="selectServiceOption(itemOption, itemGov.govAgencyCode)">
+                              <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                            </v-list-tile>
+                          </v-list>
+                        </v-menu>
                         </v-flex>
                       </v-layout>
                     </div>
@@ -71,23 +74,29 @@
     watch: {
     },
     methods: {
-      pullServiceOptions (item) {
+      pullServiceOptions (item, govAgencyCode) {
+        console.log('govAgencyCode++++++++++', govAgencyCode)
         var vm = this
         vm.serviceConfigSelect = item
         vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
           if (result.length === 1) {
-            let data = {
-              serviceCode: item.serviceCode,
-              govAgencyCode: item.govAgencyCode,
-              templateNo: result[0].templateNo,
-              originality: vm.getOriginality()
-            }
-            vm.$store.dispatch('postDossier', data).then(function (result) {
-              vm.loadingAction = false
-              vm.indexAction = -1
-              router.push({
-                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                query: vm.$router.history.current.query
+            vm.$store.dispatch('getServiceInfo', {
+              serviceInfoId: item.serviceInfoId
+            }).then(resServiceInfo => {
+              console.log('resServiceInfo+++++++++++', resServiceInfo)
+              let data = {
+                serviceCode: resServiceInfo.serviceCode,
+                govAgencyCode: govAgencyCode,
+                templateNo: result[0].templateNo,
+                originality: vm.getOriginality()
+              }
+              vm.$store.dispatch('postDossier', data).then(function (result) {
+                vm.loadingAction = false
+                vm.indexAction = -1
+                router.push({
+                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                  query: vm.$router.history.current.query
+                })
               })
             })
           } else {
@@ -95,20 +104,26 @@
           }
         })
       },
-      selectServiceOption (item) {
+      selectServiceOption (item, govAgencyCode) {
         var vm = this
-        let data = {
-          serviceCode: vm.serviceConfigSelect.serviceCode,
-          govAgencyCode: vm.serviceConfigSelect.govAgencyCode,
-          templateNo: item.templateNo,
-          originality: vm.getOriginality()
-        }
-        vm.$store.dispatch('postDossier', data).then(function (result) {
-          vm.loadingAction = false
-          vm.indexAction = -1
-          router.push({
-            path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-            query: vm.$router.history.current.query
+        console.log('govAgencyCode+++++++++++', govAgencyCode)
+        vm.$store.dispatch('getServiceInfo', {
+          serviceInfoId: vm.serviceConfigSelect.serviceInfoId
+        }).then(resServiceInfo => {
+          console.log('resServiceInfo+++++++++++', resServiceInfo)
+          let data = {
+            serviceCode: resServiceInfo.serviceCode,
+            govAgencyCode: govAgencyCode,
+            templateNo: item.templateNo,
+            originality: vm.getOriginality()
+          }
+          vm.$store.dispatch('postDossier', data).then(function (result) {
+            vm.loadingAction = false
+            vm.indexAction = -1
+            router.push({
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+              query: vm.$router.history.current.query
+            })
           })
         })
       }

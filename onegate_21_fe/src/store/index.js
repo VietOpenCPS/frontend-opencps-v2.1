@@ -619,17 +619,19 @@ export const store = new Vuex.Store({
       })
     },
     viewFile ({commit, state, dispatch}, data) {
-      let param = {
-        headers: {
-          groupId: state.initData.groupId
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
         }
-        // responseType: 'blob'
-      }
-      axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-        // var url = window.URL.createObjectURL(response.data)
-        // window.open(url, '_blank')
-      }).catch(function (xhr) {
-        console.log(xhr)
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
       })
     },
     postDossier ({ commit, state }, data) {
