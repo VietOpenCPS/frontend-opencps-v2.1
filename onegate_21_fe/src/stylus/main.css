@@ -2443,3 +2443,8 @@ body .expansion-panel__body .input-group,
 body .absolute__btn .input-group {
     padding: 0;
 }
+body .picker--landscape.picker--full-width {
+    box-shadow: none !important;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0;
+}

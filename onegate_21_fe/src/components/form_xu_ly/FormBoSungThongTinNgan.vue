@@ -13,19 +13,22 @@
                 ">{{item.fieldLabel}}</span>
                 <v-text-field v-if="item.fieldType === 'string'"
                     :id="item.fieldName"
+                    :value="item.value"
                     :placeholder="item.placeholder"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'number'"
                     :id="item.fieldName"
+                    :value="item.value"
                     :placeholder="item.placeholder"
 				    :rules="[rulesValid.number]"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'date'"
                     :id="item.fieldName"
+                    :value="item.value"
                     :placeholder="item.placeholder"
                     readonly
                     append-icon="event"
-                    v-on:click.native="dialog = true"
+                    v-on:click.native="openDialogCustom(item, item.fieldName)"
                 ></v-text-field>
             </v-flex>
           </v-layout>
@@ -39,6 +42,18 @@
                 full-width
                 landscape
             ></v-date-picker>
+            <v-card-actions style="
+                background: #fff;
+            ">
+            <v-spacer></v-spacer>
+            <v-btn
+                color="primary"
+                flat
+                @click="pickDateCustom"
+            >
+                Xác nhận
+            </v-btn>
+            </v-card-actions>
         </v-dialog>
       </v-card>
     </v-expansion-panel-content>
@@ -55,6 +70,8 @@
       }
     },
     data: () => ({
+      itemId: null,
+      fieldNameID: '',
       date: null,
       dialog: false,
       formBuilder: [],
@@ -78,6 +95,29 @@
       })
     },
     methods: {
+      openDialogCustom (item, fieldName) {
+        let vm = this
+        vm.dialog = true
+        vm.fieldNameID = fieldName
+        vm.itemId = item
+      },
+      pickDateCustom () {
+        let vm = this
+        console.log(vm.date)
+        vm.itemId.value = vm.dateTimeView(vm.date)
+        vm.dialog = false
+      },
+      dateTimeView (arg) {
+        if (arg) {
+          let value = new Date(arg)
+          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+        } else {
+          return ''
+        }
+      },
+      formSubmitData () {
+          
+      }
     }
   }
 </script>
