@@ -2461,3 +2461,12 @@ body .picker--landscape.picker--full-width {
     border-bottom: 1px solid #ddd;
     border-radius: 0;
 }
+body .btn--floating.btn--small {
+    height: 22px !important;
+    width: 22px !important;
+    box-shadow: none !important;
+    font-size: 12px !important;
+}
+body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon {
+    opacity: 0.1
+}

@@ -241,7 +241,7 @@ export const store = new Vuex.Store({
               agency: filter.agency,
               service: filter.service,
               template: filter.template,
-              status: filter.statusSearch,
+              status: filter.status,
               dueCode: filter.dueSearch,
               register: filter.register,
               keyword: filter.keyword,
@@ -1631,6 +1631,7 @@ export const store = new Vuex.Store({
           formData.append('payment', filter.payment?JSON.stringify(filter.payment):null)
           formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):null)
           formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):null)
+          formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
             toastr.success('Yêu cầu của bạn được thực hiện thành công.')

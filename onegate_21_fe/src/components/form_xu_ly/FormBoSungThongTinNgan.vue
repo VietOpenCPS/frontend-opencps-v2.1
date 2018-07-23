@@ -15,12 +15,14 @@
                     :id="item.fieldName"
                     :value="item.value"
                     :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'number'"
                     :id="item.fieldName"
                     :value="item.value"
                     :placeholder="item.placeholder"
 				    :rules="[rulesValid.number]"
+                    @input="inputChangeValue(item)"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'date'"
                     :id="item.fieldName"
@@ -107,6 +109,10 @@
         vm.itemId.value = vm.dateTimeView(vm.date)
         vm.dialog = false
       },
+      inputChangeValue (item) {
+        let vm = this
+        item.value = document.getElementById(item.fieldName).value
+      },
       dateTimeView (arg) {
         if (arg) {
           let value = new Date(arg)
@@ -116,6 +122,12 @@
         }
       },
       formSubmitData () {
+        let vm = this
+        let objectReturn = {}
+        for (let key in vm.formBuilder) {
+          objectReturn[vm.formBuilder[key].fieldName] = vm.formBuilder[key].value
+        }
+        return objectReturn
       }
     }
   }
