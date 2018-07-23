@@ -123,12 +123,11 @@
       },
       formSubmitData () {
         let vm = this
-        let dataReturn = null
+        let objectReturn = {}
         for (let key in vm.formBuilder) {
-          dataReturn[key] = document.getElementById(vm.formBuilder[key].fieldName).value
+            objectReturn[vm.formBuilder[key].fieldName] = vm.formBuilder[key].value
         }
-        console.log('dataReturn', dataReturn)
-        return dataReturn
+        return objectReturn
       }
     }
   }
