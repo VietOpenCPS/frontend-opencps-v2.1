@@ -1951,13 +1951,33 @@ export const store = new Vuex.Store({
             params: {
             }
           }
-          axios.get(state.initData.serviceConfigApi + data.serviceInfoId + '/processes', param).then(function (response) {
+          axios.get(state.initData.serviceConfigApi + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               resolve(serializable.data)
             } else {
               resolve({})
             }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceInfo ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.initData.serviceInfoApi + '/' + data.serviceInfoId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
           }).catch(function (error) {
             console.log(error)
             reject(error)

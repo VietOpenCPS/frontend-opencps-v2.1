@@ -32,7 +32,7 @@
             XỬ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
+        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()" v-if="getOriginality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
           </v-btn>
@@ -43,7 +43,7 @@
           </v-btn>
         </v-tab>
         <v-tab :key="5" href="#tabs-5">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
+          <v-btn flat class="px-0 py-0 mx-0 my-0" v-if="getOriginality !== 1">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
@@ -159,7 +159,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel> -->
           </v-tab-item>
-          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-2" v-if="getOriginality !== 1" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <div class="py-3" v-if="btnStateVisible">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -268,7 +268,7 @@
               </td>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-5" v-if="getOriginality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <comment :classPK="dossierId" :className="className"></comment>
           </v-tab-item>
           <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
