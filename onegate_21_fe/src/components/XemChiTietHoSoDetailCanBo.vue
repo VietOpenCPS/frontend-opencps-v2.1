@@ -181,7 +181,7 @@
               </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
-              <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
+              <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
@@ -199,8 +199,8 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-layout>
-            <span v-if="!btnStateVisible">Thực hiện thành công!</span>
-            <span v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</span> <br>
+            <p v-if="!btnStateVisible">Thực hiện thành công!</p>
+            <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
@@ -317,6 +317,7 @@ import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
+import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -327,9 +328,11 @@ export default {
     'thu-phi': ThuPhi,
     'ky-duyet': KyDuyet,
     'y-kien-can-bo': YkienCanBoThucHien,
-    'tai-lieu-ket-qua': TaoTaiLieuKetQua
+    'tai-lieu-ket-qua': TaoTaiLieuKetQua,
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan
   },
   data: () => ({
+    actionIdCurrent: 0,
     validateAction: true,
     btnIndex: -1,
     activeTab: 'tabs-1',
@@ -615,6 +618,7 @@ export default {
     },
     getNextAction (item) {
       var vm = this
+      vm.actionIdCurrent = item.processActionId
       if (item.type === 1) {
         let filter = {
           dossierId: vm.thongTinChiTietHoSo.dossierId,
@@ -712,6 +716,7 @@ export default {
       let vm = this
       vm.btnIndex = index
       vm.itemAction = item
+      vm.actionIdCurrent = item.processActionId
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId,
         actionId: item.processActionId

@@ -272,6 +272,11 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          if (filter.hasOwnProperty('originality') && filter.originality === 1) {
+            param['params'] = {
+              owner: true
+            }
+          }
           axios.get(state.initData.counterMenuStep, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -2109,6 +2114,24 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getExtraForm ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions/' + filter.actionId +  '/payload', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
           }).catch(function (error) {
             console.log(error)
             reject(error)

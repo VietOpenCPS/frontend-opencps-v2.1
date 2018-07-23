@@ -78,7 +78,7 @@
             color="primary"
           ></v-checkbox>
         </td>
-        <td>
+        <td class="text-xs-center px-0 py-0">
           <content-placeholders v-if="loadingTable">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -1357,9 +1357,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      if (this.menuType !== 3) {
-        router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-      }
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
 }
