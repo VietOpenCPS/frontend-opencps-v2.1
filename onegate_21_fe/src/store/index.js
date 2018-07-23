@@ -244,7 +244,12 @@ export const store = new Vuex.Store({
               status: filter.statusSearch,
               dueCode: filter.dueSearch,
               register: filter.registerSearch,
-              keyword: filter.keywordSearch
+              keyword: filter.keywordSearch,
+              domain: filter.domain,
+              substatus: filter.substatus,
+              year: filter.year,
+              month: filter.month,
+              top: filter.top
             }
           }
           axios.get(filter.queryParams, param).then(function (response) {

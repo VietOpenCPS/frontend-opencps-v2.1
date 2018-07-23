@@ -72,7 +72,6 @@
         <td>
           <v-checkbox
             :disabled="props.item['assigned'] === 0"
-            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             v-model="props.selected"
             primary
             hide-details
@@ -689,7 +688,15 @@ export default {
           page: vm.hosoDatasPage,
           agency: vm.govAgencyCode,
           service: vm.serviceCode,
-          template: vm.templateNo
+          template: vm.templateNo,
+          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
+          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
         }
         /*  test Local */
         // let filter = {
@@ -697,8 +704,17 @@ export default {
         //   page: vm.hosoDatasPage,
         //   agency: vm.govAgencyCode,
         //   service: vm.serviceCode,
-        //   template: vm.templateNo
+        //   template: vm.templateNo,
+        //   domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+        //   status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+        //   substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+        //   year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
+        //   month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+        //   top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+        //   keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+        //   register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
         // }
+        console.log('filter', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
