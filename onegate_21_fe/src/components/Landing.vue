@@ -805,7 +805,7 @@ export default {
       } else if (String(item.form) === 'PRINT_03') {
         // In văn bản mới nhất đã phê duyệt
         vm.doPrint03(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GUIDE') {
+      } else if (String(item.form) === 'GUIDING') {
         vm.doGuiding(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'PREVIEW') {
         vm.doPreview(dossierItem, item, index, isGroup)
