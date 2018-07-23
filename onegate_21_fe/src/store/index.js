@@ -2071,8 +2071,8 @@ export const store = new Vuex.Store({
               let dataReturn = serializable.data
               if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
                 dataReturn.unshift({
-                  'domainCode': '',
-                  'domainName': 'toàn bộ'
+                  'serviceCode': '',
+                  'serviceName': 'toàn bộ'
                 })
               }
               resolve(dataReturn)

@@ -54,7 +54,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierIdCTN"
-        select-all
+        :select-all="menuType !== 3 ? true : false"
         class="table-landing table-bordered"
         hide-actions
       >
@@ -69,7 +69,7 @@
         </v-tooltip>
       </template>
       <template slot="items" slot-scope="props">
-        <td>
+        <td v-if="menuType !== 3">
           <v-checkbox
             :disabled="props.item['assigned'] === 0"
             v-model="props.selected"
@@ -812,8 +812,8 @@ export default {
           domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
           status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
           substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
-          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
-          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
           top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
           keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
           register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''

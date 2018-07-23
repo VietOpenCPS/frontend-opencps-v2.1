@@ -2416,11 +2416,11 @@ body .tabs__content {
 body .btn.primary.deactive__btn {
     background-color: #8fbbd8f2 !important
 }
-
-body .menu_header_list .input-group__input {
-    margin-top: 20px;
-}
-
 table.datatable p {
     margin-bottom: 0;
+}
+table.datatable p span {
+    margin-bottom: 0;
+    font-size: 13px !important;
+    font-family: Roboto,sans-serif !important;
 }
