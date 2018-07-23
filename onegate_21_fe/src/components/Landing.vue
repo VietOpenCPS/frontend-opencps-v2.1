@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <template-rendering v-if="menuType === 3" :layout_view="filterForm"></template-rendering>
+      <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering>
       <v-flex xs12 class="px-2" v-else>
         <v-select
           :items="listThuTucHanhChinh"
@@ -350,6 +350,126 @@ export default {
   },
   data: () => ({
     /* data PhanCongThucHien */
+    itemFilterSupport: {
+      years: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': '2017',
+          'name': 'năm 2017'
+        },
+        {
+          'value': '2018',
+          'name': 'năm 2018'
+        },
+        {
+          'value': '2019',
+          'name': 'năm 2019'
+        }
+      ],
+      year: '',
+      months: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': '1',
+          'name': 'tháng 1'
+        },
+        {
+          'value': '2',
+          'name': 'tháng 2'
+        },
+        {
+          'value': '3',
+          'name': 'tháng 3'
+        },
+        {
+          'value': '4',
+          'name': 'tháng 4'
+        },
+        {
+          'value': '5',
+          'name': 'tháng 5'
+        },
+        {
+          'value': '6',
+          'name': 'tháng 6'
+        },
+        {
+          'value': '7',
+          'name': 'tháng 7'
+        },
+        {
+          'value': '8',
+          'name': 'tháng 8'
+        },
+        {
+          'value': '9',
+          'name': 'tháng 9'
+        },
+        {
+          'value': '10',
+          'name': 'tháng 10'
+        },
+        {
+          'value': '11',
+          'name': 'tháng 11'
+        },
+        {
+          'value': '12',
+          'name': 'tháng 12'
+        }
+      ],
+      month: '',
+      tops: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': 'receive',
+          'name': 'hồ sơ mới được tiếp nhận'
+        },
+        {
+          'value': 'overdue',
+          'name': 'hồ sơ đang quá hạn cần giải quyết'
+        },
+        {
+          'value': 'release',
+          'name': 'hồ sơ mới có kết quả'
+        },
+        {
+          'value': 'delay',
+          'name': 'chậm hạn trả'
+        },
+        {
+          'value': 'coming',
+          'name': 'sắp đến hạn'
+        }
+      ],
+      top: '',
+      statusLists: [],
+      status: '',
+      substatusLists: [
+        {
+          'itemCode': '',
+          'itemName': 'toàn bộ'
+        }
+      ],
+      substatus: '',
+      agencyLists: [],
+      agency: '',
+      serviceLists: [],
+      service: '',
+      domainLists: [],
+      domain: '',
+      keyword: '',
+      register: ''
+    },
     menuType: 0,
     type_assign: '',
     assign_items: [

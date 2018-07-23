@@ -299,6 +299,14 @@ body table.table tbody td[colspan="9"] {
 body .input-group--select .input-group__selections__comma {
     font-size: 13px;
 }
+body .vue-tiny-pagination .input-group{
+    padding: 0;
+}
+body .menu_header_list .input-group--select .input-group__selections__comma {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .menu__content .card {
     margin-bottom: 0;
 }

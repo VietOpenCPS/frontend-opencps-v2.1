@@ -1964,6 +1964,151 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getStatusLists ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=0', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+                dataReturn.unshift({
+                  'itemCode': '',
+                  'itemName': 'toàn bộ'
+                })
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getSubstatusLists ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=' + data.itemCode, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+                dataReturn.unshift({
+                  'itemCode': '',
+                  'itemName': 'toàn bộ'
+                })
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getAgencyLists ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+                dataReturn.unshift({
+                  'administrationCode': '',
+                  'administrationName': 'toàn bộ'
+                })
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceLists ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+                dataReturn.unshift({
+                  'domainCode': '',
+                  'domainName': 'toàn bộ'
+                })
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getDomainLists ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+                dataReturn.unshift({
+                  'domainCode': '',
+                  'domainName': 'toàn bộ'
+                })
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
     // ----End---------
   },
