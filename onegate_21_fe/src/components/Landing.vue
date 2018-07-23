@@ -72,6 +72,7 @@
         <td>
           <v-checkbox
             :disabled="props.item['assigned'] === 0"
+            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             v-model="props.selected"
             primary
             hide-details
@@ -112,9 +113,10 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
+              <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2 && props.item['assigned'] === 0"
+                :disabled="item['enable'] === 2 || props.item['assigned'] === 0"
                 v-if="item['enable'] > 0"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
@@ -122,7 +124,7 @@
               <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
                 @click="btnActionEvent(props.item, item, index, false)"
               >
-                <v-list-tile-title>{{ item.title }}{{ item.tiltle }}</v-list-tile-title>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile>
             </v-list>
           </v-menu>
@@ -170,7 +172,7 @@
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
-                  v-if="thuTucHanhChinhSelected"
+                  v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
@@ -184,6 +186,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>undo</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -191,6 +194,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
+              <v-icon>save</v-icon>&nbsp;
               Đồng ý
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -519,7 +523,6 @@ export default {
                   }
                 }
               }
-              console.log('btnDynamics', vm.btnDynamics)
               vm.$store.commit('setLoadingDynamicBtn', false)
             })
           }, 200)
@@ -680,7 +683,6 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      console.log('currentQuery', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let filter = {
           queryParams: currentQuery.q,
@@ -768,7 +770,6 @@ export default {
       vm.itemAction = item
       console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      console.log('btnActionEvent', item)
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
@@ -909,7 +910,6 @@ export default {
       })
     },
     doActions (dossierItem, item, index, isGroup) {
-      console.log('doActions')
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let result = {
@@ -940,6 +940,8 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(reject => {
+        vm.loadingAction = false
       })
     },
     doCancel (dossierItem, item, index, isGroup) {
@@ -958,6 +960,8 @@ export default {
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query
           })
+        }).catch(reject => {
+          vm.loadingAction = false
         })
       }
     },
@@ -1006,6 +1010,8 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(reject => {
+        vm.loadingAction = false
       })
     },
     doSubmitDialogAction (item) {
@@ -1018,17 +1024,35 @@ export default {
     },
     processPullBtnDynamics (item) {
       let vm = this
+      vm.btnDossierDynamics = []
       let filter = {
-        dossierId: item.dossierId
+        dossierId: item.dossierId,
+        dossierStatus: item.dossierStatus,
+        dossierSubStatus: item.dossierSubStatus
       }
       vm.dossierId = item.dossierId
-      vm.$store.dispatch('pullNextactions', filter).then(function (result) {
-        vm.btnDossierDynamics = result
-      })
-      // add menuconfig
-      // vm.$store.dispatch('pullBtnConfigStep', filter).then(function (result) {
-      //   vm.btnDossierDynamics = result
-      // })
+      if (vm.$router.history.current.query.hasOwnProperty('step')) {
+        vm.$store.dispatch('pullNextactions', filter).then(result => {
+          vm.btnDossierDynamics = result
+        })
+      } else {
+        if (item.dossierStatus === '' || item.dossierSubStatus === '') {
+          vm.$store.dispatch('pullNextactions', filter).then(result => {
+            vm.btnDossierDynamics = result
+          })
+        } else {
+          vm.btnStepsDynamics = []
+          var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
+          Promise.all(getbuttonAction).then(result => {
+            vm.btnDossierDynamics = result[0]
+            vm.btnStepsDynamics = result[1]
+          }).catch(reject => {
+            vm.$store.dispatch('pullNextactions', filter).then(result => {
+              vm.btnDossierDynamics = result
+            })
+          })
+        }
+      }
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
@@ -1085,7 +1109,6 @@ export default {
                 if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
                   vm.dialog_statusAction = true
                 } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
-                  console.log('router')
                   router.push({
                     path: vm.$router.history.current.path,
                     query: {
@@ -1122,7 +1145,6 @@ export default {
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index, btnIndex) {
-      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -1184,7 +1206,6 @@ export default {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
         */
-        console.log('index', index)
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: {

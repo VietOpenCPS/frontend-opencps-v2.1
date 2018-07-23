@@ -29,7 +29,7 @@
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            THỤ LÝ HỒ SƠ
+            XỬ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
         <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
@@ -171,14 +171,14 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
 
-              <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
+              <!-- <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
                 v-on:click.native="btnActionEvent(item, index, true)"
                 :loading="loadingAction && index === indexActionStep"
                 :disabled="loadingAction && index === indexActionStep"
               >
                 {{ item.title }}{{ item.tiltle }}
                 <span slot="loader">Loading...</span>
-              </v-btn>
+              </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
               <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
@@ -198,8 +198,10 @@
                 Xác nhận
                 <span slot="loader">Loading...</span>
               </v-btn>
-              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
             </v-layout>
+            <span v-if="!btnStateVisible">Thực hiện thành công!</span>
+            <span v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</span> <br>
+            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -666,7 +668,12 @@ export default {
           vm.showFormBoSungThongTinNgan = true
         }
         if (result.hasOwnProperty('allowAssignUser') && result.allowAssignUser !== 0) {
-          vm.assign_items = result.toUsers
+          console.log('allowAssignUser', result.toUsers)
+          if (Array.isArray(result.toUsers)) {
+            vm.assign_items = result.toUsers
+          } else {
+            vm.assign_items = [result.toUsers]
+          }
           vm.type_assign = result.allowAssignUser
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
@@ -827,9 +834,12 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      var initData = vm.$store.getters.loadingInitData
+      let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
         dossierId: dossierItem.dossierId,
-        actionCode: result.actionCode
+        actionCode: result.actionCode,
+        actionUser: actionUser
       }
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items

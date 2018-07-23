@@ -612,12 +612,12 @@ export const store = new Vuex.Store({
       let param = {
         headers: {
           groupId: state.initData.groupId
-        },
-        responseType: 'blob'
+        }
+        // responseType: 'blob'
       }
       axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-        var url = window.URL.createObjectURL(response.data)
-        window.open(url, '_blank')
+        // var url = window.URL.createObjectURL(response.data)
+        // window.open(url, '_blank')
       }).catch(function (xhr) {
         console.log(xhr)
       })
@@ -813,7 +813,7 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileType', data.fileType)
+        dataPostdossierMark.append('fileMark', data.fileMark)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -1472,14 +1472,17 @@ export const store = new Vuex.Store({
       },
       pullBtnConfigStep ({commit, state}, filter) {
         return new Promise((resolve, reject) => {
-          let param = {
+          const config = {
             headers: {
-              groupId: state.initData.groupId
+              'groupId': state.initData.groupId
             }
           }
-          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, param).then(function (response) {
-            let serializable = response.data
-            resolve(serializable.data)
+          var params = new URLSearchParams()
+          axios.post(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, params, config).then(function (response) {
+          // axios.post('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+            let serializable = response.data.data
+            let buttonConfig = JSON.parse(serializable.buttonConfig)['buttons']
+            resolve(buttonConfig)
           }).catch(function (error) {
             console.log(error)
             reject(error)
@@ -1871,7 +1874,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.initData.stepConfigsApi + '/' + data.stepCode, param).then(function (response) {
+          axios.get(state.initData.stepConfigApi + '/' + data.stepCode, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

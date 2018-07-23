@@ -1,9 +1,23 @@
 <template>
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
+    <div class="row-header">
+      <div class="background-triangle-big"> <span>THÊM MỚI HỒ SƠ</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+          {{thongTinChiTietHoSo.serviceName}}
+        </div>
+        <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+          <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+            Quay lại &nbsp;
+            <v-icon size="16">undo</v-icon>
+          </v-btn>
+        </div>
+      </div> 
+    </div>
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <thong-tin-co-ban :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban>
+          <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -22,7 +36,7 @@
       </v-expansion-panel>
     </div>
     <!--  -->
-    <div style="position: relative;">
+    <div style="position: relative;" v-if="viaPortalDetail > 0">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
@@ -80,18 +94,19 @@
 import router from '@/router'
 import toastr from 'toastr'
 // import * as utils from '../store/onegate_utils'
-import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
+import ThongTinChungHoSo from './form_xu_ly/ThongTinChungHoSo.vue'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
-    'thong-tin-co-ban': ThongTinCoBanHoSo,
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
+    'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
@@ -102,21 +117,19 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
-    viaPortalDetail: false,
+    viaPortalDetail: 0,
     showThuPhi: false
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
-    },
-    thongTinChungHoSo () {
-      return this.$store.getters.thongTinChungHoSo
     }
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
       console.log(vm.index)
+      vm.dossierId = vm.id
     })
   },
   watch: {
@@ -125,14 +138,15 @@ export default {
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
+        vm.dossierId = result.dossierId
+        vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so
         vm.$refs.thongtinchuhoso.initData(result)
         // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
-        vm.$refs.dichvuchuyenphatketqua.initData(result)
-        // vm.$refs.thongtinchung.initData(result)
-        vm.thongTinChiTietHoSo = result
+        // vm.$refs.dichvuchuyenphatketqua.initData(result)
+        vm.$refs.thongtinchunghoso.initData(result)
         vm.viaPortalDetail = result.viaPostal
         // vm.$refs.lephi.initData(result)
         console.log('result.dossierStatus', result.dossierStatus)
@@ -153,7 +167,7 @@ export default {
           //   vm.$refs.lephi.initData(lePhi)
           // })
         }
-        vm.dossierId = data
+        vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
     },
@@ -161,7 +175,6 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchung = this.$refs.thongtinchung.thongTinChungHoSo
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -172,51 +185,60 @@ export default {
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        dossierFiles.forEach(function (value, index) {
-          if (value.eForm) {
-            value['dossierId'] = vm.dossierId
-            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          }
-        })
-        let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
-        console.log('data put dossier -->', tempData)
-        tempData['dossierId'] = vm.dossierId
-        vm.$store.dispatch('putDossier', tempData).then(function (result) {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          let dataPostAction = {
-            dossierId: vm.dossierId,
-            actionCode: 1100,
-            actionNote: '',
-            actionUser: '',
-            payload: '',
-            security: '',
-            assignUsers: '',
-            payment: vm.payments,
-            createDossiers: ''
-          }
-          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            let currentQuery = vm.$router.history.current.query
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
-            })
-            vm.tiepNhanState = false
+        if (dossierFiles) {
+          dossierFiles.forEach(function (value, index) {
+            if (value.eForm) {
+              value['dossierId'] = vm.dossierId
+              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+            }
           })
-        }).catch(function (xhr) {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-        })
+        }
+        if (vm.$refs.thanhphanhoso) {
+          vm.$refs.thanhphanhoso.saveMark()
+        }
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        tempData['dossierId'] = vm.dossierId
+        console.log('data put dossier -->', tempData)
+        setTimeout(function () {
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let dataPostAction = {
+              dossierId: vm.dossierId,
+              actionCode: 1100,
+              actionNote: '',
+              actionUser: actionUser,
+              payload: '',
+              security: '',
+              assignUsers: '',
+              payment: vm.payments,
+              createDossiers: ''
+            }
+            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              let currentQuery = vm.$router.history.current.query
+              // router.push({
+              //   path: vm.$router.history.current.path,
+              //   query: {
+              //     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              //     q: currentQuery['q']
+              //   }
+              // })
+              vm.goBack()
+              vm.tiepNhanState = false
+            })
+          }).catch(function (xhr) {
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        }, 500)
       }
     },
     boSungHoSo () {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchung = this.$refs.thongtinchung.thongTinChungHoSo
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -247,7 +269,7 @@ export default {
         })
         Promise.all(listAction).then(values => {
           console.log(values)
-          let tempData = Object.assign(thongtinchung, thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
           console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
