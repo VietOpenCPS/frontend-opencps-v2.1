@@ -299,6 +299,14 @@ body table.table tbody td[colspan="9"] {
 body .input-group--select .input-group__selections__comma {
     font-size: 13px;
 }
+body .vue-tiny-pagination .input-group{
+    padding: 0;
+}
+body .menu_header_list .input-group--select .input-group__selections__comma {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .menu__content .card {
     margin-bottom: 0;
 }
@@ -2423,11 +2431,15 @@ body .tabs__content {
 body .btn.primary.deactive__btn {
     background-color: #8fbbd8f2 !important
 }
-
-body .menu_header_list .input-group__input {
-    margin-top: 20px;
-}
-
 table.datatable p {
     margin-bottom: 0;
+}
+table.datatable p span {
+    margin-bottom: 0;
+    font-size: 13px !important;
+    font-family: Roboto,sans-serif !important;
+}
+body .expansion-panel__body .input-group,
+body .absolute__btn .input-group {
+    padding: 0;
 }

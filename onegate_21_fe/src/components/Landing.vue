@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <template-rendering v-if="menuType === 3" :layout_view="filterForm"></template-rendering>
+      <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering>
       <v-flex xs12 class="px-2" v-else>
         <v-select
           :items="listThuTucHanhChinh"
@@ -54,7 +54,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierIdCTN"
-        select-all
+        :select-all="menuType !== 3 ? true : false"
         class="table-landing table-bordered"
         hide-actions
       >
@@ -69,17 +69,16 @@
         </v-tooltip>
       </template>
       <template slot="items" slot-scope="props">
-        <td>
+        <td v-if="menuType !== 3">
           <v-checkbox
             :disabled="props.item['assigned'] === 0"
-            :style="props.item['assigned'] === 0?'opacity:0.3':'opacity:1'"
             v-model="props.selected"
             primary
             hide-details
             color="primary"
           ></v-checkbox>
         </td>
-        <td>
+        <td class="text-xs-center px-0 py-0">
           <content-placeholders v-if="loadingTable">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -350,6 +349,126 @@ export default {
   },
   data: () => ({
     /* data PhanCongThucHien */
+    itemFilterSupport: {
+      years: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': '2017',
+          'name': 'năm 2017'
+        },
+        {
+          'value': '2018',
+          'name': 'năm 2018'
+        },
+        {
+          'value': '2019',
+          'name': 'năm 2019'
+        }
+      ],
+      year: '',
+      months: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': '1',
+          'name': 'tháng 1'
+        },
+        {
+          'value': '2',
+          'name': 'tháng 2'
+        },
+        {
+          'value': '3',
+          'name': 'tháng 3'
+        },
+        {
+          'value': '4',
+          'name': 'tháng 4'
+        },
+        {
+          'value': '5',
+          'name': 'tháng 5'
+        },
+        {
+          'value': '6',
+          'name': 'tháng 6'
+        },
+        {
+          'value': '7',
+          'name': 'tháng 7'
+        },
+        {
+          'value': '8',
+          'name': 'tháng 8'
+        },
+        {
+          'value': '9',
+          'name': 'tháng 9'
+        },
+        {
+          'value': '10',
+          'name': 'tháng 10'
+        },
+        {
+          'value': '11',
+          'name': 'tháng 11'
+        },
+        {
+          'value': '12',
+          'name': 'tháng 12'
+        }
+      ],
+      month: '',
+      tops: [
+        {
+          'value': '',
+          'name': 'toàn bộ'
+        },
+        {
+          'value': 'receive',
+          'name': 'hồ sơ mới được tiếp nhận'
+        },
+        {
+          'value': 'overdue',
+          'name': 'hồ sơ đang quá hạn cần giải quyết'
+        },
+        {
+          'value': 'release',
+          'name': 'hồ sơ mới có kết quả'
+        },
+        {
+          'value': 'delay',
+          'name': 'chậm hạn trả'
+        },
+        {
+          'value': 'coming',
+          'name': 'sắp đến hạn'
+        }
+      ],
+      top: '',
+      statusLists: [],
+      status: '',
+      substatusLists: [
+        {
+          'itemCode': '',
+          'itemName': 'toàn bộ'
+        }
+      ],
+      substatus: '',
+      agencyLists: [],
+      agency: '',
+      serviceLists: [],
+      service: '',
+      domainLists: [],
+      domain: '',
+      keyword: '',
+      register: ''
+    },
     menuType: 0,
     type_assign: '',
     assign_items: [
@@ -687,9 +806,17 @@ export default {
         let filter = {
           queryParams: currentQuery.q,
           page: vm.hosoDatasPage,
-          agency: vm.govAgencyCode,
-          service: vm.serviceCode,
-          template: vm.templateNo
+          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
+          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
         }
         /*  test Local */
         // let filter = {
@@ -697,8 +824,17 @@ export default {
         //   page: vm.hosoDatasPage,
         //   agency: vm.govAgencyCode,
         //   service: vm.serviceCode,
-        //   template: vm.templateNo
+        //   template: vm.templateNo,
+        //   domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+        //   status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+        //   substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+        //   year: currentQuery.hasOwnProperty('year') ? currentQuery.year : '',
+        //   month: currentQuery.hasOwnProperty('month') ? currentQuery.month : '',
+        //   top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+        //   keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+        //   register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
         // }
+        console.log('filter', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -805,7 +941,7 @@ export default {
       } else if (String(item.form) === 'PRINT_03') {
         // In văn bản mới nhất đã phê duyệt
         vm.doPrint03(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GUIDE') {
+      } else if (String(item.form) === 'GUIDING') {
         vm.doGuiding(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'PREVIEW') {
         vm.doPreview(dossierItem, item, index, isGroup)
@@ -1236,9 +1372,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      if (this.menuType !== 3) {
-        router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-      }
+      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
     }
   }
 }
