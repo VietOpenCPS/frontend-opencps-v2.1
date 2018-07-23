@@ -69,6 +69,18 @@ export default {
   }),
   created () {},
   mounted () {},
-  methods: {}
+  methods: {
+    changeKS (event) {
+      console.log('change KS', event)
+    },
+    doExport () {
+      let vm = this
+      let exportData = {
+        textValue: vm.noteReason,
+        useKS: vm.activeKS
+      }
+      return exportData
+    }
+  }
 }
 </script>

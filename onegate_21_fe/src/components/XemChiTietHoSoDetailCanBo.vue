@@ -181,7 +181,7 @@
               </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
-              <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
+              <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
@@ -865,7 +865,7 @@ export default {
         filter['payment'] = paymentsOut
       }
       if (vm.showFormBoSungThongTinNgan) {
-        filter['payload'] = vm.$refs.
+        filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let result = vm.$refs.kypheduyettailieu.doExport()
