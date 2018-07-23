@@ -42,7 +42,7 @@
             NHẬT KÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="5" href="#tabs-5">
+        <v-tab :key="5" href="#tabs-5" @click="runComment()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
@@ -199,7 +199,9 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-layout>
-            <p v-if="!btnStateVisible">Thực hiện thành công!</p>
+            <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
+              Thực hiện thành công!
+            </v-alert>
             <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
           </v-tab-item>
@@ -269,7 +271,7 @@
             </div>
           </v-tab-item>
           <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <comment :classPK="id" :className="className"></comment>
+            <comment ref="comment" :classPK="id" :className="className"></comment>
           </v-tab-item>
           <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <v-layout row wrap>
@@ -536,6 +538,10 @@ export default {
           }
         })
       })
+    },
+    runComment () {
+      var vm = this
+      vm.$refs.comment.runComment()
     },
     goBack () {
       window.history.back()
