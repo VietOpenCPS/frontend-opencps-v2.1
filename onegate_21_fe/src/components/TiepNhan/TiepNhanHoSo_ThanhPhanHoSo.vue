@@ -33,7 +33,7 @@
               <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -86,7 +86,7 @@
           </v-layout>
         </div>
       </div>
-      <v-layout row wrap>
+      <v-layout row wrap v-if="checkPartType3">
         <v-flex xs12 sm6>
           <v-subheader style="float: left;">Thêm giấy tờ khác</v-subheader>
         </v-flex>
@@ -184,7 +184,7 @@
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
             <v-flex style="width: 260px;" class="layout wrap">
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" @change="postDossierMark(item, index)" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -442,17 +442,16 @@ export default {
           itemTemplate.count = 0
           dossierMarks.forEach(function (val, index) {
             if (val.dossierPartNo === itemTemplate.partNo) {
-              itemTemplate.fileMark = val.fileMark
+              itemTemplate['fileMark'] = val.fileMark
                 // itemTemplate.fileCheck = val.fileCheck
             }
           })
           return itemTemplate
         })
-      } else {
-        dossierTemplates = dossierTemplates.map(itemTemplate => {
-          itemTemplate.count = 0
-          itemTemplate.fileMark = 0
-          return itemTemplate
+      } else if (dossierTemplates) {
+        dossierTemplates.forEach(itemTemplate => {
+          itemTemplate['count'] = 0
+          itemTemplate['fileMark'] = 0
         })
       }
       return dossierTemplates
@@ -610,6 +609,17 @@ export default {
         }
       })
     },
+    checkPartType3 () {
+      var vm = this
+      if (vm.dossierTemplateItems) {
+        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
+          if (vm.dossierTemplateItems[i].partType === 3) {
+            return true
+          }
+        }
+      }
+      return false
+    },
     viewFile2 (data) {
       var vm = this
       data['dossierId'] = vm.thongTinHoSo.dossierId
@@ -631,6 +641,17 @@ export default {
         }
       }
       return
+    },
+    saveMark () {
+      var vm = this
+      if (vm.dossierTemplateItems) {
+        vm.dossierTemplateItems.forEach(function (value, index) {
+          if (value.partType === 1) {
+            value['dossierId'] = vm.thongTinHoSo.dossierId
+            vm.$store.dispatch('postDossierMark', value)
+          }
+        })
+      }
     },
     changeOtherDossierTemp (data) {
       var vm = this

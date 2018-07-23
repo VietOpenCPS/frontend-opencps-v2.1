@@ -128,6 +128,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       console.log(vm.index)
+      vm.dossierId = vm.id
     })
   },
   watch: {
@@ -136,6 +137,7 @@ export default {
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
+        vm.dossierId = result.dossierId
         vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so
         vm.$refs.thongtinchuhoso.initData(result)
@@ -182,46 +184,54 @@ export default {
         let dossierTemplates = thanhphanhoso
         let listAction = []
         let listDossierMark = []
-        dossierFiles.forEach(function (value, index) {
-          if (value.eForm) {
-            value['dossierId'] = vm.dossierId
-            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-          }
-        })
+        if (dossierFiles) {
+          dossierFiles.forEach(function (value, index) {
+            if (value.eForm) {
+              value['dossierId'] = vm.dossierId
+              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+            }
+          })
+        }
+        if (vm.$refs.thanhphanhoso) {
+          vm.$refs.thanhphanhoso.saveMark()
+        }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
         tempData['dossierId'] = vm.dossierId
         console.log('data put dossier -->', tempData)
-        vm.$store.dispatch('putDossier', tempData).then(function (result) {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          var initData = vm.$store.getters.loadingInitData
-          let actionUser = initData.user.userName ? initData.user.userName : ''
-          let dataPostAction = {
-            dossierId: vm.dossierId,
-            actionCode: 1100,
-            actionNote: '',
-            actionUser: actionUser,
-            payload: '',
-            security: '',
-            assignUsers: '',
-            payment: vm.payments,
-            createDossiers: ''
-          }
-          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+        setTimeout(function () {
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
             toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            let currentQuery = vm.$router.history.current.query
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let dataPostAction = {
+              dossierId: vm.dossierId,
+              actionCode: 1100,
+              actionNote: '',
+              actionUser: actionUser,
+              payload: '',
+              security: '',
+              assignUsers: '',
+              payment: vm.payments,
+              createDossiers: ''
+            }
+            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              let currentQuery = vm.$router.history.current.query
+              // router.push({
+              //   path: vm.$router.history.current.path,
+              //   query: {
+              //     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+              //     q: currentQuery['q']
+              //   }
+              // })
+              vm.goBack()
+              vm.tiepNhanState = false
             })
-            vm.tiepNhanState = false
+          }).catch(function (xhr) {
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
-        }).catch(function (xhr) {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-        })
+        }, 500)
       }
     },
     boSungHoSo () {

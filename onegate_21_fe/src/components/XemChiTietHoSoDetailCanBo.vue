@@ -198,8 +198,10 @@
                 Xác nhận
                 <span slot="loader">Loading...</span>
               </v-btn>
-              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
             </v-layout>
+            <span v-if="!btnStateVisible">Thực hiện thành công!</span>
+            <span v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</span> <br>
+            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>

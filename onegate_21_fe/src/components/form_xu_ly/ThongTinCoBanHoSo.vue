@@ -14,8 +14,8 @@
             <div class="xs12 sm12 pb-1 overHidden">
               <span class="pr-2">Địa chỉ: </span>
               <v-tooltip top>
-                <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }}</span>
-                <span class="pl-0"> {{thongTinChiTietHoSo.address}} </span>
+                <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                <span class="pl-0"> {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
               </v-tooltip>
             </div>
             <!--  -->
