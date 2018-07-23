@@ -128,6 +128,7 @@
           dataReturn[key] = document.getElementById(vm.formBuilder[key].fieldName).value
         }
         console.log('dataReturn', dataReturn)
+        return dataReturn
       }
     }
   }
