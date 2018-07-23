@@ -2199,9 +2199,6 @@ body .theme--light .form_alpaca .expansion-panel__container {
     min-height: 30px;
     height: 100%;
 } */
-body .no_acction__event {
-    pointer-events: none !important;
-}
 
 body .has-error.alpaca-field-text:before {
     background-color: #c62929;
@@ -2423,4 +2420,8 @@ table.datatable p span {
     margin-bottom: 0;
     font-size: 13px !important;
     font-family: Roboto,sans-serif !important;
+}
+body .expansion-panel__body .input-group,
+body .absolute__btn .input-group {
+    padding: 0;
 }

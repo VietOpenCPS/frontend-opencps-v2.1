@@ -166,7 +166,10 @@
       },
       loadingCounter () {
         let vm = this
-        vm.$store.dispatch('loadingCounterHoSo').then(function (result) {
+        let filter = {
+          originality: vm.getOriginality()
+        }
+        vm.$store.dispatch('loadingCounterHoSo', filter).then(function (result) {
           vm.counterData = result.data
           for (let key in vm.trangThaiHoSoList) {
             vm.trangThaiHoSoList[key]['counter'] = 0
