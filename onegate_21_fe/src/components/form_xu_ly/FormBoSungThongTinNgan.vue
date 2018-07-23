@@ -125,7 +125,7 @@
         let vm = this
         let objectReturn = {}
         for (let key in vm.formBuilder) {
-            objectReturn[vm.formBuilder[key].fieldName] = vm.formBuilder[key].value
+          objectReturn[vm.formBuilder[key].fieldName] = vm.formBuilder[key].value
         }
         return objectReturn
       }
