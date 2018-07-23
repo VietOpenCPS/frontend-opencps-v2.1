@@ -3,21 +3,6 @@
     <v-card>
       <v-card-text>
         <v-layout wrap>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0">Thủ tục: </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm10>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-if="loading === false" style="float:left;height: 100%">
-              <i>{{thongTinChungHoSo.serviceName}}</i>
-            </v-subheader>
-          </v-flex>
-          <v-flex xs12></v-flex>
           <!--  -->
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -31,7 +16,11 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.dossierNo}}</i></v-subheader>
+            <v-subheader class="text-bold" v-else style="float:left">
+              <span class="text-bold">
+                {{thongTinChungHoSo.dossierNo}}
+              </span>
+            </v-subheader>
           </v-flex>
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -43,24 +32,13 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading" style="float:left"><i>{{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc</i></v-subheader>
-          </v-flex>
-          <!-- <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0" >
-              Mã tham chiếu: 
+            <v-subheader v-if="!loading" style="float:left">
+              <span class="text-bold">
+                {{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc
+              </span>
             </v-subheader>
           </v-flex>
-          <v-flex xs12 sm4>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.dossierIdCTN}}</i></v-subheader>
-          </v-flex> -->
           <v-flex xs12></v-flex>
-          <!--  -->
           <!--  -->
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -72,7 +50,7 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.receiveDate}}</i></v-subheader>
+            <v-subheader v-else style="float:left"><span class="text-bold">{{thongTinChungHoSo.receiveDate}}</span></v-subheader>
           </v-flex>
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -85,16 +63,14 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <v-subheader v-else style="float:left;height: 100%">
+              <span class="text-bold">
                 {{thongTinChungHoSo.dueDate}}
+              </span>
             </v-subheader>
           </v-flex>
         </v-layout>
       </v-card-text>
     </v-card>
-    <v-btn flat class="absolute__btn" @click="goBack">
-      Quay lại &nbsp;
-      <v-icon>undo</v-icon>
-    </v-btn>
   </div>
 </template>
 
