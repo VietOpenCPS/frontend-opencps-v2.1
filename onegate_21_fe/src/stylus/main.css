@@ -177,6 +177,19 @@ body .expansion-panel__header {
     font-size: 12px;
     color: #0d2434;
 }
+body .expand__select__gov .expansion-panel__header {
+    padding: 10px 0px;
+    font-weight: bold;
+    font-size: 12px;
+    color: #0d2434;
+}
+body .expand__select__domain .expansion-panel__header {
+    padding: 10px 0px;
+    font-weight: bold;
+    font-size: 12px;
+    color: #0d2434;
+}
+
 body .expansion-panel__header .card__text {
     padding: 5px 15px;
 }
@@ -2183,7 +2196,9 @@ body .form_alpaca .expansion-panel__header {
 body .theme--light .form_alpaca .expansion-panel__container {
     background-color: #f6f7f6;
 }
-/* .group__thanh_phan .flex__checkbox .input-group.radio-group {
+
+
+/*.group__thanh_phan .flex__checkbox .input-group.radio-group {
     width: 200px;
     max-width: 200px;
 }
@@ -2198,7 +2213,23 @@ body .theme--light .form_alpaca .expansion-panel__container {
 .form_alpaca .group__thanh_phan .radio-group .input-group__input {
     min-height: 30px;
     height: 100%;
-} */
+}*/
+
+.expand__select__gov .expansion-panel__header {
+  background-color: rgb(170, 208, 222);
+}
+
+.expand__select__domain .expansion-panel__header {
+  background-color: #dbebf0;
+}
+
+.card__text__gov {
+  padding: 7px !important
+}
+
+body .no_acction__event {
+    pointer-events: none !important;
+}
 
 body .has-error.alpaca-field-text:before {
     background-color: #c62929;
@@ -2429,4 +2460,13 @@ body .picker--landscape.picker--full-width {
     box-shadow: none !important;
     border-bottom: 1px solid #ddd;
     border-radius: 0;
+}
+body .btn--floating.btn--small {
+    height: 22px !important;
+    width: 22px !important;
+    box-shadow: none !important;
+    font-size: 12px !important;
+}
+body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon {
+    opacity: 0.1
 }

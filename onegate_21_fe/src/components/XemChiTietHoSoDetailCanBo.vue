@@ -32,7 +32,7 @@
             XỬ LÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()">
+        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()" v-if="originality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
           </v-btn>
@@ -43,7 +43,7 @@
           </v-btn>
         </v-tab>
         <v-tab :key="5" href="#tabs-5" @click="runComment()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
+          <v-btn flat class="px-0 py-0 mx-0 my-0" v-if="originality !== 1">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
@@ -62,14 +62,14 @@
                 </div>
                 <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.partName}}</div>
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile(item)" style="height:25px;width:25px">
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:25px;width:25px">
                             {{item.count}}
                           </v-btn>
                           <span>Xem</span>
@@ -77,6 +77,21 @@
                       </v-flex>
                     </v-layout>
                   </v-card>
+                  <div v-if="item.partNo === partView && stateView">
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12>
+                        <div v-for="(itemFileView, index) in fileViews">
+                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attachment</v-icon>{{itemFileView.displayName}}</span>
+                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
+                              <v-icon style="color: red">delete_outline</v-icon>
+                            </v-btn> -->
+                          </div>
+                        </div>
+                      </v-flex>
+                    </v-layout>
+                  </div>
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -88,14 +103,14 @@
                 </div>
                 <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.partName}}</div>
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile(item)" style="height:25px;width:25px">
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:25px;width:25px">
                             {{item.count}}
                           </v-btn>
                           <span>Xem</span>
@@ -103,6 +118,21 @@
                       </v-flex>
                     </v-layout>
                   </v-card>
+                  <div v-if="item.partNo === partView && stateView">
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12>
+                        <div v-for="(itemFileView, index) in fileViews">
+                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attachment</v-icon>{{itemFileView.displayName}}</span>
+                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
+                              <v-icon style="color: red">delete_outline</v-icon>
+                            </v-btn> -->
+                          </div>
+                        </div>
+                      </v-flex>
+                    </v-layout>
+                  </div>
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -114,7 +144,7 @@
                 </div>
                 <div v-for="(item, index) in documents" v-bind:key="item.documentCode">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.documentName}}</div>
@@ -205,7 +235,7 @@
             <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
           </v-tab-item>
-          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
               <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
@@ -270,7 +300,7 @@
               </td>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-5" :key="5" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <comment ref="comment" :classPK="id" :className="className"></comment>
           </v-tab-item>
           <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
@@ -347,6 +377,7 @@ export default {
     className: 'org.opencps.dossiermgt.model.Dossier',
     dossierFilesItems: [],
     dossierTemplatesItems: [],
+    fileViews: [],
     showContactDetail: false,
     listHistoryProcessing: [],
     dossierTemplatesTN: [],
@@ -380,6 +411,8 @@ export default {
     resultDialogPick: '',
     indexDialogPick: '',
     userNote: 0,
+    partView: '',
+    stateView: false,
     payment_type: 0,
     type_assign: 0,
     returnFiles: [],
@@ -454,6 +487,10 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {
@@ -1011,11 +1048,11 @@ export default {
           }
         }
       })
-      vm.$store.dispatch('pullProcessSteps', {
-        stepCode: vm.thongTinChiTietHoSo.stepCode
-      }).then(resProSteps => {
-        vm.btnStepsDynamics = resProSteps
-      })
+      // vm.$store.dispatch('pullProcessSteps', {
+      //   stepCode: vm.thongTinChiTietHoSo.stepCode
+      // }).then(resProSteps => {
+      //   vm.btnStepsDynamics = resProSteps
+      // })
     },
     showAlpacaJSFORM (item) {
       var vm = this
@@ -1102,6 +1139,30 @@ export default {
           console.log(resPostAction)
         })
       }
+    },
+    viewFileWithPartNo (item) {
+      var vm = this
+      if (vm.dossierFilesItems) {
+        var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+          return file.dossierPartNo === item.partNo
+        })
+        if (fileViewsTemp) {
+          vm.fileViews = fileViewsTemp
+          // vm.sheet = true
+          vm.partView = item.partNo
+          vm.stateView = !vm.stateView
+        } else {
+          return
+        }
+      }
+      return
+    },
+    viewFile2 (data) {
+      var vm = this
+      data['dossierId'] = vm.thongTinHoSo.dossierId
+      vm.$store.dispatch('viewFile', data).then(resUrl => {
+        window.open(resUrl, '_blank')
+      })
     }
   },
   filters: {
