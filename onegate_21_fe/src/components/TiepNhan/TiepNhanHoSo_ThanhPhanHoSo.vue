@@ -33,7 +33,7 @@
               <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
               <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row v-if="originality !== 1">
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -86,7 +86,7 @@
           </v-layout>
         </div>
       </div>
-      <v-layout row wrap v-if="checkPartType3">
+      <!-- <v-layout row wrap v-if="checkPartType3">
         <v-flex xs12 sm6>
           <v-subheader style="float: left;">Thêm giấy tờ khác</v-subheader>
         </v-flex>
@@ -95,7 +95,7 @@
             <v-icon>add</v-icon>
           </v-btn>
         </v-flex>
-      </v-layout>
+      </v-layout> -->
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -260,7 +260,7 @@
       </v-card-text> -->
     </v-card>
     <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
-    <div class="absolute-lable" style="font-size: 12px">
+    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1">
       <span>Không chọn</span>
       <span>Bản chính</span>
       <span>Bản chụp</span>
@@ -297,6 +297,10 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   mounted () {
@@ -611,7 +615,7 @@ export default {
     },
     checkPartType3 () {
       var vm = this
-      if (vm.dossierTemplateItems) {
+      if (vm.dossierTemplateItems.length !== 0) {
         for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
           if (vm.dossierTemplateItems[i].partType === 3) {
             return true
