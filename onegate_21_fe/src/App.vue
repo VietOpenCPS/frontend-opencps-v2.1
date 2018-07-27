@@ -78,7 +78,7 @@
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
           vm.trangThaiHoSoList = result
           let currentParams = vm.$router.history.current.params
-          if (!currentParams.hasOwnProperty('index')) {
+          if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
             vm.trangThaiHoSoList[0]['active'] = true
             router.push({
               path: '/danh-sach-ho-so/0',

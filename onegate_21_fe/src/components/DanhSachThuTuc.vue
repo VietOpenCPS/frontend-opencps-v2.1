@@ -50,6 +50,7 @@
 <script>
   import router from '@/router'
   export default {
+    props: ['serviceCode'],
     data: () => ({
       govAgencies: [],
       serviceOptions: [],
