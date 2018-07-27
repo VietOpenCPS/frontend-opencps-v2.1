@@ -72,25 +72,37 @@ export default {
     }
   },
   created () {
-    var vm = this
-    vm.$nextTick(function () {
-      vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-        vm.usersComment = result
-      })
-    })
+    // var vm = this
+    // vm.$nextTick(function () {
+    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+    //     vm.usersComment = result
+    //   })
+    // })
   },
   mounted () {
-    var vm = this
-    if (vm.classPK) {
-      vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-        vm.usersComment = result
-        vm.initComment()
-      }).catch(reject => {
-        vm.initComment()
-      })
-    }
+    // var vm = this
+    // if (vm.classPK) {
+    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+    //     vm.usersComment = result
+    //     vm.initComment()
+    //   }).catch(reject => {
+    //     vm.initComment()
+    //   })
+    // }
   },
   methods: {
+    runComment () {
+      var vm = this
+      if (vm.classPK) {
+        vm.initComment()
+        // vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+        //   vm.usersComment = result
+        //   vm.initComment()
+        // }).catch(reject => {
+        //   vm.initComment()
+        // })
+      }
+    },
     initComment: function () {
       var vm = this
       $('#comments-container-el').comments({
