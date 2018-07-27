@@ -2215,10 +2215,6 @@ body .theme--light .form_alpaca .expansion-panel__container {
     height: 100%;
 }*/
 
-.expand__select__gov .expansion-panel__header {
-  background-color: rgb(170, 208, 222);
-}
-
 .expand__select__domain .expansion-panel__header {
   background-color: #dbebf0;
 }

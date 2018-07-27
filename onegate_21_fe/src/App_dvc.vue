@@ -89,7 +89,7 @@
                 q: vm.trangThaiHoSoList[0]['queryParams']
               }
             })
-          } else {
+          } else if (currentParams.hasOwnProperty('index')) {
             vm.trangThaiHoSoList[currentParams.index]['active'] = true
           }
           vm.loadingCounter()
@@ -196,7 +196,7 @@
         })
       },
       doAddDVC () {
-        router.push('/danh-sach-ho-so/add-dvc/0')
+        router.push('/add-dvc/0')
       }
     }
   }

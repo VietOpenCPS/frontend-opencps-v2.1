@@ -1964,7 +1964,7 @@ export const store = new Vuex.Store({
             params: {
             }
           }
-          axios.get(state.initData.serviceConfigApi + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
+          axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               resolve(serializable.data)

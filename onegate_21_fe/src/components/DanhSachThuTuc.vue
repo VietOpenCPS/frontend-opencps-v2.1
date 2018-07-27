@@ -1,6 +1,15 @@
 <template>
   <div>
-    <v-expansion-panel expand class="expand__select__gov">
+    <div class="text-center mt-4" v-if="String(serviceCode) !== '0'">
+      <v-progress-circular
+        :size="100"
+        :width="1"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+      <p class="mt-4">đang tạo hồ sơ ...</p>
+    </div>
+    <v-expansion-panel v-else expand class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index' value="1">
         <div slot='header' class="ml-3"><v-icon>account_balance</v-icon> {{itemGov.govAgencyName}}</div>
         <v-card>
@@ -26,7 +35,7 @@
                         </v-flex>
                         <v-flex xs12 sm2 class="text-xs-center">
                           <v-menu left>
-                          <v-btn class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
+                          <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
                               Chọn
                             </v-btn>
                             <v-list v-if="serviceOptions.length > 1">
@@ -68,6 +77,21 @@
       var vm = this
       vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {
         vm.govAgencies = result
+        if (String(vm.serviceCode) !== '0') {
+          for (let key in vm.govAgencies) {
+            let govAgencyCode = vm.govAgencies[key].govAgencyCode
+            for (let keyDomain in vm.govAgencies[key].domains) {
+              for (let keyConfig in vm.govAgencies[key].domains[keyDomain].serviceConfigs) {
+                let serviceConfig = vm.govAgencies[key].domains[keyDomain].serviceConfigs[keyConfig]
+                let serviceConfigId = serviceConfig.serviceConfigId
+                if (String(vm.serviceCode) === String(serviceConfigId)) {
+                  vm.pullServiceOptions(serviceConfig, govAgencyCode)
+                  break
+                }
+              }
+            }
+          }
+        }
       })
     },
     updated () {
