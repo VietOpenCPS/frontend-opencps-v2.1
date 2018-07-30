@@ -9,17 +9,18 @@
         </div>
         <v-card >
           <v-card-text class="px-0 py-0">
-            <v-tabs icons-and-text class="mb-4">
+            <v-tabs icons-and-text class="mb-4" v-model="tabActive">
               <v-tabs-slider color="primary"></v-tabs-slider>
-              <v-tab :key="1" href="#tabs-1">
+              <v-tab :key="1" href="#tabs-1" @click="changeActive">
                 <v-btn flat class="px-0 py-0 mx-0 my-0">Ký kết quả hồ sơ</v-btn>
               </v-tab>
-              <v-tab :key="2" href="#tabs-3">
+              <v-tab :key="2" href="#tabs-3" @click="changeActive">
                 <v-btn flat class="px-0 py-0 mx-0 my-0">Không ký duyệt</v-btn>
               </v-tab>
-              <v-tab :key="3" href="#tabs-4">
+              <v-tab :key="3" href="#tabs-4" @click="changeActive">
                 <v-btn flat class="px-0 py-0 mx-0 my-0">Yêu cầu trình lại</v-btn>
               </v-tab>
+              <!--  -->
               <v-tabs-items class="px-3 py-3">
                 <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
                   <v-checkbox 
@@ -63,6 +64,7 @@ export default {
     detailDossier: {}
   },
   data: () => ({
+    tabActive: 'tabs-1',
     activeKS: true,
     noteReason: '',
     thongTinHoSo: {}
@@ -70,8 +72,9 @@ export default {
   created () {},
   mounted () {},
   methods: {
-    changeKS (event) {
-      console.log('change KS', event)
+    changeActive () {
+      var vm = this
+      console.log('tabActive', vm.tabActive)
     },
     doExport () {
       let vm = this
