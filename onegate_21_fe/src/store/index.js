@@ -140,6 +140,9 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.menuConfigToDo, param).then(function (response) {
               let serializable = response.data
+              // if (typeof serializable === 'object' && serializable.constructor === Object) {
+              //   serializable = [serializable]
+              // }
               let menuData = []
               let index = 0
               for (let key in serializable.data) {
@@ -1510,7 +1513,7 @@ export const store = new Vuex.Store({
             // abc: dât.abc
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/documents'
+        let url = state.initData.documentApi + '/' + data.dossierId + '/documents'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)

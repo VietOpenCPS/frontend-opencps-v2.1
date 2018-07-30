@@ -1,11 +1,11 @@
 <template>
   <div>
     <v-card>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 1" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 1 || item.partType === 3" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false">
-              <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+              <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType !== 3) ? 'calc(100% - 370px)' : ''}">
                 <span class="text-bold mr-2">{{index + 1}}.</span>
                 <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
               </div>
@@ -29,11 +29,8 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
-            <v-flex style="width: 260px;" class="layout wrap">
-              <!-- <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="1"></v-checkbox>
-              <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="2"></v-checkbox>
-              <v-checkbox light color="secondary" class="flex" v-model="dossierTemplateItems[index].fileType" :value="3"></v-checkbox> -->
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row v-if="originality !== 1">
+            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType !== 3">
+              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
@@ -61,12 +58,12 @@
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
-              <!-- <v-tooltip top>
-                <v-btn slot="activator" @click="onDeleteAttackFiles(item)" icon class="mx-0 my-0">
-                  <v-icon size="16" class="mx-0" color="red darken-3">delete</v-icon>
+              <v-tooltip top v-if="item.partType === 3">
+                <v-btn slot="activator" @click="dialogAddOtherTemp = true" icon class="mx-0 my-0">
+                  <v-icon size="16" class="mx-0" color="primary">add</v-icon>
                 </v-btn>
-                <span>Xóa</span>
-              </v-tooltip> -->
+                <span>Thêm giấy tờ khác</span>
+              </v-tooltip>
             </v-flex>
           </v-layout>
         </div>
@@ -86,6 +83,14 @@
           </v-layout>
         </div>
       </div>
+      <v-layout row wrap>
+        <v-flex xs12 sm2>
+          
+        </v-flex>
+        <v-flex xs12 sm12>
+          
+        </v-flex>
+      </v-layout>
       <!-- <v-layout row wrap v-if="checkPartType3">
         <v-flex xs12 sm6>
           <v-subheader style="float: left;">Thêm giấy tờ khác</v-subheader>
@@ -159,7 +164,7 @@
         </v-flex>
       </v-layout>
 
-      <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 3" v-bind:key="item.partNo">
+      <!-- <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 3" v-bind:key="item.partNo">
         <v-expansion-panel class="no_acction__event expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false">
@@ -212,12 +217,6 @@
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
-              <!-- <v-tooltip top>
-                <v-btn slot="activator" @click="onDeleteSingleFiles(item)" icon class="mx-0 my-0">
-                  <v-icon size="16" class="mx-0" style="color: red">delete</v-icon>
-                </v-btn>
-                <span>Xóa</span>
-              </v-tooltip> -->
             </v-flex>
           </v-layout>
         </div>
@@ -226,7 +225,6 @@
             <v-flex xs12 sm12>
               <div v-for="(itemFileView, index) in fileViews">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
-                  <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
                   <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                     <v-icon style="color: red">delete_outline</v-icon>
@@ -236,7 +234,7 @@
             </v-flex>
           </v-layout>
         </div>
-      </div>
+      </div> -->
       <!-- <v-card-text class="note_trichyeu">
         <v-layout wrap>
           <v-flex xs12 sm2>
@@ -638,8 +636,13 @@ export default {
         if (fileViewsTemp) {
           vm.fileViews = fileViewsTemp
           // vm.sheet = true
-          vm.partView = item.partNo
-          vm.stateView = !vm.stateView
+          if (vm.partView !== item.partNo) {
+            vm.stateView = true
+            vm.partView = item.partNo
+          } else {
+            vm.stateView = !vm.stateView
+            vm.partView = item.partNo
+          }
         } else {
           return
         }

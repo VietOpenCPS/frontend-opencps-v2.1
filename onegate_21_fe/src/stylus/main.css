@@ -2219,6 +2219,15 @@ body .theme--light .form_alpaca .expansion-panel__container {
   background-color: #dbebf0;
 }
 
+.center-all {
+  display: -webkit-box;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
 .card__text__gov {
   padding: 7px !important
 }
