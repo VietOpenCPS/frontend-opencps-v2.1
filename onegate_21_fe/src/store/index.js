@@ -885,11 +885,8 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            if (response.data.data) {
-              resolve(response.data.data)
-            } else {
-              resolve([])
-            }
+            console.log('responseDataApplicantApi', response.data.data)
+            resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
             reject(xhr)

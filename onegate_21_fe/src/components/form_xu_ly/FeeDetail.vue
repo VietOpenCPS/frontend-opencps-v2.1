@@ -115,10 +115,10 @@ export default {
     vm.data_payment = vm.payments
     if (vm.payments) {
       setTimeout(function () {
-        let feeAmount = vm.payments.feeAmount ? Number(vm.payments.feeAmount.replace(/\./g, '')) : 0
-        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.replace(/\./g, '')) : 0
-        let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.replace(/\./g, '')) : 0
-        let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.replace(/\./g, '')) : 0
+        let feeAmount = vm.payments.feeAmount ? Number(vm.payments.feeAmount.toString().replace(/\./g, '')) : 0
+        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
+        let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
+        let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
         vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
         if (vm.totalFee < 0) {
           vm.totalFee = 0

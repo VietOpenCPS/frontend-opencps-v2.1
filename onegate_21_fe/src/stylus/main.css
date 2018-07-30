@@ -2310,12 +2310,12 @@ body .input-group--selection-controls__ripple {
 }
 .absolute-lable {
     position: absolute;
-    right: 108px;
+    right: 90px;
     top: 10px
 }
 .absolute-lable span {
     display: inline-block;
-    width: 66px;
+    width: 72px;
     text-align: center
 }
 /* */
