@@ -351,7 +351,6 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
-    /* data PhanCongThucHien */
     itemFilterSupport: {
       years: [
         {
@@ -807,9 +806,9 @@ export default {
       let currentQuery = router.history.current.query
       if (currentQuery.hasOwnProperty('q')) {
         let filter = {
-          // queryParams: currentQuery.q,
+          queryParams: currentQuery.q,
           /*  test Local */
-          queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          // queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
           page: vm.hosoDatasPage,
           agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
           service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
