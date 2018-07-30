@@ -168,7 +168,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn" style="width: 270px;margin-top: 4px;">
+        <div class="absolute__btn" style="width: 270px;margin-top: 4px;" v-if="originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
@@ -177,7 +177,7 @@
             <v-radio label="Doanh Nghiệp" :value="false"></v-radio>
           </v-radio-group>
         </div>
-        <div style="position: relative;">
+        <div style="position: relative;" v-if="originality !== 1">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content hide-actions value="1">
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> THÔNG TIN NGƯỜI NỘP HỒ SƠ</div>
@@ -397,6 +397,10 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {

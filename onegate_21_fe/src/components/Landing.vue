@@ -115,7 +115,7 @@
               <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
               <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                 @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2 || props.item['assigned'] === 0"
+                :disabled="item['enable'] === 2"
                 v-if="item['enable'] > 0"
                 >
                 <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
@@ -124,6 +124,9 @@
                 @click="btnActionEvent(props.item, item, index, false)"
               >
                 <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="viewDetail(props.item, props.index)">
+                Xem chi tiết
               </v-list-tile>
             </v-list>
           </v-menu>
@@ -251,7 +254,7 @@
           <v-icon>clear</v-icon>
         </v-btn>
         <div v-if="dialogPDFLoading" style="
-            min-height: 400px;
+            min-height: 600px;
             text-align: center;
             margin: auto;
             padding: 25%;
@@ -263,7 +266,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 400px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>

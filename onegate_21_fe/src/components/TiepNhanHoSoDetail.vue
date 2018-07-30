@@ -14,10 +14,25 @@
         </div>
       </div> 
     </div>
-    <div style="position: relative;">
+    <div style="position: relative;" v-if="originality !== 1">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </div>
+    <div style="position: relative;" v-else>
+      <v-expansion-panel class="expansion-pl">
+        <v-expansion-panel-content hide-actions value="1">
+          <div slot="header">
+            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+            HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
+          </div>
+          <v-layout row wrap>
+            <v-flex xs12 sm12>
+              <span class="ml-3">{{thongTinChiTietHoSo.dossierNote}}</span>
+            </v-flex>
+          </v-layout>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -62,9 +77,15 @@
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab> -->
-      <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="tiepNhanState"> 
+      <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="originality !== 1 && tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Tiếp nhận &nbsp;
+          <v-icon>save</v-icon>
+        </v-btn>
+      </v-tab>
+      <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1"> 
+        <v-btn flat class="px-0 py-0 mx-0 my-0">
+          Lưu &nbsp;
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab>
@@ -122,6 +143,10 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {
@@ -169,6 +194,62 @@ export default {
         vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
+    },
+    luuHoSo () {
+      var vm = this
+      console.log('luu Ho So--------------------')
+      vm.$store.commit('setPrintPH', false)
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      if (vm.$refs.thongtinchuhoso.showValid()) {
+        let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+        let dossierTemplates = thanhphanhoso
+        let listAction = []
+        let listDossierMark = []
+        if (dossierFiles) {
+          dossierFiles.forEach(function (value, index) {
+            if (value.eForm) {
+              value['dossierId'] = vm.dossierId
+              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+            }
+          })
+        }
+        // if (vm.$refs.thanhphanhoso) {
+        //   vm.$refs.thanhphanhoso.saveMark()
+        // }
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        tempData['dossierId'] = vm.dossierId
+        console.log('data put dossier -->', tempData)
+        setTimeout(function () {
+          vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            var initData = vm.$store.getters.loadingInitData
+            let actionUser = initData.user.userName ? initData.user.userName : ''
+            let dataPostAction = {
+              dossierId: vm.dossierId,
+              actionCode: 1100,
+              actionNote: '',
+              actionUser: actionUser,
+              payload: '',
+              security: '',
+              assignUsers: '',
+              payment: vm.payments,
+              createDossiers: ''
+            }
+            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              let currentQuery = vm.$router.history.current.query
+              router.push('/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId)
+              vm.tiepNhanState = false
+            })
+          }).catch(function (xhr) {
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        }, 500)
+      }
     },
     tiepNhanHoSo () {
       var vm = this

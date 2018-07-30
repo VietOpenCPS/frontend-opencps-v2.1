@@ -81,7 +81,7 @@
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
           vm.trangThaiHoSoList = result
           let currentParams = vm.$router.history.current.params
-          if (!currentParams.hasOwnProperty('index')) {
+          if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
             vm.trangThaiHoSoList[0]['active'] = true
             router.push({
               path: '/danh-sach-ho-so/0',
@@ -89,7 +89,7 @@
                 q: vm.trangThaiHoSoList[0]['queryParams']
               }
             })
-          } else {
+          } else if (currentParams.hasOwnProperty('index')) {
             vm.trangThaiHoSoList[currentParams.index]['active'] = true
           }
           vm.loadingCounter()
@@ -169,7 +169,10 @@
       },
       loadingCounter () {
         let vm = this
-        vm.$store.dispatch('loadingCounterHoSo').then(function (result) {
+        let filter = {
+          originality: vm.getOriginality()
+        }
+        vm.$store.dispatch('loadingCounterHoSo', filter).then(function (result) {
           vm.counterData = result.data
           for (let key in vm.trangThaiHoSoList) {
             vm.trangThaiHoSoList[key]['counter'] = 0
@@ -193,7 +196,7 @@
         })
       },
       doAddDVC () {
-        router.push('/danh-sach-ho-so/add-dvc')
+        router.push('/add-dvc/0')
       }
     }
   }

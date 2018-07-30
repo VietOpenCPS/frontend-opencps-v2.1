@@ -619,17 +619,19 @@ export const store = new Vuex.Store({
       })
     },
     viewFile ({commit, state, dispatch}, data) {
-      let param = {
-        headers: {
-          groupId: state.initData.groupId
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
         }
-        // responseType: 'blob'
-      }
-      axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-        // var url = window.URL.createObjectURL(response.data)
-        // window.open(url, '_blank')
-      }).catch(function (xhr) {
-        console.log(xhr)
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
       })
     },
     postDossier ({ commit, state }, data) {
@@ -1962,7 +1964,7 @@ export const store = new Vuex.Store({
             params: {
             }
           }
-          axios.get(state.initData.serviceConfigApi + data.serviceInfoId + '/processes', param).then(function (response) {
+          axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               resolve(serializable.data)
@@ -2132,6 +2134,24 @@ export const store = new Vuex.Store({
           axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions/' + filter.actionId +  '/payload', param).then(function (response) {
             let serializable = response.data
             resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceInfo ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.initData.serviceInfoApi + '/' + data.serviceInfoId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
           }).catch(function (error) {
             console.log(error)
             reject(error)
