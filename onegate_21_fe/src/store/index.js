@@ -111,7 +111,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
           /** */
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
@@ -642,16 +642,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   'groupId': state.initData.groupId
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            'groupId': state.initData.groupId
+          }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -737,7 +737,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', data.applicantIdNo)
+        dataPutdossier.append('applicantIdNo', data.applicantIdNo[0] ? data.applicantIdNo[0] : '')
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -745,7 +745,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', data.delegateIdNo)
+        dataPutdossier.append('delegateIdNo', data.delegateIdNo[0] ? data.delegateIdNo[0] : '')
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)
@@ -753,6 +753,9 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
+        if (data.editable) {
+          dataPutdossier.append('dueDate', data.dueDate)
+        }
         if (data.viaPostal) {
           dataPutdossier.append('viaPostal', data.viaPostal ? 1 : 0)
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
@@ -872,8 +875,8 @@ export const store = new Vuex.Store({
       })
     },
     getUserInfoFromApplicantIdNo ({ commit, state }, data) {
-      store.dispatch('loadInitResource').then(function (result) {
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId

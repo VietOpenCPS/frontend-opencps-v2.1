@@ -2475,3 +2475,7 @@ body .btn--floating.btn--small {
 body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon {
     opacity: 0.1
 }
+/*  */
+.wrapper-datetime input:nth-child(1) {
+    font-weight: bold
+}

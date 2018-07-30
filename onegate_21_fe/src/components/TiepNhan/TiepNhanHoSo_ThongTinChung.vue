@@ -62,10 +62,26 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left;height: 100%">
+            <v-subheader v-if="!loading&&editable === false" style="float:left;height: 100%">
               <span class="text-bold">
                 {{thongTinChungHoSo.dueDate}}
               </span>
+            </v-subheader>
+            <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
+              <datetime v-model="dueDateInput" v-on:input="changeDate"
+                type="datetime"
+                input-format="DD/MM/YYYY HH:mm"
+                :i18n="{ok:'Chọn', cancel:'Thoát'}"
+                moment-locale="vi"
+                zone="local"
+                :min-date="minDate"
+                monday-first
+                wrapper-class="wrapper-datetime"
+                auto-continue
+                auto-close
+                required
+              ></datetime>
+              <v-icon>event</v-icon>
             </v-subheader>
           </v-flex>
         </v-layout>
@@ -79,6 +95,8 @@
   export default {
     data: () => ({
       minDate: null,
+      editable: false,
+      dueDateInput: (new Date()).toString(),
       dataPostDossier: {
         serviceCode: '',
         govAgencyCode: '',
@@ -105,8 +123,6 @@
       var vm = this
       vm.$nextTick(function () {
         vm.minDate = vm.getCurentDateTime('date')
-        // vm.$store.commit('setThongTinChungHoSoDueDate', (new Date()).toString())
-        // vm.$store.commit('setThongTinChungHoSoReceiveDate', vm.getCurentDateTime('datetime'))
       })
     },
     computed: {
@@ -136,8 +152,13 @@
           durationUnit: data.durationUnit,
           durationCount: data.durationCount
         }
-        console.log('thongTinChungHoSoTemp++++++++++', thongTinChungHoSoTemp)
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
+        vm.editable = data.editable
+        vm.thongTinChungHoSo['editable'] = vm.editable
+        vm.minDate = vm.getCurentDateTime('date')
+      },
+      getthongtinchunghoso () {
+        return this.thongTinChungHoSo
       },
       getCurentDateTime (type) {
         let date = new Date()
@@ -147,13 +168,15 @@
           return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}`
         }
       },
+      changeDate () {
+        this.thongTinChungHoSo['dueDate'] = this.getDuedate()
+        // console.log('dueDate', this.thongTinChungHoSo.dueDate)
+      },
       getDuedate () {
         var vm = this
-        let dueDateMs = (new Date(vm.thongTinChungHoSo.dueDate).getTime() - new Date(vm.thongTinChungHoSo.receiveDate).getTime())
-        if (Math.ceil(dueDateMs / 1000 / 60 / 60 / 24) <= 0) {
-          return 1
-        }
-        return Math.ceil(dueDateMs / 1000 / 60 / 60 / 24)
+        let date = new Date(this.dueDateInput)
+        let dueDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}`
+        return dueDate
       },
       durationText (durationUnit, durationCount) {
         var durationText

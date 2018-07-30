@@ -18,34 +18,22 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-text-field
+                    <!-- <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.applicantIdNo"
-                    ></v-text-field>
-
-                    <!-- <v-select
-                    autocomplete
-                    cache-items
-                    chips
-                    :items="applicants"
-                    item-text="applicantIdNo"
-                    item-value="applicantIdNo"
-                    @change="onChangeApplicantIdNo"
-                    :search-input.sync="applicantIdNo"
-                    v-model="thongTinChuHoSo.applicantIdNo"
-                    ></v-select> -->
-                    <!--  -->
-                    <!-- <v-select
+                    ></v-text-field> -->
+                    <v-select
                     :items="applicantItems"
-                    @keyup="querySelections($event)"
                     hide-selected
                     tags
                     v-model="thongTinChuHoSo.applicantIdNo"
                     item-text="applicantIdNo"
                     item-value="applicantIdNo"
-                    return-object
                     autocomplete
                     clearable
+                    :search-input.sync="search"
+                    @input="eventInput2($event)"
+                    cache-items
                     >
                       <template slot="item" slot-scope="data">
                         <template>
@@ -55,7 +43,7 @@
                           </v-list-tile-content>
                         </template>
                       </template>
-                    </v-select> -->
+                    </v-select>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -217,21 +205,23 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-text-field
+                      <!-- <v-text-field
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                      ></v-text-field>
+                      ></v-text-field> -->
                       <!--  -->
-                      <!-- <v-select
+                      <v-select
                       :items="applicantItems"
                       hide-selected
                       tags
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
                       item-text="applicantIdNo"
-                      item-value="applicantName"
-                      return-object
+                      item-value="applicantIdNo"
                       autocomplete
                       clearable
+                      :search-input.sync="search"
+                      @input="eventInput($event)"
+                      cache-items
                       >
                         <template slot="item" slot-scope="data">
                           <template>
@@ -241,7 +231,7 @@
                             </v-list-tile-content>
                           </template>
                         </template>
-                      </v-select> -->
+                      </v-select>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -436,7 +426,8 @@ export default {
       delegateEmail: '',
       delegateTelNo: '',
       delegateIdNo: ''
-    }
+    },
+    search: null
   }),
   computed: {
     loading () {
@@ -491,10 +482,8 @@ export default {
       },
       deep: true
     },
-    applicantIdNo (val) {
-      if (val.length >= 3) {
-        val && this.querySelections(val)
-      }
+    search (val) {
+      val && this.querySelections(val)
     }
   },
   methods: {
@@ -647,18 +636,30 @@ export default {
       }
       // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
     },
-    // eventInput (event) {
-    //   var vm = this
-    //   console.log('event', event)
-    //   vm.applicantItems = []
-    //   console.log('run input')
-    //   setTimeout(function () {
-    //     if (event.length !== 0) {
-    //       vm.applicantItems = [event[event.length - 1]]
-    //     } else { vm.applicantItems = [] }
-    //     return false
-    //   }, 200)
-    // },
+    eventInput (event) {
+      var vm = this
+      // console.log('event', event)
+      vm.thongTinNguoiNopHoSo.delegateIdNo = []
+      // console.log('run input')
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
+        } else { vm.thongTinNguoiNopHoSo.delegateIdNo = [] }
+        return false
+      }, 100)
+    },
+    eventInput2 (event) {
+      var vm = this
+      // console.log('event', event)
+      vm.thongTinChuHoSo.applicantIdNo = []
+      // console.log('run input')
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinChuHoSo.applicantIdNo = [event[event.length - 1]]
+        } else { vm.thongTinChuHoSo.applicantIdNo = [] }
+        return false
+      }, 100)
+    },
     querySelections (val) {
       var vm = this
       let params = {
@@ -666,13 +667,7 @@ export default {
       }
       vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
         vm.applicantItems = result
-        console.log('ResApplicantItems1', result)
-        console.log('applicantItems', vm.applicantItems)
-        if (result.length === 0) {
-          vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
-        }
       }).catch(xhr => {
-        vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
       })
     },
     onChangeDelegateCity (data) {
