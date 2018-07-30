@@ -496,7 +496,11 @@ export const store = new Vuex.Store({
         let file = files[0]
         let data = e.dataItem
         let formData = new FormData()
-        formData.append('displayName', file.name)
+        if (data.partType === 3) {
+          formData.append('displayName', e['displayName'])
+        } else {
+          formData.append('displayName', file.name)
+        }
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
         formData.append('isSync', 'false')
@@ -2153,6 +2157,26 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.serviceInfoApi + '/' + data.serviceInfoId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    changeDisplayNameFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          var dataPutDossierFile = new URLSearchParams()
+          dataPutDossierFile.append('displayName', data.displayName)
+          axios.put(state.initData.serviceInfoApi + '/' + data.dossierId + '/files/' + data.dossierFileId, dataPutDossierFile, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
