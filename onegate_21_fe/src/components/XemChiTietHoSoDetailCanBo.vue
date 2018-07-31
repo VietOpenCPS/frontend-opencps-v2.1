@@ -792,11 +792,9 @@ export default {
         }
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
           vm.checkInput = result.checkInput
-          isPopup = true
           if (result.checkInput === 2) {
+            isPopup = true
             vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
-          } else if (result.checkInput === 0) {
-            isPopup = false
           }
         }
       }

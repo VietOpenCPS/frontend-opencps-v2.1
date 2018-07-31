@@ -48,7 +48,7 @@
               @change="onUploadSingleFile($event,item)"
               >
               <v-tooltip top v-if="item.partType === 3 && originality === 3">
-                <v-btn slot="activator" @click="dialogAddOtherTemp = true" icon class="mx-0 my-0">
+                <v-btn slot="activator" @click="addFileOther" icon class="mx-0 my-0">
                   <v-icon size="16" class="mx-0" color="primary">add</v-icon>
                 </v-btn>
                 <span>Thêm giấy tờ khác</span>
@@ -83,7 +83,11 @@
               <div v-for="(itemFileView, index) in fileViews" :key="index">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">{{itemFileView.displayName}}</span>
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">
+                    <v-icon v-if="itemFileView.eForm">border_color</v-icon>
+                    <v-icon v-else>attach_file</v-icon>
+                    {{itemFileView.displayName}}
+                  </span>
                   <v-text-field
                     v-model="itemFileView.displayName"
                     v-if="itemFileView.dossierFileId === dossierFileIdView && stateEdit"
@@ -123,7 +127,7 @@
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-card-title class="headline">Tên giấy tờ</v-card-title>
-            <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogAddOtherTemp = false">
+            <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="cancelDialog">
               <v-icon>clear</v-icon>
             </v-btn>
             <v-progress-linear v-if="loadingAddOther" class="my-0" :indeterminate="true"></v-progress-linear>
@@ -329,6 +333,7 @@ export default {
     progressUploadPart: '',
     dialogPDF: false,
     dialogPDFLoading: true,
+    stateAddFileOther: false,
     dossierTemplatesItemSelect: {},
     fileViews: []
   }),
@@ -479,9 +484,9 @@ export default {
       return dossierTemplates
     },
     mergeDossierTemplateVsDossierMark (dossierTemplates, dossierMarks) {
-      if (dossierMarks) {
-        dossierTemplates = dossierTemplates.map(itemTemplate => {
-          itemTemplate.count = 0
+      if (dossierMarks.length !== 0) {
+        dossierTemplates.map(itemTemplate => {
+          itemTemplate['count'] = 0
           dossierMarks.forEach(function (val, index) {
             if (val.dossierPartNo === itemTemplate.partNo) {
               itemTemplate['fileMark'] = val.fileMark
@@ -563,6 +568,8 @@ export default {
       }
     },
     pickFile (item) {
+      var vm = this
+      vm.stateAddFileOther = false
       document.getElementById('file' + item.partNo).click()
     },
     onUploadSingleFile (e, data) {
@@ -638,17 +645,12 @@ export default {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.fileViews.splice(index, 1)
+          vm.stateView = true
+          vm.partView = item.dossierPartNo
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
-            var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-              return file.dossierPartNo === item.partNo
-            })
-            if (fileViewsTemp) {
-              vm.fileViews = fileViewsTemp
-            } else {
-              return
-            }
           })
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
@@ -720,11 +722,12 @@ export default {
     },
     changeOtherDossierTemp (data) {
       var vm = this
-      if (vm.originality === 3) {
+      if (vm.originality === 3 && vm.stateAddFileOther) {
         vm.loadingAddOther = true
         vm.$store.dispatch('uploadSingleOtherFile', {
           dossierId: vm.thongTinHoSo.dossierId,
-          displayName: data
+          displayName: data,
+          partNo: vm.dossierTemplatesItemSelect.partNo
         }).then(resFile => {
           vm.loadingAddOther = false
           vm.dialogAddOtherTemp = false
@@ -779,6 +782,11 @@ export default {
       var vm = this
       vm.dialogAddOtherTemp = false
       vm.progressUploadPart = ''
+    },
+    addFileOther () {
+      var vm = this
+      vm.dialogAddOtherTemp = true
+      vm.stateAddFileOther = true
     },
     changeDisplayName (item, index) {
       var vm = this
