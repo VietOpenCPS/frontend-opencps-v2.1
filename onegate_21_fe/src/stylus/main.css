@@ -2475,7 +2475,19 @@ body .btn--floating.btn--small {
 body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon {
     opacity: 0.1
 }
-/*  */
+/* fix style vue-datetime */
+.wrapper-datetime {
+    font-family: Roboto,sans-serif !important;
+}
 .wrapper-datetime input:nth-child(1) {
     font-weight: bold
+}
+.wrapper-datetime .vdatetime-popup__date-picker__item, .vdatetime-popup__month-selector {
+    font-size: 14px !important
+}
+.vdatetime-popup__date-picker__item--disabled {
+    opacity: 0.6 !important
+}
+.vdatetime-popup__date-picker__item > span {
+    font-weight: normal !important
 }

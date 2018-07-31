@@ -642,16 +642,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          // headers: {
-          //   'groupId': state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            'groupId': state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   'groupId': state.initData.groupId
+          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -733,11 +733,23 @@ export const store = new Vuex.Store({
         } else {
           applicantType = 'citizen'
         }
+        var applicantIdNo = ''
+        var delegateIdNo = ''
+        if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+          applicantIdNo = data.applicantIdNo[0]
+        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
+          applicantIdNo = data.applicantIdNo[0].applicantIdNo
+        }
+        if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
+          delegateIdNo = data.delegateIdNo[0]
+        } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
+          delegateIdNo = data.delegateIdNo[0].applicantIdNo
+        }
         var dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', data.applicantIdNo[0] ? data.applicantIdNo[0] : '')
+        dataPutdossier.append('applicantIdNo', applicantIdNo)
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -745,7 +757,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', data.delegateIdNo[0] ? data.delegateIdNo[0] : '')
+        dataPutdossier.append('delegateIdNo', delegateIdNo)
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)

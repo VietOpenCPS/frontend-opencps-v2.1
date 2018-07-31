@@ -137,13 +137,12 @@
     methods: {
       initData (data) {
         var vm = this
-        console.log(data)
         let thongTinChungHoSoTemp = {
           serviceName: data.serviceName,
           dossierTemplateName: data.dossierTemplateName,
           dossierNo: data.dossierNo,
-          receiveDate: data.receiveDate,
-          dueDate: data.dueDate,
+          receiveDate: data.editable ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
+          dueDate: data.editable ? data.receivingDuedate : data.dueDate,
           durationDate: data.durationDate,
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
@@ -155,6 +154,7 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
+        vm.dueDateInput = new Date(vm.thongTinChungHoSo.dueDate).toString()
         vm.minDate = vm.getCurentDateTime('date')
       },
       getthongtinchunghoso () {
@@ -174,9 +174,8 @@
       },
       getDuedate () {
         var vm = this
-        let date = new Date(this.dueDateInput)
-        let dueDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}`
-        return dueDate
+        let date = (new Date(this.dueDateInput)).getTime()
+        return date
       },
       durationText (durationUnit, durationCount) {
         var durationText
@@ -204,13 +203,11 @@
           path: '/danh-sach-ho-so/' + currentParams.index,
           query: currentQuery
         })
-      }
-    },
-    filters: {
+      },
       dateTimeView (arg) {
         if (arg) {
           let value = new Date(arg)
-          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
         }
       }
     }

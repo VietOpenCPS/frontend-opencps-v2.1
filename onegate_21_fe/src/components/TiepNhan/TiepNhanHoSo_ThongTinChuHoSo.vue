@@ -23,7 +23,7 @@
                     v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field> -->
                     <v-select
-                    :items="applicantItems"
+                    :items="applicantItems2"
                     hide-selected
                     tags
                     v-model="thongTinChuHoSo.applicantIdNo"
@@ -31,9 +31,10 @@
                     item-value="applicantIdNo"
                     autocomplete
                     clearable
-                    :search-input.sync="search"
+                    :search-input.sync="search2"
                     @input="eventInput2($event)"
                     cache-items
+                    return-object
                     >
                       <template slot="item" slot-scope="data">
                         <template>
@@ -222,6 +223,7 @@
                       :search-input.sync="search"
                       @input="eventInput($event)"
                       cache-items
+                      return-object
                       >
                         <template slot="item" slot-scope="data">
                           <template>
@@ -393,6 +395,7 @@ export default {
     delegateWards: [],
     wards: [],
     applicantItems: [],
+    applicantItems2: [],
     applicantIdNo: '',
     labelSwitch: {
       'true': {
@@ -427,7 +430,8 @@ export default {
       delegateTelNo: '',
       delegateIdNo: ''
     },
-    search: null
+    search: null,
+    search2: null
   }),
   computed: {
     loading () {
@@ -484,6 +488,9 @@ export default {
     },
     search (val) {
       val && this.querySelections(val)
+    },
+    search2 (val) {
+      val && this.querySelections2(val)
     }
   },
   methods: {
@@ -500,7 +507,6 @@ export default {
         delegateIdNo: data.delegateIdNo
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
-      console.log('thongTinNguoiNopHoSoTemp-----------', thongTinNguoiNopHoSoTemp)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
       let userTypeCondition = true
       if (data.applicantIdType === 'business') {
@@ -521,8 +527,6 @@ export default {
       }
       let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
-      console.log('thongtinchuhoso', vm.thongTinChuHoSo)
-      console.log('thongtinnguoinophoso', vm.thongTinNguoiNopHoSo)
       vm.$nextTick(function () {
         var filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -608,55 +612,25 @@ export default {
     onChangeWard (data) {
       this.$store.commit('setWardVal', data)
     },
-    onChangeApplicantIdNo (data) {
-      var vm = this
-      if (vm.applicants) {
-        var applicant = vm.applicants.find(item => {
-          return item.applicantIdNo === data
-        })
-        if (applicant) {
-          let userTypeCondition = true
-          if (applicant.applicantIdType === 'business') {
-            userTypeCondition = false
-          }
-          let tempDataChuHs = {
-            userType: userTypeCondition,
-            cityCode: applicant.cityCode,
-            districtCode: applicant.districtCode,
-            wardCode: applicant.wardCode,
-            applicantNote: applicant.applicantNote,
-            applicantIdNo: applicant.applicantIdNo,
-            contactEmail: applicant.contactEmail,
-            contactName: applicant.contactName,
-            address: applicant.address,
-            applicantName: applicant.applicantName
-          }
-          vm.thongTinChuHoSo = tempDataChuHs
-        }
-      }
-      // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
-    },
     eventInput (event) {
       var vm = this
-      // console.log('event', event)
       vm.thongTinNguoiNopHoSo.delegateIdNo = []
-      // console.log('run input')
       setTimeout(function () {
         if (event.length !== 0) {
           vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
         } else { vm.thongTinNguoiNopHoSo.delegateIdNo = [] }
+        vm.thongTinNguoiNopHoSo.delegateName = vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName ? vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName : ''
         return false
       }, 100)
     },
     eventInput2 (event) {
       var vm = this
-      // console.log('event', event)
       vm.thongTinChuHoSo.applicantIdNo = []
-      // console.log('run input')
       setTimeout(function () {
         if (event.length !== 0) {
           vm.thongTinChuHoSo.applicantIdNo = [event[event.length - 1]]
         } else { vm.thongTinChuHoSo.applicantIdNo = [] }
+        vm.thongTinChuHoSo.applicantName = vm.thongTinChuHoSo.applicantIdNo[0].applicantName ? vm.thongTinChuHoSo.applicantIdNo[0].applicantName : ''
         return false
       }, 100)
     },
@@ -667,6 +641,16 @@ export default {
       }
       vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
         vm.applicantItems = result
+      }).catch(xhr => {
+      })
+    },
+    querySelections2 (val) {
+      var vm = this
+      let params = {
+        idNo: val
+      }
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
+        vm.applicantItems2 = result
       }).catch(xhr => {
       })
     },
