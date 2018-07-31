@@ -888,11 +888,8 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            if (response.data.data) {
-              resolve(response.data.data)
-            } else {
-              resolve([])
-            }
+            console.log('responseDataApplicantApi', response.data.data)
+            resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
             reject(xhr)
@@ -1496,8 +1493,8 @@ export const store = new Vuex.Store({
             }
           }
           var params = new URLSearchParams()
-          axios.post(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, params, config).then(function (response) {
-          // axios.post('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
+          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig = JSON.parse(serializable.buttonConfig)['buttons']
             resolve(buttonConfig)

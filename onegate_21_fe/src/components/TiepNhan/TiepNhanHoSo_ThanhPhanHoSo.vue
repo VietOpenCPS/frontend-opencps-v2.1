@@ -80,8 +80,8 @@
         <div v-if="item.partNo === partView && stateView">
           <v-layout row wrap>
             <v-flex xs12 sm12>
-              <div v-for="(itemFileView, index) in fileViews">
-                <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 30px;">
+              <div v-for="(itemFileView, index) in fileViews" :key="index">
+                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
                   <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">{{itemFileView.displayName}}</span>
                   <v-text-field

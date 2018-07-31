@@ -44,8 +44,11 @@
             <!--  -->
             <div class="xs12 sm12 pb-1">
               <span class="pr-2">Thời hạn giải quyết: </span>
-              <span class="pl-0 text-bold "> 
+              <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.durationCount > 0"> 
                 {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
+              </span>
+              <span class="pl-0 text-bold " v-else>
+                Không quy định
               </span>
             </div>
             <!--  -->

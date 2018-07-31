@@ -351,7 +351,6 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
-    /* data PhanCongThucHien */
     itemFilterSupport: {
       years: [
         {
@@ -1363,7 +1362,10 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
+      // console.log('permission: ', item.permission)
+      // if (item.permission !== null && item.permission !== '') {
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      // }
     }
   }
 }
