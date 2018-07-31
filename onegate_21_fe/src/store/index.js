@@ -489,14 +489,14 @@ export const store = new Vuex.Store({
         console.log(xhr)
       })
     },
-    uploadSingleFile ({ commit, state }, e) {
+    uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = e.target.files || e.dataTransfer.files
+        console.log('upload')
+        let files = $('#file' + data.partNo)[0].files
         let file = files[0]
-        let data = e.dataItem
         let formData = new FormData()
         if (data.partType === 3) {
-          formData.append('displayName', e['displayName'])
+          formData.append('displayName', data['displayName'])
         } else {
           formData.append('displayName', file.name)
         }
@@ -505,11 +505,11 @@ export const store = new Vuex.Store({
         formData.append('isSync', 'false')
         formData.append('file', file)
         formData.append('dossierPartNo', data.partNo)
-        formData.append('dossierTemplateNo', e.dossierTemplateNo)
+        formData.append('dossierTemplateNo', data.dossierTemplateNo)
         formData.append('fileTemplateNo', data.partNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
-        axios.post(state.initData.dossierApi + '/' + e.dossierId + '/files', formData, {
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
             'Content-Type': 'multipart/form-data'
@@ -1726,7 +1726,12 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId
             },
-            responseType: 'blob'
+            responseType: 'blob',
+            params: {
+              serviceCode: filter.serviceCode ? filter.serviceCode : '',
+              serviceName: filter.serviceName ? filter.serviceName : '',
+              typeCode: filter.typeCode ? filter.typeCode : ''
+            }
           }
           axios.get(state.initData.getServiceConfigs + '/' + filter.serviceConfigId + '/guide', param).then(function (response) {
             let serializable = response.data
