@@ -181,6 +181,12 @@ export default {
 
         vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so
+        if (result['delegateCityCode'] === '') {
+          result['delegateCityCode'] = 25
+        }
+        if (result['cityCode'] === '') {
+          result['cityCode'] = 25
+        }
         vm.$refs.thongtinchuhoso.initData(result)
         // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
