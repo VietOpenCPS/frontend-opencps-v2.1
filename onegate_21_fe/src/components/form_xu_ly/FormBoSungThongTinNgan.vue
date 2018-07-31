@@ -2,7 +2,7 @@
   <v-expansion-panel class="expansion-pl ext__form">
     <v-expansion-panel-content hide-actions value="1">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-      Form bổ sung thông tin
+      FORM BỔ SUNG THÔNG TIN
       </div>
       <v-card>
         <v-card-text class="py-2 px-2">
