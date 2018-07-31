@@ -292,7 +292,7 @@ export default {
               payload: '',
               security: '',
               assignUsers: '',
-              payment: vm.payments,
+              payment: JSON.stringify(vm.payments),
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {

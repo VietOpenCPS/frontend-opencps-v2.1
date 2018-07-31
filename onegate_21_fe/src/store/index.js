@@ -903,7 +903,6 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            console.log('responseDataApplicantApi', response.data.data)
             resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
