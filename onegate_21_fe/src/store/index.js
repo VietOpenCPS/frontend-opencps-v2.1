@@ -528,7 +528,8 @@ export const store = new Vuex.Store({
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('displayName', data.displayName)
+        formData.append('displayName', data.displayName ? data.displayName : '')
+        formData.append('dossierPartNo', data.partNo ? data.partNo : '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -846,7 +847,7 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileMark', data.fileMark)
+        dataPostdossierMark.append('fileMark', data.fileMark ? data.fileMark : 0)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
