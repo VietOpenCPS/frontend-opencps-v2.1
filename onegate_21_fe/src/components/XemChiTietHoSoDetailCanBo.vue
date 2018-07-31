@@ -17,6 +17,29 @@
         </div>
       </div> 
     </div>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+      <v-card>
+        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
@@ -62,7 +85,7 @@
                 </div>
                 <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style">
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.partName}}</div>
@@ -81,9 +104,13 @@
                     <v-layout row wrap>
                       <v-flex xs12 sm12>
                         <div v-for="(itemFileView, index) in fileViews">
-                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                          <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                             <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attachment</v-icon>{{itemFileView.displayName}}</span>
+                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;">
+                              <v-icon v-if="itemFileView.eForm">border_color</v-icon>
+                              <v-icon v-else>attach_file</v-icon>
+                              {{itemFileView.displayName}}
+                            </span>
                             <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                               <v-icon style="color: red">delete_outline</v-icon>
                             </v-btn> -->
@@ -124,7 +151,7 @@
                         <div v-for="(itemFileView, index) in fileViews">
                           <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                             <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attachment</v-icon>{{itemFileView.displayName}}</span>
+                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attach_file</v-icon>{{itemFileView.displayName}}</span>
                             <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
                               <v-icon style="color: red">delete_outline</v-icon>
                             </v-btn> -->
@@ -220,6 +247,17 @@
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
+              <div style="position: relative;" v-if="checkInput === 2">
+                <v-expansion-panel class="expansion-pl">
+                  <v-expansion-panel-content hide-actions value="1">
+                    <div slot="header">
+                      <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                      THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+                    </div>
+                    <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </div>
               <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
                 :disabled="loadingActionProcess"
@@ -350,6 +388,7 @@ import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -361,7 +400,8 @@ export default {
     'ky-duyet': KyDuyet,
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
-    'form-bo-sung-thong-tin': FormBoSungThongTinNgan
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
+    'thanh-phan-ho-so': ThanhPhanHoSo
   },
   data: () => ({
     actionIdCurrent: 0,
@@ -384,6 +424,8 @@ export default {
     dossierTemplatesKQ: [],
     thongTinChiTietHoSo: {
     },
+    dialogPDF: false,
+    dialogPDFLoading: true,
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
@@ -404,6 +446,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showThuPhi: false,
+    checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
     dossierItemDialogPick: '',
@@ -546,7 +589,7 @@ export default {
           let dossierTemplates = values[0]
           let dossierFiles = values[1]
           dossierTemplates.forEach(item => {
-            if (item.partType === 1) {
+            if (item.partType === 1 || item.partType === 3) {
               vm.dossierTemplatesTN.push(item)
             } else {
               vm.dossierTemplatesKQ.push(item)
@@ -706,7 +749,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -746,6 +789,15 @@ export default {
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
+        }
+        if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
+          vm.checkInput = result.checkInput
+          isPopup = true
+          if (result.checkInput === 2) {
+            vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+          } else if (result.checkInput === 0) {
+            isPopup = false
+          }
         }
       }
       if (isPopup) {
@@ -1149,8 +1201,13 @@ export default {
         if (fileViewsTemp) {
           vm.fileViews = fileViewsTemp
           // vm.sheet = true
-          vm.partView = item.partNo
-          vm.stateView = !vm.stateView
+          if (vm.partView !== item.partNo) {
+            vm.stateView = true
+            vm.partView = item.partNo
+          } else {
+            vm.stateView = !vm.stateView
+            vm.partView = item.partNo
+          }
         } else {
           return
         }
@@ -1159,9 +1216,12 @@ export default {
     },
     viewFile2 (data) {
       var vm = this
-      data['dossierId'] = vm.thongTinHoSo.dossierId
-      vm.$store.dispatch('viewFile', data).then(resUrl => {
-        window.open(resUrl, '_blank')
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      data['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+      vm.$store.dispatch('viewFile', data).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
       })
     }
   },

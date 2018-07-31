@@ -1009,7 +1009,10 @@ export default {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
         let filter = {
-          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId
+          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId,
+          serviceCode: vm.thuTucHanhChinhSelected.serviceCode,
+          serviceName: vm.thuTucHanhChinhSelected.serviceName,
+          typeCode: 'DOC_03'
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true

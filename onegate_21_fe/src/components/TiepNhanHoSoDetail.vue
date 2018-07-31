@@ -237,7 +237,12 @@ export default {
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
               toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
-              router.push('/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId)
+              router.push({
+                path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
+                query: {
+                  activeTab: 'tabs-2'
+                }
+              })
               vm.tiepNhanState = false
             })
           }).catch(function (xhr) {
