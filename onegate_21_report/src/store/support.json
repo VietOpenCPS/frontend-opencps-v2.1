@@ -1,0 +1,65 @@
+{
+    "renderURLInit": "?p_p_id=FrontendWebCustomerV21&p_p_lifecycle=2&p_p_state=exclusive&p_p_mode=view&p_p_resource_id=renderURLInit",
+    "trangThaiHoSoList": [  
+        {  
+           "code":"0",
+           "active": false,
+           "type": "thong_ke",
+           "title":"TÌNH HÌNH GIẢI QUYẾT TTHC"
+        },
+        {  
+            "code":"1",
+            "active": false,
+            "type": "dossier",
+            "title":"TỔNG HỢP TIẾP NHẬN HỒ SƠ"
+        },
+        {  
+            "code":"2",
+            "active": false,
+            "type": "dossier",
+            "title":"CHI TIẾT TIẾP NHẬN HỒ SƠ"
+        },
+        {  
+            "code":"3",
+            "active": false,
+            "type": "dossier",
+            "title":"TỔNG HỢP TRẢ KẾT QUẢ"
+        },
+        {  
+            "code":"4",
+            "active": false,
+            "type": "dossier",
+            "title":"CHI TIẾT TRẢ KẾT QUẢ"
+        },
+        {  
+            "code":"5",
+            "active": false,
+            "type": "thong_ke",
+            "title":"TỔNG HỢP HỒ SƠ DVC MỨC ĐỘ 3"
+        },
+        {  
+            "code":"6",
+            "active": false,
+            "type": "tai_chinh",
+            "title":"TỔNG HỢP PHÍ, LỆ PHÍ"
+        },
+        {  
+            "code":"7",
+            "active": false,
+            "type": "tai_chinh",
+            "title":"TỔNG HỢP PHÍ, LỆ PHÍ THEO TTHC"
+        },
+        {  
+            "code":"8",
+            "active": false,
+            "type": "dossier",
+            "title":"CHI TIẾT HỒ SƠ ĐÃ GIẢI QUYẾT"
+        },
+        {  
+            "code":"9",
+            "active": false,
+            "type": "dossier",
+            "title":"CHI TIẾT HỒ SƠ ĐANG XỬ LÝ"
+        }
+    ]
+}
