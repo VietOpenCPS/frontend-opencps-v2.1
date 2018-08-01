@@ -516,6 +516,9 @@ export default {
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         // console.log('pullNextactions', result)
         // console.log('actionActive.action', vm.actionActive.action.split(','))
+        result = result.filter(function (item) {
+          return item.enable === 1
+        })
         var actionActiveArr = vm.actionActive.action.split(',')
         if (actionActiveArr.length === 1) {
           let actionActive = result.filter(function (item) {

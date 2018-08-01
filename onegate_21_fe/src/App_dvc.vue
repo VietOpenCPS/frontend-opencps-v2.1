@@ -53,7 +53,7 @@
     </v-navigation-drawer>
     <v-content>
       <router-view v-if="trangThaiHoSoList.length !== 0"></router-view>
-      <v-alert v-else outline color="warning" icon="priority_high" :value="true">
+      <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
     </v-content>
