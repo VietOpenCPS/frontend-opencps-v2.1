@@ -4,9 +4,9 @@
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 1 || item.partType === 3" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
           <v-expansion-panel-content hide-actions :value="false">
-            <div slot="header" @click="stateView = false">
+            <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1) ? 'auto' : 'calc(100% - 370px)'}">
-                <span class="text-bold mr-2">{{index + 1}}.</span>
+                <span class="text-bold mr-2" style="min-width:18px">{{index + 1}}.</span>
                 <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
               </div>
             </div>

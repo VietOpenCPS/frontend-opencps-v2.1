@@ -161,21 +161,16 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
-        vm.thongTinChiTietHoSo = result
-        // call initData thong tin chu ho so
-        vm.$refs.thongtinchuhoso.initData(result)
-        // call initData thanh phan ho so
-        vm.$refs.thanhphanhoso.initData(result)
-        // call initData thong tin chung ho so
-        vm.$refs.thongtinchunghoso.initData(result)
-        // call initData dich vu ket qua
-        vm.viaPortalDetail = result.viaPostal
-        console.log('result.dossierStatus', result.dossierStatus)
         if (result.dossierStatus === '') {
           vm.$store.dispatch('processPullBtnDetail', {
             dossierId: result.dossierId,
             actionId: 1100
           }).then(resAction => {
+            result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+            result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
+            result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
+            // call initData thong tin chung ho so
+            vm.$refs.thongtinchunghoso.initData(result)
             if (resAction && resAction.payment) {
               vm.showThuPhi = true
               vm.payments = resAction.payment
@@ -183,6 +178,20 @@ export default {
           })
         } else {
         }
+
+        vm.thongTinChiTietHoSo = result
+        // call initData thong tin chu ho so
+        if (result['delegateCityCode'] === '') {
+          result['delegateCityCode'] = 25
+        }
+        if (result['cityCode'] === '') {
+          result['cityCode'] = 25
+        }
+        vm.$refs.thongtinchuhoso.initData(result)
+        // call initData thanh phan ho so
+        vm.$refs.thanhphanhoso.initData(result)
+        // call initData dich vu ket qua
+        vm.viaPortalDetail = result.viaPostal
         vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
@@ -191,6 +200,7 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -212,9 +222,8 @@ export default {
         // if (vm.$refs.thanhphanhoso) {
         //   vm.$refs.thanhphanhoso.saveMark()
         // }
-        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
-        console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -228,7 +237,7 @@ export default {
               payload: '',
               security: '',
               assignUsers: '',
-              payment: vm.payments,
+              payment: JSON.stringify(vm.payments),
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
@@ -252,6 +261,7 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -273,9 +283,8 @@ export default {
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.saveMark()
         }
-        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
-        console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -289,7 +298,7 @@ export default {
               payload: '',
               security: '',
               assignUsers: '',
-              payment: vm.payments,
+              payment: JSON.stringify(vm.payments),
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
@@ -316,6 +325,7 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -346,7 +356,7 @@ export default {
         })
         Promise.all(listAction).then(values => {
           console.log(values)
-          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua, thongtinchunghoso)
           console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {

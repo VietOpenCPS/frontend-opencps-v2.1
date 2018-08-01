@@ -28,6 +28,8 @@ export const store = new Vuex.Store({
     dossier: {
       applicantIdNo: 'ccc'
     },
+    dossierSelected: [],
+    actionActive: {},
     serviceConfigObj: {},
     dossierTemplateName: '',
     thongTinChungHoSo: {
@@ -288,6 +290,12 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    loadDossierSelected ({commit, state}, data) {
+      commit('dossierSelected', data)
+    },
+    loadActionActive ({commit, state}, data) {
+      commit('actionActive', data)
     },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
@@ -737,11 +745,23 @@ export const store = new Vuex.Store({
         } else {
           applicantType = 'citizen'
         }
+        var applicantIdNo = ''
+        var delegateIdNo = ''
+        if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+          applicantIdNo = data.applicantIdNo[0]
+        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
+          applicantIdNo = data.applicantIdNo[0].applicantIdNo
+        }
+        if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
+          delegateIdNo = data.delegateIdNo[0]
+        } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
+          delegateIdNo = data.delegateIdNo[0].applicantIdNo
+        }
         var dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', data.applicantIdNo)
+        dataPutdossier.append('applicantIdNo', applicantIdNo)
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -749,7 +769,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', data.delegateIdNo)
+        dataPutdossier.append('delegateIdNo', delegateIdNo)
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)
@@ -757,6 +777,9 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
+        if (data.editable) {
+          dataPutdossier.append('dueDate', data.dueDate)
+        }
         if (data.viaPostal) {
           dataPutdossier.append('viaPostal', data.viaPostal ? 1 : 0)
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
@@ -849,9 +872,7 @@ export const store = new Vuex.Store({
         commit('setLoading', true)
         let options = {
           headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'groupId': state.initData.groupId
           }
         }
         var dataPostActionDossier = new URLSearchParams()
@@ -876,8 +897,8 @@ export const store = new Vuex.Store({
       })
     },
     getUserInfoFromApplicantIdNo ({ commit, state }, data) {
-      store.dispatch('loadInitResource').then(function (result) {
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -889,7 +910,6 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            console.log('responseDataApplicantApi', response.data.data)
             resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
@@ -1638,7 +1658,6 @@ export const store = new Vuex.Store({
           formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
@@ -2335,6 +2354,12 @@ export const store = new Vuex.Store({
     setCitys (state, payload) {
       state.citys = payload
     },
+    dossierSelected (state, payload) {
+      state.dossierSelected = payload
+    },
+    actionActive (state, payload) {
+      state.actionActive = payload
+    },
     setResultServices (state, payload) {
       state.resultServices = payload
     },
@@ -2390,6 +2415,12 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
+    },
+    dossierSelected (state) {
+      return state.dossierSelected
+    },
+    actionActive (state) {
+      return state.actionActive
     },
     loadingMenuConfigToDo (state) {
       return new Promise((resolve, reject) => {
