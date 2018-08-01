@@ -217,7 +217,7 @@ export default {
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             let dataPostAction = {
@@ -232,7 +232,7 @@ export default {
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               router.push({
                 path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
@@ -278,7 +278,7 @@ export default {
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             let dataPostAction = {
@@ -293,7 +293,7 @@ export default {
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               // router.push({
               //   path: vm.$router.history.current.path,

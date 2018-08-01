@@ -899,7 +899,7 @@ export default {
           isOpenDialog = false
         }
         if (isOpenDialog) {
-          vm.thuTucHanhChinhSelected = null
+          // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
           vm.doCreateDossier()

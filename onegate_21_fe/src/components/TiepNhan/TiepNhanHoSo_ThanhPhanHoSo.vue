@@ -48,7 +48,7 @@
               @change="onUploadSingleFile($event,item)"
               >
               <v-tooltip top v-if="item.partType === 3 && originality === 3">
-                <v-btn slot="activator" @click="addFileOther" icon class="mx-0 my-0">
+                <v-btn slot="activator" @click="addFileOther(item)" icon class="mx-0 my-0">
                   <v-icon size="16" class="mx-0" color="primary">add</v-icon>
                 </v-btn>
                 <span>Thêm giấy tờ khác</span>
@@ -285,7 +285,7 @@
       <span>Bản chụp</span>
       <span>Công chứng</span>
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-card-title class="headline">File đính kèm</v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
@@ -370,7 +370,7 @@ export default {
       vm.dossierTemplateItems.forEach(itemTemplate => {
         itemTemplate.count = 0
         vm.dossierFilesItems.forEach(itemFile => {
-          if (itemTemplate.partNo === itemFile.dossierPartNo) {
+          if (itemTemplate.partNo === itemFile.dossierPartNo && !itemFile.eForm) {
             itemTemplate.count ++
           }
         })
@@ -466,7 +466,7 @@ export default {
       if (dossierFiles) {
         dossierTemplates.forEach(template => {
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && template.partType === 0 && template.hasForm
+            return template.partNo === file.dossierPartNo && template.partType === 0 && file.eForm
           })
           if (itemFind) {
             template['daKhai'] = true
@@ -533,14 +533,14 @@ export default {
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -644,7 +644,7 @@ export default {
       if (x) {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.fileViews.splice(index, 1)
           vm.stateView = true
           vm.partView = item.dossierPartNo
@@ -783,10 +783,11 @@ export default {
       vm.dialogAddOtherTemp = false
       vm.progressUploadPart = ''
     },
-    addFileOther () {
+    addFileOther (item) {
       var vm = this
       vm.dialogAddOtherTemp = true
       vm.stateAddFileOther = true
+      vm.dossierTemplatesItemSelect = item
     },
     changeDisplayName (item, index) {
       var vm = this
