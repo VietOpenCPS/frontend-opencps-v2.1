@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}'
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0"
     >
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -49,7 +49,10 @@
       </v-list>
     </v-navigation-drawer>
     <v-content>
-      <router-view></router-view>
+      <router-view v-if="trangThaiHoSoList.length !== 0"></router-view>
+      <v-alert v-else outline color="warning" icon="priority_high" :value="true">
+        Bạn không có quyền thao tác!
+      </v-alert>
     </v-content>
     
   </v-app>
@@ -76,21 +79,24 @@
       vm.$nextTick(function () {
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
-          vm.trangThaiHoSoList = result
-          let currentParams = vm.$router.history.current.params
-          if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
-            vm.trangThaiHoSoList[0]['active'] = true
-            router.push({
-              path: '/danh-sach-ho-so/0',
-              query: {
-                q: vm.trangThaiHoSoList[0]['queryParams']
-              }
-            })
-          } else {
-            vm.trangThaiHoSoList[currentParams.index]['active'] = true
-          }
-          vm.loadingCounter()
           vm.loading = false
+          if (result) {
+            vm.trangThaiHoSoList = result
+            let currentParams = vm.$router.history.current.params
+            if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+              vm.trangThaiHoSoList[0]['active'] = true
+              router.push({
+                path: '/danh-sach-ho-so/0',
+                query: {
+                  q: vm.trangThaiHoSoList[0]['queryParams']
+                }
+              })
+            } else {
+              vm.trangThaiHoSoList[currentParams.index]['active'] = true
+            }
+            vm.loadingCounter()
+            vm.loading = false
+          }
         })
       })
     },

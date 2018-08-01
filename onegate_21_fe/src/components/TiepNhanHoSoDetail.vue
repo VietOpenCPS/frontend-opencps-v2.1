@@ -51,7 +51,7 @@
       </v-expansion-panel>
     </div>
     <!--  -->
-    <div style="position: relative;" v-if="viaPortalDetail > 0">
+    <div style="position: relative;" v-if="viaPortalDetail !== 0">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
@@ -63,7 +63,6 @@
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <!-- <le-phi ref="lephi"></le-phi> -->
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -152,7 +151,6 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      console.log(vm.index)
       vm.dossierId = vm.id
     })
   },
@@ -168,11 +166,10 @@ export default {
         vm.$refs.thongtinchuhoso.initData(result)
         // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
-        // call initData dich vu ket qua
-        // vm.$refs.dichvuchuyenphatketqua.initData(result)
+        // call initData thong tin chung ho so
         vm.$refs.thongtinchunghoso.initData(result)
+        // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
-        // vm.$refs.lephi.initData(result)
         console.log('result.dossierStatus', result.dossierStatus)
         if (result.dossierStatus === '') {
           vm.$store.dispatch('processPullBtnDetail', {
@@ -185,11 +182,6 @@ export default {
             }
           })
         } else {
-          // vm.$store.dispatch('loadDossierPayments', params).then(resultPayment => {
-          //   let lePhi = resultPayment
-          //   lePhi['dossierId'] = result.dossierId
-          //   vm.$refs.lephi.initData(lePhi)
-          // })
         }
         vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
@@ -242,7 +234,12 @@ export default {
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
               toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
-              router.push('/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId)
+              router.push({
+                path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
+                query: {
+                  activeTab: 'tabs-2'
+                }
+              })
               vm.tiepNhanState = false
             })
           }).catch(function (xhr) {

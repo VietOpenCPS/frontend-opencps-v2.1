@@ -351,7 +351,6 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
-    /* data PhanCongThucHien */
     itemFilterSupport: {
       years: [
         {
@@ -1010,7 +1009,10 @@ export default {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
         let filter = {
-          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId
+          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId,
+          serviceCode: vm.thuTucHanhChinhSelected.serviceCode,
+          serviceName: vm.thuTucHanhChinhSelected.serviceName,
+          typeCode: 'DOC_03'
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
@@ -1360,7 +1362,10 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
+      // console.log('permission: ', item.permission)
+      // if (item.permission !== null && item.permission !== '') {
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      // }
     }
   }
 }

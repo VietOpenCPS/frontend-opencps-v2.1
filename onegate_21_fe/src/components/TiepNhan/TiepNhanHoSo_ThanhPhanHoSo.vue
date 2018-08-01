@@ -5,7 +5,7 @@
         <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false">
-              <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType !== 3) ? 'calc(100% - 370px)' : ''}">
+              <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1) ? 'auto' : 'calc(100% - 370px)'}">
                 <span class="text-bold mr-2">{{index + 1}}.</span>
                 <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
               </div>
@@ -37,17 +37,33 @@
                 <v-radio :value="3"></v-radio>
               </v-radio-group>
             </v-flex>
+            <!-- <v-flex style="width: 260px;" class="layout wrap" v-if="progressUploadPart === item.partNo">
+              <v-progress-linear :indeterminate="true"></v-progress-linear>
+            </v-flex> -->
             <v-flex style="width: 110px;background: #fff;" class="text-xs-center">
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0 my-0">
+              <input
+              type="file"
+              style="display: none"
+              :id="'file' + item.partNo"
+              @change="onUploadSingleFile($event,item)"
+              >
+              <v-tooltip top v-if="item.partType === 3 && originality === 3">
+                <v-btn slot="activator" @click="dialogAddOtherTemp = true" icon class="mx-0 my-0">
+                  <v-icon size="16" class="mx-0" color="primary">add</v-icon>
+                </v-btn>
+                <span>Thêm giấy tờ khác</span>
+              </v-tooltip>
+              <v-progress-circular
+              :width="2"
+              :size="25"
+              color="green"
+              indeterminate
+              v-if="progressUploadPart === item.partNo"
+              ></v-progress-circular>
+              <v-tooltip top v-else>
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
-                    <input
-                    type="file"
-                    style="display: none"
-                    :id="'file' + item.partNo"
-                    @change="onUploadSingleFile($event,item)"
-                    >
-                    <v-icon size="16" color="primary" @click="pickFile(item)">attach_file</v-icon>
+                    <v-icon size="16" color="primary">attach_file</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Tải file lên</span>
@@ -58,23 +74,25 @@
                 </v-btn>
                 <span>Xem</span>
               </v-tooltip>
-              <v-tooltip top v-if="item.partType === 3">
-                <v-btn slot="activator" @click="dialogAddOtherTemp = true" icon class="mx-0 my-0">
-                  <v-icon size="16" class="mx-0" color="primary">add</v-icon>
-                </v-btn>
-                <span>Thêm giấy tờ khác</span>
-              </v-tooltip>
             </v-flex>
           </v-layout>
         </div>
         <div v-if="item.partNo === partView && stateView">
           <v-layout row wrap>
             <v-flex xs12 sm12>
-              <div v-for="(itemFileView, index) in fileViews">
+              <div v-for="(itemFileView, index) in fileViews" :key="index">
                 <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
-                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
-                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
+                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">{{itemFileView.displayName}}</span>
+                  <v-text-field
+                    v-model="itemFileView.displayName"
+                    v-if="itemFileView.dossierFileId === dossierFileIdView && stateEdit"
+                    @change="changeDisplayName(itemFileView, index)"
+                  ></v-text-field>
+                  <!-- <v-btn icon ripple @click="editDisplayName(itemFileView, index)" class="mx-0 my-0">
+                    <v-icon style="color: blue">edit</v-icon>
+                  </v-btn> -->
+                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
                     <v-icon style="color: red">delete_outline</v-icon>
                   </v-btn>
                 </div>
@@ -104,7 +122,7 @@
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
-            <v-card-title class="headline">Thêm thành phần hồ sơ</v-card-title>
+            <v-card-title class="headline">Tên giấy tờ</v-card-title>
             <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogAddOtherTemp = false">
               <v-icon>clear</v-icon>
             </v-btn>
@@ -113,10 +131,9 @@
               <v-layout wrap>
                 <v-flex xs12 class="px-2 pb-3">
                   <v-text-field
-                  label="Tên thành phần:"
+                  label="Tên giấy tờ:"
                   v-model="otherDossierTemplate"
-                  @change = "changeOtherDossierTemp"
-                  :rules="[v => !!v || 'Bạn phải điền tên thành phần.']"
+                  :rules="[v => !!v || 'Bạn phải điền tên giấy tờ.']"
                   required
                   ></v-text-field>
                 </v-flex>
@@ -124,7 +141,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="red darken-3" flat="flat" @click.native="dialogAddOtherTemp = false">
+              <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog">
                 Quay lại
               </v-btn>
               <v-btn color="primary" flat="flat" @click.native="addOtherTemplate"
@@ -264,6 +281,29 @@
       <span>Bản chụp</span>
       <span>Công chứng</span>
     </div>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+      <v-card>
+        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -284,13 +324,13 @@ export default {
     otherDossierTemplate: '',
     sheet: false,
     partView: '',
-    fileViews: [{
-      dossierFileId: 12121,
-      displayName: 'THanh phan 1'
-    }, {
-      dossierFileId: 12122,
-      displayName: 'THanh phan 2'
-    }]
+    dossierFileIdView: '',
+    stateEdit: false,
+    progressUploadPart: '',
+    dialogPDF: false,
+    dialogPDFLoading: true,
+    dossierTemplatesItemSelect: {},
+    fileViews: []
   }),
   computed: {
     loading () {
@@ -527,16 +567,29 @@ export default {
     },
     onUploadSingleFile (e, data) {
       var vm = this
-      e.dataItem = data
-      e['dossierId'] = vm.thongTinHoSo.dossierId
-      e['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
-      vm.$store.dispatch('uploadSingleFile', e).then(function (result) {
-        vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-          vm.dossierFilesItems = result
-          vm.recountFileTemplates()
+      vm.dossierTemplatesItemSelect = data
+      vm.progressUploadPart = data.partNo
+      data['dossierId'] = vm.thongTinHoSo.dossierId
+      data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+      if (data.partType !== 3) {
+        vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
+          vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+        }).catch(function (xhr) {
+          vm.progressUploadPart = ''
         })
-      }).catch(function (xhr) {
-      })
+      } else {
+        if ($('#file' + data.partNo)[0].files.length === 0) {
+          vm.progressUploadPart = ''
+          return
+        }
+        vm.partView = data.partNo
+        vm.stateView = true
+        vm.dialogAddOtherTemp = true
+      }
     },
     loadAlpcaForm (data) {
       var vm = this
@@ -624,8 +677,13 @@ export default {
     },
     viewFile2 (data) {
       var vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
       data['dossierId'] = vm.thongTinHoSo.dossierId
-      vm.$store.dispatch('viewFile', data)
+      vm.$store.dispatch('viewFile', data).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
     },
     viewFileWithPartNo (item) {
       var vm = this
@@ -662,22 +720,78 @@ export default {
     },
     changeOtherDossierTemp (data) {
       var vm = this
-      vm.loadingAddOther = true
-      vm.$store.dispatch('uploadSingleOtherFile', {
-        dossierId: vm.thongTinHoSo.dossierId,
-        displayName: data
-      }).then(resFile => {
-        vm.loadingAddOther = false
-        vm.dialogAddOtherTemp = false
-      }).catch(reject => {
-        vm.loadingAddOther = false
-      })
+      if (vm.originality === 3) {
+        vm.loadingAddOther = true
+        vm.$store.dispatch('uploadSingleOtherFile', {
+          dossierId: vm.thongTinHoSo.dossierId,
+          displayName: data
+        }).then(resFile => {
+          vm.loadingAddOther = false
+          vm.dialogAddOtherTemp = false
+        }).catch(reject => {
+          vm.loadingAddOther = false
+        })
+      } else {
+        console.log('dossierTemplatesItemSelect ', vm.dossierTemplatesItemSelect)
+        let params = vm.dossierTemplatesItemSelect
+        params['dossierId'] = vm.thongTinHoSo.dossierId
+        params['displayName'] = data
+        params['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+        vm.$store.dispatch('uploadSingleFile', params).then(function (result1) {
+          vm.progressUploadPart = ''
+          vm.dialogAddOtherTemp = false
+          console.log('success!!!!!!!!!!!!!!')
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result2 => {
+            vm.dossierFilesItems = result2
+            vm.recountFileTemplates()
+            if (vm.stateView && vm.dossierFilesItems) {
+              var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+                return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo
+              })
+              if (fileViewsTemp) {
+                vm.fileViews = fileViewsTemp
+              }
+            }
+          })
+        }).catch(function (xhr) {
+          vm.progressUploadPart = ''
+        })
+      }
     },
     addOtherTemplate () {
       var vm = this
       if (vm.$refs.form.validate()) {
+        console.log('add')
         vm.changeOtherDossierTemp(vm.otherDossierTemplate)
       }
+    },
+    editDisplayName (item, index) {
+      var vm = this
+      if (vm.dossierFileIdView !== item.dossierFileId) {
+        vm.dossierFileIdView = item.dossierFileId
+        vm.stateEdit = true
+      } else {
+        vm.dossierFileIdView = item.dossierFileId
+        vm.stateEdit = !vm.stateEdit
+      }
+    },
+    cancelDialog () {
+      var vm = this
+      vm.dialogAddOtherTemp = false
+      vm.progressUploadPart = ''
+    },
+    changeDisplayName (item, index) {
+      var vm = this
+      let params = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        value: value
+      }
+      vm.$store.dispatch('changeDisplayNameFile', params).then(result => {
+        vm.fileViews[index].displayName = result.displayName
+        vm.stateEdit = false
+      }).catch(reject => {
+        console.log('error')
+      })
     }
   }
 }

@@ -22,6 +22,7 @@
                     v-else
                     v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field>
+
                     <!-- <v-select
                     autocomplete
                     cache-items
@@ -33,6 +34,28 @@
                     :search-input.sync="applicantIdNo"
                     v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-select> -->
+                    <!--  -->
+                    <!-- <v-select
+                    :items="applicantItems"
+                    @keyup="querySelections($event)"
+                    hide-selected
+                    tags
+                    v-model="thongTinChuHoSo.applicantIdNo"
+                    item-text="applicantIdNo"
+                    item-value="applicantIdNo"
+                    return-object
+                    autocomplete
+                    clearable
+                    >
+                      <template slot="item" slot-scope="data">
+                        <template>
+                          <v-list-tile-content>
+                            <v-list-tile-title v-html="data.item.applicantName"></v-list-tile-title>
+                            <v-list-tile-sub-title v-html="data.item.applicantIdNo"></v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </template>
+                      </template>
+                    </v-select> -->
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -198,6 +221,27 @@
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
                       ></v-text-field>
+                      <!--  -->
+                      <!-- <v-select
+                      :items="applicantItems"
+                      hide-selected
+                      tags
+                      v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                      item-text="applicantIdNo"
+                      item-value="applicantName"
+                      return-object
+                      autocomplete
+                      clearable
+                      >
+                        <template slot="item" slot-scope="data">
+                          <template>
+                            <v-list-tile-content>
+                              <v-list-tile-title v-html="data.item.applicantName"></v-list-tile-title>
+                              <v-list-tile-sub-title v-html="data.item.applicantIdNo"></v-list-tile-sub-title>
+                            </v-list-tile-content>
+                          </template>
+                        </template>
+                      </v-select> -->
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -358,7 +402,7 @@ export default {
     districts: [],
     delegateWards: [],
     wards: [],
-    applicants: [],
+    applicantItems: [],
     applicantIdNo: '',
     labelSwitch: {
       'true': {
@@ -430,17 +474,17 @@ export default {
         var vm = this
         let dataChuHoSo = vm.thongTinChuHoSo
         if (value.sameUser) {
-          let dataNguoiNop = {
-            delegateName: dataChuHoSo.applicantName,
-            delegateCityCode: dataChuHoSo.cityCode,
-            delegateAddress: dataChuHoSo.address,
-            delegateDistrictCode: dataChuHoSo.districtCode,
-            delegateWardCode: dataChuHoSo.wardCode,
-            delegateEmail: dataChuHoSo.contactEmail,
-            delegateTelNo: dataChuHoSo.contactTelNo,
-            delegateIdNo: dataChuHoSo.applicantIdNo
+          let dataNguoiNopHoSo = {
+            applicantName: value.delegateName,
+            cityCode: value.delegateCityCode,
+            address: value.delegateAddress,
+            districtCode: value.delegateDistrictCode,
+            wardCode: value.delegateWardCode,
+            contactEmail: value.delegateEmail,
+            contactTelNo: value.delegateTelNo,
+            applicantIdNo: value.delegateIdNo
           }
-          vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, dataNguoiNop)
+          vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataNguoiNopHoSo)
         } else {
           this.$store.dispatch('resetThongTinNguoiNopHoSo')
         }
@@ -603,14 +647,28 @@ export default {
       }
       // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
     },
+    // eventInput (event) {
+    //   var vm = this
+    //   console.log('event', event)
+    //   vm.applicantItems = []
+    //   console.log('run input')
+    //   setTimeout(function () {
+    //     if (event.length !== 0) {
+    //       vm.applicantItems = [event[event.length - 1]]
+    //     } else { vm.applicantItems = [] }
+    //     return false
+    //   }, 200)
+    // },
     querySelections (val) {
       var vm = this
       let params = {
         idNo: val
       }
-      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(function (resApplicant) {
-        vm.applicants = resApplicant
-        if (resApplicant.length === 0) {
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
+        vm.applicantItems = result
+        console.log('ResApplicantItems1', result)
+        console.log('applicantItems', vm.applicantItems)
+        if (result.length === 0) {
           vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
         }
       }).catch(xhr => {

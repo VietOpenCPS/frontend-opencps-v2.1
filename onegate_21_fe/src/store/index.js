@@ -489,23 +489,27 @@ export const store = new Vuex.Store({
         console.log(xhr)
       })
     },
-    uploadSingleFile ({ commit, state }, e) {
+    uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = e.target.files || e.dataTransfer.files
+        console.log('upload')
+        let files = $('#file' + data.partNo)[0].files
         let file = files[0]
-        let data = e.dataItem
         let formData = new FormData()
-        formData.append('displayName', file.name)
+        if (data.partType === 3) {
+          formData.append('displayName', data['displayName'])
+        } else {
+          formData.append('displayName', file.name)
+        }
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
         formData.append('isSync', 'false')
         formData.append('file', file)
         formData.append('dossierPartNo', data.partNo)
-        formData.append('dossierTemplateNo', e.dossierTemplateNo)
+        formData.append('dossierTemplateNo', data.dossierTemplateNo)
         formData.append('fileTemplateNo', data.partNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
-        axios.post(state.initData.dossierApi + '/' + e.dossierId + '/files', formData, {
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
             'Content-Type': 'multipart/form-data'
@@ -884,11 +888,8 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            if (response.data.data) {
-              resolve(response.data.data)
-            } else {
-              resolve([])
-            }
+            console.log('responseDataApplicantApi', response.data.data)
+            resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
             reject(xhr)
@@ -1492,8 +1493,8 @@ export const store = new Vuex.Store({
             }
           }
           var params = new URLSearchParams()
-          axios.post(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, params, config).then(function (response) {
-          // axios.post('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
+          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig = JSON.parse(serializable.buttonConfig)['buttons']
             resolve(buttonConfig)
@@ -1722,7 +1723,12 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId
             },
-            responseType: 'blob'
+            responseType: 'blob',
+            params: {
+              serviceCode: filter.serviceCode ? filter.serviceCode : '',
+              serviceName: filter.serviceName ? filter.serviceName : '',
+              typeCode: filter.typeCode ? filter.typeCode : ''
+            }
           }
           axios.get(state.initData.getServiceConfigs + '/' + filter.serviceConfigId + '/guide', param).then(function (response) {
             let serializable = response.data
@@ -2152,6 +2158,26 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.serviceInfoApi + '/' + data.serviceInfoId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    changeDisplayNameFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          var dataPutDossierFile = new URLSearchParams()
+          dataPutDossierFile.append('displayName', data.displayName)
+          axios.put(state.initData.serviceInfoApi + '/' + data.dossierId + '/files/' + data.dossierFileId, dataPutDossierFile, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
