@@ -2472,7 +2472,8 @@ body .btn--floating.btn--small {
     box-shadow: none !important;
     font-size: 12px !important;
 }
-body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon {
+body table.table tbody .input-group--selection-controls.checkbox.input-group--disabled .icon,
+body table.table thead .input-group--selection-controls.checkbox.input-group--disabled .icon {
     opacity: 0.1
 }
 /* fix style vue-datetime */

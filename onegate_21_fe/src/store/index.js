@@ -28,6 +28,8 @@ export const store = new Vuex.Store({
     dossier: {
       applicantIdNo: 'ccc'
     },
+    dossierSelected: [],
+    actionActive: {},
     serviceConfigObj: {},
     dossierTemplateName: '',
     thongTinChungHoSo: {
@@ -288,6 +290,12 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    loadDossierSelected ({commit, state}, data) {
+      commit('dossierSelected', data)
+    },
+    loadActionActive ({commit, state}, data) {
+      commit('actionActive', data)
     },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
@@ -864,9 +872,7 @@ export const store = new Vuex.Store({
         commit('setLoading', true)
         let options = {
           headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'groupId': state.initData.groupId
           }
         }
         var dataPostActionDossier = new URLSearchParams()
@@ -1652,7 +1658,6 @@ export const store = new Vuex.Store({
           formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
@@ -2349,6 +2354,12 @@ export const store = new Vuex.Store({
     setCitys (state, payload) {
       state.citys = payload
     },
+    dossierSelected (state, payload) {
+      state.dossierSelected = payload
+    },
+    actionActive (state, payload) {
+      state.actionActive = payload
+    },
     setResultServices (state, payload) {
       state.resultServices = payload
     },
@@ -2404,6 +2415,12 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
+    },
+    dossierSelected (state) {
+      return state.dossierSelected
+    },
+    actionActive (state) {
+      return state.actionActive
     },
     loadingMenuConfigToDo (state) {
       return new Promise((resolve, reject) => {

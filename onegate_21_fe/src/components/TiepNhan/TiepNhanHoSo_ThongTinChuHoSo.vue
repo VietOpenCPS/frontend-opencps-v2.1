@@ -415,6 +415,7 @@ export default {
       applicantNote: '',
       applicantIdNo: '',
       contactEmail: '',
+      contactTelNo: '',
       contactName: '',
       address: '',
       applicantName: ''

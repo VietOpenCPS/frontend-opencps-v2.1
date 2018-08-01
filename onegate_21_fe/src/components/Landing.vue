@@ -58,20 +58,35 @@
         class="table-landing table-bordered"
         hide-actions
       >
-      <template slot="headerCell" slot-scope="props">
-        <v-tooltip bottom>
-          <span slot="activator">
-            {{ props.header.text }}
-          </span>
-          <span>
-            {{ props.header.text }}
-          </span>
-        </v-tooltip>
+      <!--  -->
+      <template slot="headers" slot-scope="props">
+        <tr>
+          <th>
+            <v-checkbox
+              :input-value="props.all"
+              :indeterminate="props.indeterminate"
+              :disabled="!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              primary
+              hide-details
+              @click.native="toggleAll"
+            ></v-checkbox>
+          </th>
+          <th
+            v-for="header in props.headers"
+            :key="header.text"
+          >
+            <v-tooltip bottom>
+              <span slot="activator">{{ header.text }}</span>
+              <span>{{ header.text }}</span>
+            </v-tooltip>
+          </th>
+        </tr>
       </template>
+      <!--  -->
       <template slot="items" slot-scope="props">
         <td v-if="menuType !== 3">
           <v-checkbox
-            :disabled="props.item['assigned'] === 0"
+            :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
             v-model="props.selected"
             primary
             hide-details
@@ -722,6 +737,20 @@ export default {
     }
   },
   methods: {
+    toggleAll () {
+      var vm = this
+      if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
+        return
+      } else {
+        if (vm.selected.length) {
+          vm.selected = []
+        } else {
+          vm.selected = vm.hosoDatas.filter(function (item) {
+            return item['assigned'] !== 0
+          })
+        }
+      }
+    },
     resend () {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
@@ -831,6 +860,7 @@ export default {
     changeServiceConfigs (item) {
       let vm = this
       console.log('serviceConfigItem+++++++', item)
+      console.log('thuTucHanhChinhSelected', vm.thuTucHanhChinhSelected)
       if (item.hasOwnProperty('options')) {
         console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
@@ -1043,11 +1073,20 @@ export default {
       }
       if (isGroup) {
         vm.countSelected = 0
-        if (vm.selected.length > 0) {
+        if (vm.selected.length === 1) {
           for (let key in vm.selected) {
             let actionDossierItem = vm.selected[key]
             vm.processAction(actionDossierItem, item, result, key, false)
           }
+        } else if (vm.selected.length > 1) {
+          vm.$store.dispatch('loadActionActive', item).then(function () {
+            vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
+              router.push({
+                path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
+                query: vm.$router.history.current.query
+              })
+            })
+          })
         } else {
           alert('Chọn hồ sơ để thao tác')
         }
