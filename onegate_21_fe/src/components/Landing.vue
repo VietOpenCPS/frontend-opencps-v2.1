@@ -14,6 +14,7 @@
           return-object
           :hide-selected="true"
           @change="changeServiceConfigs"
+          v-if="originality !== 1"
         ></v-select>
       </v-flex>
     </v-layout>
@@ -54,14 +55,14 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierIdCTN"
-        :select-all="menuType !== 3 ? true : false"
+        :select-all="(menuType !== 3 && originality !== 1) ? true : false"
         class="table-landing table-bordered"
         hide-actions
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th>
+          <th v-if="originality !== 1">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -72,7 +73,7 @@
             ></v-checkbox>
           </th>
           <th
-            v-for="header in props.headers"
+            v-for="(header, index) in props.headers"
             :key="header.text"
           >
             <v-tooltip bottom>
@@ -84,7 +85,7 @@
       </template>
       <!--  -->
       <template slot="items" slot-scope="props">
-        <td v-if="menuType !== 3">
+        <td v-if="menuType !== 3 && originality !== 1">
           <v-checkbox
             :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
             v-model="props.selected"
@@ -585,6 +586,10 @@ export default {
     },
     loadingTable () {
       return this.$store.getters.loadingTable
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {
