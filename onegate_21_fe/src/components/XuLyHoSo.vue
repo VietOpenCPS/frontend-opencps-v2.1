@@ -4,7 +4,7 @@
       <content-placeholders-text :lines="1" />
     </content-placeholders>
     <div v-else class="row-header">
-      <div class="background-triangle-big"> <span>{{actionActive.tiltle}}</span> </div>
+      <div class="background-triangle-big"> <span>XỬ LÝ HỒ SƠ</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName">
           {{dossierSelected[0].serviceName}}
@@ -19,10 +19,10 @@
     </div>
     <v-expansion-panel class="expansion-pl">
       <v-expansion-panel-content hide-actions value="1">
-        <div slot="header">
+        <!-- <div slot="header">
           <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
           HỒ SƠ XỬ LÝ &nbsp;&nbsp;&nbsp;&nbsp; 
-        </div>
+        </div> -->
         <v-card>
           <v-card-text class="px-0 pt-0">
             <v-data-table
@@ -180,6 +180,8 @@ export default {
         sortable: false
       }
     ],
+    mutilpleAction: false,
+    actionExits: [],
     thongTinChiTietHoSo: {
     },
     nextActions: [],
@@ -388,55 +390,72 @@ export default {
       var vm = this
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
-      for (let key in vm.dossierSelected) {
-        var filter = {
-          dossierId: vm.dossierSelected[key].dossierId,
-          actionCode: vm.actionActive.action,
-          actionUser: actionUser
-        }
-        if (vm.showPhanCongNguoiThucHien) {
-          filter['toUsers'] = vm.assign_items
-        }
-        var paymentsOut = null
-        if (vm.payments) {
-          paymentsOut = {
-            requestPayment: vm.payments['requestPayment'],
-            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+      if (vm.mutilpleAction) {
+        for (let key in vm.actionExits) {
+          for (let key2 in vm.dossierSelected) {
+            let filter = {
+              dossierId: vm.dossierSelected[key2].dossierId,
+              actionCode: vm.actionExits[key].actionCode,
+              actionUser: actionUser
+            }
+            vm.postAction(filter)
           }
         }
-        if (vm.showThuPhi) {
-          filter['payment'] = paymentsOut
-        }
-        if (vm.showFormBoSungThongTinNgan) {
-          filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
-        }
-        if (vm.showKyPheDuyetTaiLieu) {
-          let result = vm.$refs.kypheduyettailieu.doExport()
-          console.log('resultKSKS', result)
-        }
-        if (vm.showYkienCanBoThucHien) {
-          let result = vm.$refs.ykiencanbo.doExport()
-          let note = ''
-          if (result.valid) {
-            vm.validateAction = true
-            note = result.text
-          } else {
-            vm.validateAction = false
+      } else {
+        for (let key in vm.dossierSelected) {
+          let filter = {
+            dossierId: vm.dossierSelected[key].dossierId,
+            actionCode: vm.actionActive.action,
+            actionUser: actionUser
           }
-          filter['userNote'] = note
+          vm.postAction(filter)
         }
-        let currentQuery = vm.$router.history.current.query
-        vm.loadingActionProcess = true
-        if (vm.validateAction) {
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            vm.btnStateVisible = false
-          })
+      }
+    },
+    postAction (filter) {
+      var vm = this
+      if (vm.showPhanCongNguoiThucHien) {
+        filter['toUsers'] = vm.assign_items
+      }
+      var paymentsOut = null
+      if (vm.payments) {
+        paymentsOut = {
+          requestPayment: vm.payments['requestPayment'],
+          advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+          feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+          serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+          shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
         }
+      }
+      if (vm.showThuPhi) {
+        filter['payment'] = paymentsOut
+      }
+      if (vm.showFormBoSungThongTinNgan) {
+        filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+      }
+      if (vm.showKyPheDuyetTaiLieu) {
+        let result = vm.$refs.kypheduyettailieu.doExport()
+        console.log('resultKSKS', result)
+      }
+      if (vm.showYkienCanBoThucHien) {
+        let result = vm.$refs.ykiencanbo.doExport()
+        let note = ''
+        if (result.valid) {
+          vm.validateAction = true
+          note = result.text
+        } else {
+          vm.validateAction = false
+        }
+        filter['userNote'] = note
+      }
+      let currentQuery = vm.$router.history.current.query
+      vm.loadingActionProcess = true
+      if (vm.validateAction) {
+        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          vm.btnStateVisible = false
+        })
       }
     },
     doPrint02 (dossierItem, item, index, isGroup) {
@@ -495,14 +514,37 @@ export default {
       }
       let currentQuery = vm.$router.history.current.query
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
-        console.log('pullNextactions', result)
-        console.log('actionActive.action', vm.actionActive.action)
-        let actionActive = result.filter(function (item) {
-          return item.actionCode.toString() === vm.actionActive.action.toString()
-        })
-        console.log('actionActive', actionActive[0])
-        vm.dialogActionProcess = true
-        vm.processPullBtnDetail(actionActive[0], currentQuery.btnIndex)
+        // console.log('pullNextactions', result)
+        // console.log('actionActive.action', vm.actionActive.action.split(','))
+        var actionActiveArr = vm.actionActive.action.split(',')
+        if (actionActiveArr.length === 1) {
+          let actionActive = result.filter(function (item) {
+            return item.actionCode.toString() === vm.actionActive.action.toString()
+          })
+          vm.dialogActionProcess = true
+          vm.mutilpleAction = false
+          vm.processPullBtnDetail(actionActive[0], currentQuery.btnIndex)
+        } else {
+          vm.mutilpleAction = true
+          vm.actionExits = []
+          for (let key in actionActiveArr) {
+            var active = false
+            var actionItem
+            for (let key2 in result) {
+              if (actionActiveArr[key].toString() === result[key2].actionCode.toString()) {
+                active = true
+                actionItem = result[key2]
+                break
+              }
+            }
+            if (active) {
+              vm.actionExits.push(actionItem)
+            }
+          }
+          vm.dialogActionProcess = true
+          // console.log('actionExits', vm.actionExits[0])
+          vm.processPullBtnDetail(vm.actionExits[0], currentQuery.btnIndex)
+        }
       })
     },
     postNextActions (stepModel) {
