@@ -18,34 +18,23 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-text-field
+                    <!-- <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.applicantIdNo"
-                    ></v-text-field>
-
-                    <!-- <v-select
-                    autocomplete
-                    cache-items
-                    chips
-                    :items="applicants"
-                    item-text="applicantIdNo"
-                    item-value="applicantIdNo"
-                    @change="onChangeApplicantIdNo"
-                    :search-input.sync="applicantIdNo"
-                    v-model="thongTinChuHoSo.applicantIdNo"
-                    ></v-select> -->
-                    <!--  -->
-                    <!-- <v-select
-                    :items="applicantItems"
-                    @keyup="querySelections($event)"
+                    ></v-text-field> -->
+                    <v-select
+                    :items="applicantItems2"
                     hide-selected
                     tags
                     v-model="thongTinChuHoSo.applicantIdNo"
                     item-text="applicantIdNo"
                     item-value="applicantIdNo"
-                    return-object
                     autocomplete
                     clearable
+                    :search-input.sync="search2"
+                    @input="eventInput2($event)"
+                    cache-items
+                    return-object
                     >
                       <template slot="item" slot-scope="data">
                         <template>
@@ -55,7 +44,7 @@
                           </v-list-tile-content>
                         </template>
                       </template>
-                    </v-select> -->
+                    </v-select>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -217,21 +206,24 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-text-field
+                      <!-- <v-text-field
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                      ></v-text-field>
+                      ></v-text-field> -->
                       <!--  -->
-                      <!-- <v-select
+                      <v-select
                       :items="applicantItems"
                       hide-selected
                       tags
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
                       item-text="applicantIdNo"
-                      item-value="applicantName"
-                      return-object
+                      item-value="applicantIdNo"
                       autocomplete
                       clearable
+                      :search-input.sync="search"
+                      @input="eventInput($event)"
+                      cache-items
+                      return-object
                       >
                         <template slot="item" slot-scope="data">
                           <template>
@@ -241,7 +233,7 @@
                             </v-list-tile-content>
                           </template>
                         </template>
-                      </v-select> -->
+                      </v-select>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -403,6 +395,7 @@ export default {
     delegateWards: [],
     wards: [],
     applicantItems: [],
+    applicantItems2: [],
     applicantIdNo: '',
     labelSwitch: {
       'true': {
@@ -422,6 +415,7 @@ export default {
       applicantNote: '',
       applicantIdNo: '',
       contactEmail: '',
+      contactTelNo: '',
       contactName: '',
       address: '',
       applicantName: ''
@@ -436,7 +430,9 @@ export default {
       delegateEmail: '',
       delegateTelNo: '',
       delegateIdNo: ''
-    }
+    },
+    search: null,
+    search2: null
   }),
   computed: {
     loading () {
@@ -491,10 +487,11 @@ export default {
       },
       deep: true
     },
-    applicantIdNo (val) {
-      if (val.length >= 3) {
-        val && this.querySelections(val)
-      }
+    search (val) {
+      val && this.querySelections(val)
+    },
+    search2 (val) {
+      val && this.querySelections2(val)
     }
   },
   methods: {
@@ -511,7 +508,6 @@ export default {
         delegateIdNo: data.delegateIdNo
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
-      console.log('thongTinNguoiNopHoSoTemp-----------', thongTinNguoiNopHoSoTemp)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
       let userTypeCondition = true
       if (data.applicantIdType === 'business') {
@@ -532,8 +528,6 @@ export default {
       }
       let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
-      console.log('thongtinchuhoso', vm.thongTinChuHoSo)
-      console.log('thongtinnguoinophoso', vm.thongTinNguoiNopHoSo)
       vm.$nextTick(function () {
         var filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -619,46 +613,28 @@ export default {
     onChangeWard (data) {
       this.$store.commit('setWardVal', data)
     },
-    onChangeApplicantIdNo (data) {
+    eventInput (event) {
       var vm = this
-      if (vm.applicants) {
-        var applicant = vm.applicants.find(item => {
-          return item.applicantIdNo === data
-        })
-        if (applicant) {
-          let userTypeCondition = true
-          if (applicant.applicantIdType === 'business') {
-            userTypeCondition = false
-          }
-          let tempDataChuHs = {
-            userType: userTypeCondition,
-            cityCode: applicant.cityCode,
-            districtCode: applicant.districtCode,
-            wardCode: applicant.wardCode,
-            applicantNote: applicant.applicantNote,
-            applicantIdNo: applicant.applicantIdNo,
-            contactEmail: applicant.contactEmail,
-            contactName: applicant.contactName,
-            address: applicant.address,
-            applicantName: applicant.applicantName
-          }
-          vm.thongTinChuHoSo = tempDataChuHs
-        }
-      }
-      // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
+      vm.thongTinNguoiNopHoSo.delegateIdNo = []
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
+        } else { vm.thongTinNguoiNopHoSo.delegateIdNo = [] }
+        vm.thongTinNguoiNopHoSo.delegateName = vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName ? vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName : ''
+        return false
+      }, 100)
     },
-    // eventInput (event) {
-    //   var vm = this
-    //   console.log('event', event)
-    //   vm.applicantItems = []
-    //   console.log('run input')
-    //   setTimeout(function () {
-    //     if (event.length !== 0) {
-    //       vm.applicantItems = [event[event.length - 1]]
-    //     } else { vm.applicantItems = [] }
-    //     return false
-    //   }, 200)
-    // },
+    eventInput2 (event) {
+      var vm = this
+      vm.thongTinChuHoSo.applicantIdNo = []
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinChuHoSo.applicantIdNo = [event[event.length - 1]]
+        } else { vm.thongTinChuHoSo.applicantIdNo = [] }
+        vm.thongTinChuHoSo.applicantName = vm.thongTinChuHoSo.applicantIdNo[0].applicantName ? vm.thongTinChuHoSo.applicantIdNo[0].applicantName : ''
+        return false
+      }, 100)
+    },
     querySelections (val) {
       var vm = this
       let params = {
@@ -666,13 +642,17 @@ export default {
       }
       vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
         vm.applicantItems = result
-        console.log('ResApplicantItems1', result)
-        console.log('applicantItems', vm.applicantItems)
-        if (result.length === 0) {
-          vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
-        }
       }).catch(xhr => {
-        vm.thongTinChuHoSo.applicantIdNo = vm.applicantIdNo
+      })
+    },
+    querySelections2 (val) {
+      var vm = this
+      let params = {
+        idNo: val
+      }
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
+        vm.applicantItems2 = result
+      }).catch(xhr => {
       })
     },
     onChangeDelegateCity (data) {
