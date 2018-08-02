@@ -312,7 +312,7 @@
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
                     : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
-                  <p class="mb-1" v-if="item.content !== '' || item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
+                  <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <p
                   class="history__download__link hover-pointer-download mb-1"
                   title="Tải file"

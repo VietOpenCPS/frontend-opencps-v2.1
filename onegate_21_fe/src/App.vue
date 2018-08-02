@@ -72,6 +72,9 @@
     computed: {
       currentIndex () {
         return this.$store.getters.index
+      },
+      activeGetCounter () {
+        return this.$store.getters.activeGetCounter
       }
     },
     created () {
@@ -133,6 +136,9 @@
         } else {
           vm.detailState = 0
         }
+      },
+      activeGetCounter (val) {
+        this.loadingCounter()
       }
     },
     methods: {

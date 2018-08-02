@@ -18,6 +18,7 @@ export const store = new Vuex.Store({
     error: null,
     user: null,
     index: 0,
+    activeGetCounter: false,
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
     lePhi: {
@@ -113,7 +114,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
             commit('setInitData', serializable)
@@ -670,16 +671,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   'groupId': state.initData.groupId
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            'groupId': state.initData.groupId
+          }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -748,16 +749,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', false)
         let options = {
-          headers: {
-            groupId: state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   groupId: state.initData.groupId
+          //   groupId: state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            groupId: state.initData.groupId
+          }
         }
         var applicantType = ''
         if (data.userType) {
@@ -767,13 +768,16 @@ export const store = new Vuex.Store({
         }
         var applicantIdNo = ''
         var delegateIdNo = ''
-        if (typeof (data.applicantIdNo) === 'string') {
+        if (Array.isArray(data.applicantIdNo)) {
+          if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+            applicantIdNo = data.applicantIdNo[0]
+          } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
+            applicantIdNo = data.applicantIdNo[0].applicantIdNo
+          }
+        } else {
           applicantIdNo = data.applicantIdNo
-        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
-          applicantIdNo = data.applicantIdNo[0]
-        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
-          applicantIdNo = data.applicantIdNo[0].applicantIdNo
         }
+        //
         if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
           delegateIdNo = data.delegateIdNo[0]
         } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
@@ -1198,6 +1202,9 @@ export const store = new Vuex.Store({
             reject(xhr)
           })
         })
+    },
+    getActiveGetCounter ({commit, state}, data) {
+      commit('setActiveGetCounter', data)
     },
     setDefaultCityCode ({commit, state}, data) {
       state.thongTinChuHoSo.cityCode = data
@@ -2430,6 +2437,9 @@ export const store = new Vuex.Store({
     },
     setCommentItems (state, payload) {
       state.commentItems = payload
+    },
+    setActiveGetCounter (state, payload) {
+      state.activeGetCounter = payload
     }
   },
   getters: {
@@ -2481,6 +2491,9 @@ export const store = new Vuex.Store({
     },
     thongTinChuHoSo (state) {
       return state.thongTinChuHoSo
+    },
+    activeGetCounter (state) {
+      return state.activeGetCounter
     },
     thanhPhanHoSo (state) {
       return state.thanhPhanHoSo
