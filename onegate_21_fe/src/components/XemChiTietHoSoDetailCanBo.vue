@@ -228,7 +228,7 @@
 
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong :configNote="configNote">
+              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
@@ -243,7 +243,7 @@
                       <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                       THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
                     </div>
-                    <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false"></thanh-phan-ho-so>
+                    <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false"></thanh-phan-ho-so>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </div>
@@ -252,7 +252,8 @@
                 :disabled="loadingActionProcess"
                 >
                 <v-icon>save</v-icon>&nbsp;
-                <span v-if="configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span>
+                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
+                <span>Xác nhận</span>
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-layout>
@@ -796,9 +797,10 @@ export default {
         }
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
           vm.checkInput = result.checkInput
+          console.log('vm.checkInput======', vm.checkInput)
           if (result.checkInput === 2) {
             isPopup = true
-            vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+            vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
           }
         }
       }

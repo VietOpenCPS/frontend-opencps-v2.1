@@ -690,7 +690,7 @@ export default {
                 vm.dialogPDFLoading = false
                 document.getElementById('dialogPDFPreview').src = result
               })
-            }, 300)
+            }, 1000)
           }).catch(reject => {
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
