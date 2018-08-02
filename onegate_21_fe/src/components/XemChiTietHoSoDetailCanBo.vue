@@ -228,7 +228,7 @@
 
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong :configNote="configNote">
+              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
@@ -252,7 +252,8 @@
                 :disabled="loadingActionProcess"
                 >
                 <v-icon>save</v-icon>&nbsp;
-                <span v-if="configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span>
+                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> -->
+                <span>Xác nhận</span>
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-layout>
@@ -1092,7 +1093,7 @@ export default {
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
-        if (currentQuery.hasOwnProperty('btnIndex')) {
+        if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
           if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
