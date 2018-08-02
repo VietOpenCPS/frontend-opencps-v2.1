@@ -122,6 +122,59 @@
         Thực hiện thành công!
       </v-alert>
     </div>
+    <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline">
+          Trạng thái xử lý
+        </v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text style="max-height: 350px">
+          <div v-for="(item, index) in dossierSelected" v-bind:key="item.dossierId">
+            <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
+              <v-flex xs11>
+                <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
+                <div class="ml-4"><span class="text-bold">{{item.dossierNo}}</span> - {{item.serviceName}}</div>
+              </v-flex>
+              <v-flex xs1 class="text-right">
+                <v-tooltip top v-if="item.statusAction">
+                  <v-icon size="20" color="primary" slot="activator">
+                    check
+                  </v-icon>
+                  <span>Thành công</span>
+                </v-tooltip>
+                <v-tooltip top v-else>
+                  <v-icon size="20" color="red darken-3" slot="activator">
+                    block
+                  </v-icon>
+                  <span>Thất bại</span>
+                </v-tooltip>
+              </v-flex>
+            </v-layout>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="resend" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">refresh</v-icon>&nbsp;
+            Thử lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn color="red" dark @click.native="closeDialogStatusAction"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon>undo</v-icon>&nbsp;
+            Thoát
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -182,6 +235,7 @@ export default {
     ],
     mutilpleAction: false,
     actionExits: [],
+    dialog_statusAction: false,
     thongTinChiTietHoSo: {
     },
     nextActions: [],
@@ -216,7 +270,8 @@ export default {
     dialogActionProcess: false,
     rollbackable: false,
     dialogPDF: false,
-    dialogPDFLoading: false
+    dialogPDFLoading: false,
+    countProcessed: 0
   }),
   computed: {
     loading () {
@@ -388,6 +443,7 @@ export default {
     },
     processAction () {
       var vm = this
+      vm.countProcessed = 0
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
       if (vm.mutilpleAction) {
@@ -398,7 +454,7 @@ export default {
               actionCode: vm.actionExits[key].actionCode,
               actionUser: actionUser
             }
-            vm.postAction(filter)
+            vm.postAction(filter, vm.dossierSelected[key2])
           }
         }
       } else {
@@ -408,11 +464,11 @@ export default {
             actionCode: vm.actionActive.action,
             actionUser: actionUser
           }
-          vm.postAction(filter)
+          vm.postAction(filter, vm.dossierSelected[key])
         }
       }
     },
-    postAction (filter) {
+    postAction (filter, dossier) {
       var vm = this
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
@@ -455,6 +511,8 @@ export default {
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
           vm.btnStateVisible = false
+        }).catch(function (reject) {
+          console.log('reject')
         })
       }
     },
@@ -587,7 +645,9 @@ export default {
           console.log(resPostAction)
         })
       }
-    }
+    },
+    closeDialogStatusAction () {},
+    resend () {}
   },
   filters: {
     dateTimeView (arg) {

@@ -489,26 +489,7 @@ export default {
     },
     menuType: 0,
     type_assign: '',
-    assign_items: [
-      {
-        userId: 101,
-        userName: 'Trịnh Công Trình',
-        moderator: 0,
-        assigned: 1
-      },
-      {
-        userId: 102,
-        userName: 'Nguyễn Văn Nam',
-        moderator: 0,
-        assigned: 0
-      },
-      {
-        userId: 103,
-        userName: 'Trần Minh Quang',
-        moderator: 0,
-        assigned: 1
-      }
-    ],
+    assign_items: [],
     /* data TraKetQua */
     returnFiles: [],
     /* data XacNhanThuPhi */
@@ -1084,7 +1065,14 @@ export default {
         if (vm.selected.length === 1) {
           for (let key in vm.selected) {
             let actionDossierItem = vm.selected[key]
-            vm.processAction(actionDossierItem, item, result, key, false)
+            router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
+              query: {
+                activeTab: 'tabs-2',
+                btnIndex: null
+              }
+            })
+            // vm.processAction(actionDossierItem, item, result, key, false)
           }
         } else if (vm.selected.length > 1) {
           vm.$store.dispatch('loadActionActive', item).then(function () {
