@@ -309,14 +309,12 @@
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">
-                  <p class="mb-2"> Ông/bà <b>{{ item.author }}</b> 
-                    <span style="color: #0b72ba">( {{ item.payload.stepName }} )</span>
-                    <br/>
-                    <span style="color: #939393">{{ item.createDate | dateTimeView }}</span>
+                  <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
+                    : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
-                  Ý kiến: <span v-html="item.content"></span> <br>
+                  <p class="mb-1" v-if="item.content !== '' || item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <p
-                  class="history__download__link hover-pointer-download"
+                  class="history__download__link hover-pointer-download mb-1"
                   title="Tải file"
                   v-for="file in item.payload.files"
                   :key="file.dossierFileId"

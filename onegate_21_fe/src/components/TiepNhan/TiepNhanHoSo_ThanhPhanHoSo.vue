@@ -297,7 +297,7 @@
       </v-card-text> -->
     </v-card>
     <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
-    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1">
+    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
       <span>Không chọn</span>
       <span>Bản chính</span>
       <span>Bản chụp</span>
