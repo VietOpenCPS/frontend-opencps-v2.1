@@ -46,7 +46,7 @@
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
-          <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
+          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false"></thanh-phan-ho-so>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -170,7 +170,9 @@ export default {
             result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
             result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
             // call initData thong tin chung ho so
-            vm.$refs.thongtinchunghoso.initData(result)
+            if (vm.$refs.thongtinchunghoso) {
+              vm.$refs.thongtinchunghoso.initData(result)
+            }
             if (resAction && resAction.payment) {
               vm.showThuPhi = true
               vm.payments = resAction.payment
@@ -192,7 +194,9 @@ export default {
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
-        vm.$refs.dichvuchuyenphatketqua.initData(result)
+        if (vm.$refs.dichvuchuyenphatketqua) {
+          vm.$refs.dichvuchuyenphatketqua.initData(result)
+        }
       }).catch(reject => {
       })
     },
@@ -200,9 +204,9 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
+      let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo : {}
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
@@ -226,7 +230,7 @@ export default {
         tempData['dossierId'] = vm.dossierId
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             let dataPostAction = {
@@ -241,7 +245,7 @@ export default {
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               router.push({
                 path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
@@ -287,7 +291,7 @@ export default {
         tempData['dossierId'] = vm.dossierId
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             let dataPostAction = {
@@ -302,7 +306,7 @@ export default {
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               // router.push({
               //   path: vm.$router.history.current.path,

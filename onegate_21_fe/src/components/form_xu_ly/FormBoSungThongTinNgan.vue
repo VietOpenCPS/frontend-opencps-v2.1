@@ -11,6 +11,13 @@
                 <span :for="item.fieldName" style="
                     font-size: 13px;
                 ">{{item.fieldLabel}}</span>
+                <v-text-field v-if="item.fieldType === 'textarea'"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    multi-line
+                    @input="inputChangeValue(item)"
+                ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'string'"
                     :id="item.fieldName"
                     :value="item.value"

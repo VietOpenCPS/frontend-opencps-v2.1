@@ -14,6 +14,7 @@
           return-object
           :hide-selected="true"
           @change="changeServiceConfigs"
+          v-if="originality !== 1"
         ></v-select>
       </v-flex>
     </v-layout>
@@ -53,15 +54,15 @@
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
         v-model="selected"
-        item-key="dossierId"
-        :select-all="menuType !== 3 ? true : false"
+        item-key="dossierIdCTN"
+        :select-all="(menuType !== 3 && originality !== 1) ? true : false"
         class="table-landing table-bordered"
         hide-actions
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th>
+          <th v-if="originality !== 1">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -72,7 +73,7 @@
             ></v-checkbox>
           </th>
           <th
-            v-for="header in props.headers"
+            v-for="(header, index) in props.headers"
             :key="header.text"
           >
             <v-tooltip bottom>
@@ -84,7 +85,7 @@
       </template>
       <!--  -->
       <template slot="items" slot-scope="props">
-        <td v-if="menuType !== 3">
+        <td v-if="menuType !== 3 && originality !== 1">
           <v-checkbox
             :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
             v-model="props.selected"
@@ -566,6 +567,10 @@ export default {
     },
     loadingTable () {
       return this.$store.getters.loadingTable
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {
@@ -799,6 +804,7 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('newQuery=====', newQuery)
       let queryString = '?'
       newQuery['page'] = ''
       for (let key in newQuery) {
@@ -806,6 +812,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
+      console.log('queryString=====', queryString)
       queryString += 'page=' + config.page
       vm.$router.push({
         path: current.path + queryString
@@ -814,6 +821,7 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let filter = {
           queryParams: currentQuery.q,
@@ -910,7 +918,7 @@ export default {
           isOpenDialog = false
         }
         if (isOpenDialog) {
-          vm.thuTucHanhChinhSelected = null
+          // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
           vm.doCreateDossier()

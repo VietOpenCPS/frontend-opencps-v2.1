@@ -67,6 +67,10 @@ export default {
     type: {
       type: Number,
       default: () => 1
+    },
+    configNote: {
+      type: Object,
+      default: () => {}
     }
   },
   model: {
