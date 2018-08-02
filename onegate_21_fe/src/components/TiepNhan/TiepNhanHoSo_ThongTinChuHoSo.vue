@@ -18,23 +18,24 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <!-- <v-text-field
-                    v-else
-                    v-model="thongTinChuHoSo.applicantIdNo"
-                    ></v-text-field> -->
+                    <v-text-field
+                      v-if="originality === 1 || originality === '1'"
+                      v-model="thongTinChuHoSo.applicantIdNo"
+                    ></v-text-field>
                     <v-select
-                    :items="applicantItems2"
-                    hide-selected
-                    tags
-                    v-model="thongTinChuHoSo.applicantIdNo"
-                    item-text="applicantIdNo"
-                    item-value="applicantIdNo"
-                    autocomplete
-                    clearable
-                    :search-input.sync="search2"
-                    @input="eventInput2($event)"
-                    cache-items
-                    return-object
+                      v-if="originality === 3 || originality === '3'"
+                      :items="applicantItems2"
+                      hide-selected
+                      tags
+                      v-model="thongTinChuHoSo.applicantIdNo"
+                      item-text="applicantIdNo"
+                      item-value="applicantIdNo"
+                      autocomplete
+                      clearable
+                      :search-input.sync="search2"
+                      @input="eventInput2($event)"
+                      cache-items
+                      return-object
                     >
                       <template slot="item" slot-scope="data">
                         <template>
@@ -206,12 +207,13 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <!-- <v-text-field
-                      v-else
+                      <v-text-field
+                      v-if="originality === 1 || originality === '1'"
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                      ></v-text-field> -->
+                      ></v-text-field>
                       <!--  -->
                       <v-select
+                      v-if="originality === 3 || originality === '3'"
                       :items="applicantItems"
                       hide-selected
                       tags
@@ -440,6 +442,7 @@ export default {
     },
     originality () {
       var vm = this
+      console.log('originality', vm.getOriginality())
       return vm.getOriginality()
     }
   },

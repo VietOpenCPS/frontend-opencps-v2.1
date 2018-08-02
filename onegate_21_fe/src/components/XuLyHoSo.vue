@@ -95,7 +95,7 @@
     </v-dialog>
     <!--  -->
     <div>
-      <v-layout wrap v-if="dialogActionProcess">
+      <v-layout wrap v-if="btnStateVisible">
         <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
         <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
         <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
@@ -105,7 +105,7 @@
         <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
         <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
         <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
-        <v-btn color="primary" @click.native="processAction()" v-if="dialogActionProcess"
+        <v-btn color="primary" @click.native="processAction()"
           :loading="loadingActionProcess"
           :disabled="loadingActionProcess"
           >
@@ -114,15 +114,15 @@
           <span slot="loader">Loading...</span>
         </v-btn>
         <v-btn color="primary" @click="goBack()">
-        <v-icon>undo</v-icon>&nbsp;
-        Quay lại
-      </v-btn>
+          <v-icon>undo</v-icon>&nbsp;
+          Quay lại
+        </v-btn>
       </v-layout>
       <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
         Thực hiện thành công!
       </v-alert>
     </div>
-    <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
+    <!-- <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
       <v-card>
         <v-card-title class="headline">
           Trạng thái xử lý
@@ -174,7 +174,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
   </div>
 </template>
 
@@ -388,8 +388,6 @@ export default {
       if (isPopup) {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
-      } else {
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
       }
     },
     processPullBtnDetail (item, index) {
@@ -443,7 +441,6 @@ export default {
     },
     processAction () {
       var vm = this
-      vm.countProcessed = 0
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
       if (vm.mutilpleAction) {
@@ -506,7 +503,17 @@ export default {
       }
       let currentQuery = vm.$router.history.current.query
       vm.loadingActionProcess = true
-      if (vm.validateAction) {
+      if (vm.showYkienCanBoThucHien) {
+        if (vm.validateAction) {
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.dialogActionProcess = false
+            vm.loadingActionProcess = false
+            vm.btnStateVisible = false
+          }).catch(function (reject) {
+            console.log('reject')
+          })
+        }
+      } else {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
