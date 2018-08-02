@@ -823,6 +823,7 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('newQuery=====', newQuery)
       let queryString = '?'
       newQuery['page'] = ''
       for (let key in newQuery) {
@@ -830,6 +831,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
+      console.log('queryString=====', queryString)
       queryString += 'page=' + config.page
       vm.$router.push({
         path: current.path + queryString
@@ -838,6 +840,7 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let filter = {
           queryParams: currentQuery.q,

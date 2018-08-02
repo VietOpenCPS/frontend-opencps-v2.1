@@ -83,7 +83,8 @@
                   <div class="background-triangle-small"> I.</div>
                   Tài liệu nộp
                 </div>
-                <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
+                <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="true"></thanh-phan-ho-so>
+                <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style">
                       <v-flex xs11>
@@ -105,21 +106,17 @@
                       <v-flex xs12 sm12>
                         <div v-for="(itemFileView, index) in fileViews">
                           <div style="display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
-                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
                             <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;">
                               <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                               <v-icon v-else>attach_file</v-icon>
                               {{itemFileView.displayName}}
                             </span>
-                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
-                              <v-icon style="color: red">delete_outline</v-icon>
-                            </v-btn> -->
                           </div>
                         </div>
                       </v-flex>
                     </v-layout>
                   </div>
-                </div>
+                </div> -->
               </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel expand  class="expansion-pl ext__form">
@@ -130,7 +127,7 @@
                 </div>
                 <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style py-2"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.partName}}</div>
@@ -169,7 +166,7 @@
                   <div class="background-triangle-small"> III.</div>
                   Văn bản hành chính
                 </div>
-                <div v-for="(item, index) in documents" v-bind:key="item.documentCode">
+                <div v-for="(item, index) in documents" v-bind:key="index">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
                       <v-flex xs11>
@@ -178,8 +175,8 @@
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile(item)" style="height:25px;width:25px">
-                            <v-icon>visibility</v-icon>
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile2(item)" style="height:25px;width:25px">
+                            <v-icon style="font-size: 14px;">visibility</v-icon>
                           </v-btn>
                           <span>Xem</span>
                         </v-tooltip>
@@ -246,7 +243,7 @@
                       <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                       THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
                     </div>
-                    <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
+                    <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false"></thanh-phan-ho-so>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </div>
@@ -422,7 +419,7 @@ export default {
     nextActions: [],
     createFiles: [],
     processSteps: [],
-    documents: [],
+    documents: null,
     payments: '',
     dossierActions: [],
     itemselect: '',
@@ -594,8 +591,13 @@ export default {
         }).catch(reject => {
         })
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
-          vm.documents = resultDocuments
+          if (Array.isArray(resultDocuments)) {
+            vm.documents = resultDocuments
+          } else {
+            vm.documents.push(resultDocuments)
+          }
         })
+        vm.$refs.thanhphanhoso.initData(resultDossier)
         // vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
         //   vm.payments = resultPayments
         // })
@@ -740,9 +742,12 @@ export default {
       vm.indexDialogPick = index
       vm.userNote = 0
       if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
-        vm.configNote = JSON.parse(result.configNote)
-        if (vm.configNote.confirm) {
-          isPopup = true
+        try {
+          vm.configNote = JSON.parse(result.configNote)
+          if (vm.configNote.confirm) {
+            isPopup = true
+          }
+        } catch (e) {
         }
       }
       if (result !== null && result !== undefined && result !== 'undefined' &&

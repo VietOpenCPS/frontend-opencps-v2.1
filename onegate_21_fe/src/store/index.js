@@ -649,6 +649,22 @@ export const store = new Vuex.Store({
         })
       })
     },
+    viewDocument ({commit, state, dispatch}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     postDossier ({ commit, state }, data) {
       console.log('data-------------', data)
       return new Promise((resolve, reject) => {
@@ -920,6 +936,7 @@ export const store = new Vuex.Store({
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       console.log('alpaca')
+      $('#formAlpaca' + data.dossierPartNo).empty()
       /* eslint-disable */
       var formScript, formData
       if (data.formScript) {
@@ -988,14 +1005,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
-            groupId: state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
           }
         }
         try {
-          var dataPostEform = new URLSearchParams()
+          var dataPostEform = new FormData()
           var control = $('#formAlpaca' + data.partNo).alpaca('get')
           var formData = control.getValue()
-          dataPostEform.append('formdata', JSON.stringify(formData))
+          dataPostEform.append('formData', JSON.stringify(formData))
+          dataPostEform.append('file', '')
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
@@ -1537,7 +1556,11 @@ export const store = new Vuex.Store({
         let url = state.initData.documentApi + '/' + data.dossierId + '/documents'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
-            resolve(response.data.data)
+            if (response.data.data) {
+              resolve(response.data.data)
+            } else {
+              resolve([])
+            }
           }).catch(function (xhr) {
             reject(xhr)
           })
@@ -1852,7 +1875,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           $.ajax({
-            url: state.initData.dossierTemplatesApi + '/' + data.templateFileNo + '/parts/' + data.partNo + '/formdata',
+            url: state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo + '/formdata',
             type: 'GET',
             headers: {
               groupId: state.initData.groupId
