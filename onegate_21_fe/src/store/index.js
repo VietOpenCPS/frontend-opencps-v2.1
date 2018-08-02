@@ -1209,10 +1209,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {}
+            }
           }
           var listHistoryProcessing = []
+          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get(state.initData.dossierlogsApi + '/' + data.dossierId + '/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {
