@@ -20,6 +20,7 @@ export const store = new Vuex.Store({
     index: 0,
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
+    checkInput: 0,
     lePhi: {
       fee: '',
       feeNote: '',
@@ -657,7 +658,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -936,7 +937,8 @@ export const store = new Vuex.Store({
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       console.log('alpaca')
-      $('#formAlpaca' + data.dossierPartNo).empty()
+      let id = data['id'] ? data['id'] : 'nm'
+      $('#formAlpaca' + data.dossierPartNo + id).empty()
       /* eslint-disable */
       var formScript, formData
       if (data.formScript) {
@@ -951,7 +953,7 @@ export const store = new Vuex.Store({
       }
       /* eslint-disable */
       formScript.data = formData
-      $('#formAlpaca' + data.dossierPartNo).alpaca(formScript)
+      $('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
     },
     putAlpacaForm ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
@@ -961,8 +963,9 @@ export const store = new Vuex.Store({
             cps_auth: state.initData.cps_auth
           }
         }
+        let id = data['id'] ? data['id'] : 'nm'
         try {
-          var control = $('#formAlpaca' + data.dossierPartNo).alpaca('get')
+          var control = $('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
           var formData = control.getValue()
           console.log('Data Form ------', data)
           console.log('formData-------', formData)
@@ -1010,8 +1013,9 @@ export const store = new Vuex.Store({
           }
         }
         try {
+          let id = data['id'] ? data['id'] : 'nm'
           var dataPostEform = new FormData()
-          var control = $('#formAlpaca' + data.partNo).alpaca('get')
+          var control = $('#formAlpaca' + data.partNo + id).alpaca('get')
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
@@ -1517,6 +1521,7 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
+              commit('setCheckInput', serializable['checkInput'])
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
@@ -2279,6 +2284,9 @@ export const store = new Vuex.Store({
     setThanhPhanHosoTemplates (state, payload) {
       state.thanhPhanHoSo.dossierTemplates = payload
     },
+    setCheckInput (state, payload) {
+      state.checkInput = payload
+    },
     setThongTinChuHoSo (state, payload) {
       let userTypeCondition = true
       if (payload.applicantIdType === 'business') {
@@ -2505,6 +2513,9 @@ export const store = new Vuex.Store({
           return store.dispatch('loadDictItems', filter)
         }
       }
+    },
+    getCheckInput (state) {
+      return state.checkInput
     },
     resultServices (state) {
       return state.resultServices

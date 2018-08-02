@@ -45,7 +45,7 @@
     <div>
       <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab :key="1" href="#tabs-1">
+        <v-tab :key="1" href="#tabs-1" @click="loadTPHS()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THÀNH PHẦN HỒ SƠ
           </v-btn>
@@ -83,7 +83,7 @@
                   <div class="background-triangle-small"> I.</div>
                   Tài liệu nộp
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="true"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="true" :id="'nm'"></thanh-phan-ho-so>
                 <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style">
@@ -175,7 +175,7 @@
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile2(item)" style="height:25px;width:25px">
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
                             <v-icon style="font-size: 14px;">visibility</v-icon>
                           </v-btn>
                           <span>Xem</span>
@@ -214,6 +214,17 @@
             </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <div style="position: relative;" v-if="checkInput === 2">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'ci'"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
             <div class="py-3" v-if="btnStateVisible">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -225,7 +236,6 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
             </div>
-
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
@@ -236,17 +246,6 @@
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <div style="position: relative;" v-if="checkInput === 2">
-                <v-expansion-panel class="expansion-pl">
-                  <v-expansion-panel-content hide-actions value="1">
-                    <div slot="header">
-                      <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                      THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
-                    </div>
-                    <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false"></thanh-phan-ho-so>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </div>
               <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
                 :disabled="loadingActionProcess"
@@ -525,6 +524,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    getCheckInput () {
+      return this.$store.getters.getCheckInput
     }
   },
   created () {
@@ -647,7 +649,19 @@ export default {
           stepType: data
         }
         vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          vm.dossierActions = resultActions.data
+          if (resultActions.data) {
+            let resultTemp = resultActions.data
+            for (var i = 0; i < resultTemp.length; i++) {
+              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                if (!Array(resultTemp[i]['actions']).isArray()) {
+                  let arrActionsTemp = []
+                  arrActionsTemp.push(resultTemp[i]['actions'])
+                  resultTemp[i]['actions'] = arrActionsTemp
+                }
+              }
+            }
+            vm.dossierActions = resultTemp
+          }
         })
       }
     },
@@ -794,14 +808,6 @@ export default {
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
-        }
-        if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
-          vm.checkInput = result.checkInput
-          console.log('vm.checkInput======', vm.checkInput)
-          if (result.checkInput === 2) {
-            isPopup = true
-            vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
-          }
         }
       }
       if (isPopup) {
@@ -1014,6 +1020,11 @@ export default {
           if (result.rollbackable) {
             vm.rollbackable = true
           }
+          vm.$store.dispatch('pullNextactions', {
+            dossierId: vm.thongTinChiTietHoSo.dossierId
+          }).then(resNextActions => {
+            vm.checkInput = vm.getCheckInput
+          })
           if (String(item.form) === 'ACTIONS') {
           } else {
             router.push({
@@ -1101,6 +1112,15 @@ export default {
             vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
           } else {
             vm.dialogActionProcess = false
+          }
+        }
+        console.log('vm.checkInput======', vm.getCheckInput)
+        vm.checkInput = vm.getCheckInput
+        if (vm.getCheckInput !== null && vm.getCheckInput !== undefined) {
+          if (vm.checkInput === 2) {
+            setTimeout(function () {
+              vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+            }, 300)
           }
         }
       })
@@ -1227,6 +1247,22 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
       })
+    },
+    viewFileDocument (item) {
+      var vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      item['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+      vm.$store.dispatch('viewDocument', item).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
+    },
+    loadTPHS () {
+      var vm = this
+      if (vm.$refs.thanhphanhoso) {
+        vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+      }
     }
   },
   filters: {

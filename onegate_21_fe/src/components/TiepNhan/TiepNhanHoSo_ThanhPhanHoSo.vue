@@ -38,7 +38,7 @@
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView">Xóa</v-btn>
                     <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">Preview</v-btn>
-                    <div :id="'formAlpaca' + item.partNo" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
+                    <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>
                 </v-layout>
@@ -297,7 +297,7 @@
       </v-card-text> -->
     </v-card>
     <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
-    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1">
+    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
       <span>Không chọn</span>
       <span>Bản chính</span>
       <span>Bản chụp</span>
@@ -322,7 +322,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -338,6 +338,10 @@ export default {
     onlyView: {
       type: Boolean,
       default: () => false
+    },
+    id: {
+      type: String,
+      default: () => 'nm'
     }
   },
   data: () => ({
@@ -535,7 +539,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
         vm.$store.dispatch('loadFormData', item).then(resData => {
-          $('#formAlpaca' + item.partNo).empty()
+          $('#formAlpaca' + item.partNo + vm.id).empty()
           var formScript, formData
           /* eslint-disable */
           if (resScript) {
@@ -550,7 +554,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          $('#formAlpaca' + item.partNo).alpaca(formScript)
+          $('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
         })
       })
     },
@@ -561,6 +565,7 @@ export default {
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
+        fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
@@ -568,6 +573,7 @@ export default {
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
+        item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.dossierTemplateItems[index].daKhai = true
@@ -641,6 +647,7 @@ export default {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
       if (fileFind) {
+        fileFind['id'] = vm.id
         vm.$store.dispatch('loadAlpcaForm', fileFind)
       } else {
         vm.dossierTemplateItems.forEach(val => {
@@ -683,17 +690,23 @@ export default {
           file['dossierId'] = vm.thongTinHoSo.dossierId
           vm.dialogPDFLoading = true
           vm.dialogPDF = true
-          vm.$store.dispatch('putAlpacaForm', file).then(resData => {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            setTimeout(function () {
-              vm.$store.dispatch('viewFile', file).then(result => {
-                vm.dialogPDFLoading = false
-                document.getElementById('dialogPDFPreview').src = result
-              })
-            }, 1000)
-          }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
+          if (!vm.onlyView) {
+            vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+              setTimeout(function () {
+                vm.$store.dispatch('viewFile', file).then(result => {
+                  vm.dialogPDFLoading = false
+                  document.getElementById('dialogPDFPreview' + vm.id).src = result
+                })
+              }, 1000)
+            }).catch(reject => {
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          } else {
+            vm.$store.dispatch('viewFile', file).then(result => {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPDFPreview' + vm.id).src = result
+            })
+          }
         }
       })
     },
@@ -747,7 +760,7 @@ export default {
         data['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('viewFile', data).then(result => {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreview' + vm.id).src = result
         })
       }
     },
