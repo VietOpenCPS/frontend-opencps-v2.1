@@ -755,6 +755,10 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded',
             'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   groupId: state.initData.groupId
+          // }
         }
         var applicantType = ''
         if (data.userType) {
@@ -764,7 +768,9 @@ export const store = new Vuex.Store({
         }
         var applicantIdNo = ''
         var delegateIdNo = ''
-        if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+        if (typeof (data.applicantIdNo) === 'string') {
+          applicantIdNo = data.applicantIdNo
+        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
           applicantIdNo = data.applicantIdNo[0]
         } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
           applicantIdNo = data.applicantIdNo[0].applicantIdNo
@@ -1207,10 +1213,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {}
+            }
           }
           var listHistoryProcessing = []
+          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get(state.initData.dossierlogsApi + '/' + data.dossierId + '/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {

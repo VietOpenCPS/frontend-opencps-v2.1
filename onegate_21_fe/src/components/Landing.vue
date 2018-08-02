@@ -54,7 +54,7 @@
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
         v-model="selected"
-        item-key="dossierIdCTN"
+        item-key="dossierId"
         :select-all="(menuType !== 3 && originality !== 1) ? true : false"
         class="table-landing table-bordered"
         hide-actions

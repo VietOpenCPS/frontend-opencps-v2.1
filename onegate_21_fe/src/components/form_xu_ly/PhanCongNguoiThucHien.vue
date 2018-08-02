@@ -8,7 +8,7 @@
           </div>{{title_asign[type]}}
         </div>
         <v-card >
-          <v-card-text v-if="type === 1">
+          <v-card-text v-if="type === 1" class="py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               v-model="item.assigned"
