@@ -2,7 +2,8 @@
   <v-expansion-panel class="expansion-pl ext__form">
     <v-expansion-panel-content hide-actions value="1">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-      <span v-if="configNote.labelYKien">{{configNote.labelYKien}}</span> <span v-else>Ý kiến cán bộ</span> <span v-if="user_note === 2" class="red--text text--darken-3">*</span>
+      <!-- <span v-if="configNote && configNote.labelYKien">{{configNote.labelYKien}}</span> -->
+      <span>Ý kiến cán bộ</span> <span v-if="user_note === 2" class="red--text text--darken-3">*</span>
       </div>
       <v-card>
         <v-card-text class="py-2 px-2">
