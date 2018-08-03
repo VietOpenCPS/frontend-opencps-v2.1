@@ -163,29 +163,36 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
+        result['editable'] = false
         if (result.dossierStatus === '') {
-          // vm.$store.dispatch('pullNextactions', result).then(result2 => {
-          //   var actionDetail = result2.filter(function (item) {
-          //     return (item.actionCode === 1100 || item.actionCode === '1100')
-          //   })
-          vm.$store.dispatch('processPullBtnDetail', {
-            dossierId: result.dossierId,
-            // actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
-            actionId: '1100'
-          }).then(resAction => {
-            result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-            result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
-            result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
-            // call initData thong tin chung ho so
-            if (vm.$refs.thongtinchunghoso) {
-              vm.$refs.thongtinchunghoso.initData(result)
-            }
-            if (resAction && resAction.payment) {
-              vm.showThuPhi = true
-              vm.payments = resAction.payment
+          vm.$store.dispatch('pullNextactions', result).then(result2 => {
+            if (result2) {
+              var actionDetail = result2.filter(function (item) {
+                return (item.actionCode === 1100 || item.actionCode === '1100')
+              })
+              vm.$store.dispatch('processPullBtnDetail', {
+                dossierId: result.dossierId,
+                actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+              }).then(resAction => {
+                result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
+                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
+                if (resAction && resAction.payment) {
+                  vm.showThuPhi = true
+                  vm.payments = resAction.payment
+                }
+                // call initData thong tin chung ho so
+                if (vm.$refs.thongtinchunghoso) {
+                  vm.$refs.thongtinchunghoso.initData(result)
+                }
+              })
+            } else {
+              // call initData thong tin chung ho so
+              if (vm.$refs.thongtinchunghoso) {
+                vm.$refs.thongtinchunghoso.initData(result)
+              }
             }
           })
-          // })
         }
         vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so

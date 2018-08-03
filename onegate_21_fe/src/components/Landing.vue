@@ -55,14 +55,14 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1) ? true : false"
+        :select-all="checkSelectAll"
         class="table-landing table-bordered"
         hide-actions
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th v-if="originality !== 1">
+          <th v-if="checkSelectAll">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -559,7 +559,8 @@ export default {
     userNote: 0,
     dialogPDF: false,
     dialogPDFLoading: true,
-    filterForm: null
+    filterForm: null,
+    checkSelectAll: (this.menuType !== 3 && this.originality !== 1)
   }),
   computed: {
     loadingDynamicBtn () {
