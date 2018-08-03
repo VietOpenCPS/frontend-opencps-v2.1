@@ -154,7 +154,7 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = new Date(vm.thongTinChungHoSo.dueDate).toString()
+        vm.dueDateInput = new Date(Number(vm.thongTinChungHoSo.dueDate)).toString()
         vm.minDate = vm.getCurentDateTime('date')
       },
       getthongtinchunghoso () {

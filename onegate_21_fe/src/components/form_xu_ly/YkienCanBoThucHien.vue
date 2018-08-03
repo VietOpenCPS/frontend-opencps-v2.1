@@ -12,8 +12,8 @@
               <v-form v-model="valid" ref="userNoteForm">
                 <v-text-field
                   v-model.lazy="noteYkien"
-                  textarea
-                  :rows="2"
+                  multi-line
+                  :rows="3"
                   :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
                 ></v-text-field>
               </v-form>
