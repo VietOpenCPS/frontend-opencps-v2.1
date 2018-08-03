@@ -83,7 +83,7 @@
                   <div class="background-triangle-small"> I.</div>
                   Tài liệu nộp
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="true" :id="'nm'"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style">
@@ -125,7 +125,7 @@
                   <div class="background-triangle-small"> II.</div>
                   Kết quả
                 </div>
-                <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
+                <!-- <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style py-2"> 
                       <v-flex xs11>
@@ -147,17 +147,14 @@
                       <v-flex xs12 sm12>
                         <div v-for="(itemFileView, index) in fileViews">
                           <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
-                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
                             <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attach_file</v-icon>{{itemFileView.displayName}}</span>
-                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
-                              <v-icon style="color: red">delete_outline</v-icon>
-                            </v-btn> -->
                           </div>
                         </div>
                       </v-flex>
                     </v-layout>
                   </div>
-                </div>
+                </div> -->
+                <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel expand  class="expansion-pl ext__form">
@@ -221,7 +218,7 @@
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                     THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'ci'"></thanh-phan-ho-so>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
@@ -281,7 +278,7 @@
                 <td class="text-xs-center">{{props.item.sequenceRole}}</td>
                 <td class="text-xs-center">{{props.item.sequenceName}}</td>
                 <td class="text-xs-center">{{props.item.durationCount}} ngày</td>
-                <td class="text-xs-center">{{props.item.startDate | dateTimeView}}</td>
+                <td class="text-xs-center">{{props.item.startDate|dateTimeView}}</td>
                 <td class="text-xs-center">
                   <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                     {{itemUser.userName}} <br>
@@ -392,6 +389,8 @@ export default {
     'thanh-phan-ho-so': ThanhPhanHoSo
   },
   data: () => ({
+    inputTypes: [1, 3],
+    outputTypes: [2],
     actionIdCurrent: 0,
     validateAction: true,
     btnIndex: -1,
@@ -599,7 +598,16 @@ export default {
             vm.documents.push(resultDocuments)
           }
         })
-        vm.$refs.thanhphanhoso.initData(resultDossier)
+        console.log('vm.$refs========', vm.$refs)
+        if (vm.$refs.thanhphanhoso) {
+          vm.$refs.thanhphanhoso.initData(resultDossier)
+        }
+        if (vm.$refs.thanhphanhoso1) {
+          vm.$refs.thanhphanhoso1.initData(resultDossier)
+        }
+        if (vm.$refs.thanhphanhoso2) {
+          vm.$refs.thanhphanhoso2.initData(resultDossier)
+        }
         // vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
         //   vm.payments = resultPayments
         // })
@@ -1257,10 +1265,15 @@ export default {
     loadTPHS () {
       var vm = this
       console.log('loadTPHS')
-      if (vm.$refs.thanhphanhoso) {
+      if (vm.$refs.thanhphanhoso1) {
         setTimeout(function () {
-          vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
-        }, 300)
+          vm.$refs.thanhphanhoso1.initData(vm.thongTinChiTietHoSo)
+        }, 150)
+      }
+      if (vm.$refs.thanhphanhoso2) {
+        setTimeout(function () {
+          vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
+        }, 150)
       }
     }
   },

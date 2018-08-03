@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 1 || item.partType === 3" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType)" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
@@ -51,13 +51,17 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
-            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType !== 3 && !onlyView">
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
+            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType !== 3 && !thongTinHoSo.online" :disabled="onlyView">
+              <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
                 <v-radio :value="2"></v-radio>
                 <v-radio :value="3"></v-radio>
-              </v-radio-group>
+              </v-radio-group> -->
+              <v-select
+                :items="fileMarkItems"
+                v-model="dossierTemplateItems[index].fileMark"
+              ></v-select>
             </v-flex>
             <v-flex :style="{width: !onlyView ? '90px' : 'auto', 'margin-right': onlyView ? '15px' : '',  background: '#fff'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
               <input
@@ -163,34 +167,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-
-        <v-layout row wrap>
-          <v-flex xs12 sm8>
-            <v-bottom-sheet v-model="sheet">
-              <v-list>
-                <v-subheader>Danh sách file</v-subheader>
-                <v-list-tile
-                v-for="(item, index) in fileViews"
-                :key="item.dossierFileId">
-                <v-list-tile-avatar>
-                </v-list-tile-avatar>
-                <v-list-tile-title>
-                  <span @click="viewFile2(item)" style="cursor: pointer; font-weight: bold">{{ item.displayName }}</span>
-                </v-list-tile-title>
-                <v-list-tile-action>
-                  <v-btn icon ripple @click="deleteSingleFile(item, index)">
-                    <v-icon style="color: red">delete_outline</v-icon>
-                  </v-btn>
-                </v-list-tile-action>
-              </v-list-tile>
-            </v-list>
-          </v-bottom-sheet>
-        </v-flex>
-        <v-flex xs12 sm4>
-        </v-flex>
-      </v-layout>
     </v-card>
-    <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
     <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
       <span>Không chọn</span>
       <span>Bản chính</span>
@@ -236,6 +213,10 @@ export default {
     id: {
       type: String,
       default: () => 'nm'
+    },
+    partTypes: {
+      type: Array,
+      default: () => [1, 3]
     }
   },
   data: () => ({
@@ -257,7 +238,20 @@ export default {
     dialogPDFLoading: true,
     stateAddFileOther: false,
     dossierTemplatesItemSelect: {},
-    fileViews: []
+    fileViews: [],
+    fileMarkItems: [{
+      text: 'Không chọn',
+      value: 0
+    }, {
+      text: 'Bản chụp',
+      value: 1
+    }, {
+      text: 'Bản sao',
+      value: 2
+    }, {
+      text: 'Bản gốc',
+      value: 3
+    }]
   }),
   computed: {
     loading () {
@@ -338,7 +332,7 @@ export default {
           return file.eForm
         })
         var dossierTemplatesHasForm = dossierTemplateItems.filter(template => {
-          return template.hasForm && template.partType === 1
+          return template.hasForm && vm.partTypes.includes(template.partType)
         })
         if (dossierFilesEform.length > 0) {
           dossierFilesEform.forEach(itemFiles => {
@@ -348,7 +342,7 @@ export default {
           })
         } else {
           dossierTemplateItems.forEach(val => {
-            if (val.hasForm && val.partType === 1) {
+            if (val.hasForm && vm.partTypes.includes(val.partType)) {
               val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
               vm.showAlpacaJSFORM(val)
             }
@@ -367,7 +361,7 @@ export default {
         }
       } else {
         dossierTemplateItems.forEach(val => {
-          if (val.hasForm && val.partType === 1) {
+          if (val.hasForm && vm.partTypes.includes(val.partType)) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
             vm.showAlpacaJSFORM(val)
           }
@@ -388,10 +382,11 @@ export default {
         //   })
     },
     mergeDossierTemplateVsDossierFiles (dossierTemplates, dossierFiles) {
-      if (dossierFiles) {
+      var vm = this
+      if (dossierFiles.length !== 0) {
         dossierTemplates.forEach(template => {
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && template.partType === 1 && file.eForm
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm
           })
           if (itemFind) {
             template['daKhai'] = true
