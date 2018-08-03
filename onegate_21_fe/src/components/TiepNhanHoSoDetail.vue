@@ -46,7 +46,7 @@
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
-          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'"></thanh-phan-ho-so>
+          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -137,7 +137,9 @@ export default {
     thongTinChiTietHoSo: {},
     payments: {},
     viaPortalDetail: 0,
-    showThuPhi: false
+    showThuPhi: false,
+    inputTypes: [1, 3],
+    outputTypes: [2]
   }),
   computed: {
     loading () {

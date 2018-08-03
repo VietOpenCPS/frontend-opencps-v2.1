@@ -843,6 +843,9 @@ export default {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
+        }).catch(reject => {
+          vm.hosoDatas = []
+          vm.hosoDatasTotal = 0
         })
       }
     },
