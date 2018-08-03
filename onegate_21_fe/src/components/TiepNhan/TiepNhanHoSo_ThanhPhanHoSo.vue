@@ -38,7 +38,7 @@
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView">Xóa</v-btn>
                     <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">Preview</v-btn>
-                    <div :id="'formAlpaca' + item.partNo" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
+                    <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>
                 </v-layout>
@@ -59,9 +59,6 @@
                 <v-radio :value="3"></v-radio>
               </v-radio-group>
             </v-flex>
-            <!-- <v-flex style="width: 260px;" class="layout wrap" v-if="progressUploadPart === item.partNo">
-              <v-progress-linear :indeterminate="true"></v-progress-linear>
-            </v-flex> -->
             <v-flex :style="{width: !onlyView ? '90px' : 'auto', 'margin-right': onlyView ? '15px' : '',  background: '#fff'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
               <input
               type="file"
@@ -131,16 +128,6 @@
           
         </v-flex>
       </v-layout>
-      <!-- <v-layout row wrap v-if="checkPartType3">
-        <v-flex xs12 sm6>
-          <v-subheader style="float: left;">Thêm giấy tờ khác</v-subheader>
-        </v-flex>
-        <v-flex xs12 sm6 class="text-xs-right">
-          <v-btn color="primary" @click="dialogAddOtherTemp = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </v-flex>
-      </v-layout> -->
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -202,99 +189,6 @@
         <v-flex xs12 sm4>
         </v-flex>
       </v-layout>
-
-      <!-- <div class="other_dossiertemplate" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="item.partType === 3" v-bind:key="item.partNo">
-        <v-expansion-panel class="no_acction__event expaned__list__data">
-          <v-expansion-panel-content hide-actions :value="false">
-            <div slot="header" @click="stateView = false">
-              <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
-                <span class="text-bold mr-2">{{index + 1}}.</span>
-                <span>{{item.partName}}</span>
-              </div>
-            </div>
-            <v-card>
-              <v-card-text>
-                <v-layout wrap>
-                  <v-flex xs12 class="text-xs-right">
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan">
-          <content-placeholders class="mt-1" v-if="loading">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-layout row wrap class="flex__checkbox" v-else>
-            <v-flex style="width: 260px;" class="layout wrap">
-              <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
-                <v-radio :value="0"></v-radio>
-                <v-radio :value="1"></v-radio>
-                <v-radio :value="2"></v-radio>
-                <v-radio :value="3"></v-radio>
-              </v-radio-group>
-            </v-flex>
-            <v-flex style="width: 110px;background: #fff;">
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0 my-0">
-                  <v-badge>
-                    <input
-                    type="file"
-                    style="display: none"
-                    :id="'file' + item.partNo"
-                    @change="onUploadSingleFile($event,item)"
-                    >
-                    <v-icon size="16" color="primary" @click="pickFile(item)">attach_file</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Tải file lên</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
-                  {{item.count}}
-                </v-btn>
-                <span>Xem</span>
-              </v-tooltip>
-            </v-flex>
-          </v-layout>
-        </div>
-        <div v-if="item.partNo === partView && stateView && item.partType === 3">
-          <v-layout row wrap>
-            <v-flex xs12 sm12>
-              <div v-for="(itemFileView, index) in fileViews">
-                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
-                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">{{itemFileView.displayName}}</span>
-                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
-                    <v-icon style="color: red">delete_outline</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </v-flex>
-          </v-layout>
-        </div>
-      </div> -->
-      <!-- <v-card-text class="note_trichyeu">
-        <v-layout wrap>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0 text-right">Trích yếu: </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm10>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-text-field
-              v-else
-              v-model="thongTinHoSo.applicantNote"
-              multi-line
-              rows="2"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
-      </v-card-text> -->
     </v-card>
     <!--  <i><span style="color: red">(*)</span> Những thành phần bắt buộc</i> -->
     <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
@@ -322,7 +216,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -338,6 +232,10 @@ export default {
     onlyView: {
       type: Boolean,
       default: () => false
+    },
+    id: {
+      type: String,
+      default: () => 'nm'
     }
   },
   data: () => ({
@@ -522,11 +420,13 @@ export default {
           })
           return itemTemplate
         })
-      } else if (dossierTemplates) {
-        dossierTemplates.forEach(itemTemplate => {
-          itemTemplate['count'] = 0
-          itemTemplate['fileMark'] = 0
-        })
+      } else {
+        if (dossierTemplates) {
+          dossierTemplates.forEach(itemTemplate => {
+            itemTemplate['count'] = 0
+            itemTemplate['fileMark'] = 0
+          })
+        }
       }
       return dossierTemplates
     },
@@ -535,7 +435,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
         vm.$store.dispatch('loadFormData', item).then(resData => {
-          $('#formAlpaca' + item.partNo).empty()
+          $('#formAlpaca' + item.partNo + vm.id).empty()
           var formScript, formData
           /* eslint-disable */
           if (resScript) {
@@ -550,7 +450,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          $('#formAlpaca' + item.partNo).alpaca(formScript)
+          $('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
         })
       })
     },
@@ -561,6 +461,7 @@ export default {
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
+        fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
@@ -568,6 +469,7 @@ export default {
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
+        item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.dossierTemplateItems[index].daKhai = true
@@ -641,6 +543,7 @@ export default {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })
       if (fileFind) {
+        fileFind['id'] = vm.id
         vm.$store.dispatch('loadAlpcaForm', fileFind)
       } else {
         vm.dossierTemplateItems.forEach(val => {
@@ -683,17 +586,24 @@ export default {
           file['dossierId'] = vm.thongTinHoSo.dossierId
           vm.dialogPDFLoading = true
           vm.dialogPDF = true
-          vm.$store.dispatch('putAlpacaForm', file).then(resData => {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            setTimeout(function () {
-              vm.$store.dispatch('viewFile', file).then(result => {
-                vm.dialogPDFLoading = false
-                document.getElementById('dialogPDFPreview').src = result
-              })
-            }, 300)
-          }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
+          if (!vm.onlyView) {
+            file['id'] = vm.id
+            vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+              setTimeout(function () {
+                vm.$store.dispatch('viewFile', file).then(result => {
+                  vm.dialogPDFLoading = false
+                  document.getElementById('dialogPDFPreview' + vm.id).src = result
+                })
+              }, 1000)
+            }).catch(reject => {
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          } else {
+            vm.$store.dispatch('viewFile', file).then(result => {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPDFPreview' + vm.id).src = result
+            })
+          }
         }
       })
     },
@@ -747,7 +657,7 @@ export default {
         data['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('viewFile', data).then(result => {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPDFPreview' + vm.id).src = result
         })
       }
     },
