@@ -623,7 +623,7 @@ export default {
         if (event.length !== 0) {
           vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
         } else { vm.thongTinNguoiNopHoSo.delegateIdNo = [] }
-        vm.thongTinNguoiNopHoSo.delegateName = vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName ? vm.thongTinNguoiNopHoSo.delegateIdNo[0].applicantName : ''
+        vm.thongTinNguoiNopHoSo.delegateName = vm.thongTinNguoiNopHoSo.delegateIdNo[0]['applicantName'] ? vm.thongTinNguoiNopHoSo.delegateIdNo[0]['applicantName'] : ''
         return false
       }, 100)
     },
@@ -634,7 +634,7 @@ export default {
         if (event.length !== 0) {
           vm.thongTinChuHoSo.applicantIdNo = [event[event.length - 1]]
         } else { vm.thongTinChuHoSo.applicantIdNo = [] }
-        vm.thongTinChuHoSo.applicantName = vm.thongTinChuHoSo.applicantIdNo[0].applicantName ? vm.thongTinChuHoSo.applicantIdNo[0].applicantName : ''
+        vm.thongTinChuHoSo.applicantName = vm.thongTinChuHoSo.applicantIdNo[0]['applicantName'] ? vm.thongTinChuHoSo.applicantIdNo[0]['applicantName'] : ''
         return false
       }, 100)
     },

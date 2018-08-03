@@ -51,7 +51,7 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap class="flex__checkbox" v-else>
-            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType !== 3 && !thongTinHoSo.online" :disabled="onlyView">
+            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online" :disabled="onlyView">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>

@@ -72,6 +72,9 @@
     computed: {
       currentIndex () {
         return this.$store.getters.index
+      },
+      activeGetCounter () {
+        return this.$store.getters.activeGetCounter
       }
     },
     created () {
@@ -122,6 +125,7 @@
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
           vm.currentStep = String(currentQuery.step)
+          console.log('currentStep', String(currentQuery.step))
         } else {
           vm.currentStep = '0'
         }
@@ -133,6 +137,12 @@
         } else {
           vm.detailState = 0
         }
+      },
+      activeGetCounter (val) {
+        var vm = this
+        setTimeout(function () {
+          vm.loadingCounter()
+        }, 300)
       }
     },
     methods: {

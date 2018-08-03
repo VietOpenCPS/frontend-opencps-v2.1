@@ -18,6 +18,7 @@ export const store = new Vuex.Store({
     error: null,
     user: null,
     index: 0,
+    activeGetCounter: false,
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
     checkInput: 0,
@@ -777,6 +778,7 @@ export const store = new Vuex.Store({
         } else {
           applicantIdNo = data.applicantIdNo
         }
+        //
         if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
           delegateIdNo = data.delegateIdNo[0]
         } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
@@ -1204,6 +1206,9 @@ export const store = new Vuex.Store({
             reject(xhr)
           })
         })
+    },
+    getActiveGetCounter ({commit, state}, data) {
+      commit('setActiveGetCounter', data)
     },
     setDefaultCityCode ({commit, state}, data) {
       state.thongTinChuHoSo.cityCode = data
@@ -2440,6 +2445,9 @@ export const store = new Vuex.Store({
     },
     setCommentItems (state, payload) {
       state.commentItems = payload
+    },
+    setActiveGetCounter (state, payload) {
+      state.activeGetCounter = payload
     }
   },
   getters: {
@@ -2491,6 +2499,9 @@ export const store = new Vuex.Store({
     },
     thongTinChuHoSo (state) {
       return state.thongTinChuHoSo
+    },
+    activeGetCounter (state) {
+      return state.activeGetCounter
     },
     thanhPhanHoSo (state) {
       return state.thanhPhanHoSo
