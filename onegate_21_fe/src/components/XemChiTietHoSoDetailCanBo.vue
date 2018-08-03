@@ -65,8 +65,8 @@
             NHẬT KÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="5" href="#tabs-5" @click="runComment()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0" v-if="originality !== 1">
+        <v-tab :key="5" href="#tabs-5" @click="runComment()" v-if="originality !== 1">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
@@ -311,12 +311,13 @@
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
                     : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
-                  <p class="mb-1" v-if="item.content !== '' || item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
+                  <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <p
                   class="history__download__link hover-pointer-download mb-1"
                   title="Tải file"
                   v-for="file in item.payload.files"
                   :key="file.dossierFileId"
+                  style="cursor: pointer;"
                   @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
                   >
                   <v-icon>file_download</v-icon> 
@@ -1018,11 +1019,8 @@ export default {
           if (result.rollbackable) {
             vm.rollbackable = true
           }
-          vm.$store.dispatch('pullNextactions', {
-            dossierId: vm.thongTinChiTietHoSo.dossierId
-          }).then(resNextActions => {
-            vm.checkInput = vm.getCheckInput
-          })
+          vm.checkInput = 0
+          vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
           } else {
             router.push({
@@ -1258,8 +1256,11 @@ export default {
     },
     loadTPHS () {
       var vm = this
+      console.log('loadTPHS')
       if (vm.$refs.thanhphanhoso) {
-        vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+        setTimeout(function () {
+          vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+        }, 300)
       }
     }
   },

@@ -658,7 +658,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+        axios.get(state.initData.documentApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -768,12 +768,14 @@ export const store = new Vuex.Store({
         }
         var applicantIdNo = ''
         var delegateIdNo = ''
-        if (typeof (data.applicantIdNo) === 'string') {
+        if (Array.isArray(data.applicantIdNo)) {
+          if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+            applicantIdNo = data.applicantIdNo[0]
+          } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
+            applicantIdNo = data.applicantIdNo[0].applicantIdNo
+          }
+        } else {
           applicantIdNo = data.applicantIdNo
-        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
-          applicantIdNo = data.applicantIdNo[0]
-        } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
-          applicantIdNo = data.applicantIdNo[0].applicantIdNo
         }
         if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
           delegateIdNo = data.delegateIdNo[0]
