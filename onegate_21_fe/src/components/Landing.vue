@@ -805,7 +805,6 @@ export default {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      console.log('newQuery=====', newQuery)
       let queryString = '?'
       newQuery['page'] = ''
       for (let key in newQuery) {
@@ -824,10 +823,16 @@ export default {
       let currentQuery = router.history.current.query
       console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
+        let querySet
+        if (currentQuery.q.indexOf('step') > 0) {
+          querySet = currentQuery.q
+        } else {
+          querySet = currentQuery.q + '&step=' + currentQuery['step']
+        }
         let filter = {
-          queryParams: currentQuery.q,
+          queryParams: querySet,
           /*  test Local */
-          // queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
+          // queryParams: 'http://127.0.0.1:8081' + querySet,
           page: vm.hosoDatasPage,
           agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
           service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,

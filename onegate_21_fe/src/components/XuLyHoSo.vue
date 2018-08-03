@@ -97,7 +97,7 @@
     <div>
       <v-layout wrap v-if="btnStateVisible">
         <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-        <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
+        <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
         <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
         <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
         <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
@@ -481,8 +481,16 @@ export default {
     },
     postAction (filter, dossier, index) {
       var vm = this
+      var validPhanCong = false
+      var validYKien = false
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
+        let result = vm.$refs.phancong.doExport()
+        if (result) {
+          validPhanCong = true
+        } else {
+          validPhanCong = false
+        }
       }
       var paymentsOut = null
       if (vm.payments) {
@@ -507,12 +515,17 @@ export default {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
         if (result.valid) {
-          vm.validateAction = true
+          validYKien = true
           note = result.text
         } else {
-          vm.validateAction = false
+          validYKien = false
         }
         filter['userNote'] = note
+      }
+      if (validPhanCong && validYKien) {
+        vm.validateAction = true
+      } else {
+        vm.validateAction = false
       }
       let currentQuery = vm.$router.history.current.query
       if (vm.showYkienCanBoThucHien) {
