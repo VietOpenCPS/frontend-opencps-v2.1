@@ -5,10 +5,10 @@
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
-              <div style="align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 90px)' : 'calc(100% - 260px)'}">
-                <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
+              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 90px)' : 'calc(100% - 260px)'}">
+                <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
+                  <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    <span class="text-bold">{{index + 1}}.</span>
                     {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> 
                   </div>
                 </div>
@@ -20,7 +20,8 @@
                     <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                       <v-icon v-else>attach_file</v-icon>
-                      {{itemFileView.displayName}}
+                      {{itemFileView.displayName}} - 
+                      <i>{{itemFileView.modifiedDate}}</i>
                     </span>
                     <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView">
                       <v-icon style="color: red">delete_outline</v-icon>
@@ -30,7 +31,7 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text>
+              <v-card-text style="background-color: #efeeee;">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
@@ -49,7 +50,7 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
-            <v-flex style="width: 150px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online" :disabled="onlyView">
+            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online" :disabled="onlyView">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
@@ -61,7 +62,7 @@
                 v-model="dossierTemplateItems[index].fileMark"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '60px' : 'auto', 'margin-right': onlyView ? '15px' : '',  background: '#fff'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
+            <v-flex :style="{width: !onlyView ? '60px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
               <input
               type="file"
               style="display: none"
@@ -238,7 +239,7 @@ export default {
     dossierTemplatesItemSelect: {},
     fileViews: [],
     fileMarkItems: [{
-      text: 'Không chọn',
+      text: 'Không có',
       value: 0
     }, {
       text: 'Bản chụp',
