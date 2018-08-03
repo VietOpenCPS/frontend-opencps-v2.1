@@ -55,14 +55,14 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="checkSelectAll"
+        :select-all="menuType !== 3 && originality !== 1"
         class="table-landing table-bordered"
         hide-actions
       >
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th v-if="checkSelectAll">
+          <th v-if="menuType !== 3 && originality !== 1">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
