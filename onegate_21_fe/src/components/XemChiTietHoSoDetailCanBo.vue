@@ -235,7 +235,7 @@
             </div>
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
+              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
@@ -275,27 +275,26 @@
                 </v-tooltip>
               </template>
               <template slot="items" slot-scope="props">
-                <td class="text-xs-center">{{props.item.sequenceRole}}</td>
-                <td class="text-xs-center">{{props.item.sequenceName}}</td>
-                <td class="text-xs-center">{{props.item.durationCount}} ngày</td>
-                <td class="text-xs-center">{{props.item.startDate|dateTimeView}}</td>
-                <td class="text-xs-center">
+                <td class="text-xs-center">{{props.index + 1}}</td>
+                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
+                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                <td class="text-xs-left">
                   <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                     {{itemUser.userName}} <br>
                   </div>
                 </td>
-                <td>
+                <td class="text-xs-left">
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.actionName}} : ({{itemAction.createDate | dateTimeView}})
+                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                     <div v-if="index === props.item.actions.length - 1">
-                      <span v-if="itemAction.actionOverdue > 0" style="color: red">Quá hạn {{itemAction.actionOverdue}} ngày</span>
-                      <span v-else-if="itemAction.state === 0" style="color: blue">Đang chờ thực hiện</span>
-                      <span v-else-if="itemAction.state === 1" style="color: blue">Đã thực hiện</span>
-                      <span v-else style="color: blue">Quay lại bước trước</span>
+                      {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                      <div v-if="props.item.statusText">
+                        <span style="color: green">{{props.item.statusText}}</span>
+                      </div>
                     </div>
                   </div>
-                <!--  <span v-if="getMaxDueDate(props.item.actions) > 0" style="color: red">Quá hạn {{props.item.actions|getMaxDueDate}} ngày</span>
-                  <span v-else style="color: blue">Đang thực hiện</span> -->
                 </td>
               </template>
             </v-data-table>
@@ -452,6 +451,11 @@ export default {
     rollbackable: false,
     configNote: null,
     headers: [{
+      text: '#',
+      align: 'center',
+      sortable: false
+    },
+    {
       text: 'Vai trò',
       align: 'center',
       sortable: false,
@@ -953,6 +957,8 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      var validPhanCong = false
+      var validYKien = false
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -962,6 +968,12 @@ export default {
       }
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
+        let result = vm.$refs.phancong.doExport()
+        if (result) {
+          validPhanCong = true
+        } else {
+          validPhanCong = false
+        }
       }
       var paymentsOut = null
       if (vm.payments) {
@@ -981,18 +993,22 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let result = vm.$refs.kypheduyettailieu.doExport()
-        console.log('resultKSKS', result)
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
         if (result.valid) {
-          vm.validateAction = true
+          validYKien = true
           note = result.text
         } else {
-          vm.validateAction = false
+          validYKien = false
         }
         filter['userNote'] = note
+      }
+      if (validPhanCong && validYKien) {
+        vm.validateAction = true
+      } else {
+        vm.validateAction = false
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
