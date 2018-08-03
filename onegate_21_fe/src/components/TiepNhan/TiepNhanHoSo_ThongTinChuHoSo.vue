@@ -582,6 +582,7 @@ export default {
       })
     },
     onChangeCity (data) {
+      console.log('onChangeCity')
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
@@ -599,6 +600,7 @@ export default {
       })
     },
     onChangeDistrict (data) {
+      console.log('onChangeDistrict')
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
@@ -622,19 +624,36 @@ export default {
       setTimeout(function () {
         if (event.length !== 0) {
           vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
-        } else { vm.thongTinNguoiNopHoSo.delegateIdNo = [] }
-        vm.thongTinNguoiNopHoSo.delegateName = vm.thongTinNguoiNopHoSo.delegateIdNo[0]['applicantName'] ? vm.thongTinNguoiNopHoSo.delegateIdNo[0]['applicantName'] : ''
+        }
+        if (vm.thongTinNguoiNopHoSo['delegateIdNo'][0]) {
+          vm.thongTinNguoiNopHoSo['delegateName'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['applicantName'] ? vm.thongTinNguoiNopHoSo['delegateName'][0]['applicantName'] : ''
+          vm.thongTinNguoiNopHoSo['delegateAddress'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] : ''
+          vm.thongTinNguoiNopHoSo['delegateTelNo'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] : ''
+          vm.thongTinNguoiNopHoSo['delegateEmail'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] : ''
+          vm.thongTinNguoiNopHoSo['delegateCityCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] : ''
+          vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] : ''
+          vm.thongTinNguoiNopHoSo['delegateWardCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] : ''
+        }
         return false
       }, 100)
     },
     eventInput2 (event) {
       var vm = this
-      vm.thongTinChuHoSo.applicantIdNo = []
+      vm.thongTinChuHoSo['applicantIdNo'] = []
       setTimeout(function () {
         if (event.length !== 0) {
-          vm.thongTinChuHoSo.applicantIdNo = [event[event.length - 1]]
-        } else { vm.thongTinChuHoSo.applicantIdNo = [] }
-        vm.thongTinChuHoSo.applicantName = vm.thongTinChuHoSo.applicantIdNo[0]['applicantName'] ? vm.thongTinChuHoSo.applicantIdNo[0]['applicantName'] : ''
+          vm.thongTinChuHoSo['applicantIdNo'] = [event[event.length - 1]]
+        }
+        if (vm.thongTinChuHoSo['applicantIdNo'][0]) {
+          vm.thongTinChuHoSo['applicantName'] = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] : ''
+          vm.thongTinChuHoSo['address'] = vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : ''
+          vm.thongTinChuHoSo['contactTelNo'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] : ''
+          vm.thongTinChuHoSo['contactEmail'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] : ''
+          vm.thongTinChuHoSo.cityCode = vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : ''
+          vm.thongTinChuHoSo.districtCode = vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : ''
+          vm.thongTinChuHoSo.wardCode = vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
+          vm.thongTinChuHoSo.userType = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business' ? false : true
+        }
         return false
       }, 100)
     },

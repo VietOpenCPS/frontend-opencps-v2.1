@@ -958,8 +958,8 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      var validPhanCong = false
-      var validYKien = false
+      var validPhanCong = true
+      var validYKien = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
