@@ -125,6 +125,7 @@
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
           vm.currentStep = String(currentQuery.step)
+          console.log('currentStep', String(currentQuery.step))
         } else {
           vm.currentStep = '0'
         }
@@ -138,7 +139,10 @@
         }
       },
       activeGetCounter (val) {
-        this.loadingCounter()
+        var vm = this
+        setTimeout(function () {
+          vm.loadingCounter()
+        }, 300)
       }
     },
     methods: {

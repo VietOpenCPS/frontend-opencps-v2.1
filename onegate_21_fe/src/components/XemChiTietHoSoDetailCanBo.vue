@@ -281,7 +281,7 @@
                 <td class="text-xs-center">{{props.item.sequenceRole}}</td>
                 <td class="text-xs-center">{{props.item.sequenceName}}</td>
                 <td class="text-xs-center">{{props.item.durationCount}} ngày</td>
-                <td class="text-xs-center">{{props.item.startDate}}</td>
+                <td class="text-xs-center">{{props.item.startDate | dateTimeView}}</td>
                 <td class="text-xs-center">
                   <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                     {{itemUser.userName}} <br>
@@ -289,7 +289,7 @@
                 </td>
                 <td>
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.actionName}} : ({{itemAction.createDate}})
+                    {{itemAction.actionName}} : ({{itemAction.createDate | dateTimeView}})
                     <div v-if="index === props.item.actions.length - 1">
                       <span v-if="itemAction.actionOverdue > 0" style="color: red">Quá hạn {{itemAction.actionOverdue}} ngày</span>
                       <span v-else-if="itemAction.state === 0" style="color: blue">Đang chờ thực hiện</span>
@@ -652,7 +652,7 @@ export default {
             let resultTemp = resultActions.data
             for (var i = 0; i < resultTemp.length; i++) {
               if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array(resultTemp[i]['actions']).isArray()) {
+                if (!Array.isArray(resultTemp[i]['actions'])) {
                   let arrActionsTemp = []
                   arrActionsTemp.push(resultTemp[i]['actions'])
                   resultTemp[i]['actions'] = arrActionsTemp
@@ -1268,7 +1268,7 @@ export default {
     dateTimeView (arg) {
       if (arg) {
         let value = new Date(arg)
-        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
       }
