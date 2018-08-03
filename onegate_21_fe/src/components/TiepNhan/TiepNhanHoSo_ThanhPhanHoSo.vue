@@ -5,16 +5,14 @@
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
-              <div style="align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 90px)' : 'calc(100% - 370px)'}">
+              <div style="align-items: center;min-height: 38px;background: #fff;padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 90px)' : 'calc(100% - 260px)'}">
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
-                  <div>
+                  <div class="header__tphs">
                     <span class="text-bold">{{index + 1}}.</span>
-                  </div>
-                  <div>
                     {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> 
                   </div>
                 </div>
-                <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> 
+                <i v-if="item.hasForm" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> 
                 <span v-if="item.hasForm">&nbsp;-&nbsp;</span> 
                 <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
@@ -50,8 +48,8 @@
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
-          <v-layout row wrap class="flex__checkbox" v-else>
-            <v-flex style="width: 260px;" class="layout wrap" v-if="originality !== 1 && item.partType !== 3 && !thongTinHoSo.online" :disabled="onlyView">
+          <v-layout row wrap v-else>
+            <v-flex style="width: 150px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online" :disabled="onlyView">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
@@ -63,7 +61,7 @@
                 v-model="dossierTemplateItems[index].fileMark"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '90px' : 'auto', 'margin-right': onlyView ? '15px' : '',  background: '#fff'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
+            <v-flex :style="{width: !onlyView ? '60px' : 'auto', 'margin-right': onlyView ? '15px' : '',  background: '#fff'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
               <input
               type="file"
               style="display: none"
@@ -168,12 +166,12 @@
       </v-card>
     </v-dialog>
     </v-card>
-    <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
+    <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
       <span>Không chọn</span>
       <span>Bản chính</span>
       <span>Bản chụp</span>
       <span>Công chứng</span>
-    </div>
+    </div> -->
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-card-title class="headline">File đính kèm</v-card-title>
