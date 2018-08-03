@@ -1280,7 +1280,7 @@ export default {
   filters: {
     dateTimeView (arg) {
       if (arg) {
-        let value = new Date(arg)
+        let value = new Date(Number(arg))
         return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
