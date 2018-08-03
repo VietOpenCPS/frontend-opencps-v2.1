@@ -290,7 +290,6 @@
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
                     {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                     <div v-if="index === props.item.actions.length - 1">
-                      {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                       <div v-if="props.item.statusText">
                         <span style="color: green">{{props.item.statusText}}</span>
                       </div>
@@ -769,15 +768,15 @@ export default {
       vm.resultDialogPick = result
       vm.indexDialogPick = index
       vm.userNote = 0
-      if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
-        try {
-          vm.configNote = JSON.parse(result.configNote)
-          if (vm.configNote.confirm) {
-            isPopup = true
-          }
-        } catch (e) {
-        }
-      }
+      // if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
+      //   try {
+      //     vm.configNote = JSON.parse(result.configNote)
+      //     if (vm.configNote.confirm) {
+      //       isPopup = true
+      //     }
+      //   } catch (e) {
+      //   }
+      // }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||

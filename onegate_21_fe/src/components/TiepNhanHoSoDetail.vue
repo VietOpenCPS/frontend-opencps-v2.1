@@ -177,7 +177,7 @@ export default {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
                 result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
                 result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
-                if (resAction && resAction.payment) {
+                if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
                 }
