@@ -2228,6 +2228,13 @@ body .theme--light .form_alpaca .expansion-panel__container {
   align-items: center;
 }
 
+.header__tphs {
+  display: flex;
+  width: auto;
+  align-items: center;
+  text-align: left;
+}
+
 .card__text__gov {
   padding: 7px !important
 }

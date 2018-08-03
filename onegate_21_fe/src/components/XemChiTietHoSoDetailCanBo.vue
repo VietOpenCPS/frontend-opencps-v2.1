@@ -258,6 +258,7 @@
             </v-alert>
             <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printDocument()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -513,7 +514,8 @@ export default {
     }],
     filterDossierSync: null,
     messageChat: '',
-    isCallBack: true
+    isCallBack: true,
+    printDocument: false
   }),
   computed: {
     loading () {
@@ -1007,6 +1009,9 @@ export default {
             if (result.rollbackable) {
               vm.rollbackable = true
             }
+            if (result.dossierDocumentId) {
+              vm.printDocument = true
+            }
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1275,6 +1280,18 @@ export default {
           vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
         }, 150)
       }
+    },
+    printDocument () {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('doPrint03', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
     }
   },
   filters: {
