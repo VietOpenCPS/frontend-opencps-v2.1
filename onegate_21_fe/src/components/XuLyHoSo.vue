@@ -122,7 +122,7 @@
         Thực hiện thành công!
       </v-alert>
     </div>
-    <!-- <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
+    <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
       <v-card>
         <v-card-title class="headline">
           Trạng thái xử lý
@@ -135,7 +135,7 @@
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
               <v-flex xs11>
                 <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                <div class="ml-4"><span class="text-bold">{{item.dossierNo}}</span> - {{item.serviceName}}</div>
+                <div class="ml-4"><span class="text-bold">{{item.dossierNo}}</span> - {{item.applicantName}}</div>
               </v-flex>
               <v-flex xs1 class="text-right">
                 <v-tooltip top v-if="item.statusAction">
@@ -156,7 +156,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click.native="resend" 
+          <v-btn color="primary" @click.native="processAction()" 
             :loading="loadingAction"
             :disabled="loadingAction"
           >
@@ -174,7 +174,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog> -->
+    </v-dialog>
   </div>
 </template>
 
@@ -235,6 +235,9 @@ export default {
     ],
     mutilpleAction: false,
     actionExits: [],
+    dossierProcess: [],
+    countProcessed: 0,
+    activeNotify: false,
     dialog_statusAction: false,
     thongTinChiTietHoSo: {
     },
@@ -271,7 +274,8 @@ export default {
     rollbackable: false,
     dialogPDF: false,
     dialogPDFLoading: false,
-    countProcessed: 0
+    loadingActionProcess: false,
+    loadingAction: false
   }),
   computed: {
     loading () {
@@ -286,6 +290,9 @@ export default {
     },
     actionActive () {
       return this.$store.getters.actionActive
+    },
+    activeGetCounter () {
+      return this.$store.getters.activeGetCounter
     }
   },
   created () {
@@ -400,7 +407,6 @@ export default {
         actionId: item.processActionId
       }
       vm.dialogActionProcess = false
-      vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(vm.dossierSelected[0], item, result, index)
       })
@@ -443,29 +449,37 @@ export default {
       var vm = this
       var initData = vm.$store.getters.loadingInitData
       var actionUser = initData.user.userName ? initData.user.userName : ''
+      vm.dossierProcess = vm.dossierSelected.filter(function (item) {
+        return (item['statusAction'] === false || !item['statusAction'])
+      })
+      vm.countProcessed = 0
       if (vm.mutilpleAction) {
         for (let key in vm.actionExits) {
           for (let key2 in vm.dossierSelected) {
-            let filter = {
-              dossierId: vm.dossierSelected[key2].dossierId,
-              actionCode: vm.actionExits[key].actionCode,
-              actionUser: actionUser
+            if (vm.dossierSelected[key2]['statusAction'] === false || !vm.dossierSelected[key2]['statusAction']) {
+              let filter = {
+                dossierId: vm.dossierSelected[key2].dossierId,
+                actionCode: vm.actionExits[key].actionCode,
+                actionUser: actionUser
+              }
+              vm.postAction(filter, vm.dossierSelected[key2], key2)
             }
-            vm.postAction(filter, vm.dossierSelected[key2])
           }
         }
       } else {
         for (let key in vm.dossierSelected) {
-          let filter = {
-            dossierId: vm.dossierSelected[key].dossierId,
-            actionCode: vm.actionActive.action,
-            actionUser: actionUser
+          if (vm.dossierSelected[key]['statusAction'] === false || !vm.dossierSelected[key]['statusAction']) {
+            let filter = {
+              dossierId: vm.dossierSelected[key].dossierId,
+              actionCode: vm.actionActive.action,
+              actionUser: actionUser
+            }
+            vm.postAction(filter, vm.dossierSelected[key], key)
           }
-          vm.postAction(filter, vm.dossierSelected[key])
         }
       }
     },
-    postAction (filter, dossier) {
+    postAction (filter, dossier, index) {
       var vm = this
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
@@ -488,7 +502,6 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let result = vm.$refs.kypheduyettailieu.doExport()
-        console.log('resultKSKS', result)
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
@@ -502,24 +515,67 @@ export default {
         filter['userNote'] = note
       }
       let currentQuery = vm.$router.history.current.query
-      vm.loadingActionProcess = true
       if (vm.showYkienCanBoThucHien) {
         if (vm.validateAction) {
+          vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            vm.dialogActionProcess = false
-            vm.loadingActionProcess = false
-            vm.btnStateVisible = false
+            vm.countProcessed += 1
+            vm.dossierSelected[index]['statusAction'] = true
+            // console.log('countProcessed', vm.countProcessed)
+            // console.log('length', vm.dossierProcess.length)
+            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+              vm.dialog_statusAction = true
+              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+              vm.loadingActionProcess = false
+              vm.loadingAction = false
+              vm.btnStateVisible = false
+              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+            }
           }).catch(function (reject) {
-            console.log('reject')
+            vm.countProcessed += 1
+            vm.activeNotify = true
+            vm.dossierSelected[index]['statusAction'] = false
+            // console.log('countProcessed', vm.countProcessed)
+            // console.log('length', vm.dossierProcess.length)
+            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+              vm.dialog_statusAction = true
+              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+              vm.loadingActionProcess = false
+              vm.loadingAction = false
+              vm.btnStateVisible = false
+              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+            }
           })
         }
       } else {
+        vm.loadingActionProcess = true
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          vm.dialogActionProcess = false
-          vm.loadingActionProcess = false
-          vm.btnStateVisible = false
+          vm.countProcessed += 1
+          vm.dossierSelected[index]['statusAction'] = true
+          if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+            vm.dialog_statusAction = true
+            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+            vm.loadingActionProcess = false
+            vm.loadingAction = false
+            vm.btnStateVisible = false
+            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          }
         }).catch(function (reject) {
-          console.log('reject')
+          vm.countProcessed += 1
+          vm.activeNotify = true
+          vm.dossierSelected[index]['statusAction'] = false
+          if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+            vm.dialog_statusAction = true
+            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+            vm.loadingActionProcess = false
+            vm.loadingAction = false
+            vm.btnStateVisible = false
+            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          }
         })
       }
     },
@@ -586,6 +642,7 @@ export default {
         })
         var actionActiveArr = vm.actionActive.action.split(',')
         if (actionActiveArr.length === 1) {
+          vm.actionExits = actionActiveArr
           let actionActive = result.filter(function (item) {
             return item.actionCode.toString() === vm.actionActive.action.toString()
           })
@@ -653,8 +710,10 @@ export default {
         })
       }
     },
-    closeDialogStatusAction () {},
-    resend () {}
+    closeDialogStatusAction () {
+      this.dialog_statusAction = false
+      this.btnStateVisible = false
+    }
   },
   filters: {
     dateTimeView (arg) {

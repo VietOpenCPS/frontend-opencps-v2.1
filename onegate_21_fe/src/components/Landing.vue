@@ -868,10 +868,12 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('newQuery', newQuery)
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
       for (let key in newQuery) {
+        console.log('newQueryItem', key, newQuery[key])
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
@@ -884,6 +886,8 @@ export default {
       }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
+      console.log('path', current.path)
+      console.log('queryString', queryString)
       vm.$router.push({
         path: current.path + queryString
       })

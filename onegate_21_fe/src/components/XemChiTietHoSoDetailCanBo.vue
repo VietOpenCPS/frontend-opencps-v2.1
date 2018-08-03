@@ -286,7 +286,7 @@
                 </td>
                 <td>
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.actionName}} : ({{itemAction.createDate|dateTimeView}})
+                    {{itemAction.actionName}} : ({{itemAction.createDate | dateTimeView}})
                     <div v-if="index === props.item.actions.length - 1">
                       <span v-if="itemAction.actionOverdue > 0" style="color: red">Quá hạn {{itemAction.actionOverdue}} ngày</span>
                       <span v-else-if="itemAction.state === 0" style="color: blue">Đang chờ thực hiện</span>
@@ -1280,8 +1280,8 @@ export default {
   filters: {
     dateTimeView (arg) {
       if (arg) {
-        let value = new Date(arg)
-        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        let value = new Date(Number(arg))
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
       }
