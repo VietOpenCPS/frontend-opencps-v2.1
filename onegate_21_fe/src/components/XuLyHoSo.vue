@@ -407,7 +407,6 @@ export default {
         actionId: item.processActionId
       }
       vm.dialogActionProcess = false
-      vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
         vm.processPullBtnDetailRouter(vm.dossierSelected[0], item, result, index)
       })
