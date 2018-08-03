@@ -774,6 +774,7 @@ export default {
         } catch (e) {
         }
       }
+      console.log('isPopup========11111', isPopup)
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -819,6 +820,7 @@ export default {
           vm.viaPortalDetail = dossierItem.viaPostal
         }
       }
+      console.log('isPopup========222222', isPopup)
       if (isPopup) {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
