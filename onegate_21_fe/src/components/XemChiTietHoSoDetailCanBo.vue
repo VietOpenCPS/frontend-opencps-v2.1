@@ -258,7 +258,7 @@
             </v-alert>
             <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printDocument()">Quay lui</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -1032,6 +1032,9 @@ export default {
           if (result.rollbackable) {
             vm.rollbackable = true
           }
+          if (result.dossierDocumentId) {
+            vm.printDocument = true
+          }
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
@@ -1281,7 +1284,7 @@ export default {
         }, 150)
       }
     },
-    printDocument () {
+    printViewDocument () {
       let vm = this
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
