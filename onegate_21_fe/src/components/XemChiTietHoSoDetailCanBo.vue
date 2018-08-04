@@ -17,7 +17,7 @@
         </div>
       </div> 
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-card-title class="headline">File đính kèm</v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
@@ -45,7 +45,7 @@
     <div>
       <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab :key="1" href="#tabs-1">
+        <v-tab :key="1" href="#tabs-1" @click="loadTPHS()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THÀNH PHẦN HỒ SƠ
           </v-btn>
@@ -65,8 +65,8 @@
             NHẬT KÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <v-tab :key="5" href="#tabs-5" @click="runComment()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0" v-if="originality !== 1">
+        <v-tab :key="5" href="#tabs-5" @click="runComment()" v-if="originality !== 1">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI NỘI BỘ
           </v-btn>
         </v-tab>
@@ -77,13 +77,14 @@
         </v-tab> -->
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
                   Tài liệu nộp
                 </div>
-                <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
+                <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style">
                       <v-flex xs11>
@@ -104,33 +105,29 @@
                     <v-layout row wrap>
                       <v-flex xs12 sm12>
                         <div v-for="(itemFileView, index) in fileViews">
-                          <div style="display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
-                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                          <div style="display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
                             <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;">
                               <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                               <v-icon v-else>attach_file</v-icon>
                               {{itemFileView.displayName}}
                             </span>
-                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
-                              <v-icon style="color: red">delete_outline</v-icon>
-                            </v-btn> -->
                           </div>
                         </div>
                       </v-flex>
                     </v-layout>
                   </div>
-                </div>
+                </div> -->
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
                   Kết quả
                 </div>
-                <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
+                <!-- <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style py-2"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 30px;">{{item.partName}}</div>
@@ -149,27 +146,24 @@
                     <v-layout row wrap>
                       <v-flex xs12 sm12>
                         <div v-for="(itemFileView, index) in fileViews">
-                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
-                            <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
+                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
                             <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attach_file</v-icon>{{itemFileView.displayName}}</span>
-                            <!-- <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">
-                              <v-icon style="color: red">delete_outline</v-icon>
-                            </v-btn> -->
                           </div>
                         </div>
                       </v-flex>
                     </v-layout>
                   </div>
-                </div>
+                </div> -->
+                <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
+            <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> III.</div>
                   Văn bản hành chính
                 </div>
-                <div v-for="(item, index) in documents" v-bind:key="item.documentCode">
+                <div v-for="(item, index) in documents" v-bind:key="index">
                   <v-card>
                     <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
                       <v-flex xs11>
@@ -178,8 +172,8 @@
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile(item)" style="height:25px;width:25px">
-                            <v-icon>visibility</v-icon>
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
+                            <v-icon style="font-size: 14px;">visibility</v-icon>
                           </v-btn>
                           <span>Xem</span>
                         </v-tooltip>
@@ -217,6 +211,17 @@
             </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <div style="position: relative;" v-if="checkInput === 2">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
             <div class="py-3" v-if="btnStateVisible">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -227,43 +232,25 @@
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
-
-              <!-- <v-btn color="primary" v-for="(item, index) in btnStepsDynamics" v-bind:key="index" v-if="String(item.form) !== 'NEW'"
-                v-on:click.native="btnActionEvent(item, index, true)"
-                :loading="loadingAction && index === indexActionStep"
-                :disabled="loadingAction && index === indexActionStep"
-              >
-                {{ item.title }}{{ item.tiltle }}
-                <span slot="loader">Loading...</span>
-              </v-btn> -->
             </div>
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
+              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
-              <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
-              <div style="position: relative;" v-if="checkInput === 2">
-                <v-expansion-panel class="expansion-pl">
-                  <v-expansion-panel-content hide-actions value="1">
-                    <div slot="header">
-                      <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                      THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
-                    </div>
-                    <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </div>
+              <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
+              <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
                 :disabled="loadingActionProcess"
                 >
                 <v-icon>save</v-icon>&nbsp;
-                Xác nhận
+                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
+                <span>Xác nhận</span>
                 <span slot="loader">Loading...</span>
               </v-btn>
             </v-layout>
@@ -272,6 +259,7 @@
             </v-alert>
             <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">Quay lui</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -289,27 +277,23 @@
                 </v-tooltip>
               </template>
               <template slot="items" slot-scope="props">
-                <td class="text-xs-center">{{props.item.sequenceRole}}</td>
-                <td class="text-xs-center">{{props.item.sequenceName}}</td>
-                <td class="text-xs-center">{{props.item.durationCount}} ngày</td>
-                <td class="text-xs-center">{{props.item.startDate}}</td>
-                <td class="text-xs-center">
+                <td class="text-xs-center">{{props.index + 1}}</td>
+                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
+                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                <td class="text-xs-left">
                   <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                     {{itemUser.userName}} <br>
                   </div>
                 </td>
-                <td>
+                <td class="text-xs-left">
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.actionName}} : ({{itemAction.createDate}})
-                    <div v-if="index === props.item.actions.length - 1">
-                      <span v-if="itemAction.actionOverdue > 0" style="color: red">Quá hạn {{itemAction.actionOverdue}} ngày</span>
-                      <span v-else-if="itemAction.state === 0" style="color: blue">Đang chờ thực hiện</span>
-                      <span v-else-if="itemAction.state === 1" style="color: blue">Đã thực hiện</span>
-                      <span v-else style="color: blue">Quay lại bước trước</span>
-                    </div>
+                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                   </div>
-                <!--  <span v-if="getMaxDueDate(props.item.actions) > 0" style="color: red">Quá hạn {{props.item.actions|getMaxDueDate}} ngày</span>
-                  <span v-else style="color: blue">Đang thực hiện</span> -->
+                  <div v-if="props.item.statusText">
+                    <span style="color: green">{{props.item.statusText}}</span>
+                  </div>
                 </td>
               </template>
             </v-data-table>
@@ -319,17 +303,16 @@
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">
-                  <p class="mb-2"> Ông/bà <b>{{ item.author }}</b> 
-                    <span style="color: #0b72ba">( {{ item.payload.stepName }} )</span>
-                    <br/>
-                    <span style="color: #939393">{{ item.createDate | dateTimeView }}</span>
+                  <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
+                    : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
-                  Ý kiến: <span v-html="item.content"></span> <br>
+                  <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <p
-                  class="history__download__link hover-pointer-download"
+                  class="history__download__link hover-pointer-download mb-1"
                   title="Tải file"
                   v-for="file in item.payload.files"
                   :key="file.dossierFileId"
+                  style="cursor: pointer;"
                   @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
                   >
                   <v-icon>file_download</v-icon> 
@@ -389,6 +372,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import EditDate from './form_xu_ly/EditDate.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -401,9 +385,12 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
-    'thanh-phan-ho-so': ThanhPhanHoSo
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'ngay-hen-tra': EditDate
   },
   data: () => ({
+    inputTypes: [1, 3],
+    outputTypes: [2],
     actionIdCurrent: 0,
     validateAction: true,
     btnIndex: -1,
@@ -430,7 +417,7 @@ export default {
     nextActions: [],
     createFiles: [],
     processSteps: [],
-    documents: [],
+    documents: null,
     payments: '',
     dossierActions: [],
     itemselect: '',
@@ -446,6 +433,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showThuPhi: false,
+    showEditDate: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -461,9 +449,17 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    dueDateEdit: null,
+    receiveDateEdit: null,
     dialogActionProcess: false,
     rollbackable: false,
+    configNote: null,
     headers: [{
+      text: '#',
+      align: 'center',
+      sortable: false
+    },
+    {
       text: 'Vai trò',
       align: 'center',
       sortable: false,
@@ -525,7 +521,8 @@ export default {
     }],
     filterDossierSync: null,
     messageChat: '',
-    isCallBack: true
+    isCallBack: true,
+    printDocument: false
   }),
   computed: {
     loading () {
@@ -534,6 +531,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    getCheckInput () {
+      return this.$store.getters.getCheckInput
     }
   },
   created () {
@@ -601,8 +601,22 @@ export default {
         }).catch(reject => {
         })
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
-          vm.documents = resultDocuments
+          if (Array.isArray(resultDocuments)) {
+            vm.documents = resultDocuments
+          } else {
+            vm.documents.push(resultDocuments)
+          }
         })
+        console.log('vm.$refs========', vm.$refs)
+        if (vm.$refs.thanhphanhoso) {
+          vm.$refs.thanhphanhoso.initData(resultDossier)
+        }
+        if (vm.$refs.thanhphanhoso1) {
+          vm.$refs.thanhphanhoso1.initData(resultDossier)
+        }
+        if (vm.$refs.thanhphanhoso2) {
+          vm.$refs.thanhphanhoso2.initData(resultDossier)
+        }
         // vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
         //   vm.payments = resultPayments
         // })
@@ -651,7 +665,19 @@ export default {
           stepType: data
         }
         vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          vm.dossierActions = resultActions.data
+          if (resultActions.data) {
+            let resultTemp = resultActions.data
+            for (var i = 0; i < resultTemp.length; i++) {
+              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                if (!Array.isArray(resultTemp[i]['actions'])) {
+                  let arrActionsTemp = []
+                  arrActionsTemp.push(resultTemp[i]['actions'])
+                  resultTemp[i]['actions'] = arrActionsTemp
+                }
+              }
+            }
+            vm.dossierActions = resultTemp
+          }
         })
       }
     },
@@ -740,12 +766,22 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showThuPhi = false
+      vm.showEditDate = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
       vm.resultDialogPick = result
       vm.indexDialogPick = index
       vm.userNote = 0
+      // if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
+      //   try {
+      //     vm.configNote = JSON.parse(result.configNote)
+      //     if (vm.configNote.confirm) {
+      //       isPopup = true
+      //     }
+      //   } catch (e) {
+      //   }
+      // }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -784,27 +820,24 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           isPopup = true
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
         }
-        if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
-          vm.checkInput = result.checkInput
+        if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
-          if (result.checkInput === 2) {
-            vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
-          } else if (result.checkInput === 0) {
-            isPopup = false
-          }
+          vm.showEditDate = true
+          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : new Date()
+          vm.receiveDateEdit = result.receiving.receiveDate
         }
       }
       if (isPopup) {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
       } else {
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, false)
       }
     },
     processPullBtnDetail (item, index) {
@@ -936,6 +969,8 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
+      var validPhanCong = true
+      var validYKien = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -945,6 +980,12 @@ export default {
       }
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
+        let result = vm.$refs.phancong.doExport()
+        if (result) {
+          validPhanCong = true
+        } else {
+          validPhanCong = false
+        }
       }
       var paymentsOut = null
       if (vm.payments) {
@@ -959,23 +1000,38 @@ export default {
       if (vm.showThuPhi) {
         filter['payment'] = paymentsOut
       }
+      if (vm.showEditDate) {
+        let date = vm.$refs.ngayhentra.getDateInput()
+        console.log('dueDateEdit', date)
+        // filter['dueDate'] = date ? date : ''
+        // filter['receiveDate'] = vm.receiveDateEdit ? vm.receiveDateEdit : ''
+        let payload = {
+          'dueDate': date,
+          'receiveDate': vm.receiveDateEdit
+        }
+        filter['payload'] = payload
+      }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let result = vm.$refs.kypheduyettailieu.doExport()
-        console.log('resultKSKS', result)
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
         if (result.valid) {
-          vm.validateAction = true
+          validYKien = true
           note = result.text
         } else {
-          vm.validateAction = false
+          validYKien = false
         }
         filter['userNote'] = note
+      }
+      if (validPhanCong && validYKien) {
+        vm.validateAction = true
+      } else {
+        vm.validateAction = false
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
@@ -989,6 +1045,9 @@ export default {
             vm.btnStateVisible = false
             if (result.rollbackable) {
               vm.rollbackable = true
+            }
+            if (result.dossierDocumentId) {
+              vm.printDocument = true
             }
             router.push({
               path: vm.$router.history.current.path,
@@ -1010,6 +1069,11 @@ export default {
           if (result.rollbackable) {
             vm.rollbackable = true
           }
+          if (result.dossierDocumentId) {
+            vm.printDocument = true
+          }
+          vm.checkInput = 0
+          vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
           } else {
             router.push({
@@ -1090,13 +1154,22 @@ export default {
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
         vm.btnDossierDynamics = result
-        if (currentQuery.hasOwnProperty('btnIndex')) {
+        if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
           if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
             vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
           } else {
             vm.dialogActionProcess = false
+          }
+        }
+        console.log('vm.checkInput======', vm.getCheckInput)
+        vm.checkInput = vm.getCheckInput
+        if (vm.getCheckInput !== null && vm.getCheckInput !== undefined) {
+          if (vm.checkInput === 2) {
+            setTimeout(function () {
+              vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+            }, 300)
           }
         }
       })
@@ -1223,13 +1296,49 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
       })
+    },
+    viewFileDocument (item) {
+      var vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      item['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+      vm.$store.dispatch('viewDocument', item).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
+    },
+    loadTPHS () {
+      var vm = this
+      console.log('loadTPHS')
+      if (vm.$refs.thanhphanhoso1) {
+        setTimeout(function () {
+          vm.$refs.thanhphanhoso1.initData(vm.thongTinChiTietHoSo)
+        }, 150)
+      }
+      if (vm.$refs.thanhphanhoso2) {
+        setTimeout(function () {
+          vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
+        }, 150)
+      }
+    },
+    printViewDocument () {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.$store.dispatch('doPrint03', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
     }
   },
   filters: {
     dateTimeView (arg) {
       if (arg) {
-        let value = new Date(arg)
-        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        let value = new Date(Number(arg))
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
       }
