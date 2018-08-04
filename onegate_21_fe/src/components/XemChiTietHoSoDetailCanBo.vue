@@ -960,8 +960,8 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      var validPhanCong = false
-      var validYKien = false
+      var validPhanCong = true
+      var validYKien = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1020,15 +1020,18 @@ export default {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            console.log('result======', result)
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
             vm.btnStateVisible = false
-            if (result.rollbackable) {
-              vm.rollbackable = true
+            if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+              vm.rollbackable = result.rollbackable
             }
-            if (result.dossierDocumentId) {
+            if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0) {
               vm.printDocument = true
             }
+            console.log('vm.rollbackable======', vm.rollbackable)
+            console.log('vm.printDocument======', vm.printDocument)
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1043,15 +1046,18 @@ export default {
         }
       } else if (vm.validateAction) {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          console.log('result======', result)
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
           vm.btnStateVisible = false
-          if (result.rollbackable) {
-            vm.rollbackable = true
+          if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+            vm.rollbackable = result.rollbackable
           }
-          if (result.dossierDocumentId) {
+          if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0) {
             vm.printDocument = true
           }
+          console.log('vm.rollbackable======', vm.rollbackable)
+          console.log('vm.printDocument======', vm.printDocument)
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
