@@ -256,9 +256,9 @@
             <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
               Thực hiện thành công!
             </v-alert>
-            <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
-            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">Quay lui</v-btn>
+            <!-- <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p> -->
+            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -1025,7 +1025,7 @@ export default {
             if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
               vm.rollbackable = result.rollbackable
             }
-            if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0) {
+            if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
             console.log('vm.rollbackable======', vm.rollbackable)
@@ -1051,7 +1051,7 @@ export default {
           if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
             vm.rollbackable = result.rollbackable
           }
-          if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0) {
+          if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
           console.log('vm.rollbackable======', vm.rollbackable)
