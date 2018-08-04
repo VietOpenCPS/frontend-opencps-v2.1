@@ -289,11 +289,9 @@
                 <td class="text-xs-left">
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
                     {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
-                    <div v-if="index === props.item.actions.length - 1">
-                      <div v-if="props.item.statusText">
-                        <span style="color: green">{{props.item.statusText}}</span>
-                      </div>
-                    </div>
+                  </div>
+                  <div v-if="props.item.statusText">
+                    <span style="color: green">{{props.item.statusText}}</span>
                   </div>
                 </td>
               </template>
@@ -958,8 +956,8 @@ export default {
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
-      var validPhanCong = false
-      var validYKien = false
+      var validPhanCong = true
+      var validYKien = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {

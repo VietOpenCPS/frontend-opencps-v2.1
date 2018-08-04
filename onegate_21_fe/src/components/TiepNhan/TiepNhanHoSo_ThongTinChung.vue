@@ -72,7 +72,6 @@
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
-                moment-locale="vi"
                 zone="local"
                 :min-date="minDate"
                 monday-first
