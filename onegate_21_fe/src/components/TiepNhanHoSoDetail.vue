@@ -256,7 +256,8 @@ export default {
               security: '',
               assignUsers: '',
               payment: JSON.stringify(vm.payments),
-              createDossiers: ''
+              createDossiers: '',
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -318,7 +319,8 @@ export default {
               security: '',
               assignUsers: '',
               payment: JSON.stringify(vm.payments),
-              createDossiers: ''
+              createDossiers: '',
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -386,7 +388,8 @@ export default {
               security: '',
               assignUsers: {},
               payment: {},
-              createDossiers: {}
+              createDossiers: {},
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
             })

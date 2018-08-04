@@ -244,18 +244,17 @@ export const store = new Vuex.Store({
             params: {
               start: filter.page * 15 - 15,
               end: filter.page * 15,
-              agency: filter.agency,
-              service: filter.service,
-              template: filter.template,
-              status: filter.status,
-              dueCode: filter.dueSearch,
-              register: filter.register,
-              keyword: filter.keyword,
-              domain: filter.domain,
-              substatus: filter.substatus,
-              year: filter.year,
-              month: filter.month,
-              top: filter.top
+              agency: filter.agency ? filter.agency : '',
+              service: filter.service ? filter.service : '',
+              template: filter.template ? filter.template : '',
+              status: filter.status ? filter.status : '',
+              register: filter.register ? filter.register : '',
+              keyword: filter.keyword ? filter.keyword : '',
+              domain: filter.domain ? filter.domain : '',
+              substatus: filter.substatus ? filter.substatus : '',
+              year: filter.year ? filter.year : 0,
+              month: filter.month ? filter.month : 0,
+              top: filter.top ? filter.top : ''
             }
           }
           axios.get(filter.queryParams, param).then(function (response) {
@@ -1368,7 +1367,6 @@ export const store = new Vuex.Store({
             resPostCmt = response.data
             console.log('resPostCmt', resPostCmt)
           }
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(resPostCmt)
         })
         .catch(function (error) {

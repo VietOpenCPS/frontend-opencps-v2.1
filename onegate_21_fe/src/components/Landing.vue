@@ -827,16 +827,16 @@ export default {
         if (currentQuery.q.indexOf('step') > 0) {
           querySet = currentQuery.q
         } else {
-          querySet = currentQuery.q + '&step=' + currentQuery['step']
+          querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
         let filter = {
           queryParams: querySet,
           /*  test Local */
           // queryParams: 'http://127.0.0.1:8081' + querySet,
           page: vm.hosoDatasPage,
-          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
-          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
-          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
+          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
+          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
           domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
           status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
           substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',

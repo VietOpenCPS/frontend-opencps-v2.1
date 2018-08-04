@@ -481,8 +481,8 @@ export default {
     },
     postAction (filter, dossier, index) {
       var vm = this
-      var validPhanCong = false
-      var validYKien = false
+      var validPhanCong = true
+      var validYKien = true
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
         let result = vm.$refs.phancong.doExport()
