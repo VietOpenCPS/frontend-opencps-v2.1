@@ -783,6 +783,12 @@ export default {
         }
       }
       console.log('isPopup========11111', isPopup)
+      if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined' && vm.originality !== 1) {
+        try {
+          vm.$refs.thanhphanhoso.saveMark()
+        } catch (e) {
+        }
+      }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||

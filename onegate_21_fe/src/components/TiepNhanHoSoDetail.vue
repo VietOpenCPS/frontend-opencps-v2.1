@@ -138,7 +138,6 @@ export default {
     payments: {},
     viaPortalDetail: 0,
     showThuPhi: false,
-    receiveDateEdit: '',
     inputTypes: [1, 3],
     outputTypes: [2]
   }),
@@ -178,7 +177,6 @@ export default {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
                 result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
                 result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
-                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
@@ -254,6 +252,7 @@ export default {
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
+              payload: '',
               security: '',
               assignUsers: '',
               payment: JSON.stringify(vm.payments),
@@ -311,29 +310,17 @@ export default {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
-            // 
-            var paymentsOut = null
-            paymentsOut = {
-              requestPayment: vm.payments['requestPayment'],
-              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-            }
-            var payloadDate = {
-              'dueDate': tempData.dueDate,
-              'receiveDate': vm.receiveDateEdit
-            }
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
+              payload: '',
               security: '',
               assignUsers: '',
-              payload: JSON.stringify(payloadDate),
-              payment: JSON.stringify(paymentsOut),
-              createDossiers: ''
+              payment: JSON.stringify(vm.payments),
+              createDossiers: '',
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -349,7 +336,8 @@ export default {
               vm.goBack()
               vm.tiepNhanState = false
             })
-          }).catch(function (xhr) {
+          }).catch(rejectXhr => {
+            console.log('rejectXhr==========', rejectXhr)
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         }, 500)
@@ -397,6 +385,7 @@ export default {
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 7100,
+              payload: '',
               security: '',
               assignUsers: {},
               payment: {},
