@@ -652,7 +652,11 @@ export default {
           vm.thongTinChuHoSo.cityCode = vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : ''
           vm.thongTinChuHoSo.districtCode = vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : ''
           vm.thongTinChuHoSo.wardCode = vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
-          vm.thongTinChuHoSo.userType = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business' ? false : true
+          if (vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business') {
+            vm.thongTinChuHoSo.userType = false
+          } else {
+            vm.thongTinChuHoSo.userType = true
+          }
         }
         return false
       }, 100)

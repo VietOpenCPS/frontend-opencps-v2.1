@@ -834,9 +834,9 @@ export default {
           /*  test Local */
           // queryParams: 'http://127.0.0.1:8081' + querySet,
           page: vm.hosoDatasPage,
-          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
-          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
-          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
+          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
           domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
           status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
           substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
