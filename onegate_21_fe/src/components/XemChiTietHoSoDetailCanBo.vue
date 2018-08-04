@@ -242,6 +242,7 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                 :loading="loadingActionProcess"
@@ -371,6 +372,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import EditDate from './form_xu_ly/EditDate.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -383,7 +385,8 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
-    'thanh-phan-ho-so': ThanhPhanHoSo
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'ngay-hen-tra': EditDate
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -430,6 +433,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showThuPhi: false,
+    showEditDate: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -445,6 +449,8 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    dueDateEdit: null,
+    receiveDateEdit: null,
     dialogActionProcess: false,
     rollbackable: false,
     configNote: null,
@@ -760,6 +766,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showThuPhi = false
+      vm.showEditDate = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -813,11 +820,17 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           isPopup = true
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
+        }
+        if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
+          isPopup = true
+          vm.showEditDate = true
+          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : new Date()
+          vm.receiveDateEdit = result.receiving.receiveDate
         }
       }
       if (isPopup) {
@@ -986,6 +999,17 @@ export default {
       }
       if (vm.showThuPhi) {
         filter['payment'] = paymentsOut
+      }
+      if (vm.showEditDate) {
+        let date = vm.$refs.ngayhentra.getDateInput()
+        console.log('dueDateEdit', date)
+        // filter['dueDate'] = date ? date : ''
+        // filter['receiveDate'] = vm.receiveDateEdit ? vm.receiveDateEdit : ''
+        let payload = {
+          'dueDate': date,
+          'receiveDate': vm.receiveDateEdit
+        }
+        filter['payload'] = payload
       }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
