@@ -5,7 +5,7 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>GIẤY TỜ KẾT QUẢ
+          </div>Giấy tờ kết quả
         </div>
         <v-card>
           <v-card-text>

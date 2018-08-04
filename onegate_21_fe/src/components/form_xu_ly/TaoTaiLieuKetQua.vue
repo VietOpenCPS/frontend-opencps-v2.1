@@ -5,7 +5,7 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div> TÀI LIỆU KẾT QUẢ
+          </div> Tài liệu kết quả
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo">

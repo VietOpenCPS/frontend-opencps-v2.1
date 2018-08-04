@@ -46,7 +46,7 @@
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
-          <thanh-phan-ho-so ref="thanhphanhoso"></thanh-phan-ho-so>
+          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -137,7 +137,10 @@ export default {
     thongTinChiTietHoSo: {},
     payments: {},
     viaPortalDetail: 0,
-    showThuPhi: false
+    showThuPhi: false,
+    receiveDateEdit: '',
+    inputTypes: [1, 3],
+    outputTypes: [2]
   }),
   computed: {
     loading () {
@@ -161,29 +164,54 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
+        result['editable'] = false
+        if (result.dossierStatus === '') {
+          vm.$store.dispatch('pullNextactions', result).then(result2 => {
+            if (result2) {
+              var actionDetail = result2.filter(function (item) {
+                return (item.actionCode === 1100 || item.actionCode === '1100')
+              })
+              vm.$store.dispatch('processPullBtnDetail', {
+                dossierId: result.dossierId,
+                actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+              }).then(resAction => {
+                result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
+                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
+                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                  vm.showThuPhi = true
+                  vm.payments = resAction.payment
+                }
+                // call initData thong tin chung ho so
+                if (vm.$refs.thongtinchunghoso) {
+                  vm.$refs.thongtinchunghoso.initData(result)
+                }
+              })
+            } else {
+              // call initData thong tin chung ho so
+              if (vm.$refs.thongtinchunghoso) {
+                vm.$refs.thongtinchunghoso.initData(result)
+              }
+            }
+          })
+        }
         vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so
+        if (result['delegateCityCode'] === '') {
+          result['delegateCityCode'] = 25
+        }
+        if (result['cityCode'] === '') {
+          result['cityCode'] = 25
+        }
         vm.$refs.thongtinchuhoso.initData(result)
         // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
-        // call initData thong tin chung ho so
-        vm.$refs.thongtinchunghoso.initData(result)
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
-        console.log('result.dossierStatus', result.dossierStatus)
-        if (result.dossierStatus === '') {
-          vm.$store.dispatch('processPullBtnDetail', {
-            dossierId: result.dossierId,
-            actionId: 1100
-          }).then(resAction => {
-            if (resAction && resAction.payment) {
-              vm.showThuPhi = true
-              vm.payments = resAction.payment
-            }
-          })
-        } else {
+        if (vm.$refs.dichvuchuyenphatketqua) {
+          vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
-        vm.$refs.dichvuchuyenphatketqua.initData(result)
       }).catch(reject => {
       })
     },
@@ -191,8 +219,9 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo : {}
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
@@ -212,12 +241,12 @@ export default {
         // if (vm.$refs.thanhphanhoso) {
         //   vm.$refs.thanhphanhoso.saveMark()
         // }
-        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             let dataPostAction = {
@@ -225,14 +254,14 @@ export default {
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
-              payload: '',
               security: '',
               assignUsers: '',
-              payment: vm.payments,
-              createDossiers: ''
+              payment: JSON.stringify(vm.payments),
+              createDossiers: '',
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               router.push({
                 path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
@@ -252,6 +281,7 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -273,27 +303,40 @@ export default {
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.saveMark()
         }
-        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
+        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
+            // 
+            var paymentsOut = null
+            paymentsOut = {
+              requestPayment: vm.payments['requestPayment'],
+              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            }
+            var payloadDate = {
+              'dueDate': tempData.dueDate,
+              'receiveDate': vm.receiveDateEdit
+            }
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
-              payload: '',
               security: '',
               assignUsers: '',
-              payment: vm.payments,
+              payload: JSON.stringify(payloadDate),
+              payment: JSON.stringify(paymentsOut),
               createDossiers: ''
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               let currentQuery = vm.$router.history.current.query
               // router.push({
               //   path: vm.$router.history.current.path,
@@ -316,6 +359,7 @@ export default {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
+      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -346,18 +390,18 @@ export default {
         })
         Promise.all(listAction).then(values => {
           console.log(values)
-          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua)
+          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua, thongtinchunghoso)
           console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 7100,
-              payload: '',
               security: '',
               assignUsers: {},
               payment: {},
-              createDossiers: {}
+              createDossiers: {},
+              dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
             })

@@ -34,18 +34,18 @@ export default {
   props: ['classPK', 'className'],
   data: () => ({
     usersComment: [
-      {
-        id: 1,
-        fullname: 'Trịnh Công Trình',
-        email: 'trinhtc@fds.vn.com',
-        pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      },
-      {
-        id: 2,
-        fullname: 'Thái Hoàng Anh',
-        email: 'anhth@fds.vn',
-        pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      }
+      // {
+      //   id: 1,
+      //   fullname: 'Trịnh Công Trình',
+      //   email: 'trinhtc@fds.vn.com',
+      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
+      // },
+      // {
+      //   id: 2,
+      //   fullname: 'Thái Hoàng Anh',
+      //   email: 'anhth@fds.vn',
+      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
+      // }
     ],
     comment: [],
     argShowMore: true,
@@ -159,6 +159,7 @@ export default {
         timeFormatter: function (time) {
           if (time) {
             let value = new Date(time)
+            value.setHours(value.getHours() - 7)
             return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
           } else {
             return ''
