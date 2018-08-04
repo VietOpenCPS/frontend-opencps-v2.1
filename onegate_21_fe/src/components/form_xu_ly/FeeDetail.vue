@@ -17,10 +17,10 @@
               </v-flex>
               <v-flex xs12 sm3>
                 <v-text-field
-                  @change="changeFee"
+                  @keyup="changeFee"
                   v-model="data_payment.feeAmount"
                   v-money="money"
-                  suffix="đ"
+                  suffix="vnđ"
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
@@ -30,7 +30,7 @@
               </v-flex>
               <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1">
                 <v-text-field
-                  @change="changeFee"
+                  @keyup="changeFee"
                   v-model="data_payment.advanceAmount"
                   v-money="money"
                   suffix="vnđ"
@@ -44,10 +44,10 @@
               </v-flex>
               <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
                 <v-text-field
-                  @change="changeFee"
+                  @keyup="changeFee"
                   v-model="data_payment.serviceAmount"
                   v-money="money"
-                  suffix="đ"
+                  suffix="vnđ"
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
@@ -57,10 +57,10 @@
               </v-flex>
               <v-flex xs12 sm3 v-if="viaPortal === 2">
                 <v-text-field
-                  @change="changeFee"
+                  @keyup="changeFee"
                   v-model="data_payment.shipAmount"
                   v-money="money"
-                  suffix="đ"
+                  suffix="vnđ"
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
