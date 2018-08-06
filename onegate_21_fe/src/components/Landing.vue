@@ -14,6 +14,7 @@
           return-object
           :hide-selected="true"
           @change="changeServiceConfigs"
+          v-if="originality !== 1"
         ></v-select>
       </v-flex>
     </v-layout>
@@ -53,25 +54,40 @@
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
         v-model="selected"
-        item-key="dossierIdCTN"
-        :select-all="menuType !== 3 ? true : false"
+        item-key="dossierId"
+        :select-all="menuType !== 3 && originality !== 1"
         class="table-landing table-bordered"
         hide-actions
       >
-      <template slot="headerCell" slot-scope="props">
-        <v-tooltip bottom>
-          <span slot="activator">
-            {{ props.header.text }}
-          </span>
-          <span>
-            {{ props.header.text }}
-          </span>
-        </v-tooltip>
+      <!--  -->
+      <template slot="headers" slot-scope="props">
+        <tr>
+          <th v-if="menuType !== 3 && originality !== 1">
+            <v-checkbox
+              :input-value="props.all"
+              :indeterminate="props.indeterminate"
+              :disabled="!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              primary
+              hide-details
+              @click.native="toggleAll"
+            ></v-checkbox>
+          </th>
+          <th
+            v-for="(header, index) in props.headers"
+            :key="header.text"
+          >
+            <v-tooltip bottom>
+              <span slot="activator">{{ header.text }}</span>
+              <span>{{ header.text }}</span>
+            </v-tooltip>
+          </th>
+        </tr>
       </template>
+      <!--  -->
       <template slot="items" slot-scope="props">
-        <td v-if="menuType !== 3">
+        <td v-if="menuType !== 3 && originality !== 1">
           <v-checkbox
-            :disabled="props.item['assigned'] === 0"
+            :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
             v-model="props.selected"
             primary
             hide-details
@@ -473,26 +489,7 @@ export default {
     },
     menuType: 0,
     type_assign: '',
-    assign_items: [
-      {
-        userId: 101,
-        userName: 'Trịnh Công Trình',
-        moderator: 0,
-        assigned: 1
-      },
-      {
-        userId: 102,
-        userName: 'Nguyễn Văn Nam',
-        moderator: 0,
-        assigned: 0
-      },
-      {
-        userId: 103,
-        userName: 'Trần Minh Quang',
-        moderator: 0,
-        assigned: 1
-      }
-    ],
+    assign_items: [],
     /* data TraKetQua */
     returnFiles: [],
     /* data XacNhanThuPhi */
@@ -562,7 +559,8 @@ export default {
     userNote: 0,
     dialogPDF: false,
     dialogPDFLoading: true,
-    filterForm: null
+    filterForm: null,
+    checkSelectAll: (this.menuType !== 3 && this.originality !== 1)
   }),
   computed: {
     loadingDynamicBtn () {
@@ -570,6 +568,10 @@ export default {
     },
     loadingTable () {
       return this.$store.getters.loadingTable
+    },
+    originality () {
+      var vm = this
+      return vm.getOriginality()
     }
   },
   created () {
@@ -722,6 +724,20 @@ export default {
     }
   },
   methods: {
+    toggleAll () {
+      var vm = this
+      if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
+        return
+      } else {
+        if (vm.selected.length) {
+          vm.selected = []
+        } else {
+          vm.selected = vm.hosoDatas.filter(function (item) {
+            return item['assigned'] !== 0
+          })
+        }
+      }
+    },
     resend () {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
@@ -796,6 +812,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
+      console.log('queryString=====', queryString)
       queryString += 'page=' + config.page
       vm.$router.push({
         path: current.path + queryString
@@ -804,33 +821,61 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
-        let filter = {
-          queryParams: currentQuery.q,
-          /*  test Local */
-          // queryParams: 'http://127.0.0.1:8081' + currentQuery.q,
-          page: vm.hosoDatasPage,
-          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
-          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
-          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
-          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
-          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
-          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
-          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
-          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
-          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
-          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+        let querySet
+        if (currentQuery.q.indexOf('step') > 0) {
+          querySet = currentQuery.q
+        } else {
+          querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
+        }
+        var filter = null
+        if (vm.menuType !== 3) {
+          filter = {
+            queryParams: querySet,
+            page: vm.hosoDatasPage,
+            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+            substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+            year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+            month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+          }
+        } else {
+          filter = {
+            queryParams: querySet,
+            page: vm.hosoDatasPage,
+            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
+            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+            substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+            year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+            month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+          }
         }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
+        }).catch(reject => {
+          vm.hosoDatas = []
+          vm.hosoDatasTotal = 0
         })
       }
     },
     changeServiceConfigs (item) {
       let vm = this
       console.log('serviceConfigItem+++++++', item)
+      console.log('thuTucHanhChinhSelected', vm.thuTucHanhChinhSelected)
       if (item.hasOwnProperty('options')) {
         console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
@@ -845,11 +890,15 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('newQuery', newQuery)
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        console.log('newQueryItem', key, newQuery[key])
+        if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
@@ -861,6 +910,8 @@ export default {
       }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
+      console.log('path', current.path)
+      console.log('queryString', queryString)
       vm.$router.push({
         path: current.path + queryString
       })
@@ -899,7 +950,7 @@ export default {
           isOpenDialog = false
         }
         if (isOpenDialog) {
-          vm.thuTucHanhChinhSelected = null
+          // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
           vm.doCreateDossier()
@@ -1043,11 +1094,27 @@ export default {
       }
       if (isGroup) {
         vm.countSelected = 0
-        if (vm.selected.length > 0) {
+        if (vm.selected.length === 1) {
           for (let key in vm.selected) {
             let actionDossierItem = vm.selected[key]
-            vm.processAction(actionDossierItem, item, result, key, false)
+            router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
+              query: {
+                activeTab: 'tabs-2',
+                btnIndex: null
+              }
+            })
+            // vm.processAction(actionDossierItem, item, result, key, false)
           }
+        } else if (vm.selected.length > 1) {
+          vm.$store.dispatch('loadActionActive', item).then(function () {
+            vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
+              router.push({
+                path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
+                query: vm.$router.history.current.query
+              })
+            })
+          })
         } else {
           alert('Chọn hồ sơ để thao tác')
         }
