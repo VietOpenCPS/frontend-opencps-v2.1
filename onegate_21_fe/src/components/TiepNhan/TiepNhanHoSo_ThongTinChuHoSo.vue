@@ -4,7 +4,7 @@
       <div style="position: relative;">
         <v-expansion-panel class="expansion-pl">
           <v-expansion-panel-content hide-actions value="1">
-            <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> THÔNG TIN CHỦ HỒ SƠ</div>
+            <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
             <v-card>
               <v-card-text>
                 <v-layout wrap>
@@ -193,7 +193,7 @@
         <div style="position: relative;" v-if="originality !== 1">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content hide-actions value="1">
-              <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> THÔNG TIN NGƯỜI NỘP HỒ SƠ</div>
+              <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
               <v-card>
                 <v-card-text>
                   <v-layout wrap>

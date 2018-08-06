@@ -222,7 +222,7 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
-            <div class="py-3" v-if="btnStateVisible">
+            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"

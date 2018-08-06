@@ -44,7 +44,7 @@
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
@@ -54,7 +54,7 @@
     <div style="position: relative;" v-if="viaPortalDetail !== 0">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
+          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
           <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
         </v-expansion-panel-content>
       </v-expansion-panel>
