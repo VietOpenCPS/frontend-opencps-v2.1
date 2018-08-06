@@ -539,6 +539,7 @@ export const store = new Vuex.Store({
         let formData = new FormData()
         formData.append('displayName', data.displayName ? data.displayName : '')
         formData.append('dossierPartNo', data.partNo ? data.partNo : '')
+        formData.append('file', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -658,7 +659,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.documentApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -748,6 +749,7 @@ export const store = new Vuex.Store({
     putDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', false)
+        console.log('put dossier')
         let options = {
           // headers: {
           //   groupId: state.initData.groupId,
@@ -783,6 +785,10 @@ export const store = new Vuex.Store({
         } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
           delegateIdNo = data.delegateIdNo[0].applicantIdNo
         }
+        let isSameAsApplicant = false
+        if (data['sameUser'] !== null && data['sameUser'] !== undefined && data['sameUser'] !== 'undefined') {
+          isSameAsApplicant = data['sameUser']
+        }
         var dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
@@ -803,6 +809,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
+        dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
           dataPutdossier.append('dueDate', data.dueDate)
         }
@@ -818,14 +825,16 @@ export const store = new Vuex.Store({
         }
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
+          console.log('put dossier success')
           commit('setLoading', false)
           commit('setDossier', response.data)
           commit('setThongTinChuHoSo', response.data)
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
-        }).catch(function (xhr) {
-          reject(xhr)
+        }).catch(rejectXhr => {
+          console.log('put dossier catch')
+          reject(rejectXhr)
         })
       })
     },
@@ -1064,7 +1073,7 @@ export const store = new Vuex.Store({
         let url = '/o/rest/v2/postal/vnpost'
         axios.post(url, dataVnPost, options).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
@@ -1717,7 +1726,7 @@ export const store = new Vuex.Store({
           }
           axios.delete(state.initData.getNextAction + '/' + filter.dossierId , param).then(function (response) {
             let serializable = response.data
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)

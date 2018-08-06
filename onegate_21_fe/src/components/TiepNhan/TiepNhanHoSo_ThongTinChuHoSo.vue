@@ -406,7 +406,7 @@ export default {
       },
       'false': {
         cmtnd: 'Mã số thuế',
-        nguoi_nop: 'Tên tổ chức/ cá nhân'
+        nguoi_nop: 'Tên tổ chức'
       }
     },
     thongTinChuHoSo: {
@@ -626,6 +626,7 @@ export default {
           vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
         }
         if (vm.thongTinNguoiNopHoSo['delegateIdNo'][0]) {
+          console.log('vm.thongTinNguoiNopHoSo[delegateIdNo][0]==========', vm.thongTinNguoiNopHoSo['delegateIdNo'][0])
           vm.thongTinNguoiNopHoSo['delegateName'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['applicantName'] ? vm.thongTinNguoiNopHoSo['delegateName'][0]['applicantName'] : ''
           vm.thongTinNguoiNopHoSo['delegateAddress'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] : ''
           vm.thongTinNguoiNopHoSo['delegateTelNo'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] : ''
@@ -633,6 +634,12 @@ export default {
           vm.thongTinNguoiNopHoSo['delegateCityCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] : ''
           vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] : ''
           vm.thongTinNguoiNopHoSo['delegateWardCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] : ''
+          if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+            vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+          }
+          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+            vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
+          }
         }
         return false
       }, 100)
@@ -645,6 +652,7 @@ export default {
           vm.thongTinChuHoSo['applicantIdNo'] = [event[event.length - 1]]
         }
         if (vm.thongTinChuHoSo['applicantIdNo'][0]) {
+          console.log('vm.thongTinChuHoSo[applicantIdNo][0]==========', vm.thongTinChuHoSo['applicantIdNo'][0])
           vm.thongTinChuHoSo['applicantName'] = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] : ''
           vm.thongTinChuHoSo['address'] = vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : ''
           vm.thongTinChuHoSo['contactTelNo'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] : ''
@@ -656,6 +664,12 @@ export default {
             vm.thongTinChuHoSo.userType = false
           } else {
             vm.thongTinChuHoSo.userType = true
+          }
+          if (vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+            vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+          }
+          if (vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+            vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
           }
         }
         return false

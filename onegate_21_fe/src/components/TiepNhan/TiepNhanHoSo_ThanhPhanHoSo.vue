@@ -5,7 +5,7 @@
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
-              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 90px)' : 'calc(100% - 260px)'}">
+              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 120px)' : 'calc(100% - 240px)'}">
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
@@ -17,13 +17,13 @@
                 <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
-                    <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                       <v-icon v-else>attach_file</v-icon>
                       {{itemFileView.displayName}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView">
+                    <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView">
                       <v-icon style="color: red">delete_outline</v-icon>
                     </v-btn>
                   </div>
@@ -45,12 +45,12 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan" v-if="!onlyView">
+        <div class="absolute__btn group__thanh_phan" v-if="!onlyView || originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
-            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online" :disabled="onlyView">
+            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
@@ -60,9 +60,10 @@
               <v-select
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
+                :disabled="onlyView"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '60px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
+            <v-flex :style="{width: !onlyView ? '100px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
               <input
               type="file"
               style="display: none"
@@ -82,7 +83,7 @@
               indeterminate
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
-              <v-tooltip top v-else-if="!onlyView">
+              <v-tooltip top v-else-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="16" color="primary">cloud_upload</v-icon>
@@ -406,12 +407,14 @@ export default {
       if (dossierMarks.length !== 0) {
         dossierTemplates.map(itemTemplate => {
           itemTemplate['count'] = 0
-          dossierMarks.forEach(function (val, index) {
-            if (val.dossierPartNo === itemTemplate.partNo) {
-              itemTemplate['fileMark'] = val.fileMark
-                // itemTemplate.fileCheck = val.fileCheck
-            }
+          let fileMarkFind = dossierMarks.find(fileMark => {
+            return fileMark.dossierPartNo === itemTemplate.partNo
           })
+          if (fileMarkFind !== null && fileMarkFind !== undefined) {
+            itemTemplate['fileMark'] = fileMarkFind.fileMark
+          } else {
+            itemTemplate['fileMark'] = 0
+          }
           return itemTemplate
         })
       } else {
@@ -687,6 +690,11 @@ export default {
           }
         })
       }
+    },
+    changeFileMark (item) {
+      var vm = this
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      vm.$store.dispatch('postDossierMark', item)
     },
     changeOtherDossierTemp (data) {
       var vm = this

@@ -73,7 +73,7 @@
             ></v-checkbox>
           </th>
           <th
-            v-for="(header, index) in props.headers"
+            v-for="header in props.headers"
             :key="header.text"
           >
             <v-tooltip bottom>
@@ -829,22 +829,43 @@ export default {
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
-        let filter = {
-          // queryParams: querySet,
-          /*  test Local */
-          queryParams: 'http://127.0.0.1:8081' + querySet,
-          page: vm.hosoDatasPage,
-          agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
-          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
-          template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
-          domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
-          status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
-          substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
-          year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
-          month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
-          top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
-          keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-          register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+        var filter = null
+        if (vm.menuType !== 3) {
+          filter = {
+            // queryParams: querySet,
+            /*  test Local */
+            queryParams: 'http://127.0.0.1:8081' + querySet,
+            page: vm.hosoDatasPage,
+            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+            substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+            year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+            month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+          }
+        } else {
+          filter = {
+            // queryParams: querySet,
+            /*  test Local */
+            queryParams: 'http://127.0.0.1:8081' + querySet,
+            page: vm.hosoDatasPage,
+            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
+            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+            substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
+            year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
+            month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
+            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+          }
         }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
@@ -879,7 +900,9 @@ export default {
       newQuery['template_no'] = ''
       for (let key in newQuery) {
         console.log('newQueryItem', key, newQuery[key])
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }

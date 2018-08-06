@@ -257,9 +257,9 @@
             <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
               Thực hiện thành công!
             </v-alert>
-            <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p>
-            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lui</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">Quay lui</v-btn>
+            <!-- <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p> -->
+            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -773,15 +773,22 @@ export default {
       vm.resultDialogPick = result
       vm.indexDialogPick = index
       vm.userNote = 0
-      // if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
-      //   try {
-      //     vm.configNote = JSON.parse(result.configNote)
-      //     if (vm.configNote.confirm) {
-      //       isPopup = true
-      //     }
-      //   } catch (e) {
-      //   }
-      // }
+      if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
+        try {
+          vm.configNote = JSON.parse(result.configNote)
+          if (vm.configNote.confirm) {
+            isPopup = true
+          }
+        } catch (e) {
+        }
+      }
+      console.log('isPopup========11111', isPopup)
+      if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined' && vm.originality !== 1) {
+        try {
+          vm.$refs.thanhphanhoso.saveMark()
+        } catch (e) {
+        }
+      }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -833,6 +840,7 @@ export default {
           vm.receiveDateEdit = result.receiving.receiveDate
         }
       }
+      console.log('isPopup========222222', isPopup)
       if (isPopup) {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
@@ -1040,15 +1048,18 @@ export default {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            console.log('result======', result)
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
             vm.btnStateVisible = false
-            if (result.rollbackable) {
-              vm.rollbackable = true
+            if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+              vm.rollbackable = result.rollbackable
             }
-            if (result.dossierDocumentId) {
+            if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
+            console.log('vm.rollbackable======', vm.rollbackable)
+            console.log('vm.printDocument======', vm.printDocument)
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1063,15 +1074,18 @@ export default {
         }
       } else if (vm.validateAction) {
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          console.log('result======', result)
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
           vm.btnStateVisible = false
-          if (result.rollbackable) {
-            vm.rollbackable = true
+          if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+            vm.rollbackable = result.rollbackable
           }
-          if (result.dossierDocumentId) {
+          if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
+          console.log('vm.rollbackable======', vm.rollbackable)
+          console.log('vm.printDocument======', vm.printDocument)
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
