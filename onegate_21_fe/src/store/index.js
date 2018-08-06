@@ -86,19 +86,14 @@ export const store = new Vuex.Store({
       delegateIdNo: ''
     },
     dichVuChuyenPhatKetQua: {
-      viaPostal: false,
+      viaPostal: 0,
       postalServiceCode: '',
-      postalServiceName: '',
       postalAddress: '',
       postalCityCode: '',
-      postalCityName: '',
       postalDistrictCode: '',
-      postalDistrictName: '',
-      postalWardCode: '',
-      postalWardName: '',
-      postalTelNo: '',
-      vnPostCode: ''
+      postalWardCode: ''
     },
+    viaPostal: 0,
     data_phancong: []
   },
   actions: {
@@ -115,7 +110,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          // orginURL = 'http://127.0.0.1:8081/api/initdata'
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
             commit('setInitData', serializable)
@@ -672,16 +667,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          // headers: {
-          //   'groupId': state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            'groupId': state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   'groupId': state.initData.groupId
+          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -751,16 +746,16 @@ export const store = new Vuex.Store({
         commit('setLoading', false)
         console.log('put dossier')
         let options = {
-          // headers: {
-          //   groupId: state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            groupId: state.initData.groupId
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   groupId: state.initData.groupId
+          // }
         }
         var applicantType = ''
         if (data.userType) {
@@ -814,14 +809,12 @@ export const store = new Vuex.Store({
           dataPutdossier.append('dueDate', data.dueDate)
         }
         if (data.viaPostal) {
-          dataPutdossier.append('viaPostal', data.viaPostal ? 1 : 0)
+          dataPutdossier.append('viaPostal', data.viaPostal)
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
-          dataPutdossier.append('postalServiceName', data.postalServiceName)
           dataPutdossier.append('postalAddress', data.postalAddress)
           dataPutdossier.append('postalCityCode', data.postalCityCode)
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
-          dataPutdossier.append('postalTelNo', data.postalTelNo)
         }
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
@@ -2332,19 +2325,17 @@ export const store = new Vuex.Store({
     },
     setDichVuChuyenPhatKetQua (state, payload) {
       let tempData = {
-        viaPostal: payload.viaPostal,
-        postalServiceCode: payload.postalServiceCode,
-        postalServiceName: payload.postalServiceName,
-        postalAddress: payload.postalAddress,
-        postalCityCode: payload.postalCityCode,
-        postalCityName: payload.postalCityName,
-        postalDistrictCode: payload.postalDistrictCode,
-        postalDistrictName: payload.postalDistrictName,
-        postalWardCode: payload.postalWardCode,
-        postalWardName: payload.postalWardName,
-        postalTelNo: payload.postalTelNo
+        viaPostal: payload.viaPostal ? 2 : 1,
+        postalServiceCode: payload.postalServiceCode ? payload.postalServiceCode : '',
+        postalAddress: payload.postalAddress ? payload.postalAddress : '',
+        postalCityCode: payload.postalCityCode ? payload.postalCityCode : '',
+        postalDistrictCode: payload.postalDistrictCode ? payload.postalDistrictCode : '',
+        postalWardCode: payload.postalWardCode ? payload.postalWardCode : ''
       }
       state.dichVuChuyenPhatKetQua = tempData
+    },
+    setViaPostal (state, payload) {
+      state.viaPostal = payload
     },
     setServiceConfigObj (state, payload) {
       state.serviceConfigObj = payload
@@ -2518,6 +2509,9 @@ export const store = new Vuex.Store({
     },
     dichVuChuyenPhatKetQua (state) {
       return state.dichVuChuyenPhatKetQua
+    },
+    viaPostal (state) {
+      return state.viaPostal
     },
     serviceOptionItems (state) {
       return state.serviceOptionItems

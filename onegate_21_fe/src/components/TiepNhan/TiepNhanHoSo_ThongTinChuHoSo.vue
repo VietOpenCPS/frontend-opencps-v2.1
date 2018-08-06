@@ -444,6 +444,12 @@ export default {
       var vm = this
       console.log('originality', vm.getOriginality())
       return vm.getOriginality()
+    },
+    viaPostal () {
+      return this.$store.getters.viaPostal
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
   created () {
@@ -671,6 +677,15 @@ export default {
           if (vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
             vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
           }
+          let setDichVuChuyenPhat = {
+            viaPostal: vm.dichVuChuyenPhatKetQua.viaPostal,
+            postalServiceCode: vm.dichVuChuyenPhatKetQua.postalServiceCode ? vm.dichVuChuyenPhatKetQua.postalServiceCode : '',
+            postalAddress: vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : '',
+            postalCityCode: vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : '',
+            postalDistrictCode: vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : '',
+            postalWardCode: vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
+          }
+          vm.$store.commit('setDichVuChuyenPhatKetQua', setDichVuChuyenPhat)
         }
         return false
       }, 100)

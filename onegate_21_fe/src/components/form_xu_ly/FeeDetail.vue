@@ -37,7 +37,6 @@
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12 sm2></v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right">Phí dịch vụ: </v-subheader>
@@ -52,7 +51,7 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="viaPortal === 2">
+              <!-- <v-flex xs12 sm4 v-if="viaPortal === 2">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 v-if="viaPortal === 2">
@@ -63,7 +62,7 @@
                   suffix="vnđ"
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs12 sm2></v-flex>
             </v-layout>
           </v-card-text>
@@ -73,44 +72,44 @@
                 <v-subheader class="pl-0 text-right">Tổng tạm thu: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 1">
-                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} VNĐ</span>
+                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
-              <!--  -->
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
+              <!-- requestPayment === 2 -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
                 <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 2">
-                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} VNĐ</span>
+                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
-              <!--  -->
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 2"></v-flex>
+              <!-- requestPayment === 5" -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
-                <span>{{currency(feeTong.toString().replace(/\./g, ''))}} VNĐ</span>
-              </v-flex>
-              <v-flex xs12 sm7 v-if="data_payment.requestPayment === 5">
+                <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right">Đã tạm nộp: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
-                <!-- <span>{{data_payment.advanceAmount}} VNĐ</span> -->
-                <span>{{currency((Number(data_payment.advanceAmount.toString().replace(/\./g, ''))).toString().replace(/\./g, ''))}} VNĐ</span>
+                <!-- <span>{{data_payment.advanceAmount}} vnđ</span> -->
+                <span>{{currency((Number(data_payment.advanceAmount.toString().replace(/\./g, ''))).toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
-              <v-flex xs12 sm7 v-if="data_payment.requestPayment === 5">
-              </v-flex>
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right">Còn phải nộp: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
-                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} VNĐ</span>
+                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
             </v-layout>
             <p class="mt-2" style="margin-left: 100px" v-if="data_payment.paymentNote">
-              <span class="red--text">* </span> {{data_payment.paymentNote}}
+              <span class="red--text">* </span>&nbsp;&nbsp; {{data_payment.paymentNote}}
             </p>
           </v-card-text>
         </v-card>

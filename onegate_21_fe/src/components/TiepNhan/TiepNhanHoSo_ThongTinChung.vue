@@ -74,13 +74,11 @@
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
                 zone="local"
-                moment-locale="vi"
                 :min-date="minDate"
                 monday-first
                 wrapper-class="wrapper-datetime"
                 auto-continue
                 auto-close
-                required
               ></datetime>
               <v-icon>event</v-icon>
             </v-subheader>
@@ -155,7 +153,7 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate)))
+        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : ''
         vm.minDate = vm.getCurentDateTime('date')
       },
       getthongtinchunghoso () {
@@ -175,7 +173,7 @@
       },
       getDuedate () {
         var vm = this
-        let date = (new Date(this.dueDateInput)).getTime()
+        let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
         return date
       },
       durationText (durationUnit, durationCount) {

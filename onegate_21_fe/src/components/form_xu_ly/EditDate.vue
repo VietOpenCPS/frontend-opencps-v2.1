@@ -18,13 +18,11 @@
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
                 zone="local"
-                moment-locale="vi"
                 :min-date="minDate"
                 monday-first
                 wrapper-class="wrapper-datetime"
                 auto-continue
                 auto-close
-                required
               ></datetime>
             </v-layout>
           </v-card-text>
@@ -38,17 +36,17 @@ export default {
   components: {},
   props: ['dueDateEdit'],
   data: () => ({
-    dueDateInput: null,
+    dueDateInput: '',
     minDate: null
   }),
   created () {
     var vm = this
-    vm.dueDateInput = vm.formatDateInput(vm.dueDateEdit)
+    vm.dueDateInput = vm.dueDateEdit ? vm.formatDateInput(vm.dueDateEdit) : ''
     console.log('dueDateInput', vm.dueDateInput)
   },
   watch: {},
   mounted () {
-    this.dueDateInput = this.formatDateInput(this.dueDateEdit)
+    this.dueDateInput = this.dueDateEdit ? this.formatDateInput(this.dueDateEdit) : ''
     console.log('dueDateInput', this.dueDateInput)
     this.minDate = this.getCurentDateTime('date')
   },
@@ -56,7 +54,7 @@ export default {
     getDateInput () {
       var vm = this
       console.log('vm.dueDateInput', vm.dueDateInput)
-      let date = (new Date(vm.dueDateInput)).getTime()
+      let date = vm.dueDateInput ? (new Date(vm.dueDateInput)).getTime() : ''
       return date
     },
     getCurentDateTime (type) {

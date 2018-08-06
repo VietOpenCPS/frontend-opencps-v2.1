@@ -136,6 +136,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    receiveDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
@@ -175,8 +176,9 @@ export default {
                 actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
               }).then(resAction => {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
-                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
+                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
@@ -207,8 +209,10 @@ export default {
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
-        if (vm.$refs.dichvuchuyenphatketqua) {
+        if (result.viaPostal > 0) {
+          vm.$store.commit('setDichVuChuyenPhatKetQua', result)
           vm.$refs.dichvuchuyenphatketqua.initData(result)
+          console.log('run dichvuchuyenphat', result)
         }
       }).catch(reject => {
       })
@@ -328,10 +332,10 @@ export default {
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
-              payload: '',
+              payload: JSON.stringify(payloadDate),
               security: '',
               assignUsers: '',
-              payment: JSON.stringify(vm.payments),
+              payment: JSON.stringify(paymentsOut),
               createDossiers: '',
               dueDate: tempData.dueDate
             }

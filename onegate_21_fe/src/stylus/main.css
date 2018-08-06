@@ -2499,3 +2499,7 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
 .vdatetime-popup__date-picker__item > span {
     font-weight: normal !important
 }
+/*  */
+.input-group--text-field__suffix {
+    font-size: 14px !important
+}

@@ -449,8 +449,8 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
-    dueDateEdit: null,
-    receiveDateEdit: null,
+    dueDateEdit: '',
+    receiveDateEdit: '',
     dialogActionProcess: false,
     rollbackable: false,
     configNote: null,
@@ -836,7 +836,7 @@ export default {
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
           vm.showEditDate = true
-          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : new Date()
+          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
           vm.receiveDateEdit = result.receiving.receiveDate
         }
       }
