@@ -311,7 +311,7 @@ export default {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
-            // 
+            //
             var paymentsOut = null
             paymentsOut = {
               requestPayment: vm.payments['requestPayment'],

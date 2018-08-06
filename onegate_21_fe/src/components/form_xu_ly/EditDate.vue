@@ -13,10 +13,12 @@
               <v-icon color="blue">event</v-icon>
               <datetime v-model="dueDateInput"
                 class="ml-2"
+                placeholder="Chọn ngày"
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
                 zone="local"
+                moment-locale="vi"
                 :min-date="minDate"
                 monday-first
                 wrapper-class="wrapper-datetime"
@@ -41,11 +43,13 @@ export default {
   }),
   created () {
     var vm = this
-    vm.dueDateInput = vm.dueDateEdit.toString()
+    vm.dueDateInput = vm.formatDateInput(vm.dueDateEdit)
+    console.log('dueDateInput', vm.dueDateInput)
   },
   watch: {},
   mounted () {
-    this.dueDateInput = this.dueDateEdit.toString()
+    this.dueDateInput = this.formatDateInput(this.dueDateEdit)
+    console.log('dueDateInput', this.dueDateInput)
     this.minDate = this.getCurentDateTime('date')
   },
   methods: {
@@ -60,8 +64,11 @@ export default {
       if (type === 'datetime') {
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} | ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       } else if (type === 'date') {
-        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}`
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       }
+    },
+    formatDateInput (date) {
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
     }
   }
 }
