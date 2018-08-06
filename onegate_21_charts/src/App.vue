@@ -12,32 +12,24 @@
   import router from '@/router'
   export default {
     data: () => ({
-      isCallBack: true,
-      danhSachBaoCao: []
+      isCallBack: true
     }),
     computed: {
       currentIndex () {
         return this.$store.getters.index
-      },
-      loadingMenuConfigToDo () {
-        return this.$store.getters.loadingMenuConfigToDo
       }
     },
     created () {
       var vm = this
       vm.$nextTick(function () {
-        vm.danhSachBaoCao = vm.loadingMenuConfigToDo
       })
     },
     updated () {
       var vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
-        console.log(currentParams)
-        if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
+        if (vm.isCallBack) {
           vm.isCallBack = false
-          vm.danhSachBaoCao = vm.loadingMenuConfigToDo
-          vm.danhSachBaoCao[currentParams.index]['active'] = true
           let currentIndex = 0
           if (currentParams.hasOwnProperty('index')) {
             currentIndex = currentParams.index

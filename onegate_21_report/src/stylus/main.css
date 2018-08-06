@@ -2485,3 +2485,44 @@ body .vue-friendly-iframe iframe {
 body .report__filter .menu__activator .input-group{
     padding: 0;
 }
+
+body .chart__report .input-group__details{
+    min-height: 1px;
+}
+body .chart__report .input-group {
+    padding: 0;
+}
+body .theme--light .card__text .subheader {
+    font-size: 13px;
+}
+* {
+    font-size: 13px;
+}
+.fs14 {
+    font-size: 14px;
+}
+
+.report__table table, .report__table table th, .report__table table td {
+    border: 1px solid #ccc!important;
+    border-collapse: collapse!important;
+}
+.report__table table th, .report__table table td {
+    padding: 8px 4px;
+    min-width: 40px;
+}
+.report__table table {
+    width: 100%!important;
+}
+.report__table {
+    max-width: 1024px;
+    width: 100%;
+    margin: 0 auto;
+    overflow: scroll;
+}
+.report__table tr.note__column td {
+    font-size: 8px;
+}
+
+body .application .theme--light.subheader, body .theme--light .subheader {
+    line-height: 29px;
+}

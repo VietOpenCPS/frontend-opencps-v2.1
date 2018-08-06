@@ -37,6 +37,90 @@ export const store = new Vuex.Store({
           resolve(state.initData)
         })
       }
+    },
+    getAgencyLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getAgencyReportLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+              year: filter.year,
+              month: filter.month,
+              group: filter.group,
+              agency: filter.govAgencyCode,
+              reporting: false
+            }
+          }
+          let requestURL = ''
+          if (filter.document === 'REPORT_01') {
+            requestURL = '/o/rest/statistics'
+          } else {
+            requestURL = '/o/rest/v2/dossiers'
+            param.params['sort'] = 'domainCode'
+          }
+          axios.get(requestURL, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    doStatisticReportPrint ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          axios({
+            method: 'PUT',
+            url: '/o/rest/v2_1/statistics/report/' + filter.document,
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob',
+            data: filter.data
+          }).then(function (response) {
+            console.log('serializable', response)
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
     }
     // ----End---------
   },
@@ -49,6 +133,9 @@ export const store = new Vuex.Store({
     },
     setIndex (state, payload) {
       state.index = payload
+    },
+    setInitData (state, payload) {
+      state.initData = payload
     }
   },
   getters: {
@@ -59,7 +146,6 @@ export const store = new Vuex.Store({
       return state.index
     },
     loadingMenuConfigToDo (state) {
-      console.log('support.trangThaiHoSoList', support.trangThaiHoSoList)
       return support.trangThaiHoSoList
     }
   }
