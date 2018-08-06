@@ -5,10 +5,10 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>{{title_asign[type]}}
+          </div>Chọn người thực hiện
         </div>
         <v-card >
-          <v-card-text v-if="type === 1">
+          <v-card-text v-if="type === 1" class="py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               v-model="item.assigned"
@@ -17,6 +17,7 @@
               style="display:inline-block"
               ></v-checkbox>
             </v-layout>
+            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
           </v-card-text>
           <!--  -->
           <v-card-text v-else class="px-2 py-1">
@@ -46,6 +47,7 @@
                 </v-layout>
               </div>
             </v-layout>
+            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -67,6 +69,10 @@ export default {
     type: {
       type: Number,
       default: () => 1
+    },
+    configNote: {
+      type: Object,
+      default: () => {}
     }
   },
   model: {
@@ -92,7 +98,8 @@ export default {
       '2': 'PHÂN CÔNG THỰC HIỆN, PHỐI HỢP',
       '3': 'PHÂN CÔNG THỰC HIỆN, PHỐI HỢP VÀ THEO DÕI'
     },
-    presenterAddGroup: true
+    presenterAddGroup: true,
+    assignValidate: true
   }),
   created () {
     var vm = this
@@ -135,6 +142,19 @@ export default {
         $(`#btn-${index}`).addClass('btn-hidden')
       }
       // console.log('vm.assign_items', vm.assign_items)
+    },
+    doExport () {
+      var vm = this
+      let assign = vm.assign_items.filter(function (item) {
+        return Number(item.assigned) > 0
+      })
+      if (assign.length === 0) {
+        vm.assignValidate = false
+        return vm.assignValidate
+      } else {
+        vm.assignValidate = true
+        return vm.assignValidate
+      }
     }
   }
 }

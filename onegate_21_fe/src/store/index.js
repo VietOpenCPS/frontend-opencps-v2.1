@@ -18,8 +18,10 @@ export const store = new Vuex.Store({
     error: null,
     user: null,
     index: 0,
+    activeGetCounter: false,
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
+    checkInput: 0,
     lePhi: {
       fee: '',
       feeNote: '',
@@ -28,6 +30,8 @@ export const store = new Vuex.Store({
     dossier: {
       applicantIdNo: 'ccc'
     },
+    dossierSelected: [],
+    actionActive: {},
     serviceConfigObj: {},
     dossierTemplateName: '',
     thongTinChungHoSo: {
@@ -240,18 +244,17 @@ export const store = new Vuex.Store({
             params: {
               start: filter.page * 15 - 15,
               end: filter.page * 15,
-              agency: filter.agency,
-              service: filter.service,
-              template: filter.template,
-              status: filter.status,
-              dueCode: filter.dueSearch,
-              register: filter.register,
-              keyword: filter.keyword,
-              domain: filter.domain,
-              substatus: filter.substatus,
-              year: filter.year,
-              month: filter.month,
-              top: filter.top
+              agency: filter.agency ? filter.agency : '',
+              service: filter.service ? filter.service : '',
+              template: filter.template ? filter.template : '',
+              status: filter.status ? filter.status : '',
+              register: filter.register ? filter.register : '',
+              keyword: filter.keyword ? filter.keyword : '',
+              domain: filter.domain ? filter.domain : '',
+              substatus: filter.substatus ? filter.substatus : '',
+              year: filter.year ? filter.year : 0,
+              month: filter.month ? filter.month : 0,
+              top: filter.top ? filter.top : ''
             }
           }
           axios.get(filter.queryParams, param).then(function (response) {
@@ -288,6 +291,12 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    loadDossierSelected ({commit, state}, data) {
+      commit('dossierSelected', data)
+    },
+    loadActionActive ({commit, state}, data) {
+      commit('actionActive', data)
     },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
@@ -528,7 +537,9 @@ export const store = new Vuex.Store({
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('displayName', data.displayName)
+        formData.append('displayName', data.displayName ? data.displayName : '')
+        formData.append('dossierPartNo', data.partNo ? data.partNo : '')
+        formData.append('file', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -640,6 +651,22 @@ export const store = new Vuex.Store({
         })
       })
     },
+    viewDocument ({commit, state, dispatch}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     postDossier ({ commit, state }, data) {
       console.log('data-------------', data)
       return new Promise((resolve, reject) => {
@@ -722,6 +749,7 @@ export const store = new Vuex.Store({
     putDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', false)
+        console.log('put dossier')
         let options = {
           headers: {
             groupId: state.initData.groupId,
@@ -729,6 +757,10 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded',
             'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   groupId: state.initData.groupId
+          // }
         }
         var applicantType = ''
         if (data.userType) {
@@ -736,11 +768,32 @@ export const store = new Vuex.Store({
         } else {
           applicantType = 'citizen'
         }
+        var applicantIdNo = ''
+        var delegateIdNo = ''
+        if (Array.isArray(data.applicantIdNo)) {
+          if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
+            applicantIdNo = data.applicantIdNo[0]
+          } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
+            applicantIdNo = data.applicantIdNo[0].applicantIdNo
+          }
+        } else {
+          applicantIdNo = data.applicantIdNo
+        }
+        //
+        if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
+          delegateIdNo = data.delegateIdNo[0]
+        } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
+          delegateIdNo = data.delegateIdNo[0].applicantIdNo
+        }
+        let isSameAsApplicant = false
+        if (data['sameUser'] !== null && data['sameUser'] !== undefined && data['sameUser'] !== 'undefined') {
+          isSameAsApplicant = data['sameUser']
+        }
         var dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', data.applicantIdNo)
+        dataPutdossier.append('applicantIdNo', applicantIdNo)
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -748,7 +801,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', data.delegateIdNo)
+        dataPutdossier.append('delegateIdNo', delegateIdNo)
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)
@@ -756,6 +809,10 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
+        dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
+        if (data.editable) {
+          dataPutdossier.append('dueDate', data.dueDate)
+        }
         if (data.viaPostal) {
           dataPutdossier.append('viaPostal', data.viaPostal ? 1 : 0)
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
@@ -768,14 +825,16 @@ export const store = new Vuex.Store({
         }
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
+          console.log('put dossier success')
           commit('setLoading', false)
           commit('setDossier', response.data)
           commit('setThongTinChuHoSo', response.data)
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
-        }).catch(function (xhr) {
-          reject(xhr)
+        }).catch(rejectXhr => {
+          console.log('put dossier catch')
+          reject(rejectXhr)
         })
       })
     },
@@ -831,7 +890,7 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileMark', data.fileMark)
+        dataPostdossierMark.append('fileMark', data.fileMark ? data.fileMark : 0)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -848,9 +907,7 @@ export const store = new Vuex.Store({
         commit('setLoading', true)
         let options = {
           headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'groupId': state.initData.groupId
           }
         }
         var dataPostActionDossier = new URLSearchParams()
@@ -875,8 +932,8 @@ export const store = new Vuex.Store({
       })
     },
     getUserInfoFromApplicantIdNo ({ commit, state }, data) {
-      store.dispatch('loadInitResource').then(function (result) {
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -888,7 +945,6 @@ export const store = new Vuex.Store({
             }
           }
           axios.get(state.initData.applicantApi, param).then(function (response) {
-            console.log('responseDataApplicantApi', response.data.data)
             resolve(response.data.data)
           }).catch(function (xhr) {
             console.log(xhr)
@@ -899,6 +955,8 @@ export const store = new Vuex.Store({
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       console.log('alpaca')
+      let id = data['id'] ? data['id'] : 'nm'
+      $('#formAlpaca' + data.dossierPartNo + id).empty()
       /* eslint-disable */
       var formScript, formData
       if (data.formScript) {
@@ -913,7 +971,7 @@ export const store = new Vuex.Store({
       }
       /* eslint-disable */
       formScript.data = formData
-      $('#formAlpaca' + data.dossierPartNo).alpaca(formScript)
+      $('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
     },
     putAlpacaForm ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
@@ -923,8 +981,9 @@ export const store = new Vuex.Store({
             cps_auth: state.initData.cps_auth
           }
         }
+        let id = data['id'] ? data['id'] : 'nm'
         try {
-          var control = $('#formAlpaca' + data.dossierPartNo).alpaca('get')
+          var control = $('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
           var formData = control.getValue()
           console.log('Data Form ------', data)
           console.log('formData-------', formData)
@@ -967,14 +1026,17 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
-            groupId: state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
           }
         }
         try {
-          var dataPostEform = new URLSearchParams()
-          var control = $('#formAlpaca' + data.partNo).alpaca('get')
+          let id = data['id'] ? data['id'] : 'nm'
+          var dataPostEform = new FormData()
+          var control = $('#formAlpaca' + data.partNo + id).alpaca('get')
           var formData = control.getValue()
-          dataPostEform.append('formdata', JSON.stringify(formData))
+          dataPostEform.append('formData', JSON.stringify(formData))
+          dataPostEform.append('file', '')
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
@@ -1011,7 +1073,7 @@ export const store = new Vuex.Store({
         let url = '/o/rest/v2/postal/vnpost'
         axios.post(url, dataVnPost, options).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
@@ -1153,6 +1215,9 @@ export const store = new Vuex.Store({
           })
         })
     },
+    getActiveGetCounter ({commit, state}, data) {
+      commit('setActiveGetCounter', data)
+    },
     setDefaultCityCode ({commit, state}, data) {
       state.thongTinChuHoSo.cityCode = data
     },
@@ -1163,10 +1228,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {}
+            }
           }
           var listHistoryProcessing = []
+          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get(state.initData.dossierlogsApi + '/' + data.dossierId + '/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {
@@ -1311,7 +1376,6 @@ export const store = new Vuex.Store({
             resPostCmt = response.data
             console.log('resPostCmt', resPostCmt)
           }
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(resPostCmt)
         })
         .catch(function (error) {
@@ -1477,6 +1541,7 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
+              commit('setCheckInput', serializable['checkInput'])
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
@@ -1496,7 +1561,7 @@ export const store = new Vuex.Store({
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
-            let buttonConfig = JSON.parse(serializable.buttonConfig)['buttons']
+            let buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons']
             resolve(buttonConfig)
           }).catch(function (error) {
             console.log(error)
@@ -1516,7 +1581,11 @@ export const store = new Vuex.Store({
         let url = state.initData.documentApi + '/' + data.dossierId + '/documents'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
-            resolve(response.data.data)
+            if (response.data.data) {
+              resolve(response.data.data)
+            } else {
+              resolve([])
+            }
           }).catch(function (xhr) {
             reject(xhr)
           })
@@ -1637,7 +1706,6 @@ export const store = new Vuex.Store({
           formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             let serializable = response.data
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
@@ -1658,7 +1726,7 @@ export const store = new Vuex.Store({
           }
           axios.delete(state.initData.getNextAction + '/' + filter.dossierId , param).then(function (response) {
             let serializable = response.data
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
@@ -1832,7 +1900,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           $.ajax({
-            url: state.initData.dossierTemplatesApi + '/' + data.templateFileNo + '/parts/' + data.partNo + '/formdata',
+            url: state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo + '/formdata',
             type: 'GET',
             headers: {
               groupId: state.initData.groupId
@@ -2236,6 +2304,9 @@ export const store = new Vuex.Store({
     setThanhPhanHosoTemplates (state, payload) {
       state.thanhPhanHoSo.dossierTemplates = payload
     },
+    setCheckInput (state, payload) {
+      state.checkInput = payload
+    },
     setThongTinChuHoSo (state, payload) {
       let userTypeCondition = true
       if (payload.applicantIdType === 'business') {
@@ -2334,6 +2405,12 @@ export const store = new Vuex.Store({
     setCitys (state, payload) {
       state.citys = payload
     },
+    dossierSelected (state, payload) {
+      state.dossierSelected = payload
+    },
+    actionActive (state, payload) {
+      state.actionActive = payload
+    },
     setResultServices (state, payload) {
       state.resultServices = payload
     },
@@ -2375,6 +2452,9 @@ export const store = new Vuex.Store({
     },
     setCommentItems (state, payload) {
       state.commentItems = payload
+    },
+    setActiveGetCounter (state, payload) {
+      state.activeGetCounter = payload
     }
   },
   getters: {
@@ -2389,6 +2469,12 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
+    },
+    dossierSelected (state) {
+      return state.dossierSelected
+    },
+    actionActive (state) {
+      return state.actionActive
     },
     loadingMenuConfigToDo (state) {
       return new Promise((resolve, reject) => {
@@ -2421,6 +2507,9 @@ export const store = new Vuex.Store({
     thongTinChuHoSo (state) {
       return state.thongTinChuHoSo
     },
+    activeGetCounter (state) {
+      return state.activeGetCounter
+    },
     thanhPhanHoSo (state) {
       return state.thanhPhanHoSo
     },
@@ -2450,6 +2539,9 @@ export const store = new Vuex.Store({
           return store.dispatch('loadDictItems', filter)
         }
       }
+    },
+    getCheckInput (state) {
+      return state.checkInput
     },
     resultServices (state) {
       return state.resultServices

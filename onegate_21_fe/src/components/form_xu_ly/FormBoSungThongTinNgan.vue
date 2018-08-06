@@ -2,7 +2,7 @@
   <v-expansion-panel class="expansion-pl ext__form">
     <v-expansion-panel-content hide-actions value="1">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-      FORM BỔ SUNG THÔNG TIN
+      Form bổ sung thông tin
       </div>
       <v-card>
         <v-card-text class="py-2 px-2">
@@ -11,6 +11,13 @@
                 <span :for="item.fieldName" style="
                     font-size: 13px;
                 ">{{item.fieldLabel}}</span>
+                <v-text-field v-if="item.fieldType === 'textarea'"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    multi-line
+                    @input="inputChangeValue(item)"
+                ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'string'"
                     :id="item.fieldName"
                     :value="item.value"

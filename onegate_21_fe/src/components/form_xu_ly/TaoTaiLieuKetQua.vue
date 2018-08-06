@@ -5,7 +5,7 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div> TÀI LIỆU KẾT QUẢ
+          </div> Tài liệu kết quả
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo">
@@ -321,14 +321,14 @@ export default {
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -409,7 +409,7 @@ export default {
       let x = confirm('Bạn có muốn xóa?')
       if (x) {
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
