@@ -31,7 +31,7 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text style="background-color: #f6f6f6;">
+              <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
