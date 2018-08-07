@@ -1,7 +1,7 @@
 <template>
   <div class="form-chitiet">
     <div class="row-header">
-      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
+      <div class="background-triangle-big"> <span>BÁO CÁO</span> <span v-if="reportGovName.length > 0"> : {{reportGovName}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
@@ -43,6 +43,9 @@
               </v-select>
             </v-flex>
             <v-flex xs12 sm6 class="px-2 text-right">
+              <v-btn v-if="reportGovName.length > 0" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
+                <v-icon class="mr-2">undo</v-icon> Quay lại 
+              </v-btn>
               <v-tooltip bottom>
                 <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
                   <v-icon>pie_chart</v-icon>
@@ -108,7 +111,8 @@
                 <thead>
                     <tr>
                       <th rowspan="5" colspan="1" width="40">STT</th>
-                      <th rowspan="5" colspan="1" width="100%">Đơn vị</th>
+                      <th v-if="govAgencyCode === ''" rowspan="5" colspan="1" width="100%">Đơn vị</th>
+                      <th v-else rowspan="5" colspan="1" width="100%">Lĩnh vực</th>
                       <th rowspan="5" colspan="1" width="40">Tổng số</th>
                       <th rowspan="5" colspan="1" width="40">Từ chối tiếp nhận trong kỳ</th>
                       <th rowspan="5" colspan="1" width="40">Hồ sơ rút không giải quyết</th>
@@ -178,7 +182,8 @@
                   </tr>
                   <tr v-for="(item, index) in agencyLists" v-bind:key="index">
                     <td align="center">{{index + 1}}</td>
-                    <td align="center">{{item.govAgencyName}}</td>
+                    <td v-if="govAgencyCode === ''" align="center">{{item.govAgencyName}}</td>
+                    <td v-else align="center">{{item.domainName}}</td>
                     <td align="center">{{item.totalCount}}</td>
                     <td align="center">{{item.deniedCount}}</td>
                     <td align="center">{{item.cancelledCount}}</td>
@@ -202,7 +207,7 @@
                     <td align="center">{{item.overdueCount}}</td>
                     <td align="center">{{item.waitingCount}}</td>
                   </tr>
-                  <tr class="sum__column" style="font-weight: bold;">
+                  <tr class="sum__column" style="font-weight: bold;" v-if="showTable">
                     <td align="center" colspan="2">Tổng số <br> <small v-if="agencyLists !== null && agencyLists.length > 0"> ( {{agencyLists.length}} đơn vị ) </small></td>
                     <td align="center ">{{totalCounter['total_3']}}</td>
                     <td align="center">{{totalCounter['total_4']}}</td>
@@ -257,6 +262,7 @@ export default {
     noReportData: false,
     isCallBack: true,
     reloadPie: false,
+    showTable: false,
     agencyLists: [],
     group: '',
     years: [
@@ -334,7 +340,9 @@ export default {
     ],
     month: ((new Date()).getMonth() + 1) + '',
     danhSachBaoCaos: [],
-    totalCounter: {}
+    totalCounter: {},
+    reportGovName: '',
+    govAgencyCode: ''
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -364,6 +372,8 @@ export default {
       let currentQuerys = vm.$router.history.current.query
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
+        vm.reportGovName = ''
+        vm.govAgencyCode = ''
         if (currentQuerys.hasOwnProperty('year')) {
           vm.year = currentQuerys.year
         }
@@ -373,6 +383,12 @@ export default {
         if (currentQuerys.hasOwnProperty('group')) {
           vm.group = currentQuerys.group
         }
+        if (currentQuerys.hasOwnProperty('reportGovName')) {
+          vm.reportGovName = currentQuerys.reportGovName
+        }
+        if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+          vm.govAgencyCode = currentQuerys.govAgencyCode
+        }
         vm.doStaticsReport()
       }
     })
@@ -381,11 +397,20 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParam = newRoute.params
+      let currentQuerys = newRoute.query
+      vm.reportGovName = ''
+      vm.govAgencyCode = ''
+      if (currentQuerys.hasOwnProperty('reportGovName')) {
+        vm.reportGovName = currentQuerys.reportGovName
+      }
+      if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+        vm.govAgencyCode = currentQuerys.govAgencyCode
+      }
       vm.doStaticsReport()
     }
   },
   methods: {
-    toNativeView (data) {
+    toNativeViewBack (data) {
       let vm = this
       router.push({
         path: '/bao-cao/' + data,
@@ -396,15 +421,30 @@ export default {
         }
       })
     },
+    toNativeView (data) {
+      let vm = this
+      router.push({
+        path: '/bao-cao/' + data,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
+        }
+      })
+    },
     doStaticsReport () {
       let vm = this
       let filter = {
         year: vm.year,
         month: vm.month,
         group: vm.group,
-        reporting: true
+        reporting: true,
+        agency: vm.govAgencyCode
       }
       vm.reloadPie = false
+      vm.showTable = false
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
@@ -442,7 +482,11 @@ export default {
         month: vm.month,
         group: vm.group,
         reporting: true,
-        agency: 'total'
+        agency: 'total',
+        report: true
+      }
+      if (vm.govAgencyCode !== '') {
+        filter['agency'] = vm.govAgencyCode
       }
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
@@ -471,6 +515,7 @@ export default {
           vm.totalCounter['total_23'] = currentData.overdueCount
           vm.totalCounter['total_24'] = currentData.waitingCount
         }
+        vm.showTable = true
       })
     },
     changeYear (item) {
@@ -481,7 +526,9 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          group: vm.group
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
         }
       })
     },
@@ -493,7 +540,9 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          group: vm.group
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
         }
       })
     },
@@ -505,7 +554,9 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          group: vm.group
+          group: vm.group,
+          reportGovName: vm.reportGovName,
+          govAgencyCode: vm.govAgencyCode
         }
       })
     }

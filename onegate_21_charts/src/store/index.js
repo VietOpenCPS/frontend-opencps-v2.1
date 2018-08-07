@@ -52,9 +52,14 @@ export const store = new Vuex.Store({
               month: filter.month,
               group: filter.group,
               reporting: false,
-              domain: 'total',
               agency: filter['agency']
             }
+          }
+          if (filter['agency'] === 'total' || filter['agency'] === '') {
+            param.params['domain'] = 'total'
+          }
+          if (filter['report']) {
+            param.params['domain'] = 'total'
           }
           axios.get('/o/rest/statistics', param).then(function (response) {
             let serializable = response.data

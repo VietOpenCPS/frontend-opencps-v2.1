@@ -1,11 +1,11 @@
 <template>
   <v-card class="mt-3" style="border-radius: 0;">
-    <v-card-title class="headline">
+    <v-card-title class="headline" v-if="govAgencyCode === ''">
       {{item.govAgencyName}}
-      <span style="
-          position: absolute;
-          right: 15px;
-      "> <span v-if="month !== '0'">{{month}} /</span> <span v-if="year !== '0'">{{year}}</span></span>
+      <a class="detail__pie" href="javascript:;" @click="toDetailReport()"> Chi tiết</a>
+    </v-card-title>
+    <v-card-title class="headline" v-else>
+      {{item.domainName}}
     </v-card-title>
     <v-card-text class="pt-2 pb-0 px-0">
       <pie-chart :width="200" :height="200"></pie-chart>
@@ -43,9 +43,15 @@ export default {
       type: String
     }
   },
+  data: () => ({
+    govAgencyCode: ''
+  }),
   created () {
     let vm = this
-    console.log('reCreate')
+    let currentQuerys = vm.$router.history.current.query
+    if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+      vm.govAgencyCode = currentQuerys.govAgencyCode
+    }
     Vue.component('pie-chart', {
       extends: VueChartJs.Pie,
       mounted () {
@@ -89,6 +95,23 @@ export default {
         })
       }
     })
+  },
+  methods: {
+    toDetailReport () {
+      let vm = this
+      let currentParams = vm.$router.history.current.params
+      let currentQuerys = vm.$router.history.current.query
+      vm.$router.push({
+        path: '/bao-cao/' + currentParams.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group,
+          reportGovName: vm.item.govAgencyName,
+          govAgencyCode: vm.item.govAgencyCode
+        }
+      })
+    }
   }
 }
 </script>

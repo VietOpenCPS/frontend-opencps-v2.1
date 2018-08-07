@@ -2523,3 +2523,23 @@ body .theme--light .card__text .subheader {
 .report__table tr.note__column td {
     font-size: 8px;
 }
+.detail__pie{
+    position: absolute;right: 15px;
+}
+.detail__pie:before{
+   content: '';
+   position: absolute;
+   bottom: 6px;
+   left: 0;
+   width: 100%;
+   border: 1px dashed;
+}
+.detail__pie:after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #0b72ba;
+}

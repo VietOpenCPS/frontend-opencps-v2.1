@@ -25,8 +25,15 @@ export default {
       type: String
     }
   },
+  data: () => ({
+    govAgencyCode: ''
+  }),
   created () {
     let vm = this
+    let currentQuerys = vm.$router.history.current.query
+    if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+      vm.govAgencyCode = currentQuerys.govAgencyCode
+    }
     const horizonalLinePlugin = {
       id: 'horizontalLine',
       afterDraw: function (chartInstance) {
@@ -102,7 +109,11 @@ export default {
     let daGiaiQuyetQuaHan = []
     for (let key in vm.item_array) {
       if (String(vm.item_array[key].govAgencyCode) !== '') {
-        labelsCustom.push(vm.item_array[key].govAgencyName)
+        if (vm.govAgencyCode === '') {
+          labelsCustom.push(vm.item_array[key].govAgencyName)
+        } else {
+          labelsCustom.push(vm.item_array[key].domainName)
+        }
         dangXuLyConHan.push(vm.item_array[key].undueCount)
         dangXuLyQuaHan.push(vm.item_array[key].overdueCount)
         daGiaiQuyetSomHan.push(vm.item_array[key].betimesCount)
