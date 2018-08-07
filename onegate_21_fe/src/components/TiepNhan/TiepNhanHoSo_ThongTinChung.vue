@@ -69,6 +69,7 @@
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
               <datetime v-model="dueDateInput" v-on:input="changeDate"
+                placeholder="Chọn ngày"
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
@@ -78,7 +79,6 @@
                 wrapper-class="wrapper-datetime"
                 auto-continue
                 auto-close
-                required
               ></datetime>
               <v-icon>event</v-icon>
             </v-subheader>
@@ -95,7 +95,7 @@
     data: () => ({
       minDate: null,
       editable: false,
-      dueDateInput: (new Date()).toString(),
+      dueDateInput: null,
       dataPostDossier: {
         serviceCode: '',
         govAgencyCode: '',
@@ -153,7 +153,7 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = new Date(Number(vm.thongTinChungHoSo.dueDate)).toString()
+        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : ''
         vm.minDate = vm.getCurentDateTime('date')
       },
       getthongtinchunghoso () {
@@ -173,7 +173,7 @@
       },
       getDuedate () {
         var vm = this
-        let date = (new Date(this.dueDateInput)).getTime()
+        let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
         return date
       },
       durationText (durationUnit, durationCount) {
@@ -208,6 +208,9 @@
           let value = new Date(arg)
           return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
         }
+      },
+      formatDateInput (date) {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       }
     },
     filters: {

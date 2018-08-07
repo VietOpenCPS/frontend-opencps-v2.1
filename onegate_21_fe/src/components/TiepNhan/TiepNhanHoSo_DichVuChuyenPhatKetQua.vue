@@ -27,7 +27,9 @@
                 autocomplete
               ></v-select>
             </v-flex>
-            <v-flex xs12 sm2>
+            <!--  -->
+            <!--  -->
+            <!-- <v-flex xs12 sm2>
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -43,8 +45,8 @@
                 append-icon="phone"
                 :required='dichVuChuyenPhatKetQua.viaPostal'
               ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2>
+            </v-flex> -->
+            <!-- <v-flex xs12 sm2>
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -63,7 +65,7 @@
                 :required='dichVuChuyenPhatKetQua.viaPostal'
                 autocomplete
               ></v-select>
-            </v-flex>
+            </v-flex> -->
             <v-flex xs12>
 
             </v-flex>
@@ -175,48 +177,97 @@ export default {
         itemName: 'VNPOST',
         itemCode: 'VNPOST'
       }
-    ],
-    dichVuChuyenPhatKetQua: {
-      viaPostal: 0,
-      postalServiceCode: '',
-      postalServiceName: '',
-      postalAddress: '',
-      postalCityCode: '',
-      postalCityName: '',
-      postalDistrictCode: '',
-      postalDistrictName: '',
-      postalWardCode: '',
-      postalWardName: '',
-      postalTelNo: '',
-      vnPostCode: ''
-    }
+    ]
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    thongTinChuHoSoBindChuyenPhat () {
+      return this.$store.getters.thongTinChuHoSoBindChuyenPhat
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
+
   created () {
+  },
+  watch: {
+    thongTinChuHoSoBindChuyenPhat (val) {
+      var vm = this
+      console.log('val', val)
+      vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
+      vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
+      vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
+      vm.dichVuChuyenPhatKetQua.postalAddress = val.address
+      var filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 0,
+        parent: 0
+      }
+      if (val.cityCode) {
+        console.log('cityCode', val.cityCode)
+        filter.parent = val.cityCode
+        filter.level = 1
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+          vm.resultDistricts = result.data
+        })
+      }
+      if (val.districtCode) {
+        console.log('districtCode', val.districtCode)
+        filter.parent = val.districtCode
+        filter.level = 1
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+          vm.resultWards = result.data
+        })
+      }
+    }
+  },
+  mounted () {
+    var vm = this
+    var filter = {
+      collectionCode: 'ADMINISTRATIVE_REGION',
+      level: 0,
+      parent: 0
+    }
+    var data = vm.dichVuChuyenPhatKetQua
+    vm.$store.getters.getDictItems(filter).then(function (result) {
+      vm.citys = result.data
+    })
+    if (data.postalCityCode) {
+      filter.parent = data.postalCityCode
+      filter.level = 1
+      vm.$store.getters.getDictItems(filter).then(function (result) {
+        vm.resultDistricts = result.data
+      })
+    }
+    if (data.postalDistrictCode) {
+      filter.parent = data.postalDistrictCode
+      filter.level = 1
+      vm.$store.getters.getDictItems(filter).then(function (result) {
+        vm.resultWards = result.data
+      })
+    }
   },
   methods: {
     initData (data) {
       var vm = this
-      console.log('ket qua-----', data)
-      let dichVuChuyenPhatKetQuaTemp = {
-        viaPostal: data.viaPostal,
-        postalServiceCode: data.postalServiceCode,
-        postalServiceName: data.postalServiceName,
-        postalAddress: data.postalAddress,
-        postalCityCode: data.postalCityCode,
-        postalCityName: data.postalCityName,
-        postalDistrictCode: data.postalDistrictCode,
-        postalDistrictName: data.postalDistrictName,
-        postalWardCode: data.postalWardCode,
-        postalWardName: data.postalWardName,
-        postalTelNo: data.postalTelNo,
-        vnPostCode: data.vnPostCode
-      }
-      vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
+      // let dichVuChuyenPhatKetQuaTemp = {
+      //   viaPostal: data.viaPostal,
+      //   postalServiceCode: data.postalServiceCode,
+      //   postalServiceName: data.postalServiceName,
+      //   postalAddress: data.postalAddress,
+      //   postalCityCode: data.postalCityCode,
+      //   postalCityName: data.postalCityName,
+      //   postalDistrictCode: data.postalDistrictCode,
+      //   postalDistrictName: data.postalDistrictName,
+      //   postalWardCode: data.postalWardCode,
+      //   postalWardName: data.postalWardName,
+      //   postalTelNo: data.postalTelNo,
+      //   vnPostCode: data.vnPostCode
+      // }
+      // vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
       vm.$nextTick(function () {
         var filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -273,6 +324,7 @@ export default {
       })
     },
     changeViaPostal (event) {
+      this.$store.commit('setViaPostal', event ? 2 : 1)
       this.$emit('changeViapostal', event)
     }
   }

@@ -1,16 +1,16 @@
 <template>
   <v-expansion-panel class="expansion-pl ext__form">
-    <v-expansion-panel-content hide-actions value="1">
+    <v-expansion-panel-content hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-      Form bổ sung thông tin
+      {{item.fieldLabel}}
       </div>
       <v-card>
         <v-card-text class="py-2 px-2">
           <v-layout wrap>
-            <v-flex xs12 v-for="(item, index) in formBuilder" v-bind:key="index">
-                <span :for="item.fieldName" style="
+            <v-flex xs12>
+                <!-- <span :for="item.fieldName" style="
                     font-size: 13px;
-                ">{{item.fieldLabel}}</span>
+                ">{{item.fieldLabel}}</span> -->
                 <v-text-field v-if="item.fieldType === 'textarea'"
                     :id="item.fieldName"
                     :value="item.value"

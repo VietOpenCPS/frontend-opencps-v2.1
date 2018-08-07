@@ -74,6 +74,12 @@ export const store = new Vuex.Store({
       address: '',
       applicantName: ''
     },
+    thongTinChuHoSoBindChuyenPhat: {
+      cityCode: '',
+      districtCode: '',
+      wardCode: '',
+      address: ''
+    },
     thongTinNguoiNopHoSo: {
       sameUser: true,
       delegateName: '',
@@ -86,19 +92,14 @@ export const store = new Vuex.Store({
       delegateIdNo: ''
     },
     dichVuChuyenPhatKetQua: {
-      viaPostal: false,
+      viaPostal: 0,
       postalServiceCode: '',
-      postalServiceName: '',
       postalAddress: '',
       postalCityCode: '',
-      postalCityName: '',
       postalDistrictCode: '',
-      postalDistrictName: '',
-      postalWardCode: '',
-      postalWardName: '',
-      postalTelNo: '',
-      vnPostCode: ''
+      postalWardCode: ''
     },
+    viaPostal: 0,
     data_phancong: []
   },
   actions: {
@@ -591,7 +592,7 @@ export const store = new Vuex.Store({
               commit('setLePhi', response.data)
               commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
               commit('setThongTinChungHoSo', response.data)
-              commit('setDichVuChuyenPhatKetQua', response.data)
+              // commit('setDichVuChuyenPhatKetQua', response.data)
               resolve(response.data)
             }, error => {
               commit('setLoading', false)
@@ -703,7 +704,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChuHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setThongTinChungHoSo', response.data)
-          commit('setDichVuChuyenPhatKetQua', response.data)
+          // commit('setDichVuChuyenPhatKetQua', response.data)
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
@@ -821,14 +822,12 @@ export const store = new Vuex.Store({
           dataPutdossier.append('dueDate', data.dueDate)
         }
         if (data.viaPostal) {
-          dataPutdossier.append('viaPostal', data.viaPostal ? 1 : 0)
+          dataPutdossier.append('viaPostal', data.viaPostal)
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
-          dataPutdossier.append('postalServiceName', data.postalServiceName)
           dataPutdossier.append('postalAddress', data.postalAddress)
           dataPutdossier.append('postalCityCode', data.postalCityCode)
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
-          dataPutdossier.append('postalTelNo', data.postalTelNo)
         }
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
@@ -838,7 +837,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChuHoSo', response.data)
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
-          commit('setDichVuChuyenPhatKetQua', response.data)
+          // commit('setDichVuChuyenPhatKetQua', response.data)
         }).catch(rejectXhr => {
           console.log('put dossier catch')
           reject(rejectXhr)
@@ -2334,24 +2333,30 @@ export const store = new Vuex.Store({
       }
       state.thongTinChuHoSo = thongTinChuHoSoPayLoad
     },
+    setThongTinChuHoSoBindChuyenPhat (state, payload) {
+      state.thongTinChuHoSoBindChuyenPhat = {
+        cityCode: payload.cityCode,
+        districtCode: payload.districtCode,
+        wardCode: payload.wardCode,
+        address: payload.address
+      }
+    },
     setThongTinNguoiNopHoSo (state, payload) {
       state.thongTinNguoiNopHoSo = Object.assign(state.thongTinNguoiNopHoSo, payload)
     },
     setDichVuChuyenPhatKetQua (state, payload) {
       let tempData = {
         viaPostal: payload.viaPostal,
-        postalServiceCode: payload.postalServiceCode,
-        postalServiceName: payload.postalServiceName,
-        postalAddress: payload.postalAddress,
-        postalCityCode: payload.postalCityCode,
-        postalCityName: payload.postalCityName,
-        postalDistrictCode: payload.postalDistrictCode,
-        postalDistrictName: payload.postalDistrictName,
-        postalWardCode: payload.postalWardCode,
-        postalWardName: payload.postalWardName,
-        postalTelNo: payload.postalTelNo
+        postalServiceCode: payload.postalServiceCode ? payload.postalServiceCode : '',
+        postalAddress: payload.postalAddress ? payload.postalAddress : '',
+        postalCityCode: payload.postalCityCode ? payload.postalCityCode : '',
+        postalDistrictCode: payload.postalDistrictCode ? payload.postalDistrictCode : '',
+        postalWardCode: payload.postalWardCode ? payload.postalWardCode : ''
       }
       state.dichVuChuyenPhatKetQua = tempData
+    },
+    setViaPostal (state, payload) {
+      state.viaPostal = payload
     },
     setServiceConfigObj (state, payload) {
       state.serviceConfigObj = payload
@@ -2514,6 +2519,9 @@ export const store = new Vuex.Store({
     thongTinChuHoSo (state) {
       return state.thongTinChuHoSo
     },
+    thongTinChuHoSoBindChuyenPhat (state) {
+      return state.thongTinChuHoSoBindChuyenPhat
+    },
     activeGetCounter (state) {
       return state.activeGetCounter
     },
@@ -2525,6 +2533,9 @@ export const store = new Vuex.Store({
     },
     dichVuChuyenPhatKetQua (state) {
       return state.dichVuChuyenPhatKetQua
+    },
+    viaPostal (state) {
+      return state.viaPostal
     },
     serviceOptionItems (state) {
       return state.serviceOptionItems

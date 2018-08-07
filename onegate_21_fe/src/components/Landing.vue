@@ -73,7 +73,7 @@
             ></v-checkbox>
           </th>
           <th
-            v-for="(header, index) in props.headers"
+            v-for="header in props.headers"
             :key="header.text"
           >
             <v-tooltip bottom>
@@ -600,7 +600,7 @@ export default {
               vm.btnDynamics = []
               vm.trangThaiHoSoList = result
               vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
-              console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
+              // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
               vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
               if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
                 vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
@@ -610,8 +610,8 @@ export default {
               }
               if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
                 vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
-                console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
-                console.log('filterForm', vm.filterForm)
+                // console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
+                // console.log('filterForm', vm.filterForm)
               }
               let btnDynamicsOnlySteps = []
               let btnDynamicsView = []
@@ -657,12 +657,12 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
-      console.log('currentQuery watch router', currentQuery)
+      // console.log('currentQuery watch router', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
         vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
-        console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
+        // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
         vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
           vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
@@ -672,8 +672,8 @@ export default {
         }
         if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
           vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
-          console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
-          console.log('filterForm', vm.filterForm)
+          // console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
+          // console.log('filterForm', vm.filterForm)
         }
         let btnDynamicsOnlySteps = []
         let btnDynamicsView = []
@@ -812,7 +812,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      console.log('queryString=====', queryString)
+      // console.log('queryString=====', queryString)
       queryString += 'page=' + config.page
       vm.$router.push({
         path: current.path + queryString
@@ -821,7 +821,7 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      console.log('currentQuery======', currentQuery)
+      // console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0) {
@@ -833,6 +833,8 @@ export default {
         if (vm.menuType !== 3) {
           filter = {
             queryParams: querySet,
+            /*  test Local */
+            // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -849,6 +851,8 @@ export default {
         } else {
           filter = {
             queryParams: querySet,
+            /*  test Local */
+            // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
@@ -874,10 +878,10 @@ export default {
     },
     changeServiceConfigs (item) {
       let vm = this
-      console.log('serviceConfigItem+++++++', item)
-      console.log('thuTucHanhChinhSelected', vm.thuTucHanhChinhSelected)
+      // console.log('serviceConfigItem+++++++', item)
+      // console.log('thuTucHanhChinhSelected', vm.thuTucHanhChinhSelected)
       if (item.hasOwnProperty('options')) {
-        console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
+        // console.log('serviceConfigItem+++++++Option+++++++++++', item.options)
         this.listDichVu = item.options
       } else {
         this.listDichVu = []
@@ -890,12 +894,10 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
-      console.log('newQuery', newQuery)
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
       for (let key in newQuery) {
-        console.log('newQueryItem', key, newQuery[key])
         if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
           queryString += key + '=1&'
         } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
@@ -910,16 +912,12 @@ export default {
       }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
-      console.log('path', current.path)
-      console.log('queryString', queryString)
       vm.$router.push({
         path: current.path + queryString
       })
-      console.log('vm.listDichVu+++++++++', vm.listDichVu)
     },
     changeDichVuConfigs (item) {
       let vm = this
-      console.log('item dich vu: ', item)
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -955,7 +953,7 @@ export default {
         } else {
           vm.doCreateDossier()
         }
-        console.log('isOpenDialog++++++++', isOpenDialog)
+        // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
@@ -1141,7 +1139,7 @@ export default {
       let vm = this
       vm.loadingAction = true
       if (isGroup) {
-        console.log(vm.selected)
+        // console.log(vm.selected)
       } else {
         let filter = {
           dossierId: dossierItem.dossierId
@@ -1168,7 +1166,7 @@ export default {
         let currentQuery = vm.$router.history.current.query
         //
         if (isGroup) {
-          console.log(vm.selected)
+          // console.log(vm.selected)
         } else {
           vm.$store.dispatch('deleteDossier', filter).then(function (result) {
             vm.dialogActionProcess = false
@@ -1210,8 +1208,8 @@ export default {
     doSubmitDialogAction (item) {
       let vm = this
       if (vm.$refs.form.validate()) {
-        console.log('yes-----')
-        console.log('item++++++++', item)
+        // console.log('yes-----')
+        // console.log('item++++++++', item)
         vm.doCreateDossier()
       }
     },
