@@ -11,6 +11,8 @@ import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
+import 'v-suggestions/dist/v-suggestions.css'
 
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
