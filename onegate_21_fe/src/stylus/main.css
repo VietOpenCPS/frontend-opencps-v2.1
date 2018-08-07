@@ -184,12 +184,14 @@ body .expand__select__gov .expansion-panel__header {
     color: #0d2434;
 }
 body .expand__select__domain .expansion-panel__header {
-    padding: 10px 0px;
+    padding: 8px 0px;
     font-weight: bold;
     font-size: 12px;
     color: #0d2434;
 }
-
+body .icon.theme--dark {
+    color: #fff !important
+}
 body .expansion-panel__header .card__text {
     padding: 5px 15px;
 }
@@ -2216,9 +2218,16 @@ body .theme--light .form_alpaca .expansion-panel__container {
 }*/
 
 .expand__select__domain .expansion-panel__header {
-  background-color: #dbebf0;
+    background: #0d71bb;
+    color: #fff !important;
 }
-
+body .expansion-panel.expand__select__gov,
+body .expansion-panel.expand__select__domain {
+    border-bottom: none !important;
+}
+.expand__select__domain .expansion-panel__container .header__icon .icon {
+    color: #fff !important;
+}
 .center-all {
   display: -webkit-box;
   display: flex;
@@ -2497,9 +2506,10 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
 }
 .card__text__gov span {
     line-height: 32px;
+    font-size: 13px;
 }
 .card > .card__text__gov:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
 }
 .card__text__gov {
     padding: 0px 0px 0px 40px !important;
@@ -2545,4 +2555,7 @@ body .v-suggestions>input:hover {
 }
 body .input-group__input {
     padding-top: 2px;
+}
+body .expand__select__gov .header__icon {
+    padding-right: 15px;
 }

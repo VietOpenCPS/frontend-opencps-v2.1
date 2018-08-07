@@ -281,7 +281,7 @@ export default {
     months: [
       {
         'value': '0',
-        'name': 'Lọc theo tháng'
+        'name': 'Cả năm'
       },
       {
         'value': '1',
@@ -332,7 +332,7 @@ export default {
         'name': 'tháng 12'
       }
     ],
-    month: '0',
+    month: ((new Date()).getMonth() + 1) + '',
     danhSachBaoCaos: [],
     totalCounter: {}
   }),
@@ -355,26 +355,45 @@ export default {
           vm.agencyGroups = []
         }
       })
-      vm.doStaticsReport()
+    })
+  },
+  updated () {
+    var vm = this
+    vm.$nextTick(function () {
+      let currentParams = vm.$router.history.current.params
+      let currentQuerys = vm.$router.history.current.query
+      if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
+        vm.isCallBack = false
+        if (currentQuerys.hasOwnProperty('year')) {
+          vm.year = currentQuerys.year
+        }
+        if (currentQuerys.hasOwnProperty('month')) {
+          vm.month = currentQuerys.month
+        }
+        if (currentQuerys.hasOwnProperty('group')) {
+          vm.group = currentQuerys.group
+        }
+        vm.doStaticsReport()
+      }
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParam = newRoute.params
-      if (String(currentParam.index) === '1') {
-        for (let key in vm.agencyLists) {
-          let currentData = vm.agencyLists[key]
-          vm.doCounterTotal(currentData)
-        }
-      }
+      vm.doStaticsReport()
     }
   },
   methods: {
     toNativeView (data) {
       let vm = this
       router.push({
-        path: '/bao-cao/' + data
+        path: '/bao-cao/' + data,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group
+        }
       })
     },
     doStaticsReport () {
@@ -390,63 +409,12 @@ export default {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
           vm.agencyLists = []
-          vm.clearCounterTotal()
         } else {
           vm.noReportData = false
           vm.agencyLists = result
-          console.log('vm.agencyLists', vm.agencyLists)
-          if (String(vm.index) === '1') {
-            for (let key in vm.agencyLists) {
-              let currentData = vm.agencyLists[key]
-              vm.doCounterTotal(currentData)
-            }
-          }
         }
         vm.reloadPie = true
       })
-    },
-    changeYear (item) {
-      let vm = this
-      vm.year = item
-      vm.doStaticsReport()
-    },
-    changeMonth (item) {
-      let vm = this
-      vm.month = item
-      vm.doStaticsReport()
-    },
-    changeDonVi (item) {
-      let vm = this
-      vm.agency = item
-      vm.doStaticsReport()
-    },
-    doCounterTotal (currentData) {
-      let vm = this
-      vm.totalCounter['total_3'] = String(vm.totalCounter['total_3']) === 'undefined' ? 0 + currentData.totalCount : parseInt(parseInt(vm.totalCounter['total_3']) + currentData.totalCount)
-      vm.totalCounter['total_4'] = String(vm.totalCounter['total_4']) === 'undefined' ? 0 + currentData.deniedCount : parseInt(vm.totalCounter['total_4']) + currentData.deniedCount
-      vm.totalCounter['total_5'] = String(vm.totalCounter['total_5']) === 'undefined' ? 0 + currentData.cancelledCount : parseInt(vm.totalCounter['total_5']) + currentData.cancelledCount
-      vm.totalCounter['total_6'] = String(vm.totalCounter['total_6']) === 'undefined' ? 0 + currentData.processCount : parseInt(vm.totalCounter['total_6']) + currentData.processCount
-      vm.totalCounter['total_7'] = String(vm.totalCounter['total_7']) === 'undefined' ? 0 + currentData.remainingCount : parseInt(vm.totalCounter['total_7']) + currentData.remainingCount
-      vm.totalCounter['total_8'] = String(vm.totalCounter['total_8']) === 'undefined' ? 0 + currentData.receivedCount : parseInt(vm.totalCounter['total_8']) + currentData.receivedCount
-      vm.totalCounter['total_9'] = String(vm.totalCounter['total_9']) === 'undefined' ? 0 + currentData.onegateCount : parseInt(vm.totalCounter['total_9']) + currentData.onegateCount
-      vm.totalCounter['total_10'] = String(vm.totalCounter['total_10']) === 'undefined' ? 0 + currentData.onlineCount : parseInt(vm.totalCounter['total_10']) + currentData.onlineCount
-      vm.totalCounter['total_11'] = String(vm.totalCounter['total_11']) === 'undefined' ? 0 + currentData.releaseCount : parseInt(vm.totalCounter['total_11']) + currentData.releaseCount
-      vm.totalCounter['total_12'] = String(vm.totalCounter['total_12']) === 'undefined' ? 0 + currentData.betimesCount : parseInt(vm.totalCounter['total_12']) + currentData.betimesCount
-      vm.totalCounter['total_13'] = String(vm.totalCounter['total_13']) === 'undefined' ? 0 + currentData.ontimeCount : parseInt(vm.totalCounter['total_13']) + currentData.ontimeCount
-      vm.totalCounter['total_14'] = String(vm.totalCounter['total_14']) === 'undefined' ? 0 + currentData.overtimeCount : parseInt(vm.totalCounter['total_14']) + currentData.overtimeCount
-      vm.totalCounter['total_15'] = String(vm.totalCounter['total_15']) === 'undefined' ? 0 + currentData.overtimeInside : parseInt(vm.totalCounter['total_15']) + currentData.overtimeInside
-      vm.totalCounter['total_16'] = String(vm.totalCounter['total_16']) === 'undefined' ? 0 + currentData.overtimeOutside : parseInt(vm.totalCounter['total_16']) + currentData.overtimeOutside
-      vm.totalCounter['total_17'] = String(vm.totalCounter['total_17']) === 'undefined' ? 0 + currentData.ontimePercentage : parseInt(vm.totalCounter['total_17']) + currentData.ontimePercentage
-      vm.totalCounter['total_18'] = String(vm.totalCounter['total_18']) === 'undefined' ? 0 + currentData.doneCount : parseInt(vm.totalCounter['total_18']) + currentData.doneCount
-      vm.totalCounter['total_19'] = String(vm.totalCounter['total_19']) === 'undefined' ? 0 + currentData.releasingCount : parseInt(vm.totalCounter['total_19']) + currentData.releasingCount
-      vm.totalCounter['total_20'] = String(vm.totalCounter['total_20']) === 'undefined' ? 0 + currentData.unresolvedCount : parseInt(vm.totalCounter['total_20']) + currentData.unresolvedCount
-      vm.totalCounter['total_21'] = String(vm.totalCounter['total_21']) === 'undefined' ? 0 + currentData.processingCount : parseInt(vm.totalCounter['total_21']) + currentData.processingCount
-      vm.totalCounter['total_22'] = String(vm.totalCounter['total_22']) === 'undefined' ? 0 + currentData.undueCount : parseInt(vm.totalCounter['total_22']) + currentData.undueCount
-      vm.totalCounter['total_23'] = String(vm.totalCounter['total_23']) === 'undefined' ? 0 + currentData.overdueCount : parseInt(vm.totalCounter['total_23']) + currentData.overdueCount
-      vm.totalCounter['total_24'] = String(vm.totalCounter['total_24']) === 'undefined' ? 0 + currentData.waitingCount : parseInt(vm.totalCounter['total_24']) + currentData.waitingCount
-    },
-    clearCounterTotal () {
-      let vm = this
       vm.totalCounter['total_3'] = 0
       vm.totalCounter['total_4'] = 0
       vm.totalCounter['total_5'] = 0
@@ -469,6 +437,77 @@ export default {
       vm.totalCounter['total_22'] = 0
       vm.totalCounter['total_23'] = 0
       vm.totalCounter['total_24'] = 0
+      filter = {
+        year: vm.year,
+        month: vm.month,
+        group: vm.group,
+        reporting: true,
+        agency: 'total'
+      }
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result === null || result === undefined || result === 'undefined') {
+        } else {
+          let currentData = result[0]
+          vm.totalCounter['total_3'] = currentData.totalCount
+          vm.totalCounter['total_4'] = currentData.deniedCount
+          vm.totalCounter['total_5'] = currentData.cancelledCount
+          vm.totalCounter['total_6'] = currentData.processCount
+          vm.totalCounter['total_7'] = currentData.remainingCount
+          vm.totalCounter['total_8'] = currentData.receivedCount
+          vm.totalCounter['total_9'] = currentData.onegateCount
+          vm.totalCounter['total_10'] = currentData.onlineCount
+          vm.totalCounter['total_11'] = currentData.releaseCount
+          vm.totalCounter['total_12'] = currentData.betimesCount
+          vm.totalCounter['total_13'] = currentData.ontimeCount
+          vm.totalCounter['total_14'] = currentData.overtimeCount
+          vm.totalCounter['total_15'] = currentData.overtimeInside
+          vm.totalCounter['total_16'] = currentData.overtimeOutside
+          vm.totalCounter['total_17'] = currentData.ontimePercentage
+          vm.totalCounter['total_18'] = currentData.doneCount
+          vm.totalCounter['total_19'] = currentData.releasingCount
+          vm.totalCounter['total_20'] = currentData.unresolvedCount
+          vm.totalCounter['total_21'] = currentData.processingCount
+          vm.totalCounter['total_22'] = currentData.undueCount
+          vm.totalCounter['total_23'] = currentData.overdueCount
+          vm.totalCounter['total_24'] = currentData.waitingCount
+        }
+      })
+    },
+    changeYear (item) {
+      let vm = this
+      vm.year = item
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group
+        }
+      })
+    },
+    changeMonth (item) {
+      let vm = this
+      vm.month = item
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group
+        }
+      })
+    },
+    changeDonVi (item) {
+      let vm = this
+      vm.agency = item
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group
+        }
+      })
     }
   }
 }

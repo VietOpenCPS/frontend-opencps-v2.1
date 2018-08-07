@@ -21,7 +21,10 @@
             <!-- Cap 2 -->
             <v-expansion-panel expand class="expand__select__domain">
               <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains'>
-                <div slot='header' style="margin-left: 40px;">{{itemDomain.domainName}}</div>
+                <div slot='header' style="margin-left: 14px;">
+                   <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
+                   <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
+                </div>
                 <v-card>
                   <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
                     <!-- Cap 3 -->
