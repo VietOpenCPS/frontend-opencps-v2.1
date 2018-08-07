@@ -4,7 +4,7 @@
       <div style="position: relative;">
         <v-expansion-panel class="expansion-pl">
           <v-expansion-panel-content hide-actions value="1">
-            <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> THÔNG TIN CHỦ HỒ SƠ</div>
+            <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
             <v-card>
               <v-card-text>
                 <v-layout wrap>
@@ -193,7 +193,7 @@
         <div style="position: relative;" v-if="originality !== 1">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content hide-actions value="1">
-              <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> THÔNG TIN NGƯỜI NỘP HỒ SƠ</div>
+              <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
               <v-card>
                 <v-card-text>
                   <v-layout wrap>
@@ -241,7 +241,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tên tổ chức cá nhân: </v-subheader>
+                      <v-subheader v-else class="pl-0">Họ và tên: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -444,6 +444,12 @@ export default {
       var vm = this
       console.log('originality', vm.getOriginality())
       return vm.getOriginality()
+    },
+    viaPostal () {
+      return this.$store.getters.viaPostal
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
   created () {
@@ -465,6 +471,7 @@ export default {
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
+        vm.$store.commit('setThongTinChuHoSoBindChuyenPhat', value)
       },
       deep: true
     },
@@ -665,10 +672,10 @@ export default {
           } else {
             vm.thongTinChuHoSo.userType = true
           }
-          if (vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+          if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
             vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
           }
-          if (vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+          if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
             vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
           }
         }

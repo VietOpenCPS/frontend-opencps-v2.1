@@ -222,7 +222,7 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
-            <div class="py-3" v-if="btnStateVisible">
+            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
@@ -449,8 +449,8 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
-    dueDateEdit: null,
-    receiveDateEdit: null,
+    dueDateEdit: '',
+    receiveDateEdit: '',
     dialogActionProcess: false,
     rollbackable: false,
     configNote: null,
@@ -836,7 +836,7 @@ export default {
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
           vm.showEditDate = true
-          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : new Date()
+          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
           vm.receiveDateEdit = result.receiving.receiveDate
         }
       }

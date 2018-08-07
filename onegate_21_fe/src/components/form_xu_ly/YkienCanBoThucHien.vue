@@ -13,7 +13,7 @@
                 <v-text-field
                   v-model.lazy="noteYkien"
                   multi-line
-                  :rows="3"
+                  :rows="4"
                   :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
                 ></v-text-field>
               </v-form>

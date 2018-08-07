@@ -298,7 +298,7 @@ export default {
     initData (data) {
       var vm = this
       var arrTemp = []
-      console.log('dossierId++++++++', data.dossierId)
+      // console.log('dossierId++++++++', data.dossierId)
       arrTemp.push(vm.$store.dispatch('loadDossierTemplates', data))
       arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
       arrTemp.push(vm.$store.dispatch('loadDossierFiles', data.dossierId))
@@ -307,13 +307,13 @@ export default {
         var dossierTemplates = values[0]
         var dossierMarks = values[1]
         var dossierFiles = values[2]
-        console.log('dossierTemplates++++++', dossierTemplates)
-        console.log('dossierMarks++++++', dossierMarks)
-        console.log('dossierFiles++++++', dossierFiles)
+        // console.log('dossierTemplates++++++', dossierTemplates)
+        // console.log('dossierMarks++++++', dossierMarks)
+        // console.log('dossierFiles++++++', dossierFiles)
         var dossierTemplateItems = vm.mergeDossierTemplateVsDossierFiles(dossierTemplates, dossierFiles)
-        console.log('dossierTemplateItems++++++MERGER++++file', dossierTemplateItems)
+        // console.log('dossierTemplateItems++++++MERGER++++file', dossierTemplateItems)
         dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
-        console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
+        // console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
         vm.dossierTemplateItems = dossierTemplateItems
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
@@ -321,7 +321,7 @@ export default {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
         }, 500)
-        console.log('dossierTemplateItems', vm.dossierTemplateItems)
+        // console.log('dossierTemplateItems', vm.dossierTemplateItems)
       }).catch(reject => {
       })
     },
