@@ -211,8 +211,7 @@ export default {
         vm.viaPortalDetail = result.viaPostal
         if (result.viaPostal > 0) {
           vm.$store.commit('setDichVuChuyenPhatKetQua', result)
-          vm.$refs.dichvuchuyenphatketqua.initData(result)
-          console.log('run dichvuchuyenphat', result)
+          // vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
       }).catch(reject => {
       })

@@ -74,6 +74,12 @@ export const store = new Vuex.Store({
       address: '',
       applicantName: ''
     },
+    thongTinChuHoSoBindChuyenPhat: {
+      cityCode: '',
+      districtCode: '',
+      wardCode: '',
+      address: ''
+    },
     thongTinNguoiNopHoSo: {
       sameUser: true,
       delegateName: '',
@@ -579,7 +585,7 @@ export const store = new Vuex.Store({
               commit('setLePhi', response.data)
               commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
               commit('setThongTinChungHoSo', response.data)
-              commit('setDichVuChuyenPhatKetQua', response.data)
+              // commit('setDichVuChuyenPhatKetQua', response.data)
               resolve(response.data)
             }, error => {
               commit('setLoading', false)
@@ -691,7 +697,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChuHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setThongTinChungHoSo', response.data)
-          commit('setDichVuChuyenPhatKetQua', response.data)
+          // commit('setDichVuChuyenPhatKetQua', response.data)
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
@@ -824,7 +830,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChuHoSo', response.data)
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
-          commit('setDichVuChuyenPhatKetQua', response.data)
+          // commit('setDichVuChuyenPhatKetQua', response.data)
         }).catch(rejectXhr => {
           console.log('put dossier catch')
           reject(rejectXhr)
@@ -2320,12 +2326,20 @@ export const store = new Vuex.Store({
       }
       state.thongTinChuHoSo = thongTinChuHoSoPayLoad
     },
+    setThongTinChuHoSoBindChuyenPhat (state, payload) {
+      state.thongTinChuHoSoBindChuyenPhat = {
+        cityCode: payload.cityCode,
+        districtCode: payload.districtCode,
+        wardCode: payload.wardCode,
+        address: payload.address
+      }
+    },
     setThongTinNguoiNopHoSo (state, payload) {
       state.thongTinNguoiNopHoSo = Object.assign(state.thongTinNguoiNopHoSo, payload)
     },
     setDichVuChuyenPhatKetQua (state, payload) {
       let tempData = {
-        viaPostal: payload.viaPostal ? 2 : 1,
+        viaPostal: payload.viaPostal,
         postalServiceCode: payload.postalServiceCode ? payload.postalServiceCode : '',
         postalAddress: payload.postalAddress ? payload.postalAddress : '',
         postalCityCode: payload.postalCityCode ? payload.postalCityCode : '',
@@ -2497,6 +2511,9 @@ export const store = new Vuex.Store({
     },
     thongTinChuHoSo (state) {
       return state.thongTinChuHoSo
+    },
+    thongTinChuHoSoBindChuyenPhat (state) {
+      return state.thongTinChuHoSoBindChuyenPhat
     },
     activeGetCounter (state) {
       return state.activeGetCounter

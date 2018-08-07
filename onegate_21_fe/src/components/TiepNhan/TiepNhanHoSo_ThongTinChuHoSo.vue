@@ -241,7 +241,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tên tổ chức cá nhân: </v-subheader>
+                      <v-subheader v-else class="pl-0">Họ và tên: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -471,6 +471,7 @@ export default {
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
+        vm.$store.commit('setThongTinChuHoSoBindChuyenPhat', value)
       },
       deep: true
     },
@@ -671,21 +672,12 @@ export default {
           } else {
             vm.thongTinChuHoSo.userType = true
           }
-          if (vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+          if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
             vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
           }
-          if (vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+          if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
             vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
           }
-          let setDichVuChuyenPhat = {
-            viaPostal: vm.dichVuChuyenPhatKetQua.viaPostal,
-            postalServiceCode: vm.dichVuChuyenPhatKetQua.postalServiceCode ? vm.dichVuChuyenPhatKetQua.postalServiceCode : '',
-            postalAddress: vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : '',
-            postalCityCode: vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : '',
-            postalDistrictCode: vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : '',
-            postalWardCode: vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
-          }
-          vm.$store.commit('setDichVuChuyenPhatKetQua', setDichVuChuyenPhat)
         }
         return false
       }, 100)

@@ -178,30 +178,51 @@ export default {
         itemCode: 'VNPOST'
       }
     ]
-    // dichVuChuyenPhatKetQua: {
-    //   viaPostal: 0,
-    //   postalServiceCode: '',
-    //   postalServiceName: '',
-    //   postalAddress: '',
-    //   postalCityCode: '',
-    //   postalCityName: '',
-    //   postalDistrictCode: '',
-    //   postalDistrictName: '',
-    //   postalWardCode: '',
-    //   postalWardName: '',
-    //   postalTelNo: '',
-    //   vnPostCode: ''
-    // }
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
     },
+    thongTinChuHoSoBindChuyenPhat () {
+      return this.$store.getters.thongTinChuHoSoBindChuyenPhat
+    },
     dichVuChuyenPhatKetQua () {
       return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
+
   created () {
+  },
+  watch: {
+    thongTinChuHoSoBindChuyenPhat (val) {
+      var vm = this
+      console.log('val', val)
+      vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
+      vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
+      vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
+      vm.dichVuChuyenPhatKetQua.postalAddress = val.address
+      var filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 0,
+        parent: 0
+      }
+      if (val.cityCode) {
+        console.log('cityCode', val.cityCode)
+        filter.parent = val.cityCode
+        filter.level = 1
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+          vm.resultDistricts = result.data
+        })
+      }
+      if (val.districtCode) {
+        console.log('districtCode', val.districtCode)
+        filter.parent = val.districtCode
+        filter.level = 1
+        vm.$store.getters.getDictItems(filter).then(function (result) {
+          vm.resultWards = result.data
+        })
+      }
+    }
   },
   mounted () {
     var vm = this
@@ -232,7 +253,6 @@ export default {
   methods: {
     initData (data) {
       var vm = this
-      console.log('DV chuyen phat ket qua-----', data)
       // let dichVuChuyenPhatKetQuaTemp = {
       //   viaPostal: data.viaPostal,
       //   postalServiceCode: data.postalServiceCode,
