@@ -210,17 +210,13 @@ export default {
         console.log('cityCode', val.cityCode)
         filter.parent = val.cityCode
         filter.level = 1
-        vm.$store.getters.getDictItems(filter).then(function (result) {
-          vm.resultDistricts = result.data
-        })
+        vm.onChangeResultCity(val.cityCode)
       }
       if (val.districtCode) {
         console.log('districtCode', val.districtCode)
         filter.parent = val.districtCode
         filter.level = 1
-        vm.$store.getters.getDictItems(filter).then(function (result) {
-          vm.resultWards = result.data
-        })
+        vm.onChangeResultDistrict(val.districtCode)
       }
     }
   },

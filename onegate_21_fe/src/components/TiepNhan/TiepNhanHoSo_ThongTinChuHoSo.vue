@@ -735,7 +735,7 @@ export default {
       if (query.trim().length === 0) {
         return null
       }
-      const url = `/o/rest/v2/applicant?start=0&end=5&idNo=${query}`
+      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
       vm.$store.dispatch('loadInitResource').then(result => {
         let param = {
           headers: {

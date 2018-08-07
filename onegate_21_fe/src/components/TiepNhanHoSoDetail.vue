@@ -140,7 +140,8 @@ export default {
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
-    outputTypes: [2]
+    outputTypes: [2],
+    sampleCount: 0
   }),
   computed: {
     loading () {
@@ -307,6 +308,7 @@ export default {
         // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
+        tempData['sampleCount'] = vm.$refs.thanhphanhoso.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -314,13 +316,15 @@ export default {
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             //
-            var paymentsOut = null
-            paymentsOut = {
-              requestPayment: vm.payments['requestPayment'],
-              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            var paymentsOut = {}
+            if (vm.showThuPhi) {
+              paymentsOut = {
+                requestPayment: vm.payments['requestPayment'],
+                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+              }
             }
             var payloadDate = {
               'dueDate': tempData.dueDate,
@@ -334,7 +338,7 @@ export default {
               payload: JSON.stringify(payloadDate),
               security: '',
               assignUsers: '',
-              payment: JSON.stringify(paymentsOut),
+              // payment: JSON.stringify(paymentsOut),
               createDossiers: '',
               dueDate: tempData.dueDate
             }
