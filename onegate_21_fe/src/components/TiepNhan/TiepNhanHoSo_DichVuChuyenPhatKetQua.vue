@@ -187,6 +187,7 @@ export default {
       return this.$store.getters.thongTinChuHoSoBindChuyenPhat
     },
     dichVuChuyenPhatKetQua () {
+      console.log('dichVuChuyenPhatKetQua', this.$store.getters.dichVuChuyenPhatKetQua)
       return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
@@ -196,7 +197,6 @@ export default {
   watch: {
     thongTinChuHoSoBindChuyenPhat (val) {
       var vm = this
-      console.log('val', val)
       vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
       vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
       vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
@@ -207,15 +207,9 @@ export default {
         parent: 0
       }
       if (val.cityCode) {
-        console.log('cityCode', val.cityCode)
-        filter.parent = val.cityCode
-        filter.level = 1
         vm.onChangeResultCity(val.cityCode)
       }
       if (val.districtCode) {
-        console.log('districtCode', val.districtCode)
-        filter.parent = val.districtCode
-        filter.level = 1
         vm.onChangeResultDistrict(val.districtCode)
       }
     }
@@ -304,6 +298,7 @@ export default {
         level: 1,
         parent: data
       }
+      console.log('onChangeResultCity', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultDistricts = result.data
       })
@@ -315,6 +310,7 @@ export default {
         level: 2,
         parent: data
       }
+      console.log('onChangeResultDistrict', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultWards = result.data
       })

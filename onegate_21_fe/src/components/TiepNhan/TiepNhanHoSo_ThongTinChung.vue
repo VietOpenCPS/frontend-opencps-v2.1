@@ -68,11 +68,12 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <span class="text-bold">{{dueDateInput | dateTimeView}}</span>
               <vue-ctk-date-time-picker 
                 v-model="dueDateInput" 
-                label=""
                 format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                placeholder="Chọn ngày"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
               ></vue-ctk-date-time-picker>
               <v-icon style="margin-left: 8px;">event</v-icon>
@@ -156,8 +157,9 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : ''
+        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
         vm.minDate = vm.getCurentDateTime('date')
+        console.log('dueDateInput', vm.dueDateInput)
       },
       getthongtinchunghoso () {
         return this.thongTinChungHoSo

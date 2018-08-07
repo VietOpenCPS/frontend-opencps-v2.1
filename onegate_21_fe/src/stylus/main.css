@@ -2533,6 +2533,10 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
 .vdatetime-popup__date-picker__item > span {
     font-weight: normal !important
 }
+/*  */
+.input-group--text-field__suffix {
+    font-size: 14px !important
+}
 .card__text__gov span {
     line-height: 32px;
     font-size: 13px;
@@ -2550,17 +2554,20 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
 body .ctk-date-time-picker {
     font-size: 13px;
     border-radius: 0;
-    position: absolute;
+    /* position: absolute; */
 }
 body .ctk-date-time-picker .field .field-input {
     border-color: #e1e2e1 !important;
     border-radius: 0 !important;
     border: none !important;
-    border-bottom: 1px solid !important;
+    /* border-bottom: 1px solid !important; */
     height: 24px !important;
     min-height: 24px !important;
     padding: 0 !important;
-    opacity: 0 !important;
+    /* opacity: 0 !important; */
+}
+body .ctk-date-time-picker #CtkDateTimePicker {
+    font-weight: bold
 }
 body .datepicker-header {
     background: #0d71bb;
@@ -2578,6 +2585,9 @@ body .v-suggestions > input{
     border-bottom: 1px solid #949494;
     height: 28px;
     width: 100%;
+}
+body .v-suggestions > input:focus {
+    outline: medium !important
 }
 body .v-suggestions>input:hover {
     border-color: #212121
