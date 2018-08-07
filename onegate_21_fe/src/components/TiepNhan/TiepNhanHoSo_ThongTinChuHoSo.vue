@@ -22,30 +22,18 @@
                       v-if="originality === 1 || originality === '1'"
                       v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field>
-                    <v-select
-                      v-if="originality === 3 || originality === '3'"
-                      :items="applicantItems2"
-                      hide-selected
-                      tags
-                      v-model="thongTinChuHoSo.applicantIdNo"
-                      item-text="applicantIdNo"
-                      item-value="applicantIdNo"
-                      autocomplete
-                      clearable
-                      :search-input.sync="search2"
-                      @input="eventInput2($event)"
-                      cache-items
-                      return-object
-                    >
-                      <template slot="item" slot-scope="data">
-                        <template>
-                          <v-list-tile-content>
-                            <v-list-tile-title v-html="data.item.applicantName"></v-list-tile-title>
-                            <v-list-tile-sub-title v-html="data.item.applicantIdNo"></v-list-tile-sub-title>
-                          </v-list-tile-content>
-                        </template>
-                      </template>
-                    </v-select>
+                    <suggestions
+                      v-model="searchQuery"
+                      :options="searchOptions"
+                      :onItemSelected="onSearchItemSelected"
+                      :onInputChange="onInputChange">
+                      <div slot="item" slot-scope="props" class="single-item">
+                        <v-list-tile-content>
+                          <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
+                          <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
+                        </v-list-tile-content>
+                      </div>
+                    </suggestions>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -387,8 +375,13 @@
 </template>
 
 <script>
+import axios from 'axios'
+import Suggestions from 'v-suggestions'
 
 export default {
+  components: {
+    'suggestions': Suggestions
+  },
   data: () => ({
     valid_thongtinchuhoso: false,
     citys: [],
@@ -434,7 +427,10 @@ export default {
       delegateIdNo: ''
     },
     search: null,
-    search2: null
+    search2: null,
+    searchQuery: '',
+    selectedSearchItem: null,
+    searchOptions: {}
   }),
   computed: {
     loading () {
@@ -733,6 +729,34 @@ export default {
           vm.wards = result.data
         }
       })
+    },
+    onInputChange (query) {
+      let vm = this
+      if (query.trim().length === 0) {
+        return null
+      }
+      const url = `/o/rest/v2/applicant?start=0&end=5&idNo=${query}`
+      vm.$store.dispatch('loadInitResource').then(result => {
+        let param = {
+          headers: {
+            groupId: result.groupId
+          }
+        }
+        return new Promise(resolve => {
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            resolve(items)
+          })
+        })
+      })
+    },
+    onSearchItemSelected (item) {
+      this.selectedSearchItem = item
+      console.log('this.selectedSearchItem', this.selectedSearchItem)
     }
   }
 }

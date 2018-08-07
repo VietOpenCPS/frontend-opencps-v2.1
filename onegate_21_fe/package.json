@@ -26,6 +26,7 @@
     "v-suggestions": "^1.0.6",
     "vue": "^2.5.2",
     "vue-content-placeholders": "^0.2.1",
+    "vue-ctk-date-time-picker": "^1.1.19",
     "vue-datetime-2": "^0.6.1",
     "vue-router": "^3.0.1",
     "vuetify": "^1.0.19",

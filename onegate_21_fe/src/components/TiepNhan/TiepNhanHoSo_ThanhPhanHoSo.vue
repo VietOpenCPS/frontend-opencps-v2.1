@@ -55,7 +55,7 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text style="background-color: #efeeee;">
+              <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
@@ -70,7 +70,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan">
+        <div class="absolute__btn group__thanh_phan pr-3 mr-1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
