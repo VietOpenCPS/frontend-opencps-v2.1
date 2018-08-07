@@ -68,7 +68,7 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <datetime v-model="dueDateInput" v-on:input="changeDate"
+              <!-- <datetime v-model="dueDateInput" v-on:input="changeDate"
                 placeholder="Chọn ngày"
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
@@ -80,7 +80,15 @@
                 auto-continue
                 auto-close
               ></datetime>
-              <v-icon>event</v-icon>
+              <v-icon>event</v-icon> -->
+
+              <vue-ctk-date-time-picker 
+                v-model="dueDateInput" 
+                label=""
+                format="YYYY-MM-DDTHH:mm"
+                :min-date="minDate"
+              ></vue-ctk-date-time-picker>
+              <v-icon style="margin-left: 8px;">event</v-icon>
             </v-subheader>
           </v-flex>
         </v-layout>
@@ -91,7 +99,11 @@
 
 <script>
   // import router from '@/router'
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
+    components: {
+      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+    },
     data: () => ({
       minDate: null,
       editable: false,
@@ -132,7 +144,11 @@
         return this.$store.getters.isDetail
       }
     },
-    watch: {},
+    watch: {
+      dueDateInput (val) {
+        this.thongTinChungHoSo['dueDate'] = this.getDuedateF(val)
+      }
+    },
     methods: {
       initData (data) {
         var vm = this
@@ -174,6 +190,11 @@
       getDuedate () {
         var vm = this
         let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
+        return date
+      },
+      getDuedateF (val) {
+        var vm = this
+        let date = (new Date(val)).getTime()
         return date
       },
       durationText (durationUnit, durationCount) {

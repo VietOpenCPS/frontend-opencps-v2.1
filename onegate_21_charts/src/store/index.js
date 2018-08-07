@@ -44,14 +44,14 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: 1, // state.initData.groupId,
+              groupId: state.initData.groupId,
               Accept: 'application/json'
             },
             params: {
               year: filter.year,
               month: filter.month,
               group: filter.group,
-              reporting: true
+              reporting: false
             }
           }
           axios.get('/o/rest/statistics', param).then(function (response) {

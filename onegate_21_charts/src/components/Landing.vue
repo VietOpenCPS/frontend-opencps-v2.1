@@ -61,7 +61,7 @@
       </div> 
     </div>
     <div v-if="String(index) === '0'">
-      <div class="layout wrap" v-if="!noReportData">
+      <div class="layout wrap" v-if="agencyLists !== null && agencyLists !== undefined && agencyLists.length > 0">
         <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="String(item.govAgencyCode) !== '' && reloadPie">
           <pie-chart-report :item="item" :year="year" :month="month"></pie-chart-report>
         </v-flex>
@@ -203,7 +203,7 @@
                     <td align="center">{{item.waitingCount}}</td>
                   </tr>
                   <tr class="sum__column" style="font-weight: bold;">
-                    <td align="center" colspan="2">Tổng số <br> <small v-if="agencyLists !== null && agencyLists.length > 1"> ( {{agencyLists.length}} đơn vị ) </small></td>
+                    <td align="center" colspan="2">Tổng số <br> <small v-if="agencyLists !== null && agencyLists.length > 0"> ( {{agencyLists.length}} đơn vị ) </small></td>
                     <td align="center ">{{totalCounter['total_3']}}</td>
                     <td align="center">{{totalCounter['total_4']}}</td>
                     <td align="center">{{totalCounter['total_5']}}</td>
@@ -394,6 +394,7 @@ export default {
         } else {
           vm.noReportData = false
           vm.agencyLists = result
+          console.log('vm.agencyLists', vm.agencyLists)
           if (String(vm.index) === '1') {
             for (let key in vm.agencyLists) {
               let currentData = vm.agencyLists[key]

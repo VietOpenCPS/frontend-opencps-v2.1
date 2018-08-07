@@ -33,7 +33,6 @@
   import router from '@/router'
   export default {
     data: () => ({
-      isCallBack: true,
       danhSachBaoCao: []
     }),
     computed: {
@@ -53,13 +52,6 @@
     updated () {
       var vm = this
       vm.$nextTick(function () {
-        let currentParams = vm.$router.history.current.params
-        if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
-          vm.isCallBack = false
-          vm.danhSachBaoCao = vm.loadingMenuConfigToDo
-          console.log(vm.danhSachBaoCao[currentParams.index])
-          vm.danhSachBaoCao[currentParams.index]['active'] = true
-        }
       })
     },
     watch: {

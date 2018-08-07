@@ -11,7 +11,11 @@
     </div>
     <v-expansion-panel v-else expand class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
-        <div slot='header' class="ml-3"><v-icon>account_balance</v-icon> {{itemGov.govAgencyName}}</div>
+        <div slot='header' class="ml-3"><v-icon style="
+            font-size: 14px;
+            margin-top: -4px;
+            padding-right: 5px;
+        ">account_balance</v-icon> {{itemGov.govAgencyName}}</div>
         <v-card>
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <!-- Cap 2 -->
@@ -19,32 +23,30 @@
               <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains'>
                 <div slot='header' style="margin-left: 40px;">{{itemDomain.domainName}}</div>
                 <v-card>
-                  <v-card-text class="card__text__gov" style="font-size: 13px; margin-left: 38px;">
+                  <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
                     <!-- Cap 3 -->
-                    <div slot="header">
-                      <v-layout row wrap v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3' class="center-all ml-2 mb-2">
-                        <v-flex xs12 sm9>
-                          <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-                          <span>{{itemServiceConfig.serviceInfoName}}</span>
-                        </v-flex>
-                        <v-flex xs12 sm1 class="text-xs-center">
-                          Mức {{itemServiceConfig.level}}
-                        </v-flex>
-                        <v-flex xs12 sm2 class="text-xs-center">
-                          <v-menu left>
-                          <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
-                              Chọn
-                            </v-btn>
-                            <v-list v-if="serviceOptions.length > 1">
-                              <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                              @click="selectServiceOption(itemOption, itemGov.govAgencyCode)">
-                              <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                            </v-list-tile>
-                          </v-list>
-                        </v-menu>
-                        </v-flex>
-                      </v-layout>
-                    </div>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm9>
+                        <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
+                        <span>{{itemServiceConfig.serviceInfoName}}</span>
+                      </v-flex>
+                      <v-flex xs12 sm1 class="text-xs-center">
+                        <span>Mức {{itemServiceConfig.level}}</span>
+                      </v-flex>
+                      <v-flex xs12 sm2 class="text-xs-center">
+                        <v-menu left>
+                        <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
+                            Chọn
+                          </v-btn>
+                          <v-list v-if="serviceOptions.length > 1">
+                            <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                            @click="selectServiceOption(itemOption, itemGov.govAgencyCode)">
+                            <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                          </v-list-tile>
+                        </v-list>
+                      </v-menu>
+                      </v-flex>
+                    </v-layout>
                   </v-card-text>
                 </v-card>
               </v-expansion-panel-content>
