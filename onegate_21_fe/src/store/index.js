@@ -515,7 +515,7 @@ export const store = new Vuex.Store({
         formData.append('file', file)
         formData.append('dossierPartNo', data.partNo)
         formData.append('dossierTemplateNo', data.dossierTemplateNo)
-        formData.append('fileTemplateNo', data.partNo)
+        formData.append('fileTemplateNo', data.fileTemplateNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
@@ -540,6 +540,13 @@ export const store = new Vuex.Store({
         formData.append('displayName', data.displayName ? data.displayName : '')
         formData.append('dossierPartNo', data.partNo ? data.partNo : '')
         formData.append('file', '')
+        formData.append('fileType', '')
+        formData.append('fileSize', '')
+        formData.append('isSync', 'false')
+        formData.append('dossierTemplateNo', '')
+        formData.append('fileTemplateNo', '')
+        formData.append('formData', '')
+        formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,

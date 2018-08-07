@@ -15,6 +15,11 @@
                 <i v-if="item.hasForm" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> 
                 <span v-if="item.hasForm">&nbsp;-&nbsp;</span> 
                 <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i>
+                <!-- <v-text-field
+                  v-model="item.fileComment"
+                  v-if="checkInput === 1 && item.fileComment !== ''"
+                ></v-text-field>
+                <i style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> -->
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -59,8 +64,9 @@
               </v-radio-group> -->
               <v-select
                 :items="fileMarkItems"
-                v-model="dossierTemplateItems[index].fileMark"
+                v-model="item.fileMark"
                 :disabled="onlyView"
+                @change="changeFileMark(item, index)"
               ></v-select>
             </v-flex>
             <v-flex :style="{width: !onlyView ? '100px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
@@ -217,6 +223,10 @@ export default {
     partTypes: {
       type: Array,
       default: () => [1, 3]
+    },
+    checkInput: {
+      type: Number,
+      default: () => 0
     }
   },
   data: () => ({
@@ -412,8 +422,12 @@ export default {
           })
           if (fileMarkFind !== null && fileMarkFind !== undefined) {
             itemTemplate['fileMark'] = fileMarkFind.fileMark
+            itemTemplate['fileComment'] = fileMarkFind.fileComment
+            itemTemplate['fileCheck'] = fileMarkFind.fileCheck
           } else {
             itemTemplate['fileMark'] = 0
+            itemTemplate['fileComment'] = ''
+            itemTemplate['fileCheck'] = ''
           }
           return itemTemplate
         })
@@ -422,6 +436,8 @@ export default {
           dossierTemplates.forEach(itemTemplate => {
             itemTemplate['count'] = 0
             itemTemplate['fileMark'] = 0
+            itemTemplate['fileComment'] = ''
+            itemTemplate['fileCheck'] = ''
           })
         }
       }
@@ -514,12 +530,12 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
-            var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-              return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
-            })
-            if (fileViewsTemp) {
-              vm.fileViews = fileViewsTemp
-            }
+            // var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+            //   return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
+            // })
+            // if (fileViewsTemp) {
+            //   vm.fileViews = fileViewsTemp
+            // }
           })
         }).catch(function (xhr) {
           vm.progressUploadPart = ''
@@ -691,7 +707,7 @@ export default {
         })
       }
     },
-    changeFileMark (item) {
+    changeFileMark (item, index) {
       var vm = this
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('postDossierMark', item)

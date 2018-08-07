@@ -299,9 +299,9 @@ export default {
             }
           })
         }
-        if (vm.$refs.thanhphanhoso) {
-          vm.$refs.thanhphanhoso.saveMark()
-        }
+        // if (vm.$refs.thanhphanhoso) {
+        //   vm.$refs.thanhphanhoso.saveMark()
+        // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         console.log('data put dossier -->', tempData)
