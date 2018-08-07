@@ -22,30 +22,19 @@
                       v-if="originality === 1 || originality === '1'"
                       v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field>
-                    <v-select
+                    <suggestions
                       v-if="originality === 3 || originality === '3'"
-                      :items="applicantItems2"
-                      hide-selected
-                      tags
                       v-model="thongTinChuHoSo.applicantIdNo"
-                      item-text="applicantIdNo"
-                      item-value="applicantIdNo"
-                      autocomplete
-                      clearable
-                      :search-input.sync="search2"
-                      @input="eventInput2($event)"
-                      cache-items
-                      return-object
-                    >
-                      <template slot="item" slot-scope="data">
-                        <template>
-                          <v-list-tile-content>
-                            <v-list-tile-title v-html="data.item.applicantName"></v-list-tile-title>
-                            <v-list-tile-sub-title v-html="data.item.applicantIdNo"></v-list-tile-sub-title>
-                          </v-list-tile-content>
-                        </template>
-                      </template>
-                    </v-select>
+                      :options="searchOptions"
+                      :onItemSelected="onSearchItemSelected"
+                      :onInputChange="onInputChange">
+                      <div slot="item" slot-scope="props" class="single-item">
+                        <v-list-tile-content>
+                          <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
+                          <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
+                        </v-list-tile-content>
+                      </div>
+                    </suggestions>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -212,7 +201,20 @@
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
                       ></v-text-field>
                       <!--  -->
-                      <v-select
+                      <suggestions
+                        v-if="originality === 3 || originality === '3'"
+                        v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                        :options="searchOptions"
+                        :onItemSelected="onSearchItemSelected1"
+                        :onInputChange="onInputChange1">
+                        <div slot="item" slot-scope="props" class="single-item">
+                          <v-list-tile-content>
+                            <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
+                            <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </div>
+                      </suggestions>
+                      <!-- <v-select
                       v-if="originality === 3 || originality === '3'"
                       :items="applicantItems"
                       hide-selected
@@ -235,7 +237,7 @@
                             </v-list-tile-content>
                           </template>
                         </template>
-                      </v-select>
+                      </v-select> -->
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -387,8 +389,13 @@
 </template>
 
 <script>
+import axios from 'axios'
+import Suggestions from 'v-suggestions'
 
 export default {
+  components: {
+    'suggestions': Suggestions
+  },
   data: () => ({
     valid_thongtinchuhoso: false,
     citys: [],
@@ -434,7 +441,10 @@ export default {
       delegateIdNo: ''
     },
     search: null,
-    search2: null
+    search2: null,
+    searchQuery: '',
+    selectedSearchItem: null,
+    searchOptions: {}
   }),
   computed: {
     loading () {
@@ -450,6 +460,15 @@ export default {
     },
     dichVuChuyenPhatKetQua () {
       return this.$store.getters.dichVuChuyenPhatKetQua
+    },
+    ThongTinChuHoSoBindChuyenPhat () {
+      let data = {
+        cityCode: this.thongTinChuHoSo.cityCode,
+        address: this.thongTinChuHoSo.address,
+        districtCode: this.thongTinChuHoSo.districtCode,
+        wardCode: this.thongTinChuHoSo.wardCode
+      }
+      return data
     }
   },
   created () {
@@ -471,7 +490,6 @@ export default {
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
-        vm.$store.commit('setThongTinChuHoSoBindChuyenPhat', value)
       },
       deep: true
     },
@@ -496,6 +514,9 @@ export default {
         }
       },
       deep: true
+    },
+    ThongTinChuHoSoBindChuyenPhat (val) {
+      this.$store.commit('setThongTinChuHoSoBindChuyenPhat', val)
     },
     search (val) {
       val && this.querySelections(val)
@@ -589,7 +610,6 @@ export default {
       })
     },
     onChangeCity (data) {
-      console.log('onChangeCity')
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
@@ -607,7 +627,6 @@ export default {
       })
     },
     onChangeDistrict (data) {
-      console.log('onChangeDistrict')
       var vm = this
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
@@ -733,6 +752,104 @@ export default {
           vm.wards = result.data
         }
       })
+    },
+    onInputChange (query) {
+      let vm = this
+      if (query.trim().length === 0) {
+        return null
+      }
+      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      // test local
+      // const url = `http://127.0.0.1:8081/api/applicant?start=0&end=5&idNo=${query}`
+      return new Promise(resolve => {
+        vm.$store.dispatch('loadInitResource').then(result => {
+          let param = {
+            headers: {
+              groupId: result.groupId
+            }
+          }
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            resolve(items)
+          })
+        })
+      })
+    },
+    onInputChange1 (query) {
+      let vm = this
+      if (query.trim().length === 0) {
+        return null
+      }
+      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      // test local
+      // const url = `http://127.0.0.1:8081/api/applicant?start=0&end=5&idNo=${query}`
+      return new Promise(resolve => {
+        vm.$store.dispatch('loadInitResource').then(result => {
+          let param = {
+            headers: {
+              groupId: result.groupId
+            }
+          }
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            resolve(items)
+          })
+        })
+      })
+    },
+    onSearchItemSelected (item) {
+      var vm = this
+      vm.selectedSearchItem = item
+      console.log('selectedSearchItem', vm.selectedSearchItem)
+      vm.thongTinChuHoSo.applicantIdNo = item.applicantIdNo.toString()
+      //
+      vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''
+      vm.thongTinChuHoSo['address'] = item['address'] ? item['address'] : ''
+      vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
+      vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
+      vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
+      vm.thongTinChuHoSo.districtCode = item['districtCode'] ? item['districtCode'] : ''
+      vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
+      if (item['applicantIdType'] === 'business') {
+        vm.thongTinChuHoSo.userType = false
+      } else {
+        vm.thongTinChuHoSo.userType = true
+      }
+      if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+        vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+      }
+      if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+        vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
+      }
+    },
+    onSearchItemSelected1 (item) {
+      var vm = this
+      vm.selectedSearchItem = item
+      console.log('selectedSearchItem', item)
+      vm.thongTinNguoiNopHoSo.delegateIdNo = item.applicantIdNo.toString()
+      //
+      vm.thongTinNguoiNopHoSo['delegateName'] = item['applicantName'] ? item['applicantName'] : ''
+      vm.thongTinNguoiNopHoSo['delegateAddress'] = item['address'] ? item['address'] : ''
+      vm.thongTinNguoiNopHoSo['delegateTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
+      vm.thongTinNguoiNopHoSo['delegateEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
+      vm.thongTinNguoiNopHoSo['delegateCityCode'] = item['cityCode'] ? item['cityCode'] : ''
+      vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
+      vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
+      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+        vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+      }
+      if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+        vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
+      }
+      console.log('vm.thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
     }
   }
 }

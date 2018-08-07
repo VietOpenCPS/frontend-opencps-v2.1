@@ -11,7 +11,7 @@
           <v-card-text>
             <v-layout wrap class="pl-2">
               <v-icon color="blue">event</v-icon>
-              <datetime v-model="dueDateInput"
+              <!-- <datetime v-model="dueDateInput"
                 class="ml-2"
                 placeholder="Chọn ngày"
                 type="datetime"
@@ -23,7 +23,17 @@
                 wrapper-class="wrapper-datetime"
                 auto-continue
                 auto-close
-              ></datetime>
+              ></datetime> -->
+              <vue-ctk-date-time-picker 
+                style="width:auto!important"
+                class="ml-2"
+                v-model="dueDateInput" 
+                format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                placeholder="Chọn ngày"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
+                :min-date="minDate"
+              ></vue-ctk-date-time-picker>
             </v-layout>
           </v-card-text>
         </v-card>
@@ -32,8 +42,11 @@
   </div>
 </template>
 <script>
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 export default {
-  components: {},
+  components: {
+    'vue-ctk-date-time-picker': VueCtkDateTimePicker
+  },
   props: ['dueDateEdit'],
   data: () => ({
     dueDateInput: '',

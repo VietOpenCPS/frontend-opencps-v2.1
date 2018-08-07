@@ -68,7 +68,7 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <datetime v-model="dueDateInput" v-on:input="changeDate"
+              <!-- <datetime v-model="dueDateInput" v-on:input="changeDate"
                 placeholder="Chọn ngày"
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
@@ -80,6 +80,16 @@
                 auto-continue
                 auto-close
               ></datetime>
+              <v-icon>event</v-icon> -->
+
+              <vue-ctk-date-time-picker 
+                v-model="dueDateInput" 
+                format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                placeholder="Chọn ngày"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
+                :min-date="minDate"
+              ></vue-ctk-date-time-picker>
               <v-icon>event</v-icon>
             </v-subheader>
           </v-flex>
@@ -91,7 +101,11 @@
 
 <script>
   // import router from '@/router'
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
+    components: {
+      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+    },
     data: () => ({
       minDate: null,
       editable: false,
@@ -132,7 +146,11 @@
         return this.$store.getters.isDetail
       }
     },
-    watch: {},
+    watch: {
+      dueDateInput (val) {
+        this.thongTinChungHoSo['dueDate'] = this.getDuedateF(val)
+      }
+    },
     methods: {
       initData (data) {
         var vm = this
@@ -153,8 +171,9 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : ''
+        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
         vm.minDate = vm.getCurentDateTime('date')
+        console.log('dueDateInput', vm.dueDateInput)
       },
       getthongtinchunghoso () {
         return this.thongTinChungHoSo
@@ -174,6 +193,11 @@
       getDuedate () {
         var vm = this
         let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
+        return date
+      },
+      getDuedateF (val) {
+        var vm = this
+        let date = (new Date(val)).getTime()
         return date
       },
       durationText (durationUnit, durationCount) {

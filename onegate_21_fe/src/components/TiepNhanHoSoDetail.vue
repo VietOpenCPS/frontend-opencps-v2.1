@@ -53,7 +53,7 @@
     <!--  -->
     <div style="position: relative;" v-if="viaPortalDetail !== 0">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
+        <v-expansion-panel-content hide-actions value="2">
           <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
           <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
         </v-expansion-panel-content>
@@ -62,7 +62,7 @@
     <!--  -->
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
+        <v-expansion-panel-content hide-actions value="">
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -149,6 +149,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
   created () {
@@ -176,7 +179,7 @@ export default {
                 actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
               }).then(resAction => {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
                 result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
@@ -287,7 +290,8 @@ export default {
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
@@ -314,13 +318,15 @@ export default {
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             //
-            var paymentsOut = null
-            paymentsOut = {
-              requestPayment: vm.payments['requestPayment'],
-              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            var paymentsOut = {}
+            if (vm.showThuPhi) {
+              paymentsOut = {
+                requestPayment: vm.payments['requestPayment'],
+                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+              }
             }
             var payloadDate = {
               'dueDate': tempData.dueDate,

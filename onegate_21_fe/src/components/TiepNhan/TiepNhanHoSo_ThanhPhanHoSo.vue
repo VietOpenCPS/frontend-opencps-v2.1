@@ -31,7 +31,7 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text style="background-color: #efeeee;">
+              <v-card-text style="background-color: #f6f6f6;">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
@@ -45,7 +45,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan" v-if="!onlyView || originality !== 1">
+        <div class="absolute__btn group__thanh_phan pr-3 mr-1" v-if="!onlyView || originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
