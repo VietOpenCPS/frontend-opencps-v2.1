@@ -314,13 +314,15 @@ export default {
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
             //
-            var paymentsOut = null
-            paymentsOut = {
-              requestPayment: vm.payments['requestPayment'],
-              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            var paymentsOut = {}
+            if (vm.showThuPhi) {
+              paymentsOut = {
+                requestPayment: vm.payments['requestPayment'],
+                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+              }
             }
             var payloadDate = {
               'dueDate': tempData.dueDate,

@@ -673,9 +673,11 @@ export default {
             vm.thongTinChuHoSo.userType = true
           }
           if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+            console.log('change thongtinchu cityCode')
             vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
           }
           if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+            console.log('change thongtinchu districtCode')
             vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
           }
         }

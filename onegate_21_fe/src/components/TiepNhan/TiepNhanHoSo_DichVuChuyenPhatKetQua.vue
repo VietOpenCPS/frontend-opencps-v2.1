@@ -207,18 +207,18 @@ export default {
         parent: 0
       }
       if (val.cityCode) {
-        console.log('cityCode', val.cityCode)
         filter.parent = val.cityCode
         filter.level = 1
         vm.$store.getters.getDictItems(filter).then(function (result) {
+          console.log('run watch 1', val.cityCode)
           vm.resultDistricts = result.data
         })
       }
       if (val.districtCode) {
-        console.log('districtCode', val.districtCode)
         filter.parent = val.districtCode
         filter.level = 1
         vm.$store.getters.getDictItems(filter).then(function (result) {
+          console.log('run watch 2', val.districtCode)
           vm.resultWards = result.data
         })
       }
@@ -308,6 +308,7 @@ export default {
         level: 1,
         parent: data
       }
+      console.log('onChangeResultCity', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultDistricts = result.data
       })
@@ -319,6 +320,7 @@ export default {
         level: 2,
         parent: data
       }
+      console.log('onChangeResultDistrict', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.resultWards = result.data
       })
