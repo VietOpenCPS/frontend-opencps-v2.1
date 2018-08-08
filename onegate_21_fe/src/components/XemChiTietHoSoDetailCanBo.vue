@@ -211,14 +211,14 @@
             </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <div style="position: relative;" v-if="checkInput === 2">
+            <div style="position: relative;" v-if="checkInput !== 0">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                     THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
@@ -1180,12 +1180,15 @@ export default {
         console.log('vm.checkInput======', vm.getCheckInput)
         vm.checkInput = vm.getCheckInput
         if (vm.getCheckInput !== null && vm.getCheckInput !== undefined) {
-          if (vm.checkInput === 2) {
+          if (vm.checkInput !== 0) {
             setTimeout(function () {
               vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
             }, 300)
           }
         }
+        // setTimeout(function () {
+        //   vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+        // }, 300)
       })
       // vm.$store.dispatch('pullProcessSteps', {
       //   stepCode: vm.thongTinChiTietHoSo.stepCode

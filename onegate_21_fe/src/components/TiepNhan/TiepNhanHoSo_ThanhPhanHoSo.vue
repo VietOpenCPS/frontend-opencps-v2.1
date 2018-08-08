@@ -11,11 +11,19 @@
                   <div class="header__tphs">
                     {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                     <v-tooltip top v-if="item.hasForm">
-                      <i style="color: #0d71bb; margin-left: 10px;" class="fa fa-file-o" aria-hidden="true"></i>
+                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
+                        <v-badge>
+                           <i style="color: #0d71bb; margin-left: 10px; font-size: 13px;" class="fa fa-file-o" aria-hidden="true"></i>
+                        </v-badge>
+                      </v-btn>
                       <span>Form trực tuyến</span>
                     </v-tooltip>
-                    <v-tooltip top v-if="item.hasForm">
-                      <i style="color: #0d71bb;" class="fa fa-file-text-o"></i>
+                    <v-tooltip top v-if="item.hasForm && item.daKhai">
+                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
+                        <v-badge>
+                           <i style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o"></i>
+                        </v-badge>
+                      </v-btn>
                       <span>{{item.daKhai ? 'Đã khai' : 'Chưa khai '}}</span>
                     </v-tooltip>
                     <v-tooltip top v-if="!item.hasForm">
@@ -35,6 +43,7 @@
                   v-model="item.fileComment"
                   placeholder="Nhập lý do"
                   v-if="checkInput === 1 && item.fileCheck === 2"
+                  append-icon="send"
                   v-on:click.stop=""
                   @change="changeFileComment($event, item)"
                 ></v-text-field>
@@ -169,7 +178,7 @@
           </v-layout>
         </div> -->
       </div>
-      <v-layout row wrap>
+      <v-layout row wrap v-if="id !== 'kq'">
         <v-flex xs12 sm2>
           <v-subheader>Số bộ hồ sơ: </v-subheader>
         </v-flex>
@@ -177,9 +186,9 @@
           <v-text-field v-if="!onlyView"
           v-model="sampleCount"
           ></v-text-field>
-          <v-subheader v-else style="float:left">
+          <v-subheader v-else style="float:left" v-if="thongTinHoSo.sampleCount">
             <span class="text-bold">
-              {{thongTinChiTietHoSo.sampleCount}}
+              {{thongTinHoSo.sampleCount}}
             </span>
           </v-subheader>
         </v-flex>
@@ -273,14 +282,7 @@ export default {
     checkInput: {
       type: Number,
       default: () => 0
-    },
-    sampleCount: {
-      type: Number,
-      default: () => 0
     }
-  },
-  model: {
-    prop: 'sampleCount'
   },
   data: () => ({
     dossierTemplateItems: [],
@@ -302,6 +304,7 @@ export default {
     stateAddFileOther: false,
     dossierTemplatesItemSelect: {},
     fileViews: [],
+    sampleCount: 0,
     fileMarkItems: [{
       text: 'Không có',
       value: 0
@@ -377,10 +380,12 @@ export default {
         serviceInfoId: data.serviceCode
       }).then(resultServiceInfo => {
         console.log('resultServiceInf---------', resultServiceInfo)
-        if (Array.isArray(resultServiceInfo.fileTemplates)) {
-          vm.fileTemplateItems = resultServiceInfo.fileTemplates
-        } else {
-          vm.fileTemplateItems.push(resultServiceInfo.fileTemplates)
+        if (resultServiceInfo['fileTemplates']) {
+          if (Array.isArray(resultServiceInfo.fileTemplates)) {
+            vm.fileTemplateItems = resultServiceInfo.fileTemplates
+          } else {
+            vm.fileTemplateItems.push(resultServiceInfo.fileTemplates)
+          }
         }
         console.log('vm.fileTemplateItems---------', vm.fileTemplateItems)
       })
@@ -818,11 +823,11 @@ export default {
     checkStyle (item) {
       var vm = this
       if (vm.checkInput === 1) {
-        return 'calc(100% - 125px)'
+        return 'calc(100% - 140px)'
       } else {
         let divPx = 0
         if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
-          divPx += 120
+          divPx += 140
         }
         if (item.fileCheck > 0) {
           divPx += 60

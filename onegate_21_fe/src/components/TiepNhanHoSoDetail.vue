@@ -62,7 +62,7 @@
     <!--  -->
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="">
+        <v-expansion-panel-content hide-actions value="2">
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -342,7 +342,7 @@ export default {
               payload: JSON.stringify(payloadDate),
               security: '',
               assignUsers: '',
-              // payment: JSON.stringify(paymentsOut),
+              payment: JSON.stringify(paymentsOut),
               createDossiers: '',
               dueDate: tempData.dueDate
             }
