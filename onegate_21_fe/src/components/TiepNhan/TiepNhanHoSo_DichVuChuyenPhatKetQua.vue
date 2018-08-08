@@ -187,7 +187,6 @@ export default {
       return this.$store.getters.thongTinChuHoSoBindChuyenPhat
     },
     dichVuChuyenPhatKetQua () {
-      console.log('dichVuChuyenPhatKetQua', this.$store.getters.dichVuChuyenPhatKetQua)
       return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },

@@ -776,23 +776,7 @@ export const store = new Vuex.Store({
         } else {
           applicantType = 'citizen'
         }
-        var applicantIdNo = ''
-        var delegateIdNo = ''
-        if (Array.isArray(data.applicantIdNo)) {
-          if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'string') {
-            applicantIdNo = data.applicantIdNo[0]
-          } else if (data.applicantIdNo[0] && typeof (data.applicantIdNo[0]) === 'object') {
-            applicantIdNo = data.applicantIdNo[0].applicantIdNo
-          }
-        } else {
-          applicantIdNo = data.applicantIdNo
-        }
         //
-        if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'string') {
-          delegateIdNo = data.delegateIdNo[0]
-        } else if (data.delegateIdNo[0] && typeof (data.delegateIdNo[0]) === 'object') {
-          delegateIdNo = data.delegateIdNo[0].applicantIdNo
-        }
         let isSameAsApplicant = false
         if (data['sameUser'] !== null && data['sameUser'] !== undefined && data['sameUser'] !== 'undefined') {
           isSameAsApplicant = data['sameUser']
@@ -801,7 +785,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', applicantIdNo)
+        dataPutdossier.append('applicantIdNo', Number(data.applicantIdNo))
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -809,7 +793,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', delegateIdNo)
+        dataPutdossier.append('delegateIdNo', Number(data.delegateIdNo))
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)
@@ -819,7 +803,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('applicantNote', data.applicantNote)
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
-          dataPutdossier.append('dueDate', data.dueDate)
+          dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
         }
         if (data.viaPostal) {
           dataPutdossier.append('viaPostal', data.viaPostal)
