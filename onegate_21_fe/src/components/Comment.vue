@@ -106,7 +106,7 @@ export default {
     initComment: function () {
       var vm = this
       $('#comments-container-el').comments({
-        profilePictureURL: 'https://viima-app.s3.amazonaws.com/media/user_profiles/user-icon.png',
+        profilePictureURL: 'https://png.icons8.com/material/50/000000/guest-male.png',
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,
@@ -344,7 +344,7 @@ export default {
         vm.comment.fileUrl = null
       }
       if (comment.pictureUrl === '') {
-        vm.comment.pictureUrl = 'https://viima-app.s3.amazonaws.com/media/user_profiles/user-icon.png'
+        vm.comment.pictureUrl = 'https://png.icons8.com/material/50/000000/guest-male.png'
       }
       vm.comment.fullname = comment.fullname
       vm.comment.opinion = comment.opinion
