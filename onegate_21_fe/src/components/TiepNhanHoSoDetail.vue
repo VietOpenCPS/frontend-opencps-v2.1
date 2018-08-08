@@ -62,7 +62,7 @@
     <!--  -->
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="">
+        <v-expansion-panel-content hide-actions value="2">
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -287,8 +287,8 @@ export default {
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
