@@ -13,6 +13,7 @@
   "dependencies": {
     "alpaca": "^1.5.24",
     "axios": "^0.18.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.1.1",
     "glyphicons": "^0.2.0",
