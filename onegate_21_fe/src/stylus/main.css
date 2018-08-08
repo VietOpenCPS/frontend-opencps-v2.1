@@ -2249,7 +2249,9 @@ body .no_acction__event {
 }
 
 body .has-error.alpaca-field-text:before {
-    border: 1px dashed #f38c8ca1 !important;
+    border: 1px dashed #ef6868 !important;
+    height: 0;
+    background-color: transparent;
 }
 .has-error.alpaca-field-text:after {
     content: '';
@@ -2258,10 +2260,11 @@ body .has-error.alpaca-field-text:before {
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: rgba(244, 247, 213, 0.19);
+    background-color: hsl(60, 60%, 98%);
 }
 body .alpaca-field-text:before, body .alpaca-field-date:before, body .alpaca-field-datetime:before {
     height: 0;
+    background-color: transparent;
 }
 .alpaca-field-text.alpaca-field-valid:before, .alpaca-field-date.alpaca-field-valid:before, .alpaca-field-datetime.alpaca-field-valid:before {
     content: '';
@@ -2269,7 +2272,7 @@ body .alpaca-field-text:before, body .alpaca-field-date:before, body .alpaca-fie
     bottom: 3px;
     left: 0;
     width: 100%;
-    border: 1px dashed #ccc;
+    border: 1px dashed #70706c;
 }
 .alpaca-field-text.alpaca-field-valid:after, .alpaca-field-date.alpaca-field-valid:after, .alpaca-field-datetime.alpaca-field-valid:after {
     content: '';
@@ -2278,7 +2281,7 @@ body .alpaca-field-text:before, body .alpaca-field-date:before, body .alpaca-fie
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: rgba(244, 247, 213, 0.19);
+    background-color: hsl(60, 60%, 98%);
 }
 .help-block {
     display: none;
@@ -2538,7 +2541,6 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
     font-size: 14px !important
 }
 .card__text__gov span {
-    line-height: 32px;
     font-size: 13px;
 }
 .card > .card__text__gov:last-child {
@@ -2548,9 +2550,7 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
     padding: 0px 0px 0px 40px !important;
     border-bottom: 1px dashed #ddd !important;
 }
-.card__text__gov .menu__activator button.btn--small{
-    margin-top: 2px !important;
-}
+
 body .ctk-date-time-picker {
     font-size: 13px;
     border-radius: 0;
@@ -2573,6 +2573,10 @@ body .datepicker-header {
     background: #0d71bb;
     border: 1px solid #0e70bc;
     border-radius: 0 !important;
+    display: none;
+}
+body .datepicker .datetimepicker-container {
+    border-top: 1px solid #ddd;
 }
 body .datepicker-header {
     background: #0d71bb;
