@@ -2592,6 +2592,10 @@ body .v-suggestions > input:focus {
 body .v-suggestions>input:hover {
     border-color: #212121
 }
+body .datetimepicker .datepicker {
+    left: -50px !important
+}
+/*  */
 body .input-group__input {
     padding-top: 2px;
 }
