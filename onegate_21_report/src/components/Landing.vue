@@ -50,7 +50,6 @@
                 ref="menufromDate"
                 :close-on-content-click="false"
                 v-model="menufromDate"
-                :nudge-right="40"
                 lazy
                 transition="scale-transition"
                 offset-y
@@ -60,11 +59,11 @@
               >
                 <v-text-field
                   slot="activator"
-                  v-model="fromDate"
+                  v-model="fromDateFormatted"
                   append-icon="event"
                   @blur="fromDate = parseDate(fromDateFormatted)"
                 ></v-text-field>
-                <v-date-picker v-model="fromDate" no-title @input="menufromDate = false"></v-date-picker>
+                <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
               </v-menu>
             </v-flex>
             <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
@@ -75,7 +74,6 @@
                 ref="menutoDate"
                 :close-on-content-click="false"
                 v-model="menutoDate"
-                :nudge-right="40"
                 lazy
                 transition="scale-transition"
                 offset-y
@@ -85,11 +83,11 @@
               >
                 <v-text-field
                   slot="activator"
-                  v-model="toDate"
+                  v-model="toDateFormatted"
                   append-icon="event"
                   @blur="toDate = parseDate(toDateFormatted)"
                 ></v-text-field>
-                <v-date-picker v-model="toDate" no-title @input="menutoDate = false"></v-date-picker>
+                <v-date-picker v-model="toDate" no-title @input="changeToDate"></v-date-picker>
               </v-menu>
             </v-flex>
           </v-layout>
@@ -122,10 +120,10 @@ export default {
   },
   data: () => ({
     isCallBack: true,
-    fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('vi-VN'),
+    fromDate: null,
     menufromDate: false,
     fromDateFormatted: null,
-    toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('vi-VN'),
+    toDate: null,
     menutoDate: false,
     toDateFormatted: null,
     danhSachBaoCaos: [],
@@ -151,7 +149,7 @@ export default {
     months: [
       {
         'value': '0',
-        'name': 'Lọc theo tháng'
+        'name': 'Cả năm'
       },
       {
         'value': '1',
@@ -202,7 +200,7 @@ export default {
         'name': 'tháng 12'
       }
     ],
-    month: '0',
+    month: ((new Date()).getMonth() + 1) + '',
     agencyLists: [],
     govAgency: null,
     danhSachBaoCao: [],
@@ -218,6 +216,17 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       vm.danhSachBaoCao = vm.loadingMenuConfigToDo
+      let currentQuerys = vm.$router.history.current.query
+      if (currentQuerys.hasOwnProperty('fromDate')) {
+        vm.fromDateFormatted = currentQuerys.fromDate
+      } else {
+        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('vi-VN')
+      }
+      if (currentQuerys.hasOwnProperty('toDate')) {
+        vm.toDateFormatted = currentQuerys.toDate
+      } else {
+        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('vi-VN')
+      }
       vm.$store.dispatch('getAgencyLists').then(function (result) {
         vm.agencyLists = result
         if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
@@ -230,18 +239,30 @@ export default {
   updated () {
     var vm = this
     vm.$nextTick(function () {
-      let currentParams = vm.$router.history.current.params
       if (vm.isCallBack) {
         vm.isCallBack = false
         vm.danhSachBaoCao = vm.loadingMenuConfigToDo
-        let currentIndex = 0
-        if (currentParams.hasOwnProperty('index')) {
-          currentIndex = currentParams.index
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (vm.isCallBack) {
+          vm.isCallBack = false
+          if (!currentParams.hasOwnProperty('index')) {
+            router.push({
+              path: '/bao-cao/' + 0,
+              query: currentQuerys
+            })
+          }
+          if (currentQuerys.hasOwnProperty('fromDate')) {
+            vm.fromDateFormatted = currentQuerys.fromDate
+          } else {
+            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('vi-VN')
+          }
+          if (currentQuerys.hasOwnProperty('toDate')) {
+            vm.toDateFormatted = currentQuerys.toDate
+          } else {
+            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('vi-VN')
+          }
         }
-        vm.danhSachBaoCao[currentIndex]['active'] = true
-        router.push({
-          path: '/bao-cao/' + currentIndex
-        })
       }
     })
   },
@@ -266,10 +287,11 @@ export default {
         document: vm.documentTYPE,
         year: vm.year,
         month: vm.month,
-        fromDate: vm.fromDate,
-        toDate: vm.toDate,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted,
         govAgencyCode: vm.govAgency.itemCode,
-        govAgencyName: vm.govAgency.itemName
+        govAgencyName: vm.govAgency.itemName,
+        agency: vm.govAgency.itemCode
       }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
@@ -281,8 +303,8 @@ export default {
           putData['year'] = vm.year
           putData['month'] = vm.month
         } else {
-          putData['fromDate'] = vm.fromDate
-          putData['toDate'] = vm.toDate
+          putData['fromDate'] = vm.fromDateFormatted
+          putData['toDate'] = vm.toDateFormatted
         }
         putData['govAgencyCode'] = vm.govAgency.itemCode
         putData['govAgencyName'] = vm.govAgency.itemName
@@ -298,27 +320,91 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
-      vm.doPrintReport()
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          govAgencyCode: vm.govAgency.itemCode,
+          govAgencyName: vm.govAgency.itemName,
+          fromDate: vm.fromDate,
+          toDate: vm.toDate
+        }
+      })
     },
     changeMonth (item) {
       let vm = this
       vm.month = item
-      vm.doPrintReport()
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          govAgencyCode: vm.govAgency.itemCode,
+          govAgencyName: vm.govAgency.itemName,
+          fromDate: vm.fromDate,
+          toDate: vm.toDate
+        }
+      })
     },
     changeGov (item) {
       let vm = this
       vm.govAgency = item
-      vm.doPrintReport()
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          govAgencyCode: vm.govAgency.itemCode,
+          govAgencyName: vm.govAgency.itemName,
+          fromDate: vm.fromDate,
+          toDate: vm.toDate
+        }
+      })
+    },
+    changeFromDate () {
+      let vm = this
+      vm.menufromDate = false
+      vm.fromDateFormatted = vm.formatDate(vm.fromDate)
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          govAgencyCode: vm.govAgency.itemCode,
+          govAgencyName: vm.govAgency.itemName,
+          fromDate: vm.fromDateFormatted,
+          toDate: vm.toDateFormatted
+        }
+      })
+    },
+    changeToDate () {
+      let vm = this
+      vm.menutoDate = false
+      vm.toDateFormatted = vm.formatDate(vm.toDate)
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          govAgencyCode: vm.govAgency.itemCode,
+          govAgencyName: vm.govAgency.itemName,
+          fromDate: vm.fromDateFormatted,
+          toDate: vm.toDateFormatted
+        }
+      })
     },
     formatDate (date) {
       if (!date) return null
-      const [day, month, year] = date.split('/')
+      console.log('formatDate', date)
+      const [year, month, day] = date.split('-')
       return `${day}/${month}/${year}`
     },
     parseDate (date) {
       if (!date) return null
+      console.log('parseDate', date)
       const [day, month, year] = date.split('/')
-      return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     }
   }
 }

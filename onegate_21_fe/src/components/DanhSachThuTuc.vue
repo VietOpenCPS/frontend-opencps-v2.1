@@ -29,11 +29,11 @@
                   <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
                     <!-- Cap 3 -->
                     <v-layout row wrap>
-                      <v-flex xs12 sm9>
+                      <v-flex xs12 sm9 class="pt-1">
                         <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
                         <span>{{itemServiceConfig.serviceInfoName}}</span>
                       </v-flex>
-                      <v-flex xs12 sm1 class="text-xs-center">
+                      <v-flex xs12 sm1 class="text-xs-center pt-1">
                         <span>Mức {{itemServiceConfig.level}}</span>
                       </v-flex>
                       <v-flex xs12 sm2 class="text-xs-center">
