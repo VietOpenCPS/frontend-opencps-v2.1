@@ -809,7 +809,7 @@ export default {
       var vm = this
       vm.selectedSearchItem = item
       console.log('selectedSearchItem', vm.selectedSearchItem)
-      vm.thongTinChuHoSo.applicantIdNo = item.applicantIdNo.toString()
+      vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''
       vm.thongTinChuHoSo['address'] = item['address'] ? item['address'] : ''
@@ -829,12 +829,13 @@ export default {
       if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
         vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
       }
+      console.log('vm.thongTinChuHoSo', vm.thongTinChuHoSo)
     },
     onSearchItemSelected1 (item) {
       var vm = this
       vm.selectedSearchItem = item
-      console.log('selectedSearchItem', item)
-      vm.thongTinNguoiNopHoSo.delegateIdNo = item.applicantIdNo.toString()
+      console.log('selectedSearchItem1', item)
+      vm.thongTinNguoiNopHoSo['delegateIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinNguoiNopHoSo['delegateName'] = item['applicantName'] ? item['applicantName'] : ''
       vm.thongTinNguoiNopHoSo['delegateAddress'] = item['address'] ? item['address'] : ''
@@ -850,6 +851,12 @@ export default {
         vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
       }
       console.log('vm.thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+    },
+    getThongTinChuHoSo () {
+      return this.thongTinChuHoSo
+    },
+    getThongTinNguoiNopHoSo () {
+      return this.thongTinNguoiNopHoSo
     }
   }
 }

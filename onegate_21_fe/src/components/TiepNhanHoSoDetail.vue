@@ -288,8 +288,8 @@ export default {
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
