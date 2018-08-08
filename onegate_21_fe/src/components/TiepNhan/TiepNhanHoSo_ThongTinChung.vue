@@ -68,20 +68,6 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <!-- <datetime v-model="dueDateInput" v-on:input="changeDate"
-                placeholder="Chọn ngày"
-                type="datetime"
-                input-format="DD/MM/YYYY HH:mm"
-                :i18n="{ok:'Chọn', cancel:'Thoát'}"
-                zone="local"
-                :min-date="minDate"
-                monday-first
-                wrapper-class="wrapper-datetime"
-                auto-continue
-                auto-close
-              ></datetime>
-              <v-icon>event</v-icon> -->
-
               <vue-ctk-date-time-picker 
                 v-model="dueDateInput" 
                 format="YYYY-MM-DDTHH:mm"
@@ -90,7 +76,7 @@
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
               ></vue-ctk-date-time-picker>
-              <v-icon>event</v-icon>
+              <v-icon style="margin-left: 8px;">event</v-icon>
             </v-subheader>
           </v-flex>
         </v-layout>

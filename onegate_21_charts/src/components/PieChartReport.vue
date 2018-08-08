@@ -15,7 +15,7 @@
 
       <div style="line-height: 30px;position: absolute;margin-top: -65px;padding: 0 5px;margin-left: 5px;font-size: 12px;"> 
         &nbsp;Tổng số hồ sơ:
-        <span class="text-bold" style="line-height: 30px;font-size: 12px;">&nbsp;&nbsp;{{item.processCount}}</span></div>
+        <span class="text-bold" style="line-height: 30px;font-size: 12px;">&nbsp;&nbsp;{{item.undueCount + item.overdueCount + item.waitingCount + item.betimesCount + item.ontimeCount + item.overtimeCount}}</span></div>
 
     </v-card-text>
   </v-card>

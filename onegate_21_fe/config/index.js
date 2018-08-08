@@ -37,3 +37,4 @@ module.exports = {
   }
 }
 //assetsSubDirectory: 'o/front-end-super-gate',
+//assetsSubDirectory: 'o/frontend-web-customer-v2-1',

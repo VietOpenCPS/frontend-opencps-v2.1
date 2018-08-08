@@ -140,7 +140,8 @@ export default {
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
-    outputTypes: [2]
+    outputTypes: [2],
+    sampleCount: 0
   }),
   computed: {
     loading () {
@@ -306,11 +307,12 @@ export default {
             }
           })
         }
-        if (vm.$refs.thanhphanhoso) {
-          vm.$refs.thanhphanhoso.saveMark()
-        }
+        // if (vm.$refs.thanhphanhoso) {
+        //   vm.$refs.thanhphanhoso.saveMark()
+        // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
+        tempData['sampleCount'] = vm.$refs.thanhphanhoso.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {

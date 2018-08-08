@@ -5,16 +5,49 @@
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
-              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: (item.partType === 3 || originality === 1 || onlyView) ? 'calc(100% - 120px)' : 'calc(100% - 240px)'}">
+              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> 
+                    {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
+                    <v-tooltip top v-if="item.hasForm">
+                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
+                        <v-badge>
+                           <i style="color: #0d71bb; margin-left: 10px; font-size: 13px;" class="fa fa-file-o" aria-hidden="true"></i>
+                        </v-badge>
+                      </v-btn>
+                      <span>Form trực tuyến</span>
+                    </v-tooltip>
+                    <v-tooltip top v-if="item.hasForm && item.daKhai">
+                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
+                        <v-badge>
+                           <i style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o"></i>
+                        </v-badge>
+                      </v-btn>
+                      <span>{{item.daKhai ? 'Đã khai' : 'Chưa khai '}}</span>
+                    </v-tooltip>
+                    <v-tooltip top v-if="!item.hasForm">
+                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
+                        <v-badge>
+                          <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                        </v-badge>
+                      </v-btn>
+                      <span>Download file giấy tờ</span>
+                    </v-tooltip>
                   </div>
                 </div>
-                <i v-if="item.hasForm" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> 
+                <!-- <i v-if="item.hasForm" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> 
                 <span v-if="item.hasForm">&nbsp;-&nbsp;</span> 
-                <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i>
+                <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i> -->
+                <v-text-field
+                  v-model="item.fileComment"
+                  placeholder="Nhập lý do"
+                  v-if="checkInput === 1 && item.fileCheck === 2"
+                  append-icon="send"
+                  v-on:click.stop=""
+                  @change="changeFileComment($event, item)"
+                ></v-text-field>
+                <i v-else-if="item.fileComment" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -31,11 +64,12 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text style="background-color: #f6f6f6;">
+              <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
-                    <v-btn color="primary" @click="saveAlpacaForm(item, index)" v-if="item.hasForm && !onlyView">Lưu lại</v-btn>
-                    <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView">Xóa</v-btn>
+                    <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
+                    v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
+                    <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
                     <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">Preview</v-btn>
                     <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
@@ -45,12 +79,12 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan pr-3 mr-1" v-if="!onlyView || originality !== 1">
+        <div class="absolute__btn group__thanh_phan pr-3 mr-1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
-            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online">
+            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
@@ -61,9 +95,29 @@
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
                 :disabled="onlyView"
+                @change="changeFileMark($event, index)"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '100px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}">
+            <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">
+              <v-select
+                :items="fileCheckItems"
+                item-text="text"
+                item-value="value"
+                v-model="dossierTemplateItems[index].fileCheck"
+                @change="changeFileCheck($event, index)"
+              ></v-select>
+            </v-flex>
+            <v-flex style="width: 60px;" class="layout wrap" v-else-if="item.fileCheck > 0">
+              <v-tooltip top v-if="item.fileCheck === 1">
+                <v-icon size="16" class="mx-0" color="primary">done</v-icon>
+                <span>Đạt</span>
+              </v-tooltip>
+              <v-tooltip top v-else>
+                <v-icon size="16" class="mx-0" color="primary">close</v-icon>
+                <span>Không đạt</span>
+              </v-tooltip>
+            </v-flex>
+            <v-flex :style="{width: !onlyView ? '90px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input
               type="file"
               style="display: none"
@@ -124,12 +178,19 @@
           </v-layout>
         </div> -->
       </div>
-      <v-layout row wrap>
+      <v-layout row wrap v-if="id !== 'kq'">
         <v-flex xs12 sm2>
-          
+          <v-subheader>Số bộ hồ sơ: </v-subheader>
         </v-flex>
-        <v-flex xs12 sm12>
-          
+        <v-flex xs12 sm10>
+          <v-text-field v-if="!onlyView"
+          v-model="sampleCount"
+          ></v-text-field>
+          <v-subheader v-else style="float:left" v-if="thongTinHoSo.sampleCount">
+            <span class="text-bold">
+              {{thongTinHoSo.sampleCount}}
+            </span>
+          </v-subheader>
         </v-flex>
       </v-layout>
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
@@ -217,6 +278,10 @@ export default {
     partTypes: {
       type: Array,
       default: () => [1, 3]
+    },
+    checkInput: {
+      type: Number,
+      default: () => 0
     }
   },
   data: () => ({
@@ -239,6 +304,7 @@ export default {
     stateAddFileOther: false,
     dossierTemplatesItemSelect: {},
     fileViews: [],
+    sampleCount: 0,
     fileMarkItems: [{
       text: 'Không có',
       value: 0
@@ -251,7 +317,18 @@ export default {
     }, {
       text: 'Bản gốc',
       value: 3
-    }]
+    }],
+    fileCheckItems: [{
+      text: 'Chưa kiểm tra',
+      value: 0
+    }, {
+      text: 'Đạt',
+      value: 1
+    }, {
+      text: 'Không đạt',
+      value: 2
+    }],
+    fileTemplateItems: []
   }),
   computed: {
     loading () {
@@ -299,6 +376,19 @@ export default {
       var vm = this
       var arrTemp = []
       // console.log('dossierId++++++++', data.dossierId)
+      vm.$store.dispatch('getServiceInfo', {
+        serviceInfoId: data.serviceCode
+      }).then(resultServiceInfo => {
+        console.log('resultServiceInf---------', resultServiceInfo)
+        if (resultServiceInfo['fileTemplates']) {
+          if (Array.isArray(resultServiceInfo.fileTemplates)) {
+            vm.fileTemplateItems = resultServiceInfo.fileTemplates
+          } else {
+            vm.fileTemplateItems.push(resultServiceInfo.fileTemplates)
+          }
+        }
+        console.log('vm.fileTemplateItems---------', vm.fileTemplateItems)
+      })
       arrTemp.push(vm.$store.dispatch('loadDossierTemplates', data))
       arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
       arrTemp.push(vm.$store.dispatch('loadDossierFiles', data.dossierId))
@@ -412,8 +502,12 @@ export default {
           })
           if (fileMarkFind !== null && fileMarkFind !== undefined) {
             itemTemplate['fileMark'] = fileMarkFind.fileMark
+            itemTemplate['fileComment'] = fileMarkFind.fileComment
+            itemTemplate['fileCheck'] = fileMarkFind.fileCheck
           } else {
             itemTemplate['fileMark'] = 0
+            itemTemplate['fileComment'] = ''
+            itemTemplate['fileCheck'] = ''
           }
           return itemTemplate
         })
@@ -422,6 +516,8 @@ export default {
           dossierTemplates.forEach(itemTemplate => {
             itemTemplate['count'] = 0
             itemTemplate['fileMark'] = 0
+            itemTemplate['fileComment'] = ''
+            itemTemplate['fileCheck'] = ''
           })
         }
       }
@@ -514,12 +610,12 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
-            var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-              return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
-            })
-            if (fileViewsTemp) {
-              vm.fileViews = fileViewsTemp
-            }
+            // var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+            //   return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
+            // })
+            // if (fileViewsTemp) {
+            //   vm.fileViews = fileViewsTemp
+            // }
           })
         }).catch(function (xhr) {
           vm.progressUploadPart = ''
@@ -691,10 +787,56 @@ export default {
         })
       }
     },
-    changeFileMark (item) {
+    changeFileMark (event, index) {
       var vm = this
+      console.log('event=====', event)
+      let item = vm.dossierTemplateItems[index]
       item['dossierId'] = vm.thongTinHoSo.dossierId
+      item['fileMark'] = event
+      item['checkInput'] = vm.checkInput
+      console.log('item-mark-------', item)
       vm.$store.dispatch('postDossierMark', item)
+      vm.dossierTemplateItems[index].fileMark = event
+    },
+    changeFileCheck (event, index) {
+      var vm = this
+      console.log('event=====', event)
+      let item = vm.dossierTemplateItems[index]
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      item['fileCheck'] = event
+      item['checkInput'] = vm.checkInput
+      console.log('item-check-------', item)
+      vm.$store.dispatch('postDossierMark', item)
+      vm.dossierTemplateItems[index].fileCheck = event
+    },
+    changeFileComment (event, index) {
+      var vm = this
+      console.log('event=====', event)
+      let item = vm.dossierTemplateItems[index]
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      item['fileComment'] = event
+      item['checkInput'] = vm.checkInput
+      console.log('item-comment-------', item)
+      vm.$store.dispatch('postDossierMark', item)
+      vm.dossierTemplateItems[index].fileComment = event
+    },
+    checkStyle (item) {
+      var vm = this
+      if (vm.checkInput === 1) {
+        return 'calc(100% - 140px)'
+      } else {
+        let divPx = 0
+        if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
+          divPx += 140
+        }
+        if (item.fileCheck > 0) {
+          divPx += 60
+        }
+        if (!vm.onlyView) {
+          divPx += 90
+        }
+        return 'calc(100% - ' + divPx + 'px)'
+      }
     },
     changeOtherDossierTemp (data) {
       var vm = this
@@ -735,6 +877,20 @@ export default {
         }).catch(function (xhr) {
           vm.progressUploadPart = ''
         })
+      }
+    },
+    downloadFileTemplate (item, index) {
+      var vm = this
+      if (vm.fileTemplateItems.length > 0) {
+        let fileFind = vm.fileTemplateItems.find(file => {
+          return item.fileTemplateNo === file.fileTemplateNo
+        })
+        if (fileFind) {
+          let url = vm.initDataResource.serviceInfoApi + '/' + fileFind.serviceCode + '/filetemplates/' + fileFind.fileTemplateNo
+          window.open(url)
+        } else {
+          console.log('ko thay file')
+        }
       }
     },
     addOtherTemplate () {

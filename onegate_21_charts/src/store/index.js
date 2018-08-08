@@ -51,7 +51,9 @@ export const store = new Vuex.Store({
               year: filter.year,
               month: filter.month,
               group: filter.group,
-              reporting: false
+              reporting: false,
+              domain: 'total',
+              agency: filter['agency']
             }
           }
           axios.get('/o/rest/statistics', param).then(function (response) {

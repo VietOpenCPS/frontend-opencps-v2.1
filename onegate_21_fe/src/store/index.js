@@ -516,7 +516,7 @@ export const store = new Vuex.Store({
         formData.append('file', file)
         formData.append('dossierPartNo', data.partNo)
         formData.append('dossierTemplateNo', data.dossierTemplateNo)
-        formData.append('fileTemplateNo', data.partNo)
+        formData.append('fileTemplateNo', data.fileTemplateNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
@@ -541,6 +541,13 @@ export const store = new Vuex.Store({
         formData.append('displayName', data.displayName ? data.displayName : '')
         formData.append('dossierPartNo', data.partNo ? data.partNo : '')
         formData.append('file', '')
+        formData.append('fileType', '')
+        formData.append('fileSize', '')
+        formData.append('isSync', 'false')
+        formData.append('dossierTemplateNo', '')
+        formData.append('fileTemplateNo', '')
+        formData.append('formData', '')
+        formData.append('referenceUid', '')
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -806,6 +813,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
+        dataPutdossier.append('sampleCount', data.sampleCount)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
           console.log('put dossier success')
@@ -863,7 +871,6 @@ export const store = new Vuex.Store({
     },
     postDossierMark ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
         let options = {
           headers: {
             'groupId': state.initData.groupId,
@@ -873,15 +880,24 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostdossierMark = new URLSearchParams()
-        dataPostdossierMark.append('fileMark', data.fileMark ? data.fileMark : 0)
+        if (data['checkInput'] === 1) {
+          if (data.fileCheck !== undefined && data.fileCheck !== 'undefined' && data.fileCheck !== null) {
+            dataPostdossierMark.append('fileCheck', data.fileCheck)
+          }
+          if (data.fileComment !== undefined && data.fileComment !== 'undefined' && data.fileComment !== null) {
+            dataPostdossierMark.append('fileComment', data.fileComment)
+          }
+        } else {
+          if (data.fileMark !== undefined && data.fileMark !== 'undefined' && data.fileMark !== null) {
+            dataPostdossierMark.append('fileMark', data.fileMark)
+          }
+        }
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
-          commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
           // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          commit('setLoading', false)
         })
       })
     },
@@ -994,7 +1010,7 @@ export const store = new Vuex.Store({
         try {
           var dataRollBack = new URLSearchParams()
           let url = state.initData.dossierApi + '/' + data.dossierId + '/rollback'
-          axios.put(url, dataRollBack, options).then(function (response) {
+          axios.post(url, dataRollBack, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {
             reject(data)

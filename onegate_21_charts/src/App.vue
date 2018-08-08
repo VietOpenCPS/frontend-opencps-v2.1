@@ -28,6 +28,7 @@
       var vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
         if (vm.isCallBack) {
           vm.isCallBack = false
           let currentIndex = 0
@@ -35,7 +36,8 @@
             currentIndex = currentParams.index
           }
           router.push({
-            path: '/bao-cao/' + currentIndex
+            path: '/bao-cao/' + currentIndex,
+            query: currentQuerys
           })
         }
       })
