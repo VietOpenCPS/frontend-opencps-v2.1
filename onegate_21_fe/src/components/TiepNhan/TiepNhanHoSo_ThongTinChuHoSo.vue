@@ -214,30 +214,6 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <!-- <v-select
-                      v-if="originality === 3 || originality === '3'"
-                      :items="applicantItems"
-                      hide-selected
-                      tags
-                      v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                      item-text="applicantIdNo"
-                      item-value="applicantIdNo"
-                      autocomplete
-                      clearable
-                      :search-input.sync="search"
-                      @input="eventInput($event)"
-                      cache-items
-                      return-object
-                      >
-                        <template slot="item" slot-scope="data">
-                          <template>
-                            <v-list-tile-content>
-                              <v-list-tile-title v-html="data.item.applicantName"></v-list-tile-title>
-                              <v-list-tile-sub-title v-html="data.item.applicantIdNo"></v-list-tile-sub-title>
-                            </v-list-tile-content>
-                          </template>
-                        </template>
-                      </v-select> -->
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -372,7 +348,7 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 150px;margin-top: 4px;">
+          <div class="absolute__btn" style="width: 150px;margin-top: 4px;" v-if="thongTinNguoiNopHoSo.sameUser">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -486,6 +462,11 @@ export default {
           delegateEmail: value.contactEmail,
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
+        }
+        if (!vm.thongTinChuHoSo.userType) {
+          vm.thongTinNguoiNopHoSo.sameUser = false
+        } else {
+          vm.thongTinNguoiNopHoSo.sameUser = true
         }
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
@@ -809,6 +790,12 @@ export default {
       var vm = this
       vm.selectedSearchItem = item
       console.log('selectedSearchItem', vm.selectedSearchItem)
+      if (item['applicantIdType'] === 'business') {
+        vm.thongTinChuHoSo.userType = false
+        vm.thongTinNguoiNopHoSo.sameUser = false
+      } else {
+        vm.thongTinChuHoSo.userType = true
+      }
       vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''
@@ -818,11 +805,6 @@ export default {
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
       vm.thongTinChuHoSo.districtCode = item['districtCode'] ? item['districtCode'] : ''
       vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
-      if (item['applicantIdType'] === 'business') {
-        vm.thongTinChuHoSo.userType = false
-      } else {
-        vm.thongTinChuHoSo.userType = true
-      }
       if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
         vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
       }

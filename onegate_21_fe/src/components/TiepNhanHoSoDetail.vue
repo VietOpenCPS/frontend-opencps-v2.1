@@ -248,6 +248,7 @@ export default {
         // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
+        tempData['sampleCount'] = vm.$refs.thanhphanhoso.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {

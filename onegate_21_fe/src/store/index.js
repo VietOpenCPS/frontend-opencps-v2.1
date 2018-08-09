@@ -2148,7 +2148,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
           axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2177,14 +2179,16 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
           axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
               if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
                 dataReturn.unshift({
                   'domainCode': '',
-                  'domainName': 'toàn bộ'
+                  'domainName': 'toàn bộ lĩnh vực'
                 })
               }
               resolve(dataReturn)
