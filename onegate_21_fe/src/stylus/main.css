@@ -2541,7 +2541,6 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
     font-size: 14px !important
 }
 .card__text__gov span {
-    line-height: 32px;
     font-size: 13px;
 }
 .card > .card__text__gov:last-child {
@@ -2551,9 +2550,7 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
     padding: 0px 0px 0px 40px !important;
     border-bottom: 1px dashed #ddd !important;
 }
-.card__text__gov .menu__activator button.btn--small{
-    margin-top: 2px !important;
-}
+
 body .ctk-date-time-picker {
     font-size: 13px;
     border-radius: 0;
@@ -2576,6 +2573,10 @@ body .datepicker-header {
     background: #0d71bb;
     border: 1px solid #0e70bc;
     border-radius: 0 !important;
+    display: none;
+}
+body .datepicker .datetimepicker-container {
+    border-top: 1px solid #ddd;
 }
 body .datepicker-header {
     background: #0d71bb;

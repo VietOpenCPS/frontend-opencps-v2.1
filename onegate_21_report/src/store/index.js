@@ -74,29 +74,53 @@ export const store = new Vuex.Store({
               year: filter.year,
               month: filter.month,
               group: filter.group,
-              agency: filter.govAgencyCode,
-              reporting: false
+              reporting: false,
+              agency: filter['agency']
             }
           }
           let requestURL = ''
           if (filter.document === 'REPORT_01') {
             requestURL = '/o/rest/statistics'
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              param.params['domain'] = 'total'
+              axios.get(requestURL, param).then(function (responseTotal) {
+                let serializableTotal = responseTotal.data
+                if (serializableTotal.data) {
+                  let dataReturn = {
+                    data: serializable.data,
+                    dataTotal: serializableTotal.data
+                  }
+                  resolve(dataReturn)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
           } else {
             requestURL = '/o/rest/v2/dossiers'
             param.params['sort'] = 'domainCode'
+            param.params['fromReceiveDate'] = filter.fromDate
+            param.params['toReceiveDate'] = filter.toDate
+            axios.get(requestURL, param).then(function (response) {
+              let serializable = response.data
+              if (serializable.data) {
+                let dataReturn = serializable
+                resolve(dataReturn)
+              } else {
+                resolve(null)
+              }
+            }).catch(function (error) {
+              console.log(error)
+              reject(error)
+            })
           }
-          axios.get(requestURL, param).then(function (response) {
-            let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable
-              resolve(dataReturn)
-            } else {
-              resolve(null)
-            }
-          }).catch(function (error) {
-            console.log(error)
-            reject(error)
-          })
         })
       })
     },

@@ -33,7 +33,8 @@
   import router from '@/router'
   export default {
     data: () => ({
-      danhSachBaoCao: []
+      danhSachBaoCao: [],
+      isCallBack: true
     }),
     computed: {
       currentIndex () {
