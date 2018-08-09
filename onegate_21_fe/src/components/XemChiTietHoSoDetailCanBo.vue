@@ -222,6 +222,23 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
+            <div class="mx-2 pt-2">
+              <p class="mb-2">
+                <span>Chuyển đến bởi: </span>
+                <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
+                <span v-if="thongTinChiTietHoSo.lastActionNote">
+                  <span> - Ý kiến: </span>
+                  <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
+                </span>
+              </p>
+              <p class="mb-0">
+                <span>Người thực hiện: </span>
+                <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}&nbsp;</b>-
+                <span :style="thongTinChiTietHoSo.dossierOverdue&&thongTinChiTietHoSo.dossierOverdue.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                   {{thongTinChiTietHoSo.dossierOverdue}}
+                </span>
+              </p>
+            </div>
             <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -581,6 +598,7 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         var arrTemp = []
         arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
         arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
