@@ -526,7 +526,6 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)

@@ -46,15 +46,16 @@
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
             (
-              Số bộ hồ sơ: 
-              <span v-if="!stateEditSample">{{thongTinChiTietHoSo.sampleCount}}</span>
+              Số bộ hồ sơ: &nbsp;
+              <span v-if="!stateEditSample">{{thongTinChiTietHoSo.sampleCount}}</span> &nbsp;
               <v-text-field
-                style="width: 20px;"
+                style="width: 35px; max-width: 35px;"
                 v-else
                 v-model="thongTinChiTietHoSo.sampleCount"
+                v-on:click.stop=""
                 type="number"
-              ></v-text-field>
-            )
+              ></v-text-field> &nbsp;
+            ) &nbsp;&nbsp;
             <v-icon v-if="!stateEditSample" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
             <v-icon v-else style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
           </div>
