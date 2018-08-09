@@ -9,29 +9,19 @@
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
-                    <v-tooltip top v-if="item.hasForm">
-                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
-                        <v-badge>
-                           <i style="color: #0d71bb; margin-left: 10px; font-size: 13px;" class="fa fa-file-o" aria-hidden="true"></i>
-                        </v-badge>
-                      </v-btn>
-                      <span>Form trực tuyến</span>
-                    </v-tooltip>
+                    {{item.partName}} <span v-if="item.required" style="color: red"> (*) </span>
+                    &nbsp;&nbsp;
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
-                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
-                        <v-badge>
-                           <i style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o"></i>
-                        </v-badge>
-                      </v-btn>
-                      <span>{{item.daKhai ? 'Đã khai' : 'Chưa khai '}}</span>
+                      <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
+                      <span>Form trực tuyến (Đã khai)</span>
                     </v-tooltip>
-                    <v-tooltip top v-if="!item.hasForm">
-                      <v-btn slot="activator" icon class="mx-0 my-0" v-on:click.stop="downloadFileTemplate(item, index)">
-                        <v-badge>
-                          <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
-                        </v-badge>
-                      </v-btn>
+                    <v-tooltip top v-if="item.hasForm && !item.daKhai">
+                      <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
+                      <span>Form trực tuyến (Chưa khai)</span>
+                    </v-tooltip>
+                    &nbsp;&nbsp;
+                    <v-tooltip top v-if="!item.hasForm && item.hasFileTemp" v-on:click.stop="downloadFileTemplate(item, index)">
+                      <v-icon slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
                       <span>Download file giấy tờ</span>
                     </v-tooltip>
                   </div>
@@ -39,20 +29,25 @@
                 <!-- <i v-if="item.hasForm" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">(Form trực tuyến)</i> 
                 <span v-if="item.hasForm">&nbsp;-&nbsp;</span> 
                 <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i> -->
-                <v-text-field
+                <div style="display: flex">
+                  <v-text-field
                   v-model="item.fileComment"
                   placeholder="Nhập lý do"
-                  v-if="checkInput === 1 && item.fileCheck === 2"
-                  append-icon="send"
+                  v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
                   v-on:click.stop=""
-                  @change="changeFileComment($event, item)"
-                ></v-text-field>
-                <i v-else-if="item.fileComment" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                  ></v-text-field>
+                  <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
+                    <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
+                      <v-icon size="16" class="mx-0" color="primary">send</v-icon>
+                    </v-btn>
+                    <span>Gửi</span>
+                  </v-tooltip>
+                </div>
+                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
-                      <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                      <v-icon v-else>attach_file</v-icon>
+                      <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                       {{itemFileView.displayName}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
@@ -178,21 +173,6 @@
           </v-layout>
         </div> -->
       </div>
-      <v-layout row wrap v-if="id !== 'kq'">
-        <v-flex xs12 sm2>
-          <v-subheader>Số bộ hồ sơ: </v-subheader>
-        </v-flex>
-        <v-flex xs12 sm10>
-          <v-text-field v-if="!onlyView"
-          v-model="sampleCount"
-          ></v-text-field>
-          <v-subheader v-else style="float:left" v-if="thongTinHoSo.sampleCount">
-            <span class="text-bold">
-              {{thongTinHoSo.sampleCount}}
-            </span>
-          </v-subheader>
-        </v-flex>
-      </v-layout>
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -376,37 +356,40 @@ export default {
       var vm = this
       var arrTemp = []
       // console.log('dossierId++++++++', data.dossierId)
-      vm.$store.dispatch('getServiceInfo', {
-        serviceInfoId: data.serviceCode
-      }).then(resultServiceInfo => {
-        console.log('resultServiceInf---------', resultServiceInfo)
-        if (resultServiceInfo['fileTemplates']) {
-          if (Array.isArray(resultServiceInfo.fileTemplates)) {
-            vm.fileTemplateItems = resultServiceInfo.fileTemplates
-          } else {
-            vm.fileTemplateItems.push(resultServiceInfo.fileTemplates)
-          }
-        }
-        console.log('vm.fileTemplateItems---------', vm.fileTemplateItems)
-      })
+      if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
+        vm.sampleCount = data['sampleCount']
+      }
       arrTemp.push(vm.$store.dispatch('loadDossierTemplates', data))
       arrTemp.push(vm.$store.dispatch('loadDossierMark', data))
       arrTemp.push(vm.$store.dispatch('loadDossierFiles', data.dossierId))
+      arrTemp.push(vm.$store.dispatch('getServiceInfo', {
+        serviceInfoId: data.serviceCode
+      }))
       vm.thongTinHoSo = data
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]
         var dossierMarks = values[1]
         var dossierFiles = values[2]
+        var fileTemplates = []
+        if (values[3].fileTemplates) {
+          if (Array.isArray(values[3].fileTemplates)) {
+            fileTemplates = values[3].fileTemplates
+          } else {
+            fileTemplates.push(values[3].fileTemplates)
+          }
+        }
         // console.log('dossierTemplates++++++', dossierTemplates)
         // console.log('dossierMarks++++++', dossierMarks)
         // console.log('dossierFiles++++++', dossierFiles)
         var dossierTemplateItems = vm.mergeDossierTemplateVsDossierFiles(dossierTemplates, dossierFiles)
         // console.log('dossierTemplateItems++++++MERGER++++file', dossierTemplateItems)
         dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
+        dossierTemplateItems = vm.mergeDossierTemplateVsFileTemplates(dossierTemplateItems, fileTemplates)
         // console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
         vm.dossierTemplateItems = dossierTemplateItems
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
+        vm.fileTemplateItems = fileTemplates
         setTimeout(function (argument) {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
@@ -497,6 +480,7 @@ export default {
       if (dossierMarks.length !== 0) {
         dossierTemplates.map(itemTemplate => {
           itemTemplate['count'] = 0
+          itemTemplate['stateEditFileCheck'] = false
           let fileMarkFind = dossierMarks.find(fileMark => {
             return fileMark.dossierPartNo === itemTemplate.partNo
           })
@@ -507,17 +491,41 @@ export default {
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
-            itemTemplate['fileCheck'] = ''
+            itemTemplate['fileCheck'] = 0
           }
           return itemTemplate
         })
       } else {
         if (dossierTemplates) {
           dossierTemplates.forEach(itemTemplate => {
+            itemTemplate['stateEditFileCheck'] = false
             itemTemplate['count'] = 0
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
-            itemTemplate['fileCheck'] = ''
+            itemTemplate['fileCheck'] = 0
+            itemTemplate['stateEditFileCheck'] = false
+          })
+        }
+      }
+      return dossierTemplates
+    },
+    mergeDossierTemplateVsFileTemplates (dossierTemplates, fileTemplates) {
+      if (fileTemplates.length !== 0) {
+        dossierTemplates.map(itemTemplate => {
+          let fileTemp = fileTemplates.find(fileTemplate => {
+            return fileTemplate.fileTemplateNo === itemTemplate.fileTemplateNo
+          })
+          if (fileTemp !== null && fileTemp !== undefined) {
+            itemTemplate['hasFileTemp'] = fileTemp.fileTemplateNo
+          } else {
+            itemTemplate['hasFileTemp'] = ''
+          }
+          return itemTemplate
+        })
+      } else {
+        if (dossierTemplates) {
+          dossierTemplates.forEach(itemTemplate => {
+            itemTemplate['hasFileTemp'] = ''
           })
         }
       }
@@ -741,7 +749,10 @@ export default {
     },
     viewFile2 (data) {
       var vm = this
-      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xsl') {
+      if (data.fileSize === 0) {
+        return
+      }
+      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xsl' || data.fileType === 'zip' || data.fileType === 'rar') {
         var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
         window.open(url)
       } else {
@@ -805,20 +816,23 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['fileCheck'] = event
       item['checkInput'] = vm.checkInput
+      if (event === 2) {
+        item['stateEditFileCheck'] = true
+      }
       console.log('item-check-------', item)
       vm.$store.dispatch('postDossierMark', item)
       vm.dossierTemplateItems[index].fileCheck = event
     },
-    changeFileComment (event, index) {
+    changeFileComment (item, index) {
       var vm = this
-      console.log('event=====', event)
-      let item = vm.dossierTemplateItems[index]
+      console.log('item-------', item)
       item['dossierId'] = vm.thongTinHoSo.dossierId
-      item['fileComment'] = event
+      item['fileComment'] = item.fileComment
       item['checkInput'] = vm.checkInput
+      item['stateEditFileCheck'] = !item['stateEditFileCheck']
       console.log('item-comment-------', item)
       vm.$store.dispatch('postDossierMark', item)
-      vm.dossierTemplateItems[index].fileComment = event
+      vm.dossierTemplateItems[index].fileComment = item.fileComment
     },
     checkStyle (item) {
       var vm = this

@@ -526,7 +526,6 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
@@ -813,7 +812,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
-        dataPutdossier.append('sampleCount', data.sampleCount)
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
           console.log('put dossier success')
