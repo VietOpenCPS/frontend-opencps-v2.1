@@ -93,21 +93,21 @@
               <p class="mb-2">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                <span v-if="thongTinChiTietHoSo.lastActionNote">
+                <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
                   <span> - Ý kiến: </span>
                   <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                 </span>
               </p>
-              <p class="mb-0">
-                <span>Người thực hiện: </span>
-                <b>&nbsp;{{usersNextAction.toString()}}&nbsp;</b>-
+              <p class="mb-0" v-if="userThucHien.length > 0">
+                <span>Người thực hiện: &nbsp;</span>
+                <b>{{userThucHien.toString()}}&nbsp;</b>-
                 <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                   {{stepOverdueNextAction}}
                 </span>
               </p>
             </div>
             <!-- Dịch vụ công -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1">
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
               <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2">
                 {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
               </div>
@@ -547,7 +547,8 @@ export default {
     filterDossierSync: null,
     messageChat: '',
     isCallBack: true,
-    printDocument: false
+    printDocument: false,
+    userThucHien: []
   }),
   computed: {
     loading () {
@@ -568,6 +569,7 @@ export default {
           userName.push(user[key]['userName'])
         }
       }
+      this.userThucHien = userName
       return userName
     },
     stepOverdueNextAction () {

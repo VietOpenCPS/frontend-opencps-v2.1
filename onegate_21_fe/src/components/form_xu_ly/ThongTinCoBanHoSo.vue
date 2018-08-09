@@ -1,83 +1,123 @@
 <template>
   <v-expansion-panel class="expansion-pl ext__form">
     <v-expansion-panel-content hide-actions value="1">
-      <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>THÔNG TIN CHUNG HỒ SƠ</div>
+      <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
       <v-card>
         <v-card-text class="py-0">
           <v-layout wrap class="px-2 py-2">
-          <v-flex xs12 sm4 class="pr-3">
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Chủ hồ sơ: </span>
-              <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
-            </div>
+            <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Chủ hồ sơ: </span>
+                <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1 overHidden">
+                <span class="pr-2">Địa chỉ: </span>
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                </v-tooltip>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+            </v-flex>
             <!--  -->
-            <div class="xs12 sm12 pb-1 overHidden">
-              <span class="pr-2">Địa chỉ: </span>
-              <v-tooltip top>
-                <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
-                <span class="pl-0"> {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
-              </v-tooltip>
-            </div>
+            <v-flex xs12 sm4 class="pr-3" v-else>
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Cơ quan: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.govAgencyName}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+            </v-flex>
             <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Mã hồ sơ: </span>
-              <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
-            </div>
+            <v-flex xs12 sm4 v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày gửi trực tuyến: </span>
+                <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
+                <span class="pl-0 text-bold" v-else> Một cửa </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày tiếp nhận: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Thời hạn giải quyết: </span>
+                <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.durationCount > 0"> 
+                  {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
+                </span>
+                <span class="pl-0 text-bold " v-else>
+                  Không quy định
+                </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày hẹn trả: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm4 v-else>
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày gửi: </span>
+                <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
+                <span class="pl-0 text-bold" v-else> Một cửa </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày tiếp nhận: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Ngày hẹn trả: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
+              </div>
+            </v-flex>
             <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Trạng thái: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
-            </div>
-          </v-flex>
-          <!--  -->
-          <v-flex xs12 sm4>
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Ngày gửi trực tuyến: </span>
-              <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
-              <span class="pl-0 text-bold" v-else> Một cửa </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Ngày tiếp nhận: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.receiveDate}}</span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Thời hạn giải quyết: </span>
-              <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.durationCount > 0"> 
-                {{durationText(thongTinChiTietHoSo.durationUnit, thongTinChiTietHoSo.durationCount)}} làm việc 
-              </span>
-              <span class="pl-0 text-bold " v-else>
-                Không quy định
-              </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Ngày hẹn trả: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dueDate}}</span>
-            </div>
-          </v-flex>
-          <!--  -->
-          <v-flex xs12 sm4 v-if="originality !== 1">
-            <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
-            <div class="xs12 sm12 pb-1">
-              <span class="pl-0">Thư điện tử: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
-            </div>
-            <!--  -->
-            <div class="xs12 sm12 pb-1">
-              <span class="pr-2">Điện thoại: </span>
-              <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
-            </div>
-          </v-flex>
-          <v-flex xs12 sm4 v-else>
-            <div class="xs12 sm12 pb-1" style="color:#0b72ba">Cơ quan giải quyết:</div>
-            <div class="xs12 sm12 pb-1">
-              <span class="pl-0 text-bold">{{thongTinChiTietHoSo.govAgencyName}} </span>
-            </div>
-            <!--  -->
-          </v-flex>
-        </v-layout>
+            <v-flex xs12 sm4 v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
+              <div class="xs12 sm12 pb-1">
+                <span class="pl-0">Thư điện tử: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Điện thoại: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
+              </div>
+            </v-flex>
+            <v-flex xs12 sm4 v-else>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Ghi chú:</div>
+              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
+                </v-tooltip>
+              </div>
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo.extendDate">
+                <span class="pl-0 text-bold">Hẹn lại: {{thongTinChiTietHoSo.extendDate}}</span>
+              </div>
+              <!--  -->
+            </v-flex>
+          </v-layout>
         </v-card-text>
       </v-card>
     </v-expansion-panel-content>

@@ -25,10 +25,10 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 5">
+              <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 5">
+              <v-flex xs12 sm3>
                 <v-text-field
                   @keyup="changeFee"
                   v-model="data_payment.serviceAmount"
@@ -38,18 +38,6 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Phí: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="data_payment.serviceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
-                ></v-text-field>
-              </v-flex>
               <!--  -->
               <!-- <v-flex xs12 sm4 v-if="viaPortal === 2">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
@@ -77,7 +65,7 @@
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
               <!-- requestPayment === 2 -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
-                <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 2">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
