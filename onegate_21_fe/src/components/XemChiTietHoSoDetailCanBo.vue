@@ -157,7 +157,8 @@
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
-                  Tài liệu nộp
+                  Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                  <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
                 </div>
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
