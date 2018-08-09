@@ -45,19 +45,17 @@
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
-            (
-              Số bộ hồ sơ: &nbsp;
-              <span v-if="!stateEditSample">{{thongTinChiTietHoSo.sampleCount}}</span> &nbsp;
-              <v-text-field
-                style="width: 35px; max-width: 35px;"
-                v-else
-                v-model="thongTinChiTietHoSo.sampleCount"
-                v-on:click.stop=""
-                type="number"
-              ></v-text-field> &nbsp;
-            ) &nbsp;&nbsp;
-            <v-icon v-if="!stateEditSample" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
-            <v-icon v-else style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+            <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+            <v-text-field
+            class="px-0 py-0"
+            style="width: 90px; max-width: 90px;"
+            v-else-if="originality !== 1"
+            v-model="thongTinChiTietHoSo.sampleCount"
+            v-on:click.stop=""
+            type="number"
+            ></v-text-field> &nbsp;
+            <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+            <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
@@ -339,6 +337,7 @@ export default {
             if (vm.showThuPhi) {
               paymentsOut = {
                 requestPayment: vm.payments['requestPayment'],
+                paymentNote: vm.payments['paymentNote'],
                 advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                 feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                 serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),

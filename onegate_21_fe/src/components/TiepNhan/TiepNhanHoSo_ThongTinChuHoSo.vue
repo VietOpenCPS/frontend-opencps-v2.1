@@ -175,8 +175,8 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-radio-group v-else v-model="thongTinChuHoSo.userType" row>
-            <v-radio label="Công Dân" :value="true"></v-radio>
-            <v-radio label="Doanh Nghiệp" :value="false"></v-radio>
+            <v-radio label="Công dân" :value="true"></v-radio>
+            <v-radio label="Doanh nghiệp" :value="false"></v-radio>
           </v-radio-group>
         </div>
         <div style="position: relative;" v-if="originality !== 1">
@@ -469,6 +469,12 @@ export default {
           vm.thongTinNguoiNopHoSo.sameUser = true
         }
         if (vm.thongTinNguoiNopHoSo.sameUser) {
+          if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
+            vm.onChangeDelegateCity(value.cityCode)
+          }
+          if (value.districtCode && value.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
+            vm.onChangeDelegateDistrict(value.districtCode)
+          }
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
       },
