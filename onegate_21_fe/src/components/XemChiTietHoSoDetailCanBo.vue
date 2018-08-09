@@ -76,18 +76,43 @@
           </v-btn>
         </v-tab> -->
         <v-tabs-items v-model="activeTab">
-          <v-tab-item id="tabs-1" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <div style="position: relative;" v-if="checkInput !== 0">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Cập nhật hồ sơ</span> <span v-if="checkInput === 1">Kiểm tra hồ sơ</span> &nbsp;&nbsp;&nbsp;&nbsp; 
+                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
+            <!-- Một cửa -->
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
+              <p class="mb-2">
+                <span>Chuyển đến bởi: </span>
+                <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
+                <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
+                  <span> - Ý kiến: </span>
+                  <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
+                </span>
+              </p>
+              <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                <span>Người thực hiện: &nbsp;</span>
+                <b>{{usersNextAction.toString()}}&nbsp;</b>-
+                <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                  {{stepOverdueNextAction}}
+                </span>
+              </p>
+            </div>
+            <!-- Dịch vụ công -->
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
+              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2 && item.infoType === 1">
+                {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
+              </div>
+            </div>
+            <!--  -->
             <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -102,8 +127,7 @@
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
-              <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :id="'cr'" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
-              <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
+              <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
@@ -128,12 +152,13 @@
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
             <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
           </v-tab-item>
-          <v-tab-item id="tabs-2" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
-                  Tài liệu nộp
+                  Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                  <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
                 </div>
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
@@ -535,6 +560,20 @@ export default {
     },
     getCheckInput () {
       return this.$store.getters.getCheckInput
+    },
+    usersNextAction () {
+      let user = []
+      user = this.$store.getters.getUsersNextAction
+      let userName = []
+      if (user.length > 0) {
+        for (let key in user) {
+          userName.push(user[key]['userName'])
+        }
+      }
+      return userName
+    },
+    stepOverdueNextAction () {
+      return this.$store.getters.getStepOverdueNextAction
     }
   },
   created () {
@@ -582,6 +621,9 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        if (vm.originality === 1) {
+          vm.loadDossierSyncs(data)
+        }
         vm.getNextActions()
         console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         var arrTemp = []
@@ -1007,6 +1049,7 @@ export default {
       if (vm.payments) {
         paymentsOut = {
           requestPayment: vm.payments['requestPayment'],
+          paymentNote: vm.payments['paymentNote'],
           advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
           feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
           serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),

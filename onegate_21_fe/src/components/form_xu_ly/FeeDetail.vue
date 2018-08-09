@@ -25,23 +25,10 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1">
-                <v-subheader class="pl-0 text-right">Phí tạm thu: </v-subheader>
+              <v-flex xs12 sm2>
+                <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1">
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="data_payment.advanceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
-                ></v-text-field>
-              </v-flex>
-              <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Phí dịch vụ: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
+              <v-flex xs12 sm3>
                 <v-text-field
                   @keyup="changeFee"
                   v-model="data_payment.serviceAmount"
@@ -50,6 +37,7 @@
                   :class="!data_payment.editable?'inputDisable':''"
                 ></v-text-field>
               </v-flex>
+              <!--  -->
               <!--  -->
               <!-- <v-flex xs12 sm4 v-if="viaPortal === 2">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
@@ -69,15 +57,15 @@
           <v-card-text class="pt-0">
             <v-layout wrap>
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1" >
-                <v-subheader class="pl-0 text-right">Tổng tạm thu: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 1">
-                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
+                <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
               <!-- requestPayment === 2 -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
-                <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 2">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
@@ -85,7 +73,7 @@
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 2"></v-flex>
               <!-- requestPayment === 5" -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
@@ -108,9 +96,35 @@
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
             </v-layout>
-            <p class="mt-2" style="margin-left: 100px" v-if="data_payment.paymentNote">
+            <!-- <p class="mt-2" style="margin-left: 100px" v-if="data_payment.paymentNote">
               <span class="red--text">* </span>&nbsp;&nbsp; {{data_payment.paymentNote}}
-            </p>
+            </p> -->
+            <v-layout wrap style="position: relative">
+              <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+              <v-flex style="width:calc(100% - 80px)">
+                <div v-if="activeEdit == false" class="pl-2">
+                  <v-text-field class="py-0"
+                  v-model="data_payment.paymentNote"
+                  multi-line
+                  :readonly='activeEdit'
+                  required
+                  ></v-text-field>
+                </div>
+                <p class="px-2 my-0 py-1" v-if="activeEdit||data_payment.paymentNote===''">
+                  {{data_payment.paymentNote}} &nbsp;&nbsp;
+                  <v-icon color="blue" size="20" class="hover-pointer btn-add mx-0 my-0" title="Sửa" v-on:click.stop="activeEdit = false" 
+                  v-if="activeEdit==true" grey darken-4>
+                    create
+                  </v-icon>
+                </p>
+                <span style="position:absolute;top:15px; right:10px">
+                  <v-icon color="green" size="25" class="hover-pointer btn-add mx-0 my-0" v-on:click.stop="activeEdit = true" 
+                  v-if="activeEdit==false" grey darken-4>
+                    check
+                  </v-icon>
+                </span>
+              </v-flex>
+            </v-layout>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -148,7 +162,8 @@ export default {
     totalFee: 0,
     feeTamThu: 0,
     feeTong: 0,
-    checkPaid: true
+    checkPaid: true,
+    activeEdit: true
   }),
   directives: {money: VMoney},
   created () {

@@ -13,16 +13,16 @@
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
-                      <span>Form trực tuyến (Đã khai)</span>
+                      <span>Biểu mẫu trực tuyến (Đã khai)</span>
                     </v-tooltip>
                     <v-tooltip top v-if="item.hasForm && !item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
-                      <span>Form trực tuyến (Chưa khai)</span>
+                      <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip>
                     &nbsp;&nbsp;
-                    <v-tooltip top v-if="!item.hasForm && item.hasFileTemp" v-on:click.stop="downloadFileTemplate(item, index)">
-                      <v-icon slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
-                      <span>Download file giấy tờ</span>
+                    <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
+                      <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                      <span>Biểu mẫu điền thủ công</span>
                     </v-tooltip>
                   </div>
                 </div>
@@ -34,7 +34,8 @@
                   v-model="item.fileComment"
                   placeholder="Nhập lý do"
                   v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
-                  v-on:click.stop=""
+                  :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
+                  required
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
@@ -44,6 +45,10 @@
                   </v-tooltip>
                 </div>
                 <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
+                  <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
+                  <span>Chỉnh sửa ý kiến</span>
+                </v-tooltip>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -102,17 +107,17 @@
                 @change="changeFileCheck($event, index)"
               ></v-select>
             </v-flex>
-            <v-flex style="width: 60px;" class="layout wrap" v-else-if="item.fileCheck > 0">
+            <v-flex style="width: 20px; align-items: center; margin-left: 10px;" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
-                <v-icon size="16" class="mx-0" color="primary">done</v-icon>
+                <v-icon slot="activator" size="16" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>
               </v-tooltip>
-              <v-tooltip top v-else>
-                <v-icon size="16" class="mx-0" color="primary">close</v-icon>
+              <v-tooltip top v-else-if="item.fileCheck === 2">
+                <v-icon slot="activator" size="16" class="mx-0" color="primary">close</v-icon>
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '90px' : 'auto', 'margin-right': onlyView ? '15px' : ''}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? '90px' : 'auto'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input
               type="file"
               style="display: none"
@@ -818,6 +823,9 @@ export default {
       item['checkInput'] = vm.checkInput
       if (event === 2) {
         item['stateEditFileCheck'] = true
+        return
+      } else {
+        item['fileComment'] = ''
       }
       console.log('item-check-------', item)
       vm.$store.dispatch('postDossierMark', item)
@@ -826,6 +834,9 @@ export default {
     changeFileComment (item, index) {
       var vm = this
       console.log('item-------', item)
+      if (item.fileComment === null || item.fileComment === undefined || item.fileComment === '') {
+        return
+      }
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['fileComment'] = item.fileComment
       item['checkInput'] = vm.checkInput
@@ -844,7 +855,7 @@ export default {
           divPx += 140
         }
         if (item.fileCheck > 0) {
-          divPx += 60
+          divPx += 20
         }
         if (!vm.onlyView) {
           divPx += 90
@@ -863,6 +874,9 @@ export default {
         }).then(resFile => {
           vm.loadingAddOther = false
           vm.dialogAddOtherTemp = false
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result2 => {
+            vm.dossierFilesItems = result2
+          })
         }).catch(reject => {
           vm.loadingAddOther = false
         })

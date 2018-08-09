@@ -22,6 +22,8 @@ export const store = new Vuex.Store({
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
     checkInput: 0,
+    stepOverdueNextAction: '',
+    usersNextAction: [],
     lePhi: {
       fee: '',
       feeNote: '',
@@ -211,10 +213,10 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
               let serializable = response.data
               let thuTucArray = Array.from(serializable.data)
-              thuTucArray.unshift({
-                'serviceConfigId': '0',
-                'serviceName': 'Toàn bộ thủ tục'
-              })
+              // thuTucArray.unshift({
+              //   'serviceConfigId': '0',
+              //   'serviceName': 'Toàn bộ thủ tục'
+              // })
               commit('setListThuTucHanhChinh', thuTucArray)
               resolve(thuTucArray)
             }).catch(function (error) {
@@ -226,10 +228,10 @@ export const store = new Vuex.Store({
       } else {
         return new Promise((resolve, reject) => {
           let thuTucArray = Array.from(state.listThuTucHanhChinh)
-          thuTucArray.unshift({
-            'serviceConfigId': '0',
-            'serviceName': 'Toàn bộ thủ tục'
-          })
+          // thuTucArray.unshift({
+          //   'serviceConfigId': '0',
+          //   'serviceName': 'Toàn bộ thủ tục'
+          // })
           resolve(thuTucArray)
         })
       }
@@ -679,16 +681,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   'groupId': state.initData.groupId
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            'groupId': state.initData.groupId
+          }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -758,16 +760,16 @@ export const store = new Vuex.Store({
         commit('setLoading', false)
         console.log('put dossier')
         let options = {
-          headers: {
-            groupId: state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   groupId: state.initData.groupId
+          //   groupId: state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            groupId: state.initData.groupId
+          }
         }
         var applicantType = ''
         if (data.userType) {
@@ -1540,6 +1542,8 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
               commit('setCheckInput', serializable['checkInput'])
+              commit('setStepOverdueNextAction', serializable['stepOverdue'])
+              commit('setUserNextAction', serializable['users'])
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
@@ -1673,12 +1677,9 @@ export const store = new Vuex.Store({
           let config = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {
-              info: data.info
             }
           }
-          let url = state.initData.dossierApi + '/' + data.dossierId + '/syncs'
+          let url = '/o/rest/v2_1/dossiers/' + data.dossierId + '/syncs'
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)
           }).catch(function (xhr) {
@@ -2148,8 +2149,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2178,18 +2179,18 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
+          // test lcoal
           axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'domainCode': '',
-                  'domainName': 'toàn bộ lĩnh vực'
-                })
-              }
+              // if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+              //   dataReturn.unshift({
+              //     'domainCode': '',
+              //     'domainName': 'toàn bộ lĩnh vực'
+              //   })
+              // }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -2308,6 +2309,12 @@ export const store = new Vuex.Store({
     },
     setCheckInput (state, payload) {
       state.checkInput = payload
+    },
+    setUserNextAction (state, payload) {
+      state.usersNextAction = payload
+    },
+    setStepOverdueNextAction (state, payload) {
+      state.stepOverdueNextAction = payload
     },
     setThongTinChuHoSo (state, payload) {
       let userTypeCondition = true
@@ -2556,6 +2563,12 @@ export const store = new Vuex.Store({
     },
     getCheckInput (state) {
       return state.checkInput
+    },
+    getUsersNextAction (state) {
+      return state.usersNextAction
+    },
+    getStepOverdueNextAction (state) {
+      return state.stepOverdueNextAction
     },
     resultServices (state) {
       return state.resultServices
