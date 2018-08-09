@@ -337,6 +337,7 @@ export default {
             if (vm.showThuPhi) {
               paymentsOut = {
                 requestPayment: vm.payments['requestPayment'],
+                paymentNote: vm.payments['paymentNote'],
                 advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
                 feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                 serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
