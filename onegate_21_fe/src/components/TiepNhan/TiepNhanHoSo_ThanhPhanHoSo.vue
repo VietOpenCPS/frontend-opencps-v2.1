@@ -36,7 +36,6 @@
                   v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
-                  v-on:click.stop=""
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
