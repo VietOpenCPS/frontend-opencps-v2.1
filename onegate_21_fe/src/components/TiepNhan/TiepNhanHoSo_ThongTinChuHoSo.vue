@@ -469,6 +469,12 @@ export default {
           vm.thongTinNguoiNopHoSo.sameUser = true
         }
         if (vm.thongTinNguoiNopHoSo.sameUser) {
+          if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
+            vm.onChangeDelegateCity(value.cityCode)
+          }
+          if (value.districtCode && value.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
+            vm.onChangeDelegateDistrict(value.districtCode)
+          }
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
       },
