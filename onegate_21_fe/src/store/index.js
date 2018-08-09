@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
             commit('setInitData', serializable)
@@ -528,7 +528,6 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
@@ -682,16 +681,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   'groupId': state.initData.groupId
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            'groupId': state.initData.groupId
+          }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -761,16 +760,16 @@ export const store = new Vuex.Store({
         commit('setLoading', false)
         console.log('put dossier')
         let options = {
-          headers: {
-            groupId: state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   groupId: state.initData.groupId
+          //   groupId: state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            groupId: state.initData.groupId
+          }
         }
         var applicantType = ''
         if (data.userType) {
@@ -815,7 +814,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
-        dataPutdossier.append('sampleCount', data.sampleCount)
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
           console.log('put dossier success')
@@ -2153,8 +2152,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data

@@ -1226,7 +1226,7 @@ export default {
             router.push({
               path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
               query: {
-                activeTab: 'tabs-2',
+                activeTab: 'tabs-1',
                 btnIndex: null
               }
             })
@@ -1528,7 +1528,7 @@ export default {
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: {
-            activeTab: 'tabs-2',
+            activeTab: 'tabs-1',
             btnIndex: btnIndex
           }
         })
