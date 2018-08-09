@@ -148,7 +148,7 @@
                 </v-flex>
               </v-layout>
               <v-layout wrap>
-                <v-flex xs12 sm5 class="no__selected__items">
+                <v-flex xs12 sm10 class="no__selected__items">
                   <v-select
                     :items="advSearchTools"
                     v-model="advSearchToolsSelected"
@@ -162,10 +162,8 @@
                     hide-selected
                   ></v-select>
                 </v-flex>
-                <v-flex xs12 sm1 class="text-center">
-                </v-flex>
-                <v-flex xs 12 sm6 class="text-right">
-                  <v-btn color="primary" class="mx-0 my-0 mt-2" v-on:click.native="menusss = false">
+                <v-flex xs12 sm2 class="text-right">
+                  <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
                     <v-icon class="mr-2">clear</v-icon>
                     Quay lại
                   </v-btn>
@@ -188,7 +186,6 @@
           <v-select
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
-            label="Thủ tục:"
             autocomplete
             placeholder="Chọn thủ tục hành chính"
             item-text="serviceName"
@@ -203,7 +200,6 @@
           <v-select
             :items="listLinhVuc"
             v-model="linhVucSelected"
-            label="Lĩnh vực:"
             autocomplete
             placeholder="Chọn lĩnh vực"
             item-text="domainName"
@@ -367,7 +363,6 @@
                 <v-select
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  label="Thủ tục:"
                   autocomplete
                   placeholder="chọn thủ tục hành chính"
                   item-text="serviceName"
