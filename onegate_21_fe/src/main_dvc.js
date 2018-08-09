@@ -16,7 +16,7 @@ import 'v-suggestions/dist/v-suggestions.css'
 
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
-Vue.config.productionTip = false
+Vue.config.productionTip = true
 
 Vue.mixin({
   methods: {

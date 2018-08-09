@@ -209,6 +209,7 @@
             @change="changeDomain"
             v-if="originality !== 1"
           ></v-select>
+
         </v-flex>
       </v-layout>
     </v-layout>
@@ -1758,7 +1759,6 @@ export default {
     },
     selectedAdvFilter (item) {
       let vm = this
-      console.log(vm.advSearchItems)
       vm.advSearchTools[item.index].display = true
       vm.advSearchTools[item.index].disabled = true
       let hasKey = false
