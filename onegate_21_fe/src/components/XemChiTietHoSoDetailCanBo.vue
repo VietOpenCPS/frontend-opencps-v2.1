@@ -93,22 +93,22 @@
               <p class="mb-2">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                <span v-if="thongTinChiTietHoSo.lastActionNote">
+                <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
                   <span> - Ý kiến: </span>
                   <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                 </span>
               </p>
-              <p class="mb-0">
-                <span>Người thực hiện: </span>
-                <b>&nbsp;{{usersNextAction.toString()}}&nbsp;</b>-
+              <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                <span>Người thực hiện: &nbsp;</span>
+                <b>{{usersNextAction.toString()}}&nbsp;</b>-
                 <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                   {{stepOverdueNextAction}}
                 </span>
               </p>
             </div>
             <!-- Dịch vụ công -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1">
-              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2">
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
+              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2 && item.infoType === 1">
                 {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
               </div>
             </div>
@@ -562,7 +562,8 @@ export default {
       return this.$store.getters.getCheckInput
     },
     usersNextAction () {
-      let user = this.$store.getters.getUsersNextAction
+      let user = []
+      user = this.$store.getters.getUsersNextAction
       let userName = []
       if (user.length > 0) {
         for (let key in user) {

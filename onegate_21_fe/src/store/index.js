@@ -1542,7 +1542,7 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
               commit('setCheckInput', serializable['checkInput'])
-              commit('setStepOverdueNextAction', serializable['stepOverdueNextAction'])
+              commit('setStepOverdueNextAction', serializable['stepOverdue'])
               commit('setUserNextAction', serializable['users'])
               resolve(serializable.data)
             }).catch(function (error) {
@@ -1677,12 +1677,9 @@ export const store = new Vuex.Store({
           let config = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {
-              info: data.info
             }
           }
-          let url = state.initData.dossierApi + '/' + data.dossierId + '/syncs'
+          let url = '/o/rest/v2_1/dossiers/' + data.dossierId + '/syncs'
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)
           }).catch(function (xhr) {
@@ -2183,8 +2180,8 @@ export const store = new Vuex.Store({
             }
           }
           // test lcoal
-          // axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data

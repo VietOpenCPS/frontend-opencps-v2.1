@@ -25,10 +25,10 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 5">
+              <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 5">
+              <v-flex xs12 sm3>
                 <v-text-field
                   @keyup="changeFee"
                   v-model="data_payment.serviceAmount"
@@ -38,18 +38,6 @@
                 ></v-text-field>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Phí: </v-subheader>
-              </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2 || data_payment.requestPayment === 5">
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="data_payment.serviceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
-                ></v-text-field>
-              </v-flex>
               <!--  -->
               <!-- <v-flex xs12 sm4 v-if="viaPortal === 2">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
@@ -77,7 +65,7 @@
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
               <!-- requestPayment === 2 -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
-                <v-subheader class="pl-0 text-right">Tổng phí: </v-subheader>
+                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 2">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
@@ -112,9 +100,9 @@
               <span class="red--text">* </span>&nbsp;&nbsp; {{data_payment.paymentNote}}
             </p> -->
             <v-layout wrap style="position: relative">
-              <v-flex style="width:100px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;&nbsp; Ghi chú:</v-flex>
-              <v-flex style="width:calc(100% - 100px)">
-                <div v-if="activeEdit == false">
+              <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+              <v-flex style="width:calc(100% - 80px)">
+                <div v-if="activeEdit == false" class="pl-2">
                   <v-text-field class="py-0"
                   v-model="data_payment.paymentNote"
                   multi-line
