@@ -68,11 +68,12 @@
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
-              <span class="text-bold">{{dueDateInput | dateTimeView}}</span>
               <vue-ctk-date-time-picker 
                 v-model="dueDateInput" 
-                label=""
                 format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                placeholder="Chọn ngày"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
               ></vue-ctk-date-time-picker>
               <v-icon style="margin-left: 8px;">event</v-icon>
@@ -94,7 +95,7 @@
     data: () => ({
       minDate: null,
       editable: false,
-      dueDateInput: (new Date()).toString(),
+      dueDateInput: null,
       dataPostDossier: {
         serviceCode: '',
         govAgencyCode: '',
@@ -156,8 +157,9 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = new Date(Number(vm.thongTinChungHoSo.dueDate)).toString()
+        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
         vm.minDate = vm.getCurentDateTime('date')
+        console.log('dueDateInput', vm.dueDateInput)
       },
       getthongtinchunghoso () {
         return this.thongTinChungHoSo
@@ -176,7 +178,7 @@
       },
       getDuedate () {
         var vm = this
-        let date = (new Date(this.dueDateInput)).getTime()
+        let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
         return date
       },
       getDuedateF (val) {
@@ -216,6 +218,9 @@
           let value = new Date(arg)
           return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
         }
+      },
+      formatDateInput (date) {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       }
     },
     filters: {

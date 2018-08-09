@@ -44,7 +44,7 @@
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp; 
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
@@ -53,8 +53,8 @@
     <!--  -->
     <div style="position: relative;" v-if="viaPortalDetail !== 0">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
-          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>DỊCH VỤ CHUYỂN PHÁT KẾT QUẢ</div>
+        <v-expansion-panel-content hide-actions value="2">
+          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
           <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -62,7 +62,7 @@
     <!--  -->
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
+        <v-expansion-panel-content hide-actions value="2">
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -136,10 +136,12 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    receiveDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
-    outputTypes: [2]
+    outputTypes: [2],
+    sampleCount: 0
   }),
   computed: {
     loading () {
@@ -148,6 +150,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
   created () {
@@ -175,8 +180,9 @@ export default {
                 actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
               }).then(resAction => {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                result['receivingDuedate'] = resAction && resAction.receiving ? resAction.receiving.dueDate : null
-                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : null
+                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
@@ -207,8 +213,9 @@ export default {
         vm.$refs.thanhphanhoso.initData(result)
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
-        if (vm.$refs.dichvuchuyenphatketqua) {
-          vm.$refs.dichvuchuyenphatketqua.initData(result)
+        if (result.viaPostal > 0) {
+          vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+          // vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
       }).catch(reject => {
       })
@@ -281,10 +288,11 @@ export default {
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
@@ -299,26 +307,42 @@ export default {
             }
           })
         }
-        if (vm.$refs.thanhphanhoso) {
-          vm.$refs.thanhphanhoso.saveMark()
-        }
+        // if (vm.$refs.thanhphanhoso) {
+        //   vm.$refs.thanhphanhoso.saveMark()
+        // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
+        tempData['sampleCount'] = vm.$refs.thanhphanhoso.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             var initData = vm.$store.getters.loadingInitData
             let actionUser = initData.user.userName ? initData.user.userName : ''
+            //
+            var paymentsOut = {}
+            if (vm.showThuPhi) {
+              paymentsOut = {
+                requestPayment: vm.payments['requestPayment'],
+                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+              }
+            }
+            var payloadDate = {
+              'dueDate': tempData.dueDate,
+              'receiveDate': vm.receiveDateEdit
+            }
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
-              payload: '',
+              payload: JSON.stringify(payloadDate),
               security: '',
               assignUsers: '',
-              payment: JSON.stringify(vm.payments),
+              payment: JSON.stringify(paymentsOut),
               createDossiers: '',
               dueDate: tempData.dueDate
             }

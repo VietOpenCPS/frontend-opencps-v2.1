@@ -11,8 +11,9 @@
           <v-card-text>
             <v-layout wrap class="pl-2">
               <v-icon color="blue">event</v-icon>
-              <datetime v-model="dueDateInput"
+              <!-- <datetime v-model="dueDateInput"
                 class="ml-2"
+                placeholder="Chọn ngày"
                 type="datetime"
                 input-format="DD/MM/YYYY HH:mm"
                 :i18n="{ok:'Chọn', cancel:'Thoát'}"
@@ -22,8 +23,17 @@
                 wrapper-class="wrapper-datetime"
                 auto-continue
                 auto-close
-                required
-              ></datetime>
+              ></datetime> -->
+              <vue-ctk-date-time-picker 
+                style="width:auto!important"
+                class="ml-2"
+                v-model="dueDateInput" 
+                format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                placeholder="Chọn ngày"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
+                :min-date="minDate"
+              ></vue-ctk-date-time-picker>
             </v-layout>
           </v-card-text>
         </v-card>
@@ -32,27 +42,32 @@
   </div>
 </template>
 <script>
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 export default {
-  components: {},
+  components: {
+    'vue-ctk-date-time-picker': VueCtkDateTimePicker
+  },
   props: ['dueDateEdit'],
   data: () => ({
-    dueDateInput: null,
+    dueDateInput: '',
     minDate: null
   }),
   created () {
     var vm = this
-    vm.dueDateInput = vm.dueDateEdit.toString()
+    vm.dueDateInput = vm.dueDateEdit ? vm.formatDateInput(vm.dueDateEdit) : ''
+    console.log('dueDateInput', vm.dueDateInput)
   },
   watch: {},
   mounted () {
-    this.dueDateInput = this.dueDateEdit.toString()
+    this.dueDateInput = this.dueDateEdit ? this.formatDateInput(this.dueDateEdit) : ''
+    console.log('dueDateInput', this.dueDateInput)
     this.minDate = this.getCurentDateTime('date')
   },
   methods: {
     getDateInput () {
       var vm = this
       console.log('vm.dueDateInput', vm.dueDateInput)
-      let date = (new Date(vm.dueDateInput)).getTime()
+      let date = vm.dueDateInput ? (new Date(vm.dueDateInput)).getTime() : ''
       return date
     },
     getCurentDateTime (type) {
@@ -60,8 +75,11 @@ export default {
       if (type === 'datetime') {
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} | ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
       } else if (type === 'date') {
-        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}`
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       }
+    },
+    formatDateInput (date) {
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
     }
   }
 }

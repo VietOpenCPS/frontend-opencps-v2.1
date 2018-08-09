@@ -77,6 +77,7 @@
     },
     created () {
       var vm = this
+      console.log('create------')
       vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {
         vm.govAgencies = result
         if (String(vm.serviceCode) !== '0') {
