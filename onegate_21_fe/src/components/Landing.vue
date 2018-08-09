@@ -1,22 +1,91 @@
 <template>
   <div>
+    <div class="row-header no__hidden_class">
+      <div class="background-triangle-big"> <span v-if="trangThaiHoSoList !== null">{{trangThaiHoSoList[index]['title']}}</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field solo placeholder="Tìm kiếm theo từ khoá ..."></v-text-field>
+          <v-fade-transition>
+            <div v-if="menusss"
+            style="position: absolute;
+              padding: 15px;
+              z-index: 9999;
+              border: 1px solid rgba(0,0,0,0);
+              -webkit-border-radius: 2px;
+              border-radius: 2px;
+              -webkit-box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+              box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+              width: 100%;
+              background: #fff;"
+            >
+              <v-layout wrap>
+                <v-flex xs 12 sm5>
+                  <v-select
+                    label="Chọn điều kiện lọc"
+                    single-line
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm1>
+                  <v-btn icon class="my-0 mx-0">
+                    <v-icon size="16">drag_handle</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs 12 sm5>
+                  <v-select
+                    label="Chọn abc"
+                    single-line
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm1>
+                  <v-btn icon class="my-0 mx-0">
+                    <v-icon size="16">visibility_off</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </div>
+          </v-fade-transition>
+        </div>
+        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+            <v-icon size="16">filter_list</v-icon>
+          </v-btn>
+        </div>
+      </div> 
+    </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering>
-      <v-flex xs12 class="px-2" v-else>
-        <v-select
-          :items="listThuTucHanhChinh"
-          v-model="thuTucHanhChinhSelected"
-          label="Thủ tục:"
-          autocomplete
-          placeholder="Chọn thủ tục hành chính"
-          item-text="serviceName"
-          item-value="serviceConfigId"
-          return-object
-          :hide-selected="true"
-          @change="changeServiceConfigs"
-          v-if="originality !== 1"
-        ></v-select>
-      </v-flex>
+      <v-layout wrap v-else>
+        <v-flex xs6 class="pl-2 pr-3">
+          <v-select
+            :items="listThuTucHanhChinh"
+            v-model="thuTucHanhChinhSelected"
+            label="Thủ tục:"
+            autocomplete
+            placeholder="Chọn thủ tục hành chính"
+            item-text="serviceName"
+            item-value="serviceConfigId"
+            return-object
+            :hide-selected="true"
+            @change="changeServiceConfigs"
+            v-if="originality !== 1"
+          ></v-select>
+        </v-flex>
+        <v-flex xs6 class="pl-3 pr-2">
+          <v-select
+            :items="listLinhVuc"
+            v-model="linhVucSelected"
+            label="Lĩnh vực:"
+            autocomplete
+            placeholder="Chọn lĩnh vực"
+            item-text="domainName"
+            item-value="domainCode"
+            return-object
+            :hide-selected="true"
+            @change="changeDomain"
+            v-if="originality !== 1"
+          ></v-select>
+        </v-flex>
+      </v-layout>
     </v-layout>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
@@ -367,6 +436,7 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    menusss: false,
     itemFilterSupport: {
       years: [
         {
@@ -530,6 +600,9 @@ export default {
     selected: [],
     listThuTucHanhChinh: [],
     thuTucHanhChinhSelected: null,
+    listLinhVuc: [],
+    linhVucSelected: null,
+    domainCode: '',
     govAgencyCode: '',
     serviceCode: '',
     templateNo: '',
@@ -593,6 +666,7 @@ export default {
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
         vm.processListTTHC(currentQuery)
+        vm.processListDomain(currentQuery)
         if (vm.trangThaiHoSoList === null) {
           vm.$store.commit('setLoadingDynamicBtn', true)
           setTimeout(() => {
@@ -715,6 +789,16 @@ export default {
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
         console.log('watch: landing')
+        if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
+          vm.processListDomain(currentQuery)
+        } else {
+          for (let key in vm.listLinhVuc) {
+            if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+              vm.linhVucSelected = vm.listLinhVuc[key]
+              vm.domainCode = vm.linhVucSelected['domainCode']
+            }
+          }
+        }
         if (vm.listThuTucHanhChinh === null || vm.listThuTucHanhChinh === undefined || (vm.listThuTucHanhChinh !== null && vm.listThuTucHanhChinh !== undefined && vm.listThuTucHanhChinh.length === 0)) {
           vm.processListTTHC(currentQuery)
         } else {
@@ -801,6 +885,23 @@ export default {
         vm.doLoadingDataHoSo()
       })
     },
+    processListDomain (currentQuery) {
+      let vm = this
+      vm.$store.dispatch('getDomainLists').then(function (result) {
+        vm.listLinhVuc = result
+        if (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) !== '') {
+          for (let key in vm.listLinhVuc) {
+            if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
+              vm.linhVucSelected = vm.listLinhVuc[key]
+              vm.domainCode = vm.linhVucSelected['domainCode']
+            }
+          }
+        } else {
+          vm.linhVucSelected = null
+        }
+        // vm.doLoadingDataHoSo()
+      })
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -839,7 +940,7 @@ export default {
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
             template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
-            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.domainCode,
             status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
@@ -912,6 +1013,26 @@ export default {
       }
       vm.govAgencyCode = item.govAgencyCode
       vm.serviceCode = item.serviceCode
+      vm.$router.push({
+        path: current.path + queryString
+      })
+    },
+    changeDomain (item) {
+      let vm = this
+      vm.linhVucSelected = item
+      vm.domainCode = vm.linhVucSelected['domainCode']
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['domain'] = ''
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      queryString += 'domain=' + item.domainCode
       vm.$router.push({
         path: current.path + queryString
       })

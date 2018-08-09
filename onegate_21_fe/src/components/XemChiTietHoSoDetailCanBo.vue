@@ -583,6 +583,7 @@ export default {
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.getNextActions()
+        console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         var arrTemp = []
         arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
         arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
