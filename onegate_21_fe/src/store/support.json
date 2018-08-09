@@ -61,5 +61,86 @@
            "hasForm":true,
            "fileType":0
         }
+    ],
+    "advSearchTools": [
+        {
+            "index": 0,
+            "value": "adv_0",
+            "text": "Lọc hồ sơ theo năm - tháng",
+            "type": "select",
+            "dataSource": "data",
+            "spec": "year_month",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 1,
+            "value": "adv_1",
+            "text": "Lọc hồ sơ theo top",
+            "type": "select",
+            "dataSource": "data",
+            "spec": "top",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 2,
+            "value": "adv_2",
+            "text": "Lọc trạng thái hồ sơ",
+            "type": "select",
+            "dataSource": "getStatusLists",
+            "spec": "status",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 3,
+            "value": "adv_3",
+            "text": "Lọc trạng thái con",
+            "type": "select",
+            "dataSource": "getSubstatusLists",
+            "spec": "substatus",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 4,
+            "value": "adv_4",
+            "text": "Lọc theo mã đơn vị",
+            "type": "select",
+            "dataSource": "getAgencyLists",
+            "spec": "agency",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 5,
+            "value": "adv_5",
+            "text": "Lọc theo mã thủ tục",
+            "type": "select",
+            "dataSource": "getServiceLists",
+            "spec": "service",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 6,
+            "value": "adv_6",
+            "text": "Lọc theo lĩnh vực",
+            "type": "select",
+            "dataSource": "getDomainLists",
+            "spec": "domain",
+            "display": false,
+            "disabled": false
+        },
+        {
+            "index": 7,
+            "value": "adv_7",
+            "text": "Tìm theo mã sổ theo dõi",
+            "type": "text",
+            "spec": "register",
+            "display": false,
+            "disabled": false
+        }
     ]
 }
