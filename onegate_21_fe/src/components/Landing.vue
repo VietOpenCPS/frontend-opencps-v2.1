@@ -1,44 +1,173 @@
 <template>
   <div>
     <div class="row-header no__hidden_class">
-      <div class="background-triangle-big"> <span v-if="trangThaiHoSoList !== null">{{trangThaiHoSoList[index]['title']}}</span> </div>
+      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-text-field solo placeholder="Tìm kiếm theo từ khoá ..."></v-text-field>
+          <v-select
+            v-model="advSearchItems"
+            placeholder="Tìm kiếm theo từ khoá ..."
+            solo
+            chips
+            tags
+            deletable-chips
+            item-value="value"
+            item-text="text"
+            @input="keywordEventChange"
+            content-class="adv__search__select"
+            return-object
+          ></v-select>
           <v-fade-transition>
             <div v-if="menusss"
-            style="position: absolute;
-              padding: 15px;
-              z-index: 9999;
-              border: 1px solid rgba(0,0,0,0);
-              -webkit-border-radius: 2px;
-              border-radius: 2px;
-              -webkit-box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
-              box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
-              width: 100%;
-              background: #fff;"
+            class="adv__search_container"
             >
-              <v-layout wrap>
-                <v-flex xs 12 sm5>
+              <v-layout wrap v-for="(item, indexTool) in advSearchTools" v-bind:key="indexTool" v-if="item.display">
+                <v-flex xs12 sm5>
                   <v-select
+                    :items="advSearchTools"
+                    v-model="item.value"
                     label="Chọn điều kiện lọc"
                     single-line
+                    item-value="value"
+                    item-text="text"
+                    disabled
                   ></v-select>
                 </v-flex>
-                <v-flex xs 12 sm1>
+                <v-flex xs12 sm1 class="text-center">
                   <v-btn icon class="my-0 mx-0">
                     <v-icon size="16">drag_handle</v-icon>
                   </v-btn>
                 </v-flex>
-                <v-flex xs 12 sm5>
+                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
                   <v-select
-                    label="Chọn abc"
+                    :items="itemFilterSupport.years"
+                    v-model="itemFilterSupport.year"
+                    label="Chọn năm"
+                    autocomplete
                     single-line
+                    item-value="value"
+                    item-text="name"
+                    hide-selected
+                    @change="changeAdvFilterData($event, 'year', item.index)"
                   ></v-select>
                 </v-flex>
-                <v-flex xs 12 sm1>
+                <v-flex xs2 sm2 class="text-center" v-if="item.spec === 'year_month'">
                   <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">visibility_off</v-icon>
+                    <v-icon size="16">remove</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
+                  <v-select
+                    :items="itemFilterSupport.months"
+                    v-model="itemFilterSupport.month"
+                    label="Chọn tháng"
+                    autocomplete
+                    single-line
+                    item-value="value"
+                    item-text="name"
+                    @change="changeAdvFilterData($event, 'month', item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'top'">
+                  <v-select
+                    :items="itemFilterSupport.tops"
+                    v-model="itemFilterSupport.top"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="value"
+                    item-text="name"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'status'">
+                  <v-select
+                    :items="itemFilterSupport.statusLists"
+                    v-model="itemFilterSupport.status"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="itemCode"
+                    item-text="itemName"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'substatus'">
+                  <v-select
+                    :items="itemFilterSupport.substatusLists"
+                    v-model="itemFilterSupport.substatus"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="itemCode"
+                    item-text="itemName"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'agency'">
+                  <v-select
+                    :items="itemFilterSupport.agencyLists"
+                    v-model="itemFilterSupport.agency"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="administrationCode"
+                    item-text="administrationName"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'service'">
+                  <v-select
+                    :items="itemFilterSupport.serviceLists"
+                    v-model="itemFilterSupport.service"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="serviceCode"
+                    item-text="serviceName"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'domain'">
+                  <v-select
+                    :items="itemFilterSupport.domainLists"
+                    v-model="itemFilterSupport.domain"
+                    :label="item.text + ':'"
+                    autocomplete
+                    single-line
+                    item-value="domainCode"
+                    item-text="domainName"
+                    @change="changeAdvFilterData($event, item.spec, item.index)"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm6 v-if="item.spec === 'register'">
+                  <v-text-field 
+                    v-model="itemFilterSupport.register" 
+                    :placeholder="item.text">
+                  </v-text-field>
+                </v-flex>
+              </v-layout>
+              <v-layout wrap>
+                <v-flex xs12 sm5 class="no__selected__items">
+                  <v-select
+                    :items="advSearchTools"
+                    v-model="advSearchToolsSelected"
+                    label="Chọn điều kiện lọc"
+                    autocomplete
+                    single-line
+                    item-value="text"
+                    item-text="text"
+                    return-object
+                    @change="selectedAdvFilter"
+                    hide-selected
+                  ></v-select>
+                </v-flex>
+                <v-flex xs12 sm1 class="text-center">
+                </v-flex>
+                <v-flex xs 12 sm6 class="text-right">
+                  <v-btn color="primary" class="mx-0 my-0 mt-2" v-on:click.native="menusss = false">
+                    <v-icon class="mr-2">clear</v-icon>
+                    Quay lại
                   </v-btn>
                 </v-flex>
               </v-layout>
@@ -46,15 +175,15 @@
           </v-fade-transition>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
             <v-icon size="16">filter_list</v-icon>
           </v-btn>
         </div>
       </div> 
     </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering>
-      <v-flex xs12 class="px-2" v-else>
+      <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
+      <v-flex xs12 class="px-2" v-if="menuType !== 3">
         <v-select
           :items="listThuTucHanhChinh"
           v-model="thuTucHanhChinhSelected"
@@ -404,6 +533,7 @@ import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
+import support from '../store/support.json'
 
 export default {
   props: ['index'],
@@ -418,12 +548,16 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    advSearchToolsSelected: [],
+    advSearchTools: support.advSearchTools,
+    advSearchItems: [],
+    advObjectSearch: {},
     menusss: false,
     itemFilterSupport: {
       years: [
         {
           'value': '',
-          'name': 'toàn bộ'
+          'name': 'Lọc theo năm'
         },
         {
           'value': '2017',
@@ -442,7 +576,7 @@ export default {
       months: [
         {
           'value': '',
-          'name': 'toàn bộ'
+          'name': 'Lọc theo tháng'
         },
         {
           'value': '1',
@@ -1483,6 +1617,180 @@ export default {
       // if (item.permission !== null && item.permission !== '') {
       router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
       // }
+    },
+    keywordEventChange (data) {
+      let vm = this
+      console.log('keywordEventChange', data)
+      vm.advObjectSearch = {}
+      for (let key in data) {
+        if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
+          if (!data[key].startsWith('keyword:') && !data[key].startsWith('year_month:') && !data[key].startsWith('top:') &&
+            !data[key].startsWith('status:') && !data[key].startsWith('substatus:') && !data[key].startsWith('agency:') &&
+            !data[key].startsWith('service:') && !data[key].startsWith('domain:') && !data[key].startsWith('register:')) {
+            vm.advObjectSearch['keyword'] = data[key]
+          }
+          if (data[key].startsWith('keyword:')) {
+            vm.advObjectSearch['keyword'] = data[key].replace('keyword:', '')
+          } else {
+            console.log('vm.advSearchItems', vm.advSearchItems)
+            for (let keyTool in vm.advSearchItems) {
+              if (data[key].startsWith(vm.advSearchItems[keyTool].spec + ':')) {
+                vm.advObjectSearch[vm.advSearchItems[keyTool].spec] = data[key].replace(vm.advSearchItems[keyTool].spec + ':', '')
+              }
+            }
+          }
+        } else {
+          let newText = data[key].value
+          vm.advObjectSearch[data[key].spec] = newText.replace(data[key].spec + ':', '')
+        }
+      }
+      console.log('advObjectSearch', vm.advObjectSearch)
+      vm.advSearchItems = []
+      for (let key in vm.advObjectSearch) {
+        if (!vm.advObjectSearch.hasOwnProperty(key)) continue
+        let value = vm.advObjectSearch[key]
+        if (typeof value === 'string' && value !== null && value !== undefined && value !== '') {
+          if (key === 'keyword') {
+            vm.advSearchItems.push({
+              spec: key,
+              value: key + ':' + value,
+              text: key + ':' + value,
+              index: -1
+            })
+          } else {
+            let toolIndex = -2
+            for (let keyTool in vm.advSearchTools) {
+              if (vm.advSearchTools[keyTool].spec === key) {
+                toolIndex = vm.advSearchTools[keyTool].index
+                break
+              }
+            }
+            vm.advSearchItems.push({
+              spec: key,
+              value: key + ':' + value,
+              text: key + ':' + value,
+              index: toolIndex
+            })
+          }
+        } else if (typeof value !== 'string' && value !== null && value !== undefined && value !== '') {
+          vm.advSearchItems.push({
+            spec: key,
+            value: key + ':' + value.value,
+            text: key + ':' + value.value,
+            index: key + ':' + value.index
+          })
+        }
+      }
+      for (let keyTool in vm.advSearchTools) {
+        vm.advSearchTools[keyTool].display = false
+        vm.advSearchTools[keyTool].disabled = false
+        if (vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== null && vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== undefined &&
+          vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== '') {
+          vm.advSearchTools[keyTool].display = true
+          vm.advSearchTools[keyTool].disabled = true
+        }
+      }
+      vm.doRedirectFilter()
+    },
+    selectedAdvFilter (item) {
+      let vm = this
+      console.log(vm.advSearchItems)
+      vm.advSearchTools[item.index].display = true
+      vm.advSearchTools[item.index].disabled = true
+      let hasKey = false
+      for (let key in vm.advSearchItems) {
+        if (vm.advSearchItems[key].index === item.index) {
+          hasKey = true
+          break
+        }
+      }
+      if (!hasKey) {
+        vm.advSearchItems.push({
+          spec: vm.advSearchTools[item.index].spec,
+          value: vm.advSearchTools[item.index].spec + ':' + '__',
+          text: vm.advSearchTools[item.index].spec + ':' + '__',
+          index: item.index
+        })
+      }
+    },
+    showAdvFilter () {
+      let vm = this
+      vm.menusss = !vm.menusss
+      vm.$store.dispatch('getStatusLists').then(function (result) {
+        vm.itemFilterSupport.statusLists = result
+      })
+      let filter = {
+        itemCode: ''
+      }
+      vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
+        vm.itemFilterSupport.substatusLists = result
+      })
+      vm.$store.dispatch('getAgencyLists').then(function (result) {
+        vm.itemFilterSupport.agencyLists = result
+      })
+      vm.$store.dispatch('getServiceLists').then(function (result) {
+        vm.itemFilterSupport.serviceLists = result
+      })
+      vm.$store.dispatch('getDomainLists').then(function (result) {
+        vm.itemFilterSupport.domainLists = result
+      })
+    },
+    changeAdvFilterData (data, spec, index) {
+      let vm = this
+      if (spec === 'status') {
+        let filter = {
+          itemCode: data
+        }
+        vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
+          vm.itemFilterSupport.substatusLists = result
+        })
+      }
+      let valueFilter = data
+      if (spec === 'year') {
+        vm.itemFilterSupport.year = data
+        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month
+        spec = 'year_month'
+      } else if (spec === 'month') {
+        vm.itemFilterSupport.month = data
+        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month
+        spec = 'year_month'
+      }
+      for (let key in vm.advSearchItems) {
+        if (vm.advSearchItems[key].index === index) {
+          vm.advSearchItems[key].value = spec + ':' + valueFilter
+          vm.advSearchItems[key].text = spec + ':' + valueFilter
+          break
+        }
+      }
+      vm.doRedirectFilter()
+    },
+    doRedirectFilter () {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
+          key !== 'top' && key !== 'status' && key !== 'substatus' && key !== 'agency' && key !== 'service' && key !== 'domain' &&
+          key !== 'register' && key !== 'year' && key !== 'month' && key !== 'adv_renew' && key !== 'keyword') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      for (let key in vm.advSearchItems) {
+        let currentItemFilter = vm.advSearchItems[key]
+        if (currentItemFilter.spec === 'year_month') {
+          let currentYearMonth = currentItemFilter.text.replace(currentItemFilter.spec + ':', '')
+          const [year, month] = currentYearMonth.split('_')
+          queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&'
+        } else {
+          queryString += currentItemFilter.spec + '=' + currentItemFilter.text.replace(currentItemFilter.spec + ':', '') + '&'
+        }
+      }
+      queryString += 'adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      queryString = queryString.replace(/=__/g, '=')
+      vm.$router.push({
+        path: current.path + queryString
+      })
     }
   }
 }
