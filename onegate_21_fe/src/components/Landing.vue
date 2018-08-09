@@ -1,5 +1,57 @@
 <template>
   <div>
+    <div class="row-header no__hidden_class">
+      <div class="background-triangle-big"> <span v-if="trangThaiHoSoList !== null">{{trangThaiHoSoList[index]['title']}}</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field solo placeholder="Tìm kiếm theo từ khoá ..."></v-text-field>
+          <v-fade-transition>
+            <div v-if="menusss"
+            style="position: absolute;
+              padding: 15px;
+              z-index: 9999;
+              border: 1px solid rgba(0,0,0,0);
+              -webkit-border-radius: 2px;
+              border-radius: 2px;
+              -webkit-box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+              box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+              width: 100%;
+              background: #fff;"
+            >
+              <v-layout wrap>
+                <v-flex xs 12 sm5>
+                  <v-select
+                    label="Chọn điều kiện lọc"
+                    single-line
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm1>
+                  <v-btn icon class="my-0 mx-0">
+                    <v-icon size="16">drag_handle</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs 12 sm5>
+                  <v-select
+                    label="Chọn abc"
+                    single-line
+                  ></v-select>
+                </v-flex>
+                <v-flex xs 12 sm1>
+                  <v-btn icon class="my-0 mx-0">
+                    <v-icon size="16">visibility_off</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </div>
+          </v-fade-transition>
+        </div>
+        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
+            <v-icon size="16">filter_list</v-icon>
+          </v-btn>
+        </div>
+      </div> 
+    </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering>
       <v-layout wrap v-else>
@@ -384,6 +436,7 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    menusss: false,
     itemFilterSupport: {
       years: [
         {

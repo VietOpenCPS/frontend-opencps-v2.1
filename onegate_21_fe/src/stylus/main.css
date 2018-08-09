@@ -2612,3 +2612,7 @@ body .expand__select__gov .header__icon {
 body .form_alpaca .expansion-panel__container--active .expansion-panel__header {
     border-bottom: none !important;
 }
+body .no__hidden_class.row-header,
+body .no__hidden_class.row-header .text-ellipsis {
+    overflow: inherit;
+}
