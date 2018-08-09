@@ -100,9 +100,9 @@
               <span class="red--text">* </span>&nbsp;&nbsp; {{data_payment.paymentNote}}
             </p> -->
             <v-layout wrap style="position: relative">
-              <v-flex style="width:100px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;&nbsp; Ghi chú:</v-flex>
-              <v-flex style="width:calc(100% - 100px)">
-                <div v-if="activeEdit == false">
+              <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+              <v-flex style="width:calc(100% - 80px)">
+                <div v-if="activeEdit == false" class="pl-2">
                   <v-text-field class="py-0"
                   v-model="data_payment.paymentNote"
                   multi-line

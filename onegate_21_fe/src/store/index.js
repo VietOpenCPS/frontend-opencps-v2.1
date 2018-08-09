@@ -1677,12 +1677,9 @@ export const store = new Vuex.Store({
           let config = {
             headers: {
               groupId: state.initData.groupId
-            },
-            params: {
-              info: data.info
             }
           }
-          let url = state.initData.dossierApi + '/' + data.dossierId + '/syncs'
+          let url = '/o/rest/v2_1/dossiers/' + data.dossierId + '/syncs'
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)
           }).catch(function (xhr) {

@@ -1041,7 +1041,10 @@ export default {
       queryString += 'domain=' + vm.domainCode
       console.log('change Domain queryString', queryString)
       vm.$router.push({
-        path: current.path + queryString
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
       })
     },
     changeDichVuConfigs (item) {
