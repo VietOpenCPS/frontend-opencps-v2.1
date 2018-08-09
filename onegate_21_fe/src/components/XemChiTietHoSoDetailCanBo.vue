@@ -222,7 +222,8 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
-            <div class="mx-2 pt-2">
+            <!-- Một cửa -->
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
               <p class="mb-2">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -233,12 +234,17 @@
               </p>
               <p class="mb-0">
                 <span>Người thực hiện: </span>
-                <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}&nbsp;</b>-
-                <span :style="thongTinChiTietHoSo.dossierOverdue&&thongTinChiTietHoSo.dossierOverdue.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
-                   {{thongTinChiTietHoSo.dossierOverdue}}
+                <b>&nbsp;{{usersNextAction.toString()}}&nbsp;</b>-
+                <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                  {{stepOverdueNextAction}}
                 </span>
               </p>
             </div>
+            <!-- Dịch vụ công -->
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1">
+
+            </div>
+            <!--  -->
             <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
@@ -551,6 +557,19 @@ export default {
     },
     getCheckInput () {
       return this.$store.getters.getCheckInput
+    },
+    usersNextAction () {
+      let user = this.$store.getters.getUsersNextAction
+      let userName = []
+      if (user.length > 0) {
+        for (let key in user) {
+          userName.push(user[key]['userName'])
+        }
+      }
+      return userName
+    },
+    stepOverdueNextAction () {
+      return this.$store.getters.getStepOverdueNextAction
     }
   },
   created () {
@@ -1017,6 +1036,7 @@ export default {
       if (vm.payments) {
         paymentsOut = {
           requestPayment: vm.payments['requestPayment'],
+          paymentNote: vm.payments['paymentNote'],
           advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
           feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
           serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),

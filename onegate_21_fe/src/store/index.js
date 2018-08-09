@@ -22,6 +22,8 @@ export const store = new Vuex.Store({
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
     checkInput: 0,
+    stepOverdueNextAction: '',
+    usersNextAction: [],
     lePhi: {
       fee: '',
       feeNote: '',
@@ -211,10 +213,10 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
               let serializable = response.data
               let thuTucArray = Array.from(serializable.data)
-              thuTucArray.unshift({
-                'serviceConfigId': '0',
-                'serviceName': 'Toàn bộ thủ tục'
-              })
+              // thuTucArray.unshift({
+              //   'serviceConfigId': '0',
+              //   'serviceName': 'Toàn bộ thủ tục'
+              // })
               commit('setListThuTucHanhChinh', thuTucArray)
               resolve(thuTucArray)
             }).catch(function (error) {
@@ -226,10 +228,10 @@ export const store = new Vuex.Store({
       } else {
         return new Promise((resolve, reject) => {
           let thuTucArray = Array.from(state.listThuTucHanhChinh)
-          thuTucArray.unshift({
-            'serviceConfigId': '0',
-            'serviceName': 'Toàn bộ thủ tục'
-          })
+          // thuTucArray.unshift({
+          //   'serviceConfigId': '0',
+          //   'serviceName': 'Toàn bộ thủ tục'
+          // })
           resolve(thuTucArray)
         })
       }
@@ -1541,6 +1543,8 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
               commit('setCheckInput', serializable['checkInput'])
+              commit('setStepOverdueNextAction', serializable['stepOverdueNextAction'])
+              commit('setUserNextAction', serializable['users'])
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
@@ -2179,18 +2183,18 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          // test lcoal
+          // axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'domainCode': '',
-                  'domainName': 'toàn bộ lĩnh vực'
-                })
-              }
+              // if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
+              //   dataReturn.unshift({
+              //     'domainCode': '',
+              //     'domainName': 'toàn bộ lĩnh vực'
+              //   })
+              // }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -2309,6 +2313,12 @@ export const store = new Vuex.Store({
     },
     setCheckInput (state, payload) {
       state.checkInput = payload
+    },
+    setUserNextAction (state, payload) {
+      state.usersNextAction = payload
+    },
+    setStepOverdueNextAction (state, payload) {
+      state.stepOverdueNextAction = payload
     },
     setThongTinChuHoSo (state, payload) {
       let userTypeCondition = true
@@ -2557,6 +2567,12 @@ export const store = new Vuex.Store({
     },
     getCheckInput (state) {
       return state.checkInput
+    },
+    getUsersNextAction (state) {
+      return state.usersNextAction
+    },
+    getStepOverdueNextAction (state) {
+      return state.stepOverdueNextAction
     },
     resultServices (state) {
       return state.resultServices
