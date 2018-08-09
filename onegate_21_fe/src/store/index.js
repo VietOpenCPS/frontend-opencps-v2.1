@@ -813,7 +813,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
-        dataPutdossier.append('sampleCount', data.sampleCount)
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
           console.log('put dossier success')

@@ -45,14 +45,14 @@
     <div>
       <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab :key="1" href="#tabs-1" @click="loadTPHS()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            THÀNH PHẦN HỒ SƠ
-          </v-btn>
-        </v-tab>
-        <v-tab :key="2" href="#tabs-2" @click="getNextActions()"> 
+        <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             XỬ LÝ HỒ SƠ
+          </v-btn>
+        </v-tab>
+        <v-tab :key="2" href="#tabs-2" @click="loadTPHS()">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            THÀNH PHẦN HỒ SƠ
           </v-btn>
         </v-tab>
         <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()" v-if="originality !== 1">
@@ -76,7 +76,59 @@
           </v-btn>
         </v-tab> -->
         <v-tabs-items v-model="activeTab">
-          <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-1" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <div style="position: relative;" v-if="checkInput !== 0">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    <span v-if="checkInput === 2">Cập nhật hồ sơ</span> <span v-if="checkInput === 1">Kiểm tra hồ sơ</span> &nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
+            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                v-on:click.native="processPullBtnDetail(item, index)" 
+                :loading="loadingAction && index === indexAction"
+                :disabled="item.enable === 2"
+                v-if="item.enable > 0"
+              >
+                {{item.actionName}}
+                <span slot="loader">Loading...</span>
+              </v-btn>
+            </div>
+            <v-layout wrap v-if="dialogActionProcess">
+              <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
+              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
+              <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :id="'cr'" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+              <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
+              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
+              <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+              <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
+              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
+              <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
+              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+                :loading="loadingActionProcess"
+                :disabled="loadingActionProcess"
+                >
+                <v-icon>save</v-icon>&nbsp;
+                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
+                <span>Xác nhận</span>
+                <span slot="loader">Loading...</span>
+              </v-btn>
+            </v-layout>
+            <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
+              Thực hiện thành công!
+            </v-alert>
+            <!-- <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p> -->
+            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+          </v-tab-item>
+          <v-tab-item id="tabs-2" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
@@ -123,7 +175,7 @@
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
-                  Kết quả
+                  Kết quả xử lý
                 </div>
                 <!-- <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
                   <v-card>
@@ -209,57 +261,6 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel> -->
-          </v-tab-item>
-          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <div style="position: relative;" v-if="checkInput !== 0">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
-                  <div slot="header">
-                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </div>
-            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
-                v-on:click.native="processPullBtnDetail(item, index)" 
-                :loading="loadingAction && index === indexAction"
-                :disabled="item.enable === 2"
-                v-if="item.enable > 0"
-              >
-                {{item.actionName}}
-                <span slot="loader">Loading...</span>
-              </v-btn>
-            </div>
-            <v-layout wrap v-if="dialogActionProcess">
-              <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
-              <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
-              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
-              <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-              <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
-              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
-              <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
-              <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
-                :loading="loadingActionProcess"
-                :disabled="loadingActionProcess"
-                >
-                <v-icon>save</v-icon>&nbsp;
-                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
-                <span>Xác nhận</span>
-                <span slot="loader">Loading...</span>
-              </v-btn>
-            </v-layout>
-            <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
-              Thực hiện thành công!
-            </v-alert>
-            <!-- <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p> -->
-            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -581,6 +582,7 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        vm.getNextActions()
         var arrTemp = []
         arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
         arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
@@ -815,8 +817,12 @@ export default {
         }
         if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
           isPopup = true
+          if (Array.isArray(result.createFiles)) {
+            vm.createFiles = result.createFiles
+          } else {
+            vm.createFiles = [result.createFiles]
+          }
           vm.showTaoTaiLieuKetQua = true
-          vm.createFiles = result.createFiles
         }
         if (result.hasOwnProperty('eSignature') && result.eSignature) {
           isPopup = true
@@ -972,6 +978,7 @@ export default {
       }
       vm.$store.dispatch('rollBack', params).then(resRollBack => {
         vm.getNextActions()
+        vm.rollbackable = false
         vm.btnStateVisible = true
       })
     },

@@ -42,9 +42,21 @@
     <div style="position: relative;">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
-          <div slot="header">
+          <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp; 
+            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+            (
+              Số bộ hồ sơ: 
+              <span v-if="!stateEditSample">{{thongTinChiTietHoSo.sampleCount}}</span>
+              <v-text-field
+                style="width: 20px;"
+                v-else
+                v-model="thongTinChiTietHoSo.sampleCount"
+                type="number"
+              ></v-text-field>
+            )
+            <v-icon v-if="!stateEditSample" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+            <v-icon v-else style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
@@ -133,6 +145,7 @@ export default {
     validTNHS: false,
     dossierId: '',
     mark: true,
+    stateEditSample: false,
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
@@ -248,6 +261,7 @@ export default {
         // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
+        tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -272,7 +286,7 @@ export default {
               router.push({
                 path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
                 query: {
-                  activeTab: 'tabs-2'
+                  activeTab: 'tabs-1'
                 }
               })
               vm.tiepNhanState = false
@@ -312,7 +326,7 @@ export default {
         // }
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
-        tempData['sampleCount'] = vm.$refs.thanhphanhoso.sampleCount
+        tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
