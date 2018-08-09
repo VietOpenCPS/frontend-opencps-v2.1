@@ -69,14 +69,16 @@
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
               <vue-ctk-date-time-picker 
+                ref="datepicker" 
                 v-model="dueDateInput" 
                 format="YYYY-MM-DDTHH:mm"
                 formatted="DD/MM/YYYY HH:mm"
-                placeholder="Chọn ngày"
+                time-format="HH:mm"
+                :without-header="true"
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
               ></vue-ctk-date-time-picker>
-              <v-icon style="margin-left: 8px;">event</v-icon>
+              <v-icon class="hover-pointer" @click="showDatePicker">event</v-icon>
             </v-subheader>
           </v-flex>
         </v-layout>
@@ -221,6 +223,9 @@
       },
       formatDateInput (date) {
         return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      },
+      showDatePicker () {
+        this.$refs.datepicker.showDatePicker()
       }
     },
     filters: {

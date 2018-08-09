@@ -526,7 +526,6 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
@@ -813,7 +812,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
-        dataPutdossier.append('sampleCount', data.sampleCount)
+        dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
           console.log('put dossier success')
@@ -2148,7 +2147,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
           axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2177,14 +2178,16 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
           axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
               if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
                 dataReturn.unshift({
                   'domainCode': '',
-                  'domainName': 'toàn bộ'
+                  'domainName': 'toàn bộ lĩnh vực'
                 })
               }
               resolve(dataReturn)

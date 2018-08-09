@@ -2581,6 +2581,9 @@ body .datepicker .datetimepicker-container {
 body .datepicker-header {
     background: #0d71bb;
 }
+body .hover-pointer:hover {
+    cursor: pointer;
+}
 body .v-suggestions {
     padding-top: 3px;
 }

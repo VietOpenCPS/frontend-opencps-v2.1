@@ -10,27 +10,16 @@
         <v-card >
           <v-card-text>
             <v-layout wrap class="pl-2">
-              <v-icon color="blue">event</v-icon>
-              <!-- <datetime v-model="dueDateInput"
-                class="ml-2"
-                placeholder="Chọn ngày"
-                type="datetime"
-                input-format="DD/MM/YYYY HH:mm"
-                :i18n="{ok:'Chọn', cancel:'Thoát'}"
-                zone="local"
-                :min-date="minDate"
-                monday-first
-                wrapper-class="wrapper-datetime"
-                auto-continue
-                auto-close
-              ></datetime> -->
-              <vue-ctk-date-time-picker 
+              <v-icon color="blue" class="hover-pointer ml-3" @click="showDatePicker">event</v-icon>
+              <vue-ctk-date-time-picker
+                ref="datepicker" 
                 style="width:auto!important"
                 class="ml-2"
                 v-model="dueDateInput" 
                 format="YYYY-MM-DDTHH:mm"
+                time-format="HH:mm"
+                :without-header="true"
                 formatted="DD/MM/YYYY HH:mm"
-                placeholder="Chọn ngày"
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
               ></vue-ctk-date-time-picker>
@@ -80,6 +69,9 @@ export default {
     },
     formatDateInput (date) {
       return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+    },
+    showDatePicker () {
+      this.$refs.datepicker.showDatePicker()
     }
   }
 }
