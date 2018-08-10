@@ -211,6 +211,7 @@
             v-if="originality !== 1"
             clearable
           ></v-select>
+
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
           <v-text-field
@@ -1794,7 +1795,6 @@ export default {
     },
     selectedAdvFilter (item) {
       let vm = this
-      console.log(vm.advSearchItems)
       vm.advSearchTools[item.index].display = true
       vm.advSearchTools[item.index].disabled = true
       let hasKey = false
