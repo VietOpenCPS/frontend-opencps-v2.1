@@ -65,16 +65,6 @@
             NHẬT KÝ HỒ SƠ
           </v-btn>
         </v-tab>
-        <!-- <v-tab :key="5" href="#tabs-5" @click="runComment()" v-if="originality !== 1">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TRAO ĐỔI NỘI BỘ
-          </v-btn>
-        </v-tab> -->
-        <!-- <v-tab :key="6" href="#tabs-6" @click="loadDossierSyncs()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TRAO ĐỔI THẢO LUẬN
-          </v-btn>
-        </v-tab> -->
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
@@ -82,15 +72,15 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
+                    Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
             <!-- Một cửa -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3 && filterNextActionEnable(btnDossierDynamics)">
-              <p class="mb-2">
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
+              <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
                 <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
@@ -107,11 +97,11 @@
               </p>
             </div>
             <!-- Dịch vụ công -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
-              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2 && item.infoType === 1">
+            <!-- <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
+              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType !== 0 && item.infoType !== 0">
                 {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
               </div>
-            </div>
+            </div> -->
             <!--  -->
             <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
@@ -150,6 +140,56 @@
             </v-alert>
             <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
             <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            <!-- Trao đổi thảo luận -->
+            <div>
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> 
+                      <v-icon size="18" color="white">star_rate</v-icon> 
+                    </div>Trao đổi thảo luận
+                  </div>
+                  <v-card >
+                    <v-card-text class="px-0 py-0 pr-3">
+                      <v-flex xs12>
+                        <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
+                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index" v-if="item.syncType !==0 && item.infoType !== 0">
+                            <div class="timeline-badge" :class="item.syncType === 2 ? 'primary' : 'warning'">
+                              <v-icon color="grey lighten-4" size="26">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
+                            </div>
+                            <div class="timeline-panel">
+                              <div class="timeline-heading">
+                                <div class="timeline-panel-controls">
+                                  <div class="timestamp">
+                                    <small class="text-muted">{{ item.createDate | dateTimeView }}</small>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="timeline-body">
+                                <span v-if="item.syncType === 2">{{item.actionName}} </span>
+                                <span v-if="item.syncType === 2 && item.actionNote">:</span>
+                                <span v-if="item.actionNote" style="color: #0b72ba">{{ item.actionNote }}</span>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                        <!--  -->
+                        <div v-else class="no-comments no-data my-2"><i class="fa fa-comments fa-2x"></i><br>Không có trao đổi nào</div>
+                        <!--  -->
+                        <div style="position:relative">
+                          <v-text-field class="pl-5 my-3"
+                          v-model="messageChat"
+                          placeholder="Nhập trao đổi"
+                          @keyup.enter="postChat"
+                          ></v-text-field>
+                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position:absolute;top:0px;right:5px">send</v-icon>
+                        </div>
+                      </v-flex>
+                    </v-card-text>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
             <div style="position: relative;" v-if="originality !== 1">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
@@ -162,6 +202,7 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
+            <!--  -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form">
@@ -270,37 +311,6 @@
               </td>
             </div>
           </v-tab-item>
-          <!-- <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <comment ref="comment" :classPK="id" :className="className"></comment>
-          </v-tab-item> -->
-          <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
-            <v-layout row wrap>
-              <v-flex xs12 sm3>
-              </v-flex>
-              <v-flex xs12 sm6>
-                <v-card>
-                  <div style="height: 400px; overflow: auto; margin-bottom: 10px;">
-                    <div v-for="(item, index) in dossierSyncs" v-bind:key="index">
-                      <div :class="{ 'text-xs-left': item.syncType === 1, 'text-xs-right': item.syncType === 2 }">
-                        <v-chip label :color="getColorChat(item.syncType)" text-color="white">
-                          {{item.actionUser}}: {{item.actionNote}}
-                        </v-chip>
-                      </div>
-                    </div>
-                  </div>
-                  <v-text-field
-                  v-model="messageChat"
-                  solo
-                  label="Nhập trao đổi"
-                  append-icon="send"
-                  @change="postChat"
-                  ></v-text-field>
-                </v-card>
-              </v-flex>
-              <v-flex xs12 sm3>
-              </v-flex>
-            </v-layout>
-          </v-tab-item> -->
         </v-tabs-items>
       </v-tabs>
     </div>
@@ -544,9 +554,6 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
-        if (vm.originality === 1) {
-          vm.loadDossierSyncs(data)
-        }
         vm.getNextActions()
         vm.runComment()
         console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
@@ -673,16 +680,18 @@ export default {
     },
     postChat () {
       var vm = this
-      let params = {
-        dossierId: vm.thongTinChiTietHoSo.dossierId,
-        actionCode: 8200,
-        actionNote: vm.messageChat,
-        actionUser: ''
+      if (vm.messageChat) {
+        let params = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
+          actionCode: vm.originality === 3 ? '8200' : '8100',
+          actionNote: vm.messageChat,
+          actionUser: ''
+        }
+        vm.$store.dispatch('postAction', params).then(result => {
+          vm.loadDossierSyncs()
+        })
+        vm.messageChat = ''
       }
-      vm.$store.dispatch('postAction', params).then(result => {
-        vm.loadDossierSyncs()
-      })
-      vm.messageChat = ''
     },
     getNextAction (item) {
       var vm = this
@@ -1152,6 +1161,7 @@ export default {
         //   vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
         // }, 300)
       })
+      vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
       // vm.$store.dispatch('pullProcessSteps', {
       //   stepCode: vm.thongTinChiTietHoSo.stepCode
       // }).then(resProSteps => {
@@ -1198,13 +1208,6 @@ export default {
         dossierPartNo: item.partNo
       }
       vm.$store.dispatch('putAlpacaForm', value)
-    },
-    getColorChat (syncType) {
-      if (syncType === 1) {
-        return 'pink'
-      } else {
-        return 'cyan lighten-1'
-      }
     },
     postNextActions (stepModel) {
       var vm = this

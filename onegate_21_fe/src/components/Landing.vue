@@ -211,11 +211,14 @@
           ></v-select>
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
-          <v-text-field
-            placeholder="Nhập mã hồ sơ"
-            v-model="dossierNoKey"
-            clearable
-          ></v-text-field>
+          <div style="position:relative">
+            <v-text-field
+              placeholder="Nhập mã hồ sơ"
+              v-model="dossierNoKey"
+              @change="changeDossierNoKey"
+            ></v-text-field>
+            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
+          </div>
         </v-flex>
       </v-layout>
     </v-layout>
@@ -942,15 +945,6 @@ export default {
           vm.doLoadingDataHoSo()
         }
       }
-    },
-    dossierNoKey (val) {
-      if (val) {
-        if (val.length > 3 || val === '') {
-          this.doLoadingDataHoSo()
-        }
-      } else {
-        this.doLoadingDataHoSo()
-      }
     }
   },
   methods: {
@@ -1192,6 +1186,23 @@ export default {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
+    },
+    changeDossierNoKey () {
+      var vm = this
+      console.log('run log ...')
+      setTimeout(function () {
+        if (vm.dossierNoKey) {
+          if (vm.dossierNoKey.length > 3 || vm.dossierNoKey === '') {
+            vm.doLoadingDataHoSo()
+          }
+        } else {
+          vm.doLoadingDataHoSo()
+        }
+      }, 200)
+    },
+    clearDossierNoKey () {
+      this.dossierNoKey = ''
+      this.changeDossierNoKey()
     },
     changeDichVuConfigs (item) {
       let vm = this
