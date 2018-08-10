@@ -912,14 +912,14 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostActionDossier = new URLSearchParams()
-        dataPostActionDossier.append('actionCode', data.actionCode)
-        dataPostActionDossier.append('actionNote', data.actionNote)
-        dataPostActionDossier.append('actionUser', data.actionUser)
-        dataPostActionDossier.append('payload', data.payload)
-        dataPostActionDossier.append('security', data.security)
-        dataPostActionDossier.append('assignUsers', data.assignUsers)
-        dataPostActionDossier.append('payment', data.payment)
-        dataPostActionDossier.append('createDossiers', data.createDossiers)
+        dataPostActionDossier.append('actionCode', data.actionCode ? data.actionCode : '')
+        dataPostActionDossier.append('actionNote', data.actionNote ? data.actionNote : '')
+        dataPostActionDossier.append('actionUser', data.actionUser ? data.actionUser : '')
+        dataPostActionDossier.append('payload', data.payload ? JSON.stringify(data.payload) : '')
+        dataPostActionDossier.append('security', data.security ? data.security : '')
+        dataPostActionDossier.append('assignUsers', data.assignUsers ? JSON.stringify(data.assignUsers) : '')
+        dataPostActionDossier.append('payment', data.payment ? JSON.stringify(data.payment) : '')
+        dataPostActionDossier.append('createDossiers', data.createDossiers ? data.createDossiers : '')
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
@@ -1680,7 +1680,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
           let url = '/o/rest/v2/dossiers/' + data.dossierId + '/syncs'
+          // let url = 'http://127.0.0.1:8081/api/dossiers/' + data.dossierId + '/syncs'
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)
           }).catch(function (xhr) {
