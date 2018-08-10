@@ -12,7 +12,7 @@
           </div> -->
           
           <v-card class="comments__container" >
-            <v-card-text>
+            <v-card-text class="pl-4">
               <div id="comments-container-el"></div>
               
               <!-- <v-flex v-if="argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Xem thêm</span></v-flex>
