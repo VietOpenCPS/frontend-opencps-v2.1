@@ -548,26 +548,8 @@ export default {
           vm.loadDossierSyncs(data)
         }
         vm.getNextActions()
+        vm.runComment()
         console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
-        var arrTemp = []
-        arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
-        arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
-        vm.thongTinHoSo = resultDossier
-        Promise.all(arrTemp).then(values => {
-          let dossierTemplates = values[0]
-          let dossierFiles = values[1]
-          dossierTemplates.forEach(item => {
-            if (item.partType === 1 || item.partType === 3) {
-              vm.dossierTemplatesTN.push(item)
-            } else {
-              vm.dossierTemplatesKQ.push(item)
-            }
-          })
-          vm.dossierFilesItems = dossierFiles
-          vm.dossierTemplatesItems = dossierTemplates
-          vm.recountFileTemplates()
-        }).catch(reject => {
-        })
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -603,7 +585,9 @@ export default {
     },
     runComment () {
       var vm = this
-      vm.$refs.comment.runComment()
+      if (vm.$refs.comment) {
+        vm.$refs.comment.runComment()
+      }
     },
     goBack () {
       window.history.back()
