@@ -215,7 +215,7 @@
             <v-text-field
               placeholder="Nhập mã hồ sơ"
               v-model="dossierNoKey"
-              @change="changeDossierNoKey"
+              @keyup.enter="changeDossierNoKey"
             ></v-text-field>
             <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
           </div>

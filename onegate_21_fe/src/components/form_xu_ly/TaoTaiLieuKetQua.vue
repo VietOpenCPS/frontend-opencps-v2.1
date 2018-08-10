@@ -13,16 +13,18 @@
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: checkStyle(item)}">
-                    <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
+                    <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                       <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                       <div class="header__tphs">
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
-                        <v-tooltip top v-if="item.eForm">
-                          <v-badge>
-                            <i slot="activator" v-if="item.daKhai" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o" aria-hidden="true"></i>
-                            <i slot="activator" v-else style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o"></i>
-                          </v-badge>
-                          <span>Form trực tuyến {{item.daKhai ? 'Đã khai' : 'Chưa khai '}}</span>
+                        &nbsp;&nbsp;
+                        <v-tooltip top v-if="item.eForm && item.daKhai">
+                          <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
+                          <span>Biểu mẫu trực tuyến (Đã khai)</span>
+                        </v-tooltip>
+                        <v-tooltip top v-if="item.eForm && !item.daKhai">
+                          <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
+                          <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                         </v-tooltip>
                     <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
                       <v-badge v-on:click.stop="downloadFileTemplate(item, index)">
@@ -50,7 +52,7 @@
             <v-card v-if="item.eForm">
               <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                 <v-layout wrap>
-                  <v-flex xs12 class="text-xs-right" v-if="!stateView">
+                  <v-flex xs12 class="text-xs-right">
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                     v-if="item.eForm">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
@@ -219,7 +221,7 @@
     methods: {
       genAllAlpacaForm (dossierFiles, createFiles) {
         var vm = this
-        if (vm.length > 0) {
+        if (dossierFiles.length > 0) {
           var dossierFilesEform = dossierFiles.filter(file => {
             return file.eForm
           })
@@ -440,7 +442,6 @@
         item['dossierId'] = vm.detailDossier.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           vm.fileViews.splice(index, 1)
-          vm.stateView = true
           vm.partView = item.dossierPartNo
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
             vm.dossierFilesItems = result

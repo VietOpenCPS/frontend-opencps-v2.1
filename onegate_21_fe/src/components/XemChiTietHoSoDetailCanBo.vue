@@ -103,7 +103,7 @@
               </div>
             </div> -->
             <!--  -->
-            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+            <div :class="{'py-3' : filterNextActionEnable(btnDossierDynamics)}" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === indexAction"
