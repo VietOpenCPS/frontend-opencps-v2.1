@@ -181,7 +181,7 @@
     </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
-      <v-layout wrap v-if="menuType !== 3">
+      <v-layout wrap v-if="menuType !== 3 && originality !== 1">
         <v-flex xs4 class="pl-2 pr-2">
           <v-select
             :items="listLinhVuc"
@@ -193,7 +193,6 @@
             return-object
             :hide-selected="true"
             @change="changeDomain"
-            v-if="originality !== 1"
             clearable
           ></v-select>
         </v-flex>
@@ -208,16 +207,13 @@
             return-object
             :hide-selected="true"
             @change="changeServiceConfigs"
-            v-if="originality !== 1"
             clearable
           ></v-select>
-
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
           <v-text-field
             placeholder="Nhập mã hồ sơ"
             v-model="dossierNoKey"
-            
             clearable
           ></v-text-field>
         </v-flex>
@@ -1196,12 +1192,6 @@ export default {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
-    },
-    searchDossierNo () {
-      var vm = this
-      if (vm.dossierNoKey.length > 3) {
-        vm.doLoadingDataHoSo()
-      }
     },
     changeDichVuConfigs (item) {
       let vm = this

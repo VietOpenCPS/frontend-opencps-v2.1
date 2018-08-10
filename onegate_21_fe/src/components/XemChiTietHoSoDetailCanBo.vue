@@ -735,7 +735,11 @@ export default {
         }
         vm.$store.dispatch('loadDossierSyncs', dataParams).then(resultSyncs => {
           console.log('resultSyncs++++++++++++++++', resultSyncs)
-          vm.dossierSyncs = resultSyncs
+          if (resultSyncs !== null && resultSyncs !== undefined && resultSyncs !== 'undefined') {
+            vm.dossierSyncs = resultSyncs
+          } else {
+            vm.dossierSyncs = []
+          }
         })
       }
     },
