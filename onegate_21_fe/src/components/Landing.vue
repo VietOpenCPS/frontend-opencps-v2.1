@@ -182,7 +182,7 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="menuType !== 3">
-        <v-flex xs6 class="pl-3 pr-2">
+        <v-flex xs4 class="pl-2 pr-2">
           <v-select
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -197,7 +197,7 @@
             clearable
           ></v-select>
         </v-flex>
-        <v-flex xs6 class="pl-2 pr-3">
+        <v-flex xs4 class="pl-2 pr-2">
           <v-select
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -211,6 +211,14 @@
             v-if="originality !== 1"
             clearable
           ></v-select>
+        </v-flex>
+        <v-flex xs4 class="pl-2 pr-2">
+          <v-text-field
+            placeholder="Nhập mã hồ sơ"
+            v-model="dossierNoKey"
+            
+            clearable
+          ></v-text-field>
         </v-flex>
       </v-layout>
     </v-layout>
@@ -737,6 +745,7 @@ export default {
     govAgencyCode: '',
     serviceCode: '',
     templateNo: '',
+    dossierNoKey: '',
     dialogAction: false,
     loadingAction: false,
     dialogActionProcess: false,
@@ -936,6 +945,15 @@ export default {
           vm.doLoadingDataHoSo()
         }
       }
+    },
+    dossierNoKey (val) {
+      if (val) {
+        if (val.length > 3 || val === '') {
+          this.doLoadingDataHoSo()
+        }
+      } else {
+        this.doLoadingDataHoSo()
+      }
     }
   },
   methods: {
@@ -1078,7 +1096,8 @@ export default {
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         } else {
           filter = {
@@ -1089,14 +1108,15 @@ export default {
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
             template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
-            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : '',
+            domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.domainCode,
             status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : ''
+            register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -1175,6 +1195,12 @@ export default {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
+    },
+    searchDossierNo () {
+      var vm = this
+      if (vm.dossierNoKey.length > 3) {
+        vm.doLoadingDataHoSo()
+      }
     },
     changeDichVuConfigs (item) {
       let vm = this

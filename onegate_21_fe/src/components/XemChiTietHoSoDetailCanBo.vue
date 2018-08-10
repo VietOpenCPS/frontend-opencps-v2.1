@@ -89,7 +89,7 @@
               </v-expansion-panel>
             </div>
             <!-- Một cửa -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3 && filterNextActionEnable(btnDossierDynamics)">
               <p class="mb-2">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -565,7 +565,7 @@ export default {
       let user = []
       user = this.$store.getters.getUsersNextAction
       let userName = []
-      if (user.length > 0) {
+      if (user && Array.isArray(user) && user.length > 0) {
         for (let key in user) {
           userName.push(user[key]['userName'])
         }
@@ -1400,6 +1400,17 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
       })
+    },
+    filterNextActionEnable (nextaction) {
+      var isEnabale = false
+      if (nextaction && Array.isArray(nextaction)) {
+        for (let key in nextaction) {
+          if (nextaction[key]['enable'] !== 0) {
+            isEnabale = true
+          }
+        }
+      }
+      return isEnabale 
     }
   },
   filters: {
