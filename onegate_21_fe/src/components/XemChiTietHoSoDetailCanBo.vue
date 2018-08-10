@@ -77,7 +77,7 @@
         </v-tab> -->
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-            <div style="position: relative;" v-if="checkInput !== 0 && checkNextActionEnable">
+            <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
@@ -89,7 +89,7 @@
               </v-expansion-panel>
             </div>
             <!-- Một cửa -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
+            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3 && filterNextActionEnable(btnDossierDynamics)">
               <p class="mb-2">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -488,7 +488,7 @@ export default {
       let user = []
       user = this.$store.getters.getUsersNextAction
       let userName = []
-      if (user.length > 0) {
+      if (user && Array.isArray(user) && user.length > 0) {
         for (let key in user) {
           userName.push(user[key]['userName'])
         }
@@ -658,7 +658,11 @@ export default {
         }
         vm.$store.dispatch('loadDossierSyncs', dataParams).then(resultSyncs => {
           console.log('resultSyncs++++++++++++++++', resultSyncs)
-          vm.dossierSyncs = resultSyncs
+          if (resultSyncs !== null && resultSyncs !== undefined && resultSyncs !== 'undefined') {
+            vm.dossierSyncs = resultSyncs
+          } else {
+            vm.dossierSyncs = []
+          }
         })
       }
     },
@@ -1324,17 +1328,16 @@ export default {
         document.getElementById('dialogPDFPreview').src = result
       })
     },
-    checkNextActionEnable () {
-      var vm = this
-      if (vm.btnDossierDynamics.length !== 0) {
-        let index = vm.btnDossierDynamics.findIndex(action => {
-          return action.enable === 1
-        })
-        if (index !== null && index !== undefined && index !== 'undefined' && index !== -1) {
-          return true
+    filterNextActionEnable (nextaction) {
+      var isEnabale = false
+      if (nextaction && Array.isArray(nextaction)) {
+        for (let key in nextaction) {
+          if (nextaction[key]['enable'] !== 0) {
+            isEnabale = true
+          }
         }
       }
-      return false
+      return isEnabale 
     }
   },
   filters: {
