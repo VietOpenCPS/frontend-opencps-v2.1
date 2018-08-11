@@ -1054,11 +1054,12 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      // console.log('currentQuery======', currentQuery)
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0) {
           querySet = currentQuery.q
+          console.log('querySet------', querySet)
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
@@ -1126,6 +1127,10 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('++++++++++++++++++')
+      console.log('newQuery-------', newQuery)
+      console.log('current-------', current)
+      console.log('++++++++++++++++++')
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''

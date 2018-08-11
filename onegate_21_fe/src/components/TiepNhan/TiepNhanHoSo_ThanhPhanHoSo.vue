@@ -37,6 +37,7 @@
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
                   v-on:click.stop=""
+                  @keyup.enter="changeFileComment(item, index)"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
@@ -71,7 +72,7 @@
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                     v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
-                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">Preview</v-btn>
+                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
                     <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>

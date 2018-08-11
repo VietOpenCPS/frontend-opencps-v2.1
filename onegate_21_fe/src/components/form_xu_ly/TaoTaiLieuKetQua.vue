@@ -56,7 +56,7 @@
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                     v-if="item.eForm">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
-                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">Preview</v-btn>
+                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
                     <div :id="'formAlpaca' + item.partNo + id">
                     </div>
                   </v-flex>

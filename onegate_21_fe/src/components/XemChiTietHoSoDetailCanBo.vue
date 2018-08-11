@@ -62,24 +62,13 @@
         </v-tab>
         <v-tab :key="4" href="#tabs-4" @click="loadDossierLogs()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            NHẬT KÝ HỒ SƠ
+            NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-            <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
-                  <div slot="header">
-                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp; 
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </div>
             <!-- Một cửa -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
+            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3">
               <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -95,6 +84,17 @@
                   {{stepOverdueNextAction}}
                 </span>
               </p>
+            </div>
+            <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
             </div>
             <!-- Dịch vụ công -->
             <!-- <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
@@ -147,7 +147,7 @@
                   <div slot="header">
                     <div class="background-triangle-small"> 
                       <v-icon size="18" color="white">star_rate</v-icon> 
-                    </div>Trao đổi thảo luận
+                    </div>Trao đổi với người làm thủ tục
                   </div>
                   <v-card >
                     <v-card-text class="px-0 py-0 pr-3">
@@ -155,7 +155,7 @@
                         <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
                           <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index" v-if="item.syncType !==0 && item.infoType !== 0">
                             <div class="timeline-badge" :class="item.syncType === 2 ? 'primary' : 'warning'">
-                              <v-icon color="grey lighten-4" size="26">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
+                              <v-icon color="grey lighten-4" size="20">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
                             </div>
                             <div class="timeline-panel">
                               <div class="timeline-heading">
@@ -650,7 +650,11 @@ export default {
         vm.$store.dispatch('loadDossierSyncs', dataParams).then(resultSyncs => {
           console.log('resultSyncs++++++++++++++++', resultSyncs)
           if (resultSyncs !== null && resultSyncs !== undefined && resultSyncs !== 'undefined') {
-            vm.dossierSyncs = resultSyncs
+            if (Array.isArray(resultSyncs)) {
+              vm.dossierSyncs = resultSyncs
+            } else {
+              vm.dossierSyncs = [resultSyncs]
+            }
           } else {
             vm.dossierSyncs = []
           }
