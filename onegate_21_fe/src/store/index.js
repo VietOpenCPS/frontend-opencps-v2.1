@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'

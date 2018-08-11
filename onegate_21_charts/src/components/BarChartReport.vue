@@ -1,12 +1,12 @@
 <template>
   <div>
-    <line-chart class="mt-3"></line-chart>
+    <bar-chart-vertical class="mt-3"></bar-chart-vertical>
   </div>
 </template>
 
 <script>
 import router from '@/router'
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import VueChartJs from 'vue-chartjs'
 import 'chart.piecelabel.js'
 
@@ -104,29 +104,85 @@ export default {
     ]
     let dangXuLyConHan = []
     let dangXuLyQuaHan = []
+    let dangBoSungDieuKien = []
     let daGiaiQuyetSomHan = []
     let daGiaiQuyetDungHan = []
     let daGiaiQuyetQuaHan = []
+    let monthData = {}
     for (let key in vm.item_array) {
-      if (String(vm.item_array[key].govAgencyCode) !== '') {
-        if (vm.govAgencyCode === '') {
-          labelsCustom.push(vm.item_array[key].govAgencyName)
-        } else {
-          labelsCustom.push(vm.item_array[key].domainName)
+      if (String(vm.item_array[key].govAgencyCode) === '' && String(vm.item_array[key].domainName) === '') {
+      } else {
+        if (vm.item_array[key].month > 0) {
+          if (vm.item_array[key].govAgencyName !== '') {
+            if (monthData[vm.item_array[key].govAgencyName] !== null && monthData[vm.item_array[key].govAgencyName] !== undefined) {
+              monthData[vm.item_array[key].govAgencyName] = {
+                undueCount: vm.item_array[key].undueCount,
+                overdueCount: vm.item_array[key].overdueCount,
+                betimesCount: vm.item_array[key].betimesCount,
+                ontimeCount: vm.item_array[key].ontimeCount,
+                overtimeCount: vm.item_array[key].overtimeCount,
+                waitingCount: vm.item_array[key].waitingCount
+              }
+            } else {
+              monthData[vm.item_array[key].govAgencyName] = {}
+              monthData[vm.item_array[key].govAgencyName] = {
+                undueCount: vm.item_array[key].undueCount,
+                overdueCount: vm.item_array[key].overdueCount,
+                betimesCount: vm.item_array[key].betimesCount,
+                ontimeCount: vm.item_array[key].ontimeCount,
+                overtimeCount: vm.item_array[key].overtimeCount,
+                waitingCount: vm.item_array[key].waitingCount
+              }
+            }
+          } else {
+            if (monthData[vm.item_array[key].domainName] !== null && monthData[vm.item_array[key].domainName] !== undefined) {
+              monthData[vm.item_array[key].domainName] = {
+                undueCount: vm.item_array[key].undueCount,
+                overdueCount: vm.item_array[key].overdueCount,
+                betimesCount: vm.item_array[key].betimesCount,
+                ontimeCount: vm.item_array[key].ontimeCount,
+                overtimeCount: vm.item_array[key].overtimeCount,
+                waitingCount: vm.item_array[key].waitingCount
+              }
+            } else {
+              monthData[vm.item_array[key].domainName] = {}
+              monthData[vm.item_array[key].domainName] = {
+                undueCount: vm.item_array[key].undueCount,
+                overdueCount: vm.item_array[key].overdueCount,
+                betimesCount: vm.item_array[key].betimesCount,
+                ontimeCount: vm.item_array[key].ontimeCount,
+                overtimeCount: vm.item_array[key].overtimeCount,
+                waitingCount: vm.item_array[key].waitingCount
+              }
+            }
+          }
         }
-        dangXuLyConHan.push(vm.item_array[key].undueCount)
-        dangXuLyQuaHan.push(vm.item_array[key].overdueCount)
-        daGiaiQuyetSomHan.push(vm.item_array[key].betimesCount)
-        daGiaiQuyetDungHan.push(vm.item_array[key].ontimeCount)
-        daGiaiQuyetQuaHan.push(vm.item_array[key].overtimeCount)
       }
     }
+    for (let key in monthData) {
+      labelsCustom.push(key)
+      let currentObj = monthData[key]
+      dangXuLyConHan.push(currentObj.undueCount)
+      dangXuLyQuaHan.push(currentObj.overdueCount)
+      daGiaiQuyetSomHan.push(currentObj.betimesCount)
+      daGiaiQuyetDungHan.push(currentObj.ontimeCount)
+      daGiaiQuyetQuaHan.push(currentObj.overtimeCount)
+      dangBoSungDieuKien.push(currentObj.waitingCount)
+    }
+    /*
+    for (let key in vm.item_array) {
+      if (String(vm.item_array[key].govAgencyCode) === '' && String(vm.item_array[key].domainName) === '') {
+      } else {
+      }
+    }
+    */
     datasetsCustom[0]['data'] = dangXuLyConHan
     datasetsCustom[1]['data'] = dangXuLyQuaHan
-    datasetsCustom[2]['data'] = daGiaiQuyetSomHan
-    datasetsCustom[3]['data'] = daGiaiQuyetDungHan
-    datasetsCustom[4]['data'] = daGiaiQuyetQuaHan
-    Vue.component('line-chart', {
+    datasetsCustom[2]['data'] = dangBoSungDieuKien
+    datasetsCustom[3]['data'] = daGiaiQuyetSomHan
+    datasetsCustom[4]['data'] = daGiaiQuyetDungHan
+    datasetsCustom[5]['data'] = daGiaiQuyetQuaHan
+    Vue.component('bar-chart-vertical', {
       extends: VueChartJs.Bar,
       beforeMount () {
         this.addPlugin(horizonalLinePlugin)
@@ -147,12 +203,6 @@ export default {
             yAxes: [{
               stacked: true
             }]
-          },
-          pieceLabel: {
-            render: 'value',
-            fontSize: 12,
-            fontColor: '#fff',
-            fontStyle: 'bold'
           }
         })
       }

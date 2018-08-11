@@ -23,7 +23,7 @@
 
 <script>
 import router from '@/router'
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import VueChartJs from 'vue-chartjs'
 import 'chart.piecelabel.js'
 
