@@ -22,6 +22,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
+      'vue$': 'vue/dist/vue.min',
       '@': resolve('src'),
       handlebars: 'handlebars/dist/handlebars.min.js'
     }

@@ -539,7 +539,7 @@
 </template>
 
 <script>
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import router from '@/router'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
@@ -650,16 +650,8 @@ export default {
           'name': 'toàn bộ'
         },
         {
-          'value': 'receive',
-          'name': 'hồ sơ mới được tiếp nhận'
-        },
-        {
           'value': 'overdue',
           'name': 'hồ sơ đang quá hạn cần giải quyết'
-        },
-        {
-          'value': 'release',
-          'name': 'hồ sơ mới có kết quả'
         },
         {
           'value': 'delay',
