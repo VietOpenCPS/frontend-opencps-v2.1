@@ -2744,7 +2744,7 @@ body .menu__content--select .text--disabled {
     text-align: center;
     top: 5px;
     width: 35px;
-    z-index: 100;
+    z-index: 1;
 }
 .timeline > li .timeline-badge + .timeline-panel:before {
     border-bottom: 11px solid transparent;

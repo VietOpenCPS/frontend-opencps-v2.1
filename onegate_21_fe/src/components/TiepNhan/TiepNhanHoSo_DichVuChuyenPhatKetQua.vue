@@ -4,7 +4,7 @@
       <v-card-text>
         
         <v-slide-y-transition>
-          <span v-if="!dichVuChuyenPhatKetQua.viaPostal">
+          <span v-if="dichVuChuyenPhatKetQua.viaPostal === 1">
             <v-icon size="16">check_circle</v-icon> <strong>Đăng ký kết quả tại nhà</strong> để điền thông tin chuyển phát tận nhà
           </span>
           <v-layout v-else wrap>
@@ -190,7 +190,6 @@ export default {
       return this.$store.getters.dichVuChuyenPhatKetQua
     }
   },
-
   created () {
   },
   watch: {

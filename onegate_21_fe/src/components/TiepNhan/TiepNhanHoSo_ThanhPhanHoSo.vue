@@ -36,6 +36,8 @@
                   v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
+                  v-on:click.stop=""
+                  @keyup.enter="changeFileComment(item, index)"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
@@ -44,7 +46,7 @@
                     <span>Gửi</span>
                   </v-tooltip>
                 </div>
-                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 10px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
                 <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa ý kiến</span>
@@ -56,7 +58,7 @@
                       {{itemFileView.displayName}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
-                    <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView">
+                    <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView && checkInput !== 1">
                       <v-icon style="color: red">delete_outline</v-icon>
                     </v-btn>
                   </div>
@@ -70,7 +72,7 @@
                     <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                     v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
                     <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
-                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">Preview</v-btn>
+                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
                     <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>
@@ -107,7 +109,7 @@
                 @change="changeFileCheck($event, index)"
               ></v-select>
             </v-flex>
-            <v-flex style="width: 20px; align-items: center; margin-left: 10px;" class="layout wrap" v-else-if="item.fileCheck > 0">
+            <v-flex :style="{width: '20px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
                 <v-icon slot="activator" size="16" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>
@@ -854,8 +856,11 @@ export default {
         if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
           divPx += 140
         }
-        if (item.fileCheck > 0) {
+        if (item.fileCheck > 0 && !vm.thongTinHoSo.online) {
           divPx += 20
+        }
+        if (item.fileCheck > 0 && vm.thongTinHoSo.online) {
+          divPx += 40
         }
         if (!vm.onlyView) {
           divPx += 90
