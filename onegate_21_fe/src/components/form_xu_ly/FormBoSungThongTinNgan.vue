@@ -28,7 +28,7 @@
                     :id="item.fieldName"
                     :value="item.value"
                     :placeholder="item.placeholder"
-				    :rules="[rulesValid.number]"
+				            :rules="[rulesValid.number]"
                     @input="inputChangeValue(item)"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'date'"

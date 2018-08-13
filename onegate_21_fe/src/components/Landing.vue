@@ -215,7 +215,7 @@
             <v-text-field
               placeholder="Nhập mã hồ sơ"
               v-model="dossierNoKey"
-              @change="changeDossierNoKey"
+              @keyup.enter="changeDossierNoKey"
             ></v-text-field>
             <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
           </div>
@@ -546,7 +546,7 @@
 </template>
 
 <script>
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import router from '@/router'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
@@ -657,16 +657,8 @@ export default {
           'name': 'toàn bộ'
         },
         {
-          'value': 'receive',
-          'name': 'hồ sơ mới được tiếp nhận'
-        },
-        {
           'value': 'overdue',
           'name': 'hồ sơ đang quá hạn cần giải quyết'
-        },
-        {
-          'value': 'release',
-          'name': 'hồ sơ mới có kết quả'
         },
         {
           'value': 'delay',
@@ -1062,11 +1054,12 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       let currentQuery = router.history.current.query
-      // console.log('currentQuery======', currentQuery)
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0) {
           querySet = currentQuery.q
+          console.log('querySet------', querySet)
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
@@ -1134,6 +1127,10 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
+      console.log('++++++++++++++++++')
+      console.log('newQuery-------', newQuery)
+      console.log('current-------', current)
+      console.log('++++++++++++++++++')
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''

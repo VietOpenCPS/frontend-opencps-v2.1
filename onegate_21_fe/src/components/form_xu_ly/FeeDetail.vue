@@ -115,7 +115,7 @@
                 <p class="px-2 my-0 py-1" v-if="activeEdit||data_payment.paymentNote===''">
                   {{data_payment.paymentNote}} &nbsp;&nbsp;
                   <v-icon color="blue" size="20" class="hover-pointer btn-add mx-0 my-0" title="Sửa" v-on:click.stop="activeEdit = false" 
-                  v-if="activeEdit==true && data_payment.editable" grey darken-4>
+                  v-if="activeEdit==true" grey darken-4>
                     create
                   </v-icon>
                 </p>

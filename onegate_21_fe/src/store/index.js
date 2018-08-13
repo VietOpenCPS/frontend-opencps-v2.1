@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
@@ -588,14 +588,14 @@ export const store = new Vuex.Store({
                 delegateTelNo: response.data.delegateTelNo,
                 delegateIdNo: response.data.delegateIdNo
               }
+              resolve(response.data)
               commit('setLoading', false)
               commit('setDossier', response.data)
               commit('setThongTinChuHoSo', response.data)
               commit('setLePhi', response.data)
               commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
               commit('setThongTinChungHoSo', response.data)
-              // commit('setDichVuChuyenPhatKetQua', response.data)
-              resolve(response.data)
+              commit('setDichVuChuyenPhatKetQua', response.data)
             }, error => {
               commit('setLoading', false)
               reject(error)
