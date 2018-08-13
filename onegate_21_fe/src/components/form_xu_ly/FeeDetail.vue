@@ -228,15 +228,3 @@ export default {
   filters: {}
 }
 </script>
-<style>
-.inputDisable, .inputDisable label {
-  pointer-events: none
-}
-.inputDisable .input-group__details {
-  display: none
-}
-.payment-info .input-group--disabled label {
-  color: #000 !important
-}
-</style>
-
