@@ -151,7 +151,9 @@
                   <div slot="header">
                     <div class="background-triangle-small"> 
                       <v-icon size="18" color="white">star_rate</v-icon> 
-                    </div>Trao đổi với người làm thủ tục
+                    </div>
+                    <span v-if="originality === 3">Trao đổi với người làm thủ tục</span>
+                    <span v-else>Trao đổi với cán bộ xử lý</span>
                   </div>
                   <v-card >
                     <v-card-text class="px-0 py-0 pr-3">

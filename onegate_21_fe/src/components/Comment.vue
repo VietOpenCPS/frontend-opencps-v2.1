@@ -264,6 +264,7 @@ export default {
             // formData.append('fullname', 'Công Trình')
             formData.append('email', vm.initData.user.userEmail)
             formData.append('fullname', vm.initData.user.userName)
+            formData.append('opinion', document.getElementById('opinion').checked)
             $.ajax({
               url: vm.initData.commentApi + '/uploads',
               dataType: 'json',
@@ -280,6 +281,10 @@ export default {
                 vm.formatComment(comment)
                 successfulUploads.push(vm.comment)
                 serverResponded()
+                if (comment.opinion) {
+                  $('.opinion').hide()
+                }
+                document.getElementById('opinion').checked = false
               },
               error: function (xhr, data) {
                 serverResponded()
