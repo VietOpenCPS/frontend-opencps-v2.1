@@ -159,8 +159,3 @@ export default {
   }
 }
 </script>
-<style>
-  .btn-hidden {
-    display: none !important
-  }
-</style>
