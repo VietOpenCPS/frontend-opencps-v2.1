@@ -3,12 +3,15 @@
     ["env", { "modules": false }],
     "stage-2"
   ],
-  "plugins": ["transform-runtime", "transform-remove-console"],
+  "plugins": ["transform-runtime"],
   "comments": false,
   "env": {
     "test": {
       "presets": ["env", "stage-2"],
       "plugins": [ "istanbul" ]
+    },
+    "production": {
+      "plugins": ["transform-runtime", "transform-remove-console"]
     }
   }
 }

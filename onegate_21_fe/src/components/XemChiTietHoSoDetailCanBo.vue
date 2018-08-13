@@ -106,8 +106,8 @@
             <div :class="{'py-3' : filterNextActionEnable(btnDossierDynamics)}" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
-                :loading="loadingAction && index === indexAction"
-                :disabled="item.enable === 2"
+                :loading="loadingAction && index === btnIndex"
+                :disabled="loadingAction || item.enable === 2"
                 v-if="item.enable > 0"
               >
                 {{item.actionName}}
@@ -125,21 +125,25 @@
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
-                :loading="loadingActionProcess"
-                :disabled="loadingActionProcess"
-                >
-                <v-icon>save</v-icon>&nbsp;
-                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
-                <span>Xác nhận</span>
-                <span slot="loader">Loading...</span>
-              </v-btn>
+              <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+                  :loading="loadingActionProcess"
+                  :disabled="loadingActionProcess"
+                  >
+                  <v-icon>save</v-icon>&nbsp;
+                  <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
+                  <span>Xác nhận</span>
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </div>
             </v-layout>
             <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
               Thực hiện thành công!
             </v-alert>
-            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+              <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            </div>
             <!-- Trao đổi thảo luận -->
             <div>
               <v-expansion-panel class="expansion-pl">
@@ -831,10 +835,16 @@ export default {
         actionId: item.processActionId
       }
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.loadingAction = true
       vm.dialogActionProcess = false
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+        vm.loadingAction = false
+        vm.loadingActionProcess = false
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
+      }).catch(function (reject) {
+        vm.loadingAction = false
+        vm.loadingActionProcess = false
       })
     },
     btnActionEvent (item, index, isGroup) {
@@ -1043,6 +1053,8 @@ export default {
                 q: currentQuery['q']
               }
             })
+          }).catch(function (reject) {
+            vm.loadingActionProcess = false
           })
         } else {
           return false
@@ -1074,6 +1086,8 @@ export default {
               }
             })
           }
+        }).catch(function (reject) {
+          vm.loadingActionProcess = false
         })
       }
     },
