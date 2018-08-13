@@ -43,6 +43,9 @@
               </v-select>
             </v-flex>
             <v-flex xs12 sm6 class="px-2 text-right">
+              <v-btn icon class="mx-0 my-0" v-on:click.native="$vuetify.goTo('#lineChartID', options)">
+                <v-icon>show_chart</v-icon>
+              </v-btn>
               <v-btn v-if="reportGovName.length > 0" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
                 <v-icon class="mr-2">undo</v-icon> Quay lại 
               </v-btn>
@@ -73,8 +76,43 @@
           <content-placeholders-heading />
           <content-placeholders-img />
         </content-placeholders>
-        <v-flex xs12 class="mt-4" v-if="reloadPie">
-          <bar-chart-report :item_array="agencyLists" :year="year" :month="month"></bar-chart-report>
+        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadPie">
+          <v-card style="border-radius: 0;">
+            <v-card-title class="headline">
+              Tình hình giải quyết hồ sơ năm {{year}}
+            </v-card-title>
+            <v-card-text class="pt-2 pb-0 px-0">
+              <bar-chart-report :item_array="agencyLists" :year="year" :month="month"></bar-chart-report>
+            </v-card-text>
+          </v-card>
+        </v-flex>
+        <content-placeholders class="my-4 flex xs12 px-2" v-else>
+          <content-placeholders-heading />
+          <content-placeholders-img />
+        </content-placeholders>
+        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadPie">
+          <v-card style="border-radius: 0;">
+            <v-card-title class="headline">
+              Tình hình giải quyết hồ sơ năm {{year}}
+            </v-card-title>
+            <v-card-text class="pt-2 pb-0 pl-5 pr-4">
+              <bar-chart-report-horizontal :item_array="agencyLists" :year="year" :month="month"></bar-chart-report-horizontal>
+            </v-card-text>
+          </v-card>
+        </v-flex>
+        <content-placeholders class="my-4 flex xs12 px-2" v-else>
+          <content-placeholders-heading />
+          <content-placeholders-img />
+        </content-placeholders>
+        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadLine" id="lineChartID">
+          <v-card style="border-radius: 0;">
+            <v-card-title class="headline">
+              Tình hình giải quyết hồ sơ năm {{year}}
+            </v-card-title>
+            <v-card-text class="pt-2 pb-0 pl-5 pr-4">
+              <line-chart-report :item_array="agencyListsMonth" :year="year"></line-chart-report>
+            </v-card-text>
+          </v-card>
         </v-flex>
         <content-placeholders class="my-4 flex xs12 px-2" v-else>
           <content-placeholders-heading />
@@ -245,15 +283,19 @@
 
 <script>
 import router from '@/router'
-import Vue from 'vue/dist/vue.js'
+import Vue from 'vue/dist/vue.min.js'
 import PieChartReport from './PieChartReport.vue'
 import BarChartReport from './BarChartReport.vue'
+import BarChartReportHorizontal from './BarChartReportHorizontal.vue'
+import LineChartReport from './LineChartReport.vue'
 
 export default {
   props: ['index', 'id'],
   components: {
     'pie-chart-report': PieChartReport,
-    'bar-chart-report': BarChartReport
+    'bar-chart-report': BarChartReport,
+    'bar-chart-report-horizontal': BarChartReportHorizontal,
+    'line-chart-report': LineChartReport
   },
   data: () => ({
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
@@ -262,8 +304,10 @@ export default {
     noReportData: false,
     isCallBack: true,
     reloadPie: false,
+    reloadLine: false,
     showTable: false,
     agencyLists: [],
+    agencyListsMonth: [],
     group: '',
     years: [
       {
@@ -347,6 +391,13 @@ export default {
   computed: {
     loadingMenuConfigToDo () {
       return this.$store.getters.loadingMenuConfigToDo
+    },
+    options () {
+      return {
+        duration: 300,
+        offset: 0,
+        easing: 'easeInOutCubic'
+      }
     }
   },
   created () {
@@ -517,6 +568,22 @@ export default {
         }
         vm.showTable = true
       })
+      setTimeout(() => {
+        filter = {
+          year: vm.year,
+          group: vm.group,
+          agency: ''
+        }
+        vm.reloadLine = false
+        vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+          if (result === null || result === undefined || result === 'undefined') {
+            vm.agencyListsMonth = []
+          } else {
+            vm.agencyListsMonth = result
+          }
+          vm.reloadLine = true
+        })
+      }, 200)
     },
     changeYear (item) {
       let vm = this
