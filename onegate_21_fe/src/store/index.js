@@ -773,7 +773,7 @@ export const store = new Vuex.Store({
           // }
         }
         var applicantType = ''
-        if (data.userType) {
+        if (!data.userType) {
           applicantType = 'business'
         } else {
           applicantType = 'citizen'

@@ -6,7 +6,7 @@ module.exports = {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'o/frontend-web-customer-v2-1',
+    assetsSubDirectory: 'o/front-end-super-gate',
     assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
@@ -25,7 +25,7 @@ module.exports = {
     env: require('./dev.env'),
     port: 1080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'o/frontend-web-customer-v2-1',
+    assetsSubDirectory: 'o/front-end-super-gate',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
@@ -36,3 +36,5 @@ module.exports = {
     cssSourceMap: false
   }
 }
+    // assetsSubDirectory: 'o/front-end-super-gate',
+    // assetsSubDirectory: 'o/frontend-web-customer-v2-1',
