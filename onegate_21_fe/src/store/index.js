@@ -923,7 +923,7 @@ export const store = new Vuex.Store({
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
