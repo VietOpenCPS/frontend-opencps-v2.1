@@ -1911,7 +1911,7 @@ body .menu_header_list {
     border-bottom: 1px solid #dddddd;
 }
 body .menu_header_list .input-group {
-    padding: 18px 0 0;
+    padding: 5px 0 0;
 }
 .list__group__header {
     height: 37px;
@@ -2850,4 +2850,14 @@ body .menu__content--select .text--disabled {
     overflow: hidden;
     text-overflow: ellipsis; 
     white-space: nowrap
+}
+body .chip .avatar {
+    height: 24px!important;
+    min-width: 24px;
+    width: 24px!important;
+    font-size: 10px;
+}
+body .chip .chip__content {
+    height: 24px;
+    cursor: pointer;
 }
