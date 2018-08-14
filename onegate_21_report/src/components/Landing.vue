@@ -220,12 +220,12 @@ export default {
       if (currentQuerys.hasOwnProperty('fromDate')) {
         vm.fromDateFormatted = currentQuerys.fromDate
       } else {
-        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
       }
       if (currentQuerys.hasOwnProperty('toDate')) {
         vm.toDateFormatted = currentQuerys.toDate
       } else {
-        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 3).toLocaleDateString('vi-VN')
+        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
       }
       vm.doPrintReport()
       /*
@@ -256,12 +256,12 @@ export default {
           if (currentQuerys.hasOwnProperty('fromDate')) {
             vm.fromDateFormatted = currentQuerys.fromDate
           } else {
-            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
           }
           if (currentQuerys.hasOwnProperty('toDate')) {
             vm.toDateFormatted = currentQuerys.toDate
           } else {
-            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 3).toLocaleDateString('vi-VN')
+            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
           }
         }
       }
