@@ -3,7 +3,7 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="1" />
     </content-placeholders>
-    <div v-else class="row-header">
+    <div v-else-if="dossierSelected.length > 0" class="row-header">
       <div class="background-triangle-big"> <span>XỬ LÝ HỒ SƠ</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName">
@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <v-expansion-panel class="expansion-pl">
+    <v-expansion-panel class="expansion-pl" v-if="dossierSelected.length > 0">
       <v-expansion-panel-content hide-actions value="1">
         <!-- <div slot="header">
           <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -275,7 +275,9 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: false,
     loadingActionProcess: false,
-    loadingAction: false
+    loadingAction: false,
+    arrDossierId: [],
+    actionActiveTmp: []
   }),
   computed: {
     loading () {
@@ -286,9 +288,11 @@ export default {
       return vm.getOriginality()
     },
     dossierSelected () {
-      return this.$store.getters.dossierSelected
+      var vm = this
+      return vm.$store.getters.dossierSelected
     },
     actionActive () {
+      console.log('actionActive-------', this.$store.getters.actionActive)
       return this.$store.getters.actionActive
     },
     activeGetCounter () {
@@ -297,9 +301,38 @@ export default {
   },
   created () {
     var vm = this
+    console.log('this.$store.getters.dossierSelected-------', this.$store.getters.dossierSelected)
     vm.$nextTick(function () {
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
+      console.log('Xu ly ho so currentQuery ----------', currentQuery)
+      if (vm.dossierSelected.length > 0) {
+        return vm.$store.getters.dossierSelected
+      } else {
+        let arrDossier = []
+        let currentQuery = vm.$router.history.current.query
+        if (currentQuery.hasOwnProperty('dossiers')) {
+          let arrDossierIdTemp = currentQuery.dossiers.split(',')
+          vm.arrDossierId = arrDossierIdTemp
+          arrDossierIdTemp.forEach(dossierId => {
+            arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
+          })
+          Promise.all(arrDossier).then(results => {
+            vm.$store.dispatch('loadDossierSelected', results)
+          }).catch(reject => {
+          })
+        }
+      }
+      try {
+        if (vm.actionActive.action === undefined || vm.actionActive.action === null || vm.actionActive.action === '') {
+          let actionActive = JSON.parse(currentQuery.actionActive)
+          if (actionActive) {
+            vm.$store.dispatch('loadActionActive', actionActive)
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
       vm.getNextActions()
       // if (currentQuery.hasOwnProperty('activeTab')) {
       //   vm.activeTab = currentQuery.activeTab
@@ -643,8 +676,11 @@ export default {
     getNextActions () {
       let vm = this
       let query = vm.$router.history.current.query
-      let filter = {
-        dossierId: vm.dossierSelected[0].dossierId
+      let filter = {}
+      if (vm.dossierSelected.length > 0) {
+        filter['dossierId'] = vm.dossierSelected[0].dossierId
+      } else {
+        filter['dossierId'] = vm.arrDossierId[0]
       }
       let currentQuery = vm.$router.history.current.query
       vm.$store.dispatch('pullNextactions', filter).then(function (result) {
@@ -653,7 +689,10 @@ export default {
         result = result.filter(function (item) {
           return item.enable === 1
         })
-        var actionActiveArr = vm.actionActive.action.split(',')
+        var actionActiveArr = []
+        if (vm.actionActive.action !== undefined && vm.actionActive.action !== null && vm.actionActive.action !== 'undefined' && vm.actionActive.action !== '') {
+          actionActiveArr = vm.actionActive.action.split(',')
+        }
         if (actionActiveArr.length === 1) {
           vm.actionExits = actionActiveArr
           let actionActive = result.filter(function (item) {
@@ -680,8 +719,10 @@ export default {
             }
           }
           vm.dialogActionProcess = true
-          // console.log('actionExits', vm.actionExits[0])
-          vm.processPullBtnDetail(vm.actionExits[0], currentQuery.btnIndex)
+          console.log('actionExits', vm.actionExits[0])
+          if (vm.actionExits[0]) {
+            vm.processPullBtnDetail(vm.actionExits[0], currentQuery.btnIndex)
+          }
         }
       })
     },
