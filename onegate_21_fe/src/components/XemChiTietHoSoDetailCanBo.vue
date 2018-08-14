@@ -62,35 +62,14 @@
         </v-tab>
         <v-tab :key="4" href="#tabs-4" @click="loadDossierLogs()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            NHẬT KÝ HỒ SƠ
+            NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
-        <v-tab :key="5" href="#tabs-5" @click="runComment()" v-if="originality !== 1">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TRAO ĐỔI NỘI BỘ
-          </v-btn>
-        </v-tab>
-        <!-- <v-tab :key="6" href="#tabs-6" @click="loadDossierSyncs()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TRAO ĐỔI THẢO LUẬN
-          </v-btn>
-        </v-tab> -->
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-            <div style="position: relative;" v-if="checkInput !== 0">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
-                  <div slot="header">
-                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    THÀNH PHẦN HỒ SƠ &nbsp;&nbsp;&nbsp;&nbsp; 
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </div>
             <!-- Một cửa -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 3">
-              <p class="mb-2">
+            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3">
+              <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
                 <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
@@ -106,18 +85,29 @@
                 </span>
               </p>
             </div>
+            <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
             <!-- Dịch vụ công -->
-            <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
-              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType === 2 && item.infoType === 1">
+            <!-- <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
+              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType !== 0 && item.infoType !== 0">
                 {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
               </div>
-            </div>
+            </div> -->
             <!--  -->
-            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+            <div :class="{'py-3' : filterNextActionEnable(btnDossierDynamics)}" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
-                :loading="loadingAction && index === indexAction"
-                :disabled="item.enable === 2"
+                :loading="loadingAction && index === btnIndex"
+                :disabled="loadingAction || item.enable === 2"
                 v-if="item.enable > 0"
               >
                 {{item.actionName}}
@@ -135,22 +125,90 @@
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
-                :loading="loadingActionProcess"
-                :disabled="loadingActionProcess"
-                >
-                <v-icon>save</v-icon>&nbsp;
-                <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
-                <span>Xác nhận</span>
-                <span slot="loader">Loading...</span>
-              </v-btn>
+              <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+                  :loading="loadingActionProcess"
+                  :disabled="loadingActionProcess"
+                  >
+                  <v-icon>save</v-icon>&nbsp;
+                  <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
+                  <span>Xác nhận</span>
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </div>
             </v-layout>
             <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
               Thực hiện thành công!
             </v-alert>
-            <!-- <p v-if="rollbackable">Bạn có muốn quay lui thao tác vừa thực hiện</p> -->
-            <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
-            <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+              <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            </div>
+            <!-- Trao đổi thảo luận -->
+            <div>
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> 
+                      <v-icon size="18" color="white">star_rate</v-icon> 
+                    </div>
+                    <span v-if="originality === 3">Trao đổi với người làm thủ tục</span>
+                    <span v-else>Trao đổi với cán bộ xử lý</span>
+                  </div>
+                  <v-card >
+                    <v-card-text class="px-0 py-0 pr-3">
+                      <v-flex xs12>
+                        <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
+                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index" v-if="item.syncType !==0 && item.infoType !== 0">
+                            <div class="timeline-badge" :class="item.syncType === 2 ? 'primary' : 'warning'">
+                              <v-icon color="grey lighten-4" size="20">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
+                            </div>
+                            <div class="timeline-panel">
+                              <div class="timeline-heading">
+                                <div class="timeline-panel-controls">
+                                  <div class="timestamp">
+                                    <small class="text-muted">{{ item.createDate | dateTimeView }}</small>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="timeline-body">
+                                <span v-if="item.syncType === 2">{{item.actionName}} </span>
+                                <span v-if="item.syncType === 2 && item.actionNote">:</span>
+                                <span v-if="item.actionNote" style="color: #0b72ba">{{ item.actionNote }}</span>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                        <!--  -->
+                        <div v-else class="no-comments no-data my-2"><i class="fa fa-comments fa-2x"></i><br>Không có trao đổi nào</div>
+                        <!--  -->
+                        <div style="position:relative">
+                          <v-text-field class="pl-5 my-3"
+                          v-model="messageChat"
+                          placeholder="Nhập trao đổi"
+                          @keyup.enter="postChat"
+                          ></v-text-field>
+                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position:absolute;top:0px;right:5px">send</v-icon>
+                        </div>
+                      </v-flex>
+                    </v-card-text>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
+            <div style="position: relative;" v-if="originality !== 1">
+              <v-expansion-panel class="expansion-pl">
+                <v-expansion-panel-content hide-actions value="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    Trao đổi nội bộ &nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <!-- TODO -->
+                  <comment ref="comment" :classPK="id" :className="className"></comment>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </div>
+            <!--  -->
           </v-tab-item>
           <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form">
@@ -161,39 +219,6 @@
                   <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
                 </div>
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                <!-- <div v-for="(item, index) in dossierTemplatesTN" v-bind:key="item.partNo">
-                  <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style">
-                      <v-flex xs11>
-                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.partName}}</div>
-                      </v-flex>
-                      <v-flex xs1 class="text-right">
-                        <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:25px;width:25px">
-                            {{item.count}}
-                          </v-btn>
-                          <span>Xem</span>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-layout>
-                  </v-card>
-                  <div v-if="item.partNo === partView && stateView">
-                    <v-layout row wrap>
-                      <v-flex xs12 sm12>
-                        <div v-for="(itemFileView, index) in fileViews">
-                          <div style="display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
-                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;">
-                              <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                              <v-icon v-else>attach_file</v-icon>
-                              {{itemFileView.displayName}}
-                            </span>
-                          </div>
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                  </div>
-                </div> -->
               </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel expand  class="expansion-pl ext__form">
@@ -202,35 +227,6 @@
                   <div class="background-triangle-small"> II.</div>
                   Kết quả xử lý
                 </div>
-                <!-- <div v-for="(item, index) in dossierTemplatesKQ" v-bind:key="item.partNo">
-                  <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style py-2"> 
-                      <v-flex xs11>
-                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.partName}}</div>
-                      </v-flex>
-                      <v-flex xs1 class="text-right">
-                        <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:25px;width:25px">
-                            {{item.count}}
-                          </v-btn>
-                          <span>Xem</span>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-layout>
-                  </v-card>
-                  <div v-if="item.partNo === partView && stateView">
-                    <v-layout row wrap>
-                      <v-flex xs12 sm12>
-                        <div v-for="(itemFileView, index) in fileViews">
-                          <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 32px;background: #fff;padding-left: 25px;">
-                            <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer; color: blue;"><v-icon>attach_file</v-icon>{{itemFileView.displayName}}</span>
-                          </div>
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                  </div>
-                </div> -->
                 <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -260,32 +256,6 @@
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <!-- <v-expansion-panel expand  class="expansion-pl ext__form" style="border: none">
-              <v-expansion-panel-content v-bind:value="true">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> IV.</div>
-                  Chứng từ thanh toán
-                </div>
-                <div v-for="(item, index) in payments" :key="item.referenceUid">
-                  <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd"> 
-                      <v-flex xs11>
-                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.paymentFee}}</div>
-                      </v-flex>
-                      <v-flex xs1 class="text-right">
-                        <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFile(item)" style="height:25px;width:25px">
-                            <v-icon>visibility</v-icon>
-                          </v-btn>
-                          <span>Xem</span>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-layout>
-                  </v-card>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel> -->
           </v-tab-item>
           <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -347,37 +317,6 @@
               </td>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <comment ref="comment" :classPK="id" :className="className"></comment>
-          </v-tab-item>
-          <!-- <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
-            <v-layout row wrap>
-              <v-flex xs12 sm3>
-              </v-flex>
-              <v-flex xs12 sm6>
-                <v-card>
-                  <div style="height: 400px; overflow: auto; margin-bottom: 10px;">
-                    <div v-for="(item, index) in dossierSyncs" v-bind:key="index">
-                      <div :class="{ 'text-xs-left': item.syncType === 1, 'text-xs-right': item.syncType === 2 }">
-                        <v-chip label :color="getColorChat(item.syncType)" text-color="white">
-                          {{item.actionUser}}: {{item.actionNote}}
-                        </v-chip>
-                      </div>
-                    </div>
-                  </div>
-                  <v-text-field
-                  v-model="messageChat"
-                  solo
-                  label="Nhập trao đổi"
-                  append-icon="send"
-                  @change="postChat"
-                  ></v-text-field>
-                </v-card>
-              </v-flex>
-              <v-flex xs12 sm3>
-              </v-flex>
-            </v-layout>
-          </v-tab-item> -->
         </v-tabs-items>
       </v-tabs>
     </div>
@@ -565,7 +504,7 @@ export default {
       let user = []
       user = this.$store.getters.getUsersNextAction
       let userName = []
-      if (user.length > 0) {
+      if (user && Array.isArray(user) && user.length > 0) {
         for (let key in user) {
           userName.push(user[key]['userName'])
         }
@@ -621,30 +560,9 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
-        if (vm.originality === 1) {
-          vm.loadDossierSyncs(data)
-        }
         vm.getNextActions()
+        vm.runComment()
         console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
-        var arrTemp = []
-        arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
-        arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
-        vm.thongTinHoSo = resultDossier
-        Promise.all(arrTemp).then(values => {
-          let dossierTemplates = values[0]
-          let dossierFiles = values[1]
-          dossierTemplates.forEach(item => {
-            if (item.partType === 1 || item.partType === 3) {
-              vm.dossierTemplatesTN.push(item)
-            } else {
-              vm.dossierTemplatesKQ.push(item)
-            }
-          })
-          vm.dossierFilesItems = dossierFiles
-          vm.dossierTemplatesItems = dossierTemplates
-          vm.recountFileTemplates()
-        }).catch(reject => {
-        })
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -680,7 +598,9 @@ export default {
     },
     runComment () {
       var vm = this
-      vm.$refs.comment.runComment()
+      if (vm.$refs.comment) {
+        vm.$refs.comment.runComment()
+      }
     },
     goBack () {
       window.history.back()
@@ -735,7 +655,15 @@ export default {
         }
         vm.$store.dispatch('loadDossierSyncs', dataParams).then(resultSyncs => {
           console.log('resultSyncs++++++++++++++++', resultSyncs)
-          vm.dossierSyncs = resultSyncs
+          if (resultSyncs !== null && resultSyncs !== undefined && resultSyncs !== 'undefined') {
+            if (Array.isArray(resultSyncs)) {
+              vm.dossierSyncs = resultSyncs
+            } else {
+              vm.dossierSyncs = [resultSyncs]
+            }
+          } else {
+            vm.dossierSyncs = []
+          }
         })
       }
     },
@@ -762,16 +690,18 @@ export default {
     },
     postChat () {
       var vm = this
-      let params = {
-        dossierId: vm.thongTinChiTietHoSo.dossierId,
-        actionCode: 8200,
-        actionNote: vm.messageChat,
-        actionUser: ''
+      if (vm.messageChat) {
+        let params = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
+          actionCode: vm.originality === 3 ? '8200' : '8100',
+          actionNote: vm.messageChat,
+          actionUser: ''
+        }
+        vm.$store.dispatch('postAction', params).then(result => {
+          vm.loadDossierSyncs()
+        })
+        vm.messageChat = ''
       }
-      vm.$store.dispatch('postAction', params).then(result => {
-        vm.loadDossierSyncs()
-      })
-      vm.messageChat = ''
     },
     getNextAction (item) {
       var vm = this
@@ -907,10 +837,16 @@ export default {
         actionId: item.processActionId
       }
       vm.dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.loadingAction = true
       vm.dialogActionProcess = false
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
+        vm.loadingAction = false
+        vm.loadingActionProcess = false
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
+      }).catch(function (reject) {
+        vm.loadingAction = false
+        vm.loadingActionProcess = false
       })
     },
     btnActionEvent (item, index, isGroup) {
@@ -1119,6 +1055,8 @@ export default {
                 q: currentQuery['q']
               }
             })
+          }).catch(function (reject) {
+            vm.loadingActionProcess = false
           })
         } else {
           return false
@@ -1150,6 +1088,8 @@ export default {
               }
             })
           }
+        }).catch(function (reject) {
+          vm.loadingActionProcess = false
         })
       }
     },
@@ -1241,6 +1181,7 @@ export default {
         //   vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
         // }, 300)
       })
+      vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
       // vm.$store.dispatch('pullProcessSteps', {
       //   stepCode: vm.thongTinChiTietHoSo.stepCode
       // }).then(resProSteps => {
@@ -1287,13 +1228,6 @@ export default {
         dossierPartNo: item.partNo
       }
       vm.$store.dispatch('putAlpacaForm', value)
-    },
-    getColorChat (syncType) {
-      if (syncType === 1) {
-        return 'pink'
-      } else {
-        return 'cyan lighten-1'
-      }
     },
     postNextActions (stepModel) {
       var vm = this
@@ -1400,6 +1334,17 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
       })
+    },
+    filterNextActionEnable (nextaction) {
+      var isEnabale = false
+      if (nextaction && Array.isArray(nextaction)) {
+        for (let key in nextaction) {
+          if (nextaction[key]['enable'] !== 0) {
+            isEnabale = true
+          }
+        }
+      }
+      return isEnabale 
     }
   },
   filters: {

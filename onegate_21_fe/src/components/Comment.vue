@@ -12,7 +12,7 @@
           </div> -->
           
           <v-card class="comments__container" >
-            <v-card-text>
+            <v-card-text class="pl-4">
               <div id="comments-container-el"></div>
               
               <!-- <v-flex v-if="argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Xem thêm</span></v-flex>
@@ -264,6 +264,7 @@ export default {
             // formData.append('fullname', 'Công Trình')
             formData.append('email', vm.initData.user.userEmail)
             formData.append('fullname', vm.initData.user.userName)
+            formData.append('opinion', document.getElementById('opinion').checked)
             $.ajax({
               url: vm.initData.commentApi + '/uploads',
               dataType: 'json',
@@ -280,6 +281,10 @@ export default {
                 vm.formatComment(comment)
                 successfulUploads.push(vm.comment)
                 serverResponded()
+                if (comment.opinion) {
+                  $('.opinion').hide()
+                }
+                document.getElementById('opinion').checked = false
               },
               error: function (xhr, data) {
                 serverResponded()

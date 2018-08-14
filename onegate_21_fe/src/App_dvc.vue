@@ -156,7 +156,7 @@
         let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
-        if (currentQuery !== null && currentQuery !== undefined && currentQuery.hasOwnProperty('q')) {
+        if (currentQuery !== null && currentQuery !== undefined) {
           let coma = queryString.lastIndexOf('=')
           if (coma > 0) {
             queryString = queryString.substr(0, coma + 1)

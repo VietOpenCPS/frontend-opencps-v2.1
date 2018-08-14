@@ -275,7 +275,7 @@ export default {
               payload: '',
               security: '',
               assignUsers: '',
-              payment: JSON.stringify(vm.payments),
+              payment: vm.payments,
               createDossiers: '',
               dueDate: tempData.dueDate
             }
@@ -353,10 +353,10 @@ export default {
               actionCode: 1100,
               actionNote: '',
               actionUser: actionUser,
-              payload: JSON.stringify(payloadDate),
+              payload: payloadDate,
               security: '',
               assignUsers: '',
-              payment: JSON.stringify(paymentsOut),
+              payment: paymentsOut,
               createDossiers: '',
               dueDate: tempData.dueDate
             }
