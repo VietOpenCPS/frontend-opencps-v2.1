@@ -181,7 +181,7 @@
     </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
-      <v-layout wrap v-if="menuType !== 3 && originality !== 1">
+      <v-layout wrap v-if="originality !== 1">
         <v-flex xs4 class="pl-2 pr-2">
           <v-select
             :items="listLinhVuc"
@@ -221,6 +221,13 @@
           </div>
         </v-flex>
       </v-layout>
+      <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
+          <v-avatar style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
+          {{item.title}}
+        </v-chip>
+      </div>
     </v-layout>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
@@ -571,6 +578,8 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    dossierCountingShow: false,
+    dossierCounting: [],
     advSearchToolsSelected: [],
     advSearchTools: support.advSearchTools,
     advSearchItems: [],
@@ -797,65 +806,63 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
-        vm.processListTTHC(currentQuery)
-        vm.processListDomain(currentQuery)
-        if (vm.trangThaiHoSoList === null) {
-          vm.$store.commit('setLoadingDynamicBtn', true)
-          setTimeout(() => {
-            vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
-              vm.btnDynamics = []
-              vm.trangThaiHoSoList = result
-              vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
-              // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
-              vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
-              if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
-                vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
+        vm.$store.commit('setLoadingDynamicBtn', true)
+        setTimeout(() => {
+          vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
+            vm.btnDynamics = []
+            vm.trangThaiHoSoList = result
+            vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
+            vm.processListTTHC(currentQuery)
+            vm.processListDomain(currentQuery)
+            // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
+            vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
+              vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
+            }
+            if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
+              vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
+            }
+            if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
+              vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
+              // console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
+              // console.log('filterForm', vm.filterForm)
+            }
+            let btnDynamicsOnlySteps = []
+            let btnDynamicsView = []
+            for (let key in vm.btnDynamics) {
+              if (vm.btnDynamics[key].hasOwnProperty('onlySteps')) {
+                btnDynamicsOnlySteps.push(vm.btnDynamics[key])
+              } else {
+                btnDynamicsView.push(vm.btnDynamics[key])
               }
-              if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('buttons')) {
-                vm.btnDynamics = vm.trangThaiHoSoList[vm.index]['buttonConfig']['buttons']
-              }
-              if (vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== null && vm.trangThaiHoSoList[vm.index]['buttonConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['buttonConfig'].hasOwnProperty('layout_view')) {
-                vm.filterForm = vm.trangThaiHoSoList[vm.index]['buttonConfig']['layout_view']
-                // console.log('filterForm11111', vm.trangThaiHoSoList[vm.index]['buttonConfig'])
-                // console.log('filterForm', vm.filterForm)
-              }
-              let btnDynamicsOnlySteps = []
-              let btnDynamicsView = []
-              for (let key in vm.btnDynamics) {
-                if (vm.btnDynamics[key].hasOwnProperty('onlySteps')) {
-                  btnDynamicsOnlySteps.push(vm.btnDynamics[key])
-                } else {
-                  btnDynamicsView.push(vm.btnDynamics[key])
-                }
-              }
-              vm.btnDynamics = []
-              vm.btnDynamics = btnDynamicsView
-              vm.btnStepsDynamics = []
-              if (currentQuery.hasOwnProperty('step')) {
-                for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
-                  let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
-                  if (String(currentStep.stepCode) === String(currentQuery.step)) {
-                    let buttonConfig = currentStep.buttonConfig
-                    if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                      vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
-                      for (let key in btnDynamicsOnlySteps) {
-                        for (var i = 0; i < btnDynamicsOnlySteps[key].onlySteps.length; i++) {
-                          if (String(btnDynamicsOnlySteps[key].onlySteps[i]) === String(currentStep.stepCode)) {
-                            vm.btnDynamics.push(btnDynamicsOnlySteps[key])
-                          }
+            }
+            vm.btnDynamics = []
+            vm.btnDynamics = btnDynamicsView
+            vm.btnStepsDynamics = []
+            if (currentQuery.hasOwnProperty('step')) {
+              for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
+                let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
+                if (String(currentStep.stepCode) === String(currentQuery.step)) {
+                  let buttonConfig = currentStep.buttonConfig
+                  if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
+                    vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
+                    for (let key in btnDynamicsOnlySteps) {
+                      for (var i = 0; i < btnDynamicsOnlySteps[key].onlySteps.length; i++) {
+                        if (String(btnDynamicsOnlySteps[key].onlySteps[i]) === String(currentStep.stepCode)) {
+                          vm.btnDynamics.push(btnDynamicsOnlySteps[key])
                         }
                       }
-                    } else {
-                      vm.btnStepsDynamics = []
                     }
-                    break
+                  } else {
+                    vm.btnStepsDynamics = []
                   }
+                  break
                 }
               }
-              vm.$store.commit('setLoadingDynamicBtn', false)
-            })
-          }, 200)
-        }
+            }
+            vm.$store.commit('setLoadingDynamicBtn', false)
+          })
+        }, 200)
       }
     })
   },
@@ -1110,6 +1117,20 @@ export default {
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
         })
+      }
+      if (vm.menuType === 3 || String(vm.menuType) === '3') {
+        setTimeout(() => {
+          vm.$store.dispatch('loadingDossierCounting').then(function (result) {
+            if (result !== null && result !== undefined) {
+              vm.dossierCounting = result
+            } else {
+              vm.dossierCounting = []
+            }
+            vm.dossierCountingShow = true
+          })
+        }, 200)
+      } else {
+        vm.dossierCountingShow = false
       }
     },
     changeServiceConfigs (item) {
@@ -1813,6 +1834,7 @@ export default {
     },
     showAdvFilter () {
       let vm = this
+
       vm.menusss = !vm.menusss
       vm.$store.dispatch('getStatusLists').then(function (result) {
         vm.itemFilterSupport.statusLists = result
@@ -1889,6 +1911,59 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+    },
+    changeAdvFilterDataChips (item) {
+      let vm = this
+      console.log('changeAdvFilterDataChips', vm.advSearchItems)
+      let indexPush = -2
+      for (let key in vm.advSearchTools) {
+        if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
+          if (vm.advSearchTools[key]['spec'] === 'top') {
+            indexPush = vm.advSearchTools[key]['index']
+            vm.advSearchTools[key].display = true
+            vm.advSearchTools[key].disabled = true
+          }
+        } else {
+          if (vm.advSearchTools[key]['spec'] === 'status') {
+            indexPush = vm.advSearchTools[key]['index']
+            vm.advSearchTools[key].display = true
+            vm.advSearchTools[key].disabled = true
+          }
+        }
+      }
+      let typeSearch = ''
+      if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
+        typeSearch = 'top'
+      } else {
+        typeSearch = 'status'
+      }
+      let noFilterData = true
+      for (let key in vm.advSearchItems) {
+        if (vm.advSearchItems[key]['spec'] === 'status') {
+          if (item.key !== 'delay' && item.key !== 'overdue' && item.key !== 'coming') {
+            vm.advSearchItems[key].value = 'status' + ':' + item.key
+            vm.advSearchItems[key].text = 'status' + ':' + item.key
+            noFilterData = false
+            break
+          }
+        } else if (vm.advSearchItems[key]['spec'] === 'top') {
+          if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
+            vm.advSearchItems[key].value = 'top' + ':' + item.key
+            vm.advSearchItems[key].text = 'top' + ':' + item.key
+            noFilterData = false
+            break
+          }
+        }
+      }
+      if (noFilterData) {
+        vm.advSearchItems.push({
+          spec: typeSearch,
+          value: typeSearch + ':' + item.key,
+          text: typeSearch + ':' + item.key,
+          index: indexPush
+        })
+      }
+      vm.doRedirectFilter()
     }
   }
 }
