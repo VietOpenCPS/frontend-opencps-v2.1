@@ -21,8 +21,9 @@
                   v-model="data_payment.feeAmount"
                   v-money="money"
                   suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
+                  v-if="data_payment.editable === 1 || data_payment.editable === 3"
                 ></v-text-field>
+                <p class="mt-1 mb-0" v-else>{{currency(data_payment.feeAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2>
@@ -34,8 +35,9 @@
                   v-model="data_payment.serviceAmount"
                   v-money="money"
                   suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
+                  v-if="data_payment.editable === 2 || data_payment.editable === 3"
                 ></v-text-field>
+                <p class="mt-1 mb-0" v-else>{{currency(data_payment.serviceAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <!--  -->
               <!--  -->
@@ -59,7 +61,7 @@
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1" >
                 <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 1">
+              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 1">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
@@ -67,7 +69,7 @@
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
                 <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 2">
+              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 2">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 2"></v-flex>
@@ -75,7 +77,7 @@
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 5">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <!--  -->
@@ -226,15 +228,3 @@ export default {
   filters: {}
 }
 </script>
-<style>
-.inputDisable, .inputDisable label {
-  pointer-events: none
-}
-.inputDisable .input-group__details {
-  display: none
-}
-.payment-info .input-group--disabled label {
-  color: #000 !important
-}
-</style>
-

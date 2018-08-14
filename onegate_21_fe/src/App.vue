@@ -162,15 +162,27 @@
         console.log('currentParams', currentParams)
         console.log('currentQuery', currentQuery)
         let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
+        console.log('queryString++++++1111111+++++', queryString)
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
-        if (currentQuery !== null && currentQuery !== undefined && currentQuery.hasOwnProperty('q')) {
+        if (currentQuery !== null && currentQuery !== undefined) {
           let coma = queryString.lastIndexOf('=')
           if (coma > 0) {
             queryString = queryString.substr(0, coma + 1)
           }
         }
         this.currentStep = String(item.stepCode)
+        // if (vm.currentStep) {
+        //   let urls = queryString.split("?")
+        //   if (urls !== null && urls.length !== 0) {
+        //     for (var i = 0; i < urls.length; i++) {
+        //       if (urls[i].indexOf('step') > 0) {
+        //         urls.splice(i, 1)
+        //       }
+        //     }
+        //   }
+        // }
+        console.log('queryString++++++++22222222+++', queryString)
         router.push({
           path: '/danh-sach-ho-so/' + currentParams.index,
           query: {

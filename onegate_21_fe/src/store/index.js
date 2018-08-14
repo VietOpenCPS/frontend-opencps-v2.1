@@ -257,7 +257,8 @@ export const store = new Vuex.Store({
               substatus: filter.substatus ? filter.substatus : '',
               year: filter.year ? filter.year : 0,
               month: filter.month ? filter.month : 0,
-              top: filter.top ? filter.top : ''
+              top: filter.top ? filter.top : '',
+              dossierNo: filter.dossierNo ? filter.dossierNo : ''
             }
           }
           axios.get(filter.queryParams, param).then(function (response) {
@@ -587,14 +588,14 @@ export const store = new Vuex.Store({
                 delegateTelNo: response.data.delegateTelNo,
                 delegateIdNo: response.data.delegateIdNo
               }
+              resolve(response.data)
               commit('setLoading', false)
               commit('setDossier', response.data)
               commit('setThongTinChuHoSo', response.data)
               commit('setLePhi', response.data)
               commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
               commit('setThongTinChungHoSo', response.data)
-              // commit('setDichVuChuyenPhatKetQua', response.data)
-              resolve(response.data)
+              commit('setDichVuChuyenPhatKetQua', response.data)
             }, error => {
               commit('setLoading', false)
               reject(error)
@@ -681,16 +682,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          // headers: {
-          //   'groupId': state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            'groupId': state.initData.groupId
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   'groupId': state.initData.groupId
+          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -760,16 +761,16 @@ export const store = new Vuex.Store({
         commit('setLoading', false)
         console.log('put dossier')
         let options = {
-          // headers: {
-          //   groupId: state.initData.groupId,
-          //   'Accept': 'application/json',
-          //   'Content-Type': 'application/x-www-form-urlencoded',
-          //   'cps_auth': state.initData.cps_auth
-          // }
-          // test local
           headers: {
-            groupId: state.initData.groupId
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
           }
+          // test local
+          // headers: {
+          //   groupId: state.initData.groupId
+          // }
         }
         var applicantType = ''
         if (data.userType) {
@@ -911,18 +912,18 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostActionDossier = new URLSearchParams()
-        dataPostActionDossier.append('actionCode', data.actionCode)
-        dataPostActionDossier.append('actionNote', data.actionNote)
-        dataPostActionDossier.append('actionUser', data.actionUser)
-        dataPostActionDossier.append('payload', data.payload)
-        dataPostActionDossier.append('security', data.security)
-        dataPostActionDossier.append('assignUsers', data.assignUsers)
-        dataPostActionDossier.append('payment', data.payment)
-        dataPostActionDossier.append('createDossiers', data.createDossiers)
+        dataPostActionDossier.append('actionCode', data.actionCode ? data.actionCode : '')
+        dataPostActionDossier.append('actionNote', data.actionNote ? data.actionNote : '')
+        dataPostActionDossier.append('actionUser', data.actionUser ? data.actionUser : '')
+        dataPostActionDossier.append('payload', data.payload ? JSON.stringify(data.payload) : '')
+        dataPostActionDossier.append('security', data.security ? data.security : '')
+        dataPostActionDossier.append('assignUsers', data.assignUsers ? JSON.stringify(data.assignUsers) : '')
+        dataPostActionDossier.append('payment', data.payment ? JSON.stringify(data.payment) : '')
+        dataPostActionDossier.append('createDossiers', data.createDossiers ? data.createDossiers : '')
         let url = state.initData.dossierApi + '/' + data.dossierId + '/actions'
         axios.post(url, dataPostActionDossier, options).then(function (response) {
           resolve(response.data)
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
@@ -1679,7 +1680,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          let url = '/o/rest/v2_1/dossiers/' + data.dossierId + '/syncs'
+          // test local
+          let url = '/o/rest/v2/dossiers/' + data.dossierId + '/syncs'
+          // let url = 'http://127.0.0.1:8081/api/dossiers/' + data.dossierId + '/syncs'
           axios.get(url, config).then(function (response) {
             resolve(response.data.data)
           }).catch(function (xhr) {
@@ -2149,8 +2152,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2179,7 +2182,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test lcoal
+          // test local
           axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
