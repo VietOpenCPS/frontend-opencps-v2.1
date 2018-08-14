@@ -43,10 +43,14 @@
               </v-select>
             </v-flex>
             <v-flex xs12 sm6 class="px-2 text-right">
+              <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
+                <span v-if="chartView">Lĩnh vực</span>
+                <span v-else>Đơn vị</span>
+              </v-btn>
               <v-btn icon class="mx-0 my-0" v-on:click.native="$vuetify.goTo('#lineChartID', options)">
                 <v-icon>show_chart</v-icon>
               </v-btn>
-              <v-btn v-if="reportGovName.length > 0" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
+              <v-btn v-if="reportGovName.length > 0 && String(index) !== '1'" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
                 <v-icon class="mr-2">undo</v-icon> Quay lại 
               </v-btn>
               <v-tooltip bottom>
@@ -68,11 +72,11 @@
     </div>
     <div v-if="String(index) === '0'">
       <div class="layout wrap" v-if="agencyLists !== null && agencyLists !== undefined && agencyLists.length > 0">
-        <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="String(item.govAgencyCode) !== '' && reloadPie">
-          <pie-chart-report :item="item" :year="year" :month="month"></pie-chart-report>
+        <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '') || (!chartView && item.domainName !== '')) && reloadPie">
+          <pie-chart-report :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report>
         </v-flex>
         <v-flex xs12></v-flex>
-        <content-placeholders class="my-4 flex xs12 sm4 px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="String(item.govAgencyCode) !== '' && !reloadPie">
+        <content-placeholders class="my-4 flex xs12 sm4 px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '')) && !reloadPie">
           <content-placeholders-heading />
           <content-placeholders-img />
         </content-placeholders>
@@ -82,7 +86,7 @@
               Tình hình giải quyết hồ sơ năm {{year}}
             </v-card-title>
             <v-card-text class="pt-2 pb-0 px-0">
-              <bar-chart-report :item_array="agencyLists" :year="year" :month="month"></bar-chart-report>
+              <bar-chart-report :item_array="agencyLists" :year="year" :month="month" :gov_agency_code="govAgencyCode" :chart_view="chartView"></bar-chart-report>
             </v-card-text>
           </v-card>
         </v-flex>
@@ -90,13 +94,13 @@
           <content-placeholders-heading />
           <content-placeholders-img />
         </content-placeholders>
-        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadPie">
+        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadPie" id="lineChartID">
           <v-card style="border-radius: 0;">
             <v-card-title class="headline">
               Tình hình giải quyết hồ sơ năm {{year}}
             </v-card-title>
             <v-card-text class="pt-2 pb-0 pl-5 pr-4">
-              <bar-chart-report-horizontal :item_array="agencyLists" :year="year" :month="month"></bar-chart-report-horizontal>
+              <bar-chart-report-horizontal :item_array="agencyLists" :year="year" :month="month" :gov_agency_code="govAgencyCode" :chart_view="chartView"></bar-chart-report-horizontal>
             </v-card-text>
           </v-card>
         </v-flex>
@@ -104,13 +108,13 @@
           <content-placeholders-heading />
           <content-placeholders-img />
         </content-placeholders>
-        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadLine" id="lineChartID">
+        <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="reloadLine">
           <v-card style="border-radius: 0;">
             <v-card-title class="headline">
               Tình hình giải quyết hồ sơ năm {{year}}
             </v-card-title>
             <v-card-text class="pt-2 pb-0 pl-5 pr-4">
-              <line-chart-report :item_array="agencyListsMonth" :year="year"></line-chart-report>
+              <line-chart-report :item_array="agencyListsMonth" :year="year" :gov_agency_code="govAgencyCode" :chart_view="chartView"></line-chart-report>
             </v-card-text>
           </v-card>
         </v-flex>
@@ -147,49 +151,48 @@
             <div class="mt-3 report__table">
               <table>
                 <thead>
-                    <tr>
-                      <th rowspan="5" colspan="1" width="40">STT</th>
-                      <th v-if="govAgencyCode === ''" rowspan="5" colspan="1" width="100%">Đơn vị</th>
-                      <th v-else rowspan="5" colspan="1" width="100%">Lĩnh vực</th>
-                      <th rowspan="5" colspan="1" width="40">Tổng số</th>
-                      <th rowspan="5" colspan="1" width="40">Từ chối tiếp nhận trong kỳ</th>
-                      <th rowspan="5" colspan="1" width="40">Hồ sơ rút không giải quyết</th>
-                      <th rowspan="1" colspan="5">Nhận giải quyết</th>
-                      <th rowspan="1" colspan="14">Kết quả giải quyết</th>
-                    </tr>
-                    <tr>
-                      <th rowspan="4" colspan="1" width="40">Tổng số</th>
-                      <th rowspan="4" colspan="1" width="40">Tồn trước</th>
-                      <th rowspan="1" colspan="3" >Nhận trong kỳ</th>
-                      <th rowspan="1" colspan="10" >Hồ sơ đã có kết quả</th>
-                      <th rowspan="1" colspan="3" >Đang giải quyết</th>
-                      <th rowspan="4" colspan="1" width="40">Tạm dừng bổ sung điều kiện</th>
-                    </tr>
-                    <tr>
-                      <th rowspan="3" width="40">Tổng số</th>
-                      <th rowspan="3" width="40">Một cửa</th>
-                      <th rowspan="3" width="40">Trực tuyến</th>
-                      <th rowspan="3" width="40">Tổng số</th>
-                      <th colspan="6" >Tình trạng thực hiện</th>
-                      <th colspan="2" >Trả kết quả</th>
-                      <th rowspan="3" width="40">Từ chối  giải quyết</th>
-                      <th rowspan="3" width="40">Tổng số</th>
-                      <th rowspan="3" width="40">Còn hạn</th>
-                      <th rowspan="3" width="40">Quá hạn</th>
-                    </tr>
-                    <tr>
-                      <th rowspan="2" width="40">Trước hạn</th>
-                      <th rowspan="2" width="40">Đúng hạn</th>
-                      <th colspan="3" >Quá hạn</th>
-                      <th rowspan="2" width="40">% trước và đúng hạn</th>
-                      <th rowspan="2" width="40">Đã trả</th>
-                      <th rowspan="2" width="40">Chưa trả</th>
-                    </tr>
-                    <tr>
-                      <th width="40">Tổng số</th>
-                      <th width="40">Trong đơn vị</th>
-                      <th width="40">Ngoài đơn vị</th>
-                    </tr>
+                  <tr>
+                    <th rowspan="5" colspan="1" width="40"> <span v-if="govAgencyCode !== '' || String(chartView) === 'false'">Lĩnh vực</span> <span v-else>Đơn vị</span></th>
+                    <th rowspan="5" colspan="1" width="40">Tổng số</th>
+                    <th rowspan="5" colspan="1" width="40">Từ chối tiếp nhận trong kỳ</th>
+                    <th rowspan="5" colspan="1" width="40">Hồ sơ rút không giải quyết</th>
+                    <th rowspan="1" colspan="5">Nhận giải quyết</th>
+                    <th rowspan="1" colspan="15">Kết quả giải quyết</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="4" colspan="1" width="40">Tổng số</th>
+                    <th rowspan="4" colspan="1" width="40">Tồn trước</th>
+                    <th rowspan="1" colspan="3">Nhận trong kỳ</th>
+                    <th rowspan="1" colspan="9">Hồ sơ đã có kết quả</th>
+                    <th rowspan="1" colspan="4">Đang giải quyết</th>
+                    <th rowspan="4" colspan="1" width="40">Tạm dừng bổ sung điều kiện</th>
+                    <th rowspan="4" colspan="1" width="40">% trước và đúng hạn</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th rowspan="3" width="40">Một cửa</th>
+                    <th rowspan="3" width="40">Trực tuyến</th>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th colspan="5">Tình trạng thực hiện</th>
+                    <th colspan="2">Trả kết quả</th>
+                    <th rowspan="3" width="40">Từ chối giải quyết</th>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th rowspan="3" width="40">Còn hạn giải quyết</th>
+                    <th rowspan="3" width="40">Quá hạn giải quyết</th>
+                    <th rowspan="3" width="40">Đang xử lý ngoài đơn vị</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="2" width="40">Trước hạn</th>
+                    <th rowspan="2" width="40">Đúng hạn</th>
+                    <th colspan="3">Quá hạn</th>
+                    <th rowspan="2" width="40">Đã trả</th>
+                    <th rowspan="2" width="40">Chưa trả</th>
+                  </tr>
+                  <tr>
+                    <th width="40">Tổng số</th>
+                    <th width="40">Trong đơn vị</th>
+                    <th width="40">Ngoài đơn vị</th>
+                  </tr>
                 </thead>
                 <tbody>
                   <tr class="note__column">
@@ -218,10 +221,9 @@
                     <td align="center">23</td>
                     <td align="center">24</td>
                   </tr>
-                  <tr v-for="(item, index) in agencyLists" v-bind:key="index">
-                    <td align="center">{{index + 1}}</td>
-                    <td v-if="govAgencyCode === ''" align="center">{{item.govAgencyName}}</td>
-                    <td v-else align="center">{{item.domainName}}</td>
+                  <tr v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' || String(chartView) === 'true') && item.govAgencyName !== '') || ((govAgencyCode !== ''  || String(chartView) === 'false') && item.domainName !== '')">
+                    <td v-if="govAgencyCode !== '' || String(chartView) === 'false'" align="center">{{item.domainName}}</td>
+                    <td v-else align="center">{{item.govAgencyName}}</td>
                     <td align="center">{{item.totalCount}}</td>
                     <td align="center">{{item.deniedCount}}</td>
                     <td align="center">{{item.cancelledCount}}</td>
@@ -236,17 +238,18 @@
                     <td align="center">{{item.overtimeCount}}</td>
                     <td align="center">{{item.overtimeInside}}</td>
                     <td align="center">{{item.overtimeOutside}}</td>
-                    <td align="center">{{item.ontimePercentage}}</td>
                     <td align="center">{{item.doneCount}}</td>
                     <td align="center">{{item.releasingCount}}</td>
                     <td align="center">{{item.unresolvedCount}}</td>
                     <td align="center">{{item.processingCount}}</td>
                     <td align="center">{{item.undueCount}}</td>
                     <td align="center">{{item.overdueCount}}</td>
+                    <td align="center">{{item.outsideCount}}</td>
                     <td align="center">{{item.waitingCount}}</td>
+                    <td align="center">{{item.ontimePercentage}}</td>
                   </tr>
                   <tr class="sum__column" style="font-weight: bold;" v-if="showTable">
-                    <td align="center" colspan="2">Tổng số <br> <small v-if="agencyLists !== null && agencyLists.length > 0"> ( {{agencyLists.length}} đơn vị ) </small></td>
+                    <td align="center">Tổng số <br> <span v-if="agencyLists !== null && agencyLists.length > 0"> {{agencyLists.length - 1}} </span></td>
                     <td align="center ">{{totalCounter['total_3']}}</td>
                     <td align="center">{{totalCounter['total_4']}}</td>
                     <td align="center">{{totalCounter['total_5']}}</td>
@@ -269,6 +272,7 @@
                     <td align="center">{{totalCounter['total_22']}}</td>
                     <td align="center">{{totalCounter['total_23']}}</td>
                     <td align="center">{{totalCounter['total_24']}}</td>
+                    <td align="center">{{totalCounter['total_25']}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -298,6 +302,7 @@ export default {
     'line-chart-report': LineChartReport
   },
   data: () => ({
+    chartView: true,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
     agencyGroups: [],
@@ -440,6 +445,9 @@ export default {
         if (currentQuerys.hasOwnProperty('govAgencyCode')) {
           vm.govAgencyCode = currentQuerys.govAgencyCode
         }
+        if (currentQuerys.hasOwnProperty('chartView')) {
+          vm.chartView = (currentQuerys.chartView === 'true')
+        }
         vm.doStaticsReport()
       }
     })
@@ -457,10 +465,44 @@ export default {
       if (currentQuerys.hasOwnProperty('govAgencyCode')) {
         vm.govAgencyCode = currentQuerys.govAgencyCode
       }
+      if (currentQuerys.hasOwnProperty('chartView')) {
+        if (currentQuerys.chartView === 'true' || currentQuerys.chartView) {
+          vm.chartView = true
+        } else {
+          vm.chartView = false
+        }
+      }
       vm.doStaticsReport()
     }
   },
   methods: {
+    toNativeViewType () {
+      let vm = this
+      let currentQuerys = vm.$router.history.current.query
+      if (currentQuerys.hasOwnProperty('chartView')) {
+        let changTypeCHK = (currentQuerys.chartView === 'true' || currentQuerys.chartView)
+        console.log('changTypeCHK', changTypeCHK)
+        if (String(changTypeCHK) === 'true') {
+          vm.chartView = false
+          console.log('changTypeCHK1', vm.chartView)
+        } else {
+          vm.chartView = true
+          console.log('changTypeCHK2', vm.chartView)
+        }
+      } else {
+        vm.chartView = !vm.chartView
+      }
+      console.log('toNativeViewType', vm.chartView)
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group,
+          chartView: vm.chartView
+        }
+      })
+    },
     toNativeViewBack (data) {
       let vm = this
       router.push({
@@ -487,25 +529,6 @@ export default {
     },
     doStaticsReport () {
       let vm = this
-      let filter = {
-        year: vm.year,
-        month: vm.month,
-        group: vm.group,
-        reporting: true,
-        agency: vm.govAgencyCode
-      }
-      vm.reloadPie = false
-      vm.showTable = false
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        if (result === null || result === undefined || result === 'undefined') {
-          vm.noReportData = true
-          vm.agencyLists = []
-        } else {
-          vm.noReportData = false
-          vm.agencyLists = result
-        }
-        vm.reloadPie = true
-      })
       vm.totalCounter['total_3'] = 0
       vm.totalCounter['total_4'] = 0
       vm.totalCounter['total_5'] = 0
@@ -528,51 +551,90 @@ export default {
       vm.totalCounter['total_22'] = 0
       vm.totalCounter['total_23'] = 0
       vm.totalCounter['total_24'] = 0
-      filter = {
+      vm.totalCounter['total_25'] = 0
+      let filter = {
         year: vm.year,
         month: vm.month,
         group: vm.group,
         reporting: true,
-        agency: 'total',
-        report: true
+        agency: vm.govAgencyCode,
+        report: vm.chartView ? false : 'linemonth'
       }
-      if (vm.govAgencyCode !== '') {
-        filter['agency'] = vm.govAgencyCode
+      let tempGov = vm.govAgencyCode
+      if (vm.chartView) {
+        filter.report = true
+        let currentQuerys = vm.$router.history.current.query
+        if (currentQuerys.hasOwnProperty('govAgencyCode')) {
+          vm.govAgencyCode = currentQuerys.govAgencyCode
+          tempGov = vm.govAgencyCode
+          if (tempGov !== '') {
+            filter.report = false
+          }
+        }
+      } else {
+        vm.govAgencyCode = ''
+        filter.agency = 'total'
       }
+      vm.reloadPie = false
+      vm.showTable = false
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
+          vm.noReportData = true
+          vm.agencyLists = []
         } else {
-          let currentData = result[0]
-          vm.totalCounter['total_3'] = currentData.totalCount
-          vm.totalCounter['total_4'] = currentData.deniedCount
-          vm.totalCounter['total_5'] = currentData.cancelledCount
-          vm.totalCounter['total_6'] = currentData.processCount
-          vm.totalCounter['total_7'] = currentData.remainingCount
-          vm.totalCounter['total_8'] = currentData.receivedCount
-          vm.totalCounter['total_9'] = currentData.onegateCount
-          vm.totalCounter['total_10'] = currentData.onlineCount
-          vm.totalCounter['total_11'] = currentData.releaseCount
-          vm.totalCounter['total_12'] = currentData.betimesCount
-          vm.totalCounter['total_13'] = currentData.ontimeCount
-          vm.totalCounter['total_14'] = currentData.overtimeCount
-          vm.totalCounter['total_15'] = currentData.overtimeInside
-          vm.totalCounter['total_16'] = currentData.overtimeOutside
-          vm.totalCounter['total_17'] = currentData.ontimePercentage
-          vm.totalCounter['total_18'] = currentData.doneCount
-          vm.totalCounter['total_19'] = currentData.releasingCount
-          vm.totalCounter['total_20'] = currentData.unresolvedCount
-          vm.totalCounter['total_21'] = currentData.processingCount
-          vm.totalCounter['total_22'] = currentData.undueCount
-          vm.totalCounter['total_23'] = currentData.overdueCount
-          vm.totalCounter['total_24'] = currentData.waitingCount
+          vm.noReportData = false
+          vm.agencyLists = result
         }
-        vm.showTable = true
+        vm.reloadPie = true
+        for (let key in vm.agencyLists) {
+          let currentData = vm.agencyLists[key]
+          if (currentData.domainName === '' && currentData.domainName === '') {
+            vm.totalCounter['total_3'] = currentData.totalCount
+            vm.totalCounter['total_4'] = currentData.deniedCount
+            vm.totalCounter['total_5'] = currentData.cancelledCount
+            vm.totalCounter['total_6'] = currentData.processCount
+            vm.totalCounter['total_7'] = currentData.remainingCount
+            vm.totalCounter['total_8'] = currentData.receivedCount
+            vm.totalCounter['total_9'] = currentData.onegateCount
+            vm.totalCounter['total_10'] = currentData.onlineCount
+            vm.totalCounter['total_11'] = currentData.releaseCount
+            vm.totalCounter['total_12'] = currentData.betimesCount
+            vm.totalCounter['total_13'] = currentData.ontimeCount
+            vm.totalCounter['total_14'] = currentData.overtimeCount
+            vm.totalCounter['total_15'] = currentData.overtimeInside
+            vm.totalCounter['total_16'] = currentData.overtimeOutside
+            vm.totalCounter['total_17'] = currentData.doneCount
+            vm.totalCounter['total_18'] = currentData.releasingCount
+            vm.totalCounter['total_19'] = currentData.unresolvedCount
+            vm.totalCounter['total_20'] = currentData.processingCount
+            vm.totalCounter['total_21'] = currentData.undueCount
+            vm.totalCounter['total_22'] = currentData.overdueCount
+            vm.totalCounter['total_23'] = currentData.outsideCount
+            vm.totalCounter['total_24'] = currentData.waitingCount
+            vm.totalCounter['total_25'] = currentData.ontimePercentage
+            vm.showTable = true
+            break
+          }
+        }
       })
       setTimeout(() => {
         filter = {
           year: vm.year,
           group: vm.group,
-          agency: ''
+          agency: tempGov,
+          report: vm.chartView ? true : 'linemonth'
+        }
+        if (!vm.chartView) {
+          filter.agency = 'total'
+          filter.report = 'linemonth'
+        } else {
+          if (tempGov !== '') {
+            filter.agency = tempGov
+            filter.report = false
+          } else {
+            filter.agency = ''
+            filter.report = true
+          }
         }
         vm.reloadLine = false
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {

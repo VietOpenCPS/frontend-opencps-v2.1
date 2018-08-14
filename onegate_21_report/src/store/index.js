@@ -83,22 +83,14 @@ export const store = new Vuex.Store({
             requestURL = '/o/rest/statistics'
             axios.get(requestURL, param).then(function (response) {
               let serializable = response.data
-              param.params['domain'] = 'total'
-              axios.get(requestURL, param).then(function (responseTotal) {
-                let serializableTotal = responseTotal.data
-                if (serializableTotal.data) {
-                  let dataReturn = {
-                    data: serializable.data,
-                    dataTotal: serializableTotal.data
-                  }
-                  resolve(dataReturn)
-                } else {
-                  resolve(null)
+              if (serializable.data) {
+                let dataReturn = {
+                  data: serializable.data
                 }
-              }).catch(function (error) {
-                console.log(error)
-                reject(error)
-              })
+                resolve(dataReturn)
+              } else {
+                resolve(null)
+              }
             }).catch(function (error) {
               console.log(error)
               reject(error)

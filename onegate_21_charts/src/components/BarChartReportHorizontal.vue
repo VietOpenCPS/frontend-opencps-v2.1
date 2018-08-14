@@ -23,6 +23,12 @@ export default {
     },
     month: {
       type: String
+    },
+    gov_agency_code: {
+      type: String
+    },
+    chart_view: {
+      type: Boolean
     }
   },
   data: () => ({
@@ -40,14 +46,14 @@ export default {
       if (String(vm.item_array[key].govAgencyCode) === '' && String(vm.item_array[key].domainName) === '') {
       } else {
         if (vm.item_array[key].month > 0) {
-          if (vm.item_array[key].govAgencyName !== '') {
+          if (vm.gov_agency_code === '' && vm.item_array[key].govAgencyName !== '') {
             if (monthData[vm.item_array[key].govAgencyName] !== null && monthData[vm.item_array[key].govAgencyName] !== undefined) {
               monthData[vm.item_array[key].govAgencyName] = vm.item_array[key].undueCount + vm.item_array[key].overdueCount + vm.item_array[key].waitingCount + vm.item_array[key].betimesCount + vm.item_array[key].ontimeCount + vm.item_array[key].overtimeCount
             } else {
               monthData[vm.item_array[key].govAgencyName] = 0
               monthData[vm.item_array[key].govAgencyName] = vm.item_array[key].undueCount + vm.item_array[key].overdueCount + vm.item_array[key].waitingCount + vm.item_array[key].betimesCount + vm.item_array[key].ontimeCount + vm.item_array[key].overtimeCount
             }
-          } else {
+          } else if (vm.gov_agency_code !== '' && vm.item_array[key].domainName !== '' || (!vm.chart_view && vm.item_array[key].domainName !== '')) {
             if (monthData[vm.item_array[key].domainName] !== null && monthData[vm.item_array[key].domainName] !== undefined) {
               monthData[vm.item_array[key].domainName] = vm.item_array[key].undueCount + vm.item_array[key].overdueCount + vm.item_array[key].waitingCount + vm.item_array[key].betimesCount + vm.item_array[key].ontimeCount + vm.item_array[key].overtimeCount
             } else {
@@ -83,7 +89,7 @@ export default {
                 display: true,
                 scaleLabel: {
                   display: true,
-                  labelString: 'Danh sách cơ quan'
+                  labelString: (vm.gov_agency_code === '' && vm.chart_view) ? 'Danh sách cơ quan' : 'Danh sách lĩnh vực'
                 }
               }
             ]
