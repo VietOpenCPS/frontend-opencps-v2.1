@@ -1,56 +1,78 @@
 <template>
   <div style="font-size:13px" class="px-2 py-2">
-    <v-card>
-      <v-card-text class="px-0 py-0">
-        <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
-          <v-flex xs12 sm8>
-            <v-card style="height:100%;background:inherit">
-              <v-card-text class="px-2 py-1 pr-0">
-                <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <img v-if="item.photoFileEntryId" style="opacity:0.8;height:100%" :src="item.photoFileEntryId">
-                    <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/material/100/000000/guest-male.png">
-                  </v-flex>
-                  <v-flex xs12 sm10>
-                    <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
-                    <p class="mb-2">{{item.birthdate}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
-                    <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-          <v-flex xs12 sm4>
-            <v-card style="height:100%;background:inherit">
-              <v-card-text class="px-2 py-1 pr-0">
-                <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
-                <v-layout wrap class="mb-2">
-                  <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
-                  <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                  :val="item.perVeryGood" :text="item.perVeryGood? item.perVeryGood + '%' : ''" 
-                  text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
-                  </progress-bar>
-                </v-layout>
-                <v-layout wrap class="mb-2">
-                  <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
-                  <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                  :val="item.perGood" :text="item.perGood ? item.perGood + '%' : ''" 
-                  text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
-                  </progress-bar>
-                </v-layout>
-                <v-layout wrap class="mb-2">
-                  <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
-                  <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                  :val="item.perBad" :text="item.perBad ? item.perBad + '%' : ''" 
-                  text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
-                  </progress-bar>
-                </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-card-text>
-    </v-card>
+    <div class="row-header mb-2">
+      <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
+      <div class="layout row wrap header_tools">
+        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.name : ''">
+          {{workingUnitSelect ? workingUnitSelect.name : ''}}
+        </div>
+      </div> 
+    </div>
+    <content-placeholders class="mt-3" v-if="loading">
+      <content-placeholders-text :lines="10" />
+    </content-placeholders>
+    <div v-else>
+      <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
+        Không có dữ liệu.
+      </v-alert>
+      <div v-else>
+        <v-card-text class="px-0 py-0">
+          <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
+            <v-flex xs12 sm8>
+              <v-card style="height:100%;background-color:inherit">
+                <v-card-text class="px-2 py-1 pr-0">
+                  <v-layout wrap>
+                    <v-flex xs12 sm2>
+                      <img v-if="item.photoFileEntryId" style="opacity:0.8;height:100%" :src="item.photoFileEntryId">
+                      <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/material/100/000000/guest-male.png">
+                    </v-flex>
+                    <v-flex xs12 sm10>
+                      <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
+                      <p class="mb-2">{{item.birthdate}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
+                      <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
+                    </v-flex>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex xs12 sm4>
+              <v-card style="height:100%;background-color:inherit">
+                <v-card-text class="px-2 py-1 pr-0">
+                  <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
+                  <v-layout wrap class="mb-2">
+                    <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
+                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                    :val="item.perVeryGood" :text="item.perVeryGood? item.perVeryGood + '%' : ''" 
+                    text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
+                    </progress-bar>
+                  </v-layout>
+                  <v-layout wrap class="mb-2">
+                    <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
+                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                    :val="item.perGood" :text="item.perGood ? item.perGood + '%' : ''" 
+                    text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
+                    </progress-bar>
+                  </v-layout>
+                  <v-layout wrap class="mb-2">
+                    <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
+                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                    :val="item.perBad" :text="item.perBad ? item.perBad + '%' : ''" 
+                    text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
+                    </progress-bar>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <div class="text-xs-right layout wrap mt-3" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="totalPagging" :page="employeePage" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
+        </div>
+      </div>
+    </div>
     <!--  -->
     <v-dialog v-model="dialogEvaluation" max-width="600" transition="fade-transition" persistent>
       <v-card>
@@ -76,7 +98,7 @@
               </v-flex>
             </v-layout>
             <div class="mx-4">
-              <v-radio-group v-model="radioGroup" row @change="changeEvaluation">
+              <v-radio-group v-model="radioGroup" row>
                 <v-radio label="Rất hài lòng" :value="1"></v-radio>
                 <v-radio label="Hài lòng" :value="2"></v-radio>
                 <v-radio label="Không hài lòng" :value="3"></v-radio>
@@ -85,20 +107,20 @@
           </v-card-text>
           <v-card-actions class="mx-3">
             <v-spacer></v-spacer>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon>undo</v-icon>&nbsp;
-              Hủy
-              <span slot="loader">Loading...</span>
-            </v-btn>
             <v-btn color="primary" flat="flat" @click.native="submitEvaluation"
               :loading="loadingAction"
               :disabled="loadingAction"
             >
               <v-icon>save</v-icon>&nbsp;
               Gửi đánh giá
+              <span slot="loader">Loading...</span>
+            </v-btn>
+            <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon>undo</v-icon>&nbsp;
+              Hủy
               <span slot="loader">Loading...</span>
             </v-btn>
           </v-card-actions>
@@ -111,18 +133,31 @@
 <script>
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
+import TinyPagination from './pagination.vue'
 import ProgressBar from 'vue-simple-progress'
 export default {
   props: ['index'],
-  components: {ProgressBar},
+  components: {
+    ProgressBar,
+    'tiny-pagination': TinyPagination
+  },
   data: () => ({
     employeeList: [],
     employeeSelected: {},
     employeeIndex: 0,
+    employeePage: 1,
     dialogEvaluation: false,
+    loading: true,
     loadingAction: false
   }),
-  computed: {},
+  computed: {
+    totalPagging () {
+      return this.$store.getters.getTotalEmployee
+    },
+    workingUnitSelect () {
+      return this.$store.getters.getWorkingUnitSelect
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
@@ -132,38 +167,70 @@ export default {
         end: 5
       }
       vm.$nextTick(function () {
+        vm.loading = true
         vm.$store.dispatch('getEmployee', filter).then(function (result) {
-          console.log('employeesCreated', result)
+          // console.log('employeesCreated', result)
+          setTimeout(function () {
+            vm.loading = false
+          }, 200)
           vm.employeeList = result
+          let query = vm.$router.history.current.query
+          if (query.hasOwnProperty('page') && query['page'] !== '1') {
+            vm.employeePage = parseInt(query['page'])
+          } else {
+            vm.employeePage = 1
+          }
           if (vm.employeeList && vm.employeeList.length > 0) {
             for (let key in vm.employeeList) {
               vm.getEvaluationItem(key)
             }
           }
         }).catch(function (reject) {
+          vm.loading = false
           vm.employeeList = []
         })
       })
     })
   },
   watch: {
-    index (val) {
-      var vm = this
-      let filter = {
-        workingunit: val,
-        start: 0,
-        end: 5
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentParams = newRoute.params
+      let currentQuery = newRoute.query
+      if (currentParams.hasOwnProperty('index') && currentParams.index) {
+        vm.currentIndex = currentParams.index
       }
-      this.$nextTick(function () {
-        this.$store.dispatch('getEmployee', filter).then(function (result) {
-          console.log('employeesWatch', result)
-          vm.employeeList = result
-          if (vm.employeeList && vm.employeeList.length > 0) {
-            for (let key in vm.employeeList) {
-              vm.getEvaluationItem(key)
-            }
+      if (currentQuery.hasOwnProperty('page')) {
+        vm.employeePage = parseInt(currentQuery.page)
+      } else {
+        vm.employeePage = 1
+      }
+      // console.log('currentIndex', vm.currentIndex)
+      let filter = {
+        workingunit: vm.currentIndex,
+        start: vm.employeePage * 5 - 5,
+        end: vm.employeePage * 5
+      }
+      vm.loading = true
+      this.$store.dispatch('getEmployee', filter).then(function (result) {
+        console.log('employeesWatch', result)
+        setTimeout(function () {
+          vm.loading = false
+        }, 200)
+        vm.employeeList = result
+        let query = vm.$router.history.current.query
+        if (query.hasOwnProperty('page') && query['page'] !== '1') {
+          vm.employeePage = parseInt(query['page'])
+        } else {
+          vm.employeePage = 1
+        }
+        if (vm.employeeList && vm.employeeList.length > 0) {
+          for (let key in vm.employeeList) {
+            vm.getEvaluationItem(key)
           }
-        })
+        }
+      }).catch(function (reject) {
+        vm.loading = false
       })
     }
   },
@@ -175,9 +242,6 @@ export default {
       vm.employeeIndex = index
       vm.dialogEvaluation = true
       vm.radioGroup = null
-    },
-    changeEvaluation () {
-      console.log('radioGroup', this.radioGroup)
     },
     submitEvaluation () {
       var vm = this
@@ -201,7 +265,7 @@ export default {
     getEvaluationItem (key) {
       var vm = this
       vm.$store.dispatch('getEvaluationEmployee', vm.employeeList[key]).then(function (result) {
-        console.log('resultgetEvaluationEmployee', result)
+        // console.log('resultgetEvaluationEmployee', result)
         if (result && result.length > 0) {
           vm.employeeList[key]['totalEvaluation'] = result.length
           vm.employeeList[key]['veryGoodCount'] = vm.countingPercent(result).veryGoodCount
@@ -240,6 +304,18 @@ export default {
       outData.badCount = bad
       outData.perBad = (100 - outData.perVeryGood - outData.perGood).toFixed(1)
       return outData
+    },
+    paggingData (config) {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['page'] = ''
+      // console.log('queryString=====', queryString)
+      queryString += 'page=' + config.page
+      vm.$router.push({
+        path: current.path + queryString
+      })
     }
   }
 }

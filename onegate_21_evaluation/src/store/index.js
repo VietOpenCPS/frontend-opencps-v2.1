@@ -9,7 +9,8 @@ Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
     initData: null,
-    agencyGroups: null,
+    totalEmployee: 0,
+    workingUnitSelect: null,
     loading: false,
     index: 0
   },
@@ -24,7 +25,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          // orginURL = 'http://127.0.0.1:8081/api/initdata'
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
             commit('setInitData', serializable)
@@ -51,8 +52,8 @@ export const store = new Vuex.Store({
             params: {}
           }
           // test local
-          // axios.get('/o/rest/v2/workingunits', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
+          axios.get('/o/rest/v2/workingunits', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -69,20 +70,30 @@ export const store = new Vuex.Store({
     getEmployee ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            },
-            params: {
+          let param
+          if (filter.workingunit === 'all') {
+            param = {
+              start: filter.start,
+              end: filter.end
+            }
+          } else {
+            param = {
               workingunit: filter.workingunit,
               start: filter.start,
               end: filter.end
             }
           }
+          let configs = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: param
+          }
           // test local
-          // axios.get('/o/rest/v2/employees', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/employees', param).then(function (response) {
+          axios.get('/o/rest/v2/employees', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/employees', configs).then(function (response) {
             let serializable = response.data
+            commit('setTotalEmployee', serializable.total)
             if (serializable.data) {
               let dataReturn = serializable.data
               for (let key in dataReturn) {
@@ -96,9 +107,11 @@ export const store = new Vuex.Store({
               }
               resolve(dataReturn)
             } else {
+              commit('setTotalEmployee', 0)
               resolve([])
             }
           }).catch(function (error) {
+            commit('setTotalEmployee', 0)
             reject(error)
           })
         })
@@ -113,8 +126,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('/o/rest/v2/pk5/evaluation/' + filter.employeeId, param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/evaluation/' + filter.employeeId, param).then(function (response) {
+          axios.get('/o/rest/v2/pk5/evaluation/' + filter.employeeId, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/evaluation/' + filter.employeeId, param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -139,8 +152,8 @@ export const store = new Vuex.Store({
         dataPostEvaluation.append('evaluationName', filter.evaluationName ? filter.evaluationName : '')
         dataPostEvaluation.append('score', filter.score ? filter.score : '')
         // test local
-        // axios.post('/o/rest/v2/pk5/evaluation/' + filter.employeeId, dataPostEvaluation, options).then(function (response) {
-        axios.post('http://127.0.0.1:8081/api/evaluation/' + filter.employeeId, dataPostEvaluation, options).then(function (response) {
+        axios.post('/o/rest/v2/pk5/evaluation/' + filter.employeeId, dataPostEvaluation, options).then(function (response) {
+        // axios.post('http://127.0.0.1:8081/api/evaluation/' + filter.employeeId, dataPostEvaluation, options).then(function (response) {
           resolve(response.data)
         }).catch(function (xhr) {
           reject(xhr)
@@ -150,20 +163,17 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
-    setLoading (state, payload) {
-      state.loading = payload
-    },
-    setMenuConfigToDo (state, payload) {
-      state.trangThaiHoSoList = payload
-    },
     setIndex (state, payload) {
       state.index = payload
     },
     setInitData (state, payload) {
       state.initData = payload
     },
-    setAgencyGroups (state, payload) {
-      state.agencyGroups = payload
+    setTotalEmployee (state, payload) {
+      state.totalEmployee = payload
+    },
+    setWorkingUnitSelect (state, payload) {
+      state.workingUnitSelect = payload
     }
   },
   getters: {
@@ -173,8 +183,11 @@ export const store = new Vuex.Store({
     index (state) {
       return state.index
     },
-    loadingMenuConfigToDo (state) {
-      return support.trangThaiHoSoList
+    getTotalEmployee (state) {
+      return state.totalEmployee
+    },
+    getWorkingUnitSelect (state) {
+      return state.workingUnitSelect
     }
   }
 })
