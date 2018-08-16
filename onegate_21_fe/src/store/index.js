@@ -1015,6 +1015,7 @@ export const store = new Vuex.Store({
           let url = state.initData.dossierApi + '/' + data.dossierId + '/rollback'
           axios.post(url, dataRollBack, options).then(function (response) {
             resolve(response.data)
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           }).catch(function (xhr) {
             reject(data)
           })

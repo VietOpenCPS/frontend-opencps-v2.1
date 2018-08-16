@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-navigation-drawer app clipped floating width="240">
-      <div class="row-header my-2 mt-1">
+      <div class="row-header my-0 mb-2">
         <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 
       </div>
       <content-placeholders class="mt-3" v-if="loading">
@@ -49,7 +49,7 @@
         })
         vm.currentIndex = 'all'
         router.push({
-          path: '/danh-gia-can-bo/' + vm.currentIndex
+          path: '/' + vm.currentIndex
         })
       })
     },
@@ -76,7 +76,7 @@
       fiterWorkingUnit (item) {
         this.currentIndex = item.workingUnitId
         router.push({
-          path: '/danh-gia-can-bo/' + item.workingUnitId,
+          path: '/' + item.workingUnitId,
           query: {
             q: item.queryParamsqueryParams
           }

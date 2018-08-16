@@ -1,5 +1,5 @@
 <template>
-  <div style="font-size:13px" class="px-2 py-2">
+  <div style="font-size:13px" class="px-2 py-0">
     <div class="row-header mb-2">
       <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
       <div class="layout row wrap header_tools">
