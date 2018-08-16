@@ -9,13 +9,6 @@
            "title":"TÌNH HÌNH GIẢI QUYẾT TTHC"
         },
         {  
-            "code":"1",
-            "document": "REPORT_02",
-            "active": false,
-            "type": "dossier",
-            "title":"TỔNG HỢP TIẾP NHẬN HỒ SƠ"
-        },
-        {  
             "code":"2",
             "document": "REPORT_03",
             "active": false,
@@ -23,25 +16,11 @@
             "title":"CHI TIẾT TIẾP NHẬN HỒ SƠ"
         },
         {  
-            "code":"3",
-            "document": "REPORT_04",
-            "active": false,
-            "type": "dossier",
-            "title":"TỔNG HỢP TRẢ KẾT QUẢ"
-        },
-        {  
             "code":"4",
             "document": "REPORT_05",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT TRẢ KẾT QUẢ"
-        },
-        {  
-            "code":"5",
-            "document": "REPORT_06",
-            "active": false,
-            "type": "thong_ke",
-            "title":"TỔNG HỢP HỒ SƠ DVC MỨC ĐỘ 3"
         },
         {  
             "code":"8",

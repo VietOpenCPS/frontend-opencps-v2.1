@@ -5,7 +5,7 @@
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2">
+            <v-flex xs6 sm2 class="px-2" v-if="false">
               <v-select
                 :items="agencyLists"
                 v-model="govAgency"
@@ -205,7 +205,7 @@ export default {
     govAgency: null,
     danhSachBaoCao: [],
     pdfBlob: null,
-    documentTYPE: ''
+    documentTYPE: 'REPORT_01'
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -220,13 +220,15 @@ export default {
       if (currentQuerys.hasOwnProperty('fromDate')) {
         vm.fromDateFormatted = currentQuerys.fromDate
       } else {
-        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('vi-VN')
+        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
       }
       if (currentQuerys.hasOwnProperty('toDate')) {
         vm.toDateFormatted = currentQuerys.toDate
       } else {
-        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('vi-VN')
+        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
       }
+      vm.doPrintReport()
+      /*
       vm.$store.dispatch('getAgencyLists').then(function (result) {
         vm.agencyLists = result
         if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
@@ -234,6 +236,7 @@ export default {
           vm.doPrintReport()
         }
       })
+      */
     })
   },
   updated () {
@@ -246,21 +249,19 @@ export default {
         let currentQuerys = vm.$router.history.current.query
         if (vm.isCallBack) {
           vm.isCallBack = false
-          if (!currentParams.hasOwnProperty('index')) {
-            router.push({
-              path: '/bao-cao/' + 0,
-              query: currentQuerys
-            })
-          }
+          console.log('-----------------')
+          console.log(vm.danhSachBaoCao)
+          console.log(vm.index)
+          vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
           if (currentQuerys.hasOwnProperty('fromDate')) {
             vm.fromDateFormatted = currentQuerys.fromDate
           } else {
-            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('vi-VN')
+            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
           }
           if (currentQuerys.hasOwnProperty('toDate')) {
             vm.toDateFormatted = currentQuerys.toDate
           } else {
-            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('vi-VN')
+            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
           }
         }
       }
@@ -288,33 +289,30 @@ export default {
         year: vm.year,
         month: vm.month,
         fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted,
-        govAgencyCode: vm.govAgency.itemCode,
-        govAgencyName: vm.govAgency.itemName,
-        agency: vm.govAgency.itemCode
+        toDate: vm.toDateFormatted
       }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-        }
-        if (vm.documentTYPE === 'REPORT_01') {
-          putData['year'] = vm.year
-          putData['month'] = vm.month
+          if (vm.documentTYPE === 'REPORT_01') {
+            putData['year'] = vm.year
+            putData['month'] = vm.month
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          let filterPostData = {
+            document: vm.documentTYPE,
+            data: putData
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
+            vm.pdfBlob = result
+          })
         } else {
-          putData['fromDate'] = vm.fromDateFormatted
-          putData['toDate'] = vm.toDateFormatted
+          alert('Không tìm thấy dữ liệu báo cáo.')
         }
-        putData['govAgencyCode'] = vm.govAgency.itemCode
-        putData['govAgencyName'] = vm.govAgency.itemName
-        let filterPostData = {
-          document: vm.documentTYPE,
-          data: putData
-        }
-        vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
-          vm.pdfBlob = result
-        })
       })
     },
     changeYear (item) {
@@ -325,8 +323,6 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          govAgencyCode: vm.govAgency.itemCode,
-          govAgencyName: vm.govAgency.itemName,
           fromDate: vm.fromDate,
           toDate: vm.toDate
         }
@@ -340,8 +336,6 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          govAgencyCode: vm.govAgency.itemCode,
-          govAgencyName: vm.govAgency.itemName,
           fromDate: vm.fromDate,
           toDate: vm.toDate
         }
@@ -355,8 +349,6 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          govAgencyCode: vm.govAgency.itemCode,
-          govAgencyName: vm.govAgency.itemName,
           fromDate: vm.fromDate,
           toDate: vm.toDate
         }
@@ -371,8 +363,6 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          govAgencyCode: vm.govAgency.itemCode,
-          govAgencyName: vm.govAgency.itemName,
           fromDate: vm.fromDateFormatted,
           toDate: vm.toDateFormatted
         }
@@ -387,8 +377,6 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          govAgencyCode: vm.govAgency.itemCode,
-          govAgencyName: vm.govAgency.itemName,
           fromDate: vm.fromDateFormatted,
           toDate: vm.toDateFormatted
         }

@@ -2260,6 +2260,28 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    loadingDossierCounting ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/statistics/dossiers/counting', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.hasOwnProperty('data')) {
+              resolve(serializable.data)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
     // ----End---------
   },

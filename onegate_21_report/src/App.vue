@@ -53,6 +53,21 @@
     updated () {
       var vm = this
       vm.$nextTick(function () {
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (vm.isCallBack) {
+          vm.isCallBack = false
+          let currentIndex = 0
+          if (currentParams.hasOwnProperty('index')) {
+            currentIndex = currentParams.index
+          }
+          router.push({
+            path: '/bao-cao/' + currentIndex,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
       })
     },
     watch: {

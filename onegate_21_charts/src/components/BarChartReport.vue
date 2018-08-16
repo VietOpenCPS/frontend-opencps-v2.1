@@ -23,6 +23,12 @@ export default {
     },
     month: {
       type: String
+    },
+    gov_agency_code: {
+      type: String
+    },
+    chart_view: {
+      type: Boolean
     }
   },
   data: () => ({
@@ -113,7 +119,7 @@ export default {
       if (String(vm.item_array[key].govAgencyCode) === '' && String(vm.item_array[key].domainName) === '') {
       } else {
         if (vm.item_array[key].month > 0) {
-          if (vm.item_array[key].govAgencyName !== '') {
+          if (vm.gov_agency_code === '' && vm.item_array[key].govAgencyName !== '') {
             if (monthData[vm.item_array[key].govAgencyName] !== null && monthData[vm.item_array[key].govAgencyName] !== undefined) {
               monthData[vm.item_array[key].govAgencyName] = {
                 undueCount: vm.item_array[key].undueCount,
@@ -134,7 +140,7 @@ export default {
                 waitingCount: vm.item_array[key].waitingCount
               }
             }
-          } else {
+          } else if (vm.gov_agency_code !== '' && vm.item_array[key].domainName !== '' || (!vm.chart_view && vm.item_array[key].domainName !== '')) {
             if (monthData[vm.item_array[key].domainName] !== null && monthData[vm.item_array[key].domainName] !== undefined) {
               monthData[vm.item_array[key].domainName] = {
                 undueCount: vm.item_array[key].undueCount,
