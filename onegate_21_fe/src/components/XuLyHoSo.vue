@@ -538,13 +538,12 @@ export default {
             // console.log('length', vm.dossierProcess.length)
             if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
               vm.dialog_statusAction = true
-              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
             } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
-              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
             }
+            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           }).catch(function (reject) {
             vm.countProcessed += 1
             vm.activeNotify = true
@@ -553,13 +552,12 @@ export default {
             // console.log('length', vm.dossierProcess.length)
             if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
               vm.dialog_statusAction = true
-              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
             } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
-              vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
             }
+            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           })
         }
       } else {
@@ -569,26 +567,24 @@ export default {
           vm.dossierSelected[index]['statusAction'] = true
           if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
             vm.dialog_statusAction = true
-            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
             vm.loadingActionProcess = false
             vm.loadingAction = false
             vm.btnStateVisible = false
-            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           }
+          // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
         }).catch(function (reject) {
           vm.countProcessed += 1
           vm.activeNotify = true
           vm.dossierSelected[index]['statusAction'] = false
           if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
             vm.dialog_statusAction = true
-            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
             vm.loadingActionProcess = false
             vm.loadingAction = false
             vm.btnStateVisible = false
-            vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           }
+          // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
         })
       }
     },
