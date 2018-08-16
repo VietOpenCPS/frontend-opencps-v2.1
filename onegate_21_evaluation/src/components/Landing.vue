@@ -24,7 +24,7 @@
                   <v-layout wrap>
                     <v-flex xs12 sm2>
                       <img v-if="item.photoFileEntryId" style="opacity:0.8;height:100%" :src="item.photoFileEntryId">
-                      <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/material/100/000000/guest-male.png">
+                      <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
                     </v-flex>
                     <v-flex xs12 sm10>
                       <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
@@ -85,7 +85,7 @@
             <v-layout wrap>
               <v-flex xs12 sm4>
                 <img v-if="employeeSelected.photoFileEntryId" style="opacity:0.8;width:100%" :src="employeeSelected.photoFileEntryId">
-                <img v-else style="opacity:0.8;width:100%" src="https://png.icons8.com/material/100/000000/guest-male.png">
+                <img v-else style="opacity:0.8;width:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
               </v-flex>
               <v-flex xs12 sm8 class="pl-3">
                 <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
@@ -104,6 +104,7 @@
                 <v-radio label="Không hài lòng" :value="3"></v-radio>
               </v-radio-group>
             </div>
+            <span class="mx-4" v-if="radioGroup === null && evaluationValidate === false" style="color:#f44336">* &nbsp; Lựa chọn đánh giá của bạn</span>
           </v-card-text>
           <v-card-actions class="mx-3">
             <v-spacer></v-spacer>
@@ -147,6 +148,7 @@ export default {
     employeeIndex: 0,
     employeePage: 1,
     dialogEvaluation: false,
+    evaluationValidate: true,
     loading: true,
     loadingAction: false
   }),
@@ -245,22 +247,27 @@ export default {
     },
     submitEvaluation () {
       var vm = this
-      vm.loadingAction = true
-      let filter = {
-        evaluationName: vm.employeeSelected.fullName,
-        score: vm.radioGroup
+      if (vm.radioGroup) {
+        vm.evaluationValidate = true
+        vm.loadingAction = true
+        let filter = {
+          evaluationName: vm.employeeSelected.fullName,
+          score: vm.radioGroup
+        }
+        vm.$store.dispatch('postEvaluationEmployee', vm.employeeSelected).then(function (result) {
+          console.log('resultPostEvaluation', result)
+          vm.loadingAction = false
+          vm.dialogEvaluation = false
+          setTimeout(function () {
+            vm.getEvaluationItem(vm.employeeIndex)
+          }, 100)
+        }).catch(function (reject) {
+          vm.loadingAction = false
+          console.log(reject)
+        })
+      } else {
+        vm.evaluationValidate = false
       }
-      vm.$store.dispatch('postEvaluationEmployee', vm.employeeSelected).then(function (result) {
-        console.log('resultPostEvaluation', result)
-        vm.loadingAction = false
-        vm.dialogEvaluation = false
-        setTimeout(function () {
-          vm.getEvaluationItem(vm.employeeIndex)
-        }, 100)
-      }).catch(function (reject) {
-        vm.loadingAction = false
-        console.log(reject)
-      })
     },
     getEvaluationItem (key) {
       var vm = this
