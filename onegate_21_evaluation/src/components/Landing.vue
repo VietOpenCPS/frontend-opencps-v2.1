@@ -23,12 +23,12 @@
                 <v-card-text class="px-2 py-1 pr-0">
                   <v-layout wrap>
                     <v-flex xs12 sm2>
-                      <img v-if="item.photoFileEntryId" style="opacity:0.8;height:100%" :src="item.photoFileEntryId">
-                      <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
+                      <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
+                      <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
                     </v-flex>
                     <v-flex xs12 sm10>
                       <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
-                      <p class="mb-2">{{item.birthdate}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
+                      <p class="mb-2">{{item.birthdate | dateTimeView}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
                       <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
                     </v-flex>
                   </v-layout>
@@ -42,21 +42,21 @@
                   <v-layout wrap class="mb-2">
                     <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
                     <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perVeryGood" :text="item.perVeryGood? item.perVeryGood + '%' : ''" 
+                    :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
                     text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
                     </progress-bar>
                   </v-layout>
                   <v-layout wrap class="mb-2">
                     <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
                     <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perGood" :text="item.perGood ? item.perGood + '%' : ''" 
+                    :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
                     text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
                     </progress-bar>
                   </v-layout>
                   <v-layout wrap class="mb-2">
                     <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
                     <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perBad" :text="item.perBad ? item.perBad + '%' : ''" 
+                    :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
                     text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
                     </progress-bar>
                   </v-layout>
@@ -74,58 +74,56 @@
       </div>
     </div>
     <!--  -->
-    <v-dialog v-model="dialogEvaluation" max-width="600" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogEvaluation" scrollable max-width="600" persistent>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
-          <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
-            <v-icon>clear</v-icon>
+        <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text class="pb-0 pt-4" style="height: 290px;">
+          <v-layout wrap>
+            <v-flex xs12 sm4>
+              <img v-if="employeeSelected.photoFileEntryId" style="max-height:185px" :src="employeeSelected.photoFileEntryId">
+              <img v-else style="max-height:185px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+            </v-flex>
+            <v-flex xs12 sm8 class="pl-3">
+              <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
+              <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
+              <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
+              <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
+              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
+              <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobPosTitle}}</span></p>
+              <p class="mb-2">Đơn vị: <span class="text-bold">{{employeeSelected.workingUnitName}}</span></p>
+            </v-flex>
+          </v-layout>
+          <div class="mx-4">
+            <v-radio-group v-model="radioGroup" row>
+              <v-radio label="Rất hài lòng" :value="1"></v-radio>
+              <v-radio label="Hài lòng" :value="2"></v-radio>
+              <v-radio label="Không hài lòng" :value="3"></v-radio>
+            </v-radio-group>
+          </div>
+          <span class="mx-4" v-if="radioGroup === null && evaluationValidate === false" style="color:#f44336">* &nbsp; Lựa chọn đánh giá của bạn</span>
+        </v-card-text>
+        <v-card-actions class="mx-3">
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat="flat" @click.native="submitEvaluation"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon>save</v-icon>&nbsp;
+            Gửi đánh giá
+            <span slot="loader">Loading...</span>
           </v-btn>
-          <v-card-text class="pb-0 pt-4">
-            <v-layout wrap>
-              <v-flex xs12 sm4>
-                <img v-if="employeeSelected.photoFileEntryId" style="opacity:0.8;width:100%" :src="employeeSelected.photoFileEntryId">
-                <img v-else style="opacity:0.8;width:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
-              </v-flex>
-              <v-flex xs12 sm8 class="pl-3">
-                <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
-                <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
-                <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate}}</span></p>
-                <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
-                <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
-                <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobTitle}}</span></p>
-                <p class="mb-2">Đơn vị: <span class="text-bold">{{employeeSelected.workingUnitName}}</span></p>
-              </v-flex>
-            </v-layout>
-            <div class="mx-4">
-              <v-radio-group v-model="radioGroup" row>
-                <v-radio label="Rất hài lòng" :value="1"></v-radio>
-                <v-radio label="Hài lòng" :value="2"></v-radio>
-                <v-radio label="Không hài lòng" :value="3"></v-radio>
-              </v-radio-group>
-            </div>
-            <span class="mx-4" v-if="radioGroup === null && evaluationValidate === false" style="color:#f44336">* &nbsp; Lựa chọn đánh giá của bạn</span>
-          </v-card-text>
-          <v-card-actions class="mx-3">
-            <v-spacer></v-spacer>
-            <v-btn color="primary" flat="flat" @click.native="submitEvaluation"
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon>save</v-icon>&nbsp;
-              Gửi đánh giá
-              <span slot="loader">Loading...</span>
-            </v-btn>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon>undo</v-icon>&nbsp;
-              Hủy
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-card-actions>
-        </v-form>
+          <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon>undo</v-icon>&nbsp;
+            Hủy
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -207,12 +205,12 @@ export default {
       } else {
         vm.employeePage = 1
       }
-      // console.log('currentIndex', vm.currentIndex)
       let filter = {
         workingunit: vm.currentIndex,
         start: vm.employeePage * 5 - 5,
         end: vm.employeePage * 5
       }
+      console.log('filter', filter)
       vm.loading = true
       this.$store.dispatch('getEmployee', filter).then(function (result) {
         console.log('employeesWatch', result)
@@ -251,10 +249,11 @@ export default {
         vm.evaluationValidate = true
         vm.loadingAction = true
         let filter = {
+          employeeId: vm.employeeSelected.employeeId,
           evaluationName: vm.employeeSelected.fullName,
           score: vm.radioGroup
         }
-        vm.$store.dispatch('postEvaluationEmployee', vm.employeeSelected).then(function (result) {
+        vm.$store.dispatch('postEvaluationEmployee', filter).then(function (result) {
           console.log('resultPostEvaluation', result)
           vm.loadingAction = false
           vm.dialogEvaluation = false
@@ -323,6 +322,16 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+    }
+  },
+  filters: {
+    dateTimeView (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+      } else {
+        return ''
+      }
     }
   }
 }

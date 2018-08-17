@@ -1158,7 +1158,7 @@ export default {
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
-        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && queryString.indexOf(key) < 0) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
