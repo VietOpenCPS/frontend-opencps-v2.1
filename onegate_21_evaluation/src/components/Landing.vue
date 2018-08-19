@@ -273,13 +273,15 @@ export default {
       vm.$store.dispatch('getEvaluationEmployee', vm.employeeList[key]).then(function (result) {
         // console.log('resultgetEvaluationEmployee', result)
         if (result && result.length > 0) {
-          vm.employeeList[key]['totalEvaluation'] = result.length
-          vm.employeeList[key]['veryGoodCount'] = vm.countingPercent(result).veryGoodCount
-          vm.employeeList[key]['perVeryGood'] = vm.countingPercent(result).perVeryGood
-          vm.employeeList[key]['goodCount'] = vm.countingPercent(result).goodCount
-          vm.employeeList[key]['perGood'] = vm.countingPercent(result).perGood
-          vm.employeeList[key]['badCount'] = vm.countingPercent(result).badCount
-          vm.employeeList[key]['perBad'] = vm.countingPercent(result).perBad
+          setTimeout(function () {
+            vm.employeeList[key]['totalEvaluation'] = result.length
+            vm.employeeList[key]['veryGoodCount'] = vm.countingPercent(result).veryGoodCount
+            vm.employeeList[key]['perVeryGood'] = vm.countingPercent(result).perVeryGood
+            vm.employeeList[key]['goodCount'] = vm.countingPercent(result).goodCount
+            vm.employeeList[key]['perGood'] = vm.countingPercent(result).perGood
+            vm.employeeList[key]['badCount'] = vm.countingPercent(result).badCount
+            vm.employeeList[key]['perBad'] = vm.countingPercent(result).perBad
+          }, 200)
         }
       }).catch(function (reject) {
         console.log(reject)

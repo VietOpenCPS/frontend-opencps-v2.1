@@ -1563,6 +1563,7 @@ export const store = new Vuex.Store({
             }
           }
           var params = new URLSearchParams()
+          // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
@@ -1731,6 +1732,7 @@ export const store = new Vuex.Store({
           }
           axios.delete(state.initData.getNextAction + '/' + filter.dossierId , param).then(function (response) {
             let serializable = response.data
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {
