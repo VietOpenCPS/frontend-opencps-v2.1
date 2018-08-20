@@ -109,17 +109,16 @@
               </v-btn>
               <!-- Action special -->
               <v-menu bottom offset-y>
-                <v-btn slot="activator" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
+                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                  </v-list-tile>
                   <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
                     @click="processPullBtnDetail(item, index)" 
-                    v-if="item['autoEvent'] === 'special'"
+                    v-if="item['autoEvent'] === 'special' && checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
                     >
                     <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-                  </v-list-tile>
-                
-                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
-                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                   </v-list-tile>
                 </v-list>
               </v-menu>
@@ -152,7 +151,7 @@
               Thực hiện thành công!
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+              <v-btn color="primary" v-if="rollbackable && currentUser.userName === thongTinChiTietHoSo.lastActionUser" @click="rollBack()">Quay lui hồ sơ</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -524,6 +523,9 @@ export default {
     },
     stepOverdueNextAction () {
       return this.$store.getters.getStepOverdueNextAction
+    },
+    currentUser () {
+      return this.$store.getters.loadingInitData.user
     }
   },
   created () {
@@ -897,24 +899,28 @@ export default {
         vm.doDeleteDossier(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'ROLLBACK_01') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 9000
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'ROLLBACK_02') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 9000
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 8500
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 8400
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       }
     },
     doPrint01 (dossierItem, item, index) {
@@ -951,7 +957,6 @@ export default {
       vm.loadingAction = true
       vm.$store.dispatch('doCopy', filter).then(function (result) {
         vm.loadingAction = false
-        vm.indexAction = -1
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
@@ -1137,8 +1142,6 @@ export default {
           if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
-          console.log('vm.rollbackable======', vm.rollbackable)
-          console.log('vm.printDocument======', vm.printDocument)
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
@@ -1204,6 +1207,34 @@ export default {
           document.getElementById('dialogPDFPreview').src = result
         })
       }
+    },
+    doActionSpecial (filter) {
+      var vm = this
+      let currentQuery = vm.$router.history.current.query
+      vm.$store.dispatch('postAction', filter).then(function (result) {
+        console.log('result======', result)
+        vm.dialogActionProcess = false
+        vm.loadingActionProcess = false
+        vm.btnStateVisible = false
+        if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+          vm.rollbackable = result.rollbackable
+        }
+        if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+          vm.printDocument = true
+        }
+        vm.checkInput = 0
+        vm.$store.commit('setCheckInput', 0)
+        router.push({
+          path: vm.$router.history.current.path,
+          query: {
+            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            q: currentQuery['q']
+          }
+        })
+      }).catch(function (reject) {
+        vm.loadingActionProcess = false
+      })
     },
     getNextActions () {
       // var vm = this
@@ -1404,6 +1435,30 @@ export default {
         }
       }
       return isEnabale 
+    },
+    checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
+      var vm = this
+      var checkValue = true
+      // check theo người thực hiện
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
+        let check = vm.usersNextAction.filter(function (item) {
+          return item === currentUser.userName
+        })
+        if (check.length > 0) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      }
+      // check theo lastactionUser
+      if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
+        if (currentUser.userName === thongtinchitiet.lastActionUser) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      }
+      return checkValue
     }
   },
   filters: {
