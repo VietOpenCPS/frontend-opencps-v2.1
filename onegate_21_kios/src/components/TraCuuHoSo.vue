@@ -250,7 +250,7 @@ export default {
       })
     },
     viewDetail (item) {
-      // window.location.href = 'http://119.17.200.7/web/so-xay-dung#/danh-sach-ho-so/0/chi-tiet-ho-so/102205'
+      router.push('/tra-cuu-ho-so/' + item.dossierId)
     }
   }
 }

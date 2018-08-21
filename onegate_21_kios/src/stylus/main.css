@@ -173,13 +173,16 @@ body .expansion-panel {
     border-bottom: 1px solid #dddddd;
     border-top: 0;
 }
-body .expansion-panel .expansion-panel__body > .card{
+/* body .expansion-panel .expansion-panel__body > .card{
     border-top: 1px solid #dddddd;
+} */
+.expansion-panel__body .active {
+    background-color: #eee !important;
 }
 body .expansion-panel__header {
-    padding: 5px 0px;
+    padding: 8px 0px;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 13px;
     color: #0d2434;
 }
 body .expand__select__gov .expansion-panel__header {
@@ -574,6 +577,20 @@ body .input-group--text-field label {
     font-weight: bolder;
     color: #0b72ba !important
 }
+body .sub-header .expansion-panel .expansion-panel__header {
+    background-color: #d6e9f7 !important;
+    border-bottom: none !important;
+}
+body .sub-header .expansion-panel .expansion-panel__header > div {
+    color: #0b72ba !important
+}
+body .main-header .expansion-panel .expansion-panel__header {
+    background-color: #afb0b7a3;
+}
+
+body .list-bdb .boder-bottom:not(:last-child){
+    border-bottom: 1px dashed #ddd;
+}
 input::-webkit-input-placeholder, input::placeholder{
     font-size: 13px;
 }
@@ -874,6 +891,11 @@ body .input-group--selection-controls__ripple {
     padding-bottom: 5px;
     padding-top: 5px;
 }
+.main-header .expansion-pl .expansion-panel__header, .expansion-pl-transparent .expansion-panel__header {
+    padding-left: 0px;
+    padding-bottom: 8px;
+    padding-top: 8px;
+}
 .form_alpaca .expansion-panel__header {
     padding-bottom: 0px !important;
     padding-top: 0px !important;
@@ -895,16 +917,20 @@ body .input-group--selection-controls__ripple {
 .col-tien-trinh-2 {
     background-color: #E9F7F8
 }
-.overflowComment::-webkit-scrollbar-track{
+.overflowContainer {
+    max-height: 500px;
+    overflow: auto
+}
+.overflowContainer::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;
     background-color: #F5F5F5;
 }
-.overflowComment::-webkit-scrollbar{
+.overflowContainer::-webkit-scrollbar{
     width: 8px;
     background-color: #F5F5F5;
 }
-.overflowComment::-webkit-scrollbar-thumb{
+.overflowContainer::-webkit-scrollbar-thumb{
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: rgb(181, 181, 181);

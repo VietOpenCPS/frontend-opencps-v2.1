@@ -3,7 +3,9 @@ import Router from 'vue-router'
 
 const routerOptions = [
   { path: '/tra-cuu-ho-so', component: 'TraCuuHoSo', props: false },
+  { path: '/tra-cuu-ho-so/:index', component: 'ChiTietHoSo', props: true },
   { path: '/tra-cuu-thu-tuc', component: 'TraCuuThuTuc', props: false },
+  { path: '/tra-cuu-thu-tuc/:index', component: 'ChiTietThuTuc', props: true },
   { path: '*', component: 'NotFound' }
 ]
 
