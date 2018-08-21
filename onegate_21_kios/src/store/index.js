@@ -41,6 +41,32 @@ export const store = new Vuex.Store({
         })
       }
     },
+    loadingDataHoSo ({commit, state}, filter) {
+      commit('setLoadingTable', true)
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.page * 15 - 15,
+              end: filter.page * 15,
+              dossierNo: filter.dossierNo ? filter.dossierNo : '',
+              applicantName: filter.applicantName ? filter.applicantName : '',
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
+            }
+          }
+          axios.get(filter.queryParams, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getDomainLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
