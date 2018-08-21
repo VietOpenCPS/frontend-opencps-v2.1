@@ -188,7 +188,7 @@
             v-model="linhVucSelected"
             autocomplete
             placeholder="Chọn lĩnh vực"
-            item-text="domainName"
+            item-text="displayName"
             item-value="domainCode"
             return-object
             :hide-selected="true"
@@ -202,7 +202,7 @@
             v-model="thuTucHanhChinhSelected"
             autocomplete
             placeholder="Chọn thủ tục hành chính"
-            item-text="serviceName"
+            item-text="displayName"
             item-value="serviceConfigId"
             return-object
             :hide-selected="true"
@@ -987,7 +987,10 @@ export default {
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
-        vm.listThuTucHanhChinh = result
+        vm.listThuTucHanhChinh = result.map(thuTuc => {
+          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          return thuTuc
+        })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
           for (let key in vm.listThuTucHanhChinh) {
             if (String(vm.listThuTucHanhChinh[key].serviceConfigId) === String(currentQuery.service_config)) {
@@ -1027,7 +1030,12 @@ export default {
     processListDomain (currentQuery) {
       let vm = this
       vm.$store.dispatch('getDomainLists').then(function (result) {
-        vm.listLinhVuc = result
+        if (result.length > 0) {
+          vm.listLinhVuc = result.map(domain => {
+            domain['displayName'] = domain['domainCode'] + ' - ' + domain['domainName']
+            return domain
+          })
+        }
         if (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) !== '') {
           for (let key in vm.listLinhVuc) {
             if (String(vm.listLinhVuc[key]['domainCode']) === String(currentQuery.domain)) {
@@ -1411,11 +1419,18 @@ export default {
             // vm.processAction(actionDossierItem, item, result, key, false)
           }
         } else if (vm.selected.length > 1) {
+          console.log('run doActions Landing')
           vm.$store.dispatch('loadActionActive', item).then(function () {
             vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
+              let dossiersSelect = vm.selected.map(select => {
+                return select.dossierId
+              }).join(',')
+              let query = vm.$router.history.current.query
+              query['dossiers'] = dossiersSelect
+              query['actionActive'] = JSON.stringify(item)
               router.push({
                 path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
-                query: vm.$router.history.current.query
+                query: query
               })
             })
           })

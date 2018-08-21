@@ -292,6 +292,7 @@ export default {
     dossierTemplatesItemSelect: {},
     fileViews: [],
     sampleCount: 0,
+    serviceInfoId: 0,
     fileMarkItems: [{
       text: 'Không có',
       value: 0
@@ -378,6 +379,9 @@ export default {
         var dossierMarks = values[1]
         var dossierFiles = values[2]
         var fileTemplates = []
+        if (values[3].hasOwnProperty('serviceInfoId')) {
+          vm.serviceInfoId = values[3].serviceInfoId
+        }
         if (values[3].fileTemplates) {
           if (Array.isArray(values[3].fileTemplates)) {
             fileTemplates = values[3].fileTemplates
@@ -919,7 +923,7 @@ export default {
           return item.fileTemplateNo === file.fileTemplateNo
         })
         if (fileFind) {
-          let url = vm.initDataResource.serviceInfoApi + '/' + fileFind.serviceCode + '/filetemplates/' + fileFind.fileTemplateNo
+          let url = vm.initDataResource.serviceInfoApi + '/' + vm.serviceInfoId + '/filetemplates/' + fileFind.fileTemplateNo
           window.open(url)
         } else {
           console.log('ko thay file')
