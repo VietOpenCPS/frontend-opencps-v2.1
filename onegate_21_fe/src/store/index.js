@@ -925,10 +925,11 @@ export const store = new Vuex.Store({
           resolve(response.data)
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           commit('setLoading', false)
+          store.dispatch('getActiveGetCounter', !state.activeGetCounter)
         }).catch(function (xhr) {
           reject(xhr)
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          commit('setLoading', false)
+          store.commit('setLoading', false)
         })
       })
     },
@@ -1014,6 +1015,7 @@ export const store = new Vuex.Store({
           let url = state.initData.dossierApi + '/' + data.dossierId + '/rollback'
           axios.post(url, dataRollBack, options).then(function (response) {
             resolve(response.data)
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           }).catch(function (xhr) {
             reject(data)
           })
@@ -1561,6 +1563,7 @@ export const store = new Vuex.Store({
             }
           }
           var params = new URLSearchParams()
+          // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
@@ -1707,6 +1710,7 @@ export const store = new Vuex.Store({
           formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):null)
           formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -1728,6 +1732,7 @@ export const store = new Vuex.Store({
           }
           axios.delete(state.initData.getNextAction + '/' + filter.dossierId , param).then(function (response) {
             let serializable = response.data
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(serializable)
           }).catch(function (error) {

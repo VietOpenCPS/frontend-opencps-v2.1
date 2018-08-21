@@ -260,6 +260,7 @@ export default {
             formData.append('fileType', comment.file.type)
             formData.append('fileSize', comment.file.size)
             formData.append('pings', comment.pings.join())
+            formData.append('opinion', document.getElementById('opinion').checked)
             // formData.append('email', 'congtrinh0209@gmail.com')
             // formData.append('fullname', 'Công Trình')
             formData.append('email', vm.initData.user.userEmail)
@@ -278,6 +279,10 @@ export default {
               contentType: false,
               processData: false,
               success: function (comment) {
+                if (comment.opinion) {
+                  $('.opinion').hide()
+                }
+                document.getElementById('opinion').checked = false
                 vm.formatComment(comment)
                 successfulUploads.push(vm.comment)
                 serverResponded()

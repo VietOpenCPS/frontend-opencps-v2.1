@@ -62,9 +62,9 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading&&editable === false" style="float:left;height: 100%">
+            <v-subheader v-if="!loading&&(editable === false || editable === null || editable === undefined || editable === 'undefined')" style="float:left;height: 100%">
               <span class="text-bold">
-                {{thongTinChungHoSo.dueDate | dateTimeView}}
+                {{thongTinChungHoSo.dueDate}}
               </span>
             </v-subheader>
             <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
@@ -146,8 +146,8 @@
           serviceName: data.serviceName,
           dossierTemplateName: data.dossierTemplateName,
           dossierNo: data.dossierNo,
-          receiveDate: vm.dateTimeView(data.receivingDate),
-          dueDate: data.receivingDuedate,
+          receiveDate: data.receivingDate ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
+          dueDate: data.receivingDuedate ? data.receivingDuedate : data.dueDate,
           durationDate: data.durationDate,
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
@@ -159,7 +159,9 @@
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
         vm.thongTinChungHoSo['editable'] = vm.editable
-        vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
+        if (vm.editable) {
+          vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
+        }
         vm.minDate = vm.getCurentDateTime('date')
         console.log('dueDateInput', vm.dueDateInput)
       },
