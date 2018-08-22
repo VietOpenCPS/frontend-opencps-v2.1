@@ -47,11 +47,14 @@
         <div class="my-3 pt-2 text-center" style="height: 40px; background-color: #d6e9f7">
           <span style="color:red">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
         </div>
+        <div>
+          
+        </div>
         <v-data-table
         :headers="headersTable"
         :items="dossierList"
         hide-actions
-        class="table-landing table-bordered"
+        class="table-tracuu table-landing table-bordered"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">

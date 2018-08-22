@@ -270,6 +270,24 @@ table.datatable--select-all thead th:first-child, table.datatable--select-all tb
     padding: 0px !important;
     width: 32px !important;
 }
+div.table-tracuu {
+    max-height: 700px;
+    overflow: auto
+}
+div.table-tracuu::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    background-color: #F5F5F5;
+}
+div.table-tracuu::-webkit-scrollbar{
+    width: 8px;
+    background-color: #F5F5F5;
+}
+div.table-tracuu::-webkit-scrollbar-thumb{
+    border-radius: 8px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: rgb(181, 181, 181);
+}
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
 }

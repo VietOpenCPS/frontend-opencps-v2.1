@@ -148,7 +148,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              serviceName: filter.serviceName ? filter.serviceName : '',
+              keyword: filter.keyword ? filter.keyword : '',
               level: filter.level ? filter.level : '',
               domain: filter.domain ? filter.domain : ''
             }
@@ -215,8 +215,8 @@ export const store = new Vuex.Store({
           }
           var listHistoryProcessing = []
           // test local
-          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get('/o/rest/v2/dossiers/' + filter.dossierId + '/logs', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {
               if (serializable.data[key].notificationType === 'PROCESS_TYPE') {
