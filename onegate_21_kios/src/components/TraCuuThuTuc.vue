@@ -73,8 +73,8 @@
           </v-btn>
         </div>
       </v-layout>
-      <div class="my-3 pt-2 text-center" style="height: 40px; background-color: #d6e9f7">
-        <span style="color:red">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
+      <div class="my-3 pt-2 text-center total-result-search">
+        <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
       </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
@@ -152,7 +152,7 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      vm.serviceNameKey = newQuery.hasOwnProperty('serviceName') ? newQuery.serviceName : ''
+      vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
       vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
       vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
       vm.loading = true
@@ -174,7 +174,7 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.serviceNameKey = currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.doLoadingThuTuc()
@@ -191,7 +191,7 @@ export default {
         vm.levelSelected = ''
         vm.linhVucSelected = ''
       }
-      newQuery['serviceName'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
       for (let key in newQuery) {
@@ -213,7 +213,7 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       filter = {
-        serviceName: currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : '',
+        keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       }

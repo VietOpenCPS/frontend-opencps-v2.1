@@ -6,10 +6,16 @@
       Tra Cứu Hồ Sơ &nbsp;
       <v-icon size="18">arrow_forward</v-icon>
     </v-btn>
-    <v-btn color="primary"
+    <v-btn color="primary" class="mr-5"
       @click="goTraCuuThuTuc"
     >
       Tra Cứu Thủ Tục &nbsp;
+      <v-icon size="18">arrow_forward</v-icon>
+    </v-btn>
+    <v-btn color="primary"
+      @click="goDanhGiaCanBo"
+    >
+      Đánh Giá Cán Bộ &nbsp;
       <v-icon size="18">arrow_forward</v-icon>
     </v-btn>
   </div>
@@ -29,6 +35,9 @@ export default {
     },
     goTraCuuThuTuc () {
       router.push('/tra-cuu-thu-tuc')
+    },
+    goDanhGiaCanBo () {
+      router.push('/danh-gia-can-bo')
     }
   }
 }

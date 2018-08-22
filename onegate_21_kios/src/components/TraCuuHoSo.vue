@@ -45,10 +45,7 @@
           </div>
         </v-layout>
         <div class="my-3 pt-2 text-center" style="height: 40px; background-color: #d6e9f7">
-          <span style="color:red">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
-        </div>
-        <div>
-          
+          <span class="text-bold" style="color:#e82020">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
         </div>
         <v-data-table
         :headers="headersTable"
