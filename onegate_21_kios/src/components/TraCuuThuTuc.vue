@@ -5,12 +5,20 @@
         <div style="width: calc(100% - 260px)">
           <v-layout wrap>
             <v-flex xs4 class="pl-2 pr-2">
-              <v-text-field
+              <!-- <v-text-field
                 label="Tên thủ tục"
                 placeholder="Nhấn để nhập tên thủ tục"
                 v-model="serviceNameKey"
                 clearable
-              ></v-text-field>
+              ></v-text-field> -->
+              <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <label>Tên thủ tục</label>
+                <div class="input-group__input">
+                  <input id="serviceNameKey" data-layout="normal" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+                  <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                </div>
+                <div class="input-group__details"></div>
+              </div>
             </v-flex>
             <v-flex xs4 class="pl-2 pr-2">
               <v-select
@@ -73,6 +81,9 @@
           </v-btn>
         </div>
       </v-layout>
+      <!--  -->
+      <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+      <!--  -->
       <div class="my-3 pt-2 text-center total-result-search">
         <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
       </div>
@@ -130,6 +141,7 @@
 <script>
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
+import $ from 'jquery'
 export default {
   props: [],
   components: {},
@@ -143,7 +155,14 @@ export default {
     levelSelected: '',
     listThuTuc: [],
     govAgencyList: [],
-    serviceItemTotal: 0
+    serviceItemTotal: 0,
+    //
+    visible: false,
+    layout: 'normal',
+    input: null,
+    options: {
+      useKbEvents: false
+    }
   }),
   computed: {},
   created () {
@@ -152,7 +171,8 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+      // vm.serviceNameKey = newQuery.hasOwnProperty('serviceName') ? newQuery.serviceName : ''
+      $('#serviceNameKey').val(newQuery.hasOwnProperty('serviceName') ? newQuery.serviceName : '')
       vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
       vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
       vm.loading = true
@@ -174,7 +194,8 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      // vm.serviceNameKey = currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : ''
+      $('#serviceNameKey').val(currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : '')
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.doLoadingThuTuc()
@@ -187,11 +208,14 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       if (refresh === 'refesh') {
-        vm.serviceNameKey = ''
+        vm.visible = false
+        // vm.serviceNameKey = ''
+        $('#serviceNameKey').val('')
         vm.levelSelected = ''
         vm.linhVucSelected = ''
       }
-      newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      // newQuery['serviceName'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      newQuery['serviceName'] = $('#serviceNameKey').val()
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
       for (let key in newQuery) {
@@ -213,7 +237,7 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       filter = {
-        keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+        serviceName: currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       }
@@ -268,6 +292,39 @@ export default {
         return 'orange'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    //
+    clear (id) {
+      $(`#${id}`).val('')
+    },
+    accept (text) {
+      this.hide()
+    },
+    show (e) {
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+    },
+    hide () {
+      this.visible = false
+    },
+    next () {
+      let inputs = document.querySelectorAll('input')
+      let found = false
+      let arr1 = []
+      arr1.forEach.call(inputs, (item, i) => {
+        if (!found && item === this.input && i < inputs.length - 1) {
+          found = true
+          this.$nextTick(() => {
+            inputs[i + 1].focus()
+          })
+        }
+      })
+      if (!found) {
+        this.input.blur()
+        this.hide()
       }
     }
   }

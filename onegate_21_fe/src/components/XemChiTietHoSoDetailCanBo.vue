@@ -801,7 +801,7 @@ export default {
           isPopup = true
           vm.showPhanCongNguoiThucHien = true
         }
-        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined' && result.createFiles.length > 0) {
+        if (result.hasOwnProperty('createFiles') && result.createFiles !== null && result.createFiles !== undefined && result.createFiles !== 'undefined') {
           isPopup = true
           if (Array.isArray(result.createFiles)) {
             vm.createFiles = result.createFiles

@@ -8,18 +8,23 @@
         </div>
       </div> 
     </div> -->
-    <content-placeholders class="mt-3" v-if="loading">
-      <content-placeholders-text :lines="10" />
-    </content-placeholders>
-    <div v-else>
+    <div >
       <v-layout class="wrap">
-        <v-text-field
+        <!-- <v-text-field
           label="Tên cán bộ"
           placeholder="Nhấn để nhập tên cán bộ"
           v-model="employeeNameKey"
           clearable
           style="max-width:400px"
-        ></v-text-field>
+        ></v-text-field> -->
+        <div class="input-group input-group--placeholder input-group--text-field primary--text">
+          <label>Tên cán bộ</label>
+          <div class="input-group__input">
+            <input id="employeeNameKey" data-layout="normal" @focus="show" aria-label="Tên cán bộ" placeholder="Nhấn để nhập tên cán bộ" type="text">
+            <i v-if="visible" @click="clear('employeeNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+          </div>
+          <div class="input-group__details"></div>
+        </div>
         <v-btn color="primary"
           :loading="loading"
           :disabled="loading"
@@ -33,9 +38,11 @@
         </v-btn>
       </v-layout>
       <!--  -->
-      <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
-        Không có dữ liệu.
-      </v-alert>
+      <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+      <!--  -->
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
       <div v-else class="mt-3">
         <div class="my-3 pt-2 text-center total-result-search">
           <span class="text-bold">Có {{totalPagging}} kết quả được tìm thấy</span>
@@ -162,6 +169,7 @@ import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import TinyPagination from './pagination.vue'
 import ProgressBar from 'vue-simple-progress'
+import $ from 'jquery'
 export default {
   // props: ['index'],
   components: {
@@ -173,11 +181,18 @@ export default {
     employeeSelected: {},
     employeeIndex: 0,
     employeePage: 1,
-    employeeNameKey: '',
+    // employeeNameKey: '',
     dialogEvaluation: false,
     evaluationValidate: true,
     loading: true,
-    loadingAction: false
+    loadingAction: false,
+    //
+    visible: false,
+    layout: 'normal',
+    input: null,
+    options: {
+      useKbEvents: false
+    }
   }),
   computed: {
     totalPagging () {
@@ -236,7 +251,8 @@ export default {
       }
       let filter = {
         // workingunit: vm.currentIndex,
-        keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        // keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        employeeName: $('#employeeNameKey').val(),
         start: vm.employeePage * 10 - 10,
         end: vm.employeePage * 10
       }
@@ -267,9 +283,11 @@ export default {
   methods: {
     filterEmployee () {
       var vm = this
+      vm.visible = false
       let filter = {
         // workingunit: vm.currentIndex,
-        keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        // keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        employeeName: $('#employeeNameKey').val(),
         start: vm.employeePage * 10 - 10,
         end: vm.employeePage * 10
       }
@@ -303,7 +321,8 @@ export default {
         vm.evaluationValidate = true
         vm.loadingAction = true
         let filter = {
-          employeeId: vm.employeeSelected.employeeId,
+          // employeeId: vm.employeeSelected.employeeId,
+          employeeName: $('#employeeNameKey').val(),
           evaluationName: vm.employeeSelected.fullName,
           score: vm.radioGroup
         }
@@ -378,6 +397,39 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+    },
+    //
+    clear (id) {
+      $(`#${id}`).val('')
+    },
+    accept (text) {
+      this.hide()
+    },
+    show (e) {
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+    },
+    hide () {
+      this.visible = false
+    },
+    next () {
+      let inputs = document.querySelectorAll('input')
+      let found = false
+      let arr1 = []
+      arr1.forEach.call(inputs, (item, i) => {
+        if (!found && item === this.input && i < inputs.length - 1) {
+          found = true
+          this.$nextTick(() => {
+            inputs[i + 1].focus()
+          })
+        }
+      })
+      if (!found) {
+        this.input.blur()
+        this.hide()
+      }
     }
   },
   filters: {
