@@ -171,8 +171,8 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      // vm.serviceNameKey = newQuery.hasOwnProperty('serviceName') ? newQuery.serviceName : ''
-      $('#serviceNameKey').val(newQuery.hasOwnProperty('serviceName') ? newQuery.serviceName : '')
+      // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+      $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
       vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
       vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
       vm.loading = true
@@ -194,8 +194,8 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      // vm.serviceNameKey = currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : ''
-      $('#serviceNameKey').val(currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : '')
+      // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.doLoadingThuTuc()
@@ -214,8 +214,8 @@ export default {
         vm.levelSelected = ''
         vm.linhVucSelected = ''
       }
-      // newQuery['serviceName'] = vm.serviceNameKey ? vm.serviceNameKey : ''
-      newQuery['serviceName'] = $('#serviceNameKey').val()
+      // newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      newQuery['keyword'] = $('#serviceNameKey').val()
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
       for (let key in newQuery) {
@@ -237,7 +237,7 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       filter = {
-        serviceName: currentQuery.hasOwnProperty('serviceName') ? currentQuery.serviceName : '',
+        keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       }

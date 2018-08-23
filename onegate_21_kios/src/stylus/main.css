@@ -274,6 +274,21 @@ div.table-tracuu {
     max-height: 700px;
     overflow: auto
 }
+div.table-tracuu table.table thead tr th:first-child, div.table-tracuu table.table tbody tr td:first-child {
+    max-width: 50px !important;
+}
+div.table-tracuu table.table thead tr th:nth-child(2), div.table-tracuu table.table tbody tr td::nth-child(2) {
+    min-width: 250px;
+    max-width: 270px;
+}
+div.table-tracuu table.table thead tr th:nth-child(4), div.table-tracuu table.table tbody tr td::nth-child(4) {
+    min-width: 170px;
+    max-width: 200px;
+}
+div.table-tracuu table.table thead tr th:nth-child(5), div.table-tracuu table.table tbody tr td::nth-child(5) {
+    min-width: 150px;
+    max-width: 150px;
+}
 div.table-tracuu::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;

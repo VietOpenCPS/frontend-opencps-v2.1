@@ -52,7 +52,7 @@ export const store = new Vuex.Store({
             params: {}
           }
           // test local
-          axios.get('/o/rest/v2/workingunits', param).then(function (response) {
+          axios.get('/o/rest/v2/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -71,17 +71,9 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param
-          if (filter.workingunit === 'all') {
-            param = {
-              start: filter.start,
-              end: filter.end
-            }
-          } else {
-            param = {
-              workingunit: filter.workingunit,
-              start: filter.start,
-              end: filter.end
-            }
+          param = {
+            start: filter.start,
+            end: filter.end
           }
           let configs = {
             headers: {
@@ -91,7 +83,7 @@ export const store = new Vuex.Store({
             params: param
           }
           // test local
-          axios.get('/o/rest/v2/employees', configs).then(function (response) {
+          axios.get('/o/rest/v2/employees/publish/' + filter.workingUnit, configs).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/employees', configs).then(function (response) {
             let serializable = response.data
             commit('setTotalEmployee', serializable.total)

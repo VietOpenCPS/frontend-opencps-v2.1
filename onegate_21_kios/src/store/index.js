@@ -56,7 +56,9 @@ export const store = new Vuex.Store({
               applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
             }
           }
-          axios.get(state.initData.dossierApi, param).then(function (response) {
+          // test local
+          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -148,8 +150,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              serviceName: filter.serviceName ? filter.serviceName : '',
-              level: filter.level ? filter.level : '',
+              keyword: filter.keyword ? filter.keyword : '',
+              level: filter.level ? filter.level : 0,
               domain: filter.domain ? filter.domain : ''
             }
           }
@@ -263,8 +265,7 @@ export const store = new Vuex.Store({
           }
           let configs = {
             headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
+              groupId: state.initData.groupId
             },
             params: param
           }

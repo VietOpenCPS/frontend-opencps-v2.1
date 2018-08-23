@@ -110,7 +110,7 @@
                   <span>{{props.item.serviceName}}</span>
                 </div>
               </td>
-              <td class="text-xs-left">
+              <td class="text-xs-left" >
                 <content-placeholders v-if="loadingTable">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -298,6 +298,10 @@ export default {
         vm.dossierItemTotal = 0
       })
     },
+    viewDetail (item) {
+      router.push('/tra-cuu-ho-so/' + item.dossierId)
+    },
+    //
     clear (id) {
       $(`#${id}`).val('')
     },

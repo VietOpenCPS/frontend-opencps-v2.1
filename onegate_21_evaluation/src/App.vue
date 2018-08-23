@@ -8,14 +8,14 @@
         <content-placeholders-text :lines="7" />
       </content-placeholders>
       <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working" style="max-height: 500px;overflow: auto;">
-        <v-list-tile :class="item.workingUnitId.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.workingUnitId" @click="fiterWorkingUnit(item)">
+        <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
           <v-list-tile-action>
             <v-icon size="18" color="primary">account_balance</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-tooltip top>
-              <v-list-tile-title slot="activator" v-text="item.name"></v-list-tile-title>
-              <span>{{item.name}}</span>
+              <v-list-tile-title slot="activator" v-text="item.itemName"></v-list-tile-title>
+              <span>{{item.itemName}}</span>
             </v-tooltip>
           </v-list-tile-content>
         </v-list-tile>
@@ -47,7 +47,7 @@
           vm.loading = false
           vm.workingUnitList = []
         })
-        vm.currentIndex = 'all'
+        vm.currentIndex = vm.workingUnitList.length > 0 ? vm.workingUnitList[0].itemCode : ''
         router.push({
           path: '/' + vm.currentIndex
         })
@@ -63,7 +63,7 @@
           vm.currentIndex = currentParams.index
         }
         let workingUnitSelect = vm.workingUnitList.filter(function (item) {
-          return item.workingUnitId.toString() === vm.currentIndex.toString()
+          return item.itemCode.toString() === vm.currentIndex.toString()
         })
         if (workingUnitSelect && workingUnitSelect.length > 0) {
           this.$store.commit('setWorkingUnitSelect', workingUnitSelect[0])
@@ -74,9 +74,9 @@
     },
     methods: {
       fiterWorkingUnit (item) {
-        this.currentIndex = item.workingUnitId
+        this.currentIndex = item.itemCode
         router.push({
-          path: '/' + item.workingUnitId,
+          path: '/' + item.itemCode,
           query: {
             q: item.queryParamsqueryParams
           }
