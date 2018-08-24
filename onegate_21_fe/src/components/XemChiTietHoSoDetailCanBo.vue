@@ -108,7 +108,7 @@
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
-                v-if="item.enable > 0"
+                v-if="item.enable > 0 || (actionSpecial && item['autoEvent'] === 'special')"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
@@ -419,6 +419,7 @@ export default {
     dialogActionProcess: false,
     rollbackable: false,
     configNote: null,
+    actionSpecial: false,
     headers: [{
       text: '#',
       align: 'center',
@@ -529,6 +530,9 @@ export default {
       if (currentQuery.hasOwnProperty('activeTab')) {
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
+        if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
+          vm.actionSpecial = currentQuery['actionSpecial']
+        }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
         vm.getNextActions()
@@ -547,6 +551,9 @@ export default {
         vm.btnIndex = -1
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
+        if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
+          vm.actionSpecial = currentQuery['actionSpecial']
+        }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
         vm.getNextActions()
