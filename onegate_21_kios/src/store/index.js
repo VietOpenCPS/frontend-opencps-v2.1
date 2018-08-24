@@ -207,6 +207,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossierDetailPass ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              secretCode: filter.password
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
+            // let serializable = response.data
+            console.log('response', response)
+            resolve(response)
+          }).catch(function (error) {
+            console.log('error', error)
+            reject(error)
+          })
+        })
+      })
+    },
     getListHistoryProcessingItems ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -253,6 +277,30 @@ export const store = new Vuex.Store({
       })
     },
     // action Danh gia can bo
+    getWorkingUnit ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     getEmployee ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -270,7 +318,7 @@ export const store = new Vuex.Store({
             params: param
           }
           // test local
-          axios.get('/o/rest/v2/employees', configs).then(function (response) {
+          axios.get('/o/rest/v2/employees/publish/' + filter.workingunit, configs).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/employees', configs).then(function (response) {
             let serializable = response.data
             commit('setTotalEmployee', serializable.total)
@@ -329,7 +377,6 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostEvaluation = new URLSearchParams()
-        dataPostEvaluation.append('evaluationName', filter.evaluationName ? filter.evaluationName : '')
         dataPostEvaluation.append('score', filter.score ? filter.score : '')
         // test local
         axios.post('/o/rest/v2/pk5/evaluation/' + filter.employeeId, dataPostEvaluation, options).then(function (response) {

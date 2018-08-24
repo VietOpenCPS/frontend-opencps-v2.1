@@ -75,72 +75,130 @@
         <!--  -->
         <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
         <!--  -->
-        <div class="my-3 pt-2 text-center total-result-search">
-          <span class="text-bold">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
-        </div>
-        <v-data-table
-        :headers="headersTable"
-        :items="dossierList"
-        hide-actions
-        class="table-tracuu table-landing table-bordered"
-        >
-          <template slot="items" slot-scope="props">
-            <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
-              <td class="text-xs-center">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.index + 1}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.dossierNo}}</span><br>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.serviceName}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left" >
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.applicantName}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loadingTable">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.dossierStatusText}}</span>
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-        <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
-          <v-btn outline color="indigo" @click="showMore" 
-            :loading="loadingTable"
-            :disabled="loadingTable">
-            <v-icon size="20">expand_more</v-icon>&nbsp;
-            Xem thêm
-            <span slot="loader">Loading...</span>
-          </v-btn>
+        <v-alert class="mt-5" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
+          Yêu cầu nhập thông tin để tra cứu
+        </v-alert>
+        <!--  -->
+        <div v-if="validateTracuu === true">
+          <div class="my-3 pt-2 text-center total-result-search">
+            <span class="text-bold">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
+          </div>
+          <v-data-table
+          :headers="headersTable"
+          :items="dossierList"
+          hide-actions
+          class="table-tracuu table-landing table-bordered"
+          >
+            <template slot="items" slot-scope="props">
+              <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.index + 1}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.dossierNo}}</span><br>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.serviceName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left" >
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.applicantName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loadingTable">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.dossierStatusText}}</span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+          <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
+            <v-btn outline color="indigo" @click="showMore" 
+              :loading="loadingTable"
+              :disabled="loadingTable">
+              <v-icon size="20">expand_more</v-icon>&nbsp;
+              Xem thêm
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </div>
         </div>
       </v-card>
+      <v-dialog v-model="dialogCheckPass" persistent max-width="500px">
+        <v-form ref="form" v-model="valid">
+          <v-card>
+            <v-card-title style="color: #fff;background-color: #0b72ba">
+              <span class="headline">Mã bí mật truy cập hồ sơ</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12>
+                    <v-text-field v-model="passCheck"
+                    placeholder="Nhập mã bí mật đã được cấp"
+                    :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
+                    required></v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
+                :loading="loading"
+                :disabled="loading"
+              >
+                <v-icon>save</v-icon>&nbsp;
+                Truy cập hồ sơ
+                <span slot="loader">Loading...</span>
+              </v-btn>
+              <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
+                :loading="loading"
+                :disabled="loading"
+                @click="clearDialog"
+              >
+                <v-icon>undo</v-icon>&nbsp;
+                Thoát
+                <span slot="loader">Loading...</span>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </v-dialog>
+      <v-dialog v-model="dialogError" persistent max-width="290">
+        <v-card>
+          <v-card-title class="headline">Bạn không có quyền truy cập hồ sơ 
+            <span>{{dossierDetail.dossierNo}}</span>
+          </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click.native="dialogError = false">Đồng ý</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -190,6 +248,12 @@ export default {
         sortable: false
       }
     ],
+    validateTracuu: false,
+    dialogCheckPass: false,
+    dialogError: false,
+    dossierDetail: '',
+    valid: false,
+    passCheck: '',
     //
     visible: false,
     layout: 'normal',
@@ -202,17 +266,17 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
-      let current = vm.$router.history.current
-      let newQuery = current.query
-      // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
-      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
-      $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
-      $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
-      vm.hosoDatasPage = 1
-      vm.doLoadingDataHoSo()
+      // var vm = this
+      // let current = vm.$router.history.current
+      // let newQuery = current.query
+      // // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
+      // $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
+      // // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      // $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
+      // // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
+      // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
+      // vm.hosoDatasPage = 1
+      // vm.doLoadingDataHoSo()
     })
   },
   watch: {
@@ -227,7 +291,12 @@ export default {
       // vm.applicantNameKey = currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : ''
       $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      vm.doLoadingDataHoSo()
+      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val() || $('#applicantNameKey').val()) {
+        vm.validateTracuu = true
+        vm.doLoadingDataHoSo()
+      } else {
+        vm.validateTracuu = false
+      }
     }
   },
   methods: {
@@ -248,12 +317,17 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      vm.$router.push({
-        path: current.path + queryString,
-        query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val() || $('#applicantNameKey').val()) {
+        vm.validateTracuu = true
+        vm.$router.push({
+          path: current.path + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        vm.validateTracuu = false
+      }
     },
     showMore () {
       var vm = this
@@ -299,7 +373,35 @@ export default {
       })
     },
     viewDetail (item) {
-      router.push('/tra-cuu-ho-so/' + item.dossierId)
+      var vm = this
+      vm.dossierDetail = item
+      vm.dialogCheckPass = true
+      // router.push('/tra-cuu-ho-so/' + item.dossierId)
+    },
+    submitViewDetail () {
+      var vm = this
+      if (this.$refs.form.validate()) {
+        vm.loading = true
+        let filter = {
+          dossierId: vm.dossierDetail.dossierId
+        }
+        vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+          vm.loading = false
+          vm.dialogCheckPass = false
+          vm.clearDialog()
+          if (result.status && result.status.toString() === '203') {
+            vm.dialogError = true
+          } else if (result.status && result.status.toString() === '200') {
+            router.push('/tra-cuu-ho-so/' + vm.dossierDetail.dossierId)
+          }
+        }).catch(function (reject) {
+          vm.loading = false
+          console.log('reject', reject)
+        })
+      }
+    },
+    clearDialog () {
+      this.$refs.form.reset()
     },
     //
     clear (id) {

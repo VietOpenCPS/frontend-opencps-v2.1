@@ -2,6 +2,7 @@ import Vue from 'vue/dist/vue.min.js'
 import Router from 'vue-router'
 
 const routerOptions = [
+  { path: '/', component: 'Landing', props: true },
   { path: '/:index', component: 'Landing', props: true },
   { path: '*', component: 'NotFound' }
 ]

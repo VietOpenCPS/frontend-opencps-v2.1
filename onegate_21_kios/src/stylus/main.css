@@ -275,7 +275,7 @@ div.table-tracuu {
     overflow: auto
 }
 div.table-tracuu table.table thead tr th:first-child, div.table-tracuu table.table tbody tr td:first-child {
-    max-width: 50px !important;
+    max-width: 100px !important;
 }
 div.table-tracuu table.table thead tr th:nth-child(2), div.table-tracuu table.table tbody tr td::nth-child(2) {
     min-width: 250px;

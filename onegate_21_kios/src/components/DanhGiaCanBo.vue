@@ -10,32 +10,53 @@
     </div> -->
     <div >
       <v-layout class="wrap">
-        <!-- <v-text-field
-          label="Tên cán bộ"
-          placeholder="Nhấn để nhập tên cán bộ"
-          v-model="employeeNameKey"
-          clearable
-          style="max-width:400px"
-        ></v-text-field> -->
-        <div class="input-group input-group--placeholder input-group--text-field primary--text">
-          <label>Tên cán bộ</label>
-          <div class="input-group__input">
-            <input id="employeeNameKey" data-layout="normal" @focus="show" aria-label="Tên cán bộ" placeholder="Nhấn để nhập tên cán bộ" type="text">
-            <i v-if="visible" @click="clear('employeeNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-          </div>
-          <div class="input-group__details"></div>
+        <div style="width: calc(100% - 150px)">
+          <v-layout wrap>
+            <!-- <v-text-field
+              label="Tên cán bộ"
+              placeholder="Nhấn để nhập tên cán bộ"
+              v-model="employeeNameKey"
+              clearable
+              style="max-width:400px"
+            ></v-text-field> -->
+            <v-flex xs6 class="pl-2 pr-2">
+              <v-select
+                :items="listCoQuan"
+                v-model="coQuanSelected"
+                autocomplete
+                label="Cơ quan"
+                item-text="itemName"
+                item-value="itemCode"
+                return-object
+                @change="changeCoQuan"
+                :hide-selected="true"
+              ></v-select>
+            </v-flex>
+            <v-flex xs6 class="pl-2 pr-2">
+              <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <label>Tên cán bộ</label>
+                <div class="input-group__input">
+                  <input id="employeeNameKey" data-layout="normal" @focus="show" aria-label="Tên cán bộ" placeholder="Nhấn để nhập tên cán bộ" type="text">
+                  <i v-if="visible" @click="clear('employeeNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                </div>
+                <div class="input-group__details"></div>
+              </div>
+            </v-flex>
+          </v-layout>
         </div>
-        <v-btn color="primary"
-          :loading="loading"
-          :disabled="loading"
-          @click="filterEmployee"
-          class="mt-3 ml-3"
-        >
-          <v-icon size="18">search</v-icon>
-          &nbsp;
-          Tra Cứu
-          <span slot="loader">Loading...</span>
-        </v-btn>
+        <div class="pt-2 text-center" style="width: 150px">
+          <v-btn color="primary"
+            :loading="loading"
+            :disabled="loading"
+            @click="filterEmployee"
+            class="mt-3 ml-3"
+          >
+            <v-icon size="18">search</v-icon>
+            &nbsp;
+            Tra Cứu
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </div>
       </v-layout>
       <!--  -->
       <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
@@ -55,14 +76,15 @@
                   <v-card class="employeeItem-scope-left">
                     <v-card-text class="px-2 py-1 pr-0">
                       <v-layout wrap>
-                        <v-flex xs12 sm2>
+                        <v-flex xs12 sm5>
                           <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
                           <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
                         </v-flex>
-                        <v-flex xs12 sm10>
+                        <v-flex xs12 sm7>
                           <p class="mb-2 text-bold">{{item.fullName}}</p>
-                          <p class="mb-2">{{item.birthdate | dateTimeView}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
-                          <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
+                          <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
+                          <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
+                          <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
@@ -128,7 +150,6 @@
               <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
               <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
               <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobPosTitle}}</span></p>
-              <p class="mb-2">Đơn vị: <span class="text-bold">{{employeeSelected.workingUnitName}}</span></p>
             </v-flex>
           </v-layout>
           <div class="mx-4">
@@ -179,6 +200,8 @@ export default {
   data: () => ({
     employeeList: [],
     employeeSelected: {},
+    listCoQuan: [],
+    coQuanSelected: '',
     employeeIndex: 0,
     employeePage: 1,
     // employeeNameKey: '',
@@ -212,26 +235,38 @@ export default {
       }
       vm.$nextTick(function () {
         vm.loading = true
-        vm.$store.dispatch('getEmployee', filter).then(function (result) {
-          // console.log('employeesCreated', result)
-          setTimeout(function () {
-            vm.loading = false
-          }, 200)
-          vm.employeeList = result
-          let query = vm.$router.history.current.query
-          if (query.hasOwnProperty('page') && query['page'] !== '1') {
-            vm.employeePage = parseInt(query['page'])
-          } else {
+        vm.$store.dispatch('getWorkingUnit').then(function (result) {
+          vm.listCoQuan = result
+          if (vm.listCoQuan.length > 0) {
+            vm.coQuanSelected = vm.listCoQuan[0]
             vm.employeePage = 1
-          }
-          if (vm.employeeList && vm.employeeList.length > 0) {
-            for (let key in vm.employeeList) {
-              vm.getEvaluationItem(key)
+            let filter = {
+              workingunit: vm.coQuanSelected.itemCode,
+              start: 0,
+              end: 10
             }
+            vm.$store.dispatch('getEmployee', filter).then(function (result) {
+              // console.log('employeesCreated', result)
+              setTimeout(function () {
+                vm.loading = false
+              }, 200)
+              vm.employeeList = result
+              let query = vm.$router.history.current.query
+              if (query.hasOwnProperty('page') && query['page'] !== '1') {
+                vm.employeePage = parseInt(query['page'])
+              } else {
+                vm.employeePage = 1
+              }
+              if (vm.employeeList && vm.employeeList.length > 0) {
+                for (let key in vm.employeeList) {
+                  vm.getEvaluationItem(key)
+                }
+              }
+            }).catch(function (reject) {
+              vm.loading = false
+              vm.employeeList = []
+            })
           }
-        }).catch(function (reject) {
-          vm.loading = false
-          vm.employeeList = []
         })
       })
     })
@@ -250,7 +285,7 @@ export default {
         vm.employeePage = 1
       }
       let filter = {
-        // workingunit: vm.currentIndex,
+        workingunit: vm.coQuanSelected,
         // keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
         employeeName: $('#employeeNameKey').val(),
         start: vm.employeePage * 10 - 10,
@@ -285,7 +320,7 @@ export default {
       var vm = this
       vm.visible = false
       let filter = {
-        // workingunit: vm.currentIndex,
+        workingunit: vm.coQuanSelected.itemCode,
         // keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
         employeeName: $('#employeeNameKey').val(),
         start: vm.employeePage * 10 - 10,
@@ -307,6 +342,12 @@ export default {
         vm.loading = false
       })
     },
+    changeCoQuan () {
+      var vm = this
+      setTimeout(function () {
+        vm.filterEmployee()
+      }, 100)
+    },
     showEvaluation (item, index) {
       var vm = this
       // console.log('itemEmployee', item)
@@ -321,9 +362,9 @@ export default {
         vm.evaluationValidate = true
         vm.loadingAction = true
         let filter = {
-          // employeeId: vm.employeeSelected.employeeId,
-          employeeName: $('#employeeNameKey').val(),
-          evaluationName: vm.employeeSelected.fullName,
+          employeeId: vm.employeeSelected.employeeId,
+          // employeeName: $('#employeeNameKey').val(),
+          // evaluationName: vm.employeeSelected.fullName,
           score: vm.radioGroup
         }
         vm.$store.dispatch('postEvaluationEmployee', filter).then(function (result) {
