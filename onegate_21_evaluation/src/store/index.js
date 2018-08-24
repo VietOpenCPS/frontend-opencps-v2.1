@@ -85,12 +85,13 @@ export const store = new Vuex.Store({
           }
           let configs = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
             },
             params: param
           }
           // test local
-          axios.get('/o/rest/v2/employees', param).then(function (response) {
+          axios.get('/o/rest/v2/employees', configs).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/employees', configs).then(function (response) {
             let serializable = response.data
             commit('setTotalEmployee', serializable.total)

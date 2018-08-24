@@ -1,67 +1,95 @@
 <template>
   <div style="font-size:13px" class="px-2 py-0">
-    <div class="row-header mb-2">
+    <!-- <div class="row-header mb-2">
       <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
       <div class="layout row wrap header_tools">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.name : ''">
           {{workingUnitSelect ? workingUnitSelect.name : ''}}
         </div>
       </div> 
-    </div>
+    </div> -->
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
+      <v-layout class="wrap">
+        <v-text-field
+          label="Tên cán bộ"
+          placeholder="Nhấn để nhập tên cán bộ"
+          v-model="employeeNameKey"
+          clearable
+          style="max-width:400px"
+        ></v-text-field>
+        <v-btn color="primary"
+          :loading="loading"
+          :disabled="loading"
+          @click="filterEmployee"
+          class="mt-3 ml-3"
+        >
+          <v-icon size="18">search</v-icon>
+          &nbsp;
+          Tra Cứu
+          <span slot="loader">Loading...</span>
+        </v-btn>
+      </v-layout>
+      <!--  -->
       <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
         Không có dữ liệu.
       </v-alert>
-      <div v-else>
+      <div v-else class="mt-3">
+        <div class="my-3 pt-2 text-center total-result-search">
+          <span class="text-bold">Có {{totalPagging}} kết quả được tìm thấy</span>
+        </div>
         <v-card-text class="px-0 py-0">
-          <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
-            <v-flex xs12 sm8>
-              <v-card style="height:100%;background-color:inherit">
-                <v-card-text class="px-2 py-1 pr-0">
-                  <v-layout wrap>
-                    <v-flex xs12 sm2>
-                      <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
-                      <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
-                    </v-flex>
-                    <v-flex xs12 sm10>
-                      <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
-                      <p class="mb-2">{{item.birthdate | dateTimeView}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
-                      <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
-                    </v-flex>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-card style="height:100%;background-color:inherit">
-                <v-card-text class="px-2 py-1 pr-0">
-                  <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
+          <v-layout wrap >
+            <v-flex xs12 sm6 class="mb-2" v-for="(item, index) in employeeList" :key="index" :class="index%2!==1 ? 'pr-2' : ''" @click="showEvaluation(item, index)" style="height:120px">
+              <v-layout class="employeeItem mb-1 card" wrap>
+                <v-flex xs12 sm6>
+                  <v-card class="employeeItem-scope-left">
+                    <v-card-text class="px-2 py-1 pr-0">
+                      <v-layout wrap>
+                        <v-flex xs12 sm2>
+                          <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
+                          <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+                        </v-flex>
+                        <v-flex xs12 sm10>
+                          <p class="mb-2 text-bold">{{item.fullName}}</p>
+                          <p class="mb-2">{{item.birthdate | dateTimeView}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
+                          <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
+                        </v-flex>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-card class="employeeItem-scope-right">
+                    <v-card-text class="px-2 py-1 pr-0">
+                      <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
+                        <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
+                        <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
+                        <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -135,7 +163,7 @@ import Vue from 'vue/dist/vue.min.js'
 import TinyPagination from './pagination.vue'
 import ProgressBar from 'vue-simple-progress'
 export default {
-  props: ['index'],
+  // props: ['index'],
   components: {
     ProgressBar,
     'tiny-pagination': TinyPagination
@@ -145,6 +173,7 @@ export default {
     employeeSelected: {},
     employeeIndex: 0,
     employeePage: 1,
+    employeeNameKey: '',
     dialogEvaluation: false,
     evaluationValidate: true,
     loading: true,
@@ -162,9 +191,9 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       let filter = {
-        workingunit: vm.index,
+        // workingunit: vm.index,
         start: 0,
-        end: 5
+        end: 10
       }
       vm.$nextTick(function () {
         vm.loading = true
@@ -197,23 +226,24 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      if (currentParams.hasOwnProperty('index') && currentParams.index) {
-        vm.currentIndex = currentParams.index
-      }
+      // if (currentParams.hasOwnProperty('index') && currentParams.index) {
+      //   vm.currentIndex = currentParams.index
+      // }
       if (currentQuery.hasOwnProperty('page')) {
         vm.employeePage = parseInt(currentQuery.page)
       } else {
         vm.employeePage = 1
       }
       let filter = {
-        workingunit: vm.currentIndex,
-        start: vm.employeePage * 5 - 5,
-        end: vm.employeePage * 5
+        // workingunit: vm.currentIndex,
+        keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        start: vm.employeePage * 10 - 10,
+        end: vm.employeePage * 10
       }
-      console.log('filter', filter)
+      // console.log('filter', filter)
       vm.loading = true
       this.$store.dispatch('getEmployee', filter).then(function (result) {
-        console.log('employeesWatch', result)
+        // console.log('employeesWatch', result)
         setTimeout(function () {
           vm.loading = false
         }, 200)
@@ -235,9 +265,33 @@ export default {
     }
   },
   methods: {
+    filterEmployee () {
+      var vm = this
+      let filter = {
+        // workingunit: vm.currentIndex,
+        keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
+        start: vm.employeePage * 10 - 10,
+        end: vm.employeePage * 10
+      }
+      vm.employeePage = 1
+      vm.loading = true
+      this.$store.dispatch('getEmployee', filter).then(function (result) {
+        setTimeout(function () {
+          vm.loading = false
+        }, 200)
+        vm.employeeList = result
+        if (vm.employeeList && vm.employeeList.length > 0) {
+          for (let key in vm.employeeList) {
+            vm.getEvaluationItem(key)
+          }
+        }
+      }).catch(function (reject) {
+        vm.loading = false
+      })
+    },
     showEvaluation (item, index) {
       var vm = this
-      console.log('itemEmployee', item)
+      // console.log('itemEmployee', item)
       vm.employeeSelected = item
       vm.employeeIndex = index
       vm.dialogEvaluation = true
@@ -254,7 +308,7 @@ export default {
           score: vm.radioGroup
         }
         vm.$store.dispatch('postEvaluationEmployee', filter).then(function (result) {
-          console.log('resultPostEvaluation', result)
+          // console.log('resultPostEvaluation', result)
           vm.loadingAction = false
           vm.dialogEvaluation = false
           setTimeout(function () {

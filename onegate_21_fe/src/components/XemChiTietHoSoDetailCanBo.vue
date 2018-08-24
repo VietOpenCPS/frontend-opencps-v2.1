@@ -96,14 +96,8 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
-            <!-- Dịch vụ công -->
-            <!-- <div class="mx-2 pt-2" v-if="btnStateVisible && originality === 1 && dossierSyncs.length > 0">
-              <div v-for="(item, index) in dossierSyncs" :key="index" v-if="item.syncType !== 0 && item.infoType !== 0">
-                {{item.createDate | dateTimeView}} - <b>{{item.actionName}}</b> <span style="color: #0b72ba">: {{item.actionNote}}</span> 
-              </div>
-            </div> -->
-            <!--  -->
-            <div :class="{'py-3' : filterNextActionEnable(btnDossierDynamics)}" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+            <!-- Action button -->
+            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
               <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
@@ -113,7 +107,23 @@
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
+              <!-- Action special -->
+              <v-menu bottom offset-y>
+                <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                <v-list>
+                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
+                    @click="processPullBtnDetail(item, index)" 
+                    v-if="item['autoEvent'] === 'special' && checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
+                    >
+                    <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
             </div>
+            <!--  -->
             <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
@@ -141,7 +151,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Rút lại hồ sơ</v-btn>
+              <v-btn color="primary" v-if="rollbackable && currentUser.userName === thongTinChiTietHoSo.lastActionUser" @click="rollBack()">Quay lui hồ sơ</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -519,6 +529,9 @@ export default {
     },
     stepOverdueNextAction () {
       return this.$store.getters.getStepOverdueNextAction
+    },
+    currentUser () {
+      return this.$store.getters.loadingInitData.user
     }
   },
   created () {
@@ -547,7 +560,6 @@ export default {
       if (currentParams.hasOwnProperty('activeTab') && vm.isCallBack) {
         vm.isCallBack = false
         vm.btnDossierDynamics = []
-        vm.btnStepsDynamics = []
         vm.btnIndex = -1
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
@@ -592,9 +604,10 @@ export default {
         if (vm.$refs.thanhphanhoso2) {
           vm.$refs.thanhphanhoso2.initData(resultDossier)
         }
-        // vm.$store.dispatch('loadDossierPayments', resultDossier).then(resultPayments => {
-        //   vm.payments = resultPayments
-        // })
+        vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
+          vm.btnStepsDynamics = result
+          console.log('btnStepsDynamics', vm.btnStepsDynamics)
+        })
       })
     },
     recountFileTemplates () {
@@ -861,21 +874,11 @@ export default {
         vm.loadingActionProcess = false
       })
     },
-    btnActionEvent (item, index, isGroup) {
+    btnActionEvent (item, index) {
       let vm = this
       vm.itemAction = item
       vm.indexAction = index
-      if (String(item.form) === 'NEW') {
-        let isOpenDialog = true
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
-          isOpenDialog = false
-        }
-        if (isOpenDialog) {
-          vm.dialogAction = true
-        } else {
-          vm.doCreateDossier()
-        }
-      } else if (String(item.form) === 'UPDATE') {
+      if (String(item.form) === 'UPDATE') {
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + vm.thongTinChiTietHoSo.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
@@ -886,49 +889,79 @@ export default {
           query: vm.$router.history.current.query
         })
       } else if (String(item.form) === 'COPY') {
-        vm.doCopy(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doCopy(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'CANCEL') {
-        vm.doCancel(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doCancel(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'PRINT_01') {
         // Xem trước phiếu của một hồ sơ
-        vm.doPrint01(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doPrint01(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'PRINT_02') {
         // Xem trước phiếu gộp của nhiều hồ sơ
-        vm.doPrint02(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doPrint02(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'PRINT_03') {
         // In văn bản mới nhất đã phê duyệt
-        vm.doPrint03(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doPrint03(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'GUIDE') {
-        vm.doGuiding(vm.thongTinChiTietHoSo, item, index, isGroup)
+        // vm.doGuiding(vm.thongTinChiTietHoSo, item, index, isGroup)
       } else if (String(item.form) === 'PREVIEW') {
-        vm.doPreview(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doPreview(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'ACTIONS') {
-        vm.doActions(vm.thongTinChiTietHoSo, item, index, isGroup)
+        // vm.doActions(vm.thongTinChiTietHoSo, item, index, isGroup)
       } else if (String(item.form) === 'DELETE') {
-        vm.doDeleteDossier(vm.thongTinChiTietHoSo, item, index, isGroup)
+        vm.doDeleteDossier(vm.thongTinChiTietHoSo, item, index)
       } else if (String(item.form) === 'ROLLBACK_01') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 9000
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'ROLLBACK_02') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 9000
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 8500
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
           actionCode: 8400
         }
-        vm.processAction(vm.thongTinChiTietHoSo, item, result, index, true)
+        vm.doActionSpecial(result)
       }
     },
-    doCopy (dossierItem, item, index, isGroup) {
+    doPrint01 (dossierItem, item, index) {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: dossierItem.dossierId,
+        document: item.document
+      }
+      vm.$store.dispatch('doPrint01', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
+    },
+    doPreview (dossierItem, item, index) {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: dossierItem.dossierId,
+        document: item.document
+      }
+      vm.$store.dispatch('doPrint03', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
+    },
+    doCopy (dossierItem, item, index) {
       let vm = this
       let filter = {
         dossierId: dossierItem.dossierId
@@ -936,31 +969,67 @@ export default {
       vm.loadingAction = true
       vm.$store.dispatch('doCopy', filter).then(function (result) {
         vm.loadingAction = false
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+          query: vm.$router.history.current.query
+        })
+      }).catch(function (reject) {
+        vm.loadingAction = false
+      })
+    },
+    doDeleteDossier (dossierItem, item, index) {
+      let vm = this
+      let x = confirm('Bạn có muốn thực hiện hành động này?')
+      if (x) {
+        let filter = {
+          dossierId: dossierItem.dossierId
+        }
+        let currentQuery = vm.$router.history.current.query
+        vm.$store.dispatch('deleteDossier', filter).then(function (result) {
+          vm.dialogActionProcess = false
+          vm.loadingActionProcess = false
+          vm.goBack()
+        })
+      } else {
+        return false
+      }
+    },
+    doCancel (dossierItem, item, index) {
+      let vm = this
+      vm.loadingAction = true
+      let filter = {
+        dossierId: dossierItem.dossierId
+      }
+      vm.$store.dispatch('doCancel', filter).then(function (result) {
+        vm.loadingAction = false
         vm.indexAction = -1
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
+      }).catch(function (reject) {
+        vm.loadingAction = false
       })
     },
-    doCancel (dossierItem, item, index, isGroup) {
+    doCreateDossier () {
       let vm = this
-      vm.loadingAction = true
-      if (isGroup) {
-        console.log(vm.selected)
-      } else {
-        let filter = {
-          dossierId: dossierItem.dossierId
-        }
-        vm.$store.dispatch('doCancel', filter).then(function (result) {
-          vm.loadingAction = false
-          vm.indexAction = -1
-          router.push({
-            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
-            query: vm.$router.history.current.query
-          })
-        })
+      let data = {
+        serviceCode: vm.serviceCode,
+        govAgencyCode: vm.govAgencyCode,
+        templateNo: vm.templateNo,
+        originality: vm.getOriginality()
       }
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        router.push({
+          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+          query: vm.$router.history.current.query
+        })
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
     },
     rollBack () {
       var vm = this
@@ -1102,8 +1171,6 @@ export default {
           if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
-          console.log('vm.rollbackable======', vm.rollbackable)
-          console.log('vm.printDocument======', vm.printDocument)
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
@@ -1170,6 +1237,34 @@ export default {
         })
       }
     },
+    doActionSpecial (filter) {
+      var vm = this
+      let currentQuery = vm.$router.history.current.query
+      vm.$store.dispatch('postAction', filter).then(function (result) {
+        console.log('result======', result)
+        vm.dialogActionProcess = false
+        vm.loadingActionProcess = false
+        vm.btnStateVisible = false
+        if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+          vm.rollbackable = result.rollbackable
+        }
+        if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+          vm.printDocument = true
+        }
+        vm.checkInput = 0
+        vm.$store.commit('setCheckInput', 0)
+        router.push({
+          path: vm.$router.history.current.path,
+          query: {
+            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            q: currentQuery['q']
+          }
+        })
+      }).catch(function (reject) {
+        vm.loadingActionProcess = false
+      })
+    },
     getNextActions () {
       // var vm = this
       // let params = {
@@ -1211,11 +1306,6 @@ export default {
         // }, 300)
       })
       vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
-      // vm.$store.dispatch('pullProcessSteps', {
-      //   stepCode: vm.thongTinChiTietHoSo.stepCode
-      // }).then(resProSteps => {
-      //   vm.btnStepsDynamics = resProSteps
-      // })
     },
     showAlpacaJSFORM (item) {
       var vm = this
@@ -1374,6 +1464,30 @@ export default {
         }
       }
       return isEnabale 
+    },
+    checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
+      var vm = this
+      var checkValue = true
+      // check theo người thực hiện
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
+        let check = vm.usersNextAction.filter(function (item) {
+          return item === currentUser.userName
+        })
+        if (check.length > 0) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      }
+      // check theo lastactionUser
+      if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
+        if (currentUser.userName === thongtinchitiet.lastActionUser) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      }
+      return checkValue
     }
   },
   filters: {
