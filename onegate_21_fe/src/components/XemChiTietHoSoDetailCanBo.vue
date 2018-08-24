@@ -133,6 +133,7 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
@@ -348,6 +349,7 @@ import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
+import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -361,7 +363,8 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
-    'ngay-hen-tra': EditDate
+    'ngay-hen-tra': EditDate,
+    'ngay-gia-han': ExtendDateEdit
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -409,6 +412,8 @@ export default {
     showTraKetQua: false,
     showThuPhi: false,
     showEditDate: false,
+    showLuiHanTra: false,
+    showBaoTraSom: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -424,6 +429,8 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    extendDateEdit: '',
+    typeExtendDate: '',
     dueDateEdit: '',
     receiveDateEdit: '',
     dialogActionProcess: false,
@@ -831,6 +838,18 @@ export default {
           vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
           vm.receiveDateEdit = result.receiving.receiveDate
         }
+        if (result.hasOwnProperty('overdue')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.overdue !== '' ? new Date(result.overdue) : ''
+          vm.typeExtendDate = 'overdue'
+        }
+        if (result.hasOwnProperty('betimes')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.betimes !== '' ? new Date(result.betimes) : ''
+          vm.typeExtendDate = 'betimes'
+        }
       }
       console.log('isPopup========222222', isPopup)
       if (isPopup) {
@@ -912,15 +931,17 @@ export default {
       } else if (String(item.form) === 'OVERDUE') {
         let result = {
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8500
+          overdue: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8400
+          betimes: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       }
     },
     doPrint01 (dossierItem, item, index) {
@@ -1034,6 +1055,7 @@ export default {
       let vm = this
       var validPhanCong = true
       var validYKien = true
+      var validTreHan = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1075,6 +1097,25 @@ export default {
         }
         filter['payload'] = payload
       }
+      if (vm.showExtendDateEdit) {
+        let data = vm.$refs.ngaygiahan.doExport()
+        console.log('extendDateEdit', date)
+        if (data.valid) {
+          validTreHan = true
+        } else {
+          validTreHan = false
+        }
+        let payload = {
+          'extendDate': data.extendDate,
+        }
+        if (vm.typeExtendDate === 'overdue') {
+          payload = {
+            'extendDate': data.extendDate,
+            'delayNote': data.text
+          }
+        }
+        filter['payload'] = payload
+      }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
@@ -1092,7 +1133,7 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien) {
+      if (validPhanCong && validYKien && validTreHan) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1452,7 +1493,7 @@ export default {
       }
       // check theo lastactionUser
       if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
-        if (currentUser.userName === thongtinchitiet.lastActionUser) {
+        if (currentUser.userId === thongtinchitiet.lastActionUserId) {
           checkValue = true
         } else {
           checkValue = false
