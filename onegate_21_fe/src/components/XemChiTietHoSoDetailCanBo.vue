@@ -1482,8 +1482,9 @@ export default {
       var checkValue = true
       // check theo người thực hiện
       if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
-        let check = vm.usersNextAction.filter(function (item) {
-          return item === currentUser.userName
+        let userArr = vm.$store.getters.getUsersNextAction
+        let check = userArr.filter(function (item) {
+          return item === currentUser.userId
         })
         if (check.length > 0) {
           checkValue = true
@@ -1493,11 +1494,11 @@ export default {
       }
       // check theo lastactionUser
       if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
-        if (currentUser.userId === thongtinchitiet.lastActionUserId) {
-          checkValue = true
-        } else {
+        // if (currentUser.userId === thongtinchitiet.lastActionUserId) {
+        //   checkValue = true
+        // } else {
           checkValue = false
-        }
+        // }
       }
       return checkValue
     }
