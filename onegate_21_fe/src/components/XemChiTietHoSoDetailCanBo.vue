@@ -7,7 +7,7 @@
       <div class="background-triangle-big"> <span>CHI TIẾT HỒ SƠ</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
-          {{thongTinChiTietHoSo.serviceName}}
+          {{thongTinChiTietHoSo.serviceCode}} - {{thongTinChiTietHoSo.serviceName}}
         </div>
         <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
           <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -148,8 +148,8 @@
                 </v-btn>
               </div>
             </v-layout>
-            <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
-              Thực hiện thành công!
+            <v-alert v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
+              {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
               <v-btn color="primary" v-if="rollbackable && currentUser.userName === thongTinChiTietHoSo.lastActionUser" @click="rollBack()">Quay lui hồ sơ</v-btn>
@@ -166,7 +166,7 @@
                     <span v-if="originality === 3">Trao đổi với người làm thủ tục</span>
                     <span v-else>Trao đổi với cán bộ xử lý</span>
                   </div>
-                  <v-card >
+                  <v-card>
                     <v-card-text class="px-0 py-0 pr-3">
                       <v-flex xs12>
                         <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
@@ -504,7 +504,12 @@ export default {
     filterDossierSync: null,
     messageChat: '',
     isCallBack: true,
-    printDocument: false
+    printDocument: false,
+    alertObj: {
+      icon: 'check_circle',
+      color: 'success',
+      message: 'Thực hiện thành công!'
+    }
   }),
   computed: {
     loading () {
@@ -1049,6 +1054,13 @@ export default {
         vm.getNextActions()
         vm.rollbackable = false
         vm.btnStateVisible = true
+      }).catch(reject => {
+        vm.alertObj = {
+          icon: 'error',
+          color: 'error',
+          message: 'Rút lại hồ sơ không thành công!'
+        }
+        vm.btnStateVisible = false
       })
     },
     processAction (dossierItem, item, result, index, isConfirm) {
@@ -1148,6 +1160,11 @@ export default {
             console.log('result======', result)
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
+            vm.alertObj = {
+              icon: 'check_circle',
+              color: 'success',
+              message: 'Thực hiện thành công!'
+            }
             vm.btnStateVisible = false
             if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
               vm.rollbackable = result.rollbackable
@@ -1176,6 +1193,11 @@ export default {
           console.log('result======', result)
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
+          vm.alertObj = {
+            icon: 'check_circle',
+            color: 'success',
+            message: 'Thực hiện thành công!'
+          }
           vm.btnStateVisible = false
           if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
             vm.rollbackable = result.rollbackable
