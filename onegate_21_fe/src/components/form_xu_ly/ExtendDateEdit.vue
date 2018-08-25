@@ -83,10 +83,19 @@ export default {
     doExport () {
       let vm = this
       let date = vm.extendDateInput ? (new Date(vm.extendDateInput)).getTime() : ''
-      let exportData = {
-        text: vm.delayNote,
-        extendDate: date,
-        valid: vm.$refs.delayNoteForm.validate()
+      var exportData
+      if (vm.type === 'overdue') {
+        exportData = {
+          text: vm.delayNote,
+          extendDate: date,
+          valid: vm.$refs.delayNoteForm.validate()
+        }
+      } else {
+        exportData = {
+          text: vm.delayNote,
+          extendDate: date,
+          valid: true
+        }
       }
       return exportData
     },

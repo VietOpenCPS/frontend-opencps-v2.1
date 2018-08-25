@@ -412,8 +412,7 @@ export default {
     showTraKetQua: false,
     showThuPhi: false,
     showEditDate: false,
-    showLuiHanTra: false,
-    showBaoTraSom: false,
+    showExtendDateEdit: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -767,6 +766,7 @@ export default {
       vm.showTraKetQua = false
       vm.showThuPhi = false
       vm.showEditDate = false
+      vm.showExtendDateEdit = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -792,7 +792,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -934,14 +934,18 @@ export default {
         }
         vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
+        vm.btnIndex = 111
         let result = {
+          actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
           overdue: vm.thongTinChiTietHoSo['extendDate']
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       } else if (String(item.form) === 'BETIMES') {
+        vm.btnIndex = 333
         let result = {
+          actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
           betimes: vm.thongTinChiTietHoSo['extendDate']
         }
@@ -1111,14 +1115,14 @@ export default {
       }
       if (vm.showExtendDateEdit) {
         let data = vm.$refs.ngaygiahan.doExport()
-        console.log('extendDateEdit', date)
+        console.log('extendDateEdit', data.extendDate)
         if (data.valid) {
           validTreHan = true
         } else {
           validTreHan = false
         }
         let payload = {
-          'extendDate': data.extendDate,
+          'extendDate': data.extendDate
         }
         if (vm.typeExtendDate === 'overdue') {
           payload = {
@@ -1320,10 +1324,26 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
-            vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          if (currentQuery.btnIndex.toString() === '111') {
+            let result = {
+              actionCode: 8500,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              overdue: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+          } else if (currentQuery.btnIndex.toString() === '333') {
+            let result = {
+              actionCode: 8400,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              betimes: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
           } else {
-            vm.dialogActionProcess = false
+            if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
+              vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+            } else {
+              vm.dialogActionProcess = false
+            }
           }
         }
         console.log('vm.checkInput======', vm.getCheckInput)
@@ -1503,10 +1523,10 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
         let userArr = vm.$store.getters.getUsersNextAction
         let check = userArr.filter(function (item) {
-          return item === currentUser.userId
+          return item.userId.toString() === currentUser.userId.toString()
         })
         if (check.length > 0) {
           checkValue = true
