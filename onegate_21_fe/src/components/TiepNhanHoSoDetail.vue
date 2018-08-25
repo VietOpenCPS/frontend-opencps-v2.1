@@ -211,6 +211,10 @@ export default {
               }
             }
           })
+        } else {
+          if (vm.$refs.thongtinchunghoso) {
+            vm.$refs.thongtinchunghoso.initData(result)
+          }
         }
         vm.thongTinChiTietHoSo = result
         // call initData thong tin chu ho so

@@ -1,131 +1,152 @@
 <template>
   <div style="font-size:13px" class="px-2 py-0">
-    <div class="row-header mb-2">
-      <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
-      <div class="layout row wrap header_tools">
-        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.name : ''">
-          {{workingUnitSelect ? workingUnitSelect.name : ''}}
-        </div>
-      </div> 
-    </div>
-    <content-placeholders class="mt-3" v-if="loading">
-      <content-placeholders-text :lines="10" />
-    </content-placeholders>
-    <div v-else>
-      <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
-        Không có dữ liệu.
-      </v-alert>
+    <v-navigation-drawer app clipped floating width="240">
+      <div class="row-header my-0 mb-2">
+        <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 
+      </div>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="7" />
+      </content-placeholders>
+      <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working" style="overflow: auto;">
+        <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
+          <v-list-tile-action>
+            <v-icon size="18" color="primary">account_balance</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-tooltip top>
+              <v-list-tile-title slot="activator" v-text="item.itemName"></v-list-tile-title>
+              <span>{{item.itemName}}</span>
+            </v-tooltip>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-content>
+      <div class="row-header mb-2">
+        <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
+        <div class="layout row wrap header_tools">
+          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.itemName : ''">
+            {{workingUnitSelect ? workingUnitSelect.itemName : ''}}
+          </div>
+        </div> 
+      </div>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
       <div v-else>
-        <v-card-text class="px-0 py-0">
-          <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
-            <v-flex xs12 sm8>
-              <v-card style="height:100%;background-color:inherit">
-                <v-card-text class="px-2 py-1 pr-0">
-                  <v-layout wrap>
-                    <v-flex xs12 sm2>
-                      <img v-if="item.photoFileEntryId" style="opacity:0.8;height:100%" :src="item.photoFileEntryId">
-                      <img v-else style="opacity:0.8;height:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
-                    </v-flex>
-                    <v-flex xs12 sm10>
-                      <p class="mb-2" style="font-weight: bold">{{item.fullName}}</p>
-                      <p class="mb-2">{{item.birthdate}} <span v-if="item.birthdate && item.jobPosTitle"> |</span><span style="color: #0b72ba"> {{item.jobPosTitle}}</span></p>
-                      <p class="mb-2" style="color:green">{{item.workingUnitName}}</p>
-                    </v-flex>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-card style="height:100%;background-color:inherit">
-                <v-card-text class="px-2 py-1 pr-0">
-                  <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perVeryGood" :text="item.perVeryGood? item.perVeryGood + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perGood" :text="item.perGood ? item.perGood + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                  <v-layout wrap class="mb-2">
-                    <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
-                    <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                    :val="item.perBad" :text="item.perBad ? item.perBad + '%' : ''" 
-                    text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
-                    </progress-bar>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <div class="text-xs-right layout wrap mt-3" style="position: relative;">
-          <div class="flex pagging-table px-2"> 
-            <tiny-pagination :total="totalPagging" :page="employeePage" custom-class="custom-tiny-class" 
-              @tiny:change-page="paggingData" ></tiny-pagination> 
+        <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
+          Không có dữ liệu.
+        </v-alert>
+        <div v-else>
+          <v-card-text class="px-0 py-0">
+            <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
+              <v-flex xs12 sm8>
+                <v-card style="height:100%;background-color:inherit">
+                  <v-card-text class="px-2 py-1 pr-0">
+                    <v-layout wrap>
+                      <v-flex xs12 sm2>
+                        <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
+                        <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+                      </v-flex>
+                      <v-flex xs12 sm10>
+                        <p class="mb-2 text-bold">{{item.fullName}}</p>
+                        <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
+                        <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
+                        <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
+                      </v-flex>
+                    </v-layout>
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-card style="height:100%;background-color:inherit">
+                  <v-card-text class="px-2 py-1 pr-0">
+                    <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
+                    <v-layout wrap class="mb-2">
+                      <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
+                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                      :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
+                      text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
+                      </progress-bar>
+                    </v-layout>
+                    <v-layout wrap class="mb-2">
+                      <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
+                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                      :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
+                      text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
+                      </progress-bar>
+                    </v-layout>
+                    <v-layout wrap class="mb-2">
+                      <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
+                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
+                      :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
+                      text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
+                      </progress-bar>
+                    </v-layout>
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <div class="text-xs-right layout wrap mt-3" style="position: relative;">
+            <div class="flex pagging-table px-2"> 
+              <tiny-pagination :total="totalPagging" :page="employeePage" custom-class="custom-tiny-class" 
+                @tiny:change-page="paggingData" ></tiny-pagination> 
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </v-content>
     <!--  -->
-    <v-dialog v-model="dialogEvaluation" max-width="600" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogEvaluation" scrollable max-width="600" persistent>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
-          <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
-            <v-icon>clear</v-icon>
+        <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text class="pb-0 pt-4" style="height: 290px;">
+          <v-layout wrap>
+            <v-flex xs12 sm4>
+              <img v-if="employeeSelected.photoFileEntryId" style="max-height:185px" :src="employeeSelected.photoFileEntryId">
+              <img v-else style="max-height:185px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+            </v-flex>
+            <v-flex xs12 sm8 class="pl-3">
+              <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
+              <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
+              <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
+              <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
+              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
+              <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobPosTitle}}</span></p>
+            </v-flex>
+          </v-layout>
+          <div class="mx-4">
+            <v-radio-group v-model="radioGroup" row>
+              <v-radio label="Rất hài lòng" :value="1"></v-radio>
+              <v-radio label="Hài lòng" :value="2"></v-radio>
+              <v-radio label="Không hài lòng" :value="3"></v-radio>
+            </v-radio-group>
+          </div>
+          <span class="mx-4" v-if="radioGroup === null && evaluationValidate === false" style="color:#f44336">* &nbsp; Lựa chọn đánh giá của bạn</span>
+        </v-card-text>
+        <v-card-actions class="mx-3">
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat="flat" @click.native="submitEvaluation"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon>save</v-icon>&nbsp;
+            Gửi đánh giá
+            <span slot="loader">Loading...</span>
           </v-btn>
-          <v-card-text class="pb-0 pt-4">
-            <v-layout wrap>
-              <v-flex xs12 sm4>
-                <img v-if="employeeSelected.photoFileEntryId" style="opacity:0.8;width:100%" :src="employeeSelected.photoFileEntryId">
-                <img v-else style="opacity:0.8;width:100%" src="https://png.icons8.com/ios/100/000000/gender-neutral-user.png">
-              </v-flex>
-              <v-flex xs12 sm8 class="pl-3">
-                <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
-                <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
-                <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate}}</span></p>
-                <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
-                <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
-                <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobTitle}}</span></p>
-                <p class="mb-2">Đơn vị: <span class="text-bold">{{employeeSelected.workingUnitName}}</span></p>
-              </v-flex>
-            </v-layout>
-            <div class="mx-4">
-              <v-radio-group v-model="radioGroup" row>
-                <v-radio label="Rất hài lòng" :value="1"></v-radio>
-                <v-radio label="Hài lòng" :value="2"></v-radio>
-                <v-radio label="Không hài lòng" :value="3"></v-radio>
-              </v-radio-group>
-            </div>
-            <span class="mx-4" v-if="radioGroup === null && evaluationValidate === false" style="color:#f44336">* &nbsp; Lựa chọn đánh giá của bạn</span>
-          </v-card-text>
-          <v-card-actions class="mx-3">
-            <v-spacer></v-spacer>
-            <v-btn color="primary" flat="flat" @click.native="submitEvaluation"
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon>save</v-icon>&nbsp;
-              Gửi đánh giá
-              <span slot="loader">Loading...</span>
-            </v-btn>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
-              :loading="loadingAction"
-              :disabled="loadingAction"
-            >
-              <v-icon>undo</v-icon>&nbsp;
-              Hủy
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-card-actions>
-        </v-form>
+          <v-btn color="red darken-3" flat="flat" @click.native="dialogEvaluation = false"
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon>undo</v-icon>&nbsp;
+            Hủy
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -143,6 +164,9 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    currentIndex: '',
+    workingUnitList: [],
+    workingUnitSelect: {},
     employeeList: [],
     employeeSelected: {},
     employeeIndex: 0,
@@ -155,42 +179,54 @@ export default {
   computed: {
     totalPagging () {
       return this.$store.getters.getTotalEmployee
-    },
-    workingUnitSelect () {
-      return this.$store.getters.getWorkingUnitSelect
     }
   },
   created () {
     let vm = this
     vm.$nextTick(function () {
-      let filter = {
-        workingunit: vm.index,
-        start: 0,
-        end: 5
-      }
-      vm.$nextTick(function () {
-        vm.loading = true
-        vm.$store.dispatch('getEmployee', filter).then(function (result) {
-          // console.log('employeesCreated', result)
-          setTimeout(function () {
-            vm.loading = false
-          }, 200)
-          vm.employeeList = result
-          let query = vm.$router.history.current.query
-          if (query.hasOwnProperty('page') && query['page'] !== '1') {
-            vm.employeePage = parseInt(query['page'])
-          } else {
-            vm.employeePage = 1
-          }
-          if (vm.employeeList && vm.employeeList.length > 0) {
-            for (let key in vm.employeeList) {
-              vm.getEvaluationItem(key)
+      vm.loading = true
+      vm.$store.dispatch('getWorkingUnit').then(function (result) {
+        vm.loading = false
+        if (result && result.length > 0) {
+          vm.workingUnitList = result
+        }
+        if (vm.index) {
+          vm.currentIndex = vm.index
+        } else {
+          vm.currentIndex = vm.workingUnitList.length > 0 ? vm.workingUnitList[0].itemCode : ''
+        }
+        vm.workingUnitSelect = vm.workingUnitList.length > 0 ? vm.workingUnitList[0] : ''
+        let filter = {
+          workingunit: vm.currentIndex,
+          start: 0,
+          end: 5
+        }
+        if (vm.workingUnitList.length > 0) {
+          vm.$store.dispatch('getEmployee', filter).then(function (result) {
+            // console.log('employeesCreated', result)
+            setTimeout(function () {
+              vm.loading = false
+            }, 200)
+            vm.employeeList = result
+            let query = vm.$router.history.current.query
+            if (query.hasOwnProperty('page') && query['page'] !== '1') {
+              vm.employeePage = parseInt(query['page'])
+            } else {
+              vm.employeePage = 1
             }
-          }
-        }).catch(function (reject) {
-          vm.loading = false
-          vm.employeeList = []
-        })
+            if (vm.employeeList && vm.employeeList.length > 0) {
+              for (let key in vm.employeeList) {
+                vm.getEvaluationItem(key)
+              }
+            }
+          }).catch(function (reject) {
+            vm.loading = false
+            vm.employeeList = []
+          })
+        }
+      }).catch(function (reject) {
+        vm.loading = false
+        vm.workingUnitList = []
       })
     })
   },
@@ -207,12 +243,12 @@ export default {
       } else {
         vm.employeePage = 1
       }
-      // console.log('currentIndex', vm.currentIndex)
       let filter = {
         workingunit: vm.currentIndex,
         start: vm.employeePage * 5 - 5,
         end: vm.employeePage * 5
       }
+      console.log('filter', filter)
       vm.loading = true
       this.$store.dispatch('getEmployee', filter).then(function (result) {
         console.log('employeesWatch', result)
@@ -237,6 +273,16 @@ export default {
     }
   },
   methods: {
+    fiterWorkingUnit (item) {
+      this.workingUnitSelect = item
+      this.currentIndex = item.itemCode
+      router.push({
+        path: '/' + item.itemCode,
+        query: {
+          q: item.queryParamsqueryParams
+        }
+      })
+    },
     showEvaluation (item, index) {
       var vm = this
       console.log('itemEmployee', item)
@@ -251,10 +297,11 @@ export default {
         vm.evaluationValidate = true
         vm.loadingAction = true
         let filter = {
+          employeeId: vm.employeeSelected.employeeId,
           evaluationName: vm.employeeSelected.fullName,
           score: vm.radioGroup
         }
-        vm.$store.dispatch('postEvaluationEmployee', vm.employeeSelected).then(function (result) {
+        vm.$store.dispatch('postEvaluationEmployee', filter).then(function (result) {
           console.log('resultPostEvaluation', result)
           vm.loadingAction = false
           vm.dialogEvaluation = false
@@ -274,13 +321,15 @@ export default {
       vm.$store.dispatch('getEvaluationEmployee', vm.employeeList[key]).then(function (result) {
         // console.log('resultgetEvaluationEmployee', result)
         if (result && result.length > 0) {
-          vm.employeeList[key]['totalEvaluation'] = result.length
-          vm.employeeList[key]['veryGoodCount'] = vm.countingPercent(result).veryGoodCount
-          vm.employeeList[key]['perVeryGood'] = vm.countingPercent(result).perVeryGood
-          vm.employeeList[key]['goodCount'] = vm.countingPercent(result).goodCount
-          vm.employeeList[key]['perGood'] = vm.countingPercent(result).perGood
-          vm.employeeList[key]['badCount'] = vm.countingPercent(result).badCount
-          vm.employeeList[key]['perBad'] = vm.countingPercent(result).perBad
+          setTimeout(function () {
+            vm.employeeList[key]['totalEvaluation'] = result.length
+            vm.employeeList[key]['veryGoodCount'] = vm.countingPercent(result).veryGoodCount
+            vm.employeeList[key]['perVeryGood'] = vm.countingPercent(result).perVeryGood
+            vm.employeeList[key]['goodCount'] = vm.countingPercent(result).goodCount
+            vm.employeeList[key]['perGood'] = vm.countingPercent(result).perGood
+            vm.employeeList[key]['badCount'] = vm.countingPercent(result).badCount
+            vm.employeeList[key]['perBad'] = vm.countingPercent(result).perBad
+          }, 200)
         }
       }).catch(function (reject) {
         console.log(reject)
@@ -323,6 +372,16 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+    }
+  },
+  filters: {
+    dateTimeView (arg) {
+      if (arg) {
+        let value = new Date(arg)
+        return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+      } else {
+        return ''
+      }
     }
   }
 }
