@@ -303,6 +303,27 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: rgb(181, 181, 181);
 }
+.dialog-keyboard {
+    position: absolute !important;
+    top: 0px !important
+}
+.virtual-keyboard {
+    z-index: 10000;
+    width: 90% !important;
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ddd;
+    border-radius: 5px;
+}
+.overlayActive {
+    pointer-events: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    opacity: .46;
+    background-color: #21212173;
+}
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
 }

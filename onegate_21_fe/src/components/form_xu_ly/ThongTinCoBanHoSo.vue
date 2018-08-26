@@ -93,7 +93,7 @@
             </v-flex>
             <!--  -->
             <v-flex xs12 sm4 v-if="originality !== 1">
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
+              <div class="xs12 sm12 pb-1 text-bold">Thông tin liên hệ:</div>
               <div class="xs12 sm12 pb-1">
                 <span class="pl-0">Thư điện tử: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
