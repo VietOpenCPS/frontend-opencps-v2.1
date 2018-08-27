@@ -75,7 +75,7 @@ export default {
   },
   watch: {},
   mounted () {
-    this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : vm.formatDateInput(new Date())
+    this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : this.formatDateInput(new Date())
     console.log('extendDateInput', this.extendDateInput)
     this.minDate = this.getCurentDateTime('date')
   },

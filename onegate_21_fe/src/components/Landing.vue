@@ -298,13 +298,13 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td v-if="menuType !== 3 && originality !== 1">
-          <v-checkbox
-            :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
-            v-model="props.selected"
-            primary
-            hide-details
-            color="primary"
-          ></v-checkbox>
+            <v-checkbox
+              :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              v-model="props.selected"
+              primary
+              hide-details
+              color="primary"
+            ></v-checkbox>
           </td>
           <td class="text-xs-center px-0 py-0">
             <content-placeholders v-if="loadingTable">
@@ -343,28 +343,24 @@
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                   @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                  :disabled="item['enable'] === 2 || String(prop.item['permission']).indexOf('write') === -1"
+                  :disabled="item['enable'] === 2 || String(props.item['permission']).indexOf('write') === -1"
                   v-if="item['enable'] > 0 || item['autoEvent'] === 'special'"
                   >
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
-                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
+                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
+                  v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
-                <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
-                @click="btnActionEvent(props.item, item, index, false)"
-              >
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="viewDetail(props.item, props.index)">
-                Xem chi tiết
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        </td>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="viewDetail(props.item, props.index)">
+                  Xem chi tiết
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
@@ -1073,11 +1069,15 @@ export default {
       // check theo người thực hiện
       if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
         let userArr = vm.$store.getters.getUsersNextAction
-        let check = userArr.filter(function (item) {
-          return item.userId.toString() === currentUser.userId.toString()
-        })
-        if (check.length > 0) {
-          checkValue = true
+        if (userArr.length > 0) {
+          let check = userArr.filter(function (item) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          })
+          if (check.length > 0) {
+            checkValue = true
+          } else {
+            checkValue = false
+          }
         } else {
           checkValue = false
         }

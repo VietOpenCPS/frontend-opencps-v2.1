@@ -54,13 +54,34 @@
             style="width: 90px; max-width: 90px;"
             v-else-if="originality !== 1"
             v-model="thongTinChiTietHoSo.sampleCount"
-            v-on:click.stop=""
             type="number"
             ></v-text-field> &nbsp;
             <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
             <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </div>
+    <!--  -->
+    <div v-if="originality !== 1">
+      <v-expansion-panel class="expansion-pl">
+        <v-expansion-panel-content hide-actions value="1">
+          <div slot="header" style="display: flex; align-items: center;">
+            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+            Nội dung &nbsp;&nbsp;&nbsp;&nbsp;
+          </div>
+          <div>
+            <v-card>
+              <v-card-text>
+                <v-text-field
+                  v-model="briefNote"
+                  multi-line
+                  :rows="2"
+                ></v-text-field>
+              </v-card-text>
+            </v-card>
+          </div>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
@@ -151,6 +172,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    briefNote: '',
     receiveDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
@@ -183,6 +205,7 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
+        vm.briefNote = result.briefNote ? result.briefNote : ''
         result['editable'] = false
         if (result.dossierStatus === '') {
           vm.$store.dispatch('pullNextactions', result).then(result2 => {
@@ -340,6 +363,7 @@ export default {
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
+        tempData['briefNote'] = vm.briefNote
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
