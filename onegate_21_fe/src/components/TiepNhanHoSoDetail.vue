@@ -42,28 +42,6 @@
     <!--  -->
     <thong-tin-chu-ho-so ref="thongtinchuhoso"></thong-tin-chu-ho-so>
     <!--  -->
-    <div style="position: relative;">
-      <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
-          <div slot="header" style="display: flex; align-items: center;">
-            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
-            <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-            <v-text-field
-            class="px-0 py-0"
-            style="width: 90px; max-width: 90px;"
-            v-else-if="originality !== 1"
-            v-model="thongTinChiTietHoSo.sampleCount"
-            type="number"
-            ></v-text-field> &nbsp;
-            <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
-            <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
-          </div>
-          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <!--  -->
     <div v-if="originality !== 1">
       <v-expansion-panel class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
@@ -82,6 +60,28 @@
               </v-card-text>
             </v-card>
           </div>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </div>
+    <!--  -->
+    <div style="position: relative;">
+      <v-expansion-panel class="expansion-pl">
+        <v-expansion-panel-content hide-actions value="1">
+          <div slot="header" style="display: flex; align-items: center;">
+            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+            <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+            <v-text-field
+            class="px-0 py-0"
+            style="width: 90px; max-width: 90px;"
+            v-else-if="originality !== 1"
+            v-model="thongTinChiTietHoSo.sampleCount"
+            type="number"
+            ></v-text-field> &nbsp;
+            <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+            <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+          </div>
+          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>

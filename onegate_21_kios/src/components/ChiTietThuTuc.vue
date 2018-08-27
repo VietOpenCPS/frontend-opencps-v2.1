@@ -50,7 +50,7 @@
                   </v-layout>
                   <v-layout wrap class="my-1">
                     <v-flex xs12 sm2><span class="text-bold">Thời gian giải quyết</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.durationText}}</span></v-flex>
+                    <v-flex xs12 sm10><span v-html="serviceDetail.durationText"></span></v-flex>
                   </v-layout>
                   <v-layout wrap class="my-1">
                     <v-flex xs12 sm2><span class="text-bold">Đối tượng</span></v-flex>
@@ -62,7 +62,7 @@
                   </v-layout>
                   <v-layout wrap class="my-1">
                     <v-flex xs12 sm2><span class="text-bold">Lệ phí</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.feeText}}</span></v-flex>
+                    <v-flex xs12 sm10><span v-html="serviceDetail.feeText"></span></v-flex>
                   </v-layout>
                   <v-layout wrap>
                     <v-flex xs12 sm2><span class="text-bold">Căn cứ pháp lý</span></v-flex>

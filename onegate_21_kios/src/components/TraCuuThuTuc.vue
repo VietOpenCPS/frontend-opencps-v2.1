@@ -13,6 +13,7 @@
                 item-text="administrationName"
                 item-value="administrationCode"
                 :hide-selected="true"
+                @change="changeAdministration"
               ></v-select>
             </v-flex>
             <v-flex xs3 class="pl-2 pr-2">
@@ -25,6 +26,7 @@
                 item-text="domainName"
                 item-value="domainCode"
                 :hide-selected="true"
+                @change="changeDomain"
                 clearable
               ></v-select>
             </v-flex>
@@ -38,6 +40,7 @@
                 item-text="levelName"
                 item-value="level"
                 :hide-selected="true"
+                @change="changeLevel"
                 clearable
               >
                 <template slot="item" slot-scope="data">
@@ -223,6 +226,7 @@ export default {
   methods: {
     filterServiceinfos (refresh) {
       var vm = this
+      vm.visible = false
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -271,6 +275,30 @@ export default {
         vm.listThuTuc = []
         vm.serviceItemTotal = 0
       })
+    },
+    changeAdministration () {
+      var vm = this
+      console.log('administration', vm.govAgencySelected)
+      setTimeout (function () {
+        // let domainList = vm.listLinhVuc.filter(function (item) {
+        //   return item. === vm.govAgencySelected
+        // })
+        // vm.listLinhVuc = domainList
+      }, 200)
+    },
+    changeDomain () {
+      var vm = this
+      console.log('domain', vm.linhVucSelected)
+      setTimeout (function () {
+        
+      }, 200)
+    },
+    changeLevel () {
+      var vm = this
+      console.log('level', vm.levelSelected)
+      setTimeout (function () {
+        
+      }, 200)
     },
     viewDetail (item) {
       router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)
@@ -333,6 +361,9 @@ export default {
       $(`#${id}`).val('')
     },
     accept (text) {
+      // console.log('text', text)
+      // this.visible = false
+      // this.doLoadingThuTuc()
       this.hide()
     },
     show (e) {

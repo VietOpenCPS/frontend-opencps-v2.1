@@ -217,7 +217,7 @@
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
             ></v-text-field>
-            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
+            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
           </div>
         </v-flex>
       </v-layout>
