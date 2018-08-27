@@ -4,15 +4,18 @@
       <v-layout wrap class="px-0 py-0">
         <div style="width: calc(100% - 260px)">
           <v-layout wrap>
-            <v-flex xs4 class="pl-2 pr-2">
-              <v-text-field
-                label="Tên thủ tục"
-                placeholder="Nhấn để nhập tên thủ tục"
-                v-model="serviceNameKey"
-                clearable
-              ></v-text-field>
+            <v-flex xs3 class="pl-2 pr-2">
+              <v-select
+                :items="govAgencyList"
+                v-model="govAgencySelected"
+                autocomplete
+                label="Cơ quan"
+                item-text="administrationName"
+                item-value="administrationCode"
+                :hide-selected="true"
+              ></v-select>
             </v-flex>
-            <v-flex xs4 class="pl-2 pr-2">
+            <v-flex xs3 class="pl-2 pr-2">
               <v-select
                 :items="listLinhVuc"
                 v-model="linhVucSelected"
@@ -25,7 +28,7 @@
                 clearable
               ></v-select>
             </v-flex>
-            <v-flex xs4 class="pl-2 pr-2">
+            <v-flex xs3 class="pl-2 pr-2">
               <v-select
                 :items="listMucDo"
                 v-model="levelSelected"
@@ -45,6 +48,22 @@
                   </template>
                 </template>
               </v-select>
+            </v-flex>
+            <v-flex xs3 class="pl-2 pr-2">
+              <!-- <v-text-field
+                label="Tên thủ tục"
+                placeholder="Nhấn để nhập tên thủ tục"
+                v-model="serviceNameKey"
+                clearable
+              ></v-text-field> -->
+              <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <label>Tên thủ tục</label>
+                <div class="input-group__input">
+                  <input id="serviceNameKey" data-layout="normal" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+                  <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                </div>
+                <div class="input-group__details"></div>
+              </div>
             </v-flex>
           </v-layout>
         </div>
@@ -73,6 +92,9 @@
           </v-btn>
         </div>
       </v-layout>
+      <!--  -->
+      <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+      <!--  -->
       <div class="my-3 pt-2 text-center total-result-search">
         <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
       </div>
@@ -80,11 +102,11 @@
         <content-placeholders-text :lines="10" />
       </content-placeholders>
       <div v-else class="overflowContainer">
-        <div class="mb-3 main-header" v-for="(item, index) in govAgencyList" :key="index" v-if="checkAgency(item)">
+        <div class="mb-3 main-header">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content value="1">
               <div slot="header" class="pl-2">
-                {{item.administrationName}}
+                {{govAgencySelected.administrationName}}
               </div>
               <v-card class="sub-header" v-for="(item2, index2) in listLinhVuc" :key="index2" v-if="checkDomain(item2)">
                 <v-expansion-panel class="expansion-pl">
@@ -130,6 +152,7 @@
 <script>
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
+import $ from 'jquery'
 export default {
   props: [],
   components: {},
@@ -143,7 +166,15 @@ export default {
     levelSelected: '',
     listThuTuc: [],
     govAgencyList: [],
-    serviceItemTotal: 0
+    govAgencySelected: {},
+    serviceItemTotal: 0,
+    //
+    visible: false,
+    layout: 'normal',
+    input: null,
+    options: {
+      useKbEvents: false
+    }
   }),
   computed: {},
   created () {
@@ -152,29 +183,36 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+      // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+      $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
       vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
       vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+      vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
       vm.loading = true
       vm.listThuTuc = []
+      vm.$store.dispatch('getGovAgency').then(function (result) {
+        vm.govAgencyList = result
+        if (vm.govAgencyList.length > 0) {
+          vm.govAgencySelected = vm.govAgencyList[0].administrationCode
+          vm.doLoadingThuTuc()
+        }
+      })
       vm.$store.dispatch('getDomainLists').then(function (result) {
         vm.listLinhVuc = result
       })
       vm.$store.dispatch('getLevelLists').then(function (result) {
         vm.listMucDo = result
       })
-      vm.$store.dispatch('getGovAgency').then(function (result) {
-        vm.govAgencyList = result
-      })
-      vm.doLoadingThuTuc()
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencyList[0].administrationCode
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.doLoadingThuTuc()
@@ -187,13 +225,17 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       if (refresh === 'refesh') {
-        vm.serviceNameKey = ''
+        vm.visible = false
+        // vm.serviceNameKey = ''
+        $('#serviceNameKey').val('')
         vm.levelSelected = ''
         vm.linhVucSelected = ''
       }
-      newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      // newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      newQuery['keyword'] = $('#serviceNameKey').val()
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
+      newQuery['administration'] = vm.govAgencySelected ? vm.govAgencySelected : ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -213,6 +255,7 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       filter = {
+        administration: currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencySelected,
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
@@ -268,6 +311,39 @@ export default {
         return 'orange'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    //
+    clear (id) {
+      $(`#${id}`).val('')
+    },
+    accept (text) {
+      this.hide()
+    },
+    show (e) {
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+    },
+    hide () {
+      this.visible = false
+    },
+    next () {
+      let inputs = document.querySelectorAll('input')
+      let found = false
+      let arr1 = []
+      arr1.forEach.call(inputs, (item, i) => {
+        if (!found && item === this.input && i < inputs.length - 1) {
+          found = true
+          this.$nextTick(() => {
+            inputs[i + 1].focus()
+          })
+        }
+      })
+      if (!found) {
+        this.input.blur()
+        this.hide()
       }
     }
   }

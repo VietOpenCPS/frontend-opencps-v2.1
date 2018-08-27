@@ -351,15 +351,20 @@
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
-                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="viewDetail(props.item, props.index)" :class="{'no_acction__event': !props.item['permission']}">
-                  Xem chi tiết
-                </v-list-tile>
-              </v-list>
-            </v-menu>
-          </td>
-        </tr>
+                <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
+                v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
+                @click="btnActionEvent(props.item, item, index, false)"
+              >
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="viewDetail(props.item, props.index)">
+                Xem chi tiết
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+        </td>
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
@@ -789,6 +794,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    currentUser () {
+      return this.$store.getters.loadingInitData.user
     }
   },
   created () {
@@ -1059,6 +1067,31 @@ export default {
         // vm.doLoadingDataHoSo()
       })
     },
+    checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
+      var vm = this
+      var checkValue = true
+      // check theo người thực hiện
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+        let userArr = vm.$store.getters.getUsersNextAction
+        let check = userArr.filter(function (item) {
+          return item.userId.toString() === currentUser.userId.toString()
+        })
+        if (check.length > 0) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      }
+      // check theo lastactionUser
+      if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
+        // if (currentUser.userId === thongtinchitiet.lastActionUserId) {
+        //   checkValue = true
+        // } else {
+        checkValue = false
+        // }
+      }
+      return checkValue
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -1327,14 +1360,18 @@ export default {
         vm.processAction(dossierItem, item, result, index, true)
       } else if (String(item.form) === 'OVERDUE') {
         let result = {
-          actionCode: 8500
+          actionCode: 8500,
+          dossierId: dossierItem.dossierId,
+          overdue: dossierItem['extendDate']
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 111)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
-          actionCode: 8400
+          actionCode: 8400,
+          dossierId: dossierItem.dossierId,
+          betimes: dossierItem['extendDate']
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -1693,7 +1730,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -1727,6 +1764,12 @@ export default {
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
+        }
+        if (result.hasOwnProperty('overdue')) {
+          isPopup = true
+        }
+        if (result.hasOwnProperty('betimes')) {
+          isPopup = true
         }
       }
       if (isPopup) {

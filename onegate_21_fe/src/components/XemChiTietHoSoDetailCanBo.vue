@@ -138,6 +138,7 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
@@ -356,6 +357,7 @@ import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
+import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -369,7 +371,8 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
-    'ngay-hen-tra': EditDate
+    'ngay-hen-tra': EditDate,
+    'ngay-gia-han': ExtendDateEdit
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -417,6 +420,7 @@ export default {
     showTraKetQua: false,
     showThuPhi: false,
     showEditDate: false,
+    showExtendDateEdit: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -432,6 +436,8 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    extendDateEdit: '',
+    typeExtendDate: '',
     dueDateEdit: '',
     receiveDateEdit: '',
     dialogActionProcess: false,
@@ -775,6 +781,7 @@ export default {
       vm.showTraKetQua = false
       vm.showThuPhi = false
       vm.showEditDate = false
+      vm.showExtendDateEdit = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -794,7 +801,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -844,6 +851,18 @@ export default {
           vm.showEditDate = true
           vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
           vm.receiveDateEdit = result.receiving.receiveDate
+        }
+        if (result.hasOwnProperty('overdue')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.overdue !== '' ? new Date(result.overdue) : ''
+          vm.typeExtendDate = 'overdue'
+        }
+        if (result.hasOwnProperty('betimes')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.betimes !== '' ? new Date(result.betimes) : ''
+          vm.typeExtendDate = 'betimes'
         }
       }
       console.log('isPopup========222222', isPopup)
@@ -925,17 +944,23 @@ export default {
         }
         vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
+        vm.btnIndex = 111
         let result = {
+          actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8500
+          overdue: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       } else if (String(item.form) === 'BETIMES') {
+        vm.btnIndex = 333
         let result = {
+          actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8400
+          betimes: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       }
     },
     doPrint01 (dossierItem, item, index) {
@@ -1056,6 +1081,7 @@ export default {
       let vm = this
       var validPhanCong = true
       var validYKien = true
+      var validTreHan = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1097,6 +1123,25 @@ export default {
         }
         filter['payload'] = payload
       }
+      if (vm.showExtendDateEdit) {
+        let data = vm.$refs.ngaygiahan.doExport()
+        console.log('extendDateEdit', data.extendDate)
+        if (data.valid) {
+          validTreHan = true
+        } else {
+          validTreHan = false
+        }
+        let payload = {
+          'extendDate': data.extendDate
+        }
+        if (vm.typeExtendDate === 'overdue') {
+          payload = {
+            'extendDate': data.extendDate,
+            'delayNote': data.text
+          }
+        }
+        filter['payload'] = payload
+      }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
@@ -1114,7 +1159,7 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien) {
+      if (validPhanCong && validYKien && validTreHan) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1299,10 +1344,26 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
-            vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          if (currentQuery.btnIndex.toString() === '111') {
+            let result = {
+              actionCode: 8500,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              overdue: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+          } else if (currentQuery.btnIndex.toString() === '333') {
+            let result = {
+              actionCode: 8400,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              betimes: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
           } else {
-            vm.dialogActionProcess = false
+            if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
+              vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+            } else {
+              vm.dialogActionProcess = false
+            }
           }
         }
         console.log('vm.checkInput======', vm.getCheckInput)
@@ -1482,9 +1543,10 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
-        let check = vm.usersNextAction.filter(function (item) {
-          return item === currentUser.userName
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+        let userArr = vm.$store.getters.getUsersNextAction
+        let check = userArr.filter(function (item) {
+          return item.userId.toString() === currentUser.userId.toString()
         })
         if (check.length > 0) {
           checkValue = true
@@ -1494,11 +1556,11 @@ export default {
       }
       // check theo lastactionUser
       if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
-        if (currentUser.userName === thongtinchitiet.lastActionUser) {
-          checkValue = true
-        } else {
+        // if (currentUser.userId === thongtinchitiet.lastActionUserId) {
+        //   checkValue = true
+        // } else {
           checkValue = false
-        }
+        // }
       }
       return checkValue
     }
