@@ -93,7 +93,7 @@
         </div>
       </v-layout>
       <!--  -->
-      <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+      <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
       <!--  -->
       <div class="my-3 pt-2 text-center total-result-search">
         <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
@@ -101,12 +101,12 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <div v-else class="overflowContainer">
+      <div v-else class="overflowContainer" :class="visible ? 'overlayActive': ''">
         <div class="mb-3 main-header">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content value="1">
               <div slot="header" class="pl-2">
-                {{govAgencySelected.administrationName}}
+                {{govAgencyName(govAgencySelected)}}
               </div>
               <v-card class="sub-header" v-for="(item2, index2) in listLinhVuc" :key="index2" v-if="checkDomain(item2)">
                 <v-expansion-panel class="expansion-pl">
@@ -115,7 +115,7 @@
                       {{item2.domainName}}
                     </div>
                     <v-card class="list-bdb">
-                      <div class="pl-4 pr-2 py-1 boder-bottom" v-for="(item3, index3) in listThuTuc" :key="index3" v-if="checkThuTuc(item, item2, item3)">
+                      <div class="pl-4 pr-2 py-1 boder-bottom" v-for="(item3, index3) in listThuTuc" :key="index3" v-if="checkThuTuc(govAgencySelected, item2, item3)">
                         <v-layout wrap class="px-0 py-0" style="align-items: center">
                           <div style="width: 110px">
                             <v-chip class="mx-0 my-0" label :color="getColor(item3.maxLevel)" text-color="white" style="height:25px">
@@ -144,6 +144,9 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
+      </div>
+      <div class="virtual-keyboard" v-if="visible">
+        <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
       </div>
     </div>
   </div>
@@ -183,17 +186,16 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
-      $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
-      vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
-      vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-      vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
       vm.loading = true
       vm.listThuTuc = []
       vm.$store.dispatch('getGovAgency').then(function (result) {
         vm.govAgencyList = result
         if (vm.govAgencyList.length > 0) {
-          vm.govAgencySelected = vm.govAgencyList[0].administrationCode
+          // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+          $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+          vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
+          vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+          vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : vm.govAgencyList[0].administrationCode
           vm.doLoadingThuTuc()
         }
       })
@@ -208,9 +210,9 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
-      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencyList[0].administrationCode
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencyList[0].administrationCode
       // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
@@ -298,7 +300,7 @@ export default {
       }
     },
     checkThuTuc (govAgency, domain, serviceinfos) {
-      if (serviceinfos.administrationCode === govAgency.administrationCode && serviceinfos.domainCode === domain.domainCode) {
+      if (serviceinfos.administrationCode === govAgency && serviceinfos.domainCode === domain.domainCode) {
         return true
       } else {
         return false
@@ -311,6 +313,19 @@ export default {
         return 'orange'
       } else if (level === 4) {
         return 'red'
+      }
+    },
+    govAgencyName (arg) {
+      var vm = this
+      if (arg) {
+        let value = vm.govAgencyList.filter(function (item) {
+          return item.administrationCode.toString() === arg.toString()
+        })
+        if (value.length > 0) {
+          return value[0].administrationName
+        }
+      } else {
+        return ''
       }
     },
     //
