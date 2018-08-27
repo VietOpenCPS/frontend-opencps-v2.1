@@ -279,26 +279,24 @@ export default {
     changeAdministration () {
       var vm = this
       console.log('administration', vm.govAgencySelected)
-      setTimeout (function () {
-        // let domainList = vm.listLinhVuc.filter(function (item) {
-        //   return item. === vm.govAgencySelected
-        // })
-        // vm.listLinhVuc = domainList
-      }, 200)
+      // setTimeout (function () {
+      //   let domainList = vm.listLinhVuc.filter(function (item) {
+      //     return item. === vm.govAgencySelected
+      //   })
+      //   vm.listLinhVuc = domainList
+      // }, 200)
     },
     changeDomain () {
       var vm = this
       console.log('domain', vm.linhVucSelected)
-      setTimeout (function () {
-        
-      }, 200)
+      // setTimeout (function () {
+      // }, 200)
     },
     changeLevel () {
       var vm = this
       console.log('level', vm.levelSelected)
-      setTimeout (function () {
-        
-      }, 200)
+      // setTimeout (function () {
+      // }, 200)
     },
     viewDetail (item) {
       router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)
@@ -371,6 +369,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -391,6 +390,15 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick () {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          vm.filterServiceinfos()
+        })
+      }, 300)
     }
   }
 }

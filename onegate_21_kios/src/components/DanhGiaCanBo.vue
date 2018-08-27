@@ -451,6 +451,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -471,6 +472,15 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick () {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          vm.filterEmployee()
+        })
+      }, 300)
     }
   },
   filters: {

@@ -168,7 +168,7 @@
                     data-layout="normal" @focus="show"></v-text-field> -->
                     <div class="input-group input-group--placeholder input-group--text-field primary--text">
                       <div class="input-group__input">
-                        <input id="passCheck" data-layout="normal" @focus="show"
+                        <input id="passCheck" data-layout="normal" @focus="showKeyboard"
                         aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
                         <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                       </div>
@@ -445,12 +445,20 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick('search')
+    },
+    showKeyboard (e) {
+      this.validPass = true
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+      this.bindClick('view')
     },
     hide () {
       this.visible = false
     },
     next () {
-      console.log('run next')
       let inputs = document.querySelectorAll('input')
       let found = false
       let arr1 = []
@@ -466,6 +474,21 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick (type) {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        if (type === 'search') {
+          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+            vm.filterDossier()
+          })
+        } else if (type === 'view') {
+          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+            vm.submitViewDetail()
+          })
+        }
+      }, 300)
     }
   }
 }
