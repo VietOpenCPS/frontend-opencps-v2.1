@@ -81,7 +81,7 @@
         <!--  -->
         <div v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
           <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
-            <span class="text-bold">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
+            <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
           </div>
           <v-data-table
           :headers="headersTable"
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div class="virtual-keyboard" v-if="visible">
-          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
       </v-card>
       <v-dialog v-model="dialogCheckPass" content-class="dialog-keyboard" persistent max-width="500px">
@@ -275,24 +275,30 @@ export default {
     layout: 'normal',
     input: null,
     options: {
-      useKbEvents: false
+      useKbEvents: true,
+      preventClickEvent: false
     }
   }),
   computed: {},
   created () {
     let vm = this
     vm.$nextTick(function () {
-      // var vm = this
-      // let current = vm.$router.history.current
-      // let newQuery = current.query
-      // // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
-      // $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      // // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
-      // $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      // // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
-      // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
-      // vm.hosoDatasPage = 1
-      // vm.doLoadingDataHoSo()
+      var vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
+      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
+      // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
+      // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
+      $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
+      vm.hosoDatasPage = 1
+      if ($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '' || $('#applicantNameKey').val() !== '') {
+        vm.validateTracuu = true
+        vm.doLoadingDataHoSo()
+      } else {
+        vm.validateTracuu = false
+      }
     })
   },
   watch: {

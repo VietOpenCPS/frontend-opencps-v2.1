@@ -96,7 +96,7 @@
       <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
       <!--  -->
       <div class="my-3 pt-2 text-center total-result-search">
-        <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
+        <span class="text-bold">Có {{serviceItemTotal}} thủ tục được tìm thấy</span>
       </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
