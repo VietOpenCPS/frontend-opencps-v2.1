@@ -1546,7 +1546,11 @@ export const store = new Vuex.Store({
               let serializable = response.data
               commit('setCheckInput', serializable['checkInput'])
               commit('setStepOverdueNextAction', serializable['stepOverdue'])
-              commit('setUserNextAction', serializable['users'])
+              if (Array.isArray(serializable['users'])) {
+                commit('setUserNextAction', serializable['users'])
+              } else {
+                commit('setUserNextAction', [serializable['users']])
+              }
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)

@@ -70,12 +70,12 @@ export default {
   }),
   created () {
     var vm = this
-    vm.extendDateInput = vm.extendDateEdit ? vm.formatDateInput(vm.extendDateEdit) : ''
+    vm.extendDateInput = vm.extendDateEdit ? vm.formatDateInput(vm.extendDateEdit) : vm.formatDateInput(new Date())
     console.log('extendDateInput', vm.extendDateInput)
   },
   watch: {},
   mounted () {
-    this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : ''
+    this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : vm.formatDateInput(new Date())
     console.log('extendDateInput', this.extendDateInput)
     this.minDate = this.getCurentDateTime('date')
   },
