@@ -402,6 +402,7 @@ export default {
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
+        vm.changeStateViewResult()
         setTimeout(function (argument) {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
