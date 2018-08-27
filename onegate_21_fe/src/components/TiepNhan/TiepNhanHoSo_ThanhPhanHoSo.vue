@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType)" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
@@ -316,7 +316,8 @@ export default {
       text: 'Không đạt',
       value: 2
     }],
-    fileTemplateItems: []
+    fileTemplateItems: [],
+    stateViewResult: true
   }),
   computed: {
     loading () {
@@ -397,10 +398,10 @@ export default {
         dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
         dossierTemplateItems = vm.mergeDossierTemplateVsFileTemplates(dossierTemplateItems, fileTemplates)
         // console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
-        vm.dossierTemplateItems = dossierTemplateItems
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
+        vm.dossierTemplateItems = dossierTemplateItems
         setTimeout(function (argument) {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
@@ -894,6 +895,41 @@ export default {
         return 'calc(100% - ' + divPx + 'px)'
       }
     },
+    checkVisibleTemp (item, index) {
+      var vm = this
+      if (!vm.onlyView) {
+        return true
+      }
+      if (item.partType === 3) {
+        if (vm.dossierFilesItems.length > 0) {
+          let indexFile = vm.dossierFilesItems.findIndex(file => {
+            return file.dossierPartNo === item.partNo
+          })
+          if (indexFile === -1) {
+            return false
+          } else {
+            return true
+          }
+        } else {
+          return false
+        }
+      } else {
+        return true
+      }
+    },
+    changeStateViewResult () {
+      var vm = this
+      if (vm.dossierFilesItems.length > 0) {
+        let index = vm.dossierFilesItems.findIndex(file => {
+          return file.dossierPartType === 2
+        })
+        if (index !== -1) {
+          vm.$emit('tp:change-state-view-result', true)
+        } else {
+          vm.$emit('tp:change-state-view-result', false)
+        }
+      }
+    },
     changeOtherDossierTemp (data) {
       var vm = this
       if (vm.originality === 3 && vm.stateAddFileOther) {
@@ -984,12 +1020,13 @@ export default {
       var vm = this
       if (vm.dossierTemplateItems.length > 0) {
         for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['daKhai']) {
+          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['daKhai'] && vm.partTypes.includes(vm.dossierTemplateItems[i].partType)) {
             let message = 'Chú ý :' + vm.dossierTemplateItems[i].partName + ' là thành phần bắt buộc!'
             toastr.error(message)
             return false
           }
         }
+        return true
       } else {
         return true
       }
