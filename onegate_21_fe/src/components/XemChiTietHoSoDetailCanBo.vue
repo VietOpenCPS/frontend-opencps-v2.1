@@ -242,16 +242,16 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form">
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="stateViewResult">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
                   Kết quả xử lý
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form">
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> III.</div>
@@ -405,7 +405,7 @@ export default {
     nextActions: [],
     createFiles: [],
     processSteps: [],
-    documents: null,
+    documents: [],
     payments: '',
     dossierActions: [],
     itemselect: '',
@@ -519,7 +519,9 @@ export default {
       icon: 'check_circle',
       color: 'success',
       message: 'Thực hiện thành công!'
-    }
+    },
+    stateViewResult: true,
+    stateViewDocument: true
   }),
   computed: {
     loading () {
@@ -1557,6 +1559,11 @@ export default {
         // }
       }
       return checkValue
+    },
+    changeStateViewResult (data) {
+      console.log('state view result', data)
+      var vm = this
+      vm.stateViewResult = data
     }
   },
   filters: {
