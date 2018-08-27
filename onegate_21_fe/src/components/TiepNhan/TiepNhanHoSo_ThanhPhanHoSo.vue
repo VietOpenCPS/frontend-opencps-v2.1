@@ -9,7 +9,7 @@
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    {{item.partName}} <span v-if="item.required" style="color: red"> (*) </span>
+                    {{item.partName}}&nbsp; <span v-if="item.required" style="color: red"> (*) </span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
@@ -124,7 +124,7 @@
               type="file"
               style="display: none"
               :id="'file' + item.partNo"
-              @change="onUploadSingleFile($event,item)"
+              @change="onUploadSingleFile($event, item, index)"
               >
               <v-tooltip top v-if="item.partType === 3 && originality === 3 && !onlyView">
                 <v-btn slot="activator" @click="addFileOther(item)" icon class="mx-0 my-0">
@@ -469,6 +469,7 @@ export default {
       var vm = this
       if (dossierFiles.length !== 0) {
         dossierTemplates.forEach(template => {
+          template['daKhai'] = false
           var itemFind = dossierFiles.find(file => {
             return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm
           })
@@ -477,6 +478,11 @@ export default {
           } else if (!itemFind && template.hasForm) {
             template['daKhai'] = false
           }
+          dossierFiles.forEach(dossierFile => {
+            if (template.partNo === dossierFile.dossierPartNo && !dossierFile.eForm && !template.hasForm) {
+              template['daKhai'] = true
+            }
+          })
         })
       } else {
         dossierTemplates.forEach(template => {
@@ -617,12 +623,13 @@ export default {
       vm.stateAddFileOther = false
       document.getElementById('file' + item.partNo).click()
     },
-    onUploadSingleFile (e, data) {
+    onUploadSingleFile (e, data, index) {
       var vm = this
       vm.dossierTemplatesItemSelect = data
       vm.progressUploadPart = data.partNo
       data['dossierId'] = vm.thongTinHoSo.dossierId
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+      vm.dossierTemplateItems[index]['daKhai'] = true
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
           vm.progressUploadPart = ''
@@ -731,7 +738,8 @@ export default {
           vm.partView = item.dossierPartNo
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
-            vm.recountFileTemplates()
+            // vm.recountFileTemplates()
+            vm.setDaKhai(vm.dossierFilesItems)
           })
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
@@ -746,6 +754,20 @@ export default {
           this.$store.dispatch('viewFile', val)
         }
       })
+    },
+    setDaKhai (itemFile) {
+      var vm = this
+      let indexFile = vm.dossierFilesItems.findIndex(file => {
+        return file.dossierPartNo === itemFile.dossierPartNo
+      })
+      if (indexFile === -1) {
+        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
+          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo && !vm.dossierTemplateItems[i].hasForm) {
+            vm.dossierTemplateItems[i]['daKhai'] = false
+            break
+          }
+        }
+      }
     },
     checkPartType3 () {
       var vm = this
@@ -957,6 +979,20 @@ export default {
       vm.dialogAddOtherTemp = true
       vm.stateAddFileOther = true
       vm.dossierTemplatesItemSelect = item
+    },
+    validDossierTemplate () {
+      var vm = this
+      if (vm.dossierTemplateItems.length > 0) {
+        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
+          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['daKhai']) {
+            let message = 'Chú ý :' + vm.dossierTemplateItems[i].partName + ' là thành phần bắt buộc!'
+            toastr.error(message)
+            return false
+          }
+        }
+      } else {
+        return true
+      }
     },
     changeDisplayName (item, index) {
       var vm = this

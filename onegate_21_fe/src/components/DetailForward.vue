@@ -3,6 +3,7 @@
     <tiep-nhan-ho-so-detail 
       v-if="formCode === 'NEW' || formCode === 'UPDATE' || formCode === 'COPY'" 
       ref="tiepnhanhosodetail"
+      :formCode="formCode"
     ></tiep-nhan-ho-so-detail>
     <!--
     <xem-chi-tiet-ho-so-detail 
