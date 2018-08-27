@@ -47,7 +47,7 @@
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            XỬ LÝ HỒ SƠ
+            <span v-if="originality === 3">XỬ LÝ HỒ SƠ</span> <span v-else>CHUẨN BỊ HỒ SƠ</span>
           </v-btn>
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="loadTPHS()">
@@ -68,7 +68,7 @@
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
-            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3">
+            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
               <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -79,10 +79,15 @@
               </p>
               <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                 <span>Người thực hiện: &nbsp;</span>
-                <b>{{usersNextAction.toString()}}&nbsp;</b>-
+                <b>{{usersNextAction.join(', ')}}&nbsp;</b>-
                 <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                   {{stepOverdueNextAction}}
                 </span>
+              </p>
+            </div>
+            <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
+              <p class="mb-2">
+                Hồ sơ đã hoàn thành quá trình xử lý
               </p>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
@@ -124,7 +129,7 @@
               </v-menu>
             </div>
             <!--  -->
-            <v-layout wrap v-if="dialogActionProcess">
+            <v-layout wrap v-if="dialogActionProcess" style="border-left: 2px solid blue;">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -155,7 +160,7 @@
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
-            <div>
+            <div v-if="thongTinChiTietHoSo.online">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
@@ -190,7 +195,10 @@
                           </li>
                         </ul>
                         <!--  -->
-                        <div v-else class="no-comments no-data my-2"><i class="fa fa-comments fa-2x"></i><br>Không có trao đổi nào</div>
+                        <div v-else class="no-comments no-data my-2">
+                          <i class="fa fa-comments" style="font-size: 25px;"></i><br>
+                          <span style="font-size: 18px;">Không có trao đổi nào</span>
+                        </div>
                         <!--  -->
                         <div style="position:relative">
                           <v-text-field class="pl-5 my-3"
@@ -783,12 +791,6 @@ export default {
         }
       }
       console.log('isPopup========11111', isPopup)
-      // if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined' && vm.originality !== 1) {
-      //   try {
-      //     vm.$refs.thanhphanhoso.saveMark()
-      //   } catch (e) {
-      //   }
-      // }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -846,9 +848,11 @@ export default {
       }
       console.log('isPopup========222222', isPopup)
       if (isPopup) {
+        vm.loadingAction = false
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
       } else {
+        vm.loadingAction = true
         vm.processAction(vm.thongTinChiTietHoSo, item, result, index, false)
       }
     },
@@ -866,7 +870,6 @@ export default {
       vm.dialogActionProcess = false
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.loadingAction = false
         vm.loadingActionProcess = false
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
       }).catch(function (reject) {
@@ -1124,6 +1127,7 @@ export default {
         if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             console.log('result======', result)
+            vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
             vm.alertObj = {
@@ -1149,14 +1153,22 @@ export default {
               }
             })
           }).catch(function (reject) {
+            vm.loadingAction = false
             vm.loadingActionProcess = false
           })
         } else {
           return false
         }
       } else if (vm.validateAction) {
+        if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined') {
+          var valid = vm.$refs.thanhphanhoso.validDossierTemplate()
+          if (!valid) {
+            return
+          }
+        }
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           console.log('result======', result)
+          vm.loadingAction = false
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
           vm.alertObj = {
@@ -1185,6 +1197,7 @@ export default {
             })
           }
         }).catch(function (reject) {
+          vm.loadingAction = false
           vm.loadingActionProcess = false
         })
       }

@@ -1,7 +1,10 @@
 <template>
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
     <div class="row-header">
-      <div class="background-triangle-big"> <span>THÊM MỚI HỒ SƠ</span> </div>
+      <div class="background-triangle-big"> 
+        <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span> 
+        <span v-else>THÊM MỚI HỒ SƠ</span> 
+      </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
           {{thongTinChiTietHoSo.serviceName}}
@@ -30,7 +33,7 @@
           </div>
           <v-layout row wrap>
             <v-flex xs12 sm12>
-              <span class="ml-3">{{thongTinChiTietHoSo.dossierNote}}</span>
+              <span class="ml-3" v-html="thongTinChiTietHoSo.dossierNote"></span>
             </v-flex>
           </v-layout>
         </v-expansion-panel-content>
@@ -89,7 +92,7 @@
       </v-tab> -->
       <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="originality !== 1 && tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
-          Tiếp nhận &nbsp;
+          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab>
@@ -213,6 +216,7 @@ export default {
           })
         } else {
           if (vm.$refs.thongtinchunghoso) {
+            console.log('has thong tin chung ho so')
             vm.$refs.thongtinchunghoso.initData(result)
           }
         }
@@ -247,6 +251,9 @@ export default {
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
+        if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          return
+        }
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []
@@ -312,6 +319,9 @@ export default {
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
+        if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          return
+        }
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []

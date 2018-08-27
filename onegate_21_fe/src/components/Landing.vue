@@ -296,7 +296,8 @@
       </template>
       <!--  -->
       <template slot="items" slot-scope="props">
-        <td v-if="menuType !== 3 && originality !== 1">
+        <tr>
+          <td v-if="menuType !== 3 && originality !== 1">
           <v-checkbox
             :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
             v-model="props.selected"
@@ -304,60 +305,61 @@
             hide-details
             color="primary"
           ></v-checkbox>
-        </td>
-        <td class="text-xs-center px-0 py-0">
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
-            {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
-          </span>
-        </td>
-
-        <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
-          :class="itemHeader['class_column']"
-          v-if="itemHeader.hasOwnProperty('value')"
-        >
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
-            <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
-            <span v-else>
-              {{ props.item[itemHeader.value] }}
+          </td>
+          <td class="text-xs-center px-0 py-0">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
-          </div>
-        </td>
-        <td class="text-xs-center px-0 py-0" v-if="!hideAction">
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-menu left :nudge-left="50" :nudge-top="15" 
-            v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
-              (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
-            <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
-              <v-icon>more_vert</v-icon>
-            </v-btn>
-            <v-list>
-              <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
-                @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2"
-                v-if="item['enable'] > 0"
+          </td>
+
+          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
+            :class="itemHeader['class_column']"
+            v-if="itemHeader.hasOwnProperty('value')"
+          >
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+              <span v-else>
+                {{ props.item[itemHeader.value] }}
+              </span>
+            </div>
+          </td>
+          <td class="text-xs-center px-0 py-0" v-if="!hideAction">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <v-menu left :nudge-left="50" :nudge-top="15" 
+              v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
+                (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
+              <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
+                <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
+                  @click="processPullBtnDetail(props.item, item, props.index, i)" 
+                  :disabled="item['enable'] === 2 || String(prop.item['permission']).indexOf('write') === -1"
+                  v-if="item['enable'] > 0 || item['autoEvent'] === 'special'"
+                  >
+                  <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
+                  @click="btnActionEvent(props.item, item, index, false)"
                 >
-                <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
-                @click="btnActionEvent(props.item, item, index, false)"
-              >
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="viewDetail(props.item, props.index)">
-                Xem chi tiết
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        </td>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="viewDetail(props.item, props.index)" :class="{'no_acction__event': !props.item['permission']}">
+                  Xem chi tiết
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
@@ -774,7 +776,8 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: true,
     filterForm: null,
-    checkSelectAll: (this.menuType !== 3 && this.originality !== 1)
+    checkSelectAll: (this.menuType !== 3 && this.originality !== 1),
+    titleLanding: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -840,6 +843,13 @@ export default {
             vm.btnDynamics = btnDynamicsView
             vm.btnStepsDynamics = []
             if (currentQuery.hasOwnProperty('step')) {
+              // if (vm.trangThaiHoSoList[vm.index]['item'].length > 0) {
+              //   vm.trangThaiHoSoList[vm.index]['item'].forEach(item => {
+              //     if (item.stepCode === currentQuery['step']) {
+              //       vm.titleLanding = item.stepName
+              //     }
+              //   })
+              // }
               for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
                 let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
                 if (String(currentStep.stepCode) === String(currentQuery.step)) {
@@ -1166,9 +1176,12 @@ export default {
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
-        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
           queryString += key + '=' + newQuery[key] + '&'
         }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1) {
+        queryString += 'step=' + newQuery['step'] + '&'
       }
       if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
         queryString += 'service_config=' + item.serviceConfigId
@@ -1198,11 +1211,14 @@ export default {
       let queryString = '?'
       newQuery['domain'] = ''
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
+        if (key === 'page') {
           queryString += key + '=1&'
-        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
           queryString += key + '=' + newQuery[key] + '&'
         }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1) {
+        queryString += 'step=' + newQuery['step'] + '&'
       }
       queryString += 'domain=' + vm.domainCode
       console.log('change Domain queryString', queryString)
@@ -1718,12 +1734,16 @@ export default {
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
         */
+        let query = {
+          activeTab: 'tabs-1',
+          btnIndex: btnIndex
+        }
+        if (item['autoEvent'] === 'special') {
+          query['actionSpecial'] = true
+        }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
-          query: {
-            activeTab: 'tabs-1',
-            btnIndex: btnIndex
-          }
+          query: query
         })
       } else {
         vm.processAction(dossierItem, item, result, index, true)

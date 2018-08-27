@@ -5,7 +5,7 @@
       <v-card>
         <v-card-text class="py-0">
           <v-layout wrap class="px-2 py-2">
-            <v-flex xs12 sm4 class="pr-3" v-if="originality !== 1">
+            <v-flex xs12 sm3 class="pr-3" v-if="originality !== 1">
               <div class="xs12 sm12 pb-1">
                 <span class="pr-2">Chủ hồ sơ: </span>
                 <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
@@ -29,8 +29,32 @@
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
             </v-flex>
+            <v-flex xs12 sm3 class="pr-3" v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Người nộp hồ sơ: </span>
+                <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.delegateName}}</span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1 overHidden">
+                <span class="pr-2">Địa chỉ: </span>
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.delegateAddress }} {{thongTinChiTietHoSo.delegateWardName}}, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
+                </v-tooltip>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+              </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+            </v-flex>
             <!--  -->
-            <v-flex xs12 sm4 class="pr-3" v-else>
+            <v-flex xs12 sm4 class="pr-3" v-if="originality === 1">
               <div class="xs12 sm12 pb-1">
                 <span class="pr-2">Mã hồ sơ: </span>
                 <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
@@ -47,7 +71,7 @@
               </div>
             </v-flex>
             <!--  -->
-            <v-flex xs12 sm4 v-if="originality !== 1">
+            <v-flex xs12 sm3 v-if="originality !== 1">
               <div class="xs12 sm12 pb-1">
                 <span class="pr-2">Ngày gửi trực tuyến: </span>
                 <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
@@ -92,8 +116,8 @@
               </div>
             </v-flex>
             <!--  -->
-            <v-flex xs12 sm4 v-if="originality !== 1">
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
+            <v-flex xs12 sm3 v-if="originality !== 1">
+              <div class="xs12 sm12 pb-1 text-bold">Thông tin liên hệ:</div>
               <div class="xs12 sm12 pb-1">
                 <span class="pl-0">Thư điện tử: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
