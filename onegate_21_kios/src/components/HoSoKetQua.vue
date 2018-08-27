@@ -73,14 +73,14 @@
           </div>
         </v-layout>
         <!--  -->
-        <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
+        <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
         <!--  -->
         <v-alert class="mt-5" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
           Yêu cầu nhập thông tin để tra cứu
         </v-alert>
         <!--  -->
-        <div v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
-          <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
+        <div v-if="validateTracuu === true">
+          <div class="my-3 pt-2 text-center total-result-search">
             <span class="text-bold">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
           </div>
           <v-data-table
@@ -88,7 +88,6 @@
           :items="dossierList"
           hide-actions
           class="table-tracuu table-landing table-bordered"
-          :class="visible ? 'overlayActive': ''"
           >
             <template slot="items" slot-scope="props">
               <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
@@ -147,11 +146,8 @@
             </v-btn>
           </div>
         </div>
-        <div class="virtual-keyboard" v-if="visible">
-          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
-        </div>
       </v-card>
-      <v-dialog v-model="dialogCheckPass" content-class="dialog-keyboard" persistent max-width="500px">
+      <v-dialog v-model="dialogCheckPass" persistent max-width="500px">
         <v-form ref="form" v-model="valid">
           <v-card>
             <v-card-title style="color: #fff;background-color: #0b72ba">
@@ -161,21 +157,10 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12>
-                    <!-- <v-text-field v-model="passCheck"
+                    <v-text-field v-model="passCheck"
                     placeholder="Nhập mã bí mật đã được cấp"
                     :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
-                    required
-                    data-layout="normal" @focus="show"></v-text-field> -->
-                    <div class="input-group input-group--placeholder input-group--text-field primary--text">
-                      <div class="input-group__input">
-                        <input id="passCheck" data-layout="normal" @focus="show"
-                        aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
-                        <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                      </div>
-                      <div class="input-group__details">
-                        <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
-                      </div>
-                    </div>
+                    required></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -269,7 +254,6 @@ export default {
     dossierDetail: '',
     valid: false,
     passCheck: '',
-    validPass: true,
     //
     visible: false,
     layout: 'normal',
@@ -396,12 +380,10 @@ export default {
     },
     submitViewDetail () {
       var vm = this
-      if ($('#passCheck').val() !== '') {
-        vm.validPass = true
+      if (this.$refs.form.validate()) {
         vm.loading = true
         let filter = {
-          // password: vm.passCheck ? vm.passCheck : '',
-          password: $('#passCheck').val(),
+          password: vm.passCheck ? vm.passCheck : '',
           dossierId: vm.dossierDetail.dossierId
         }
         vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
@@ -417,14 +399,10 @@ export default {
           vm.loading = false
           console.log('reject', reject)
         })
-      } else {
-        vm.validPass = false
       }
     },
     clearDialog () {
-      $('#passCheck').val('')
-      this.validPass = true
-      this.visible = false
+      this.$refs.form.reset()
     },
     //
     clear (id) {
@@ -434,7 +412,6 @@ export default {
       this.hide()
     },
     show (e) {
-      this.validPass = true
       this.input = e.target
       if (!this.visible) {
         this.visible = true

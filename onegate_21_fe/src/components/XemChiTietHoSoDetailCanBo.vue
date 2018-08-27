@@ -79,7 +79,9 @@
               </p>
               <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                 <span>Người thực hiện: &nbsp;</span>
-                <b>{{usersNextAction.join(', ')}}&nbsp;</b>-
+                <span v-for="(item, index) in usersNextAction" :key="item.userId">
+                  &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                </span> - 
                 <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                   {{stepOverdueNextAction}}
                 </span>
@@ -531,15 +533,7 @@ export default {
       return this.$store.getters.getCheckInput
     },
     usersNextAction () {
-      let user = []
-      user = this.$store.getters.getUsersNextAction
-      let userName = []
-      if (user && Array.isArray(user) && user.length > 0) {
-        for (let key in user) {
-          userName.push(user[key]['userName'])
-        }
-      }
-      return userName
+      return this.$store.getters.getUsersNextAction
     },
     stepOverdueNextAction () {
       return this.$store.getters.getStepOverdueNextAction
