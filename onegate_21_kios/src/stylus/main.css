@@ -1446,8 +1446,7 @@ body .menu__content--select .text--disabled {
 	background-image: url('/o/frontend-web-kios/images/kios-home-1.png');
 }
 .kios-home .custom-row:nth-child(2) .col-5 {
-	background-image: url('/o/frontend-web-kios/images/kios-home-2.png');
-	text-align: right;
+	background-image: url('/o/frontend-web-kios/images/kios-home-2.png')
 }
 .kios-home .custom-row:nth-child(3) .col-5 {
 	background-image: url('/o/frontend-web-kios/images/kios-home-3.png');

@@ -414,12 +414,16 @@ export default {
           vm.loading = false
           vm.dialogCheckPass = false
           vm.clearDialog()
-          if (result.status && result.status.toString() === '203') {
-            vm.dialogError = true
-          } else if (result.status && result.status.toString() === '200') {
-            router.push('/ho-so/' + vm.dossierDetail.dossierId)
-          }
+          router.push('/ho-so/' + vm.dossierDetail.dossierId)
+          // if (result.status && result.status.toString() === '403') {
+          //   vm.dialogError = true
+          // } else if (result.status && result.status.toString() === '200') {
+          //   router.push('/ho-so/' + vm.dossierDetail.dossierId)
+          // }
         }).catch(function (reject) {
+          vm.dialogCheckPass = false
+          vm.clearDialog()
+          vm.dialogError = true
           vm.loading = false
           console.log('reject', reject)
         })

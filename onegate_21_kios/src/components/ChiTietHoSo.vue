@@ -169,17 +169,8 @@
       let vm = this
       vm.$nextTick(function () {
         var vm = this
-        vm.loading = true
-        let filter = {
-          dossierId: vm.index
-        }
-        vm.$store.dispatch('getDossierDetail', filter).then(function (result) {
-          vm.dossierDetail = result
-          vm.loadDossiertemplate()
-          vm.loading = false
-        }).catch(function (reject) {
-          vm.loading = false
-        })
+        vm.dossierDetail = this.$store.getters.getDetailDossier
+        vm.loadDossiertemplate()
       })
     },
     watch: {},
@@ -199,15 +190,17 @@
         let filter = {
           dossierTemplateNo: vm.dossierDetail.dossierTemplateNo
         }
-        vm.$store.dispatch('loadDossierTemplates', filter).then(function (result) {
-          console.log(result)
-          vm.tailieuNop = result.filter(function (item) {
-            return item.partType === 1
+        if (vm.dossierDetail.dossierTemplateNo) {
+          vm.$store.dispatch('loadDossierTemplates', filter).then(function (result) {
+            console.log(result)
+            vm.tailieuNop = result.filter(function (item) {
+              return item.partType === 1
+            })
+            vm.tailieuKeyQua = result.filter(function (item) {
+              return item.partType === 2
+            })
           })
-          vm.tailieuKeyQua = result.filter(function (item) {
-            return item.partType === 2
-          })
-        })
+        }
       },
       goBack () {
         window.history.back()

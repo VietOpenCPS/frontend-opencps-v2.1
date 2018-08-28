@@ -12,6 +12,7 @@ export const store = new Vuex.Store({
     totalEmployee: 0,
     workingUnitSelect: null,
     loading: false,
+    dossierDetail: {},
     index: 0
   },
   actions: {
@@ -248,7 +249,8 @@ export const store = new Vuex.Store({
           // test local
           axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
-            // let serializable = response.data
+            let serializable = response.data
+            commit('setDossierDetail', serializable)
             console.log('response', response)
             resolve(response)
           }).catch(function (error) {
@@ -423,6 +425,9 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
+    setDossierDetail (state, payload) {
+      state.dossierDetail = payload
+    },
     setTotalEmployee (state, payload) {
       state.totalEmployee = payload
     },
@@ -437,8 +442,8 @@ export const store = new Vuex.Store({
     getTotalEmployee (state) {
       return state.totalEmployee
     },
-    getWorkingUnitSelect (state) {
-      return state.workingUnitSelect
+    getDetailDossier (state) {
+      return state.dossierDetail
     }
   }
 })

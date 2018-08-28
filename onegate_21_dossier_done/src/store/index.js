@@ -57,8 +57,8 @@ export const store = new Vuex.Store({
             // }
           }
           // test local
-          // axios.get('/o/rest/v2/dossiers', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
