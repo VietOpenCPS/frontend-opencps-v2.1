@@ -46,14 +46,12 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
-            },
-            params: {}
+              groupId: state.initData.groupId
+            }
           }
           // test local
-          axios.get('/o/rest/v2/workingunits', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
+          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -71,28 +69,19 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param
-          if (filter.workingunit === 'all') {
-            param = {
-              start: filter.start,
-              end: filter.end
-            }
-          } else {
-            param = {
-              workingunit: filter.workingunit,
-              start: filter.start,
-              end: filter.end
-            }
+          param = {
+            start: filter.start,
+            end: filter.end
           }
           let configs = {
             headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
+              groupId: state.initData.groupId
             },
             params: param
           }
           // test local
-          axios.get('/o/rest/v2/employees', configs).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/employees', configs).then(function (response) {
+          axios.get('/o/rest/v2/employees/publish/' + filter.workingunit, configs).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/employees/publish/' + filter.workingunit, configs).then(function (response) {
             let serializable = response.data
             commit('setTotalEmployee', serializable.total)
             if (serializable.data) {

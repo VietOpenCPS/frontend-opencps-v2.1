@@ -86,16 +86,18 @@
           if (result) {
             vm.trangThaiHoSoList = result
             let currentParams = vm.$router.history.current.params
-            if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
-              vm.trangThaiHoSoList[0]['active'] = true
-              router.push({
-                path: '/danh-sach-ho-so/0',
-                query: {
-                  q: vm.trangThaiHoSoList[0]['queryParams']
-                }
-              })
-            } else {
-              vm.trangThaiHoSoList[currentParams.index]['active'] = true
+            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
+              if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+                vm.trangThaiHoSoList[0]['active'] = true
+                router.push({
+                  path: '/danh-sach-ho-so/0',
+                  query: {
+                    q: vm.trangThaiHoSoList[0]['queryParams']
+                  }
+                })
+              } else {
+                vm.trangThaiHoSoList[currentParams.index]['active'] = true
+              }
             }
             vm.loadingCounter()
             vm.loading = false

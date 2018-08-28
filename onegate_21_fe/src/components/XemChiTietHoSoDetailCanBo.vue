@@ -47,7 +47,7 @@
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            XỬ LÝ HỒ SƠ
+            <span v-if="originality === 3">XỬ LÝ HỒ SƠ</span> <span v-else>CHUẨN BỊ HỒ SƠ</span>
           </v-btn>
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="loadTPHS()">
@@ -68,7 +68,7 @@
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
-            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3">
+            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
               <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                 <span>Chuyển đến bởi: </span>
                 <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
@@ -79,10 +79,17 @@
               </p>
               <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                 <span>Người thực hiện: &nbsp;</span>
-                <b>{{usersNextAction.toString()}}&nbsp;</b>-
+                <span v-for="(item, index) in usersNextAction" :key="item.userId">
+                  &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                </span> - 
                 <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                   {{stepOverdueNextAction}}
                 </span>
+              </p>
+            </div>
+            <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
+              <p class="mb-2">
+                Hồ sơ đã hoàn thành quá trình xử lý
               </p>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
@@ -102,7 +109,7 @@
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
-                v-if="item.enable > 0"
+                v-if="item.enable > 0 || (actionSpecial && item['autoEvent'] === 'special')"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
@@ -124,7 +131,7 @@
               </v-menu>
             </div>
             <!--  -->
-            <v-layout wrap v-if="dialogActionProcess">
+            <v-layout wrap v-if="dialogActionProcess" style="border-left: 2px solid blue;">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -133,6 +140,7 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
+              <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
@@ -155,7 +163,7 @@
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
-            <div>
+            <div v-if="thongTinChiTietHoSo.online">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
@@ -190,7 +198,10 @@
                           </li>
                         </ul>
                         <!--  -->
-                        <div v-else class="no-comments no-data my-2"><i class="fa fa-comments fa-2x"></i><br>Không có trao đổi nào</div>
+                        <div v-else class="no-comments no-data my-2">
+                          <i class="fa fa-comments" style="font-size: 25px;"></i><br>
+                          <span style="font-size: 18px;">Không có trao đổi nào</span>
+                        </div>
                         <!--  -->
                         <div style="position:relative">
                           <v-text-field class="pl-5 my-3"
@@ -231,16 +242,16 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form">
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="stateViewResult">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
                   Kết quả xử lý
                 </div>
-                <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+                <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form">
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> III.</div>
@@ -348,6 +359,7 @@ import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
+import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -361,7 +373,8 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
-    'ngay-hen-tra': EditDate
+    'ngay-hen-tra': EditDate,
+    'ngay-gia-han': ExtendDateEdit
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -392,7 +405,7 @@ export default {
     nextActions: [],
     createFiles: [],
     processSteps: [],
-    documents: null,
+    documents: [],
     payments: '',
     dossierActions: [],
     itemselect: '',
@@ -409,6 +422,7 @@ export default {
     showTraKetQua: false,
     showThuPhi: false,
     showEditDate: false,
+    showExtendDateEdit: false,
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -424,11 +438,14 @@ export default {
     returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
+    extendDateEdit: '',
+    typeExtendDate: '',
     dueDateEdit: '',
     receiveDateEdit: '',
     dialogActionProcess: false,
     rollbackable: false,
     configNote: null,
+    actionSpecial: false,
     headers: [{
       text: '#',
       align: 'center',
@@ -502,7 +519,9 @@ export default {
       icon: 'check_circle',
       color: 'success',
       message: 'Thực hiện thành công!'
-    }
+    },
+    stateViewResult: true,
+    stateViewDocument: true
   }),
   computed: {
     loading () {
@@ -516,15 +535,7 @@ export default {
       return this.$store.getters.getCheckInput
     },
     usersNextAction () {
-      let user = []
-      user = this.$store.getters.getUsersNextAction
-      let userName = []
-      if (user && Array.isArray(user) && user.length > 0) {
-        for (let key in user) {
-          userName.push(user[key]['userName'])
-        }
-      }
-      return userName
+      return this.$store.getters.getUsersNextAction
     },
     stepOverdueNextAction () {
       return this.$store.getters.getStepOverdueNextAction
@@ -542,6 +553,9 @@ export default {
       if (currentQuery.hasOwnProperty('activeTab')) {
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
+        if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
+          vm.actionSpecial = currentQuery['actionSpecial']
+        }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
         vm.getNextActions()
@@ -559,6 +573,9 @@ export default {
         vm.btnIndex = -1
         vm.activeTab = currentQuery.activeTab
         vm.btnIndex = currentQuery['btnIndex']
+        if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
+          vm.actionSpecial = currentQuery['actionSpecial']
+        }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
         vm.getNextActions()
@@ -760,6 +777,7 @@ export default {
       vm.showTraKetQua = false
       vm.showThuPhi = false
       vm.showEditDate = false
+      vm.showExtendDateEdit = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -776,16 +794,10 @@ export default {
         }
       }
       console.log('isPopup========11111', isPopup)
-      // if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined' && vm.originality !== 1) {
-      //   try {
-      //     vm.$refs.thanhphanhoso.saveMark()
-      //   } catch (e) {
-      //   }
-      // }
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -836,12 +848,26 @@ export default {
           vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
           vm.receiveDateEdit = result.receiving.receiveDate
         }
+        if (result.hasOwnProperty('overdue')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.overdue !== '' ? new Date(result.overdue) : ''
+          vm.typeExtendDate = 'overdue'
+        }
+        if (result.hasOwnProperty('betimes')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.betimes !== '' ? new Date(result.betimes) : ''
+          vm.typeExtendDate = 'betimes'
+        }
       }
       console.log('isPopup========222222', isPopup)
       if (isPopup) {
+        vm.loadingAction = false
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
       } else {
+        vm.loadingAction = true
         vm.processAction(vm.thongTinChiTietHoSo, item, result, index, false)
       }
     },
@@ -859,7 +885,6 @@ export default {
       vm.dialogActionProcess = false
       vm.loadingActionProcess = true
       vm.$store.dispatch('processPullBtnDetail', filter).then(function (result) {
-        vm.loadingAction = false
         vm.loadingActionProcess = false
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, item, result, index)
       }).catch(function (reject) {
@@ -915,17 +940,23 @@ export default {
         }
         vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
+        vm.btnIndex = 111
         let result = {
+          actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8500
+          overdue: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       } else if (String(item.form) === 'BETIMES') {
+        vm.btnIndex = 333
         let result = {
+          actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          actionCode: 8400
+          betimes: vm.thongTinChiTietHoSo['extendDate']
         }
-        vm.doActionSpecial(result)
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       }
     },
     doPrint01 (dossierItem, item, index) {
@@ -1046,6 +1077,7 @@ export default {
       let vm = this
       var validPhanCong = true
       var validYKien = true
+      var validTreHan = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1087,6 +1119,25 @@ export default {
         }
         filter['payload'] = payload
       }
+      if (vm.showExtendDateEdit) {
+        let data = vm.$refs.ngaygiahan.doExport()
+        console.log('extendDateEdit', data.extendDate)
+        if (data.valid) {
+          validTreHan = true
+        } else {
+          validTreHan = false
+        }
+        let payload = {
+          'extendDate': data.extendDate
+        }
+        if (vm.typeExtendDate === 'overdue') {
+          payload = {
+            'extendDate': data.extendDate,
+            'delayNote': data.text
+          }
+        }
+        filter['payload'] = payload
+      }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
@@ -1104,7 +1155,7 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien) {
+      if (validPhanCong && validYKien && validTreHan) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1117,6 +1168,7 @@ export default {
         if (x && vm.validateAction) {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             console.log('result======', result)
+            vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
             vm.alertObj = {
@@ -1142,14 +1194,22 @@ export default {
               }
             })
           }).catch(function (reject) {
+            vm.loadingAction = false
             vm.loadingActionProcess = false
           })
         } else {
           return false
         }
       } else if (vm.validateAction) {
+        if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined') {
+          var valid = vm.$refs.thanhphanhoso.validDossierTemplate()
+          if (!valid) {
+            return
+          }
+        }
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           console.log('result======', result)
+          vm.loadingAction = false
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
           vm.alertObj = {
@@ -1178,6 +1238,7 @@ export default {
             })
           }
         }).catch(function (reject) {
+          vm.loadingAction = false
           vm.loadingActionProcess = false
         })
       }
@@ -1279,10 +1340,26 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
-            vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+          if (currentQuery.btnIndex.toString() === '111') {
+            let result = {
+              actionCode: 8500,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              overdue: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+          } else if (currentQuery.btnIndex.toString() === '333') {
+            let result = {
+              actionCode: 8400,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              betimes: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
           } else {
-            vm.dialogActionProcess = false
+            if (vm.btnDossierDynamics[currentQuery.btnIndex].enable === 1 || vm.btnDossierDynamics[currentQuery.btnIndex].enable === 2) {
+              vm.processPullBtnDetail(vm.btnDossierDynamics[currentQuery.btnIndex], currentQuery.btnIndex)
+            } else {
+              vm.dialogActionProcess = false
+            }
           }
         }
         console.log('vm.checkInput======', vm.getCheckInput)
@@ -1462,9 +1539,10 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'ROLLBACK_01') {
-        let check = vm.usersNextAction.filter(function (item) {
-          return item === currentUser.userName
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+        let userArr = vm.$store.getters.getUsersNextAction
+        let check = userArr.filter(function (item) {
+          return item.userId.toString() === currentUser.userId.toString()
         })
         if (check.length > 0) {
           checkValue = true
@@ -1474,13 +1552,18 @@ export default {
       }
       // check theo lastactionUser
       if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
-        if (currentUser.userName === thongtinchitiet.lastActionUser) {
-          checkValue = true
-        } else {
+        // if (currentUser.userId === thongtinchitiet.lastActionUserId) {
+        //   checkValue = true
+        // } else {
           checkValue = false
-        }
+        // }
       }
       return checkValue
+    },
+    changeStateViewResult (data) {
+      console.log('state view result', data)
+      var vm = this
+      vm.stateViewResult = data
     }
   },
   filters: {

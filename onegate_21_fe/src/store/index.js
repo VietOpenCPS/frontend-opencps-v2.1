@@ -264,9 +264,11 @@ export const store = new Vuex.Store({
           axios.get(filter.queryParams, param).then(function (response) {
             let serializable = response.data
             commit('setLoadingTable', false)
+            commit('setUserNextAction', [])
             resolve(serializable)
           }).catch(function (error) {
             commit('setLoadingTable', false)
+            commit('setUserNextAction', [])
             console.log(error)
             reject(error)
           })
@@ -803,6 +805,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
+        dataPutdossier.append('briefNote', data.briefNote)
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
           dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
@@ -1546,7 +1549,11 @@ export const store = new Vuex.Store({
               let serializable = response.data
               commit('setCheckInput', serializable['checkInput'])
               commit('setStepOverdueNextAction', serializable['stepOverdue'])
-              commit('setUserNextAction', serializable['users'])
+              if (Array.isArray(serializable['users'])) {
+                commit('setUserNextAction', serializable['users'])
+              } else {
+                commit('setUserNextAction', [serializable['users']])
+              }
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
@@ -1567,7 +1574,12 @@ export const store = new Vuex.Store({
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
-            let buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons']
+            let buttonConfig
+            if (serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {
+              buttonConfig = JSON.parse(serializable[0].buttonConfig)['buttons'] ? JSON.parse(serializable[0].buttonConfig)['buttons'] : []
+            } else {
+              buttonConfig = []
+            }
             resolve(buttonConfig)
           }).catch(function (error) {
             console.log(error)

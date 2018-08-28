@@ -20,17 +20,17 @@
               </div>
               <!--  -->
               <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Mã hồ sơ: </span>
-                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
+                <span class="pl-0">Thư điện tử: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
               </div>
               <!--  -->
               <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Trạng thái: </span>
-                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+                <span class="pr-2">Điện thoại: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
               </div>
             </v-flex>
             <!--  -->
-            <v-flex xs12 sm4 class="pr-3" v-else>
+            <v-flex xs12 sm4 class="pr-3" v-if="originality === 1">
               <div class="xs12 sm12 pb-1">
                 <span class="pr-2">Mã hồ sơ: </span>
                 <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
@@ -93,15 +93,22 @@
             </v-flex>
             <!--  -->
             <v-flex xs12 sm4 v-if="originality !== 1">
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Thông tin liên hệ:</div>
               <div class="xs12 sm12 pb-1">
-                <span class="pl-0">Thư điện tử: </span>
-                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactEmail}} </span>
+                <span class="pr-2">Mã hồ sơ: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
               </div>
               <!--  -->
               <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Điện thoại: </span>
-                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
+                <span class="pr-2">Trạng thái: </span>
+                <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
+              </div>
+              <!-- brief note -->
+              <div class="xs12 sm12 pb-1 overHidden">
+                <span class="pr-2">Nội dung: </span>
+                <v-tooltip top v-if="thongTinChiTietHoSo.briefNote">
+                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.briefNote}}</span>
+                  <span class="pl-0">{{thongTinChiTietHoSo.briefNote}} </span>
+                </v-tooltip>
               </div>
             </v-flex>
             <v-flex xs12 sm4 v-else>

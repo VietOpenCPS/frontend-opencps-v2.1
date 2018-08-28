@@ -2861,3 +2861,11 @@ body .chip .chip__content {
     height: 24px;
     cursor: pointer;
 }
+
+.no-comments.no-data > i {
+  font-size: 25px;
+}
+
+.no-comments.no-data {
+  font-size: 18px;
+}

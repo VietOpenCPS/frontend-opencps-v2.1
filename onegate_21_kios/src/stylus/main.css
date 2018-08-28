@@ -274,6 +274,21 @@ div.table-tracuu {
     max-height: 700px;
     overflow: auto
 }
+div.table-tracuu table.table thead tr th:first-child, div.table-tracuu table.table tbody tr td:first-child {
+    max-width: 100px !important;
+}
+div.table-tracuu table.table thead tr th:nth-child(2), div.table-tracuu table.table tbody tr td::nth-child(2) {
+    min-width: 250px;
+    max-width: 270px;
+}
+div.table-tracuu table.table thead tr th:nth-child(4), div.table-tracuu table.table tbody tr td::nth-child(4) {
+    min-width: 170px;
+    max-width: 200px;
+}
+div.table-tracuu table.table thead tr th:nth-child(5), div.table-tracuu table.table tbody tr td::nth-child(5) {
+    min-width: 150px;
+    max-width: 150px;
+}
 div.table-tracuu::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;
@@ -287,6 +302,27 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: rgb(181, 181, 181);
+}
+.dialog-keyboard {
+    position: absolute !important;
+    top: 0px !important
+}
+.virtual-keyboard {
+    z-index: 10000;
+    width: 90% !important;
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ddd;
+    border-radius: 5px;
+}
+.overlayActive {
+    pointer-events: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    opacity: .46;
+    background-color: #21212173;
 }
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
@@ -339,6 +375,10 @@ table.table .input-group--selection-controls.checkbox .icon {
 }
 body table.table tbody td[colspan="9"] {
     padding-top: 10px !important;
+}
+.table-detail-domain table.table tbody tr td:first-child {
+    min-width: 150px !important;
+    max-width: 200px;
 }
 body .input-group--select .input-group__selections__comma {
     font-size: 13px;
@@ -939,16 +979,20 @@ body .input-group--selection-controls__ripple {
     max-height: 500px;
     overflow: auto
 }
-.overflowContainer::-webkit-scrollbar-track{
+.dossierList {
+    max-height: 600px;
+    overflow: auto
+}
+.overflowContainer::-webkit-scrollbar-track, .dossierList::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;
     background-color: #F5F5F5;
 }
-.overflowContainer::-webkit-scrollbar{
+.overflowContainer::-webkit-scrollbar, .dossierList::-webkit-scrollbar{
     width: 8px;
     background-color: #F5F5F5;
 }
-.overflowContainer::-webkit-scrollbar-thumb{
+.overflowContainer::-webkit-scrollbar-thumb, .dossierList::-webkit-scrollbar-thumb{
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: rgb(181, 181, 181);
@@ -1299,6 +1343,23 @@ body .menu__content--select .text--disabled {
 .total-result-search {
     height: 40px;
     background-color: #d6e9f7
+}
+.total-result-search-blue {
+    height: 40px;
+    background-color: #3563c1;
+    color: #ffffff;
+    font-weight: 500
+}
+/* .dossierList {
+    height: 600px;
+    overflow:hidden;
+    position:relative
+} */
+.dossierList .flex span {
+    font-weight: 450
+}
+.active {
+    background-color: #eee !important;
 }
 .total-result-search span {
     color: #e82020

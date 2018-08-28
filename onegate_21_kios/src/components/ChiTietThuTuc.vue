@@ -35,39 +35,47 @@
             <v-tab key="4" ripple class="mx-2"> Yêu cầu điều kiện </v-tab>
             <v-tab-item key="1" >
               <v-card>
-                <v-card-text>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Cơ quan quản lý</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.administrationName}}</span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Lĩnh vực</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.domainName}}</span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Cách thực hiện</span></v-flex>
-                    <v-flex xs12 sm10><span v-html="serviceDetail.methodText"></span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Thời gian giải quyết</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.durationText}}</span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Đối tượng</span></v-flex>
-                    <v-flex xs12 sm10><span v-html="serviceDetail.applicantText"></span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Kết quả giải quyết</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.resultText}}</span></v-flex>
-                  </v-layout>
-                  <v-layout wrap class="my-1">
-                    <v-flex xs12 sm2><span class="text-bold">Lệ phí</span></v-flex>
-                    <v-flex xs12 sm10><span>{{serviceDetail.feeText}}</span></v-flex>
-                  </v-layout>
-                  <v-layout wrap>
-                    <v-flex xs12 sm2><span class="text-bold">Căn cứ pháp lý</span></v-flex>
-                    <v-flex xs12 sm10><span v-html="serviceDetail.regularText"></span></v-flex>
-                  </v-layout>
+                <v-card-text class="px-0 py-0">
+                  <div class="table-detail-domain table-bordered">
+                    <div class="table__overflow">
+                      <table class="datatable table">
+                        <tbody>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
+                            <td class="pt-2"><span>{{serviceDetail.administrationName}}</span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Lĩnh vực</span></td>
+                            <td class="pt-2"><span>{{serviceDetail.domainName}}</span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Cách thực hiện</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.methodText"></span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.durationText"></span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.applicantText"></span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.resultText"></span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.feeText"></span></td>
+                          </tr>
+                          <tr>
+                            <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
+                            <td class="pt-2"><span v-html="serviceDetail.regularText"></span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </v-card-text>
               </v-card>
             </v-tab-item>
