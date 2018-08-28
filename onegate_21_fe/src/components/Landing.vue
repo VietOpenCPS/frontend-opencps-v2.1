@@ -822,7 +822,9 @@ export default {
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
-            vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
+              vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            }
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
               vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
             }
@@ -1781,8 +1783,10 @@ export default {
           activeTab: 'tabs-1',
           btnIndex: btnIndex
         }
-        if (item['autoEvent'] === 'special') {
-          query['actionSpecial'] = true
+        if (item['autoEvent']) {
+          if (item['autoEvent'] === 'special') {
+            query['actionSpecial'] = true
+          }
         }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],

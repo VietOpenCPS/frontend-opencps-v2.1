@@ -108,6 +108,7 @@ export default {
     dialogError: false,
     dossierDetail: '',
     valid: false,
+    validPass: true,
     passCheck: '',
     //
     visible: false,

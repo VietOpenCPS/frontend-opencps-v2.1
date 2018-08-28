@@ -104,7 +104,7 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <div v-else class="overflowContainer" :class="visible ? 'overlayActive': ''">
+      <div v-if="!loading && listThuTuc && listThuTuc.length > 0" class="overflowContainer" :class="visible ? 'overlayActive': ''">
         <div class="mb-3 main-header">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content value="1">
@@ -268,7 +268,11 @@ export default {
       }
       vm.$store.dispatch('getServiceLists', filter).then(function (result) {
         vm.loading = false
-        vm.listThuTuc = result.data
+        if (result.data) {
+          vm.listThuTuc = result.data
+        } else {
+          vm.listThuTuc = []
+        }
         vm.serviceItemTotal = result.total
       }).catch(reject => {
         vm.loading = false

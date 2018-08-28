@@ -109,7 +109,7 @@
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
-                v-if="item.enable > 0 || (actionSpecial && item['autoEvent'] === 'special')"
+                v-if="item.enable > 0 || (item['autoEvent'] === 'special')"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
@@ -123,7 +123,7 @@
                   </v-list-tile>
                   <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
                     @click="processPullBtnDetail(item, index)" 
-                    v-if="item['autoEvent'] === 'special' && checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
+                    v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
                     >
                     <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                   </v-list-tile>
@@ -131,7 +131,7 @@
               </v-menu>
             </div>
             <!--  -->
-            <v-layout wrap v-if="dialogActionProcess" style="border-left: 2px solid blue;">
+            <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -159,7 +159,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable && currentUser.userName === thongTinChiTietHoSo.lastActionUser" @click="rollBack()">Quay lui hồ sơ</v-btn>
+              <v-btn color="primary" v-if="rollbackable && currentUser.userId === thongTinChiTietHoSo.lastActionUserId" @click="rollBack()">Quay lui hồ sơ</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -944,7 +944,7 @@ export default {
         let result = {
           actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          overdue: vm.thongTinChiTietHoSo['extendDate']
+          overdue: vm.thongTinChiTietHoSo['extendDate'] ? vm.thongTinChiTietHoSo['extendDate'] : ''
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
@@ -953,7 +953,7 @@ export default {
         let result = {
           actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          betimes: vm.thongTinChiTietHoSo['extendDate']
+          betimes: vm.thongTinChiTietHoSo['extendDate'] ? vm.thongTinChiTietHoSo['extendDate'] : ''
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
@@ -1541,11 +1541,15 @@ export default {
       // check theo người thực hiện
       if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
         let userArr = vm.$store.getters.getUsersNextAction
-        let check = userArr.filter(function (item) {
-          return item.userId.toString() === currentUser.userId.toString()
-        })
-        if (check.length > 0) {
-          checkValue = true
+        if (userArr.length > 0) {
+          let check = userArr.filter(function (item) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          })
+          if (check.length > 0) {
+            checkValue = true
+          } else {
+            checkValue = false
+          }
         } else {
           checkValue = false
         }
