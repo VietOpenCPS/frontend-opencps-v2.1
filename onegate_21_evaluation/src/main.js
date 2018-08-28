@@ -14,7 +14,7 @@ Vue.use(Vuetify)
 Vue.config.productionTip = true
 
 new Vue({ // eslint-disable-line no-new
-  el: '#app',
+  el: '#app_evv',
   router,
   store,
   render: h => h(App)

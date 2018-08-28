@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="app_report">
     <v-navigation-drawer app clipped floating width="240"
     >
       <v-list class="py-0 nav_trang_thai_ho_so">

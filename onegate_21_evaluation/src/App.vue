@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="app_evv11">
     <v-navigation-drawer app clipped floating width="240">
       <div class="row-header my-0 mb-2">
         <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 

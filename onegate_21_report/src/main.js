@@ -22,7 +22,7 @@ Vue.mixin({
 })
 
 new Vue({ // eslint-disable-line no-new
-  el: '#app',
+  el: '#app_report',
   router,
   store,
   render: h => h(App)
