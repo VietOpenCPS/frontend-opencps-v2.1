@@ -12,7 +12,7 @@
           <div class="dossierList">
             <div class="wrap-list" :style="{ color: activeColor, fontSize: fontSize + 'px' }">
               <v-layout class="wrap" v-for="(item, index) in dossierList" 
-              :key="item.dossierId" :class="index%2==1 ? 'active': ''" @click="viewDetail(item)">
+              :key="item.dossierId" :class="index%2==1 ? 'active': ''">
                 <v-flex class="px-3 py-2" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
                 <v-flex class="px-3 py-2" style="width: calc(100% - 450px)"><span> {{item.applicantName}}</span></v-flex>
                 <v-flex class="px-3 py-2 text-right" style="width: 200px"><span>{{item.dueDate}}</span></v-flex>

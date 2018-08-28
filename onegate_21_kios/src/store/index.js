@@ -240,11 +240,10 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
-            },
-            params: {
+              groupId: state.initData.groupId,
               secretCode: filter.password
-            }
+            },
+            params: {}
           }
           // test local
           axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
