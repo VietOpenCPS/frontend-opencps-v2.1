@@ -4,7 +4,7 @@ import Router from 'vue-router'
 const routerOptions = [
   { path: '/', component: 'Landing', props: false },
   { path: '/tra-cuu-ho-so', component: 'TraCuuHoSo', props: false },
-  { path: '/tra-cuu-ho-so/:index', component: 'ChiTietHoSo', props: true },
+  { path: '/ho-so/:index', component: 'ChiTietHoSo', props: true },
   { path: '/tra-cuu-thu-tuc', component: 'TraCuuThuTuc', props: false },
   { path: '/tra-cuu-thu-tuc/:index', component: 'ChiTietThuTuc', props: true },
   { path: '/danh-gia-can-bo', component: 'DanhGiaCanBo', props: false },

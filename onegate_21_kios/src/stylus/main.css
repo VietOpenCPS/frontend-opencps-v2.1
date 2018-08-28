@@ -376,6 +376,10 @@ table.table .input-group--selection-controls.checkbox .icon {
 body table.table tbody td[colspan="9"] {
     padding-top: 10px !important;
 }
+.table-detail-domain table.table tbody tr td:first-child {
+    min-width: 150px !important;
+    max-width: 200px;
+}
 body .input-group--select .input-group__selections__comma {
     font-size: 13px;
 }
@@ -975,16 +979,20 @@ body .input-group--selection-controls__ripple {
     max-height: 500px;
     overflow: auto
 }
-.overflowContainer::-webkit-scrollbar-track{
+.dossierList {
+    max-height: 600px;
+    overflow: auto
+}
+.overflowContainer::-webkit-scrollbar-track, .dossierList::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;
     background-color: #F5F5F5;
 }
-.overflowContainer::-webkit-scrollbar{
+.overflowContainer::-webkit-scrollbar, .dossierList::-webkit-scrollbar{
     width: 8px;
     background-color: #F5F5F5;
 }
-.overflowContainer::-webkit-scrollbar-thumb{
+.overflowContainer::-webkit-scrollbar-thumb, .dossierList::-webkit-scrollbar-thumb{
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: rgb(181, 181, 181);
