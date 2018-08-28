@@ -36,7 +36,7 @@
             <v-tab-item key="1" >
               <v-card>
                 <v-card-text class="px-0 py-0">
-                  <div class="table-tracuu table-landing table-bordered">
+                  <div class="table-detail-domain table-bordered">
                     <div class="table__overflow">
                       <table class="datatable table">
                         <tbody>

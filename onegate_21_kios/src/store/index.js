@@ -68,6 +68,33 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingDataHoSoKQ ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+            // params: {
+            //   start: filter.page ? filter.page * 15 - 15 : '',
+            //   end: filter.page * 15,
+            //   dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            //   applicantName: filter.applicantName ? filter.applicantName : '',
+            //   applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
+            // }
+          }
+          // test local
+          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getDomainLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

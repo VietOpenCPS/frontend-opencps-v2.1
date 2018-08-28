@@ -417,7 +417,7 @@ export default {
           if (result.status && result.status.toString() === '203') {
             vm.dialogError = true
           } else if (result.status && result.status.toString() === '200') {
-            router.push('/tra-cuu-ho-so/' + vm.dossierDetail.dossierId)
+            router.push('/ho-so/' + vm.dossierDetail.dossierId)
           }
         }).catch(function (reject) {
           vm.loading = false

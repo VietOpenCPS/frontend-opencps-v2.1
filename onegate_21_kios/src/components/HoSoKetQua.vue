@@ -5,13 +5,14 @@
         <content-placeholders-text :lines="10" />
       </content-placeholders>
       <v-card v-else>
-        <div style="background-color: #ffffff">
+        <div style="background-color: #ffffff" :class="visible ? 'overlayActive': ''">
           <div class="mt-3 pt-2 text-center total-result-search-blue">
             <span>DANH SÁCH HỒ SƠ CÓ KẾT QUẢ &nbsp; ({{dossierItemTotal}})</span>
           </div>
           <div class="dossierList">
-            <div class="wrap-list">
-              <v-layout class="wrap" v-for="(item, index) in dossierList" :key="item.dossierId" :class="index%2==1 ? 'active': ''">
+            <div class="wrap-list" :style="{ color: activeColor, fontSize: fontSize + 'px' }">
+              <v-layout class="wrap" v-for="(item, index) in dossierList" 
+              :key="item.dossierId" :class="index%2==1 ? 'active': ''" @click="viewDetail(item)">
                 <v-flex class="px-3 py-2" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
                 <v-flex class="px-3 py-2" style="width: calc(100% - 450px)"><span> {{item.applicantName}}</span></v-flex>
                 <v-flex class="px-3 py-2 text-right" style="width: 200px"><span>{{item.dueDate}}</span></v-flex>
@@ -131,7 +132,7 @@ export default {
       vm.loading = true
       var filter = null
       filter = {}
-      vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+      vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false
         vm.dossierList = result.data
         vm.dossierItemTotal = result.total
@@ -164,7 +165,7 @@ export default {
           if (result.status && result.status.toString() === '203') {
             vm.dialogError = true
           } else if (result.status && result.status.toString() === '200') {
-            router.push('/tra-cuu-ho-so/' + vm.dossierDetail.dossierId)
+            router.push('/ho-so/' + vm.dossierDetail.dossierId)
           }
         }).catch(function (reject) {
           vm.loading = false
@@ -192,6 +193,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -212,6 +214,15 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick () {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          vm.submitViewDetail()
+        })
+      }, 300)
     }
   }
 }
