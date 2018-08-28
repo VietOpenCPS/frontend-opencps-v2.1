@@ -217,7 +217,7 @@
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
             ></v-text-field>
-            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
+            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
           </div>
         </v-flex>
       </v-layout>
@@ -296,68 +296,71 @@
       </template>
       <!--  -->
       <template slot="items" slot-scope="props">
-        <td v-if="menuType !== 3 && originality !== 1">
-          <v-checkbox
-            :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
-            v-model="props.selected"
-            primary
-            hide-details
-            color="primary"
-          ></v-checkbox>
-        </td>
-        <td class="text-xs-center px-0 py-0">
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
-            {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
-          </span>
-        </td>
-
-        <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
-          :class="itemHeader['class_column']"
-          v-if="itemHeader.hasOwnProperty('value')"
-        >
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
-            <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
-            <span v-else>
-              {{ props.item[itemHeader.value] }}
+        <tr>
+          <td v-if="menuType !== 3 && originality !== 1">
+            <v-checkbox
+              :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              v-model="props.selected"
+              primary
+              hide-details
+              color="primary"
+            ></v-checkbox>
+          </td>
+          <td class="text-xs-center px-0 py-0">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
-          </div>
-        </td>
-        <td class="text-xs-center px-0 py-0" v-if="!hideAction">
-          <content-placeholders v-if="loadingTable">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-menu left :nudge-left="50" :nudge-top="15" 
-            v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
-              (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
-            <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
-              <v-icon>more_vert</v-icon>
-            </v-btn>
-            <v-list>
-              <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
-              <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
-                @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                :disabled="item['enable'] === 2"
-                v-if="item['enable'] > 0"
+          </td>
+
+          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
+            :class="itemHeader['class_column']"
+            v-if="itemHeader.hasOwnProperty('value')"
+          >
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+              <span v-else>
+                {{ props.item[itemHeader.value] }}
+              </span>
+            </div>
+          </td>
+          <td class="text-xs-center px-0 py-0" v-if="!hideAction">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <v-menu left :nudge-left="50" :nudge-top="15" 
+              v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
+                (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
+              <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
+                <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
+                  @click="processPullBtnDetail(props.item, item, props.index, i)" 
+                  :disabled="item['enable'] === 2 || String(props.item['permission']).indexOf('write') === -1"
+                  v-if="item['enable'] > 0 || item['autoEvent'] === 'special'"
+                  >
+                  <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
+                  v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
+                  @click="btnActionEvent(props.item, item, index, false)"
                 >
-                <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
-                @click="btnActionEvent(props.item, item, index, false)"
-              >
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="viewDetail(props.item, props.index)">
-                Xem chi tiết
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        </td>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="viewDetail(props.item, props.index)">
+                  Xem chi tiết
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
@@ -774,7 +777,8 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: true,
     filterForm: null,
-    checkSelectAll: (this.menuType !== 3 && this.originality !== 1)
+    checkSelectAll: (this.menuType !== 3 && this.originality !== 1),
+    titleLanding: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -786,6 +790,9 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    currentUser () {
+      return this.$store.getters.loadingInitData.user
     }
   },
   created () {
@@ -840,6 +847,13 @@ export default {
             vm.btnDynamics = btnDynamicsView
             vm.btnStepsDynamics = []
             if (currentQuery.hasOwnProperty('step')) {
+              // if (vm.trangThaiHoSoList[vm.index]['item'].length > 0) {
+              //   vm.trangThaiHoSoList[vm.index]['item'].forEach(item => {
+              //     if (item.stepCode === currentQuery['step']) {
+              //       vm.titleLanding = item.stepName
+              //     }
+              //   })
+              // }
               for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
                 let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
                 if (String(currentStep.stepCode) === String(currentQuery.step)) {
@@ -1049,6 +1063,35 @@ export default {
         // vm.doLoadingDataHoSo()
       })
     },
+    checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
+      var vm = this
+      var checkValue = true
+      // check theo người thực hiện
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+        let userArr = vm.$store.getters.getUsersNextAction
+        if (userArr.length > 0) {
+          let check = userArr.filter(function (item) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          })
+          if (check.length > 0) {
+            checkValue = true
+          } else {
+            checkValue = false
+          }
+        } else {
+          checkValue = false
+        }
+      }
+      // check theo lastactionUser
+      if (form === 'ROLLBACK_01' || form === 'ROLLBACK_02' || form === 'ROLLBACK_03') {
+        // if (currentUser.userId === thongtinchitiet.lastActionUserId) {
+        //   checkValue = true
+        // } else {
+        checkValue = false
+        // }
+      }
+      return checkValue
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -1166,9 +1209,12 @@ export default {
       for (let key in newQuery) {
         if (key === 'page') {
           queryString += key + '=1&'
-        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
           queryString += key + '=' + newQuery[key] + '&'
         }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1) {
+        queryString += 'step=' + newQuery['step'] + '&'
       }
       if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
         queryString += 'service_config=' + item.serviceConfigId
@@ -1198,11 +1244,14 @@ export default {
       let queryString = '?'
       newQuery['domain'] = ''
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== undefined && newQuery[key] !== null && key === 'page') {
+        if (key === 'page') {
           queryString += key + '=1&'
-        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && key !== 'step') {
           queryString += key + '=' + newQuery[key] + '&'
         }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1) {
+        queryString += 'step=' + newQuery['step'] + '&'
       }
       queryString += 'domain=' + vm.domainCode
       console.log('change Domain queryString', queryString)
@@ -1311,14 +1360,18 @@ export default {
         vm.processAction(dossierItem, item, result, index, true)
       } else if (String(item.form) === 'OVERDUE') {
         let result = {
-          actionCode: 8500
+          actionCode: 8500,
+          dossierId: dossierItem.dossierId,
+          overdue: dossierItem['extendDate']
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 111)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
-          actionCode: 8400
+          actionCode: 8400,
+          dossierId: dossierItem.dossierId,
+          betimes: dossierItem['extendDate']
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -1677,7 +1730,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -1712,18 +1765,28 @@ export default {
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
         }
+        if (result.hasOwnProperty('overdue')) {
+          isPopup = true
+        }
+        if (result.hasOwnProperty('betimes')) {
+          isPopup = true
+        }
       }
       if (isPopup) {
         /*
         vm.dialogActionProcess = true
         vm.loadingActionProcess = false
         */
+        let query = {
+          activeTab: 'tabs-1',
+          btnIndex: btnIndex
+        }
+        if (item['autoEvent'] === 'special') {
+          query['actionSpecial'] = true
+        }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
-          query: {
-            activeTab: 'tabs-1',
-            btnIndex: btnIndex
-          }
+          query: query
         })
       } else {
         vm.processAction(dossierItem, item, result, index, true)

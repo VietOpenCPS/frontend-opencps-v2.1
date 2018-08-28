@@ -9,13 +9,19 @@
     <v-btn color="primary" class="mr-5"
       @click="goTraCuuThuTuc"
     >
-      Tra Cứu Thủ Tục &nbsp;
+      Tra cứu thủ tục &nbsp;
       <v-icon size="18">arrow_forward</v-icon>
     </v-btn>
     <v-btn color="primary"
       @click="goDanhGiaCanBo"
     >
-      Đánh Giá Cán Bộ &nbsp;
+      Đánh giá cán bộ &nbsp;
+      <v-icon size="18">arrow_forward</v-icon>
+    </v-btn>
+    <v-btn color="primary"
+      @click="goHoSoKetQua"
+    >
+      Hồ sơ đã có kết quả &nbsp;
       <v-icon size="18">arrow_forward</v-icon>
     </v-btn>
   </div>
@@ -38,6 +44,9 @@ export default {
     },
     goDanhGiaCanBo () {
       router.push('/danh-gia-can-bo')
+    },
+    goHoSoKetQua () {
+      router.push('/ho-so-co-ket-qua')
     }
   }
 }
