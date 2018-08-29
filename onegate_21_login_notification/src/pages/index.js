@@ -59,6 +59,7 @@ class Index extends React.Component {
     anchorEl: null,
     isSignedIn: false,
     userNameLogin: '',
+    forgottenURL: '/forgotten-password',
     drawer: false,
     avatarURL: 'http://via.placeholder.com/350x150',
     notificationCount: 0,
@@ -83,9 +84,17 @@ class Index extends React.Component {
   componentDidMount() {
     let vm = this
     if (themeDisplay !== null && themeDisplay !== undefined) {
+      let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+      let forgottenURLStr = ''
+      if (redirectURL !== '') {
+        forgottenURLStr = redirectURL + '/forgotten-password'
+      } else {
+        forgottenURLStr = themeDisplay.getURLHome() + '/forgotten-password'
+      }
       vm.setState({
         isSignedIn: themeDisplay.isSignedIn(),
-        userNameLogin: themeDisplay.getUserName()
+        userNameLogin: themeDisplay.getUserName(),
+        forgottenURL: forgottenURLStr
       })
       if (themeDisplay.isSignedIn()) {
         let param = {
@@ -131,7 +140,7 @@ class Index extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { open, isSignedIn, userNameLogin, avatarURL, notificationCount } = this.state;
+    const { open, isSignedIn, userNameLogin, avatarURL, notificationCount, forgottenURL } = this.state;
 
     return (
       <div>
@@ -147,7 +156,7 @@ class Index extends React.Component {
             </div>
             <div className="login-input">
               <div className="forgetten-password-input">
-                <a href="/forgotten-password" className="text-hover-blue">Quên mật khẩu?</a>
+                <a href={forgottenURL} className="text-hover-blue">Quên mật khẩu?</a>
               </div> 
               <div className="action-btn-login-input">
                 <button onClick={this.goToDangKyPage} type="button" className="btn-register">Đăng ký</button>
