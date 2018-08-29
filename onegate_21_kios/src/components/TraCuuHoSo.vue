@@ -152,56 +152,54 @@
         </div>
       </v-card>
       <v-dialog v-model="dialogCheckPass" content-class="dialog-keyboard" persistent max-width="500px">
-        <v-form ref="form" v-model="valid">
-          <v-card>
-            <v-card-title style="color: #fff;background-color: #0b72ba">
-              <span class="headline">Mã bí mật truy cập hồ sơ</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex xs12>
-                    <!-- <v-text-field v-model="passCheck"
-                    placeholder="Nhập mã bí mật đã được cấp"
-                    :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
-                    required
-                    data-layout="normal" @focus="show"></v-text-field> -->
-                    <div class="input-group input-group--placeholder input-group--text-field primary--text">
-                      <div class="input-group__input">
-                        <input id="passCheck" data-layout="normal" @focus="showKeyboard"
-                        aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
-                        <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                      </div>
-                      <div class="input-group__details">
-                        <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
-                      </div>
+        <v-card>
+          <v-card-title style="color: #fff;background-color: #0b72ba">
+            <span class="headline">Mã bí mật truy cập hồ sơ</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <!-- <v-text-field v-model="passCheck"
+                  placeholder="Nhập mã bí mật đã được cấp"
+                  :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
+                  required
+                  data-layout="normal" @focus="show"></v-text-field> -->
+                  <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                    <div class="input-group__input">
+                      <input id="passCheck" data-layout="normal" @focus="showKeyboard" @keyup.enter="submitViewDetail"
+                      aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
+                      <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                     </div>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
-                :loading="loading"
-                :disabled="loading"
-              >
-                <v-icon>save</v-icon>&nbsp;
-                Truy cập hồ sơ
-                <span slot="loader">Loading...</span>
-              </v-btn>
-              <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
-                :loading="loading"
-                :disabled="loading"
-                @click="clearDialog"
-              >
-                <v-icon>undo</v-icon>&nbsp;
-                Thoát
-                <span slot="loader">Loading...</span>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
+                    <div class="input-group__details">
+                      <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
+                    </div>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
+              :loading="loading"
+              :disabled="loading"
+            >
+              <v-icon>save</v-icon>&nbsp;
+              Truy cập hồ sơ
+              <span slot="loader">Loading...</span>
+            </v-btn>
+            <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
+              :loading="loading"
+              :disabled="loading"
+              @click="clearDialog"
+            >
+              <v-icon>undo</v-icon>&nbsp;
+              Thoát
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>

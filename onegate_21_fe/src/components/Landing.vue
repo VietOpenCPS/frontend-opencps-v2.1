@@ -287,7 +287,7 @@
             v-for="header in props.headers"
             :key="header.text"
             :class="header['class'] ? header['class'] : ''"
-            :style="header['width'] ? 'width:' + header['width'] + 'px' : ''"
+            :width="header['width'] ? header['width'] + 'px' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
@@ -1071,7 +1071,7 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'BETIMES') {
         let userArr = vm.$store.getters.getUsersNextAction
         if (userArr.length > 0) {
           let check = userArr.filter(function (item) {

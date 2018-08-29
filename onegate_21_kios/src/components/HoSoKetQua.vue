@@ -10,7 +10,7 @@
             <span>DANH SÁCH HỒ SƠ CÓ KẾT QUẢ &nbsp; ({{dossierItemTotal}})</span>
           </div>
           <div class="dossierList">
-            <div class="wrap-list" :style="{ color: activeColor, fontSize: fontSize + 'px' }">
+            <div class="wrap-list" :style="{ color: activeColor }">
               <v-layout class="wrap" v-for="(item, index) in dossierList" 
               :key="item.dossierId" :class="index%2==1 ? 'active': ''">
                 <v-flex class="px-3 py-2" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>

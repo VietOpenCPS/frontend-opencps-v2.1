@@ -115,18 +115,18 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Action special -->
-              <v-menu bottom offset-y>
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
+                  <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
                     @click="processPullBtnDetail(item, index)" 
                     v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
                     >
                     <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-                  </v-list-tile>
+                  </v-list-tile> -->
                 </v-list>
               </v-menu>
             </div>
@@ -150,7 +150,7 @@
                   >
                   <v-icon>save</v-icon>&nbsp;
                   <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
-                  <span>Xác nhận</span>
+                  Xác nhận
                   <span slot="loader">Loading...</span>
                 </v-btn>
               </div>
@@ -558,7 +558,9 @@ export default {
         }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
-        vm.getNextActions()
+        if (currentQuery['btnIndex'].toString() !== '111' && currentQuery['btnIndex'].toString() !== '333') {
+          vm.getNextActions()
+        }
       }
     })
   },
@@ -851,13 +853,13 @@ export default {
         if (result.hasOwnProperty('overdue')) {
           isPopup = true
           vm.showExtendDateEdit = true
-          vm.extendDateEdit = result.overdue !== '' ? new Date(result.overdue) : ''
+          vm.extendDateEdit = result.overdue
           vm.typeExtendDate = 'overdue'
         }
         if (result.hasOwnProperty('betimes')) {
           isPopup = true
           vm.showExtendDateEdit = true
-          vm.extendDateEdit = result.betimes !== '' ? new Date(result.betimes) : ''
+          vm.extendDateEdit = result.betimes
           vm.typeExtendDate = 'betimes'
         }
       }
@@ -1539,7 +1541,8 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03'
+      && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'BETIMES') {
         let userArr = vm.$store.getters.getUsersNextAction
         if (userArr.length > 0) {
           let check = userArr.filter(function (item) {
