@@ -995,7 +995,7 @@ body .input-group--selection-controls__ripple {
 .dossierList .flex span {
     font-weight: 450
 }
-.dossierList .wrap-list {
+.dossierList .activeAnimate {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -1006,6 +1006,9 @@ body .input-group--selection-controls__ripple {
     -moz-animation: animate1 30s linear infinite;
     -webkit-animation: animate1 30s linear infinite;
     animation: animate1 30s linear infinite;
+}
+.dossierList .activeAnimate:hover {
+    animation-play-state: paused
 }
 @-moz-keyframes animate1 {
     0% { -moz-transform: translateY(100%); }
@@ -1394,7 +1397,7 @@ body .menu__content--select .text--disabled {
     color: #ffffff;
     font-weight: 500
 }
-.active {
+.wrap-list .active {
     background-color: #eee !important;
 }
 .total-result-search span {

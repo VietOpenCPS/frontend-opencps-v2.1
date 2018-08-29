@@ -121,6 +121,32 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDomainListsPublic ({commit, state}, administrationCode) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceconfigs/pubish/' + administrationCode + '/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.domains) {
+              let dataReturn = serializable.domains
+              console.log('dataReturn', dataReturn)
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getGovAgency ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

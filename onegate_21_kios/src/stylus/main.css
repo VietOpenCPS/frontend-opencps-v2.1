@@ -317,6 +317,14 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     background-color: #ddd;
     border-radius: 5px;
 }
+.vue-touch-keyboard .keyboard .key {
+    font-size: 15px !important;
+    border-radius: 3px !important;
+    box-shadow: none !important
+}
+.vue-touch-keyboard .keyboard .key.backspace {
+    background-size: 18px;
+}
 .overlayActive {
     pointer-events: none;
     -ms-touch-action: none;
@@ -1394,7 +1402,7 @@ body .menu__content--select .text--disabled {
     color: #ffffff;
     font-weight: 500
 }
-.active {
+.table-tracuu table.table tr .active {
     background-color: #eee !important;
 }
 .total-result-search span {

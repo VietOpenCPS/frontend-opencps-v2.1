@@ -286,6 +286,8 @@
           <th
             v-for="header in props.headers"
             :key="header.text"
+            :class="header['class'] ? header['class'] : ''"
+            :style="header['width'] ? 'width:' + header['width'] + 'px' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
@@ -1783,11 +1785,11 @@ export default {
           activeTab: 'tabs-1',
           btnIndex: btnIndex
         }
-        if (item['autoEvent']) {
-          if (item['autoEvent'] === 'special') {
-            query['actionSpecial'] = true
-          }
-        }
+        // if (item['autoEvent']) {
+        //   if (item['autoEvent'] === 'special') {
+        //     query['actionSpecial'] = true
+        //   }
+        // }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: query

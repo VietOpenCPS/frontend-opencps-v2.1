@@ -47,17 +47,13 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              step: 300
             }
-            // params: {
-            //   start: filter.page ? filter.page * 15 - 15 : '',
-            //   end: filter.page * 15,
-            //   dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            //   applicantName: filter.applicantName ? filter.applicantName : '',
-            //   applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
-            // }
           }
           // test local
-          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          axios.get('/o/rest/v2/dossiers/publish/searchDossiers', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
