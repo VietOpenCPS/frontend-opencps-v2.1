@@ -30,6 +30,28 @@
           </div>
         </div> 
       </div>
+      <v-layout class="wrap mb-4">
+        <v-text-field
+          placeholder="Nhấn để nhập tên cán bộ"
+          v-model="employeeNameKey"
+          @keyup.enter="getEmployee"
+          clearable
+          style="width: calc(100% - 200px)"
+        ></v-text-field>
+        <div class="pt-2 text-center" style="width: 200px">
+          <v-btn color="primary"
+            :loading="loading"
+            :disabled="loading"
+            @click="getEmployee"
+            class="mt-3 ml-3"
+          >
+            <v-icon size="18">search</v-icon>
+            &nbsp;
+            Tra Cứu
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </div>
+      </v-layout>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
@@ -170,6 +192,7 @@ export default {
     employeeList: [],
     employeeSelected: {},
     employeeIndex: 0,
+    employeeNameKey: '',
     employeePage: 1,
     dialogEvaluation: false,
     evaluationValidate: true,
@@ -199,7 +222,7 @@ export default {
         let filter = {
           workingunit: vm.currentIndex,
           start: 0,
-          end: 5
+          end: 10
         }
         if (vm.workingUnitList.length > 0) {
           vm.$store.dispatch('getEmployee', filter).then(function (result) {
@@ -244,9 +267,10 @@ export default {
         vm.employeePage = 1
       }
       let filter = {
+        employeeName: vm.employeeNameKey,
         workingunit: vm.currentIndex,
-        start: vm.employeePage * 5 - 5,
-        end: vm.employeePage * 5
+        start: vm.employeePage * 10 - 10,
+        end: vm.employeePage * 10
       }
       console.log('filter', filter)
       vm.loading = true
@@ -276,6 +300,7 @@ export default {
     fiterWorkingUnit (item) {
       this.workingUnitSelect = item
       this.currentIndex = item.itemCode
+      this.employeeNameKey = ''
       router.push({
         path: '/' + item.itemCode,
         query: {
@@ -290,6 +315,30 @@ export default {
       vm.employeeIndex = index
       vm.dialogEvaluation = true
       vm.radioGroup = null
+    },
+    getEmployee () {
+      var vm = this
+      vm.employeePage = 1
+      let filter = {
+        workingunit: vm.currentIndex,
+        employeeName: vm.employeeNameKey,
+        start: vm.employeePage * 10 - 10,
+        end: vm.employeePage * 10
+      }
+      vm.loading = true
+      vm.$store.dispatch('getEmployee', filter).then(function (result) {
+        setTimeout(function () {
+          vm.loading = false
+        }, 200)
+        vm.employeeList = result
+        if (vm.employeeList && vm.employeeList.length > 0) {
+          for (let key in vm.employeeList) {
+            vm.getEvaluationItem(key)
+          }
+        }
+      }).catch(function (reject) {
+        vm.loading = false
+      })
     },
     submitEvaluation () {
       var vm = this

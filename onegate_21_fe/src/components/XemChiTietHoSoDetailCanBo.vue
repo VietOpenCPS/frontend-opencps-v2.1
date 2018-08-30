@@ -109,29 +109,29 @@
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
-                v-if="item.enable > 0 || (actionSpecial && item['autoEvent'] === 'special')"
+                v-if="item.enable > 0 || (item['autoEvent'] === 'special')"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Action special -->
-              <v-menu bottom offset-y>
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
+                  <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
                     @click="processPullBtnDetail(item, index)" 
-                    v-if="item['autoEvent'] === 'special' && checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
+                    v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
                     >
                     <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-                  </v-list-tile>
+                  </v-list-tile> -->
                 </v-list>
               </v-menu>
             </div>
             <!--  -->
-            <v-layout wrap v-if="dialogActionProcess" style="border-left: 2px solid blue;">
+            <v-layout wrap v-if="dialogActionProcess">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -150,7 +150,7 @@
                   >
                   <v-icon>save</v-icon>&nbsp;
                   <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
-                  <span>Xác nhận</span>
+                  Xác nhận
                   <span slot="loader">Loading...</span>
                 </v-btn>
               </div>
@@ -159,7 +159,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable && currentUser.userName === thongTinChiTietHoSo.lastActionUser" @click="rollBack()">Quay lui hồ sơ</v-btn>
+              <v-btn color="primary" v-if="rollbackable && currentUser.userId === thongTinChiTietHoSo.lastActionUserId" @click="rollBack()">Quay lui hồ sơ</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -191,8 +191,8 @@
                               </div>
                               <div class="timeline-body">
                                 <span v-if="item.syncType === 2">{{item.actionName}} </span>
-                                <span v-if="item.syncType === 2 && item.actionNote">:</span>
-                                <span v-if="item.actionNote" style="color: #0b72ba">{{ item.actionNote }}</span>
+                                <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">:</span>
+                                <span v-if="item.actionNote && item.actionNote !== 'null'" style="color: #0b72ba">{{ item.actionNote }}</span>
                               </div>
                             </div>
                           </li>
@@ -558,7 +558,9 @@ export default {
         }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
-        vm.getNextActions()
+        if (currentQuery['btnIndex'].toString() !== '111' && currentQuery['btnIndex'].toString() !== '333') {
+          vm.getNextActions()
+        }
       }
     })
   },
@@ -851,13 +853,13 @@ export default {
         if (result.hasOwnProperty('overdue')) {
           isPopup = true
           vm.showExtendDateEdit = true
-          vm.extendDateEdit = result.overdue !== '' ? new Date(result.overdue) : ''
+          vm.extendDateEdit = result.overdue
           vm.typeExtendDate = 'overdue'
         }
         if (result.hasOwnProperty('betimes')) {
           isPopup = true
           vm.showExtendDateEdit = true
-          vm.extendDateEdit = result.betimes !== '' ? new Date(result.betimes) : ''
+          vm.extendDateEdit = result.betimes
           vm.typeExtendDate = 'betimes'
         }
       }
@@ -944,7 +946,7 @@ export default {
         let result = {
           actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          overdue: vm.thongTinChiTietHoSo['extendDate']
+          overdue: vm.thongTinChiTietHoSo['extendDate'] ? vm.thongTinChiTietHoSo['extendDate'] : ''
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
@@ -953,7 +955,7 @@ export default {
         let result = {
           actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
-          betimes: vm.thongTinChiTietHoSo['extendDate']
+          betimes: vm.thongTinChiTietHoSo['extendDate'] ? vm.thongTinChiTietHoSo['extendDate'] : ''
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
@@ -1539,13 +1541,18 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03'
+      && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'BETIMES') {
         let userArr = vm.$store.getters.getUsersNextAction
-        let check = userArr.filter(function (item) {
-          return item.userId.toString() === currentUser.userId.toString()
-        })
-        if (check.length > 0) {
-          checkValue = true
+        if (userArr.length > 0) {
+          let check = userArr.filter(function (item) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          })
+          if (check.length > 0) {
+            checkValue = true
+          } else {
+            checkValue = false
+          }
         } else {
           checkValue = false
         }

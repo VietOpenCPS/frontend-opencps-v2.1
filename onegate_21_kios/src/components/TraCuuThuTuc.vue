@@ -62,7 +62,7 @@
               <div class="input-group input-group--placeholder input-group--text-field primary--text">
                 <label>Tên thủ tục</label>
                 <div class="input-group__input">
-                  <input id="serviceNameKey" data-layout="normal" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+                  <input id="serviceNameKey" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
                   <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                 </div>
                 <div class="input-group__details"></div>
@@ -104,7 +104,7 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <div v-else class="overflowContainer" :class="visible ? 'overlayActive': ''">
+      <div v-if="!loading && listThuTuc && listThuTuc.length > 0" class="overflowContainer" :class="visible ? 'overlayActive': ''">
         <div class="mb-3 main-header">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content value="1">
@@ -199,11 +199,12 @@ export default {
           vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
           vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
           vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : vm.govAgencyList[0].administrationCode
+          vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
+            vm.listLinhVuc = result
+            console.log('listLinhVuc', vm.listLinhVuc)
+          })
           vm.doLoadingThuTuc()
         }
-      })
-      vm.$store.dispatch('getDomainLists').then(function (result) {
-        vm.listLinhVuc = result
       })
       vm.$store.dispatch('getLevelLists').then(function (result) {
         vm.listMucDo = result
@@ -263,12 +264,16 @@ export default {
       filter = {
         administration: currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencySelected,
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : vm.levelSelected,
+        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.linhVucSelected
       }
       vm.$store.dispatch('getServiceLists', filter).then(function (result) {
         vm.loading = false
-        vm.listThuTuc = result.data
+        if (result.data) {
+          vm.listThuTuc = result.data
+        } else {
+          vm.listThuTuc = []
+        }
         vm.serviceItemTotal = result.total
       }).catch(reject => {
         vm.loading = false
@@ -279,24 +284,26 @@ export default {
     changeAdministration () {
       var vm = this
       console.log('administration', vm.govAgencySelected)
-      // setTimeout (function () {
-      //   let domainList = vm.listLinhVuc.filter(function (item) {
-      //     return item. === vm.govAgencySelected
-      //   })
-      //   vm.listLinhVuc = domainList
-      // }, 200)
+      setTimeout (function () {
+        vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
+          vm.listLinhVuc = result
+        })
+        vm.filterServiceinfos('filter')
+      }, 200)
     },
     changeDomain () {
       var vm = this
       console.log('domain', vm.linhVucSelected)
-      // setTimeout (function () {
-      // }, 200)
+      setTimeout (function () {
+        vm.filterServiceinfos('filter')
+      }, 200)
     },
     changeLevel () {
       var vm = this
       console.log('level', vm.levelSelected)
-      // setTimeout (function () {
-      // }, 200)
+      setTimeout (function () {
+        vm.filterServiceinfos('filter')
+      }, 200)
     },
     viewDetail (item) {
       router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)

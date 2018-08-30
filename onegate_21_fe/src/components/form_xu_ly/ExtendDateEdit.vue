@@ -3,7 +3,7 @@
     <v-expansion-panel v-if="type === 'overdue'" class="expansion-pl">
       <v-expansion-panel-content hide-actions value="1">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-          <span>Lý do chậm hạn trả</span><span> *</span>
+          <span>Lý do chậm hạn trả</span><span style="color:red"> *</span>
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
@@ -70,12 +70,14 @@ export default {
   }),
   created () {
     var vm = this
-    vm.extendDateInput = vm.extendDateEdit ? vm.formatDateInput(vm.extendDateEdit) : vm.formatDateInput(new Date())
-    console.log('extendDateInput', vm.extendDateInput)
+    // vm.extendDateInput = vm.extendDateEdit ? vm.formatDateInput(vm.extendDateEdit) : vm.formatDateInput(new Date())
+    // vm.extendDateInput = vm.extendDateEdit ? (vm.parseCurrentDate(vm.extendDateEdit) + ' ' + vm.parseCurrentTime(vm.extendDateEdit)) : vm.formatDateInput(new Date())
+    // console.log('extendDateInput', vm.extendDateInput)
   },
   watch: {},
   mounted () {
-    this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : this.formatDateInput(new Date())
+    // this.extendDateInput = this.extendDateEdit ? this.formatDateInput(this.extendDateEdit) : this.formatDateInput(new Date())
+    this.extendDateInput = this.extendDateEdit ? this.parseCurrentDate(this.extendDateEdit) : this.formatDateInput(new Date())
     console.log('extendDateInput', this.extendDateInput)
     this.minDate = this.getCurentDateTime('date')
   },
@@ -118,6 +120,15 @@ export default {
     },
     showDatePicker () {
       this.$refs.datepicker.showDatePicker()
+    },
+    parseCurrentDate (date) {
+      if (!date) {
+        return null
+      }
+      let [day1, time] = date.split(' ')
+      let [day2, month, year] = `${day1}`.split('/')
+      let [hh, mm, ss] = `${time}`.split(':')
+      return `${year}-${month.padStart(2, '0')}-${day2.padStart(2, '0')} ${hh}:${mm}`
     }
   }
 }

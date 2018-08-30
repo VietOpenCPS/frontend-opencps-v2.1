@@ -1547,17 +1547,21 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/nextactions', param).then(function (response) {
               let serializable = response.data
+              commit('setUserNextAction', [])
               commit('setCheckInput', serializable['checkInput'])
               commit('setStepOverdueNextAction', serializable['stepOverdue'])
-              if (Array.isArray(serializable['users'])) {
-                commit('setUserNextAction', serializable['users'])
-              } else {
-                commit('setUserNextAction', [serializable['users']])
+              if (serializable['users']) {
+                if (Array.isArray(serializable['users'])) {
+                  commit('setUserNextAction', serializable['users'])
+                } else {
+                  commit('setUserNextAction', [serializable['users']])
+                }
               }
               resolve(serializable.data)
             }).catch(function (error) {
               console.log(error)
               reject(error)
+              commit('setUserNextAction', [])
             })
           })
         })

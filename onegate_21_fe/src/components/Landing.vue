@@ -286,6 +286,8 @@
           <th
             v-for="header in props.headers"
             :key="header.text"
+            :class="header['class'] ? header['class'] : ''"
+            :width="header['width'] ? header['width'] + 'px' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
@@ -822,7 +824,9 @@ export default {
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
-            vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
+              vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            }
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
               vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
             }
@@ -1067,7 +1071,7 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'BETIMES') {
         let userArr = vm.$store.getters.getUsersNextAction
         if (userArr.length > 0) {
           let check = userArr.filter(function (item) {
@@ -1781,9 +1785,11 @@ export default {
           activeTab: 'tabs-1',
           btnIndex: btnIndex
         }
-        if (item['autoEvent'] === 'special') {
-          query['actionSpecial'] = true
-        }
+        // if (item['autoEvent']) {
+        //   if (item['autoEvent'] === 'special') {
+        //     query['actionSpecial'] = true
+        //   }
+        // }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: query
