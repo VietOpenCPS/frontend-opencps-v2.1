@@ -1229,6 +1229,9 @@ body .menu__content--select .text--disabled {
 .wrap_working .list_item_active {
     background-color: #e1e2e1;
 }
+.wrap_working .list__tile__title {
+    font-weight: 500
+}
 .vue-simple-progress, .vue-simple-progress-bar {
     z-index: 0 !important;
     border-radius: 5px;

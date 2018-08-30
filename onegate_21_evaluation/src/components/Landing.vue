@@ -1,124 +1,126 @@
 <template>
-  <div style="font-size:13px" class="px-2 py-0">
-    <v-navigation-drawer app clipped floating width="240">
-      <div class="row-header my-0 mb-2">
-        <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 
-      </div>
-      <content-placeholders class="mt-3" v-if="loading">
-        <content-placeholders-text :lines="7" />
-      </content-placeholders>
-      <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working" style="overflow: auto;">
-        <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
-          <v-list-tile-action>
-            <v-icon size="18" color="primary">account_balance</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-tooltip top>
-              <v-list-tile-title slot="activator" v-text="item.itemName"></v-list-tile-title>
-              <span>{{item.itemName}}</span>
-            </v-tooltip>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
-    <v-content>
-      <div class="row-header mb-2">
-        <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
-        <div class="layout row wrap header_tools">
-          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.itemName : ''">
-            {{workingUnitSelect ? workingUnitSelect.itemName : ''}}
-          </div>
-        </div> 
-      </div>
-      <v-layout class="wrap mb-4">
-        <v-text-field
-          placeholder="Nhấn để nhập tên cán bộ"
-          v-model="employeeNameKey"
-          @keyup.enter="getEmployee"
-          clearable
-          style="width: calc(100% - 200px)"
-        ></v-text-field>
-        <div class="pt-2 text-center" style="width: 200px">
-          <v-btn color="primary"
-            :loading="loading"
-            :disabled="loading"
-            @click="getEmployee"
-            class="mt-3 ml-3"
-          >
-            <v-icon size="18">search</v-icon>
-            &nbsp;
-            Tra Cứu
-            <span slot="loader">Loading...</span>
-          </v-btn>
+  <div style="font-size:13px" class="py-0">
+    <v-layout class="wrap">
+      <v-flex xs3 md2>
+        <div class="row-header my-0 mb-2">
+          <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 
         </div>
-      </v-layout>
-      <content-placeholders class="mt-3" v-if="loading">
-        <content-placeholders-text :lines="10" />
-      </content-placeholders>
-      <div v-else>
-        <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
-          Không có dữ liệu.
-        </v-alert>
+        <content-placeholders class="mt-3" v-if="loading">
+          <content-placeholders-text :lines="7" />
+        </content-placeholders>
+        <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working" style="overflow: auto;">
+          <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
+            <v-list-tile-action>
+              <v-icon size="18" color="primary">account_balance</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-tooltip top>
+                <v-list-tile-title slot="activator" v-text="item.itemName"></v-list-tile-title>
+                <span>{{item.itemName}}</span>
+              </v-tooltip>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-flex>
+      <v-flex xs9 md10 class="pl-2">
+        <div class="row-header mb-2">
+          <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
+          <div class="layout row wrap header_tools">
+            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.itemName : ''">
+              {{workingUnitSelect ? workingUnitSelect.itemName : ''}}
+            </div>
+          </div> 
+        </div>
+        <v-layout class="wrap mb-4">
+          <v-text-field
+            placeholder="Nhấn để nhập tên cán bộ"
+            v-model="employeeNameKey"
+            @keyup.enter="getEmployee"
+            clearable
+            style="width: calc(100% - 200px)"
+          ></v-text-field>
+          <div class="pt-1 text-center" style="width: 200px">
+            <v-btn color="primary"
+              :loading="loading"
+              :disabled="loading"
+              @click="getEmployee"
+              class="mt-3 ml-3"
+            >
+              <v-icon size="18">search</v-icon>
+              &nbsp;
+              Tra Cứu
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </div>
+        </v-layout>
+        <content-placeholders class="mt-3" v-if="loading">
+          <content-placeholders-text :lines="10" />
+        </content-placeholders>
         <div v-else>
-          <v-card-text class="px-0 py-0">
-            <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
-              <v-flex xs12 sm8>
-                <v-card style="height:100%;background-color:inherit">
-                  <v-card-text class="px-2 py-1 pr-0">
-                    <v-layout wrap>
-                      <v-flex xs12 sm2>
-                        <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
-                        <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
-                      </v-flex>
-                      <v-flex xs12 sm10>
-                        <p class="mb-2 text-bold">{{item.fullName}}</p>
-                        <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
-                        <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
-                        <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
-                      </v-flex>
-                    </v-layout>
-                  </v-card-text>
-                </v-card>
-              </v-flex>
-              <v-flex xs12 sm4>
-                <v-card style="height:100%;background-color:inherit">
-                  <v-card-text class="px-2 py-1 pr-0">
-                    <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
-                    <v-layout wrap class="mb-2">
-                      <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
-                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                      :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
-                      text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
-                      </progress-bar>
-                    </v-layout>
-                    <v-layout wrap class="mb-2">
-                      <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
-                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                      :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
-                      text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
-                      </progress-bar>
-                    </v-layout>
-                    <v-layout wrap class="mb-2">
-                      <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
-                      <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
-                      :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
-                      text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
-                      </progress-bar>
-                    </v-layout>
-                  </v-card-text>
-                </v-card>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-          <div class="text-xs-right layout wrap mt-3" style="position: relative;">
-            <div class="flex pagging-table px-2"> 
-              <tiny-pagination :total="totalPagging" :page="employeePage" custom-class="custom-tiny-class" 
-                @tiny:change-page="paggingData" ></tiny-pagination> 
+          <v-alert v-if="employeeList.length === 0" :value="true" outline color="info" icon="info">
+            Không có dữ liệu.
+          </v-alert>
+          <div v-else>
+            <v-card-text class="px-0 py-0">
+              <v-layout class="employeeItem mb-1" wrap v-for="(item, index) in employeeList" :key="index" @click="showEvaluation(item, index)" style="height:120px">
+                <v-flex xs6 md8>
+                  <v-card style="height:100%;background-color:inherit">
+                    <v-card-text class="px-2 py-1 pr-0">
+                      <v-layout wrap>
+                        <v-flex xs12 sm3 md2>
+                          <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
+                          <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+                        </v-flex>
+                        <v-flex xs12 sm9 md10>
+                          <p class="mb-2 text-bold">{{item.fullName}}</p>
+                          <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
+                          <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
+                          <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
+                        </v-flex>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+                <v-flex xs6 md4>
+                  <v-card style="height:100%;background-color:inherit">
+                    <v-card-text class="px-2 py-1 pr-0">
+                      <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs6 md5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
+                        <progress-bar class="flex xs6 md7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs6 md5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
+                        <progress-bar class="flex xs6 md7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                      <v-layout wrap class="mb-2">
+                        <div class="flex xs6 md5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
+                        <progress-bar class="flex xs6 md7" size="17" spacing="1" bar-transition="all 1s ease"
+                        :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
+                        text-position="inside" bg-color="#e0e0e0" bar-color="#d9534f" text-fg-color="#fff">
+                        </progress-bar>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+            <div class="text-xs-right layout wrap mt-3" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="totalPagging" :page="employeePage" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </v-content>
+      </v-flex>
+    </v-layout>
     <!--  -->
     <v-dialog v-model="dialogEvaluation" scrollable max-width="600" persistent>
       <v-card>
