@@ -67,11 +67,11 @@
                   <v-card style="height:100%;background-color:inherit">
                     <v-card-text class="px-2 py-1 pr-0">
                       <v-layout wrap>
-                        <v-flex xs12 sm3 md2>
+                        <v-flex xs3 sm3 md2>
                           <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
                           <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
                         </v-flex>
-                        <v-flex xs12 sm9 md10>
+                        <v-flex xs9 sm9 md10>
                           <p class="mb-2 text-bold">{{item.fullName}}</p>
                           <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
                           <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
