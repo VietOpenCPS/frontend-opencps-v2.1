@@ -90,6 +90,11 @@
                 <v-date-picker v-model="toDate" no-title @input="changeToDate"></v-date-picker>
               </v-menu>
             </v-flex>
+            <v-flex class="px-2 text-right">
+              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+                Xuất Excel
+              </v-btn>
+            </v-flex>
           </v-layout>
         </div>
       </div>
@@ -281,6 +286,42 @@ export default {
     }
   },
   methods: {
+    doExcelFunc () {
+      let vm = this
+      vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
+      let filter = {
+        document: vm.documentTYPE,
+        year: vm.year,
+        month: vm.month,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      vm.pdfBlob = null
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        let putData = {}
+        if (result !== null && result !== undefined) {
+          putData = result
+          if (vm.documentTYPE === 'REPORT_01') {
+            putData['year'] = vm.year
+            putData['month'] = vm.month
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          putData['reportType'] = 'excel'
+          let filterPostData = {
+            document: vm.documentTYPE,
+            data: putData
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
+            console.log(result)
+            window.open(result, '_blank')
+          })
+        } else {
+          alert('Không tìm thấy dữ liệu báo cáo.')
+        }
+      })
+    },
     doPrintReport () {
       let vm = this
       vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
