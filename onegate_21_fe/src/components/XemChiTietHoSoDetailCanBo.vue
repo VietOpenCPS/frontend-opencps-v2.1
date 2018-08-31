@@ -52,7 +52,7 @@
         </v-tab>
         <v-tab :key="2" href="#tabs-2" @click="loadTPHS()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            THÀNH PHẦN HỒ SƠ
+            <span v-if="thongTinChiTietHoSo.finishDate">THÀNH PHẦN HỒ SƠ VÀ KẾT QUẢ</span> <span v-else>THÀNH PHẦN HỒ SƠ</span>
           </v-btn>
         </v-tab>
         <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()" v-if="originality !== 1">
@@ -97,7 +97,7 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xsls</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
@@ -1078,6 +1078,7 @@ export default {
       var validPhanCong = true
       var validYKien = true
       var validTreHan = true
+      vm.loadingActionProcess = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
       let filter = {
@@ -1204,6 +1205,8 @@ export default {
         if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined') {
           var valid = vm.$refs.thanhphanhoso.validDossierTemplate()
           if (!valid) {
+            vm.loadingAction = false
+            vm.loadingActionProcess = false
             return
           }
         }
