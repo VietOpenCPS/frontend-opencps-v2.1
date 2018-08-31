@@ -6,6 +6,7 @@
           <v-layout wrap>
             <v-flex xs3 class="pl-2 pr-2">
               <v-select
+                class="select-border"
                 :items="govAgencyList"
                 v-model="govAgencySelected"
                 autocomplete
@@ -18,6 +19,7 @@
             </v-flex>
             <v-flex xs3 class="pl-2 pr-2">
               <v-select
+                class="select-border"
                 :items="listLinhVuc"
                 v-model="linhVucSelected"
                 autocomplete
@@ -32,6 +34,7 @@
             </v-flex>
             <v-flex xs3 class="pl-2 pr-2">
               <v-select
+                class="select-border"
                 :items="listMucDo"
                 v-model="levelSelected"
                 autocomplete
@@ -59,18 +62,17 @@
                 v-model="serviceNameKey"
                 clearable
               ></v-text-field> -->
-              <div class="input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                 <label>Tên thủ tục</label>
                 <div class="input-group__input">
                   <input id="serviceNameKey" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
                   <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                 </div>
-                <div class="input-group__details"></div>
               </div>
             </v-flex>
           </v-layout>
         </div>
-        <div class="pt-2 text-center" style="width: 260px">
+        <div class="mt-4 text-center" style="width: 260px">
           <v-btn color="primary"
             :loading="loading"
             :disabled="loading"
@@ -284,7 +286,9 @@ export default {
     changeAdministration () {
       var vm = this
       console.log('administration', vm.govAgencySelected)
-      setTimeout (function () {
+      vm.listLinhVuc = []
+      vm.linhVucSelected = ''
+      setTimeout(function () {
         vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
           vm.listLinhVuc = result
         })
@@ -294,14 +298,14 @@ export default {
     changeDomain () {
       var vm = this
       console.log('domain', vm.linhVucSelected)
-      setTimeout (function () {
+      setTimeout(function () {
         vm.filterServiceinfos('filter')
       }, 200)
     },
     changeLevel () {
       var vm = this
       console.log('level', vm.levelSelected)
-      setTimeout (function () {
+      setTimeout(function () {
         vm.filterServiceinfos('filter')
       }, 200)
     },

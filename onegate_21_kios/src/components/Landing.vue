@@ -32,11 +32,16 @@
 <script>
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
+import $ from 'jquery'
 export default {
   props: [],
   components: {},
   data: () => ({
   }),
+  created () {
+    // $('.mWrapper > header').css('display', 'block !important')
+    // $('.mWrapper > footer').css('display', 'block !important')
+  },
   methods: {
     goTraCuuHoSo () {
       router.push('/tra-cuu-ho-so')

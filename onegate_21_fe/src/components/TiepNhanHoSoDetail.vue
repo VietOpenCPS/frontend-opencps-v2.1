@@ -368,50 +368,52 @@ export default {
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            var initData = vm.$store.getters.loadingInitData
-            let actionUser = initData.user.userName ? initData.user.userName : ''
-            //
-            var paymentsOut = {}
-            if (vm.showThuPhi) {
-              paymentsOut = {
-                requestPayment: vm.payments['requestPayment'],
-                paymentNote: vm.payments['paymentNote'],
-                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            if (formCode !== 'UPDATE') {
+              var initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              //
+              var paymentsOut = {}
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
               }
+              var payloadDate = {
+                'dueDate': tempData.dueDate,
+                'receiveDate': vm.receiveDateEdit
+              }
+              let dataPostAction = {
+                dossierId: vm.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: payloadDate,
+                security: '',
+                assignUsers: '',
+                payment: paymentsOut,
+                createDossiers: '',
+                dueDate: tempData.dueDate
+              }
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+                let currentQuery = vm.$router.history.current.query
+                // router.push({
+                //   path: vm.$router.history.current.path,
+                //   query: {
+                //     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                //     q: currentQuery['q']
+                //   }
+                // })
+                vm.goBack()
+                vm.tiepNhanState = false
+              })
             }
-            var payloadDate = {
-              'dueDate': tempData.dueDate,
-              'receiveDate': vm.receiveDateEdit
-            }
-            let dataPostAction = {
-              dossierId: vm.dossierId,
-              actionCode: 1100,
-              actionNote: '',
-              actionUser: actionUser,
-              payload: payloadDate,
-              security: '',
-              assignUsers: '',
-              payment: paymentsOut,
-              createDossiers: '',
-              dueDate: tempData.dueDate
-            }
-            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-              let currentQuery = vm.$router.history.current.query
-              // router.push({
-              //   path: vm.$router.history.current.path,
-              //   query: {
-              //     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-              //     q: currentQuery['q']
-              //   }
-              // })
-              vm.goBack()
-              vm.tiepNhanState = false
-            })
           }).catch(rejectXhr => {
             console.log('rejectXhr==========', rejectXhr)
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')

@@ -5,17 +5,24 @@
         <content-placeholders-text :lines="10" />
       </content-placeholders>
       <v-card v-else>
-        <div style="background-color: #ffffff" :class="visible ? 'overlayActive': ''">
-          <div class="mt-3 pt-2 text-center total-result-search-blue">
-            <span>DANH SÁCH HỒ SƠ CÓ KẾT QUẢ &nbsp; ({{dossierItemTotal}})</span>
+        <div class="table-dossier" style="background-color: #ffffff">
+          <h4 class="py-3 ml-3">
+            <span>DANH SÁCH HỒ SƠ ĐÃ CÓ KẾT QUẢ &nbsp; (TỔNG SỐ: {{dossierItemTotal}})</span>
+          </h4>
+          <div>
+            <v-layout class="wrap">
+              <v-flex class="px-3 py-2 th" style="width: 250px"><span class="text-bold">Số hồ sơ</span></v-flex>
+              <v-flex class="px-3 py-2 th" style="width: calc(100% - 450px)"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
+              <v-flex class="px-3 py-2 th" style="width: 200px"><span class="text-bold">Ngày trả kết quả</span></v-flex>
+            </v-layout>
           </div>
           <div class="dossierList">
-            <div class="wrap-list" :style="{ color: activeColor }" :class="dossierList.length > 10 ? activeAnimate : ''">
+            <div class="wrap-list" :class="dossierList.length > 10 ? activeAnimate : ''">
               <v-layout class="wrap" v-for="(item, index) in dossierList" 
               :key="item.dossierId" :class="index%2==1 ? 'active': ''">
-                <v-flex class="px-3 py-2" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
-                <v-flex class="px-3 py-2" style="width: calc(100% - 450px)"><span> {{item.applicantName}}</span></v-flex>
-                <v-flex class="px-3 py-2 text-right" style="width: 200px"><span>{{item.dueDate}}</span></v-flex>
+                <v-flex class="px-3 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
+                <v-flex class="px-3 py-2 td" style="width: calc(100% - 450px)"><span> {{item.applicantName}}</span></v-flex>
+                <v-flex class="px-3 py-2 td" style="width: 200px"><span>{{item.finishDate}}</span></v-flex>
               </v-layout>
             </div>
           </div>
@@ -36,7 +43,24 @@ export default {
     loading: false,
     loadingAction: false,
     dossierList: [],
-    dossierItemTotal: 0
+    dossierItemTotal: 0,
+    headersTable: [
+      {
+        text: 'Số hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Chủ hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Ngày hẹn trả',
+        align: 'center',
+        sortable: false
+      }
+    ]
   }),
   computed: {},
   created () {

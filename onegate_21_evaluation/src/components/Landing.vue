@@ -1,19 +1,20 @@
 <template>
   <div style="font-size:13px" class="py-0">
     <v-layout class="wrap">
-      <v-flex xs3 md2>
+      <v-flex class="content-left">
         <div class="row-header my-0 mb-2">
           <div class="row-blue"> CƠ QUAN CHUYÊN MÔN </div> 
         </div>
         <content-placeholders class="mt-3" v-if="loading">
           <content-placeholders-text :lines="7" />
         </content-placeholders>
-        <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working" style="overflow: auto;">
-          <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
+        <v-list v-else class="py-0 nav_trang_thai_ho_so overflowComment wrap_working">
+          <v-list-tile :class="item.itemCode.toString() === currentIndex.toString() ? 'list_item_active' : ''" 
+          v-for="item in workingUnitList" :key="item.itemCode" @click="fiterWorkingUnit(item)">
             <v-list-tile-action>
               <v-icon size="18" color="primary">account_balance</v-icon>
             </v-list-tile-action>
-            <v-list-tile-content>
+            <v-list-tile-content style="display:inline-block;padding-top:3px">
               <v-tooltip top>
                 <v-list-tile-title slot="activator" v-text="item.itemName"></v-list-tile-title>
                 <span>{{item.itemName}}</span>
@@ -22,17 +23,40 @@
           </v-list-tile>
         </v-list>
       </v-flex>
-      <v-flex xs9 md10 class="pl-2">
+      <v-flex class="content-right pl-2">
         <div class="row-header mb-2">
-          <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
+          <div class="background-triangle-big"> <span>{{workingUnitSelect ? workingUnitSelect.itemName : ''}}</span> </div>
           <div class="layout row wrap header_tools">
-            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="workingUnitSelect ? workingUnitSelect.itemName : ''">
-              {{workingUnitSelect ? workingUnitSelect.itemName : ''}}
+            <div class="flex solo text-ellipsis">
+              <v-text-field
+                v-model="employeeNameKey"
+                @keyup.enter="getEmployee"
+                placeholder="Tìm kiếm theo tên cán bộ"
+                solo
+              ></v-text-field>
+            </div> 
+            <div class="flex text-right" style="margin-left: auto;">
+              <v-btn flat class="my-0 mx-0 btn-border-left"
+              :loading="loading"
+              :disabled="loading"
+              @click="getEmployee">
+                <!-- <v-icon size="16">search</v-icon> -->
+                Tìm kiếm
+              </v-btn>
             </div>
           </div> 
         </div>
-        <v-layout class="wrap mb-4">
+        <!--  -->
+        <!-- <div class="row-header" style="margin-top: 6px;">
+          <div class="background-triangle-big"> <span v-if="trangThaiHoSoList">{{trangThaiHoSoList[index].title}}</span> </div> 
+          <div class="layout row wrap header_tools row-blue">
+            
+          </div>
+        </div> -->
+        <!--  -->
+        <!-- <v-layout class="wrap mb-4">
           <v-text-field
+            class="input-border pt-2"
             placeholder="Nhấn để nhập tên cán bộ"
             v-model="employeeNameKey"
             @keyup.enter="getEmployee"
@@ -52,7 +76,7 @@
               <span slot="loader">Loading...</span>
             </v-btn>
           </div>
-        </v-layout>
+        </v-layout> -->
         <content-placeholders class="mt-3" v-if="loading">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
@@ -68,14 +92,14 @@
                     <v-card-text class="px-2 py-1 pr-0">
                       <v-layout wrap>
                         <v-flex xs3 sm3 md2>
-                          <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
+                          <img v-if="item.imageUrl" style="max-height:105px" :src="item.imageUrl">
                           <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
                         </v-flex>
-                        <v-flex xs9 sm9 md10>
+                        <v-flex xs9 sm9 md10 class="pl-3">
                           <p class="mb-2 text-bold">{{item.fullName}}</p>
-                          <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
-                          <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
-                          <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
+                          <p class="mb-2">Mã thẻ: <span class="text-bold">{{item.employeeNo}}</span></p>
+                          <!-- <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p> -->
+                          <p class="mb-2">Chức vụ: <span class="text-bold">{{item.jobPosTitle}}</span></p>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
@@ -122,24 +146,24 @@
       </v-flex>
     </v-layout>
     <!--  -->
-    <v-dialog v-model="dialogEvaluation" scrollable max-width="600" persistent>
+    <v-dialog v-model="dialogEvaluation" scrollable max-width="500" persistent>
       <v-card>
         <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
           <v-icon>clear</v-icon>
         </v-btn>
-        <v-card-text class="pb-0 pt-4" style="height: 290px;">
+        <v-card-text class="pb-0 pt-3" style="height: 200px;">
           <v-layout wrap>
             <v-flex xs12 sm4>
-              <img v-if="employeeSelected.photoFileEntryId" style="max-height:185px" :src="employeeSelected.photoFileEntryId">
-              <img v-else style="max-height:185px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+              <img v-if="employeeSelected.imageUrl" style="max-height:125px" :src="employeeSelected.imageUrl">
+              <img v-else style="max-height:125px" src="/o/frontend-web-evaluation/images/default_avatar.png">
             </v-flex>
             <v-flex xs12 sm8 class="pl-3">
               <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
-              <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
-              <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
+              <p class="mb-2">Mã thẻ: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
+              <!-- <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
               <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
-              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
+              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p> -->
               <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobPosTitle}}</span></p>
             </v-flex>
           </v-layout>
@@ -242,6 +266,7 @@ export default {
             if (vm.employeeList && vm.employeeList.length > 0) {
               for (let key in vm.employeeList) {
                 vm.getEvaluationItem(key)
+                // vm.getImageUsers(key, vm.employeeList[key])
               }
             }
           }).catch(function (reject) {
@@ -291,6 +316,7 @@ export default {
         if (vm.employeeList && vm.employeeList.length > 0) {
           for (let key in vm.employeeList) {
             vm.getEvaluationItem(key)
+            // vm.getImageUsers(key, vm.employeeList[key])
           }
         }
       }).catch(function (reject) {
@@ -336,6 +362,7 @@ export default {
         if (vm.employeeList && vm.employeeList.length > 0) {
           for (let key in vm.employeeList) {
             vm.getEvaluationItem(key)
+            // vm.getImageUsers(key, vm.employeeList[key])
           }
         }
       }).catch(function (reject) {
@@ -367,6 +394,19 @@ export default {
         vm.evaluationValidate = false
       }
     },
+    // getImageUsers (key, item) {
+    //   var vm = this
+    //   vm.fileAttachmentUrl({
+    //     method : 'GET',
+    //     url : '/o/rest/v2/users/' + item.mappingUser.userId + '/photo',
+    //     async : false,
+    //     success: function (options) {
+    //       var urlOut = options.url
+    //       item['imageUrl'] = urlOut
+    //     },
+    //     error: function () {}
+    //   })
+    // },
     getEvaluationItem (key) {
       var vm = this
       vm.$store.dispatch('getEvaluationEmployee', vm.employeeList[key]).then(function (result) {
@@ -424,6 +464,45 @@ export default {
         path: current.path + queryString
       })
     }
+    // get image users
+    // fileAttachmentUrl (options) {
+    //   var xhttp = new XMLHttpRequest()
+    //   var a, filename
+    //   var data = {}
+    //   xhttp.onreadystatechange = function() {
+    //     if (xhttp.readyState === 4 && xhttp.status === 200) {
+    //       var disposition = xhttp.getResponseHeader('Content-Disposition')
+    //       if (disposition && disposition.indexOf('attachment') !== -1) {
+    //         var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+    //         var matches = filenameRegex.exec(disposition)
+    //         if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '')
+    //       }
+    //       a = document.createElement('a')
+    //       a.href = window.URL.createObjectURL(xhttp.response)
+    //       var url = window.URL.createObjectURL(xhttp.response)
+    //       options.success({url : url, status : xhttp.status})
+    //     } else if (xhttp.readyState === 4 && xhttp.status !== 200) {
+    //       options.error(xhttp.status)
+    //     }
+    //   }
+    //   xhttp.open(options.method, options.url)
+    //   xhttp.setRequestHeader('Content-Type', 'application/json')
+    //   if (options.hasOwnProperty('headers')) {
+    //     Object.keys( options.headers ).map(function(objectKey, index) {
+    //       var value = options.headers[objectKey]
+    //       xhttp.setRequestHeader(objectKey, value)
+    //     })
+    //   }
+    //   if (options.hasOwnProperty('responseType')) {
+    //     xhttp.responseType = options.responseType
+    //   } else {
+    //     xhttp.responseType = 'blob'
+    //   }
+    //   if (options.hasOwnProperty('data')) {
+    //     data = options.data
+    //   }
+    //   xhttp.send(data)
+    // }
   },
   filters: {
     dateTimeView (arg) {
