@@ -78,7 +78,7 @@
                       <v-layout wrap>
                         <v-flex xs12 sm5>
                           <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
-                          <img v-else style="max-height:105px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+                          <img v-else style="max-height:105px" src="/o/frontend-web-kios/images/default_avatar.png">
                         </v-flex>
                         <v-flex xs12 sm7>
                           <p class="mb-2 text-bold">{{item.fullName}}</p>
@@ -141,7 +141,7 @@
           <v-layout wrap>
             <v-flex xs12 sm4>
               <img v-if="employeeSelected.photoFileEntryId" style="max-height:185px" :src="employeeSelected.photoFileEntryId">
-              <img v-else style="max-height:185px" src="/o/frontend-web-evaluation/images/default_avatar.png">
+              <img v-else style="max-height:185px" src="/o/frontend-web-kios/images/default_avatar.png">
             </v-flex>
             <v-flex xs12 sm8 class="pl-3">
               <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
@@ -285,7 +285,7 @@ export default {
         vm.employeePage = 1
       }
       let filter = {
-        workingunit: vm.coQuanSelected,
+        workingunit: vm.coQuanSelected.itemCode,
         // keyword: vm.employeeNameKey ? vm.employeeNameKey : '',
         employeeName: $('#employeeNameKey').val(),
         start: vm.employeePage * 10 - 10,
@@ -451,6 +451,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -471,6 +472,15 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick () {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          vm.filterEmployee()
+        })
+      }, 300)
     }
   },
   filters: {

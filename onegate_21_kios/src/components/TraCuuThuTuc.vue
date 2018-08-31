@@ -13,6 +13,7 @@
                 item-text="administrationName"
                 item-value="administrationCode"
                 :hide-selected="true"
+                @change="changeAdministration"
               ></v-select>
             </v-flex>
             <v-flex xs3 class="pl-2 pr-2">
@@ -25,6 +26,7 @@
                 item-text="domainName"
                 item-value="domainCode"
                 :hide-selected="true"
+                @change="changeDomain"
                 clearable
               ></v-select>
             </v-flex>
@@ -38,6 +40,7 @@
                 item-text="levelName"
                 item-value="level"
                 :hide-selected="true"
+                @change="changeLevel"
                 clearable
               >
                 <template slot="item" slot-scope="data">
@@ -59,7 +62,7 @@
               <div class="input-group input-group--placeholder input-group--text-field primary--text">
                 <label>Tên thủ tục</label>
                 <div class="input-group__input">
-                  <input id="serviceNameKey" data-layout="normal" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+                  <input id="serviceNameKey" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
                   <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                 </div>
                 <div class="input-group__details"></div>
@@ -96,12 +99,12 @@
       <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
       <!--  -->
       <div class="my-3 pt-2 text-center total-result-search">
-        <span class="text-bold">Có {{serviceItemTotal}} kết quả được tìm thấy</span>
+        <span class="text-bold">Có {{serviceItemTotal}} thủ tục được tìm thấy</span>
       </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <div v-else class="overflowContainer" :class="visible ? 'overlayActive': ''">
+      <div v-if="!loading && listThuTuc && listThuTuc.length > 0" class="overflowContainer" :class="visible ? 'overlayActive': ''">
         <div class="mb-3 main-header">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content value="1">
@@ -196,11 +199,12 @@ export default {
           vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
           vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
           vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : vm.govAgencyList[0].administrationCode
+          vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
+            vm.listLinhVuc = result
+            console.log('listLinhVuc', vm.listLinhVuc)
+          })
           vm.doLoadingThuTuc()
         }
-      })
-      vm.$store.dispatch('getDomainLists').then(function (result) {
-        vm.listLinhVuc = result
       })
       vm.$store.dispatch('getLevelLists').then(function (result) {
         vm.listMucDo = result
@@ -223,6 +227,7 @@ export default {
   methods: {
     filterServiceinfos (refresh) {
       var vm = this
+      vm.visible = false
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -259,18 +264,46 @@ export default {
       filter = {
         administration: currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencySelected,
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : vm.levelSelected,
+        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.linhVucSelected
       }
       vm.$store.dispatch('getServiceLists', filter).then(function (result) {
         vm.loading = false
-        vm.listThuTuc = result.data
+        if (result.data) {
+          vm.listThuTuc = result.data
+        } else {
+          vm.listThuTuc = []
+        }
         vm.serviceItemTotal = result.total
       }).catch(reject => {
         vm.loading = false
         vm.listThuTuc = []
         vm.serviceItemTotal = 0
       })
+    },
+    changeAdministration () {
+      var vm = this
+      console.log('administration', vm.govAgencySelected)
+      setTimeout (function () {
+        vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
+          vm.listLinhVuc = result
+        })
+        vm.filterServiceinfos('filter')
+      }, 200)
+    },
+    changeDomain () {
+      var vm = this
+      console.log('domain', vm.linhVucSelected)
+      setTimeout (function () {
+        vm.filterServiceinfos('filter')
+      }, 200)
+    },
+    changeLevel () {
+      var vm = this
+      console.log('level', vm.levelSelected)
+      setTimeout (function () {
+        vm.filterServiceinfos('filter')
+      }, 200)
     },
     viewDetail (item) {
       router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)
@@ -333,6 +366,9 @@ export default {
       $(`#${id}`).val('')
     },
     accept (text) {
+      // console.log('text', text)
+      // this.visible = false
+      // this.doLoadingThuTuc()
       this.hide()
     },
     show (e) {
@@ -340,6 +376,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -360,6 +397,15 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick () {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          vm.filterServiceinfos()
+        })
+      }, 300)
     }
   }
 }

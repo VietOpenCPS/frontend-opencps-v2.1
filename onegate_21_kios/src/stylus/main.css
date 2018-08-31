@@ -317,6 +317,14 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     background-color: #ddd;
     border-radius: 5px;
 }
+.vue-touch-keyboard .keyboard .key {
+    font-size: 15px !important;
+    border-radius: 3px !important;
+    box-shadow: none !important
+}
+.vue-touch-keyboard .keyboard .key.backspace {
+    background-size: 18px;
+}
 .overlayActive {
     pointer-events: none;
     -ms-touch-action: none;
@@ -375,6 +383,10 @@ table.table .input-group--selection-controls.checkbox .icon {
 }
 body table.table tbody td[colspan="9"] {
     padding-top: 10px !important;
+}
+.table-detail-domain table.table tbody tr td:first-child {
+    min-width: 150px !important;
+    max-width: 200px;
 }
 body .input-group--select .input-group__selections__comma {
     font-size: 13px;
@@ -975,12 +987,60 @@ body .input-group--selection-controls__ripple {
     max-height: 500px;
     overflow: auto
 }
+.dossierList {
+    height: 600px;
+    overflow: auto;
+    position: relative;
+}
+.dossierList::scrollbar{
+    width: 0px;
+    background-color: transparent;
+}
+.dossierList::-webkit-scrollbar{
+    width: 0px;
+    background-color: transparent;
+}
+.dossierList .flex span {
+    font-weight: 450
+}
+.dossierList .wrap-list {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    -moz-transform:translateY(100%);
+    -webkit-transform:translateY(100%);	
+    transform:translateY(100%);
+    -moz-animation: animate1 30s linear infinite;
+    -webkit-animation: animate1 30s linear infinite;
+    animation: animate1 30s linear infinite;
+}
+@-moz-keyframes animate1 {
+    0% { -moz-transform: translateY(100%); }
+    100% { -moz-transform: translateY(-100%); }
+}
+@-webkit-keyframes animate1 {
+    0% { -webkit-transform: translateY(100%); }
+    100% { -webkit-transform: translateY(-100%); }
+}
+@keyframes animate1 {
+    0% { 
+        -moz-transform: translateY(100%);
+        -webkit-transform: translateY(100%);
+        transform: translateY(100%)
+    }
+    100% { 
+        -moz-transform: translateY(-100%);
+        -webkit-transform: translateY(-100%);
+        transform: translateY(-100%)
+    }
+}
 .overflowContainer::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     border-radius: 8px;
     background-color: #F5F5F5;
 }
-.overflowContainer::-webkit-scrollbar{
+.overflowContainer::-webkit-scrollbar-thumb{
     width: 8px;
     background-color: #F5F5F5;
 }
@@ -1336,6 +1396,15 @@ body .menu__content--select .text--disabled {
     height: 40px;
     background-color: #d6e9f7
 }
+.total-result-search-blue {
+    height: 40px;
+    background-color: #3563c1;
+    color: #ffffff;
+    font-weight: 500
+}
+.table-tracuu table.table tr .active {
+    background-color: #eee !important;
+}
 .total-result-search span {
     color: #e82020
 }
@@ -1350,4 +1419,70 @@ body .menu__content--select .text--disabled {
     background-color:inherit !important;
     box-shadow:none !important;
     border-right: 1px solid #ddd !important
+}
+/*  */
+.kios-wrapper .custom-row {
+    overflow: hidden;
+    cursor: pointer;
+}
+.kios-wrapper div[class*="col"] {
+	float: left;
+	margin: 10px;
+	box-sizing: border-box;
+}
+.kios-wrapper .col-5 {
+	width: 41.666666667%;
+}
+.kios-wrapper .col-7 {
+	width: 58.333333333%;
+}
+.kios-home .custom-row {
+	display: -webkit-box;
+	display: flex;
+	height: 230px;
+}
+.kios-home .col-5 {
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+	color: white;
+	font-weight: bold;
+	font-size: 40px;
+	padding: 20px;
+}
+.kios-home .custom-row:nth-child(1) .col-5 {
+	background-image: url('/o/frontend-web-kios/images/kios-home-1.png');
+}
+.kios-home .custom-row:nth-child(2) .col-5 {
+	background-image: url('/o/frontend-web-kios/images/kios-home-2.png')
+}
+.kios-home .custom-row:nth-child(3) .col-5 {
+	background-image: url('/o/frontend-web-kios/images/kios-home-3.png');
+}
+.kios-home .col-7 p {
+	font-size: 22px;
+	margin: 0;
+	color: white;
+	padding: 20px;
+}
+.kios-home .custom-row:nth-child(1) .col-7 {
+	background-color: #1cbbb4;
+}
+.kios-home .custom-row:nth-child(2) .col-7 {
+	background-color: #07b2e0;
+}
+.kios-home .custom-row:nth-child(3) .col-7 {
+	background-color: #5674b9;
+}
+
+@media screen and (min-width: 1600px) {
+	.kios-home .custom-row {
+		height: 330px;
+	}
+	.kios-home .col-7 p {
+		font-size: 36px;
+	}
+	.kios-home .col-5 {
+		font-size: 60px;
+	}
 }

@@ -70,6 +70,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param
           param = {
+            employeeName: filter.employeeName,
             start: filter.start,
             end: filter.end
           }

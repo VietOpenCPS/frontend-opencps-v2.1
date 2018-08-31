@@ -29,7 +29,7 @@
 import $ from 'jquery'
 // import axios from 'axios'
 import 'jquery-textcomplete'
-import '../store/jquery_comment'
+import 'jquery-comments'
 export default {
   props: ['classPK', 'className'],
   data: () => ({

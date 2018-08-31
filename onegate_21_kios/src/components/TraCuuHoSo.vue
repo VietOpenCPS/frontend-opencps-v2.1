@@ -17,7 +17,7 @@
                 <div class="input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Số hồ sơ</label>
                   <div class="input-group__input">
-                    <input id="dossierNoKey" data-layout="normal" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
+                    <input id="dossierNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                   <div class="input-group__details"></div>
@@ -35,7 +35,7 @@
                 <div class="input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Số CMND</label>
                   <div class="input-group__input">
-                    <input id="applicantIdNoKey" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                    <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                   <div class="input-group__details"></div>
@@ -51,7 +51,7 @@
                 <div class="input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Họ tên người nộp</label>
                   <div class="input-group__input">
-                    <input id="applicantNameKey" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập họ và tên" type="text">
+                    <input id="applicantNameKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập họ và tên" type="text">
                     <i v-if="visible" @click="clear('applicantNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                   <div class="input-group__details"></div>
@@ -75,13 +75,13 @@
         <!--  -->
         <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
         <!--  -->
-        <v-alert class="mt-5" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
+        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
           Yêu cầu nhập thông tin để tra cứu
         </v-alert>
         <!--  -->
         <div v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
           <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
-            <span class="text-bold">Có {{dossierItemTotal}} kết quả được tìm thấy</span>
+            <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
           </div>
           <v-data-table
           :headers="headersTable"
@@ -148,60 +148,58 @@
           </div>
         </div>
         <div class="virtual-keyboard" v-if="visible">
-          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
       </v-card>
       <v-dialog v-model="dialogCheckPass" content-class="dialog-keyboard" persistent max-width="500px">
-        <v-form ref="form" v-model="valid">
-          <v-card>
-            <v-card-title style="color: #fff;background-color: #0b72ba">
-              <span class="headline">Mã bí mật truy cập hồ sơ</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex xs12>
-                    <!-- <v-text-field v-model="passCheck"
-                    placeholder="Nhập mã bí mật đã được cấp"
-                    :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
-                    required
-                    data-layout="normal" @focus="show"></v-text-field> -->
-                    <div class="input-group input-group--placeholder input-group--text-field primary--text">
-                      <div class="input-group__input">
-                        <input id="passCheck" data-layout="normal" @focus="show"
-                        aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
-                        <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                      </div>
-                      <div class="input-group__details">
-                        <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
-                      </div>
+        <v-card>
+          <v-card-title style="color: #fff;background-color: #0b72ba">
+            <span class="headline">Mã bí mật truy cập hồ sơ</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <!-- <v-text-field v-model="passCheck"
+                  placeholder="Nhập mã bí mật đã được cấp"
+                  :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
+                  required
+                  data-layout="normal" @focus="show"></v-text-field> -->
+                  <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                    <div class="input-group__input">
+                      <input id="passCheck" data-layout="normal" @focus="showKeyboard" @keyup.enter="submitViewDetail"
+                      aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
+                      <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                     </div>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
-                :loading="loading"
-                :disabled="loading"
-              >
-                <v-icon>save</v-icon>&nbsp;
-                Truy cập hồ sơ
-                <span slot="loader">Loading...</span>
-              </v-btn>
-              <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
-                :loading="loading"
-                :disabled="loading"
-                @click="clearDialog"
-              >
-                <v-icon>undo</v-icon>&nbsp;
-                Thoát
-                <span slot="loader">Loading...</span>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
+                    <div class="input-group__details">
+                      <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
+                    </div>
+                  </div>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
+              :loading="loading"
+              :disabled="loading"
+            >
+              <v-icon>save</v-icon>&nbsp;
+              Truy cập hồ sơ
+              <span slot="loader">Loading...</span>
+            </v-btn>
+            <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
+              :loading="loading"
+              :disabled="loading"
+              @click="clearDialog"
+            >
+              <v-icon>undo</v-icon>&nbsp;
+              Thoát
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
@@ -275,24 +273,30 @@ export default {
     layout: 'normal',
     input: null,
     options: {
-      useKbEvents: false
+      useKbEvents: true,
+      preventClickEvent: false
     }
   }),
   computed: {},
   created () {
     let vm = this
     vm.$nextTick(function () {
-      // var vm = this
-      // let current = vm.$router.history.current
-      // let newQuery = current.query
-      // // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
-      // $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      // // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
-      // $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      // // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
-      // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
-      // vm.hosoDatasPage = 1
-      // vm.doLoadingDataHoSo()
+      var vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
+      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
+      // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
+      // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
+      $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
+      vm.hosoDatasPage = 1
+      if ($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '' || $('#applicantNameKey').val() !== '') {
+        vm.validateTracuu = true
+        vm.doLoadingDataHoSo()
+      } else {
+        vm.validateTracuu = false
+      }
     })
   },
   watch: {
@@ -411,9 +415,11 @@ export default {
           if (result.status && result.status.toString() === '203') {
             vm.dialogError = true
           } else if (result.status && result.status.toString() === '200') {
-            router.push('/tra-cuu-ho-so/' + vm.dossierDetail.dossierId)
+            router.push('/ho-so/' + vm.dossierDetail.dossierId)
           }
         }).catch(function (reject) {
+          vm.dialogCheckPass = false
+          vm.visible = false
           vm.loading = false
           console.log('reject', reject)
         })
@@ -439,12 +445,20 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
+      this.bindClick('search')
+    },
+    showKeyboard (e) {
+      this.validPass = true
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+      this.bindClick('view')
     },
     hide () {
       this.visible = false
     },
     next () {
-      console.log('run next')
       let inputs = document.querySelectorAll('input')
       let found = false
       let arr1 = []
@@ -460,6 +474,21 @@ export default {
         this.input.blur()
         this.hide()
       }
+    },
+    bindClick (type) {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        if (type === 'search') {
+          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+            vm.filterDossier()
+          })
+        } else if (type === 'view') {
+          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+            vm.submitViewDetail()
+          })
+        }
+      }, 300)
     }
   }
 }

@@ -217,7 +217,7 @@
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
             ></v-text-field>
-            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:25px;right:0px">clear</v-icon>
+            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
           </div>
         </v-flex>
       </v-layout>
@@ -287,6 +287,8 @@
           <th
             v-for="header in props.headers"
             :key="header.text"
+            :class="header['class'] ? header['class'] : ''"
+            :width="header['width'] ? header['width'] + 'px' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
@@ -299,13 +301,13 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td v-if="menuType !== 3 && originality !== 1">
-          <v-checkbox
-            :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
-            v-model="props.selected"
-            primary
-            hide-details
-            color="primary"
-          ></v-checkbox>
+            <v-checkbox
+              :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              v-model="props.selected"
+              primary
+              hide-details
+              color="primary"
+            ></v-checkbox>
           </td>
           <td class="text-xs-center px-0 py-0">
             <content-placeholders v-if="loadingTable">
@@ -344,28 +346,24 @@
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                   @click="processPullBtnDetail(props.item, item, props.index, i)" 
-                  :disabled="item['enable'] === 2 || String(prop.item['permission']).indexOf('write') === -1"
+                  :disabled="item['enable'] === 2 || String(props.item['permission']).indexOf('write') === -1"
                   v-if="item['enable'] > 0 || item['autoEvent'] === 'special'"
                   >
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
-                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId" v-if="String(item.form) !== 'NEW'"
+                <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
+                  v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
-                <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW'"
-                @click="btnActionEvent(props.item, item, index, false)"
-              >
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="viewDetail(props.item, props.index)">
-                Xem chi tiết
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        </td>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="viewDetail(props.item, props.index)">
+                  Xem chi tiết
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
@@ -827,7 +825,9 @@ export default {
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
-            vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('headers')) {
+              vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
+            }
             if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
               vm.hideAction = vm.trangThaiHoSoList[vm.index]['tableConfig']['hideAction']
             }
@@ -1072,13 +1072,17 @@ export default {
       var vm = this
       var checkValue = true
       // check theo người thực hiện
-      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW') {
+      if (form !== 'PRINT_01' && form !== 'PRINT_02' && form !== 'PRINT_03' && form !== 'GUIDE' && form !== 'PREVIEW' && form !== 'BETIMES') {
         let userArr = vm.$store.getters.getUsersNextAction
-        let check = userArr.filter(function (item) {
-          return item.userId.toString() === currentUser.userId.toString()
-        })
-        if (check.length > 0) {
-          checkValue = true
+        if (userArr.length > 0) {
+          let check = userArr.filter(function (item) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          })
+          if (check.length > 0) {
+            checkValue = true
+          } else {
+            checkValue = false
+          }
         } else {
           checkValue = false
         }
@@ -1782,9 +1786,11 @@ export default {
           activeTab: 'tabs-1',
           btnIndex: btnIndex
         }
-        if (item['autoEvent'] === 'special') {
-          query['actionSpecial'] = true
-        }
+        // if (item['autoEvent']) {
+        //   if (item['autoEvent'] === 'special') {
+        //     query['actionSpecial'] = true
+        //   }
+        // }
         router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: query
