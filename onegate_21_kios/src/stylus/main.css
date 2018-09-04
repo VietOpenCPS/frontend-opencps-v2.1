@@ -270,39 +270,7 @@ table.datatable--select-all thead th:first-child, table.datatable--select-all tb
     padding: 0px !important;
     width: 32px !important;
 }
-div.table-tracuu {
-    max-height: 700px;
-    overflow: auto
-}
-div.table-tracuu table.table thead tr th:first-child, div.table-tracuu table.table tbody tr td:first-child {
-    max-width: 100px !important;
-}
-div.table-tracuu table.table thead tr th:nth-child(2), div.table-tracuu table.table tbody tr td::nth-child(2) {
-    min-width: 250px;
-    max-width: 270px;
-}
-div.table-tracuu table.table thead tr th:nth-child(4), div.table-tracuu table.table tbody tr td::nth-child(4) {
-    min-width: 170px;
-    max-width: 200px;
-}
-div.table-tracuu table.table thead tr th:nth-child(5), div.table-tracuu table.table tbody tr td::nth-child(5) {
-    min-width: 150px;
-    max-width: 150px;
-}
-div.table-tracuu::-webkit-scrollbar-track{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 8px;
-    background-color: #F5F5F5;
-}
-div.table-tracuu::-webkit-scrollbar{
-    width: 8px;
-    background-color: #F5F5F5;
-}
-div.table-tracuu::-webkit-scrollbar-thumb{
-    border-radius: 8px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: rgb(181, 181, 181);
-}
+
 .dialog-keyboard {
     position: absolute !important;
     top: 0px !important
@@ -318,7 +286,7 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     border-radius: 5px;
 }
 .vue-touch-keyboard .keyboard .key {
-    font-size: 15px !important;
+    font-size: 16px !important;
     border-radius: 3px !important;
     box-shadow: none !important
 }
@@ -347,7 +315,7 @@ table .action_column {
 }
 .application .theme--light.table thead th, .theme--light .table thead th {
     color: #201c1c;
-    font-size: 13px;
+    /* font-size: 13px; */
 }
 body .table-bordered {
     border: 0;
@@ -497,10 +465,10 @@ body .navigation-drawer .list__group__header__prepend-icon .icon{
 .list__group.list__group--active::before, .list__group.list__group--active::after {
     background: none !important;
 }
-.input-group label {
-    font-size: 14px !important;
+/* .input-group label {
+    font-size: 14px;
     font-weight: normal;
-}
+} */
 .btn_wrap_actions {
     text-align: right;
 }
@@ -660,9 +628,9 @@ body .list-bdb .boder-bottom:not(:last-child){
 input::-webkit-input-placeholder, input::placeholder{
     font-size: 13px;
 }
-body .application .input-group--text-field input, body .application .input-group--text-field textarea {
+/* body .application .input-group--text-field input, body .application .input-group--text-field textarea {
     font-size: 13px;
-}
+} */
 body .theme--light .list .list__tile--highlighted {
     background: none;
 }
@@ -720,9 +688,7 @@ body .loader {
 .theme--light .navigation-drawer.detail_state .list__group:first-child > .list__group__header {
     border-right: 1px solid #0d71bb;
 }
-body .application--wrap {
-    border-top: 1px solid #dddddd;
-}
+
 .btn--loader .btn__loading span{
     font-size: 12px;
 }
@@ -1066,7 +1032,7 @@ table.datatable p {
 }
 table.datatable p span {
     margin-bottom: 0;
-    font-size: 13px !important;
+    font-size: 13px;
     font-family: Roboto,sans-serif !important;
 }
 body .expansion-panel__body .input-group,
@@ -1090,7 +1056,7 @@ body table.table thead .input-group--selection-controls.checkbox.input-group--di
 }
 /*  */
 .input-group--text-field__suffix {
-    font-size: 14px !important
+    font-size: 14px
 }
 .card__text__gov span {
     font-size: 13px;
@@ -1405,6 +1371,39 @@ body .menu__content--select .text--disabled {
 .table-tracuu table.table tr .active {
     background-color: #eee !important;
 }
+div.table-tracuu {
+    max-height: 700px;
+    overflow: auto
+}
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
+    max-width: 100px;
+}
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(2) {
+    min-width: 250px;
+    max-width: 270px;
+}
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(4) {
+    min-width: 200px;
+    max-width: 250px;
+}
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(5) {
+    min-width: 200px;
+    max-width: 250px;
+}
+div.table-tracuu::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    background-color: #F5F5F5;
+}
+div.table-tracuu::-webkit-scrollbar{
+    width: 8px;
+    background-color: #F5F5F5;
+}
+div.table-tracuu::-webkit-scrollbar-thumb{
+    border-radius: 8px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: rgb(181, 181, 181);
+}
 .total-result-search span {
     color: #e82020
 }
@@ -1474,7 +1473,25 @@ body .menu__content--select .text--disabled {
 .kios-home .custom-row:nth-child(3) .col-7 {
 	background-color: #5674b9;
 }
-
+.input-border .input-group__input {
+    border: 1px solid #0b72ba;
+    border-radius: 3px;
+    padding-left: 5px;
+    margin-top: 8px
+}
+.select-border .input-group__input {
+    border: 1px solid #0b72ba;
+    height: 34px;
+    border-radius: 5px;
+    padding-left: 5px;
+    margin-top: 8px
+}
+.select-border .input-group__details {
+    display: none;
+}
+.kios-item * {
+    font-size: 15px !important
+}
 @media screen and (min-width: 1600px) {
 	.kios-home .custom-row {
 		height: 330px;

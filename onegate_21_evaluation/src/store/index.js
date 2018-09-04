@@ -95,6 +95,7 @@ export const store = new Vuex.Store({
                 dataReturn[key]['perGood'] = 0
                 dataReturn[key]['badCount'] = 0
                 dataReturn[key]['perBad'] = 0
+                dataReturn[key]['imageUrl'] = ''
               }
               resolve(dataReturn)
             } else {

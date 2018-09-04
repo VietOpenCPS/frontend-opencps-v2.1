@@ -979,10 +979,20 @@ body .input-group--selection-controls__ripple {
     max-height: 500px;
     overflow: auto
 }
+.table-dossier .th {
+    text-align: center
+}
+.table-dossier .th, .table-dossier .td {
+    border-right: 1px solid #d3d3d3;
+    border-top: 1px solid #d3d3d3;
+}
 .dossierList {
     height: 600px;
     overflow: auto;
-    position: relative;
+    position: relative
+}
+.dossierList .wrap-list {
+    border-bottom: 1px solid #d3d3d3;
 }
 .dossierList::scrollbar{
     width: 0px;

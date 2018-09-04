@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-0">
+  <div class="px-2 py-0 kios-item">
     <div>
       <v-card>
         <v-layout wrap class="px-0 py-0">
@@ -14,13 +14,12 @@
                   @focus="show"
                   data-layout="normal"
                 ></v-text-field> -->
-                <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Số hồ sơ</label>
                   <div class="input-group__input">
                     <input id="dossierNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
-                  <div class="input-group__details"></div>
                 </div>
               </v-flex>
               <v-flex xs4 class="pl-2 pr-2">
@@ -32,13 +31,12 @@
                   @focus="show"
                   data-layout="normal"
                 ></v-text-field> -->
-                <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Số CMND</label>
                   <div class="input-group__input">
                     <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
-                  <div class="input-group__details"></div>
                 </div>
               </v-flex>
               <v-flex xs4 class="pl-2 pr-2">
@@ -48,18 +46,17 @@
                   v-model="applicantNameKey"
                   clearable
                 ></v-text-field> -->
-                <div class="input-group input-group--placeholder input-group--text-field primary--text">
+                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <label>Họ tên người nộp</label>
                   <div class="input-group__input">
                     <input id="applicantNameKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập họ và tên" type="text">
                     <i v-if="visible" @click="clear('applicantNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
-                  <div class="input-group__details"></div>
                 </div>
               </v-flex>
             </v-layout>
           </div>
-          <div class="pt-2 text-center" style="width: 150px">
+          <div class="mt-4 text-center" style="width: 150px">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
@@ -279,6 +276,8 @@ export default {
   }),
   computed: {},
   created () {
+    // $('.mWrapper > header').css('display', 'none !important')
+    // $('.mWrapper > footer').css('display', 'none !important')
     let vm = this
     vm.$nextTick(function () {
       var vm = this

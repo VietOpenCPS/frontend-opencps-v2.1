@@ -1,5 +1,5 @@
 <template>
-  <div style="font-size:13px" class="px-2 py-0">
+  <div style="font-size:13px" class="px-2 py-0 kios-item">
     <!-- <div class="row-header mb-2">
       <div class="background-triangle-big"> <span>ĐÁNH GIÁ CÁN BỘ</span> </div>
       <div class="layout row wrap header_tools">
@@ -21,6 +21,7 @@
             ></v-text-field> -->
             <v-flex xs6 class="pl-2 pr-2">
               <v-select
+                class="select-border"
                 :items="listCoQuan"
                 v-model="coQuanSelected"
                 autocomplete
@@ -33,23 +34,22 @@
               ></v-select>
             </v-flex>
             <v-flex xs6 class="pl-2 pr-2">
-              <div class="input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                 <label>Tên cán bộ</label>
                 <div class="input-group__input">
                   <input id="employeeNameKey" data-layout="normal" @focus="show" aria-label="Tên cán bộ" placeholder="Nhấn để nhập tên cán bộ" type="text">
                   <i v-if="visible" @click="clear('employeeNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                 </div>
-                <div class="input-group__details"></div>
               </div>
             </v-flex>
           </v-layout>
         </div>
-        <div class="pt-2 text-center" style="width: 150px">
+        <div class="mt-4 text-center" style="width: 150px">
           <v-btn color="primary"
             :loading="loading"
             :disabled="loading"
             @click="filterEmployee"
-            class="mt-3 ml-3"
+            class="ml-3"
           >
             <v-icon size="18">search</v-icon>
             &nbsp;
@@ -72,43 +72,43 @@
           <v-layout wrap >
             <v-flex xs12 sm6 class="mb-2" v-for="(item, index) in employeeList" :key="index" :class="index%2!==1 ? 'pr-2' : ''" @click="showEvaluation(item, index)" style="height:120px">
               <v-layout class="employeeItem mb-1 card" wrap>
-                <v-flex xs12 sm6>
+                <v-flex xs12 sm5>
                   <v-card class="employeeItem-scope-left">
                     <v-card-text class="px-2 py-1 pr-0">
                       <v-layout wrap>
-                        <v-flex xs12 sm5>
-                          <img v-if="item.photoFileEntryId" style="max-height:105px" :src="item.photoFileEntryId">
-                          <img v-else style="max-height:105px" src="/o/frontend-web-kios/images/default_avatar.png">
+                        <v-flex xs3 sm3>
+                          <img v-if="item.photoFileEntryId" style="height:100%;width:100%" :src="item.photoFileEntryId">
+                          <img v-else style="height:100%;width:100%" src="/o/frontend-web-kios/images/default_avatar.png">
                         </v-flex>
-                        <v-flex xs12 sm7>
+                        <v-flex xs9 sm9 class="pl-1">
                           <p class="mb-2 text-bold">{{item.fullName}}</p>
-                          <p class="mb-2">Mã nhân viên: <span class="text-bold">{{item.employeeNo}}</span></p>
-                          <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p>
-                          <p class="mb-2" style="color:green">{{item.jobPosTitle}}</p>
+                          <p class="mb-2">Mã thẻ: <span class="text-bold">{{item.employeeNo}}</span></p>
+                          <!-- <p class="mb-2">Ngày sinh: <span class="text-bold">{{item.birthdate | dateTimeView}}</span></p> -->
+                          <p class="mb-2">Chức vụ: <span class="text-bold">{{item.jobPosTitle}}</span></p>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
                   </v-card>
                 </v-flex>
-                <v-flex xs12 sm6>
+                <v-flex xs12 sm7>
                   <v-card class="employeeItem-scope-right">
                     <v-card-text class="px-2 py-1 pr-0">
                       <p class="mb-2">Tổng số lượt đánh giá: <span class="text-bold">{{item.totalEvaluation}}</span></p>
-                      <v-layout wrap class="mb-2">
+                      <v-layout wrap class="mb-1">
                         <div class="flex xs5 pr-2">Rất hài lòng <span class="text-bold" style="color:#5cb85c">({{item.veryGoodCount}})</span></div>
                         <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
                         :val="item.perVeryGood" :text="item.veryGoodCount !== 0 ? item.perVeryGood + '%' : ''" 
                         text-position="inside" bg-color="#e0e0e0" bar-color="#5cb85c" text-fg-color="#fff">
                         </progress-bar>
                       </v-layout>
-                      <v-layout wrap class="mb-2">
+                      <v-layout wrap class="mb-1">
                         <div class="flex xs5 pr-2">Hài lòng <span class="text-bold" style="color:#f0ad4e">({{item.goodCount}})</span></div>
                         <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
                         :val="item.perGood" :text="item.goodCount !== 0 ? item.perGood + '%' : ''" 
                         text-position="inside" bg-color="#e0e0e0" bar-color="#f0ad4e" text-fg-color="#fff">
                         </progress-bar>
                       </v-layout>
-                      <v-layout wrap class="mb-2">
+                      <v-layout wrap class="mb-1">
                         <div class="flex xs5 pr-2">Không hài lòng <span class="text-bold" style="color:#d9534f">({{item.badCount}})</span></div>
                         <progress-bar class="flex xs7" size="17" spacing="1" bar-transition="all 1s ease"
                         :val="item.perBad" :text="item.badCount !== 0 ? item.perBad + '%' : ''" 
@@ -131,24 +131,24 @@
       </div>
     </div>
     <!--  -->
-    <v-dialog v-model="dialogEvaluation" scrollable max-width="600" persistent>
+    <v-dialog v-model="dialogEvaluation" scrollable max-width="500" persistent>
       <v-card>
         <v-card-title class="headline">Đánh giá cán bộ</v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogEvaluation = false">
           <v-icon>clear</v-icon>
         </v-btn>
-        <v-card-text class="pb-0 pt-4" style="height: 290px;">
+        <v-card-text class="pb-0 pt-2" style="height: 190px;">
           <v-layout wrap>
-            <v-flex xs12 sm4>
-              <img v-if="employeeSelected.photoFileEntryId" style="max-height:185px" :src="employeeSelected.photoFileEntryId">
-              <img v-else style="max-height:185px" src="/o/frontend-web-kios/images/default_avatar.png">
+            <v-flex xs12 sm3>
+              <img v-if="employeeSelected.photoFileEntryId" style="max-height:110px" :src="employeeSelected.photoFileEntryId">
+              <img v-else style="max-height:110px" src="/o/frontend-web-kios/images/default_avatar.png">
             </v-flex>
-            <v-flex xs12 sm8 class="pl-3">
+            <v-flex xs12 sm9 class="pl-3">
               <p class="mb-2 text-bold">{{employeeSelected.fullName}}</p>
-              <p class="mb-2">Mã nhân viên: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
-              <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
+              <p class="mb-2">Mã thẻ: <span class="text-bold">{{employeeSelected.employeeNo}}</span></p>
+              <!-- <p class="mb-2">Ngày sinh: <span class="text-bold">{{employeeSelected.birthdate | dateTimeView}}</span></p>
               <p class="mb-2">Số điện thoại: <span class="text-bold">{{employeeSelected.telNo}}</span></p>
-              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p>
+              <p class="mb-2">Email: <span class="text-bold">{{employeeSelected.email}}</span></p> -->
               <p class="mb-2">Chức vụ: <span class="text-bold">{{employeeSelected.jobPosTitle}}</span></p>
             </v-flex>
           </v-layout>
