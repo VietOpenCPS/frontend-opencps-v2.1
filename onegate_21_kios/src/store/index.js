@@ -12,6 +12,7 @@ export const store = new Vuex.Store({
     totalEmployee: 0,
     workingUnitSelect: null,
     loading: false,
+    dossierDetail: {},
     index: 0
   },
   actions: {
@@ -109,6 +110,32 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getDomainListsPublic ({commit, state}, administrationCode) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceconfigs/pubish/' + administrationCode + '/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.domains) {
+              let dataReturn = serializable.domains
+              console.log('dataReturn', dataReturn)
               resolve(dataReturn)
             } else {
               resolve([])
@@ -240,16 +267,16 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
-            },
-            params: {
+              groupId: state.initData.groupId,
               secretCode: filter.password
-            }
+            },
+            params: {}
           }
           // test local
           axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
-            // let serializable = response.data
+            let serializable = response.data
+            commit('setDossierDetail', serializable)
             console.log('response', response)
             resolve(response)
           }).catch(function (error) {
@@ -424,6 +451,9 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
+    setDossierDetail (state, payload) {
+      state.dossierDetail = payload
+    },
     setTotalEmployee (state, payload) {
       state.totalEmployee = payload
     },
@@ -438,8 +468,8 @@ export const store = new Vuex.Store({
     getTotalEmployee (state) {
       return state.totalEmployee
     },
-    getWorkingUnitSelect (state) {
-      return state.workingUnitSelect
+    getDetailDossier (state) {
+      return state.dossierDetail
     }
   }
 })

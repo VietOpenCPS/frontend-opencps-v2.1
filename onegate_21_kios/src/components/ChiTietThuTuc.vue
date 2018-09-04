@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-0">
+  <div class="px-2 py-0 kios-item">
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>

@@ -11,10 +11,12 @@
           <v-card-text v-if="type === 1" class="py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
+              slot="activator"
               v-model="item.assigned"
               :label="item.userName"
               @change = 'changeAssigned($event, index)'
               style="display:inline-block"
+              :title="item.userName"
               ></v-checkbox>
             </v-layout>
             <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
