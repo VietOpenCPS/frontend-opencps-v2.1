@@ -1,66 +1,37 @@
 <template>
-  <div class="px-2 py-0 kios-item">
+  <div class="py-0 kios-item">
     <div>
       <v-card>
+        <h4 class="py-2 ml-2">
+          <span>TRA CỨU THÔNG TIN HỒ SƠ </span>
+        </h4>
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
-              <v-flex xs4 class="pl-2 pr-2">
-                <!-- <v-text-field
-                  label="Số hồ sơ"
-                  placeholder="Nhấn để nhập mã số hồ sơ"
-                  v-model="dossierNoKey"
-                  clearable
-                  @focus="show"
-                  data-layout="normal"
-                ></v-text-field> -->
+              <v-flex xs6 class="pl-2 pr-2">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <label>Số hồ sơ</label>
+                  <!-- <label>Mã số hồ sơ</label> -->
                   <div class="input-group__input">
-                    <input id="dossierNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
+                    <input id="dossierNoKey" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
               </v-flex>
-              <v-flex xs4 class="pl-2 pr-2">
-                <!-- <v-text-field
-                  label="Số CMND"
-                  placeholder="Nhấn để nhập số CMND"
-                  v-model="applicantIdNoKey"
-                  clearable
-                  @focus="show"
-                  data-layout="normal"
-                ></v-text-field> -->
+              <v-flex xs6 class="pl-2 pr-2">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <label>Số CMND</label>
                   <div class="input-group__input">
-                    <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                    <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                  </div>
-                </div>
-              </v-flex>
-              <v-flex xs4 class="pl-2 pr-2">
-                <!-- <v-text-field
-                  label="Họ tên người nộp"
-                  placeholder="Nhấn để nhập họ và tên"
-                  v-model="applicantNameKey"
-                  clearable
-                ></v-text-field> -->
-                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <label>Họ tên người nộp</label>
-                  <div class="input-group__input">
-                    <input id="applicantNameKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập họ và tên" type="text">
-                    <i v-if="visible" @click="clear('applicantNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
               </v-flex>
             </v-layout>
           </div>
-          <div class="mt-4 text-center" style="width: 150px">
+          <div class="text-center" style="width: 150px;margin-top:12px">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
-              @click="filterDossier"
+              @click="confirmPass"
             >
               <v-icon size="18">search</v-icon>
               &nbsp;
@@ -76,41 +47,25 @@
           Yêu cầu nhập thông tin để tra cứu
         </v-alert>
         <!--  -->
-        <div v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
-          <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
+        <div class="my-2" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
+          <!-- <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
             <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
-          </div>
+          </div> -->
           <v-data-table
           :headers="headersTable"
           :items="dossierList"
           hide-actions
-          class="table-tracuu table-landing table-bordered"
+          class="table-tracuu table-landing table-bordered mt-3"
           :class="visible ? 'overlayActive': ''"
           >
             <template slot="items" slot-scope="props">
               <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
-                <td class="text-xs-center">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.index + 1}}</span>
-                  </div>
-                </td>
                 <td class="text-xs-left">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
                     <span>{{props.item.dossierNo}}</span><br>
-                  </div>
-                </td>
-                <td class="text-xs-left">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.serviceName}}</span>
                   </div>
                 </td>
                 <td class="text-xs-left" >
@@ -127,11 +82,16 @@
                   </content-placeholders>
                   <div v-else>
                     <span>
-                      <span>{{props.item.dossierStatusText}}</span>
+                      <span>{{props.item.submitDate}}</span>
                     </span>
                   </div>
                 </td>
               </tr>
+            </template>
+            <template slot="no-data">
+              <div class="text-xs-center mt-2">
+                Không có hồ sơ nào được tìm thấy
+              </div>
             </template>
           </v-data-table>
           <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
@@ -148,56 +108,6 @@
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
       </v-card>
-      <v-dialog v-model="dialogCheckPass" content-class="dialog-keyboard" persistent max-width="500px">
-        <v-card>
-          <v-card-title style="color: #fff;background-color: #0b72ba">
-            <span class="headline">Mã bí mật truy cập hồ sơ</span>
-          </v-card-title>
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <!-- <v-text-field v-model="passCheck"
-                  placeholder="Nhập mã bí mật đã được cấp"
-                  :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
-                  required
-                  data-layout="normal" @focus="show"></v-text-field> -->
-                  <div class="input-group input-group--placeholder input-group--text-field primary--text">
-                    <div class="input-group__input">
-                      <input id="passCheck" data-layout="normal" @focus="showKeyboard" @keyup.enter="submitViewDetail"
-                      aria-label="Số hồ sơ" placeholder="Nhập mã bí mật đã được cấp" type="text">
-                      <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                    </div>
-                    <div class="input-group__details">
-                      <div v-if="!validPass" class="input-group__messages" style="color:red">* Mã bí mật là bắt buộc</div>
-                    </div>
-                  </div>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" flat="flat" @click.native="submitViewDetail"
-              :loading="loading"
-              :disabled="loading"
-            >
-              <v-icon>save</v-icon>&nbsp;
-              Truy cập hồ sơ
-              <span slot="loader">Loading...</span>
-            </v-btn>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogCheckPass = false"
-              :loading="loading"
-              :disabled="loading"
-              @click="clearDialog"
-            >
-              <v-icon>undo</v-icon>&nbsp;
-              Thoát
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
           <v-card-title class="headline">Bạn không có quyền truy cập hồ sơ 
@@ -217,9 +127,12 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
-  components: {},
+  components: {
+    'vue-touch-keyboard': VueTouchKeyBoard
+  },
   data: () => ({
     loading: false,
     loadingAction: false,
@@ -233,17 +146,7 @@ export default {
     totalPages: 1,
     headersTable: [
       {
-        text: 'Số thứ tự',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Số hồ sơ',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Thủ tục thực hiện',
+        text: 'Mã hồ sơ',
         align: 'center',
         sortable: false
       },
@@ -253,7 +156,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Tình trạng hồ sơ',
+        text: 'Ngày nộp',
         align: 'center',
         sortable: false
       }
@@ -274,23 +177,22 @@ export default {
       preventClickEvent: false
     }
   }),
-  computed: {},
+  computed: {
+    filterDossierKey () {
+      return this.$store.getters.getFilterDossierKey
+    }
+  },
   created () {
-    // $('.mWrapper > header').css('display', 'none !important')
-    // $('.mWrapper > footer').css('display', 'none !important')
     let vm = this
     vm.$nextTick(function () {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      // vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      // vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      // vm.applicantNameKey = newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : ''
-      $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
+      // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if ($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '' || $('#applicantNameKey').val() !== '') {
+      if ($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '') {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
@@ -298,26 +200,23 @@ export default {
       }
     })
   },
-  watch: {
-    '$route': function (newRoute, oldRoute) {
-      let vm = this
-      let currentParams = newRoute.params
-      let currentQuery = newRoute.query
-      // vm.dossierNoKey = currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : ''
-      $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
-      // vm.applicantIdNoKey = currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
-      $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
-      // vm.applicantNameKey = currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : ''
-      $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
-      vm.hosoDatasPage = 1
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val() || $('#applicantNameKey').val()) {
-        vm.validateTracuu = true
-        vm.doLoadingDataHoSo()
-      } else {
-        vm.validateTracuu = false
-      }
-    }
-  },
+  // watch: {
+  //   '$route': function (newRoute, oldRoute) {
+  //     let vm = this
+  //     let currentParams = newRoute.params
+  //     let currentQuery = newRoute.query
+  //     $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
+  //     $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
+  //     // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
+  //     vm.hosoDatasPage = 1
+  //     if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+  //       vm.validateTracuu = true
+  //       vm.doLoadingDataHoSo()
+  //     } else {
+  //       vm.validateTracuu = false
+  //     }
+  //   }
+  // },
   methods: {
     filterDossier () {
       var vm = this
@@ -325,11 +224,8 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      // newQuery['dossierNo'] = vm.dossierNoKey ? vm.dossierNoKey : ''
       newQuery['dossierNo'] = $('#dossierNoKey').val()
-      // newQuery['applicantIdNo'] = vm.applicantIdNoKey ? vm.applicantIdNoKey : ''
       newQuery['applicantIdNo'] = $('#applicantIdNoKey').val()
-      // newQuery['applicantName'] = vm.applicantNameKey ? vm.applicantNameKey : ''
       newQuery['applicantName'] = $('#applicantNameKey').val()
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -342,6 +238,38 @@ export default {
           path: current.path + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        vm.validateTracuu = false
+      }
+    },
+    // setFilterKey () {
+    //   var vm = this
+    //   setTimeout(function () {
+    //     let payload = {
+    //       dossierNo: $('#dossierNoKey').val(),
+    //       applicantIdNo: $('#applicantIdNoKey').val(),
+    //       secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
+    //     }
+    //     vm.$store.commit('setFilterDossierKey', payload)
+    //     console.log('payloadFilter', vm.$store.getters.getFilterDossierKey)
+    //   }, 200)
+    // },
+    confirmPass () {
+      var vm = this
+      let payload = {
+        dossierNo: $('#dossierNoKey').val(),
+        applicantIdNo: $('#applicantIdNoKey').val(),
+        secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
+      }
+      vm.$store.commit('setFilterDossierKey', payload)
+      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+        vm.validateTracuu = true
+        vm.$router.push({
+          path: '/ma-truy-cap',
+          query: {
+            target: 'tracuuhoso'
           }
         })
       } else {
@@ -377,8 +305,8 @@ export default {
       filter = {
         page: vm.hosoDatasPage,
         dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
-        applicantName: currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '',
-        applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
+        applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+        secretCode: vm.filterDossierKey.secretCode
       }
       vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
         vm.loadingTable = false
@@ -394,8 +322,13 @@ export default {
     viewDetail (item) {
       var vm = this
       vm.dossierDetail = item
-      vm.dialogCheckPass = true
-      // router.push('/tra-cuu-ho-so/' + item.dossierId)
+      vm.$store.commit('setDossierDetail', item)
+      vm.$router.push({
+        path: '/ma-truy-cap',
+        query: {
+          target: 'chitiethoso'
+        }
+      })
     },
     submitViewDetail () {
       var vm = this
@@ -477,13 +410,13 @@ export default {
     bindClick (type) {
       var vm = this
       setTimeout(function () {
-        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
         if (type === 'search') {
-          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
             vm.filterDossier()
           })
         } else if (type === 'view') {
-          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
+          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
             vm.submitViewDetail()
           })
         }

@@ -275,31 +275,7 @@ table.datatable--select-all thead th:first-child, table.datatable--select-all tb
     position: absolute !important;
     top: 0px !important
 }
-.virtual-keyboard {
-    z-index: 10000;
-    width: 90% !important;
-    position: fixed;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ddd;
-    border-radius: 5px;
-}
-.vue-touch-keyboard .keyboard .key {
-    font-size: 16px !important;
-    border-radius: 3px !important;
-    box-shadow: none !important
-}
-.vue-touch-keyboard .keyboard .key.backspace {
-    background-size: 18px;
-}
-.overlayActive {
-    pointer-events: none;
-    -ms-touch-action: none;
-    touch-action: none;
-    opacity: .46;
-    background-color: #21212173;
-}
+
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
 }
@@ -480,7 +456,7 @@ body .navigation-drawer .list__group__header__prepend-icon .icon{
     font-size: 13px;
 }
 .btn.accent, .btn.error, .btn.info, .btn.primary, .btn.secondary, .btn.success, .btn.warning, .btn.red {
-    height: 30px;
+    height: 34px;
     min-width: inherit;
 }
 .btn.primary {
@@ -504,10 +480,10 @@ body .theme--light .list .list__tile--link:hover, body .theme--light .list .list
 body .application .theme--light.icon, body .theme--light .icon {
     font-size: 18px;
 }
-body .list__tile__title {
+/* body .list__tile__title {
     font-size: 13px;
     line-height: 26px;
-}
+} */
 .list__group__items > div:hover {
     background-color: #f6f6f6;
 }
@@ -1376,19 +1352,10 @@ div.table-tracuu {
     overflow: auto
 }
 div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
-    max-width: 100px;
+    width: 320px;
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(2) {
-    min-width: 250px;
-    max-width: 270px;
-}
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(4) {
-    min-width: 200px;
-    max-width: 250px;
-}
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(5) {
-    min-width: 200px;
-    max-width: 250px;
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(3) {
+    max-width: 300px;
 }
 div.table-tracuu::-webkit-scrollbar-track{
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -1418,6 +1385,38 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     background-color:inherit !important;
     box-shadow:none !important;
     border-right: 1px solid #ddd !important
+}
+.table-dossier .th {
+    text-align: center;
+    border-top: 1px solid #d3d3d3;
+}
+.table-dossier .th, .table-dossier .td {
+    border-right: 1px solid #d3d3d3;
+    border-bottom: 1px solid #d3d3d3;
+}
+.wrap-password {
+    max-width: 500px;
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.list-domain .list__tile {
+    height: 42px;
+    cursor: pointer;
+    color: #0b72ba
+}
+.menu__content .list>div .list__tile {
+    font-size: 16px !important
+}
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3) {
+    min-width: 200px;
+}
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4) {
+    min-width: 100px;
+}
+.table-thu-tuc .table tbody td, body table.table tbody th {
+    height: 50px;
 }
 /*  */
 .kios-wrapper .custom-row {
@@ -1477,20 +1476,21 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     border: 1px solid #0b72ba;
     border-radius: 3px;
     padding-left: 5px;
-    margin-top: 8px
+    /* margin-top: 8px */
 }
 .select-border .input-group__input {
     border: 1px solid #0b72ba;
     height: 34px;
     border-radius: 5px;
     padding-left: 5px;
-    margin-top: 8px
+    /* margin-top: 8px */
 }
 .select-border .input-group__details {
     display: none;
 }
 .kios-item * {
-    font-size: 15px !important
+    font-size: 16px !important;
+    line-height: 26px
 }
 @media screen and (min-width: 1600px) {
 	.kios-home .custom-row {
@@ -1502,4 +1502,106 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 	.kios-home .col-5 {
 		font-size: 60px;
 	}
+}
+/* style vitual keyboard */
+.virtual-keyboard {
+    z-index: 10000;
+    background-color: #1b4771;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+}
+.virtual-keyboard .vue-touch-keyboard {
+    width: 60% !important;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.vue-touch-keyboard .keyboard .key {
+    font-size: 25px !important
+}
+.vue-touch-keyboard .keyboard .key.backspace {
+    background-size: 18px;
+}
+.overlayActive {
+    pointer-events: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    opacity: 1;
+}
+.vue-touch-keyboard .keyboard {
+    width: 100%;
+    margin: 0;
+}
+.vue-touch-keyboard .keyboard .line {
+    display: flex;
+    justify-content: space-around;
+}
+.vue-touch-keyboard .keyboard .line:not(:last-child) {
+    margin-bottom: 7px;
+}
+.vue-touch-keyboard .keyboard .key {
+    width: 60px;
+    height: 60px; 
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    padding-top: 15px;
+    overflow: hidden;
+    vertical-align: middle;
+    border: 1px solid #ccc;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+}
+.vue-touch-keyboard .keyboard .key:not(:last-child) {
+    margin-right: 7px;
+}
+.vue-touch-keyboard .keyboard .key.backspace {
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.vue-touch-keyboard .keyboard .key.half {
+    flex: 20;
+}
+.vue-touch-keyboard .keyboard .key.control {
+    color: #000;
+    background-color: #fff;
+    width: 100px;
+}
+.vue-touch-keyboard .keyboard .key.featured {
+    color: #000;
+    width: 100px;
+}
+.vue-touch-keyboard .keyboard .key:hover {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+.vue-touch-keyboard .keyboard .key:active {
+    transform: scale(0.98);
+    color: #000;
+    background-color: #fff;
+}
+.vue-touch-keyboard .keyboard .key.activated {
+    color: #000;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+.vue-touch-keyboard .keyboard .placeholder {
+    flex: 20;
+    height: 2.2em;
+    line-height: 2.2em;
+}
+.vue-touch-keyboard .keyboard .placeholder:not(:last-child) {
+    margin-right: 0.5em;
+}
+.vue-touch-keyboard .keyboard:before, .vue-touch-keyboard .keyboard:after {
+    content: '';
+    display: table;
+}
+.vue-touch-keyboard .keyboard:after {
+    clear: both;
 }

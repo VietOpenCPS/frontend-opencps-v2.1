@@ -10,6 +10,11 @@ export const store = new Vuex.Store({
   state: {
     initData: null,
     totalEmployee: 0,
+    filterDossierKey: {
+      dossierNo: '',
+      applicantIdNo: '',
+      secretCode: ''
+    },
     workingUnitSelect: null,
     loading: false,
     dossierDetail: {},
@@ -26,7 +31,7 @@ export const store = new Vuex.Store({
             orginURL = window.location.href.substr(0, coma)
           }
           /* test local */
-          // orginURL = 'http://127.0.0.1:8081/api/initdata'
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
           axios.get(orginURL + support.renderURLInit, param).then(function (response) {
             let serializable = response.data
             commit('setInitData', serializable)
@@ -53,13 +58,13 @@ export const store = new Vuex.Store({
               start: filter.page * 15 - 15,
               end: filter.page * 15,
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
-              applicantName: filter.applicantName ? filter.applicantName : '',
-              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
+              secretCode: filter.secretCode ? filter.secretCode : ''
             }
           }
           // test local
-          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          // axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -75,18 +80,14 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              step: 300
             }
-            // params: {
-            //   start: filter.page ? filter.page * 15 - 15 : '',
-            //   end: filter.page * 15,
-            //   dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            //   applicantName: filter.applicantName ? filter.applicantName : '',
-            //   applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
-            // }
           }
           // test local
-          axios.get('/o/rest/v2/dossiers', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          // axios.get('/o/rest/v2/dossiers/publish/searchDossiers', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -105,8 +106,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -130,12 +131,12 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceconfigs/pubish/' + administrationCode + '/domains', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceconfigs/pubish/' + administrationCode + '/domains', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
-            if (serializable.domains) {
-              let dataReturn = serializable.domains
-              console.log('dataReturn', dataReturn)
+            if (serializable.data) {
+              // let dataReturn = serializable.domains
+              let dataReturn = serializable.data
               resolve(dataReturn)
             } else {
               resolve([])
@@ -156,8 +157,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -180,8 +181,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/levels', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/levels', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/statistics/levels', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/levels', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -211,8 +212,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -267,14 +268,13 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId,
-              secretCode: filter.password
+              groupId: state.initData.groupId
             },
             params: {}
           }
           // test local
-          axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
+          // axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
             let serializable = response.data
             commit('setDossierDetail', serializable)
             console.log('response', response)
@@ -341,8 +341,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
+          // axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/workingunits', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -454,6 +454,13 @@ export const store = new Vuex.Store({
     setDossierDetail (state, payload) {
       state.dossierDetail = payload
     },
+    setFilterDossierKey (state, payload) {
+      state.filterDossierKey = {
+        dossierNo: payload.dossierNo ? payload.dossierNo : '',
+        applicantIdNo: payload.applicantIdNo ? payload.applicantIdNo : '',
+        secretCode: payload.secretCode ? payload.secretCode : ''
+      }
+    },
     setTotalEmployee (state, payload) {
       state.totalEmployee = payload
     },
@@ -470,6 +477,9 @@ export const store = new Vuex.Store({
     },
     getDetailDossier (state) {
       return state.dossierDetail
+    },
+    getFilterDossierKey (state) {
+      return state.filterDossierKey
     }
   }
 })

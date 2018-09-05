@@ -8,8 +8,8 @@ const routerOptions = [
   { path: '/tra-cuu-thu-tuc', component: 'TraCuuThuTuc', props: false },
   { path: '/tra-cuu-thu-tuc/:index', component: 'ChiTietThuTuc', props: true },
   { path: '/danh-gia-can-bo', component: 'DanhGiaCanBo', props: false },
-  // { path: '/ho-so-co-ket-qua', component: 'HoSoKetQua', props: false },
-  { path: '*', component: 'NotFound' }
+  { path: '/ho-so-co-ket-qua', component: 'HoSoKetQua', props: false },
+  { path: '/ma-truy-cap', component: 'CheckPassword', props: false }
 ]
 
 const routes = routerOptions.map(route => {
