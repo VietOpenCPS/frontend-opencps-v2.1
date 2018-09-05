@@ -36,3 +36,5 @@ module.exports = {
     cssSourceMap: false
   }
 }
+    // assetsSubDirectory: 'o/front-end-super-gate',
+    // assetsSubDirectory: 'o/front-end-super-gate',

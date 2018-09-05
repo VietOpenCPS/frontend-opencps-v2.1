@@ -4,7 +4,7 @@
       <div style="position: relative;">
         <v-expansion-panel class="expansion-pl">
           <v-expansion-panel-content hide-actions value="1">
-            <div slot="header"> <div class="background-triangle-small"> II. </div> THÔNG TIN CHỦ HỒ SƠ</div>
+            <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
             <v-card>
               <v-card-text>
                 <v-layout wrap>
@@ -19,10 +19,22 @@
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
                     <v-text-field
-                    v-else
-                    @change="onChangeApplicantIdNo"
-                    v-model="thongTinChuHoSo.applicantIdNo"
+                      v-if="originality === 1 || originality === '1'"
+                      v-model="thongTinChuHoSo.applicantIdNo"
                     ></v-text-field>
+                    <suggestions
+                      v-if="originality === 3 || originality === '3'"
+                      v-model="thongTinChuHoSo.applicantIdNo"
+                      :options="searchOptions"
+                      :onItemSelected="onSearchItemSelected"
+                      :onInputChange="onInputChange">
+                      <div slot="item" slot-scope="props" class="single-item">
+                        <v-list-tile-content>
+                          <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
+                          <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
+                        </v-list-tile-content>
+                      </div>
+                    </suggestions>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -158,19 +170,19 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn" style="width: 270px;margin-top: 4px;">
+        <div class="absolute__btn" style="width: 270px;margin-top: 4px;" v-if="originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-radio-group v-else v-model="thongTinChuHoSo.userType" row>
-            <v-radio label="Công Dân" :value="true"></v-radio>
-            <v-radio label="Doanh Nghiệp" :value="false"></v-radio>
+            <v-radio label="Công dân" :value="true"></v-radio>
+            <v-radio label="Doanh nghiệp" :value="false"></v-radio>
           </v-radio-group>
         </div>
-        <div style="position: relative;">
+        <div style="position: relative;" v-if="originality !== 1">
           <v-expansion-panel class="expansion-pl">
             <v-expansion-panel-content hide-actions value="1">
-              <div slot="header"> <div class="background-triangle-small"> III. </div> THÔNG TIN NGƯỜI NỘP HỒ SƠ</div>
+              <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
               <v-card>
                 <v-card-text>
                   <v-layout wrap>
@@ -185,15 +197,29 @@
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
-                      v-else
+                      v-if="originality === 1 || originality === '1'"
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
                       ></v-text-field>
+                      <!--  -->
+                      <suggestions
+                        v-if="originality === 3 || originality === '3'"
+                        v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                        :options="searchOptions"
+                        :onItemSelected="onSearchItemSelected1"
+                        :onInputChange="onInputChange1">
+                        <div slot="item" slot-scope="props" class="single-item">
+                          <v-list-tile-content>
+                            <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
+                            <v-list-tile-sub-title v-html="props.item.applicantIdNo"></v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </div>
+                      </suggestions>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tên tổ chức cá nhân: </v-subheader>
+                      <v-subheader v-else class="pl-0">Họ và tên: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -322,7 +348,7 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 150px;margin-top: 4px;">
+          <div class="absolute__btn" style="width: 150px;margin-top: 4px;" v-if="thongTinNguoiNopHoSo.sameUser">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -339,8 +365,13 @@
 </template>
 
 <script>
+import axios from 'axios'
+import Suggestions from 'v-suggestions'
 
 export default {
+  components: {
+    'suggestions': Suggestions
+  },
   data: () => ({
     valid_thongtinchuhoso: false,
     citys: [],
@@ -348,6 +379,9 @@ export default {
     districts: [],
     delegateWards: [],
     wards: [],
+    applicantItems: [],
+    applicantItems2: [],
+    applicantIdNo: '',
     labelSwitch: {
       'true': {
         cmtnd: 'CMND/ Hộ chiếu',
@@ -355,7 +389,7 @@ export default {
       },
       'false': {
         cmtnd: 'Mã số thuế',
-        nguoi_nop: 'Tên tổ chức/ cá nhân'
+        nguoi_nop: 'Tên tổ chức'
       }
     },
     thongTinChuHoSo: {
@@ -366,6 +400,7 @@ export default {
       applicantNote: '',
       applicantIdNo: '',
       contactEmail: '',
+      contactTelNo: '',
       contactName: '',
       address: '',
       applicantName: ''
@@ -380,11 +415,36 @@ export default {
       delegateEmail: '',
       delegateTelNo: '',
       delegateIdNo: ''
-    }
+    },
+    search: null,
+    search2: null,
+    searchQuery: '',
+    selectedSearchItem: null,
+    searchOptions: {}
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    originality () {
+      var vm = this
+      console.log('originality', vm.getOriginality())
+      return vm.getOriginality()
+    },
+    viaPostal () {
+      return this.$store.getters.viaPostal
+    },
+    dichVuChuyenPhatKetQua () {
+      return this.$store.getters.dichVuChuyenPhatKetQua
+    },
+    ThongTinChuHoSoBindChuyenPhat () {
+      let data = {
+        cityCode: this.thongTinChuHoSo.cityCode,
+        address: this.thongTinChuHoSo.address,
+        districtCode: this.thongTinChuHoSo.districtCode,
+        wardCode: this.thongTinChuHoSo.wardCode
+      }
+      return data
     }
   },
   created () {
@@ -403,7 +463,18 @@ export default {
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
         }
+        if (!vm.thongTinChuHoSo.userType) {
+          vm.thongTinNguoiNopHoSo.sameUser = false
+        } else {
+          vm.thongTinNguoiNopHoSo.sameUser = true
+        }
         if (vm.thongTinNguoiNopHoSo.sameUser) {
+          if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
+            vm.onChangeDelegateCity(value.cityCode)
+          }
+          if (value.districtCode && value.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
+            vm.onChangeDelegateDistrict(value.districtCode)
+          }
           vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
         }
       },
@@ -414,22 +485,31 @@ export default {
         var vm = this
         let dataChuHoSo = vm.thongTinChuHoSo
         if (value.sameUser) {
-          let dataNguoiNop = {
-            delegateName: dataChuHoSo.applicantName,
-            delegateCityCode: dataChuHoSo.cityCode,
-            delegateAddress: dataChuHoSo.address,
-            delegateDistrictCode: dataChuHoSo.districtCode,
-            delegateWardCode: dataChuHoSo.wardCode,
-            delegateEmail: dataChuHoSo.contactEmail,
-            delegateTelNo: dataChuHoSo.contactTelNo,
-            delegateIdNo: dataChuHoSo.applicantIdNo
+          let dataNguoiNopHoSo = {
+            applicantName: value.delegateName,
+            cityCode: value.delegateCityCode,
+            address: value.delegateAddress,
+            districtCode: value.delegateDistrictCode,
+            wardCode: value.delegateWardCode,
+            contactEmail: value.delegateEmail,
+            contactTelNo: value.delegateTelNo,
+            applicantIdNo: value.delegateIdNo
           }
-          vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, dataNguoiNop)
+          vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataNguoiNopHoSo)
         } else {
           this.$store.dispatch('resetThongTinNguoiNopHoSo')
         }
       },
       deep: true
+    },
+    ThongTinChuHoSoBindChuyenPhat (val) {
+      this.$store.commit('setThongTinChuHoSoBindChuyenPhat', val)
+    },
+    search (val) {
+      val && this.querySelections(val)
+    },
+    search2 (val) {
+      val && this.querySelections2(val)
     }
   },
   methods: {
@@ -446,7 +526,6 @@ export default {
         delegateIdNo: data.delegateIdNo
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
-      console.log('thongTinNguoiNopHoSoTemp-----------', thongTinNguoiNopHoSoTemp)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
       let userTypeCondition = true
       if (data.applicantIdType === 'business') {
@@ -461,13 +540,12 @@ export default {
         applicantIdNo: data.applicantIdNo,
         contactEmail: data.contactEmail,
         contactName: data.contactName,
+        contactTelNo: data.contactTelNo,
         address: data.address,
         applicantName: data.applicantName
       }
       let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
-      console.log('thongtinchuhoso', vm.thongTinChuHoSo)
-      console.log('thongtinnguoinophoso', vm.thongTinNguoiNopHoSo)
       vm.$nextTick(function () {
         var filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -479,31 +557,40 @@ export default {
         })
         setTimeout(function () {
           if (data.cityCode) {
-            filter.parent = data.cityCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.districts = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.cityCode
+            }).then(function (resultDistricts) {
+              vm.districts = resultDistricts.data
             })
           }
+          console.log('districtCode-----------', data.districtCode)
           if (data.districtCode) {
-            filter.parent = data.districtCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.wards = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.districtCode
+            }).then(function (resultWards) {
+              vm.wards = resultWards.data
             })
           }
           if (data.delegateCityCode) {
-            filter.parent = data.delegateCityCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.delegateDistricts = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.delegateCityCode
+            }).then(function (resultDeDistricts) {
+              vm.delegateDistricts = resultDeDistricts.data
             })
           }
           if (data.delegateDistrictCode) {
-            filter.parent = data.delegateDistrictCode
-            filter.level = 1
-            vm.$store.getters.getDictItems(filter).then(function (result) {
-              vm.delegateWards = result.data
+            vm.$store.getters.getDictItems({
+              collectionCode: 'ADMINISTRATIVE_REGION',
+              level: 1,
+              parent: data.delegateDistrictCode
+            }).then(function (resultDeWards) {
+              vm.delegateWards = resultDeWards.data
             })
           }
         }, 200)
@@ -544,8 +631,82 @@ export default {
     onChangeWard (data) {
       this.$store.commit('setWardVal', data)
     },
-    onChangeApplicantIdNo (data) {
-      // this.$store.dispatch('getUserInfoFromApplicantIdNo', data)
+    eventInput (event) {
+      var vm = this
+      vm.thongTinNguoiNopHoSo.delegateIdNo = []
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
+        }
+        if (vm.thongTinNguoiNopHoSo['delegateIdNo'][0]) {
+          console.log('vm.thongTinNguoiNopHoSo[delegateIdNo][0]==========', vm.thongTinNguoiNopHoSo['delegateIdNo'][0])
+          vm.thongTinNguoiNopHoSo['delegateName'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['applicantName'] ? vm.thongTinNguoiNopHoSo['delegateName'][0]['applicantName'] : ''
+          vm.thongTinNguoiNopHoSo['delegateAddress'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] : ''
+          vm.thongTinNguoiNopHoSo['delegateTelNo'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] : ''
+          vm.thongTinNguoiNopHoSo['delegateEmail'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] : ''
+          vm.thongTinNguoiNopHoSo['delegateCityCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] : ''
+          vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] : ''
+          vm.thongTinNguoiNopHoSo['delegateWardCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] : ''
+          if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+            vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+          }
+          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+            vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
+          }
+        }
+        return false
+      }, 100)
+    },
+    eventInput2 (event) {
+      var vm = this
+      vm.thongTinChuHoSo['applicantIdNo'] = []
+      setTimeout(function () {
+        if (event.length !== 0) {
+          vm.thongTinChuHoSo['applicantIdNo'] = [event[event.length - 1]]
+        }
+        if (vm.thongTinChuHoSo['applicantIdNo'][0]) {
+          console.log('vm.thongTinChuHoSo[applicantIdNo][0]==========', vm.thongTinChuHoSo['applicantIdNo'][0])
+          vm.thongTinChuHoSo['applicantName'] = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] : ''
+          vm.thongTinChuHoSo['address'] = vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : ''
+          vm.thongTinChuHoSo['contactTelNo'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] : ''
+          vm.thongTinChuHoSo['contactEmail'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] : ''
+          vm.thongTinChuHoSo.cityCode = vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : ''
+          vm.thongTinChuHoSo.districtCode = vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : ''
+          vm.thongTinChuHoSo.wardCode = vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
+          if (vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business') {
+            vm.thongTinChuHoSo.userType = false
+          } else {
+            vm.thongTinChuHoSo.userType = true
+          }
+          if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+            vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+          }
+          if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+            vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
+          }
+        }
+        return false
+      }, 100)
+    },
+    querySelections (val) {
+      var vm = this
+      let params = {
+        idNo: val
+      }
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
+        vm.applicantItems = result
+      }).catch(xhr => {
+      })
+    },
+    querySelections2 (val) {
+      var vm = this
+      let params = {
+        idNo: val
+      }
+      vm.$store.dispatch('getUserInfoFromApplicantIdNo', params).then(result => {
+        vm.applicantItems2 = result
+      }).catch(xhr => {
+      })
     },
     onChangeDelegateCity (data) {
       var vm = this
@@ -578,6 +739,112 @@ export default {
           vm.wards = result.data
         }
       })
+    },
+    onInputChange (query) {
+      let vm = this
+      if (query.trim().length === 0) {
+        return null
+      }
+      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      // test local
+      // const url = `http://127.0.0.1:8081/api/applicant?start=0&end=5&idNo=${query}`
+      return new Promise(resolve => {
+        vm.$store.dispatch('loadInitResource').then(result => {
+          let param = {
+            headers: {
+              groupId: result.groupId
+            }
+          }
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            resolve(items)
+          })
+        })
+      })
+    },
+    onInputChange1 (query) {
+      let vm = this
+      if (query.trim().length === 0) {
+        return null
+      }
+      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      // test local
+      // const url = `http://127.0.0.1:8081/api/applicant?start=0&end=5&idNo=${query}`
+      return new Promise(resolve => {
+        vm.$store.dispatch('loadInitResource').then(result => {
+          let param = {
+            headers: {
+              groupId: result.groupId
+            }
+          }
+          axios.get(url, param).then(response => {
+            let items = []
+            if (response.data.hasOwnProperty('data')) {
+              items = response.data.data
+            } else {
+            }
+            resolve(items)
+          })
+        })
+      })
+    },
+    onSearchItemSelected (item) {
+      var vm = this
+      vm.selectedSearchItem = item
+      console.log('selectedSearchItem', vm.selectedSearchItem)
+      if (item['applicantIdType'] === 'business') {
+        vm.thongTinChuHoSo.userType = false
+        vm.thongTinNguoiNopHoSo.sameUser = false
+      } else {
+        vm.thongTinChuHoSo.userType = true
+      }
+      vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
+      //
+      vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''
+      vm.thongTinChuHoSo['address'] = item['address'] ? item['address'] : ''
+      vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
+      vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
+      vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
+      vm.thongTinChuHoSo.districtCode = item['districtCode'] ? item['districtCode'] : ''
+      vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
+      if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+        vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+      }
+      if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+        vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
+      }
+      console.log('vm.thongTinChuHoSo', vm.thongTinChuHoSo)
+    },
+    onSearchItemSelected1 (item) {
+      var vm = this
+      vm.selectedSearchItem = item
+      console.log('selectedSearchItem1', item)
+      vm.thongTinNguoiNopHoSo['delegateIdNo'] = item.applicantIdNo.toString()
+      //
+      vm.thongTinNguoiNopHoSo['delegateName'] = item['applicantName'] ? item['applicantName'] : ''
+      vm.thongTinNguoiNopHoSo['delegateAddress'] = item['address'] ? item['address'] : ''
+      vm.thongTinNguoiNopHoSo['delegateTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
+      vm.thongTinNguoiNopHoSo['delegateEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
+      vm.thongTinNguoiNopHoSo['delegateCityCode'] = item['cityCode'] ? item['cityCode'] : ''
+      vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
+      vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
+      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+        vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+      }
+      if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+        vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
+      }
+      console.log('vm.thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+    },
+    getThongTinChuHoSo () {
+      return this.thongTinChuHoSo
+    },
+    getThongTinNguoiNopHoSo () {
+      return this.thongTinNguoiNopHoSo
     }
   }
 }

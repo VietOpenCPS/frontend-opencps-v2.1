@@ -136,12 +136,13 @@
     </v-expansion-panel>
     <!--  -->
     <div class="text-center mt-2">
-      <v-btn color="primary" v-on:click.native="daBoSung">
-        Hoàn thành bổ sung&nbsp;
+      <v-btn color="primary" v-for="(item, index) in btnDossierDynamics" v-bind:key="index" @click="nextAction(item, index)" v-if="visibleBtnNextAction">
+        {{item.actionName}}
+        <span slot="loader">Loading...</span>
       </v-btn>
-      <v-btn color="primary" @click="goBack">
+      <!-- <v-btn color="primary" @click="goBack">
         Lưu &nbsp;
-      </v-btn>
+      </v-btn> -->
       <v-btn color="primary" @click.native="goBack"
         :loading="loadingAction"
         :disabled="loadingAction"
@@ -152,7 +153,7 @@
       </v-btn>
     </div>
     <!-- dialog bổ sung hồ sơ -->
-    <v-dialog v-model="dialog_addTHPHS" scrollable persistent max-width="700px">
+    <!-- <v-dialog v-model="dialog_addTHPHS" scrollable persistent max-width="700px">
       <v-card>
         <v-card-title class="headline">
           Bổ sung hồ sơ
@@ -185,7 +186,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <!--  -->
     <!-- <v-btn color="primary" @click.native="dialog_addTHPHS = true">
       TEST BSHS &nbsp;
@@ -195,12 +196,16 @@
   </div>
 </template>
 <script>
+  import router from '@/router'
   import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
   export default {
+    props: ['index', 'id'],
     data: () => ({
       dialog_addTHPHS: false,
       loadingAction: false,
-      thongTinChiTietHoSo: {}
+      thongTinChiTietHoSo: {},
+      btnDossierDynamics: [],
+      visibleBtnNextAction: true
     }),
     computed: {
       loading () {
@@ -210,7 +215,11 @@
     components: {
       'thanh-phan-ho-so': ThanhPhanHoSo
     },
-    created () {},
+    created () {
+      var vm = this
+      vm.initData(vm.id)
+      vm.getNextActions(vm.id)
+    },
     watch: {
     },
     methods: {
@@ -224,8 +233,73 @@
       goBack () {
         window.history.back()
       },
-      daBoSung () {
+      getNextActions (dossierId) {
+        let vm = this
+        let filter = {
+          dossierId: dossierId
+        }
+        vm.$store.dispatch('pullNextactions', filter).then(function (result) {
+          vm.btnDossierDynamics = result
+        })
+      },
+      nextAction (item, index) {
         console.log('Đã bổ sung')
+        var vm = this
+        console.log('luu Ho So--------------------')
+        vm.$store.commit('setPrintPH', false)
+        let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+        let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+        let dossierTemplates = thanhphanhoso
+        let listAction = []
+        let listDossierMark = []
+        if (dossierTemplates) {
+          dossierTemplates.forEach(function (val, index) {
+            if (val.partType === 1) {
+              val['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
+            }
+          })
+          if (dossierFiles.length !== 0) {
+            dossierFiles.forEach(function (value, index) {
+              if (value.eForm) {
+                value['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+              }
+            })
+          } else {
+            dossierTemplates.forEach(function (val, index) {
+              if (val.partType === 1 && val.hasForm) {
+                val['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                listAction.push(vm.$store.dispatch('postEform', val))
+              }
+            })
+          }
+        }
+        Promise.all(listDossierMark).then(values => {
+        }).catch(function (xhr) {
+        })
+        Promise.all(listAction).then(values => {
+          console.log(values)
+          let filter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            actionCode: item.actionCode
+          }
+          let currentQuery = vm.$router.history.current.query
+          vm.loadingActionProcess = true
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.visibleBtnNextAction = false
+            router.push({
+              path: vm.$router.history.current.path,
+              query: {
+                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                q: currentQuery['q']
+              }
+            })
+          })
+        }).catch(reject => {
+          console.log('reject=============', reject)
+        })
       }
     }
   }

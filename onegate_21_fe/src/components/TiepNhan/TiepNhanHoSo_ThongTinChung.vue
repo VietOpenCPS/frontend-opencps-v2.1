@@ -3,35 +3,6 @@
     <v-card>
       <v-card-text>
         <v-layout wrap>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0">Thủ tục: </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm10>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-if="loading === false" style="float:left;height: 100%">
-              <i>{{thongTinChungHoSo.serviceName}}</i>
-            </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0">Dịch vụ: </v-subheader>
-          </v-flex>
-          <v-flex xs12 sm10>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-if="loading === false" style="float:left;height: 100%">
-              <i>{{thongTinChungHoSo.dossierTemplateName}}</i>
-            </v-subheader>
-          </v-flex>
-          <v-flex xs12></v-flex>
           <!--  -->
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -45,25 +16,12 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.dossierIdCTN}}</i></v-subheader>
-          </v-flex>
-          <v-flex xs12></v-flex>
-          <!--  -->
-          <v-flex xs12 sm2>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else class="pl-0" >
-              Mã tiếp nhận: 
+            <v-subheader class="text-bold" v-else style="float:left">
+              <span class="text-bold">
+                {{thongTinChungHoSo.dossierNo}}
+              </span>
             </v-subheader>
           </v-flex>
-          <v-flex xs12 sm4>
-            <content-placeholders class="mt-1" v-if="loading">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.dossierNo}}</i></v-subheader>
-          </v-flex>
-          <!--  -->
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
@@ -74,19 +32,25 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading&&thongTinChungHoSo.durationDate" style="float:left"><i>{{thongTinChungHoSo.durationDate}} làm việc</i></v-subheader>
+            <v-subheader v-if="!loading" style="float:left">
+              <span class="text-bold">
+                {{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc
+              </span>
+            </v-subheader>
           </v-flex>
+          <v-flex xs12></v-flex>
+          <!--  -->
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else class="pl-0">Ngày giờ tiếp nhận: </v-subheader>
+            <v-subheader v-else class="pl-0">Ngày tiếp nhận: </v-subheader>
           </v-flex>
           <v-flex xs12 sm4>
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left"><i>{{thongTinChungHoSo.receiveDate}}</i></v-subheader>
+            <v-subheader v-else style="float:left"><span class="text-bold">{{thongTinChungHoSo.receiveDate}}</span></v-subheader>
           </v-flex>
           <v-flex xs12 sm2>
             <content-placeholders class="mt-1" v-if="loading">
@@ -98,39 +62,42 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-else style="float:left;height: 100%">
-              <!-- <datetime v-model="thongTinChungHoSo.dueDate" 
-                type="datetime"
-                input-format="DD/MM/YYYY | HH:mm"
-                :i18n="{ok:'Chọn', cancel:'Thoát'}"
-                moment-locale="vi"
-                zone="local"
-                :min-date="minDate"
-                monday-first
-                wrapper-class="wrapper-datetime"
-                auto-continue
-                auto-close
-                required
-                ></datetime> -->
-                <!-- <v-icon>event</v-icon> -->
+            <v-subheader v-if="!loading&&(editable === false || editable === null || editable === undefined || editable === 'undefined')" style="float:left;height: 100%">
+              <span class="text-bold">
                 {{thongTinChungHoSo.dueDate}}
+              </span>
+            </v-subheader>
+            <v-subheader v-if="!loading&&editable === true" style="float:left;height: 100%">
+              <vue-ctk-date-time-picker 
+                ref="datepicker" 
+                v-model="dueDateInput" 
+                format="YYYY-MM-DDTHH:mm"
+                formatted="DD/MM/YYYY HH:mm"
+                time-format="HH:mm"
+                :without-header="true"
+                :label="dueDateInput ? '' : 'Chọn ngày'"
+                :min-date="minDate"
+              ></vue-ctk-date-time-picker>
+              <v-icon class="hover-pointer" @click="showDatePicker">event</v-icon>
             </v-subheader>
           </v-flex>
         </v-layout>
       </v-card-text>
     </v-card>
-    <v-btn flat class="absolute__btn">
-      Hướng dẫn &nbsp;
-      <v-icon>file_copy</v-icon>
-    </v-btn>
   </div>
 </template>
 
 <script>
   // import router from '@/router'
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
+    components: {
+      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+    },
     data: () => ({
       minDate: null,
+      editable: false,
+      dueDateInput: null,
       dataPostDossier: {
         serviceCode: '',
         govAgencyCode: '',
@@ -142,21 +109,21 @@
         serviceConfig: '',
         serviceOption: '',
         dossierNo: '',
-        receiveDate: new Date(),
-        dueDate: (new Date()).toString(),
+        receiveDate: '',
+        dueDate: '',
         durationDate: '',
         dossierId: '',
         dossierIdCTN: '',
         dossierStatus: '',
-        dossierStatusText: ''
+        dossierStatusText: '',
+        durationUnit: '',
+        durationCount: ''
       }
     }),
     created () {
       var vm = this
       vm.$nextTick(function () {
         vm.minDate = vm.getCurentDateTime('date')
-        // vm.$store.commit('setThongTinChungHoSoDueDate', (new Date()).toString())
-        // vm.$store.commit('setThongTinChungHoSoReceiveDate', vm.getCurentDateTime('datetime'))
       })
     },
     computed: {
@@ -167,24 +134,39 @@
         return this.$store.getters.isDetail
       }
     },
-    watch: {},
+    watch: {
+      dueDateInput (val) {
+        this.thongTinChungHoSo['dueDate'] = this.getDuedateF(val)
+      }
+    },
     methods: {
       initData (data) {
         var vm = this
-        console.log(data)
         let thongTinChungHoSoTemp = {
           serviceName: data.serviceName,
           dossierTemplateName: data.dossierTemplateName,
           dossierNo: data.dossierNo,
-          receiveDate: data.receiveDate,
-          dueDate: data.dueDate,
+          receiveDate: data.receivingDate ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
+          dueDate: data.receivingDuedate ? data.receivingDuedate : data.dueDate,
           durationDate: data.durationDate,
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
           dossierStatus: data.dossierStatus,
-          dossierStatusText: data.dossierStatusText
+          dossierStatusText: data.dossierStatusText,
+          durationUnit: data.durationUnit,
+          durationCount: data.durationCount
         }
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
+        vm.editable = data.editable
+        vm.thongTinChungHoSo['editable'] = vm.editable
+        if (vm.editable) {
+          vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
+        }
+        vm.minDate = vm.getCurentDateTime('date')
+        console.log('dueDateInput', vm.dueDateInput)
+      },
+      getthongtinchunghoso () {
+        return this.thongTinChungHoSo
       },
       getCurentDateTime (type) {
         let date = new Date()
@@ -194,20 +176,67 @@
           return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}`
         }
       },
+      changeDate () {
+        this.thongTinChungHoSo['dueDate'] = this.getDuedate()
+        // console.log('dueDate', this.thongTinChungHoSo.dueDate)
+      },
       getDuedate () {
         var vm = this
-        let dueDateMs = (new Date(vm.thongTinChungHoSo.dueDate).getTime() - new Date(vm.thongTinChungHoSo.receiveDate).getTime())
-        if (Math.ceil(dueDateMs / 1000 / 60 / 60 / 24) <= 0) {
-          return 1
+        let date = this.dueDateInput ? (new Date(this.dueDateInput)).getTime() : ''
+        return date
+      },
+      getDuedateF (val) {
+        var vm = this
+        let date = (new Date(val)).getTime()
+        return date
+      },
+      durationText (durationUnit, durationCount) {
+        var durationText
+        if (durationUnit === 1 && durationCount > 8) {
+          let day = Math.floor(durationCount / 8) + ' ngày'
+          let hours
+          if (durationCount % 8 !== 0) {
+            hours = ((durationCount / 8) - Math.floor(durationCount / 8)) * 8 + ' giờ'
+          } else {
+            hours = ''
+          }
+          durationText = `${day} ${hours}`
+        } else if (durationUnit === 0) {
+          durationText = durationCount + ' ngày'
+        } else if (durationUnit === 1 && durationCount <= 8) {
+          durationText = durationCount + ' giờ'
         }
-        return Math.ceil(dueDateMs / 1000 / 60 / 60 / 24)
+        return durationText
+      },
+      goBack () {
+        let vm = this
+        let currentParams = vm.$router.history.current.params
+        let currentQuery = vm.$router.history.current.query
+        vm.$router.push({
+          path: '/danh-sach-ho-so/' + currentParams.index,
+          query: currentQuery
+        })
+      },
+      dateTimeView (arg) {
+        if (arg) {
+          let value = new Date(arg)
+          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        }
+      },
+      formatDateInput (date) {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      },
+      showDatePicker () {
+        this.$refs.datepicker.showDatePicker()
       }
     },
     filters: {
       dateTimeView (arg) {
         if (arg) {
           let value = new Date(arg)
-          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+          return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        } else {
+          return ''
         }
       }
     }

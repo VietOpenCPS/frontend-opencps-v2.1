@@ -9,7 +9,8 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    app: './src/main.js'
+    app: './src/main.js',
+    app_dvc: './src/main_dvc.js'
   },
   output: {
     path: config.build.assetsRoot,
@@ -21,6 +22,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
+      'vue$': 'vue/dist/vue.min',
       '@': resolve('src'),
       handlebars: 'handlebars/dist/handlebars.min.js'
     }

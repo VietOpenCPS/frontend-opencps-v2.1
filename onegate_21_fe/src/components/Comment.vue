@@ -12,7 +12,7 @@
           </div> -->
           
           <v-card class="comments__container" >
-            <v-card-text>
+            <v-card-text class="pl-4">
               <div id="comments-container-el"></div>
               
               <!-- <v-flex v-if="argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Xem thêm</span></v-flex>
@@ -29,23 +29,23 @@
 import $ from 'jquery'
 // import axios from 'axios'
 import 'jquery-textcomplete'
-import '../store/jquery_comment'
+import 'jquery-comments'
 export default {
   props: ['classPK', 'className'],
   data: () => ({
     usersComment: [
-      {
-        id: 1,
-        fullname: 'Trịnh Công Trình',
-        email: 'trinhtc@fds.vn.com',
-        pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      },
-      {
-        id: 2,
-        fullname: 'Thái Hoàng Anh',
-        email: 'anhth@fds.vn',
-        pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
-      }
+      // {
+      //   id: 1,
+      //   fullname: 'Trịnh Công Trình',
+      //   email: 'trinhtc@fds.vn.com',
+      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
+      // },
+      // {
+      //   id: 2,
+      //   fullname: 'Thái Hoàng Anh',
+      //   email: 'anhth@fds.vn',
+      //   pictureUrl: 'https://app.viima.com/static/media/user_profiles/user-icon.png'
+      // }
     ],
     comment: [],
     argShowMore: true,
@@ -80,21 +80,33 @@ export default {
     // })
   },
   mounted () {
-    var vm = this
-    if (vm.classPK) {
-      vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
-        vm.usersComment = result
-        vm.initComment()
-      }).catch(reject => {
-        vm.initComment()
-      })
-    }
+    // var vm = this
+    // if (vm.classPK) {
+    //   vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+    //     vm.usersComment = result
+    //     vm.initComment()
+    //   }).catch(reject => {
+    //     vm.initComment()
+    //   })
+    // }
   },
   methods: {
+    runComment () {
+      var vm = this
+      if (vm.classPK) {
+        vm.initComment()
+        // vm.$store.dispatch('loadUsersComment', vm.classPK).then(result => {
+        //   vm.usersComment = result
+        //   vm.initComment()
+        // }).catch(reject => {
+        //   vm.initComment()
+        // })
+      }
+    },
     initComment: function () {
       var vm = this
       $('#comments-container-el').comments({
-        profilePictureURL: 'https://viima-app.s3.amazonaws.com/media/user_profiles/user-icon.png',
+        profilePictureURL: 'https://png.icons8.com/material/50/000000/guest-male.png',
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,
@@ -147,6 +159,7 @@ export default {
         timeFormatter: function (time) {
           if (time) {
             let value = new Date(time)
+            value.setHours(value.getHours() - 7)
             return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
           } else {
             return ''
@@ -247,10 +260,12 @@ export default {
             formData.append('fileType', comment.file.type)
             formData.append('fileSize', comment.file.size)
             formData.append('pings', comment.pings.join())
+            formData.append('opinion', document.getElementById('opinion').checked)
             // formData.append('email', 'congtrinh0209@gmail.com')
             // formData.append('fullname', 'Công Trình')
             formData.append('email', vm.initData.user.userEmail)
             formData.append('fullname', vm.initData.user.userName)
+            formData.append('opinion', document.getElementById('opinion').checked)
             $.ajax({
               url: vm.initData.commentApi + '/uploads',
               dataType: 'json',
@@ -264,9 +279,17 @@ export default {
               contentType: false,
               processData: false,
               success: function (comment) {
+                if (comment.opinion) {
+                  $('.opinion').hide()
+                }
+                document.getElementById('opinion').checked = false
                 vm.formatComment(comment)
                 successfulUploads.push(vm.comment)
                 serverResponded()
+                if (comment.opinion) {
+                  $('.opinion').hide()
+                }
+                document.getElementById('opinion').checked = false
               },
               error: function (xhr, data) {
                 serverResponded()
@@ -331,7 +354,7 @@ export default {
         vm.comment.fileUrl = null
       }
       if (comment.pictureUrl === '') {
-        vm.comment.pictureUrl = 'https://viima-app.s3.amazonaws.com/media/user_profiles/user-icon.png'
+        vm.comment.pictureUrl = 'https://png.icons8.com/material/50/000000/guest-male.png'
       }
       vm.comment.fullname = comment.fullname
       vm.comment.opinion = comment.opinion

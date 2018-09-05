@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}'
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0"
     >
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -20,10 +20,10 @@
             @click="toTableIndexing(item, index)" >
             <v-list-tile-content>
               <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1" class="status__counter_group status__counter">
+              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1 && item['menuType'] !== 3" class="status__counter_group status__counter">
                 {{item.counter}}
               </span>
-              <span v-else class="status__counter_group status__counter">
+              <span v-else-if="item['menuType'] !== 3" class="status__counter_group status__counter">
                 <v-progress-circular :width="1" :size="16" indeterminate color="red"></v-progress-circular>
               </span>
             </v-list-tile-content>
@@ -49,7 +49,10 @@
       </v-list>
     </v-navigation-drawer>
     <v-content>
-      <router-view></router-view>
+      <router-view v-if="trangThaiHoSoList.length !== 0"></router-view>
+      <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
+        Bạn không có quyền thao tác!
+      </v-alert>
     </v-content>
     
   </v-app>
@@ -69,6 +72,9 @@
     computed: {
       currentIndex () {
         return this.$store.getters.index
+      },
+      activeGetCounter () {
+        return this.$store.getters.activeGetCounter
       }
     },
     created () {
@@ -76,21 +82,26 @@
       vm.$nextTick(function () {
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
-          vm.trangThaiHoSoList = result
-          let currentParams = vm.$router.history.current.params
-          if (!currentParams.hasOwnProperty('index')) {
-            vm.trangThaiHoSoList[0]['active'] = true
-            router.push({
-              path: '/danh-sach-ho-so/0',
-              query: {
-                q: vm.trangThaiHoSoList[0]['queryParams']
-              }
-            })
-          } else {
-            vm.trangThaiHoSoList[currentParams.index]['active'] = true
-          }
-          vm.loadingCounter()
           vm.loading = false
+          if (result) {
+            vm.trangThaiHoSoList = result
+            let currentParams = vm.$router.history.current.params
+            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
+              if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+                vm.trangThaiHoSoList[0]['active'] = true
+                router.push({
+                  path: '/danh-sach-ho-so/0',
+                  query: {
+                    q: vm.trangThaiHoSoList[0]['queryParams']
+                  }
+                })
+              } else {
+                vm.trangThaiHoSoList[currentParams.index]['active'] = true
+              }
+            }
+            vm.loadingCounter()
+            vm.loading = false
+          }
         })
       })
     },
@@ -116,6 +127,7 @@
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
           vm.currentStep = String(currentQuery.step)
+          console.log('currentStep', String(currentQuery.step))
         } else {
           vm.currentStep = '0'
         }
@@ -127,6 +139,12 @@
         } else {
           vm.detailState = 0
         }
+      },
+      activeGetCounter (val) {
+        var vm = this
+        setTimeout(function () {
+          vm.loadingCounter()
+        }, 300)
       }
     },
     methods: {
@@ -146,15 +164,27 @@
         console.log('currentParams', currentParams)
         console.log('currentQuery', currentQuery)
         let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
+        console.log('queryString++++++1111111+++++', queryString)
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
-        if (currentQuery !== null && currentQuery !== undefined && currentQuery.hasOwnProperty('q')) {
+        if (currentQuery !== null && currentQuery !== undefined) {
           let coma = queryString.lastIndexOf('=')
           if (coma > 0) {
             queryString = queryString.substr(0, coma + 1)
           }
         }
         this.currentStep = String(item.stepCode)
+        // if (vm.currentStep) {
+        //   let urls = queryString.split("?")
+        //   if (urls !== null && urls.length !== 0) {
+        //     for (var i = 0; i < urls.length; i++) {
+        //       if (urls[i].indexOf('step') > 0) {
+        //         urls.splice(i, 1)
+        //       }
+        //     }
+        //   }
+        // }
+        console.log('queryString++++++++22222222+++', queryString)
         router.push({
           path: '/danh-sach-ho-so/' + currentParams.index,
           query: {
@@ -166,7 +196,10 @@
       },
       loadingCounter () {
         let vm = this
-        vm.$store.dispatch('loadingCounterHoSo').then(function (result) {
+        let filter = {
+          originality: vm.getOriginality()
+        }
+        vm.$store.dispatch('loadingCounterHoSo', filter).then(function (result) {
           vm.counterData = result.data
           for (let key in vm.trangThaiHoSoList) {
             vm.trangThaiHoSoList[key]['counter'] = 0

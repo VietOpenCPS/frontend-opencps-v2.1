@@ -1,56 +1,68 @@
 <template>  
-  <div class="phancong" style="background-color: white">
-    <div xs12>
-      <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
-          <div slot="header">
-            <div class="background-triangle-small"> 
-              <v-icon size="18" color="white">star_rate</v-icon> 
-            </div>{{title_asign[type]}}
-          </div>
-          <v-card>
-            <v-card-text>
-              <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId" style="display: inline-block">
-                <v-layout wrap v-if="type === 1">
-                  <v-flex>
-                    <v-checkbox v-model="item.assigned"
-                    @change = 'changeAssigned($event, index)'
+  <div class="phancong" style="background-color: white;width:100%">
+    <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel-content hide-actions value="1">
+        <div slot="header">
+          <div class="background-triangle-small"> 
+            <v-icon size="18" color="white">star_rate</v-icon> 
+          </div>Chọn người thực hiện
+        </div>
+        <v-card >
+          <v-card-text v-if="type === 1" class="py-1">
+            <v-layout wrap>
+              <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
+              slot="activator"
+              v-model="item.assigned"
+              :label="item.userName"
+              @change = 'changeAssigned($event, index)'
+              style="display:inline-block"
+              :title="item.userName"
+              ></v-checkbox>
+            </v-layout>
+            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
+          </v-card-text>
+          <!--  -->
+          <v-card-text v-else class="px-2 py-1">
+            <v-layout wrap class="my-1">
+              <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId">
+                <v-layout wrap>
+                  <v-tooltip top>
+                    <v-checkbox 
+                      slot="activator"
+                      v-model="item.assigned"
+                      :label="item.userName"
+                      @change = 'checkAsign($event, index)'
+                      style="min-width:150px"
                     ></v-checkbox>
-                  </v-flex>
-                  <v-flex class="pt-1">
-                    <span>{{item.userName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  </v-flex>
-                </v-layout>
-
-                <v-layout wrap v-else class="my-1">
-                  <v-flex class="pt-1">{{item.userName}}</v-flex> &nbsp; &nbsp;
-                  <v-flex>
-                    <v-select
-                      :items="assignedtype_items[type]"
-                      :value="item.assigned"
-                      item-text="text"
-                      item-value="value"
-                      return-object
-                      hide-selected
-                      @change = 'changeAssigned($event, index)'
-                      style="max-width: 160px"
-                    ></v-select>
-                  </v-flex>
-                  &nbsp; &nbsp;
+                    <span class="pl-0"> {{item.userName}} </span>
+                  </v-tooltip>
+                  
+                  <toggle-button class="mx-1 btn-tgl"
+                  :id="`btn-${index}`"                                           
+                  v-model="presenterAddGroup"
+                  title_checked = "Thực hiện"
+                  title_unchecked = "Phối hợp"
+                  :labels="{checked: 'TH', unchecked: 'PH'}"
+                  :color="{checked: '#7DCE94', unchecked: '#82C7EB'}"
+                  :width="50"
+                  @change="changeTypeAssign($event, index)"/>
                 </v-layout>
               </div>
-            </v-card-text>
-          </v-card>
-          
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
+            </v-layout>
+            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
+          </v-card-text>
+        </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
   </div>
 </template>
-
 <script>
-
+import $ from 'jquery'
+import toggleButton from '../toggleButton.vue'
 export default {
+  components: {
+    'toggle-button': toggleButton
+  },
   props: {
     assign_items: {
       type: Array,
@@ -59,6 +71,10 @@ export default {
     type: {
       type: Number,
       default: () => 1
+    },
+    configNote: {
+      type: Object,
+      default: () => {}
     }
   },
   model: {
@@ -83,8 +99,16 @@ export default {
       '1': 'PHÂN CÔNG NGƯỜI THỰC HIỆN',
       '2': 'PHÂN CÔNG THỰC HIỆN, PHỐI HỢP',
       '3': 'PHÂN CÔNG THỰC HIỆN, PHỐI HỢP VÀ THEO DÕI'
-    }
+    },
+    presenterAddGroup: true,
+    assignValidate: true
   }),
+  created () {
+    var vm = this
+    setTimeout(function () {
+      $('.btn-tgl').addClass('btn-hidden')
+    }, 200)
+  },
   mounted () {
     this.data_phancong = this.assign_items
   },
@@ -97,13 +121,43 @@ export default {
         } else {
           vm.assign_items[index].assigned = 0
         }
-      } else {
-        vm.assign_items[index].assigned = event.value
       }
-      // vm.data_pc = vm.assign_items
-      // vm.$emit('change', vm.data_pc)
+    },
+    checkAsign (event, index) {
+      var vm = this
+      if (event) {
+        vm.assign_items[index].assigned = 1
+        $(`#btn-${index}`).removeClass('btn-hidden')
+      } else {
+        vm.assign_items[index].assigned = 0
+        $(`#btn-${index}`).addClass('btn-hidden')
+      }
+      // console.log('vm.assign_items', vm.assign_items)
+    },
+    changeTypeAssign (event, index) {
+      var vm = this
+      if (event.value) {
+        vm.assign_items[index].assigned = 1
+        $(`#btn-${index}`).removeClass('btn-hidden')
+      } else {
+        vm.assign_items[index].assigned = 2
+        $(`#btn-${index}`).addClass('btn-hidden')
+      }
+      // console.log('vm.assign_items', vm.assign_items)
+    },
+    doExport () {
+      var vm = this
+      let assign = vm.assign_items.filter(function (item) {
+        return Number(item.assigned) > 0
+      })
+      if (assign.length === 0) {
+        vm.assignValidate = false
+        return vm.assignValidate
+      } else {
+        vm.assignValidate = true
+        return vm.assignValidate
+      }
     }
   }
 }
 </script>
-
