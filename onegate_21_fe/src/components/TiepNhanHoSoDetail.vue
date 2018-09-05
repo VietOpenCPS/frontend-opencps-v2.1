@@ -368,7 +368,7 @@ export default {
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            if (formCode !== 'UPDATE') {
+            if (vm.formCode !== 'UPDATE') {
               var initData = vm.$store.getters.loadingInitData
               let actionUser = initData.user.userName ? initData.user.userName : ''
               //
