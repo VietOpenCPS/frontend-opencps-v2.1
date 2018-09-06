@@ -5,7 +5,7 @@ module.exports = {
   build: {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    assetsRoot: path.resolve(__dirname, '../../docs'),
     assetsSubDirectory: 'o/opencps-frontend/danh_gia_can_bo',
     assetsPublicPath: '/',
     productionSourceMap: true,
