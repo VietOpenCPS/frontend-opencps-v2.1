@@ -1,4 +1,7 @@
 {
+    "initData": {
+        
+    },
     "xyz": "FrontendPublicChartjs, FrontendWebChartjs",
     "renderURLInit": "?p_p_id=FrontendPublicChartjs&p_p_lifecycle=2&p_p_state=exclusive&p_p_mode=view&p_p_resource_id=renderURLInit",
     "trangThaiHoSoList": [  
