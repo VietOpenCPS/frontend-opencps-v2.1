@@ -3,79 +3,87 @@
     <h4 class="py-2 ml-2">
       <span>TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
-      <v-layout wrap>
-        <v-flex xs3 class="pl-2 pr-2">
-          <v-select
-            class="select-border"
-            :items="govAgencyList"
-            v-model="govAgencySelected"
-            item-text="administrationName"
-            item-value="administrationCode"
-            :hide-selected="true"
-            @change="changeAdministration"
-          ></v-select>
-        </v-flex>
-        <v-flex xs3 class="pl-2 pr-2">
-          <v-select
-            class="select-border"
-            :items="listLinhVuc"
-            v-model="linhVucSelected"
-            placeholder="Chọn lĩnh vực"
-            item-text="domainName"
-            item-value="domainCode"
-            :hide-selected="true"
-            @change="changeDomain"
-          ></v-select>
-        </v-flex>
-        <v-flex xs3 class="pl-2 pr-2">
-          <v-select
-            class="select-border"
-            :items="listMucDo"
-            v-model="levelSelected"
-            autocomplete
-            placeholder="Chọn mức độ"
-            item-text="levelName"
-            item-value="level"
-            :hide-selected="true"
-            @change="changeLevel"
-            clearable
-          >
-            <template slot="item" slot-scope="data">
-              <template>
-                <v-list-tile-content>
-                  <v-list-tile-title >Mức độ {{data.item.level}}</v-list-tile-title>
-                </v-list-tile-content>
-              </template>
-            </template>
-          </v-select>
-        </v-flex>
-        <v-flex xs3 class="pl-2 pr-2">
-          <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-            <div class="input-group__input">
-              <input id="serviceNameKey" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
-              <i v-if="visible" @click="clear('serviceNameKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-            </div>
-          </div>
-        </v-flex>
-      </v-layout>
-      <!-- <div class="text-center" style="width: 130px">
-        <v-btn color="primary"
-          :loading="loading"
-          :disabled="loading"
-          @click="filterServiceinfos('filter')"
-          style="height:34px;width:110px;margin-top:17px"
+    <v-layout wrap>
+      <v-flex xs4 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="govAgencyList"
+          v-model="govAgencySelected"
+          placeholder="Chọn cơ quan"
+          item-text="administrationName"
+          item-value="administrationCode"
+          :hide-selected="true"
+          @change="changeAdministration"
+        ></v-select>
+      </v-flex>
+      <v-flex xs4 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="listLinhVuc"
+          v-model="linhVucSelected"
+          placeholder="Chọn lĩnh vực"
+          item-text="domainName"
+          item-value="domainCode"
+          :hide-selected="true"
+          @change="changeDomain"
+        ></v-select>
+      </v-flex>
+      <!-- <v-flex xs3 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="listMucDo"
+          v-model="levelSelected"
+          autocomplete
+          placeholder="Chọn mức độ"
+          item-text="levelName"
+          item-value="level"
+          :hide-selected="true"
+          @change="changeLevel"
+          clearable
         >
-          <v-icon size="18">search</v-icon>
-          &nbsp;
-          Tra Cứu
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </div> -->
+          <template slot="item" slot-scope="data">
+            <template>
+              <v-list-tile-content>
+                <v-list-tile-title >Mức độ {{data.item.level}}</v-list-tile-title>
+              </v-list-tile-content>
+            </template>
+          </template>
+        </v-select>
+      </v-flex> -->
+      <v-flex xs4 class="pl-2 pr-2">
+        <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
+          <div class="input-group__input">
+            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+            <i aria-hidden="true" @click="filterServiceinfos('filter')" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+          </div>
+        </div>
+      </v-flex>
+    </v-layout>
+    <!-- <div class="text-center" style="width: 130px">
+      <v-btn color="primary"
+        :loading="loading"
+        :disabled="loading"
+        @click="filterServiceinfos('filter')"
+        style="height:34px;width:110px;margin-top:17px"
+      >
+        <v-icon size="18">search</v-icon>
+        &nbsp;
+        Tra Cứu
+        <span slot="loader">Loading...</span>
+      </v-btn>
+    </div> -->
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div v-if="listLinhVuc && !linhVucSelected && listLinhVuc.length > 0">
-      <v-list class="list-domain mt-2">
+    <div class="mt-4" v-if="!activeDetailService && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
+      <v-layout class="wrap">
+        <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+          <v-btn class="kios-btn" @click="filterAdministration(item)" outline color="info" style="width:100%">{{item.administrationName}}</v-btn>
+        </v-flex>
+      </v-layout>
+    </div>
+    <div class="list-domain mt-4" v-if="!activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+      <v-list>
         <template v-for="(item, index) in listLinhVuc" >
           <v-list-tile :key="index" @click="filterDomain(item)">
             <v-list-tile-content>
@@ -84,19 +92,19 @@
           </v-list-tile>
         </template>
       </v-list>
-      <div class="text-xs-center layout wrap mt-3" style="position: relative;">
+      <div class="text-xs-center layout wrap mt-4" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
         </div>
       </div>
     </div>
-    <div v-if="linhVucSelected && listThuTuc.length > 0">
+    <div class="mt-4" v-if="!activeDetailService && govAgencySelected && linhVucSelected && listThuTuc.length > 0" :class="visible ? 'overlayActive': ''">
       <v-data-table
         :headers="headersTable"
         :items="listThuTuc"
         hide-actions
-        class="table-bordered table-thu-tuc mt-3"
+        class="table-bordered table-thu-tuc mx-2 mt-3"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
@@ -145,6 +153,9 @@
           </template>
         </v-data-table>
     </div>
+    <div class="mt-4" v-if="activeDetailService">
+      <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
+    </div>
     <div class="virtual-keyboard" v-if="visible">
       <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
     </div>
@@ -157,11 +168,13 @@ import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import TinyPagination from './pagination.vue'
 import VueTouchKeyBoard from './keyboard.vue'
+import ChiTietThuTuc from './ChiTietThuTuc.vue'
 export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination,
-    'vue-touch-keyboard': VueTouchKeyBoard
+    'vue-touch-keyboard': VueTouchKeyBoard,
+    'chi-tiet-thu-tuc': ChiTietThuTuc
   },
   data: () => ({
     loading: false,
@@ -178,6 +191,7 @@ export default {
     pageListLinhVuc: 1,
     totalPaggingLinhVuc: 0,
     totalPaggingThuTuc: 0,
+    serviceId: '',
     headersTable: [
       {
         text: 'STT',
@@ -208,7 +222,11 @@ export default {
       useKbEvents: false
     }
   }),
-  computed: {},
+  computed: {
+    activeDetailService () {
+      return this.$store.getters.getActiveDetailService
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
@@ -218,26 +236,31 @@ export default {
       vm.loading = true
       vm.listThuTuc = []
       vm.$store.dispatch('getGovAgency').then(function (result) {
+        vm.loading = false
         vm.govAgencyList = result
         if (vm.govAgencyList.length > 0) {
           // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
           $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
           vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
           vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-          vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : vm.govAgencyList[0].administrationCode
-          vm.loading = true
-          vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
-            vm.loading = false
-            vm.listLinhVuc = result
-            vm.totalPaggingLinhVuc = vm.listLinhVuc.length
-            console.log('listLinhVuc', vm.listLinhVuc)
-            if (vm.govAgencySelected && vm.linhVucSelected) {
-              vm.doLoadingThuTuc()
-            }
-          }).catch(reject => {
-            vm.loading = false
-          })
+          vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+          if (vm.govAgencySelected) {
+            vm.loading = true
+            vm.$store.dispatch('getDomainListsPublic', vm.govAgencySelected).then(function (result) {
+              vm.loading = false
+              vm.listLinhVuc = result
+              vm.totalPaggingLinhVuc = vm.listLinhVuc.length
+              console.log('listLinhVuc', vm.listLinhVuc)
+              if (vm.govAgencySelected && vm.linhVucSelected) {
+                vm.doLoadingThuTuc()
+              }
+            }).catch(reject => {
+              vm.loading = false
+            })
+          }
         }
+      }).catch(reject => {
+        vm.loading = false
       })
       vm.$store.dispatch('getLevelLists').then(function (result) {
         vm.listMucDo = result
@@ -249,7 +272,7 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencyList[0].administrationCode
+      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
       // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
@@ -319,6 +342,7 @@ export default {
     },
     changeAdministration () {
       var vm = this
+      vm.$store.commit('setActiveDetailService', false)
       vm.listLinhVuc = []
       vm.linhVucSelected = ''
       vm.levelSelected = ''
@@ -330,8 +354,14 @@ export default {
         })
       }, 200)
     },
+    filterAdministration (item) {
+      var vm = this
+      vm.govAgencySelected = item.administrationCode
+      vm.changeAdministration()
+    },
     changeDomain () {
       var vm = this
+      vm.$store.commit('setActiveDetailService', false)
       vm.pageListLinhVuc = 1
       setTimeout(function () {
         console.log('domain', vm.linhVucSelected)
@@ -353,7 +383,10 @@ export default {
       }, 200)
     },
     viewDetail (item) {
-      router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)
+      var vm = this
+      vm.$store.commit('setActiveDetailService', true)
+      vm.serviceId = item.serviceInfoId
+      // router.push('/tra-cuu-thu-tuc/' + item.serviceInfoId)
     },
     paggingData (config) {
       let vm = this

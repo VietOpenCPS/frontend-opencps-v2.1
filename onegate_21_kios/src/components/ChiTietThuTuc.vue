@@ -4,104 +4,104 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
-      <div class="row-header">
-        <div class="background-triangle-big"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
-        <div class="layout row wrap header_tools">
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-              Quay lại &nbsp;
-              <v-icon size="16">undo</v-icon>
-            </v-btn>
-          </div>
-        </div> 
-      </div>
-      <div>
-        <div class="mx-2 my-3">
-          <v-chip class="mx-0 my-0 mr-3" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:25px">
+      <v-layout class="wrap">
+        <v-flex class="pr-2 pb-3" style="width: calc(100% - 150px)">
+          <v-chip class="mx-0 my-0 mr-3 kios-btn" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:25px">
             Mức độ {{serviceDetail.maxLevel}}
           </v-chip>
           <span class="text-bold">{{serviceDetail.serviceName}}</span>
-        </div>
-        <div class="mt-2">
-          <v-tabs
-            v-model="active"
-            color="cyan"
-            dark
-            slider-color="yellow"
+        </v-flex>
+        <v-flex class="text-xs-right" style="width: 150px">
+          <v-btn color="primary"
+            @click="goBack"
+            class="kios-btn"
           >
-            <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
-            <v-tab key="2" ripple class="mx-2"> Trình tự thực hiện</v-tab>
-            <v-tab key="3" ripple class="mx-2"> Thành phần hồ sơ </v-tab>
-            <v-tab key="4" ripple class="mx-2"> Yêu cầu điều kiện </v-tab>
-            <v-tab-item key="1" >
-              <v-card>
-                <v-card-text class="px-0 py-0">
-                  <div class="table-detail-domain table-bordered">
-                    <div class="table__overflow">
-                      <table class="datatable table">
-                        <tbody>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
-                            <td class="pt-2"><span>{{serviceDetail.administrationName}}</span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Lĩnh vực</span></td>
-                            <td class="pt-2"><span>{{serviceDetail.domainName}}</span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Cách thực hiện</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.methodText"></span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.durationText"></span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.applicantText"></span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.resultText"></span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.feeText"></span></td>
-                          </tr>
-                          <tr>
-                            <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.regularText"></span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+            <v-icon size="18">undo</v-icon>
+            &nbsp;
+            Quay lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-flex>
+      </v-layout>
+      <div class="mt-2">
+        <v-tabs
+          v-model="active"
+          color="cyan"
+          dark
+          slider-color="yellow"
+        >
+          <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
+          <v-tab key="2" ripple class="mx-2"> Trình tự thực hiện</v-tab>
+          <v-tab key="3" ripple class="mx-2"> Thành phần hồ sơ </v-tab>
+          <v-tab key="4" ripple class="mx-2"> Yêu cầu điều kiện </v-tab>
+          <v-tab-item key="1" >
+            <v-card>
+              <v-card-text class="px-0 py-0">
+                <div class="table-detail-domain table-bordered">
+                  <div class="table__overflow">
+                    <table class="datatable table">
+                      <tbody>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
+                          <td class="pt-2"><span>{{serviceDetail.administrationName}}</span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Lĩnh vực</span></td>
+                          <td class="pt-2"><span>{{serviceDetail.domainName}}</span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Cách thực hiện</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.methodText"></span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.durationText"></span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.applicantText"></span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.resultText"></span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.feeText"></span></td>
+                        </tr>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
+                          <td class="pt-2"><span v-html="serviceDetail.regularText"></span></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                </v-card-text>
-              </v-card>
-            </v-tab-item>
-            <v-tab-item key="2" >
-              <v-card>
-                <v-card-text>
-                  <div v-html="serviceDetail.processText"></div>
-                </v-card-text>
-              </v-card>
-            </v-tab-item>
-            <v-tab-item key="3" >
-              <v-card>
-                <v-card-text>
-                  <div v-html="serviceDetail.dossierText"></div>
-                </v-card-text>
-              </v-card>
-            </v-tab-item>
-            <v-tab-item key="4" >
-              <v-card>
-                <v-card-text>
-                  <div v-html="serviceDetail.conditionText"></div>
-                </v-card-text>
-              </v-card>
-            </v-tab-item>
-          </v-tabs>
-        </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item key="2" >
+            <v-card>
+              <v-card-text>
+                <div v-html="serviceDetail.processText"></div>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item key="3" >
+            <v-card>
+              <v-card-text>
+                <div v-html="serviceDetail.dossierText"></div>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item key="4" >
+            <v-card>
+              <v-card-text>
+                <div v-html="serviceDetail.conditionText"></div>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
       </div>
     </div>
   </div>
@@ -138,7 +138,8 @@ export default {
   watch: {},
   methods: {
     goBack () {
-      window.history.back()
+      var vm = this
+      vm.$store.commit('setActiveDetailService', false)
     },
     getColor (level) {
       if (level === 2) {

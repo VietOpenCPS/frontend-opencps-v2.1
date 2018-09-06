@@ -18,7 +18,8 @@ export const store = new Vuex.Store({
     workingUnitSelect: null,
     loading: false,
     dossierDetail: {},
-    index: 0
+    index: 0,
+    activeDetailService: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -232,8 +233,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + filter.index, param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/' + filter.index, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -466,6 +467,9 @@ export const store = new Vuex.Store({
     },
     setWorkingUnitSelect (state, payload) {
       state.workingUnitSelect = payload
+    },
+    setActiveDetailService (state, payload) {
+      state.activeDetailService = payload
     }
   },
   getters: {
@@ -480,6 +484,9 @@ export const store = new Vuex.Store({
     },
     getFilterDossierKey (state) {
       return state.filterDossierKey
+    },
+    getActiveDetailService (state) {
+      return state.activeDetailService
     }
   }
 })

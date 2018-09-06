@@ -7,7 +7,7 @@
             <v-flex xs12 class="pr-2">
               <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                 <div class="input-group__input">
-                  <input id="passCheck" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
+                  <input id="passCheck" class="kios-input" data-layout="normal" @keyup.enter="submitPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
                   <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                 </div>
                 <div class="mt-2" v-if="!validPass">
@@ -22,6 +22,7 @@
             :loading="loadingTable"
             :disabled="loadingTable"
             @click="submitPass"
+            class="kios-btn"
           >
             <v-icon size="20">search</v-icon>
             &nbsp;
@@ -57,9 +58,12 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
-  components: {},
+  components: {
+    'vue-touch-keyboard': VueTouchKeyBoard
+  },
   data: () => ({
     loading: false,
     loadingAction: false,
@@ -217,7 +221,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
-      this.bindClick('search')
+      this.bindClick()
     },
     showKeyboard (e) {
       this.validPass = true
@@ -225,7 +229,7 @@ export default {
       if (!this.visible) {
         this.visible = true
       }
-      this.bindClick('view')
+      this.bindClick()
     },
     hide () {
       this.visible = false
@@ -247,20 +251,14 @@ export default {
         this.hide()
       }
     },
-    bindClick (type) {
+    bindClick () {
       var vm = this
       setTimeout(function () {
-        $('.keyboard .line:nth-child(3) .key:last-child').unbind('click')
-        if (type === 'search') {
-          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
-            vm.filterDossier()
-          })
-        } else if (type === 'view') {
-          $('.keyboard .line:nth-child(3) .key:last-child').bind('click', function () {
-            vm.submitViewDetail()
-          })
-        }
-      }, 300)
+        $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
+        $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
+          vm.submitPass()
+        })
+      }, 200)
     }
   }
 }

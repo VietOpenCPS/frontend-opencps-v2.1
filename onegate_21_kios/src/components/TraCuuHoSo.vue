@@ -8,19 +8,19 @@
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
-              <v-flex xs6 class="pl-2 pr-2">
+              <v-flex xs6 class="pl-2 pr-3">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <!-- <label>Mã số hồ sơ</label> -->
                   <div class="input-group__input">
-                    <input id="dossierNoKey" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
+                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
               </v-flex>
-              <v-flex xs6 class="pl-2 pr-2">
+              <v-flex xs6 class="pl-3 pr-2">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <div class="input-group__input">
-                    <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
@@ -32,6 +32,7 @@
               :loading="loadingTable"
               :disabled="loadingTable"
               @click="confirmPass"
+              class="kios-btn"
             >
               <v-icon size="18">search</v-icon>
               &nbsp;
@@ -47,7 +48,7 @@
           Yêu cầu nhập thông tin để tra cứu
         </v-alert>
         <!--  -->
-        <div class="my-2" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
+        <div class="mx-2 mt-4" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
           <!-- <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
             <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
           </div> -->
@@ -94,7 +95,7 @@
               </div>
             </template>
           </v-data-table>
-          <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
+          <!-- <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
             <v-btn outline color="indigo" @click="showMore" 
               :loading="loadingTable"
               :disabled="loadingTable">
@@ -102,7 +103,7 @@
               Xem thêm
               <span slot="loader">Loading...</span>
             </v-btn>
-          </div>
+          </div> -->
         </div>
         <div class="virtual-keyboard" v-if="visible">
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
@@ -413,7 +414,7 @@ export default {
         $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
         if (type === 'search') {
           $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
-            vm.filterDossier()
+            vm.confirmPass()
           })
         } else if (type === 'view') {
           $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {

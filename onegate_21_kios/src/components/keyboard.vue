@@ -161,7 +161,6 @@ export default {
         })
         res.push(row)
       })
-
       return res
     }
   },
@@ -293,7 +292,7 @@ export default {
           }
         }
 
-        if (this.currentKeySet === 'shifted') this.changeKeySet('default')
+        // if (this.currentKeySet === 'shifted') this.changeKeySet('default')
       }
       this.input.value = text
       this.setFocusToInput(caret)
