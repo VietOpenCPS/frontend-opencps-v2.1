@@ -22,6 +22,16 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        let currentIndex = 0
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (currentParams.hasOwnProperty('index')) {
+          currentIndex = currentParams.index
+        }
+        router.push({
+          path: '/bao-cao/' + currentIndex,
+          query: currentQuerys
+        })
       })
     },
     updated () {
