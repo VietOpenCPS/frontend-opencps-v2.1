@@ -52,7 +52,7 @@
                   <span>Chỉnh sửa ý kiến</span>
                 </v-tooltip>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
-                  <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px; font-size: 12px;">
+                  <div :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                       {{itemFileView.displayName}} - 
@@ -927,6 +927,10 @@ export default {
         if (index !== -1) {
           vm.$emit('tp:change-state-view-result', true)
         } else {
+          vm.$emit('tp:change-state-view-result', false)
+        }
+      } else {
+        if (vm.partTypes.includes(2)) {
           vm.$emit('tp:change-state-view-result', false)
         }
       }
