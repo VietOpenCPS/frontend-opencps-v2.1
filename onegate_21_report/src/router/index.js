@@ -1,17 +1,12 @@
 import Vue from 'vue/dist/vue.js'
 import Router from 'vue-router'
+import Landing from '@/components/Landing'
+import NotFound from '@/components/NotFound'
 
-const routerOptions = [
-  { path: '/bao-cao/:index', component: 'Landing', props: true },
-  { path: '*', component: 'NotFound' }
+const routes = [
+  { path: '/bao-cao/:index', name: 'Landing', component: Landing, props: true },
+  { path: '*', name: 'NotFound', component: NotFound }
 ]
-
-const routes = routerOptions.map(route => {
-  return {
-    ...route,
-    component: () => import(`@/components/${route.component}.vue`)
-  }
-})
 
 Vue.use(Router)
 
