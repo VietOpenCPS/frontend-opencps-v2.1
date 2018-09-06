@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span> bản ghi. </div> -->
-    <div v-if="total > 0" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
+    <div v-if="total > currentLimit" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
       <!-- <div class="px-3 xs2 flex">
         <v-select
           v-bind:items="totalPagesData"
@@ -19,8 +19,8 @@
           </button>
         </li> -->
         <li class="page-item" :class="classFirstPage">
-          <button @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation" style="border-left: 0;">
-            <i aria-hidden="true" class="material-icons icon">chevron_left</i>
+          <button @click.prevent="lastPage" :class="classFirstPage" class="pagination__navigation primary">
+            <i aria-hidden="true" class="material-icons icon">arrow_left</i>
           </button>
         </li>
         <!-- <li class="page-item" style="margin-right: 0;">
@@ -29,8 +29,8 @@
           </button>
         </li> -->
         <li class="page-item ml-4" :class="classLastPage" style="margin-right: 0;">
-          <button @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation" style="border-left: 0;">
-            <i aria-hidden="true" class="material-icons icon">chevron_right</i>
+          <button @click.prevent="nextPage" :class="classLastPage" class="pagination__navigation primary">
+            <i aria-hidden="true" class="material-icons icon">arrow_right</i>
           </button>
         </li>
         <!-- <li class="page-item" :class="classLastPage">
@@ -79,7 +79,7 @@ export default {
     return {
       version: '0.2.1',
       currentPage: 1,
-      currentLimit: 5,
+      currentLimit: 10,
       translations: {
         en: {
           prev: 'Previous',

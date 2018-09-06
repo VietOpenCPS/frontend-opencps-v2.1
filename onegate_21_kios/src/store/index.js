@@ -56,11 +56,10 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              start: filter.page * 15 - 15,
-              end: filter.page * 15,
+              start: filter.page * 10 - 10,
+              end: filter.page * 10,
               dossierNo: filter.dossierNo ? filter.dossierNo : '',
-              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : '',
-              secretCode: filter.secretCode ? filter.secretCode : ''
+              applicantIdNo: filter.applicantIdNo ? filter.applicantIdNo : ''
             }
           }
           // test local
@@ -123,16 +122,20 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDomainListsPublic ({commit, state}, administrationCode) {
+    getDomainListsPublic ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.page * 10 - 10,
+              end: filter.page * 10
             }
           }
           // test local
-          // axios.get('/o/rest/v2/serviceconfigs/pubish/' + administrationCode + '/domains', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceconfigs/pubish/' + filter.administrationCode + '/domains', param).then(function (response) {
           axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -206,6 +209,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
+              start: filter.page * 10 - 10,
+              end: filter.page * 10,
               administration: filter.administration ? filter.administration : '',
               keyword: filter.keyword ? filter.keyword : '',
               level: filter.level ? filter.level : 0,

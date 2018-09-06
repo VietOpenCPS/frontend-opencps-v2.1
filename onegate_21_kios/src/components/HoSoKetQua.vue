@@ -9,7 +9,7 @@
           <h4 class="py-3 ml-3">
             <span>DANH SÁCH HỒ SƠ CÓ KẾT QUẢ </span>
           </h4>
-          <div> 
+          <div class="mt-3"> 
             <v-layout class="wrap">
               <v-flex class="px-3 py-2 th" style="width: 250px"><span class="text-bold">Mã hồ sơ</span></v-flex>
               <v-flex class="px-3 py-2 th" style="width: calc(100% - 650px)"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
@@ -21,7 +21,7 @@
             <!-- <div class="wrap-list" :class="dossierList.length > 10 ? activeAnimate : ''"> -->
             <div>
               <v-layout class="wrap" v-for="(item, index) in dossierList" 
-              :key="item.dossierId" :class="index%2==1 ? 'active': ''">
+              :key="item.dossierId" :class="index%2===1 ? 'active': ''">
                 <v-flex class="px-3 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
                 <v-flex class="px-3 py-2 td" style="width: calc(100% - 650px)"><span> {{item.applicantName}}</span></v-flex>
                 <v-flex class="px-3 py-2 td" style="width: 200px"><span>{{item.submitDate}}</span></v-flex>

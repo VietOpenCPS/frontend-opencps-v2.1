@@ -176,7 +176,7 @@ body .expansion-panel {
 /* body .expansion-panel .expansion-panel__body > .card{
     border-top: 1px solid #dddddd;
 } */
-.expansion-panel__body .active {
+.expansion-panel__body .active, .dossierList .active {
     background-color: #eee !important;
 }
 body .expansion-panel__header {
@@ -553,7 +553,7 @@ body .list__tile:hover {
 .tiny-pagination .page-item {
     margin: .2rem .05rem;
 }
-body .pagination button {
+/* body .pagination button {
     box-shadow: none;
     margin: 0;
     border: 1px solid #ccc;
@@ -561,6 +561,18 @@ body .pagination button {
     font-size: 13px;
     width: 30px;
     height: 30px;
+} */
+body .pagination button {
+    box-shadow: none;
+    margin: 0;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+}
+body .pagination button .icon {
+    font-size: 36px !important;
+    color: #ffffff !important
 }
 body .pagination .tiny-pagination li:not(:first-child) button {
     margin-left: -2px;
@@ -1174,8 +1186,8 @@ body .menu__content--select .text--disabled {
     background-color: #eee !important;
 }
 div.table-tracuu {
-    max-height: 700px;
-    overflow: auto
+    height: 500px;
+    overflow-y: scroll;
 }
 div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
     width: 320px;
@@ -1218,6 +1230,20 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .kios-input {
     height: 35px !important;
 }
+.scroll-btn {
+    width: 60px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.scroll-btn button {
+    width: 50px !important;
+    height: 50px !important;
+}
+.scroll-btn button .icon {
+    font-size: 32px !important;
+}
 .table-dossier .th {
     text-align: center;
     border-top: 1px solid #d3d3d3;
@@ -1236,7 +1262,8 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .list-domain .list__tile {
     height: 42px;
     cursor: pointer;
-    color: #0b72ba
+    color: #0b72ba;
+    border-bottom: 1px solid #d3d3d3
 }
 .menu__content .list>div .list__tile {
     font-size: 16px !important
@@ -1343,12 +1370,12 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .virtual-keyboard {
     z-index: 10000;
     background-color: #1b4771;
-    width: 100%;
+    width: calc(100% - 240px);
     position: fixed;
     bottom: 0px;
 }
 .virtual-keyboard .vue-touch-keyboard {
-    width: 60% !important;
+    width: 80% !important;
     position: relative;
     left: 50%;
     transform: translateX(-50%);

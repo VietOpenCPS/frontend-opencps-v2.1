@@ -14,7 +14,7 @@
         <v-flex class="text-xs-right" style="width: 150px">
           <v-btn color="primary"
             @click="goBack"
-            class="kios-btn"
+            class="kios-btn mr-0"
           >
             <v-icon size="18">undo</v-icon>
             &nbsp;
@@ -30,10 +30,10 @@
           dark
           slider-color="yellow"
         >
-          <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
-          <v-tab key="2" ripple class="mx-2"> Trình tự thực hiện</v-tab>
-          <v-tab key="3" ripple class="mx-2"> Thành phần hồ sơ </v-tab>
-          <v-tab key="4" ripple class="mx-2"> Yêu cầu điều kiện </v-tab>
+          <v-tab key="1" ripple class="mr-2"> Thông tin chung </v-tab>
+          <v-tab key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
+          <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
+          <v-tab key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
           <v-tab-item key="1" >
             <v-card>
               <v-card-text class="px-0 py-0">
@@ -138,8 +138,7 @@ export default {
   watch: {},
   methods: {
     goBack () {
-      var vm = this
-      vm.$store.commit('setActiveDetailService', false)
+      window.history.back()
     },
     getColor (level) {
       if (level === 2) {

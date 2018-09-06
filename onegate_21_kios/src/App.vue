@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app style="width: calc(100% - 240px); float: right">
     <v-content>
       <router-view></router-view>
     </v-content>

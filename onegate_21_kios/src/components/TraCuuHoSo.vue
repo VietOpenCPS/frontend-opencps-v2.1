@@ -1,7 +1,7 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card>
+      <v-card class="pb-2">
         <h4 class="py-2 ml-2">
           <span>TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
@@ -12,7 +12,7 @@
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <!-- <label>Mã số hồ sơ</label> -->
                   <div class="input-group__input">
-                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
+                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
@@ -20,7 +20,7 @@
               <v-flex xs6 class="pl-3 pr-2">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <div class="input-group__input">
-                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="confirmPass" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
@@ -31,7 +31,7 @@
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
-              @click="confirmPass"
+              @click="filterDossier"
               class="kios-btn"
             >
               <v-icon size="18">search</v-icon>
@@ -45,10 +45,10 @@
         <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
         <!--  -->
         <v-alert class="mt-5 mx-2" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
-          Yêu cầu nhập thông tin để tra cứu
+          Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
-        <div class="mx-2 mt-4" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''">
+        <div class="mx-2 mt-4" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''" style="position:relative">
           <!-- <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
             <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
           </div> -->
@@ -56,6 +56,7 @@
           :headers="headersTable"
           :items="dossierList"
           hide-actions
+          id="tracuuhoso"
           class="table-tracuu table-landing table-bordered mt-3"
           :class="visible ? 'overlayActive': ''"
           >
@@ -95,13 +96,18 @@
               </div>
             </template>
           </v-data-table>
-          <!-- <div v-if="hosoDatasPage < totalPages && dossierItemTotal > 0" class="mt-3 text-center">
-            <v-btn outline color="indigo" @click="showMore" 
-              :loading="loadingTable"
-              :disabled="loadingTable">
-              <v-icon size="20">expand_more</v-icon>&nbsp;
-              Xem thêm
-              <span slot="loader">Loading...</span>
+          <div class="text-xs-center layout wrap mt-4" style="position: relative;">
+            <div class="flex pagging-table px-2">
+              <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
+                @tiny:change-page="paggingData" ></tiny-pagination> 
+            </div>
+          </div>
+          <!-- <div class="scroll-btn">
+            <v-btn fab color="primary" @click="scroll">
+              <v-icon dark>keyboard_arrow_up</v-icon>
+            </v-btn>
+            <v-btn fab color="primary">
+              <v-icon dark>keyboard_arrow_down</v-icon>
             </v-btn>
           </div> -->
         </div>
@@ -128,10 +134,12 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import TinyPagination from './pagination.vue'
 import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
   components: {
+    'tiny-pagination': TinyPagination,
     'vue-touch-keyboard': VueTouchKeyBoard
   },
   data: () => ({
@@ -187,6 +195,8 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
+      let inputs = document.querySelectorAll('input')
+      inputs[0].focus()
       let current = vm.$router.history.current
       let newQuery = current.query
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
@@ -201,23 +211,23 @@ export default {
       }
     })
   },
-  // watch: {
-  //   '$route': function (newRoute, oldRoute) {
-  //     let vm = this
-  //     let currentParams = newRoute.params
-  //     let currentQuery = newRoute.query
-  //     $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
-  //     $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
-  //     // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
-  //     vm.hosoDatasPage = 1
-  //     if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
-  //       vm.validateTracuu = true
-  //       vm.doLoadingDataHoSo()
-  //     } else {
-  //       vm.validateTracuu = false
-  //     }
-  //   }
-  // },
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentParams = newRoute.params
+      let currentQuery = newRoute.query
+      $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
+      $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
+      // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
+      vm.hosoDatasPage = 1
+      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+        vm.validateTracuu = true
+        vm.doLoadingDataHoSo()
+      } else {
+        vm.validateTracuu = false
+      }
+    }
+  },
   methods: {
     filterDossier () {
       var vm = this
@@ -304,7 +314,7 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       filter = {
-        page: vm.hosoDatasPage,
+        page: currentQuery.page ? currentQuery.page : 1,
         dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
         applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
         secretCode: vm.filterDossierKey.secretCode
@@ -313,7 +323,8 @@ export default {
         vm.loadingTable = false
         vm.dossierList = result.data
         vm.dossierItemTotal = result.total
-        vm.totalPages = Math.ceil(result.total / 15)
+        vm.hosoDatasPage = currentQuery.page ? currentQuery.page : 1
+        vm.totalPages = vm.dossierList.length
       }).catch(reject => {
         vm.loadingTable = false
         vm.dossierList = []
@@ -359,6 +370,22 @@ export default {
       } else {
         vm.validPass = false
       }
+    },
+    paggingData (config) {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['page'] = ''
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      queryString += 'page=' + config.page
+      vm.$router.push({
+        path: current.path + queryString
+      })
     },
     clearDialog () {
       $('#passCheck').val('')
@@ -414,7 +441,7 @@ export default {
         $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
         if (type === 'search') {
           $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
-            vm.confirmPass()
+            vm.filterDossier()
           })
         } else if (type === 'view') {
           $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
