@@ -25,7 +25,7 @@ module.exports = {
     env: require('./dev.env'),
     port: 1080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'o/front-end-super-gate',
+    assetsSubDirectory: 'o/opencps-frontend/mot_cua',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
