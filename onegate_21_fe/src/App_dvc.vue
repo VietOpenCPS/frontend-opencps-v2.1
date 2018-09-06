@@ -4,7 +4,7 @@
       :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0"
     >
       <div class="mx-2">
-        <v-btn block color="primary" v-on:click.native="doAddDVC()">Thêm mới</v-btn>
+        <v-btn block color="primary" v-on:click.native="doAddDVC()">Thêm mới hồ sơ</v-btn>
       </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />

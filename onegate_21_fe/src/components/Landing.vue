@@ -268,6 +268,7 @@
         item-key="dossierId"
         :select-all="menuType !== 3 && originality !== 1"
         class="table-landing table-bordered"
+        no-data-text="Không có hồ sơ nào!"
         hide-actions
       >
       <!--  -->
