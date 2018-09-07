@@ -33,7 +33,7 @@
           </div>
           <v-layout row wrap>
             <v-flex xs12 sm12>
-              <span class="ml-3" v-html="thongTinChiTietHoSo.dossierNote"></span>
+              <div class="ml-3 mr-3" v-html="thongTinChiTietHoSo.dossierNote"></div>
             </v-flex>
           </v-layout>
         </v-expansion-panel-content>
@@ -80,6 +80,7 @@
             ></v-text-field> &nbsp;
             <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
             <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+            <span style="position: absolute; right: 15px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xsls</span>
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
@@ -368,7 +369,7 @@ export default {
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            if (formCode !== 'UPDATE') {
+            if (vm.formCode !== 'UPDATE') {
               var initData = vm.$store.getters.loadingInitData
               let actionUser = initData.user.userName ? initData.user.userName : ''
               //

@@ -1232,20 +1232,7 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .kios-input {
     height: 35px !important;
 }
-.scroll-btn {
-    width: 60px;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-}
-.scroll-btn button {
-    width: 50px !important;
-    height: 50px !important;
-}
-.scroll-btn button .icon {
-    font-size: 32px !important;
-}
+
 .back-btn {
     width: 50px !important;
     height: 50px !important;
@@ -1258,7 +1245,7 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     font-weight: bolder;
 }
 ::placeholder {
-    font-size: 18px !important
+    font-size: 16px !important
 }
 
 .table-dossier .th {
@@ -1303,26 +1290,6 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 	float: left;
 	margin: 10px;
 	box-sizing: border-box;
-}
-.kios-wrapper .col-5 {
-	width: 41.666666667%;
-}
-.kios-wrapper .col-7 {
-	width: 58.333333333%;
-}
-.kios-home .custom-row {
-	display: -webkit-box;
-	display: flex;
-	height: 230px;
-}
-.kios-home .col-5 {
-	background-size: cover;
-	background-position: center center;
-	background-repeat: no-repeat;
-	color: white;
-	font-weight: bold;
-	font-size: 40px;
-	padding: 20px;
 }
 .kios-home .custom-row:nth-child(1) .col-5 {
 	background-image: url('/o/frontend-web-kios/images/kios-home-1.png');
@@ -1484,4 +1451,41 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 }
 .vue-touch-keyboard .keyboard:after {
     clear: both;
+}
+.wrap-scroll {
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden
+}
+.wrap-scroll-votting {
+    border: 1px solid #d3d3d3;
+    max-height: 200px
+}
+.wrap-scroll-sevice {
+    border: 1px solid #d3d3d3;
+    border-top: 0px;
+    max-height: 300px
+}
+.wrap-scroll::-webkit-scrollbar {
+    width: 40px !important;
+    border-left: 1px solid #d3d3d3;
+}
+.wrap-scroll::-webkit-scrollbar-button {
+    background-size: 100%;
+    height: 60px !important;
+    width: 40px !important;
+}
+
+.wrap-scroll::-webkit-scrollbar-button:vertical:increment {
+    background-image: url(icons-scroll-down-trans.png);
+    background-repeat: no-repeat;
+    background-position: bottom
+}
+.wrap-scroll::-webkit-scrollbar-button:vertical:decrement {
+    background-image: url(icons-scroll-up-trans.png);
+    background-repeat: no-repeat;
+    background-position: top
+}
+.hidden-el{
+    visibility: hidden;
 }

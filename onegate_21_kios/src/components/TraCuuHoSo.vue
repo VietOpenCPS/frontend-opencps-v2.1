@@ -3,7 +3,7 @@
     <div>
       <v-card class="pb-2">
         <h4 class="py-2 ml-2">
-          <span style="color:#3563c1">TRA CỨU THÔNG TIN HỒ SƠ </span>
+          <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">

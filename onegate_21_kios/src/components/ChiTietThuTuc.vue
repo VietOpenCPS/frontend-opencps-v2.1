@@ -34,7 +34,7 @@
           <v-tab key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
           <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
           <v-tab key="4" ripple class="mr-2"> Yêu cầu điều kiện </v-tab>
-          <v-tab-item key="1" >
+          <v-tab-item key="1" class="wrap-scroll wrap-scroll-sevice">
             <v-card>
               <v-card-text class="px-0 py-0">
                 <div class="table-detail-domain table-bordered">
@@ -80,21 +80,21 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item key="2" >
+          <v-tab-item key="2" class="wrap-scroll wrap-scroll-sevice">
             <v-card>
               <v-card-text>
                 <div v-html="serviceDetail.processText"></div>
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item key="3" >
+          <v-tab-item key="3" class="wrap-scroll wrap-scroll-sevice">
             <v-card>
               <v-card-text>
                 <div v-html="serviceDetail.dossierText"></div>
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item key="4" >
+          <v-tab-item key="4" class="wrap-scroll wrap-scroll-sevice">
             <v-card>
               <v-card-text>
                 <div v-html="serviceDetail.conditionText"></div>

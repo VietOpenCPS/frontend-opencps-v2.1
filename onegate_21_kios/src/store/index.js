@@ -337,6 +337,53 @@ export const store = new Vuex.Store({
         })
       })
     },
+    // voting
+    loadVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // axios.get('/o/rest/v2/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+            if (result.data) {
+              resolve(result.data.data)
+            } else {
+              resolve([])
+            }
+            commit('setLoading', false)
+          }).catch(xhr => {
+            reject(xhr)
+            commit('setLoading', false)
+          })
+        })
+      })
+    },
+    submitVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          var params = new URLSearchParams()
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          params.append('selected', data.selected)
+          params.append('dossierNo', data.dossierNo)
+          params.append('applicantIdNo', data.applicantIdNo)
+          axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
+          // axios.post('/o/rest/v2/votings/' + data.votingId + '/results', params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.error('Gửi đánh giá thất bại')
+            reject(xhr)
+          })
+        })
+      })
+    },
     // action Danh gia can bo
     getWorkingUnit ({commit, state}, filter) {
       return new Promise((resolve, reject) => {

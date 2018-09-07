@@ -1,7 +1,7 @@
 <template>
   <div class="px-2 py-0 kios-item" style="background:#fff">
     <h4 class="py-2 ml-2">
-      <span style="color:#3563c1">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
+      <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
     <v-layout wrap>
       <v-flex xs4 class="pl-2 pr-2">
@@ -53,8 +53,8 @@
       <v-flex xs4 class="pl-2 pr-2">
         <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
           <div class="input-group__input">
-            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos('filter')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
-            <i aria-hidden="true" @click="filterServiceinfos('filter')" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos()" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+            <i aria-hidden="true" @click="filterServiceinfos()" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
           </div>
         </div>
       </v-flex>
@@ -324,6 +324,9 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       // newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
+      if (newQuery.hasOwnProperty('detail')) {
+        newQuery['detail'] = ''
+      }
       newQuery['keyword'] = $('#serviceNameKey').val()
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
@@ -404,9 +407,8 @@ export default {
     changeDomain () {
       var vm = this
       setTimeout(function () {
-        console.log('domain', vm.linhVucSelected)
         if (vm.linhVucSelected) {
-          vm.filterServiceinfos('filter')
+          vm.filterServiceinfos()
         }
       }, 200)
     },
@@ -417,9 +419,8 @@ export default {
     },
     changeLevel () {
       var vm = this
-      console.log('level', vm.levelSelected)
       setTimeout(function () {
-        vm.filterServiceinfos('filter')
+        vm.filterServiceinfos()
       }, 200)
     },
     viewDetail (item) {
@@ -428,18 +429,20 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['detail'] = true
+      if (newQuery.hasOwnProperty('detail')) {
+        newQuery['detail'] = ''
+      }
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
+      queryString += '&detail=true'
       vm.$router.push({
         path: current.path + queryString
       })
     },
     paggingData (config) {
-      console.log('config', config)
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
