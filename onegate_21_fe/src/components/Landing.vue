@@ -573,7 +573,6 @@ import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
-import gRecaptcha from '@finpo/vue2-recaptcha-invisible'
 
 export default {
   props: ['index'],
@@ -585,8 +584,7 @@ export default {
     'xac-nhan-thu-phi': XacNhanThuPhi,
     'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
-    'template-rendering': TemplateRendering,
-    'g-recaptcha': gRecaptcha
+    'template-rendering': TemplateRendering
   },
   data: () => ({
     dossierCountingShow: false,
