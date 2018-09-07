@@ -359,6 +359,9 @@
                 </v-list-tile>
                 <v-list-tile @click="viewDetail(props.item, props.index)">
                   Xem chi tiết
+                    <!-- <g-recaptcha data-sitekey="6Le9NG4UAAAAAAckfnDTZiaBB8pS95DMU77OWuw8" :data-validate="validate" :data-callback="callback" data-language="vi" style="width: 100%">
+                      <span>Xem chi tiết</span>
+                    </g-recaptcha> -->
                 </v-list-tile>
               </v-list>
             </v-menu>
@@ -570,6 +573,7 @@ import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
+import gRecaptcha from '@finpo/vue2-recaptcha-invisible'
 
 export default {
   props: ['index'],
@@ -581,7 +585,8 @@ export default {
     'xac-nhan-thu-phi': XacNhanThuPhi,
     'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
-    'template-rendering': TemplateRendering
+    'template-rendering': TemplateRendering,
+    'g-recaptcha': gRecaptcha
   },
   data: () => ({
     dossierCountingShow: false,
@@ -1129,9 +1134,9 @@ export default {
         var filter = null
         if (vm.menuType !== 3) {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1148,9 +1153,9 @@ export default {
           }
         } else {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
@@ -2049,6 +2054,19 @@ export default {
         })
       }
       vm.doRedirectFilter()
+    },
+    validate () {
+      // validate your form , if you don't have validate prop , default validate pass .
+      return true
+    },
+    callback (token) {
+      // google recaptcha token , then you can pass to backend with your form data .
+      if (token) {
+        alert(token)
+      } else {
+        // if you use data-size show reCAPTCHA , maybe you will get empty token. 6LfuMm4UAAAAAIeNgZHhWHR-aVaqXqNUSsurnzm2
+        alert('please check you are not robot')
+      }
     }
   }
 }
