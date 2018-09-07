@@ -51,6 +51,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-btn class="back-btn" @click="goBack" fab color="primary">
+      <v-icon dark>arrow_back</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -207,6 +210,9 @@ export default {
       $('#passCheck').val('')
       this.validPass = true
       this.visible = false
+    },
+    goBack () {
+      window.history.back()
     },
     //
     clear (id) {

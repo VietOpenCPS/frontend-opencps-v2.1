@@ -7,7 +7,7 @@
       <v-card v-else>
         <div class="table-dossier" style="background-color: #ffffff">
           <h4 class="py-3 ml-3">
-            <span>DANH SÁCH HỒ SƠ CÓ KẾT QUẢ </span>
+            <span style="color:#3563c1">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ </span>
           </h4>
           <div class="mt-3"> 
             <v-layout class="wrap">

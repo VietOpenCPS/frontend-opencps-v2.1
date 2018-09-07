@@ -1182,12 +1182,14 @@ body .menu__content--select .text--disabled {
     color: #ffffff;
     font-weight: 500
 }
+.table-tracuu thead tr:first-child {
+    height: 50px;
+}
+.table-tracuu tbody tr {
+    height: 45px;
+}
 .table-tracuu table.table tr .active {
     background-color: #eee !important;
-}
-div.table-tracuu {
-    height: 500px;
-    overflow-y: scroll;
 }
 div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
     width: 320px;
@@ -1244,6 +1246,21 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .scroll-btn button .icon {
     font-size: 32px !important;
 }
+.back-btn {
+    width: 50px !important;
+    height: 50px !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+.back-btn .icon {
+    font-size: 26px !important;
+    font-weight: bolder;
+}
+::placeholder {
+    font-size: 18px !important
+}
+
 .table-dossier .th {
     text-align: center;
     border-top: 1px solid #d3d3d3;

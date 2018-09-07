@@ -1,7 +1,7 @@
 <template>
   <div class="px-2 py-0 kios-item" style="background:#fff">
     <h4 class="py-2 ml-2">
-      <span>TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
+      <span style="color:#3563c1">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
     <v-layout wrap>
       <v-flex xs4 class="pl-2 pr-2">
@@ -140,7 +140,10 @@
               </content-placeholders>
               <div v-else>
                 <span>
-                  <span>Mức độ {{props.item.maxLevel}}</span>
+                  <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
+                    Mức độ {{props.item.maxLevel}}
+                  </v-chip>
+                  <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
                 </span>
               </div>
             </td>
@@ -457,7 +460,7 @@ export default {
       if (level === 2) {
         return 'green'
       } else if (level === 3) {
-        return 'orange'
+        return 'orange darken-1'
       } else if (level === 4) {
         return 'red'
       }

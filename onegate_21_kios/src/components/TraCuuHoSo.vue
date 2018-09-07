@@ -3,7 +3,7 @@
     <div>
       <v-card class="pb-2">
         <h4 class="py-2 ml-2">
-          <span>TRA CỨU THÔNG TIN HỒ SƠ </span>
+          <span style="color:#3563c1">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">
@@ -44,7 +44,7 @@
         <!--  -->
         <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
         <!--  -->
-        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false" :value="true" outline color="warning" icon="priority_high">
+        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false" :value="true" outline color="orange" icon="priority_high">
           Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
