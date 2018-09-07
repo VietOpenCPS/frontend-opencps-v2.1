@@ -1132,9 +1132,9 @@ export default {
         var filter = null
         if (vm.menuType !== 3) {
           filter = {
-            // queryParams: querySet,
+            queryParams: querySet,
             /*  test Local */
-            queryParams: 'http://127.0.0.1:8081' + querySet,
+            // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1151,9 +1151,9 @@ export default {
           }
         } else {
           filter = {
-            // queryParams: querySet,
+            queryParams: querySet,
             /*  test Local */
-            queryParams: 'http://127.0.0.1:8081' + querySet,
+            // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
