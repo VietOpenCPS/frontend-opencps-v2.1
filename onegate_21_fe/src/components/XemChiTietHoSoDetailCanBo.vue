@@ -616,10 +616,12 @@ export default {
         if (vm.$refs.thanhphanhoso2) {
           vm.$refs.thanhphanhoso2.initData(resultDossier)
         }
-        vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
-          vm.btnStepsDynamics = result
-          console.log('btnStepsDynamics', vm.btnStepsDynamics)
-        })
+        if (resultDossier['dossierSubStatus']) {
+          vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
+            vm.btnStepsDynamics = result
+            console.log('btnStepsDynamics', vm.btnStepsDynamics)
+          })
+        }
       })
     },
     recountFileTemplates () {
@@ -1169,6 +1171,7 @@ export default {
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x && vm.validateAction) {
+          vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             console.log('result======', result)
             vm.loadingAction = false
@@ -1212,6 +1215,7 @@ export default {
             return
           }
         }
+        vm.loadingActionProcess = true
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
           console.log('result======', result)
           vm.loadingAction = false

@@ -1806,7 +1806,7 @@ export default {
     },
     processPullBtnDetail (dossierItem, item, index, btnIndex) {
       let vm = this
-      if (item['enable'] === 1) {
+      if (item['enable'] === 1 || item['autoEvent'] === 'special') {
         vm.itemAction = item
         let filter = {
           dossierId: dossierItem.dossierId,
