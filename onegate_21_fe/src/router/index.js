@@ -11,6 +11,8 @@ const routerOptions = [
   { path: '/danh-sach-ho-so/:index/tra-ket-qua/:id', component: 'TraKetQuaDetail', props: true },
   { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', component: 'DetailForward', props: true },
   { path: '/add-dvc/:serviceCode', component: 'DanhSachThuTuc', props: true },
+  { path: '/captcha', component: 'testCaptcha', props: true },
+  { path: '/danh-sach-ho-so/:index/nop-thanh-cong/:id', component: 'NopThanhCong', props: true },
   { path: '*', component: 'NotFound' }
 ]
 
