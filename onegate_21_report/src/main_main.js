@@ -16,7 +16,7 @@ Vue.config.productionTip = false
 Vue.mixin({
   methods: {
     getReportCongDVC: function () {
-      return false
+      return true
     }
   }
 })
