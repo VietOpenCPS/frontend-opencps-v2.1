@@ -257,9 +257,6 @@ export default {
         let currentQuerys = vm.$router.history.current.query
         if (vm.isCallBack) {
           vm.isCallBack = false
-          console.log('-----------------')
-          console.log(vm.danhSachBaoCao)
-          console.log(vm.index)
           vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
           if (currentQuerys.hasOwnProperty('fromDate')) {
             vm.fromDateFormatted = currentQuerys.fromDate
@@ -300,7 +297,7 @@ export default {
         toDate: vm.toDateFormatted
       }
       if (vm.isDVC) {
-        filter['agency'] = vm.govAgency
+        filter['agency'] = vm.govAgency['itemCode']
       }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
@@ -339,7 +336,7 @@ export default {
         toDate: vm.toDateFormatted
       }
       if (vm.isDVC) {
-        filter['agency'] = vm.govAgency
+        filter['agency'] = vm.govAgency['itemCode']
       }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
