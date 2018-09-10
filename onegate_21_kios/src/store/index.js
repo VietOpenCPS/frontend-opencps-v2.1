@@ -19,7 +19,9 @@ export const store = new Vuex.Store({
     loading: false,
     dossierDetail: {},
     index: 0,
-    activeDetailService: false
+    activeDetailService: false,
+    applicantIdNoSearch: '',
+    dossierNoSearch: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -302,8 +304,8 @@ export const store = new Vuex.Store({
           }
           var listHistoryProcessing = []
           // test local
-          axios.get('/o/rest/v2/dossierlogs/' + filter.dossierId + '/logs', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
+          // axios.get('/o/rest/v2/dossierlogs/' + filter.dossierId + '/logs', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {
               if (serializable.data[key].notificationType === 'PROCESS_TYPE') {
@@ -314,6 +316,24 @@ export const store = new Vuex.Store({
           })
           .catch(function (error) {
             reject(error)
+          })
+        })
+      })
+    },
+    loadDossierActions ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let config = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          // axios.get('/o/rest/v2/dossiers/'+ data.dossierId + '/sequences', config).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers/' + data.dossierId + '/sequences', config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(xhr)
           })
         })
       })
@@ -522,6 +542,15 @@ export const store = new Vuex.Store({
     },
     setActiveDetailService (state, payload) {
       state.activeDetailService = payload
+    },
+    setActiveDetailDossier (state, payload) {
+      state.activeDetailDossier = payload
+    },
+    setApplicantIdNoSearch (state, payload) {
+      state.applicantIdNoSearch = payload
+    },
+    setDossierNoSearch (state, payload) {
+      state.dossierNoSearch = payload
     }
   },
   getters: {
@@ -539,6 +568,12 @@ export const store = new Vuex.Store({
     },
     getActiveDetailService (state) {
       return state.activeDetailService
+    },
+    getApplicantIdNoSearch (state) {
+      return state.applicantIdNoSearch
+    },
+    getDossierNoSearch (state) {
+      return state.dossierNoSearch
     }
   }
 })

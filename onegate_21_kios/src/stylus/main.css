@@ -1466,6 +1466,11 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     border-top: 0px;
     max-height: 300px
 }
+.wrap-scroll-dossier {
+    border: 1px solid #d3d3d3;
+    border-top: 0px;
+    max-height: 300px
+}
 .wrap-scroll::-webkit-scrollbar {
     width: 40px !important;
     border-left: 1px solid #d3d3d3;

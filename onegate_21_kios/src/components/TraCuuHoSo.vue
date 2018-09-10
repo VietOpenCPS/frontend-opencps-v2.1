@@ -41,17 +41,11 @@
             </v-btn>
           </div>
         </v-layout>
-        <!--  -->
-        <!-- <vue-touch-keyboard class="mt-5" v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" /> -->
-        <!--  -->
-        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false" :value="true" outline color="orange" icon="priority_high">
+        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
           Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
-        <div class="mx-2 mt-4" v-if="validateTracuu === true" :class="visible ? 'overlayActive': ''" style="position:relative">
-          <!-- <div class="my-3 pt-2 text-center total-result-search" :class="visible ? 'overlayActive': ''">
-            <span class="text-bold">Có {{dossierItemTotal}} hồ sơ được tìm thấy</span>
-          </div> -->
+        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
           <v-data-table
           :headers="headersTable"
           :items="dossierList"
@@ -102,14 +96,9 @@
                 @tiny:change-page="paggingData" ></tiny-pagination> 
             </div>
           </div>
-          <!-- <div class="scroll-btn">
-            <v-btn fab color="primary" @click="scroll">
-              <v-icon dark>keyboard_arrow_up</v-icon>
-            </v-btn>
-            <v-btn fab color="primary">
-              <v-icon dark>keyboard_arrow_down</v-icon>
-            </v-btn>
-          </div> -->
+        </div>
+        <div class="mx-2 mt-4" v-if="validateTracuu === true && activeDetailDossier">
+          <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
         <div class="virtual-keyboard" v-if="visible">
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
@@ -134,13 +123,15 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import ChiTietHoSo from './ChiTietHoSo.vue'
 import TinyPagination from './pagination.vue'
 import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination,
-    'vue-touch-keyboard': VueTouchKeyBoard
+    'vue-touch-keyboard': VueTouchKeyBoard,
+    'chi-tiet-ho-so': ChiTietHoSo
   },
   data: () => ({
     loading: false,
@@ -177,6 +168,7 @@ export default {
     valid: false,
     passCheck: '',
     validPass: true,
+    activeDetailDossier: false,
     //
     visible: false,
     layout: 'normal',
@@ -195,19 +187,27 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
-      let inputs = document.querySelectorAll('input')
-      inputs[0].focus()
       let current = vm.$router.history.current
       let newQuery = current.query
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
+      if (newQuery.hasOwnProperty('detail') && newQuery['detail'] && $('#dossierNoKey').val() === '') {
+        let inputs = document.querySelectorAll('input')
+        inputs[0].focus()
+      }
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if ($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '') {
+      if (($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
         vm.validateTracuu = false
+      }
+      if (newQuery.hasOwnProperty('detail') && newQuery['detail']) {
+        vm.validateTracuu = true
+        vm.activeDetailDossier = true
+      } else {
+        vm.activeDetailDossier = false
       }
     })
   },
@@ -220,11 +220,17 @@ export default {
       $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
       // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+      if (($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
         vm.validateTracuu = false
+      }
+      if (currentQuery.hasOwnProperty('detail') && currentQuery['detail']) {
+        vm.validateTracuu = true
+        vm.activeDetailDossier = true
+      } else {
+        vm.activeDetailDossier = false
       }
     }
   },
@@ -236,8 +242,11 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       newQuery['dossierNo'] = $('#dossierNoKey').val()
+      vm.$store.commit('setDossierNoSearch', $('#dossierNoKey').val())
       newQuery['applicantIdNo'] = $('#applicantIdNoKey').val()
+      vm.$store.commit('setApplicantIdNoSearch', $('#applicantIdNoKey').val())
       newQuery['applicantName'] = $('#applicantNameKey').val()
+      newQuery['detail'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'

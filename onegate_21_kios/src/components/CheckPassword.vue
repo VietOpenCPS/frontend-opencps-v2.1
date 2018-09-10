@@ -90,6 +90,12 @@ export default {
     },
     dossierDetail () {
       return this.$store.getters.getDetailDossier
+    },
+    applicantIdNoSearch () {
+      return this.$store.getters.getApplicantIdNoSearch
+    },
+    dossierNoSearch () {
+      return this.$store.getters.getDossierNoSearch
     }
   },
   created () {
@@ -158,7 +164,10 @@ export default {
             if (result.status && result.status.toString() === '203') {
               vm.dialogError = true
             } else if (result.status && result.status.toString() === '200') {
-              router.push('/ho-so/' + vm.dossierDetail.dossierId)
+              let queryString = '?dossierNo=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
+              vm.$router.push({
+                path: '/tra-cuu-ho-so' + queryString
+              })
             }
           }).catch(function (reject) {
             vm.dialogCheckPass = false

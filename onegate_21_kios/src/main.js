@@ -10,6 +10,9 @@ import { store } from './store'
 // import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
+import axios from 'axios'
+
+// axios.defaults.headers.common['Token'] = window.Liferay.authToken
 // Vue.use(VueTouchKeyboard)
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)

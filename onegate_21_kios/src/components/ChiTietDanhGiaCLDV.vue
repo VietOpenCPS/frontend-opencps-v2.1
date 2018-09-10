@@ -18,7 +18,7 @@
     <v-layout wrap class="mt-4">
       <v-flex xs12 sm6 class="pr-3">
         <v-layout wrap>
-          <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
+          <div style="width:110px" class="text-bold">Mã hồ sơ </div>
           <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
             <div class="input-group__input">
               <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
