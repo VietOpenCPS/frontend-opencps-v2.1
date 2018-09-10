@@ -5,7 +5,7 @@
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2" v-if="false">
+            <v-flex xs6 sm2 class="px-2" v-if="isDVC">
               <v-select
                 :items="agencyLists"
                 v-model="govAgency"
@@ -124,6 +124,7 @@ export default {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    isDVC: false,
     isCallBack: true,
     fromDate: null,
     menufromDate: false,
@@ -220,6 +221,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      vm.isDVC = vm.getReportCongDVC()
       vm.danhSachBaoCao = vm.loadingMenuConfigToDo
       let currentQuerys = vm.$router.history.current.query
       if (currentQuerys.hasOwnProperty('fromDate')) {
@@ -232,16 +234,17 @@ export default {
       } else {
         vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
       }
-      vm.doPrintReport()
-      /*
-      vm.$store.dispatch('getAgencyLists').then(function (result) {
-        vm.agencyLists = result
-        if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
-          vm.govAgency = vm.agencyLists[0]
-          vm.doPrintReport()
-        }
-      })
-      */
+      if (vm.isDVC) {
+        vm.$store.dispatch('getAgencyLists').then(function (result) {
+          vm.agencyLists = result
+          if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
+            vm.govAgency = vm.agencyLists[0]
+            vm.doPrintReport()
+          }
+        })
+      } else {
+        vm.doPrintReport()
+      }
     })
   },
   updated () {
@@ -296,6 +299,9 @@ export default {
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
       }
+      if (vm.isDVC) {
+        filter['agency'] = vm.govAgency
+      }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
@@ -331,6 +337,9 @@ export default {
         month: vm.month,
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
+      }
+      if (vm.isDVC) {
+        filter['agency'] = vm.govAgency
       }
       vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
