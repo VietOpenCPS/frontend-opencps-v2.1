@@ -8,6 +8,9 @@ import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
+import axios from 'axios'
+
+axios.defaults.headers.common['Token'] = 'foo bar'
 
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
