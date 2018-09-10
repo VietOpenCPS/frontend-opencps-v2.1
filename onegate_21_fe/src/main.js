@@ -14,7 +14,9 @@ import Datetime from 'vue-datetime-2'
 import 'babel-polyfill'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
 import 'v-suggestions/dist/v-suggestions.css'
+import axios from 'axios'
 
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.use(Datetime)
