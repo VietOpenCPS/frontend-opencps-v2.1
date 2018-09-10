@@ -283,38 +283,38 @@
               <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
               >
-              <template slot="headerCell" slot-scope="props">
-                <v-tooltip bottom>
-                  <span slot="activator">
-                    {{ props.header.text }}
-                  </span>
-                  <span>
-                    {{ props.header.text }}
-                  </span>
-                </v-tooltip>
-              </template>
-              <template slot="items" slot-scope="props">
-                <td class="text-xs-center">{{props.index + 1}}</td>
-                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
-                <td class="text-xs-left">{{props.item.sequenceName}}</td>
-                <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
-                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                <td class="text-xs-left">
-                  <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
-                    {{itemUser.userName}} <br>
-                  </div>
-                </td>
-                <td class="text-xs-left">
-                  <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
-                  </div>
-                  <div v-if="props.item.statusText">
-                    <span style="color: green">{{props.item.statusText}}</span>
-                  </div>
-                </td>
-              </template>
-            </v-data-table>
-          </div>
+                <template slot="headerCell" slot-scope="props">
+                  <v-tooltip bottom>
+                    <span slot="activator">
+                      {{ props.header.text }}
+                    </span>
+                    <span>
+                      {{ props.header.text }}
+                    </span>
+                  </v-tooltip>
+                </template>
+                <template slot="items" slot-scope="props">
+                  <td class="text-xs-center">{{props.index + 1}}</td>
+                  <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                  <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                  <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
+                  <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                  <td class="text-xs-left">
+                    <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                      {{itemUser.userName}} <br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left">
+                    <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                      {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                    </div>
+                    <div v-if="props.item.statusText">
+                      <span style="color: green">{{props.item.statusText}}</span>
+                    </div>
+                  </td>
+                </template>
+              </v-data-table>
+            </div>
           </v-tab-item>
           <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">

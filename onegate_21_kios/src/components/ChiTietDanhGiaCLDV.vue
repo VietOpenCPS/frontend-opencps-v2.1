@@ -36,7 +36,7 @@
               <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
             </div>
             <div class="mt-2" v-if="!validPass2">
-              <div class="input-group__messages" style="color:red">* Số CMND là bắt buộc</div>
+              <div class="input-group__messages" style="color:red">Số CMND là bắt buộc</div>
             </div>
           </div>
         </v-layout>
@@ -122,6 +122,9 @@ export default {
         }
         Promise.all(arrAction).then(results => {
           vm.loadingAction = false
+          vm.$router.push({
+            path: '/danh-gia-cldv'
+          })
         }).catch(xhr => {
           vm.loadingAction = false
         })

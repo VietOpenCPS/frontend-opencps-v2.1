@@ -18,9 +18,23 @@
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel> -->
-      <div class="mb-4">
-        <span class="text-bold">{{dossierDetail.serviceName}}</span>
-      </div>
+      <v-layout class="wrap">
+        <v-flex class="pr-2 pb-3" style="width: calc(100% - 150px)">
+          <span class="text-bold">{{dossierDetail.serviceName}}</span>
+        </v-flex>
+        <v-flex class="text-xs-right" style="width: 150px">
+          <v-btn color="primary"
+            @click="goBack"
+            class="kios-btn mr-0"
+          >
+            <v-icon size="18">undo</v-icon>
+            &nbsp;
+            Quay lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-flex>
+      </v-layout>
+
       <div class="mt-2">
         <v-tabs
           v-model="active"
@@ -241,7 +255,6 @@
       vm.$nextTick(function () {
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
-        vm.loadDossiertemplate()
       })
     },
     watch: {},
@@ -295,7 +308,19 @@
         }
       },
       goBack () {
-        window.history.back()
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['detail'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: current.path + queryString
+        })
       },
       getColor (level) {
         if (level === 2) {

@@ -301,7 +301,7 @@ body .table-bordered {
 body .table__overflow .table > thead > tr > th {
     border-right: 1px solid lightgray;
     border-top: 1px solid lightgray;
-    color: #0d2434 !important;
+    color: #065694 !important;
     font-weight: bold;
 }
 body .table-bordered tbody > tr > td {
@@ -1251,6 +1251,7 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 .table-dossier .th {
     text-align: center;
     border-top: 1px solid #d3d3d3;
+    color: #065694
 }
 .table-dossier .th, .table-dossier .td {
     border-right: 1px solid #d3d3d3;
@@ -1459,7 +1460,7 @@ div.table-tracuu::-webkit-scrollbar-thumb{
 }
 .wrap-scroll-votting {
     border: 1px solid #d3d3d3;
-    max-height: 200px
+    max-height: 300px
 }
 .wrap-scroll-sevice {
     border: 1px solid #d3d3d3;
@@ -1472,15 +1473,19 @@ div.table-tracuu::-webkit-scrollbar-thumb{
     max-height: 300px
 }
 .wrap-scroll::-webkit-scrollbar {
-    width: 40px !important;
+    width: 30px !important;
     border-left: 1px solid #d3d3d3;
+}
+.wrap-scroll::-webkit-scrollbar-thumb {
+	border-radius: 0px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #2980b9;
 }
 .wrap-scroll::-webkit-scrollbar-button {
     background-size: 100%;
-    height: 60px !important;
-    width: 40px !important;
+    height: 30px !important;
+    width: 30px !important;
 }
-
 .wrap-scroll::-webkit-scrollbar-button:vertical:increment {
     background-image: url(icons-scroll-down-trans.png);
     background-repeat: no-repeat;

@@ -27,7 +27,7 @@
               </v-flex>
             </v-layout>
           </div>
-          <div class="text-center" style="width: 150px;margin-top:12px">
+          <div class="text-right" style="width: 150px;margin-top:12px">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
@@ -191,7 +191,7 @@ export default {
       let newQuery = current.query
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      if (newQuery.hasOwnProperty('detail') && newQuery['detail'] && $('#dossierNoKey').val() === '') {
+      if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
         let inputs = document.querySelectorAll('input')
         inputs[0].focus()
       }
@@ -231,6 +231,10 @@ export default {
         vm.activeDetailDossier = true
       } else {
         vm.activeDetailDossier = false
+      }
+      if (!currentQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
+        let inputs = document.querySelectorAll('input')
+        inputs[0].focus()
       }
     }
   },

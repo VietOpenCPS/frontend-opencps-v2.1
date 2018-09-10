@@ -30,7 +30,7 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </div>
-        <div class="text-center mt-3">
+        <div class="text-center text-bold mt-3" style="color:#065694">
           <p class="mb-1">Mã tra cứu là dãy số gồm 4 ký tự được in trên</p>
           <p> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
         </div>
