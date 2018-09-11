@@ -4,13 +4,11 @@ import Landing from '@/components/Landing'
 import Employees from '@/components/Employees'
 import EmployeeDetail from '@/components/EmployeeDetail'
 import Captcha from '@/components/Captcha'
-import NotFound from '@/components/NotFound'
 
 const routes = [
   { path: '/', component: Landing, props: true },
   { path: '/danh-sach-can-bo/:itemCode', component: Employees, props: true },
-  { path: '/danh-sach-can-bo/:itemCode/:id', component: EmployeeDetail, props: true },
-  { path: '*', component: NotFound }
+  { path: '/danh-sach-can-bo/:itemCode/:id', component: EmployeeDetail, props: true }
 ]
 
 Vue.use(Router)
