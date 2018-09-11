@@ -3,7 +3,7 @@
     <h4 class="pt-2 ml-2">
       <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
-    <v-layout wrap>
+    <v-layout wrap class="mt-2">
       <v-flex xs4 class="pl-2 pr-2">
         <v-select
           class="select-border"
@@ -83,7 +83,7 @@
       </v-layout>
     </div>
     <div class="wrap-scroll wrap-scroll-domain list-domain mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
-      <v-list class="pt-0">
+      <v-list class="py-0">
         <template v-for="(item, index) in listLinhVuc" >
           <v-list-tile :key="index" @click="filterDomain(item)">
             <v-list-tile-content>
@@ -92,7 +92,7 @@
           </v-list-tile>
         </template>
       </v-list>
-      <div class="text-xs-center layout wrap mt-4" style="position: relative;">
+      <div class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -155,7 +155,7 @@
           </div>
         </template>
       </v-data-table>
-      <div v-if="listThuTuc.length > 10" class="text-xs-center layout wrap mt-4" style="position: relative;">
+      <div v-if="listThuTuc.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2">
           <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 

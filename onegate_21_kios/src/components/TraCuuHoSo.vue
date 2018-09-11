@@ -90,14 +90,14 @@
               </div>
             </template>
           </v-data-table>
-          <div v-if="dossierList.length > 10" class="text-xs-center layout wrap mt-4" style="position: relative;">
+          <div v-if="dossierList.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
             <div class="flex pagging-table px-2">
               <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
                 @tiny:change-page="paggingData" ></tiny-pagination> 
             </div>
           </div>
         </div>
-        <div class="mx-2 mt-4" v-if="validateTracuu === true && activeDetailDossier">
+        <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
           <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
         <div class="virtual-keyboard" v-if="visible">

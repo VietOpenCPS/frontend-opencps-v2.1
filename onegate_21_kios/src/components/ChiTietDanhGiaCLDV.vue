@@ -1,6 +1,6 @@
 <template>
   <div class="mt-3 px-2 py-0 kios-item">
-    <div class="wrap-scroll wrap-scroll-votting px-2 py-2">
+    <div class="wrap-scroll px-2 py-2" :class="votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
       <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index">
         <div class="text-bold">
           {{index + 1}}.&nbsp; {{ item.subject }}

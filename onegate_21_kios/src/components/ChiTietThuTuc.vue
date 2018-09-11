@@ -5,25 +5,14 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="pr-2 pb-3" style="width: calc(100% - 150px)">
-          <v-chip class="mx-0 my-0 mr-3 kios-btn" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:25px">
+        <v-flex class="pr-2 pb-2">
+          <v-chip class="mx-0 my-0 mr-3" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
             Mức độ {{serviceDetail.maxLevel}}
           </v-chip>
           <span class="text-bold">{{serviceDetail.serviceName}}</span>
         </v-flex>
-        <v-flex class="text-xs-right" style="width: 150px">
-          <v-btn color="primary"
-            @click="goBack"
-            class="kios-btn mr-0"
-          >
-            <v-icon size="18">undo</v-icon>
-            &nbsp;
-            Quay lại
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-flex>
       </v-layout>
-      <div class="mt-2">
+      <div class="mt-0">
         <v-tabs
           v-model="active"
           color="cyan"
@@ -103,6 +92,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
+      <v-btn class="back-btn" @click="goBack" fab color="primary">
+        <v-icon dark>arrow_back</v-icon>
+      </v-btn>
     </div>
   </div>
 </template>

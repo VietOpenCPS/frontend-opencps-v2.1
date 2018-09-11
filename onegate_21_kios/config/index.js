@@ -25,7 +25,7 @@ module.exports = {
     env: require('./dev.env'),
     port: 1080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'o/frontend-web-kios',
+    assetsSubDirectory: 'o/opencps-frontend/frontend_web_kios',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"

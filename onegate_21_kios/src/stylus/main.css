@@ -553,22 +553,14 @@ body .list__tile:hover {
 .tiny-pagination .page-item {
     margin: .2rem .05rem;
 }
-/* body .pagination button {
-    box-shadow: none;
-    margin: 0;
-    border: 1px solid #ccc;
-    border-radius: 0;
-    font-size: 13px;
-    width: 30px;
-    height: 30px;
-} */
+
 body .pagination button {
     box-shadow: none;
     margin: 0;
     border: 2px solid #ccc;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
 }
 body .pagination button .icon {
     font-size: 36px !important;
@@ -1425,7 +1417,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     overflow-x: hidden
 }
 .wrap-scroll-tabledossier {
-    max-height: 400px
+    max-height: 380px
 }
 .wrap-scroll-tableservice {
     max-height: 400px
@@ -1452,23 +1444,31 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     width: 30px !important;
     border: 1px solid #d3d3d3;
 }
+.wrap-scroll-domain::-webkit-scrollbar {
+    border-right: 0px;
+    border-top: 0px;
+    border-bottom: 0px
+}
+.wrap-scroll-tableservice::-webkit-scrollbar {
+    border-left: 0px;
+}
 .wrap-scroll::-webkit-scrollbar-thumb {
 	border-radius: 0px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #2980b9;
+    background-color: #2980b98f;
 }
 .wrap-scroll::-webkit-scrollbar-button {
     background-size: 100%;
-    height: 30px !important;
+    height: 40px !important;
     width: 30px !important;
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:increment {
-    background-image: url("../assets/icons-scroll-down-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-down-trans.png");
     background-repeat: no-repeat;
     background-position: bottom
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:decrement {
-    background-image: url("../assets/icons-scroll-up-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-up-trans.png");
     background-repeat: no-repeat;
     background-position: top
 }
@@ -1479,7 +1479,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 * {margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 a, a:hover, a:focus {text-decoration: none}
 header {
-    background: white url('../assets/bg-banner.jpg') center center no-repeat;
+    background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/bg-banner.jpg') center center no-repeat;
     background-size: auto 100%;
 	padding: 10px 15px;
 	border-bottom: 1px solid #ddd;
@@ -1491,6 +1491,9 @@ header a {
 	align-items: center;
 	text-transform: uppercase;
 	font-size: 18px;
+}
+header a div>p{
+    color: #00204f
 }
 header img {
 	width: 50px;
@@ -1527,12 +1530,16 @@ header span {
 }
 .tab-item .right.fullScreen {
     width: 100%;
+    padding-left: 0;
 }
 .tab-item .right .right-content {
     position: relative;
     background-color: #ffffff;
     width: 100%;
     height: 100%;
+}
+.tab-item .right .right-content .card {
+    box-shadow: none !important
 }
 .tab-item .left .icon {
 	text-align: center;

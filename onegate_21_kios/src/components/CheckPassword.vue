@@ -101,6 +101,8 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      let inputs = document.querySelectorAll('input')
+      inputs[0].focus()
       $('#passCheck').val('')
       let current = vm.$router.history.current
       let newQuery = current.query
