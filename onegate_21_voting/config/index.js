@@ -5,8 +5,8 @@ module.exports = {
   build: {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'o/frontend-web-voting',
+    assetsRoot: path.resolve(__dirname, '../../docs'),
+    assetsSubDirectory: 'o/opencps-frontend/frontend-web-voting',
     assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as

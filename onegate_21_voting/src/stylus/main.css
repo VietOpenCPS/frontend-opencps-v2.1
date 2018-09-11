@@ -76,3 +76,16 @@
     font-weight: bold;
     text-transform: uppercase;
 }
+ul#captcha li {
+    display:inline;
+}
+
+ul#captcha li:focus
+{
+  outline:none;
+  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+
+ul#captcha li:hover {
+  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
