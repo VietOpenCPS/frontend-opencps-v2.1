@@ -1,0 +1,9 @@
+{
+    "renderURLInit": "?p_p_id=FrontendWebVoting&p_p_lifecycle=2&p_p_state=exclusive&p_p_mode=view&p_p_resource_id=renderURLInit",
+    "initData": {
+        "votingApi": "/o/rest/v2/votings",
+        "agenciesApi": "/o/rest/v2/serviceinfos/statistics/agencies",
+        "employeeApi": "/o/rest/v2/employees/publish",
+        "detailEmployeeApi": "/o/rest/v2/employees"
+    }
+}
