@@ -2,10 +2,10 @@
   <div class="py-0 kios-item">
     <div>
       <v-card class="pb-2">
-        <h4 class="py-2 ml-2">
+        <h4 class="pt-2 ml-2">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
-        <v-layout wrap class="px-0 py-0">
+        <v-layout wrap class="mt-3 px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
               <v-flex xs6 class="pl-2 pr-3">
@@ -45,13 +45,13 @@
           Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
-        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
+        <div class="wrap-scroll wrap-scroll-tabledossier mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
           <v-data-table
           :headers="headersTable"
           :items="dossierList"
           hide-actions
           id="tracuuhoso"
-          class="table-tracuu table-landing table-bordered mt-3"
+          class="table-tracuu table-landing table-bordered"
           :class="visible ? 'overlayActive': ''"
           >
             <template slot="items" slot-scope="props">
@@ -90,7 +90,7 @@
               </div>
             </template>
           </v-data-table>
-          <div class="text-xs-center layout wrap mt-4" style="position: relative;">
+          <div v-if="dossierList.length > 10" class="text-xs-center layout wrap mt-4" style="position: relative;">
             <div class="flex pagging-table px-2">
               <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
                 @tiny:change-page="paggingData" ></tiny-pagination> 

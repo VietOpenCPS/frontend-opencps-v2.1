@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-0 kios-item">
+  <div class="py-0 kios-item">
     <div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
@@ -11,25 +11,39 @@
           </h4>
           <div class="mt-3"> 
             <v-layout class="wrap">
-              <v-flex class="px-3 py-2 th" style="width: 250px"><span class="text-bold">Mã hồ sơ</span></v-flex>
-              <v-flex class="px-3 py-2 th" style="width: calc(100% - 650px)"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
-              <v-flex class="px-3 py-2 th" style="width: 200px"><span class="text-bold">Ngày nộp</span></v-flex>
-              <v-flex class="px-3 py-2 th" style="width: 200px"><span class="text-bold">Ngày có kết quả</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 250px"><span class="text-bold">Mã hồ sơ</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: calc(100% - 550px)"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Ngày nộp</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Ngày có kết quả</span></v-flex>
             </v-layout>
           </div>
           <div class="dossierList">
-            <!-- <div class="wrap-list" :class="dossierList.length > 10 ? activeAnimate : ''"> -->
-            <div>
-              <v-layout class="wrap" v-for="(item, index) in dossierList" 
+            <marquee behavior="scroll" direction="up" v-if="dossierList.length > 9">
+              <div class="wrap-list">
+                <v-layout class="wrap" v-for="(item, index) in dossierList"
+                :key="item.dossierId" :class="index%2===1 ? 'active': ''">
+                  <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.submitDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.finishDate}}</span></v-flex>
+                </v-layout>
+              </div>
+            </marquee>
+            <div class="wrap-list" v-else>
+              <v-layout class="wrap" v-for="(item, index) in dossierList"
               :key="item.dossierId" :class="index%2===1 ? 'active': ''">
-                <v-flex class="px-3 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
-                <v-flex class="px-3 py-2 td" style="width: calc(100% - 650px)"><span> {{item.applicantName}}</span></v-flex>
-                <v-flex class="px-3 py-2 td" style="width: 200px"><span>{{item.submitDate}}</span></v-flex>
-                <v-flex class="px-3 py-2 td" style="width: 200px"><span>{{item.finishDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.submitDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.finishDate}}</span></v-flex>
               </v-layout>
             </div>
           </div>
         </div>
+        <v-btn class="back-btn" @click="changeScreen" fab color="primary">
+          <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
+          <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
+        </v-btn>
       </v-card>
     </div>
   </div>
@@ -48,11 +62,18 @@ export default {
     dossierList: [],
     dossierItemTotal: 0
   }),
-  computed: {},
+  computed: {
+    fullScreen () {
+      return this.$store.getters.getFullScreen
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
       vm.doLoadingDataHoSo()
+      setInterval(function () {
+        vm.doLoadingDataHoSo()
+      }, 3600000)
     })
   },
   watch: {},
@@ -71,6 +92,10 @@ export default {
         vm.dossierList = []
         vm.dossierItemTotal = 0
       })
+    },
+    changeScreen () {
+      var vm = this
+      vm.$store.commit('setFullScreen', !vm.fullScreen)
     }
   }
 }

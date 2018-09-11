@@ -19,22 +19,10 @@
         </v-expansion-panel-content>
       </v-expansion-panel> -->
       <v-layout class="wrap">
-        <v-flex class="pr-2 pb-3" style="width: calc(100% - 150px)">
+        <v-flex class="pr-2 pb-2">
           <span class="text-bold">{{dossierDetail.serviceName}}</span>
         </v-flex>
-        <v-flex class="text-xs-right" style="width: 150px">
-          <v-btn color="primary"
-            @click="goBack"
-            class="kios-btn mr-0"
-          >
-            <v-icon size="18">undo</v-icon>
-            &nbsp;
-            Quay lại
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-flex>
       </v-layout>
-
       <div class="mt-2">
         <v-tabs
           v-model="active"
@@ -195,6 +183,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
+      <v-btn class="back-btn" @click="goBack" fab color="primary">
+        <v-icon dark>arrow_back</v-icon>
+      </v-btn>
     </div>
   </div>
 </template>

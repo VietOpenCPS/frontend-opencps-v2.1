@@ -1,9 +1,9 @@
 <template>
-  <div class="px-2 py-0 kios-item" style="background:#fff">
+  <div class="px-2 py-0 kios-item">
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <h4 class="py-2 ml-2" v-if="!detailActive">
+    <h4 class="pt-2 ml-2" v-if="!detailActive">
       <span style="color:#065694">CHỌN ĐƠN VỊ ĐỂ ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ </span>
     </h4>
     <div class="text-xs-center" v-if="detailActive">

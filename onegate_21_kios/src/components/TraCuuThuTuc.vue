@@ -1,6 +1,6 @@
 <template>
-  <div class="px-2 py-0 kios-item" style="background:#fff">
-    <h4 class="py-2 ml-2">
+  <div class="px-2 py-0 kios-item">
+    <h4 class="pt-2 ml-2">
       <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
     <v-layout wrap>
@@ -82,8 +82,8 @@
         </v-flex>
       </v-layout>
     </div>
-    <div class="list-domain mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
-      <v-list>
+    <div class="wrap-scroll wrap-scroll-domain list-domain mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+      <v-list class="pt-0">
         <template v-for="(item, index) in listLinhVuc" >
           <v-list-tile :key="index" @click="filterDomain(item)">
             <v-list-tile-content>
@@ -99,12 +99,12 @@
         </div>
       </div>
     </div>
-    <div class="mt-4" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected && listThuTuc.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected && listThuTuc.length > 0" :class="visible ? 'overlayActive': ''">
       <v-data-table
         :headers="headersTable"
         :items="listThuTuc"
         hide-actions
-        class="table-bordered table-thu-tuc mx-2 mt-3"
+        class="table-bordered table-thu-tuc ml-2"
       >
         <template slot="items" slot-scope="props">
           <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
@@ -155,7 +155,7 @@
           </div>
         </template>
       </v-data-table>
-      <div class="text-xs-center layout wrap mt-4" style="position: relative;">
+      <div v-if="listThuTuc.length > 10" class="text-xs-center layout wrap mt-4" style="position: relative;">
         <div class="flex pagging-table px-2">
           <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 

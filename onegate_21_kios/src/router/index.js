@@ -11,7 +11,7 @@ import HoSoKetQua from '@/components/HoSoKetQua'
 import CheckPassword from '@/components/CheckPassword'
 
 const routes = [
-  { path: '/', name: 'Landing', component: Landing, props: false },
+  { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
   { path: '/ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
   { path: '/tra-cuu-thu-tuc', name: 'TraCuuThuTuc', component: TraCuuThuTuc, props: false },

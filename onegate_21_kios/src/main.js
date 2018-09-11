@@ -6,15 +6,12 @@ import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'
 import { store } from './store'
-// import VueTouchKeyboard from 'vue-touch-keyboard'
-// import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
 import axios from 'axios'
 
-axios.defaults.headers.common['Token'] = window.Liferay.authToken
+// axios.defaults.headers.common['Token'] = window.Liferay.authToken
 
-// Vue.use(VueTouchKeyboard)
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = true
