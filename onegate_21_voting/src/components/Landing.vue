@@ -8,7 +8,7 @@
       </v-flex>
       <v-flex xs12 sm8>
         <v-layout row wrap>
-          <v-flex xs12 sm4 v-for="(item, index) in govAgencys" style="padding-left: 5px; padding-right: 5px;">
+          <v-flex xs12 sm4 v-for="(item, index) in govAgencys" :key="index + 'gov'" style="padding-left: 5px; padding-right: 5px;">
             <v-chip class="text-xs-center" style="width: 100%; min-height: 40px; cursor: pointer;" label color="primary" text-color="white" @click="viewListEmployee(item)">
               <span style="cursor: pointer;">{{item.administrationName}}</span>
             </v-chip>

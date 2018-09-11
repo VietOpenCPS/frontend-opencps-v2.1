@@ -6,7 +6,7 @@
         {{captcha}}
       </v-chip>
     </v-flex>
-    <div v-drag-and-drop:options="options" class="drag-wrapper" class="text-xs-center mt-3">
+    <div v-drag-and-drop:options="options" class="drag-wrapper text-xs-center mt-3">
       <ul id="captcha">
         <li class="item-captcha" v-for="(item, index) in arrCaptcha" style="padding: 10px 15px; background-color: #81D4FA; margin-right: 2px; color: #fff; font-weight: bold;">{{item}}</li>
       </ul>
