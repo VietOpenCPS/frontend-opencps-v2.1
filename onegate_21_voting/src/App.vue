@@ -1,29 +1,25 @@
 <template>
-  <v-app>
-    
-    <v-content>
+  <div>
+    <v-app>
       <router-view></router-view>
-    </v-content>
-
-  </v-app>
+    </v-app>
+  </div>
 </template>
 
 <script>
   import router from '@/router'
   export default {
     data: () => ({
-      danhSachBaoCao: [],
-      isCallBack: true
+      workingUnitList: [],
+      currentIndex: 0,
+      loading: true
     }),
-    computed: {
-    },
     created () {
-    },
-    updated () {
+      var vm = this
+      vm.$nextTick(function () {})
     },
     watch: {
     },
-    methods: {
-    }
+    methods: {}
   }
 </script>
