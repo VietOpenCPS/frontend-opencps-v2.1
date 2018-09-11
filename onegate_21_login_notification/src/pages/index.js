@@ -61,7 +61,7 @@ class Index extends React.Component {
     userNameLogin: '',
     forgottenURL: '/forgotten-password',
     drawer: false,
-    avatarURL: 'http://via.placeholder.com/350x150',
+    avatarURL: '',
     notificationCount: 0,
     isShowUserMenu: false,
     toggle_exclusive: 0
@@ -178,15 +178,20 @@ class Index extends React.Component {
             </IconButton>
           </Grid>
           <Grid item>
-            <Chip
-              onClick={this.handleToggle}
-              avatar={<Avatar src={avatarURL} />}
-              label={userNameLogin}
-              className={classes.chip}
-              style={chipStyle}
-              onDelete={this.handleToggle}
-              deleteIcon={<ExpandMoreIcon />}
-            />
+            { avatarURL === '' ? 
+              abc
+            :
+              <Chip
+                onClick={this.handleToggle}
+                avatar={<Avatar src={avatarURL} />}
+                label={userNameLogin}
+                className={classes.chip}
+                style={chipStyle}
+                onDelete={this.handleToggle}
+                deleteIcon={<ExpandMoreIcon />}
+              />
+            }
+            
             <Menu
               id="fade-menu"
               className="user-profile-menu-react"

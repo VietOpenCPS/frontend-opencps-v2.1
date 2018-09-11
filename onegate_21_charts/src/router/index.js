@@ -1,19 +1,16 @@
 import Vue from 'vue/dist/vue.min.js'
 import Router from 'vue-router'
+import Landing from '@/components/Landing'
+import NotFound from '@/components/NotFound'
+import LandingLinePublic from '@/components/LandingLinePublic'
+import LandingPiePublic from '@/components/LandingPiePublic'
 
-const routerOptions = [
-  { path: '/bao-cao/:index', component: 'Landing', props: true },
-  { path: '/report/bar/:year/:month/:agency/:domain', component: 'LandingLinePublic', props: true },
-  { path: '/report/pie/:year/:month/:agency/:domain', component: 'LandingPiePublic', props: true },
-  { path: '*', component: 'NotFound' }
+const routes = [
+  { path: '/bao-cao/:index', name: 'Landing', component: Landing, props: true },
+  { path: '/report/bar/:year/:month/:agency/:domain', name: 'LandingLinePublic', component: LandingLinePublic, props: true },
+  { path: '/report/pie/:year/:month/:agency/:domain', name: 'LandingPiePublic', component: LandingPiePublic, props: true },
+  { path: '*', name: 'NotFound', component: NotFound }
 ]
-
-const routes = routerOptions.map(route => {
-  return {
-    ...route,
-    component: () => import(`@/components/${route.component}.vue`)
-  }
-})
 
 Vue.use(Router)
 
