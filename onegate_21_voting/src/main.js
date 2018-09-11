@@ -9,9 +9,11 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
 import axios from 'axios'
+import VueDraggable from 'vue-draggable'
 
 // axios.defaults.headers.common['Token'] = window.Liferay.authToken
 Vue.use(VueContentPlaceholders)
+Vue.use(VueDraggable)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
 
