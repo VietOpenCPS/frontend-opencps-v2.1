@@ -92,7 +92,7 @@
           </v-list-tile>
         </template>
       </v-list>
-      <div class="text-xs-center layout wrap mt-2" style="position: relative;">
+      <div v-if="listLinhVuc.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -269,6 +269,7 @@ export default {
                 vm.doLoadingThuTuc()
               }
             }).catch(reject => {
+              vm.listLinhVuc = []
               vm.loading = false
             })
           }

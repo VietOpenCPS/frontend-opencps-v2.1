@@ -115,19 +115,21 @@ export default {
       if (vm.validPass2) {
         vm.loadingAction = true
         let arrAction = []
-        for (var index in vm.votingItems) {
-          vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
-          vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
-          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
-        }
-        Promise.all(arrAction).then(results => {
-          vm.loadingAction = false
-          vm.$router.push({
-            path: '/danh-gia-cldv'
+        if (vm.votingItems.length > 0) {
+          for (var index in vm.votingItems) {
+            vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
+            vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
+            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          }
+          Promise.all(arrAction).then(results => {
+            vm.loadingAction = false
+            vm.$router.push({
+              path: '/danh-gia-cldv'
+            })
+          }).catch(xhr => {
+            vm.loadingAction = false
           })
-        }).catch(xhr => {
-          vm.loadingAction = false
-        })
+        }
       }
     },
     goBack () {
