@@ -85,8 +85,16 @@ export default {
       var filter = {}
       vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false
-        vm.dossierList = result.data
-        vm.dossierItemTotal = result.total
+        if (result.data) {
+          vm.dossierList = result.data
+        } else {
+          vm.dossierList = []
+        }
+        if (result.total) {
+          vm.dossierItemTotal = result.total
+        } else {
+          vm.dossierItemTotal = 0
+        }
       }).catch(reject => {
         vm.loading = false
         vm.dossierList = []

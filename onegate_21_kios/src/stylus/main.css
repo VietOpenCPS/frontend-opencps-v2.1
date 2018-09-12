@@ -1175,7 +1175,14 @@ body .menu__content--select .text--disabled {
     font-weight: 500
 }
 .table-tracuu thead tr:first-child {
-    height: 50px;
+    height: 42px;
+}
+.table-tracuu thead tr:first-child th{
+    height: 42px !important;
+    padding-top: 8px !important;
+}
+.table-tracuu .datatable__progress {
+    display: none !important;
 }
 .table-tracuu tbody tr {
     height: 45px;
@@ -1185,6 +1192,9 @@ body .menu__content--select .text--disabled {
 }
 div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
     width: 320px;
+}
+div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
+    width: calc(100% - 505px);
 }
 div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(3) {
     width: 185px;
@@ -1198,6 +1208,7 @@ div.table-tracuu::-webkit-scrollbar{
     width: 8px;
     background-color: #F5F5F5;
 }
+
 div.table-tracuu::-webkit-scrollbar-thumb {
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -1604,6 +1615,6 @@ header span {
 .mWrapper > footer {
     display: none !important;
 }
-section #main-content {
+.mWrapper > section {
     padding: 0 !important
 }
