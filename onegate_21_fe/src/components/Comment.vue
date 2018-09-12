@@ -263,7 +263,7 @@ export default {
             formData.append('opinion', document.getElementById('opinion').checked)
             // formData.append('email', 'congtrinh0209@gmail.com')
             // formData.append('fullname', 'Công Trình')
-            formData.append('email', vm.initData.user.userEmail)
+            formData.append('email', '')
             formData.append('fullname', vm.initData.user.userName)
             formData.append('opinion', document.getElementById('opinion').checked)
             $.ajax({
