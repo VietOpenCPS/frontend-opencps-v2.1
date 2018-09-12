@@ -386,8 +386,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // axios.get('/o/rest/v2/votings/' + data.className + '/' + data.classPK, param).then(result => {
-          axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+          // test local
+          axios.get('/o/rest/v2/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
@@ -413,8 +414,9 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('dossierNo', data.dossierNo)
           params.append('applicantIdNo', data.applicantIdNo)
-          axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
-          // axios.post('/o/rest/v2/votings/' + data.votingId + '/results', params, config).then(result => {
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
+          axios.post('/o/rest/v2/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
             toastr.error('Gửi đánh giá thất bại')

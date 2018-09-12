@@ -1190,13 +1190,16 @@ body .menu__content--select .text--disabled {
 .table-tracuu table.table tr .active {
     background-color: #eee !important;
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(1),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(1) {
     width: 320px;
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(2),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(2) {
     width: calc(100% - 505px);
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(3) {
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(3),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(3) {
     width: 185px;
 }
 div.table-tracuu::-webkit-scrollbar-track{
@@ -1276,14 +1279,25 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .menu__content .list>div .list__tile {
     font-size: 16px !important
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3) {
-    min-width: 200px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(1),
+.table-thu-tuc .table > tbody > tr > td:nth-child(1) {
+    width: 50px;
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4) {
-    min-width: 100px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(2),
+.table-thu-tuc .table > tbody > tr > td:nth-child(2) {
+    width: calc(100% - 360px);
 }
-.table-thu-tuc .table tbody td, body table.table tbody th {
-    height: 50px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3),
+.table-thu-tuc .table > tbody > tr > td:nth-child(3) {
+    width: 200px;
+}
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4),
+.table-thu-tuc .table > tbody > tr > td:nth-child(4) {
+    width: 110px;
+}
+.table-thu-tuc thead tr:first-child th{
+    height: 42px !important;
+    padding-top: 8px !important;
 }
 .input-border .input-group__input {
     border: 1px solid #0b72ba;
@@ -1617,4 +1631,7 @@ header span {
 }
 .mWrapper > section {
     padding: 0 !important
+}
+.tabs__items {
+    overflow: hidden !important
 }
