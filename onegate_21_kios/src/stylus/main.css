@@ -1463,12 +1463,12 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     width: 30px !important;
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:increment {
-    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-down-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-scroll-down-trans.png");
     background-repeat: no-repeat;
     background-position: bottom
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:decrement {
-    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-up-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-scroll-up-trans.png");
     background-repeat: no-repeat;
     background-position: top
 }
@@ -1479,7 +1479,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 * {margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 a, a:hover, a:focus {text-decoration: none}
 header {
-    background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/bg-banner.jpg') center center no-repeat;
+    background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/bg-banner.jpg') center center no-repeat;
     background-size: auto 100%;
 	padding: 10px 15px;
 	border-bottom: 1px solid #ddd;
@@ -1595,4 +1595,15 @@ header span {
 .tab-item .left a:nth-child(3):hover {
 	background-color: #e4d538;
 }
-
+.mWrapper > header {
+    display: none !important;
+}
+.mWrapper > nav {
+    display: none !important;
+}
+.mWrapper > footer {
+    display: none !important;
+}
+section #main-content {
+    padding: 0 !important
+}

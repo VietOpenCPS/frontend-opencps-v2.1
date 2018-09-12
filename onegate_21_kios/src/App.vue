@@ -3,7 +3,7 @@
     <v-content>
     <header>
       <a href="/web/cong-dich-vu-cong">
-        <img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/logo.png">
+        <img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/logo.png">
         <div>
           <p class="text-bold">Tỉnh Phú Thọ</p>
           <span class="text-bold">Hệ thống một cửa điện tử và dịch vụ công trực tuyến</span>
@@ -14,21 +14,21 @@
       <div class="tab-item">
         <div class="left" :class="fullScreen ? 'smallScreen' : ''">
           <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-            <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-search-50.png"></p>
+            <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-search-50.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Tra cứu hồ sơ</span><br>
               <span>Tra cứu thông tin hồ sơ</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('tracuuthutuc')">
-            <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icon-search-dc-50.png"></p>
+            <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-search-dc-50.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Tra cứu thủ tục</span><br>
               <span>Tra cứu thông tin thủ tục</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('danhgia')">
-            <p class="icon pl-1 pr-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icon-evaluation.png"></p>
+            <p class="icon pl-1 pr-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-evaluation.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Đánh giá</span><br>
               <span>Đánh giá chất lượng dịch vụ</span>
