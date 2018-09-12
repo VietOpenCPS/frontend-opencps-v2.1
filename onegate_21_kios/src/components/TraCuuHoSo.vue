@@ -193,7 +193,7 @@ export default {
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
       if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
         let inputs = document.querySelectorAll('input')
-        inputs[0].focus()
+        inputs[2].focus()
       }
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
@@ -333,10 +333,15 @@ export default {
         secretCode: vm.filterDossierKey.secretCode
       }
       vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
-        vm.loadingTable = false
-        vm.dossierList = result.data
-        vm.dossierItemTotal = result.total
         vm.hosoDatasPage = currentQuery.page ? currentQuery.page : 1
+        vm.loadingTable = false
+        if (result.data) {
+          vm.dossierList = result.data
+          vm.dossierItemTotal = result.total
+        } else {
+          vm.dossierList = []
+          vm.dossierItemTotal = 0
+        }
         vm.totalPages = vm.dossierList.length
       }).catch(reject => {
         vm.loadingTable = false
