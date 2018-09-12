@@ -19,10 +19,10 @@
       </div>
       <div class="custom-row" @click="goDanhGiaCanBo">
         <div class="col-7">
-          <p>Đánh giá cán bộ tiếp dân<br/> tại đơn vị hành chính công</p>
+          <p>Đánh giá chất lượng dịch vụ<br/> tại đơn vị hành chính công</p>
         </div>
         <div class="col-5">
-          <span>Đánh giá<br/>cán bộ</span>
+          <span>Đánh giá chất lượng dịch vụ</span>
         </div>
       </div>
     </div>

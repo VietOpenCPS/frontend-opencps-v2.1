@@ -174,13 +174,13 @@ body .expansion-panel .expansion-panel__body > .card{
 body .expansion-panel__header {
     padding: 5px 0px;
     font-weight: bold;
-    font-size: 12px;
+    /* font-size: 12px; */
     color: #0d2434;
 }
 body .expand__select__gov .expansion-panel__header {
     padding: 10px 0px;
     font-weight: bold;
-    font-size: 12px;
+    /* font-size: 12px; */
     color: #0d2434;
 }
 body .expand__select__domain .expansion-panel__header {
