@@ -135,13 +135,7 @@ export const store = new Vuex.Store({
           axios.get('/o/rest/v2/serviceconfigs/pubish/' + filter.administrationCode + '/domains', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              // let dataReturn = serializable.domains
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
+            resolve(serializable)
           }).catch(function (error) {
             console.log(error)
             reject(error)

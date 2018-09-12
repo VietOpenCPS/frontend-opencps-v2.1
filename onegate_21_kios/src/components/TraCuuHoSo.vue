@@ -90,7 +90,7 @@
               </div>
             </template>
           </v-data-table>
-          <div v-if="dossierList.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+          <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
             <div class="flex pagging-table px-2">
               <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
                 @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -143,7 +143,7 @@ export default {
     dossierList: [],
     dossierItemTotal: 0,
     hosoDatasPage: 1,
-    totalPages: 1,
+    totalPages: 0,
     headersTable: [
       {
         text: 'Mã hồ sơ',
@@ -193,7 +193,7 @@ export default {
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
       if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
         let inputs = document.querySelectorAll('input')
-        inputs[2].focus()
+        inputs[0].focus()
       }
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
@@ -338,14 +338,15 @@ export default {
         if (result.data) {
           vm.dossierList = result.data
           vm.dossierItemTotal = result.total
+          vm.totalPages = Number(result.total)
         } else {
           vm.dossierList = []
           vm.dossierItemTotal = 0
         }
-        vm.totalPages = vm.dossierList.length
       }).catch(reject => {
         vm.loadingTable = false
         vm.dossierList = []
+        vm.totalPages = 0
         vm.dossierItemTotal = 0
       })
     },

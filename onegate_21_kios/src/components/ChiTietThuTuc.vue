@@ -5,14 +5,14 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="pb-2" style="width: 100px">
+        <div class="pb-2" style="width: 100px">
           <v-chip class="mx-0 my-0" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
             Mức độ {{serviceDetail.maxLevel}}
           </v-chip>
-        </v-flex>
-        <v-flex style="calc(100% - 100px)">
+        </div>
+        <div style="width:calc(100% - 100px)">
           <span class="text-bold">{{serviceDetail.serviceName}}</span>
-        </v-flex>    
+        </div>    
       </v-layout>
       <div class="mt-0">
         <v-tabs
