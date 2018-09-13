@@ -78,7 +78,7 @@
     <div class="mt-4" v-if="!loading && !activeDetailService && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn outline flat color="primary" class="kios-btn" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
+          <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
