@@ -23,6 +23,7 @@
     "jquery": "^3.3.1",
     "jquery-comments": "^1.0.1",
     "jquery-textcomplete": "^1.8.4",
+    "macaddress": "^0.2.9",
     "popper.js": "^1.14.3",
     "toastr": "^2.1.4",
     "v-money": "^0.8.1",
