@@ -8,7 +8,7 @@ Vue.use(Vuex)
 Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
-    initData: null,
+    initData: {},
     totalEmployee: 0,
     filterDossierKey: {
       dossierNo: '',
@@ -45,6 +45,32 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    // loadInitResource ({commit, state}) {
+    //   if (state.initData == null) {
+    //     return new Promise((resolve, reject) => {
+    //       let param = {}
+    //       let orginURL = window.location.href
+    //       let coma = window.location.href.lastIndexOf('#/')
+    //       if (coma > 0) {
+    //         orginURL = window.location.href.substr(0, coma)
+    //       }
+    //       /* test local */
+    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
+    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+    //         let serializable = response.data
+    //         commit('setInitData', serializable)
+    //         resolve(serializable)
+    //       }).catch(function (error) {
+    //         console.log(error)
+    //         reject(error)
+    //       })
+    //     })
+    //   } else {
+    //     return new Promise((resolve, reject) => {
+    //       resolve(state.initData)
+    //     })
+    //   }
+    // },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -135,13 +161,7 @@ export const store = new Vuex.Store({
           axios.get('/o/rest/v2/serviceconfigs/pubish/' + filter.administrationCode + '/domains', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              // let dataReturn = serializable.domains
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
+            resolve(serializable)
           }).catch(function (error) {
             console.log(error)
             reject(error)
@@ -160,6 +180,30 @@ export const store = new Vuex.Store({
           // test local
           axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
           // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getGovAgencyDictItem ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -362,8 +406,9 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // axios.get('/o/rest/v2/votings/' + data.className + '/' + data.classPK, param).then(result => {
-          axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+          // test local
+          axios.get('/o/rest/v2/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
@@ -389,8 +434,9 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('dossierNo', data.dossierNo)
           params.append('applicantIdNo', data.applicantIdNo)
-          axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
-          // axios.post('/o/rest/v2/votings/' + data.votingId + '/results', params, config).then(result => {
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
+          axios.post('/o/rest/v2/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
             toastr.error('Gửi đánh giá thất bại')

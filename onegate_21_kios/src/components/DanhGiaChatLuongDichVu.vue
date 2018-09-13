@@ -13,7 +13,7 @@
     <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn class="kios-btn primary" @click="votingDetail(item)" style="width:100%">{{item.administrationName}}</v-btn>
+          <v-btn outline flat color="primary" class="kios-btn" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.itemName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
@@ -60,13 +60,13 @@ export default {
       if (vm.govAgencySelected) {
         vm.detailActive = true
         if (vm.govAgencyList.length === 0) {
-          vm.$store.dispatch('getGovAgency').then(function (result) {
+          vm.$store.dispatch('getGovAgencyDictItem').then(function (result) {
             vm.govAgencyList = result
           }).catch(reject => {})
         }
       } else {
         vm.detailActive = false
-        vm.$store.dispatch('getGovAgency').then(function (result) {
+        vm.$store.dispatch('getGovAgencyDictItem').then(function (result) {
           vm.govAgencyList = result
         }).catch(reject => {})
       }
@@ -93,11 +93,11 @@ export default {
   methods: {
     votingDetail (item) {
       var vm = this
-      vm.govAgencySelected = item.administrationCode
+      vm.govAgencySelected = item.itemCode
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['administration'] = item.administrationCode
+      newQuery['administration'] = item.itemCode
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -114,10 +114,10 @@ export default {
       var vm = this
       if (arg) {
         let value = vm.govAgencyList.filter(function (item) {
-          return item.administrationCode.toString() === arg.toString()
+          return item.itemCode.toString() === arg.toString()
         })
         if (value.length > 0) {
-          return value[0].administrationName
+          return value[0].itemName
         }
       } else {
         return ''
