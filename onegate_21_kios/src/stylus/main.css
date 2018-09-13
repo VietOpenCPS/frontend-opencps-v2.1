@@ -344,6 +344,11 @@ body .menu_header_list .input-group--select .input-group__selections__comma {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+div.input-group__input > div.input-group__selections {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .menu__content .card {
     margin-bottom: 0;
 }
@@ -1235,6 +1240,15 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .kios-btn {
     height: 38px !important
 }
+.btn-select {
+    height: auto !important;
+    min-height: 38px;
+}
+.btn-select .btn__content {
+    white-space: normal !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important
+}
 .kios-input {
     height: 35px !important;
 }
@@ -1298,6 +1312,9 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .table-thu-tuc thead tr:first-child th{
     height: 42px !important;
     padding-top: 8px !important;
+}
+table > thead > tr > th.column {
+    float: none !important
 }
 .input-border .input-group__input {
     border: 1px solid #0b72ba;
@@ -1474,9 +1491,9 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     border-top: 0px;
     border-bottom: 0px
 }
-.wrap-scroll-tableservice::-webkit-scrollbar {
+/* .wrap-scroll-tableservice::-webkit-scrollbar {
     border-left: 0px;
-}
+} */
 .wrap-scroll::-webkit-scrollbar-thumb {
 	border-radius: 0px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
