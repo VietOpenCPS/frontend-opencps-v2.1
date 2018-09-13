@@ -1233,6 +1233,9 @@ export default {
           if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
+          if (vm.checkInput === 2 && vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+            router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+          }
           vm.checkInput = 0
           vm.$store.commit('setCheckInput', 0)
           if (String(item.form) === 'ACTIONS') {
