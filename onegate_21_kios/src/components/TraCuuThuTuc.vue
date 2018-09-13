@@ -99,7 +99,7 @@
         </div>
       </div>
     </div>
-    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected && listThuTuc.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected" :class="visible ? 'overlayActive': ''">
       <v-data-table
         :headers="headersTable"
         :items="listThuTuc"
