@@ -862,19 +862,19 @@ export default {
               for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
                 let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
                 if (String(currentStep.stepCode) === String(currentQuery.step)) {
-                  let buttonConfig = currentStep.buttonConfig
-                  if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                    vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
-                    for (let key in btnDynamicsOnlySteps) {
-                      for (var i = 0; i < btnDynamicsOnlySteps[key].onlySteps.length; i++) {
-                        if (String(btnDynamicsOnlySteps[key].onlySteps[i]) === String(currentStep.stepCode)) {
-                          vm.btnDynamics.push(btnDynamicsOnlySteps[key])
-                        }
+                  // let buttonConfig = currentStep.buttonConfig
+                  // if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
+                  //   vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
+                  for (let keyOnlyStep in btnDynamicsOnlySteps) {
+                    for (var i = 0; i < btnDynamicsOnlySteps[keyOnlyStep].onlySteps.length; i++) {
+                      if (String(btnDynamicsOnlySteps[keyOnlyStep].onlySteps[i]) === String(currentStep.stepCode)) {
+                        vm.btnDynamics.push(btnDynamicsOnlySteps[keyOnlyStep])
                       }
                     }
-                  } else {
-                    vm.btnStepsDynamics = []
                   }
+                  // } else {
+                  //   vm.btnStepsDynamics = []
+                  // }
                   break
                 }
               }
@@ -923,22 +923,23 @@ export default {
           for (let key in vm.trangThaiHoSoList[vm.index]['items']) {
             let currentStep = vm.trangThaiHoSoList[vm.index]['items'][key]
             if (String(currentStep.stepCode) === String(currentQuery.step)) {
-              let buttonConfig = currentStep.buttonConfig
-              if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
-                for (let key in btnDynamicsOnlySteps) {
-                  for (var i = 0; i < btnDynamicsOnlySteps[key].onlySteps.length; i++) {
-                    if (String(btnDynamicsOnlySteps[key].onlySteps[i]) === String(currentStep.stepCode)) {
-                      vm.btnDynamics.push(btnDynamicsOnlySteps[key])
-                    }
+              // let buttonConfig = currentStep.buttonConfig
+              // if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
+              //   vm.btnStepsDynamics = JSON.parse(buttonConfig)['buttons']
+              for (let keyOnlySteps in btnDynamicsOnlySteps) {
+                for (var i = 0; i < btnDynamicsOnlySteps[keyOnlySteps].onlySteps.length; i++) {
+                  if (String(btnDynamicsOnlySteps[keyOnlySteps].onlySteps[i]) === String(currentStep.stepCode)) {
+                    vm.btnDynamics.push(btnDynamicsOnlySteps[keyOnlySteps])
                   }
                 }
-              } else {
-                vm.btnStepsDynamics = []
               }
+              // } else {
+              //   vm.btnStepsDynamics = []
+              // }
               break
             }
           }
+          console.log('btnDynamics', vm.btnDynamics)
         }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)
@@ -946,7 +947,6 @@ export default {
           vm.hosoDatasPage = 1
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
-        console.log('watch: landing')
         if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
           vm.processListDomain(currentQuery)
         } else {

@@ -113,7 +113,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span>{{props.index + 1}}</span><br>
+                <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
               </div>
             </td>
             <td class="text-xs-left" >
