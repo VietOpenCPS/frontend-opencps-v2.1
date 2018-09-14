@@ -91,7 +91,7 @@ export default {
       var vm = this
       vm.validPass2 = true
       let filter = {
-        className: 'GOVERNMENT_AGENCY',
+        className: 'govagency',
         classPK: vm.administration
       }
       vm.$store.dispatch('loadVoting', filter).then(function (result) {
@@ -113,21 +113,23 @@ export default {
         vm.validPass2 = true
       }
       if (vm.validPass2) {
-        vm.loadingAction = true
         let arrAction = []
-        for (var index in vm.votingItems) {
-          vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
-          vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
-          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
-        }
-        Promise.all(arrAction).then(results => {
-          vm.loadingAction = false
-          vm.$router.push({
-            path: '/danh-gia-cldv'
+        if (vm.votingItems.length > 0) {
+          vm.loadingAction = true
+          for (var index in vm.votingItems) {
+            vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
+            vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
+            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          }
+          Promise.all(arrAction).then(results => {
+            vm.loadingAction = false
+            vm.$router.push({
+              path: '/danh-gia-cldv'
+            })
+          }).catch(xhr => {
+            vm.loadingAction = false
           })
-        }).catch(xhr => {
-          vm.loadingAction = false
-        })
+        }
       }
     },
     goBack () {

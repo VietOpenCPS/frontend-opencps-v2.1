@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span> bản ghi. </div> -->
-    <div v-if="total > currentLimit" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
+    <div v-if="total > currentLimit" class="vue-tiny-pagination pagination layout" style="justify-content: center; -webkit-justify-content: center;">
       <!-- <div class="px-3 xs2 flex">
         <v-select
           v-bind:items="totalPagesData"

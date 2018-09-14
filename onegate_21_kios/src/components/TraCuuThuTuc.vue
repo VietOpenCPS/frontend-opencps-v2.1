@@ -78,7 +78,7 @@
     <div class="mt-4" v-if="!loading && !activeDetailService && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn class="kios-btn primary" @click="filterAdministration(item)" style="width:100%">{{item.administrationName}}</v-btn>
+          <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
@@ -92,14 +92,14 @@
           </v-list-tile>
         </template>
       </v-list>
-      <div class="text-xs-center layout wrap mt-2" style="position: relative;">
+      <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
         </div>
       </div>
     </div>
-    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected && listThuTuc.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected" :class="visible ? 'overlayActive': ''">
       <v-data-table
         :headers="headersTable"
         :items="listThuTuc"
@@ -155,7 +155,7 @@
           </div>
         </template>
       </v-data-table>
-      <div v-if="listThuTuc.length > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+      <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2">
           <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -262,13 +262,20 @@ export default {
             }
             vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
               vm.loading = false
-              vm.listLinhVuc = result
+              if (result.data) {
+                vm.listLinhVuc = result.data
+                vm.totalPaggingLinhVuc = Number(result.total)
+              } else {
+                vm.listLinhVuc = []
+                vm.totalPaggingLinhVuc = 0
+              }
               vm.pageListLinhVuc = Number(newQuery.page) ? Number(newQuery.page) : 1
-              vm.totalPaggingLinhVuc = vm.listLinhVuc.length
               if (vm.govAgencySelected && vm.linhVucSelected) {
                 vm.doLoadingThuTuc()
               }
             }).catch(reject => {
+              vm.listLinhVuc = []
+              vm.totalPaggingLinhVuc = 0
               vm.loading = false
             })
           }
@@ -299,11 +306,18 @@ export default {
         }
         vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
           vm.loading = false
-          vm.listLinhVuc = result
+          if (result.data) {
+            vm.listLinhVuc = result.data
+            vm.totalPaggingLinhVuc = Number(result.total)
+          } else {
+            vm.listLinhVuc = []
+            vm.totalPaggingLinhVuc = 0
+          }
           vm.pageListLinhVuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
-          vm.totalPaggingLinhVuc = vm.listLinhVuc.length
         }).catch(reject => {
           vm.loading = false
+          vm.listLinhVuc = []
+          vm.totalPaggingLinhVuc = 0
         })
       }
       if (vm.govAgencySelected && vm.linhVucSelected) {
@@ -362,14 +376,16 @@ export default {
         if (result.data) {
           vm.listThuTuc = result.data
           vm.pageListThuTuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
-          vm.totalPaggingThuTuc = vm.listThuTuc.length
+          vm.totalPaggingThuTuc = result.total
         } else {
+          vm.totalPaggingThuTuc = 0
           vm.listThuTuc = []
         }
         vm.serviceItemTotal = result.total
       }).catch(reject => {
         vm.loading = false
         vm.listThuTuc = []
+        vm.totalPaggingThuTuc = 0
         vm.serviceItemTotal = 0
       })
     },

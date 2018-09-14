@@ -344,6 +344,11 @@ body .menu_header_list .input-group--select .input-group__selections__comma {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+div.input-group__input > div.input-group__selections {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .menu__content .card {
     margin-bottom: 0;
 }
@@ -1175,7 +1180,14 @@ body .menu__content--select .text--disabled {
     font-weight: 500
 }
 .table-tracuu thead tr:first-child {
-    height: 50px;
+    height: 42px;
+}
+.table-tracuu thead tr:first-child th{
+    height: 42px !important;
+    padding-top: 8px !important;
+}
+.table-tracuu .datatable__progress {
+    display: none !important;
 }
 .table-tracuu tbody tr {
     height: 45px;
@@ -1183,10 +1195,16 @@ body .menu__content--select .text--disabled {
 .table-tracuu table.table tr .active {
     background-color: #eee !important;
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(1) {
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(1),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(1) {
     width: 320px;
 }
-div.table-tracuu.table-landing.table-bordered > div > table > thead > tr:nth-child(1) > th:nth-child(3) {
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(2),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(2) {
+    width: calc(100% - 505px);
+}
+div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(3),
+div.table-tracuu > div > table > tbody > tr > td:nth-child(3) {
     width: 185px;
 }
 div.table-tracuu::-webkit-scrollbar-track{
@@ -1198,6 +1216,7 @@ div.table-tracuu::-webkit-scrollbar{
     width: 8px;
     background-color: #F5F5F5;
 }
+
 div.table-tracuu::-webkit-scrollbar-thumb {
     border-radius: 8px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -1220,6 +1239,15 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 }
 .kios-btn {
     height: 38px !important
+}
+.btn-select {
+    height: auto !important;
+    min-height: 38px;
+}
+.btn-select .btn__content {
+    white-space: normal !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important
 }
 .kios-input {
     height: 35px !important;
@@ -1265,14 +1293,28 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .menu__content .list>div .list__tile {
     font-size: 16px !important
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3) {
-    min-width: 200px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(1),
+.table-thu-tuc .table > tbody > tr > td:nth-child(1) {
+    width: 50px;
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4) {
-    min-width: 100px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(2),
+.table-thu-tuc .table > tbody > tr > td:nth-child(2) {
+    width: calc(100% - 360px);
 }
-.table-thu-tuc .table tbody td, body table.table tbody th {
-    height: 50px;
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3),
+.table-thu-tuc .table > tbody > tr > td:nth-child(3) {
+    width: 200px;
+}
+.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4),
+.table-thu-tuc .table > tbody > tr > td:nth-child(4) {
+    width: 110px;
+}
+.table-thu-tuc thead tr:first-child th{
+    height: 42px !important;
+    padding-top: 8px !important;
+}
+table > thead > tr > th.column {
+    float: none !important
 }
 .input-border .input-group__input {
     border: 1px solid #0b72ba;
@@ -1449,9 +1491,9 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     border-top: 0px;
     border-bottom: 0px
 }
-.wrap-scroll-tableservice::-webkit-scrollbar {
+/* .wrap-scroll-tableservice::-webkit-scrollbar {
     border-left: 0px;
-}
+} */
 .wrap-scroll::-webkit-scrollbar-thumb {
 	border-radius: 0px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -1463,12 +1505,12 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     width: 30px !important;
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:increment {
-    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-down-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-scroll-down-trans.png");
     background-repeat: no-repeat;
     background-position: bottom
 }
 .wrap-scroll::-webkit-scrollbar-button:vertical:decrement {
-    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/icons-scroll-up-trans.png");
+    background-image: url("https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-scroll-up-trans.png");
     background-repeat: no-repeat;
     background-position: top
 }
@@ -1479,7 +1521,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 * {margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 a, a:hover, a:focus {text-decoration: none}
 header {
-    background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/frontend_web_kios/img/bg-banner.jpg') center center no-repeat;
+    background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/bg-banner.jpg') center center no-repeat;
     background-size: auto 100%;
 	padding: 10px 15px;
 	border-bottom: 1px solid #ddd;
@@ -1595,4 +1637,18 @@ header span {
 .tab-item .left a:nth-child(3):hover {
 	background-color: #e4d538;
 }
-
+.mWrapper > header {
+    display: none !important;
+}
+.mWrapper > nav {
+    display: none !important;
+}
+.mWrapper > footer {
+    display: none !important;
+}
+.mWrapper > section {
+    padding: 0 !important
+}
+.tabs__items {
+    overflow: hidden !important
+}
