@@ -117,6 +117,8 @@ export default {
         if (vm.votingItems.length > 0) {
           vm.loadingAction = true
           for (var index in vm.votingItems) {
+            vm.votingItems[index]['className'] = 'govagency'
+            vm.votingItems[index]['classPk'] = vm.administration
             vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
             vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
             arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
