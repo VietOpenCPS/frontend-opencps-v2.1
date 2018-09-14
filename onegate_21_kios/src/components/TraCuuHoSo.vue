@@ -78,7 +78,7 @@
                   </content-placeholders>
                   <div v-else>
                     <span>
-                      <span>{{props.item.submitDate}}</span>
+                      <span>{{props.item.receiveDate}}</span>
                     </span>
                   </div>
                 </td>
