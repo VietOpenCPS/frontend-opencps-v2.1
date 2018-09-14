@@ -166,6 +166,7 @@ export default {
             if (result.status && result.status.toString() === '203') {
               vm.dialogError = true
             } else if (result.status && result.status.toString() === '200') {
+              vm.$store.commit('setDossierDetail', result.data)
               let queryString = '?dossierNo=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
               vm.$router.push({
                 path: '/tra-cuu-ho-so' + queryString
