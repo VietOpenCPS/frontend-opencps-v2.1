@@ -9,8 +9,14 @@
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    {{item.partName}}&nbsp; <span v-if="item.required" style="color: red"> (*) </span>
-                    &nbsp;&nbsp;
+                    <v-tooltip top>
+                      <span slot="activator">
+                        {{item.partName}}&nbsp; 
+                        <span v-if="item.required" style="color: red"> (*) </span>
+                        &nbsp;&nbsp;
+                      </span>
+                      <span>{{item.partTip}}</span>
+                    </v-tooltip>
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
