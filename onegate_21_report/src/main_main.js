@@ -8,13 +8,10 @@ import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
-<<<<<<< HEAD:onegate_21_voting/src/main.js
-import VueDraggable from 'vue-draggable'
 import axios from 'axios'
 
 axios.defaults.headers.common['Token'] = window.Liferay.authToken
 
-Vue.use(VueDraggable)
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
