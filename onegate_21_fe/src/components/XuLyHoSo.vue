@@ -305,8 +305,8 @@ export default {
     vm.$nextTick(function () {
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
-      console.log('Xu ly ho so currentQuery ----------', currentQuery)
-      if (vm.dossierSelected.length > 0) {
+      console.log('currentQuery', currentQuery)
+      if (vm.dossierSelected.length === 0) {
         return vm.$store.getters.dossierSelected
       } else {
         let arrDossier = []
@@ -671,6 +671,7 @@ export default {
     },
     getNextActions () {
       let vm = this
+      console.log('run next action')
       let query = vm.$router.history.current.query
       let filter = {}
       if (vm.dossierSelected.length > 0) {

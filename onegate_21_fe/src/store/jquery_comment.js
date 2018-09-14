@@ -974,7 +974,7 @@
 				if(parentId) self.reRenderCommentActionBar(parentId);
 				// 
 				if (commentJSON.opinion==true) {
-					$(`[data-sort-key=${self.currentSortKey}]`).trigger('click')
+					$('[data-sort-key=' + self.currentSortKey + ']').trigger('click')
 				}
 				// 
 			};
@@ -2014,10 +2014,10 @@
 	//
 	getComments: function() {
 		var self = this;
-		let commentArr = Object.keys(this.commentsById).map(function(id){return self.commentsById[id]})
-		let importantCmtArr = commentArr.filter(function(comment){return comment.opinion})
-		let importantCmtUser = commentArr.filter(function(comment){return comment.opinion&&comment.createdByCurrentUser})
-		let attachCmtArr = commentArr.filter(function(comment){return comment.fileURL != undefined})
+		var commentArr = Object.keys(this.commentsById).map(function(id){return self.commentsById[id]})
+		var importantCmtArr = commentArr.filter(function(comment){return comment.opinion})
+		var importantCmtUser = commentArr.filter(function(comment){return comment.opinion&&comment.createdByCurrentUser})
+		var attachCmtArr = commentArr.filter(function(comment){return comment.fileURL != undefined})
 		if (commentArr.length > 3) {
 			$('.data-container[data-container=comments]').addClass('lessEl')
 		} else {
