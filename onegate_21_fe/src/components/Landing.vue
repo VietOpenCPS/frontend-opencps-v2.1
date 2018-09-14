@@ -748,6 +748,7 @@ export default {
     hosoDatasPage: 1,
     selected: [],
     listThuTucHanhChinh: [],
+    listThuTuc: [],
     thuTucHanhChinhSelected: null,
     listLinhVuc: [],
     linhVucSelected: null,
@@ -1013,6 +1014,10 @@ export default {
           thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
           return thuTuc
         })
+        vm.listThuTuc = result.map(thuTuc => {
+          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          return thuTuc
+        })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
           for (let key in vm.listThuTucHanhChinh) {
             if (String(vm.listThuTucHanhChinh[key].serviceConfigId) === String(currentQuery.service_config)) {
@@ -1242,6 +1247,15 @@ export default {
       console.log('change Domain')
       let vm = this
       vm.linhVucSelected = item
+      if (item) {
+        setTimeout(function () {
+          vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
+            return (itemThuTuc.serviceCode.indexOf(item.domainCode) === 0)
+          })
+        }, 100)
+      } else {
+        vm.listThuTucHanhChinh = vm.listThuTuc
+      }
       if (item !== null) {
         vm.domainCode = vm.linhVucSelected['domainCode']
       } else {
