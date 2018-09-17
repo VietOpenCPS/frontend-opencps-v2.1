@@ -217,6 +217,16 @@
                 }
               }
               vm.trangThaiHoSoList[key]['counter'] = parentCount
+            } else {
+              let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
+              let countParent = 0
+              for (let countKey in vm.counterData) {
+                if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
+                  let countParent = vm.counterData[countKey].totalCount
+                  break
+                }
+              }
+              vm.trangThaiHoSoList[key]['counter'] = countParent
             }
           }
           vm.loading = false
