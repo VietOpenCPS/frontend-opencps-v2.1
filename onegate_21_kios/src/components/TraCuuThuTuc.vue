@@ -241,6 +241,7 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
+      vm.$store.commit('setFullScreen', false)
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.loading = true

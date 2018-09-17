@@ -1,27 +1,27 @@
 <template>
-  <div class="py-0 kios-item">
+  <div class="py-0">
     <div>
       <v-card class="pb-2">
         <h4 class="pt-2 ml-2">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
-        <v-layout wrap class="mt-3 px-0 py-0">
+        <v-layout wrap class="mt-2 px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
               <v-flex xs6 class="pl-2 pr-3">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <!-- <label>Mã số hồ sơ</label> -->
                   <div class="input-group__input">
-                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
-                    <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                    <input id="dossierNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
+                    <i @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
               </v-flex>
               <v-flex xs6 class="pl-3 pr-2">
                 <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <div class="input-group__input">
-                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-                    <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                    <input id="applicantIdNoKey" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                    <i @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
                 </div>
               </v-flex>
@@ -32,7 +32,6 @@
               :loading="loadingTable"
               :disabled="loadingTable"
               @click="filterDossier"
-              class="kios-btn"
             >
               <v-icon size="18">search</v-icon>
               &nbsp;
@@ -45,7 +44,7 @@
           Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
-        <div class="wrap-scroll wrap-scroll-tabledossier mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
+        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
           <v-data-table
           :headers="headersTable"
           :items="dossierList"
@@ -100,9 +99,6 @@
         <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
           <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
-        <div class="virtual-keyboard" v-if="visible">
-          <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
-        </div>
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
@@ -123,15 +119,13 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
-import ChiTietHoSo from './ChiTietHoSo.vue'
+import ChiTietHoSoHomePage from './ChiTietHoSoHomePage.vue'
 import TinyPagination from './pagination.vue'
-import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination,
-    'vue-touch-keyboard': VueTouchKeyBoard,
-    'chi-tiet-ho-so': ChiTietHoSo
+    'chi-tiet-ho-so': ChiTietHoSoHomePage
   },
   data: () => ({
     loading: false,
@@ -181,13 +175,16 @@ export default {
   computed: {
     filterDossierKey () {
       return this.$store.getters.getFilterDossierKey
+    },
+    fullScreen () {
+      return this.$store.getters.getFullScreen
     }
   },
   created () {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
-      vm.$store.commit('setFullScreen', false)
+      vm.$store.commit('setFullScreen', true)
       let current = vm.$router.history.current
       let newQuery = current.query
       $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
@@ -292,7 +289,7 @@ export default {
       if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
         vm.validateTracuu = true
         vm.$router.push({
-          path: '/ma-truy-cap',
+          path: '/ma-truy-cap-ho-so',
           query: {
             target: 'tracuuhoso'
           }
@@ -356,7 +353,7 @@ export default {
       vm.dossierDetail = item
       vm.$store.commit('setDossierDetail', item)
       vm.$router.push({
-        path: '/ma-truy-cap',
+        path: '/ma-truy-cap-ho-so',
         query: {
           target: 'chitiethoso'
         }
