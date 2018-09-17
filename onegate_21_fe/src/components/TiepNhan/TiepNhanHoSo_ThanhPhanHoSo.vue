@@ -9,7 +9,7 @@
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    <v-tooltip top>
+                    <v-tooltip top style="max-width: 100% !important;">
                       <span slot="activator">
                         {{item.partName}}&nbsp; 
                         <span v-if="item.required" style="color: red"> (*) </span>
