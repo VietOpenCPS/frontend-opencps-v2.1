@@ -9,7 +9,7 @@
      </v-flex>
      <v-flex xs12 sm10>
        <v-layout row wrap>
-         <v-flex xs4 sm3 v-for="(item, index) in employeeItems" class="text-xs-center mb-3" :key="index">
+         <v-flex xs4 sm3 v-for="(item, index) in employeeItems" class="text-xs-center" :key="index">
            <v-card style="width: 200px; margin: 0 auto; padding: 10px 0;">
               <img v-if="item['imageUrl']" style="width: 166px; height: 166px;" src="item['imageUrl']"/>
               <img v-else style="width: 166px; height: 166px;" src="https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?k=6&m=476085198&s=612x612&w=0&h=5cDQxXHFzgyz8qYeBQu2gCZq1_TN0z40e_8ayzne0X0="/> <br>
