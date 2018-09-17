@@ -20,7 +20,7 @@
 		    	<span class="text-bold" style="color: green;"></span>
 		    </p>
 		  </v-flex>
-		  <v-flex xs12 sm12>
+		  <v-flex xs12 sm12 class="ml-3">
 		    <p style="margin-bottom: 5px !important;">
 		    	<i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
 		    	<span class="text-bold">THÔNG TIN HỒ SƠ ĐÃ NỘP</span>
@@ -29,7 +29,7 @@
           <li class="mr-3" style="margin-left: 15px" v-for="(item, index) in dossierTemplateSendItems">- <span role="option"> {{item.partName}}</span> <br></li>
         </ul>
 		  </v-flex>
-		  <v-flex xs12 sm12 style="margin-bottom: 10px;">
+		  <v-flex xs12 sm12 style="margin-bottom: 10px;" class="ml-3">
 		    <p style="margin-bottom: 5px !important;">
 		    	<i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
 		    	<span class="text-bold">ĐỊA ĐIỂM HOÀN TẤT THỦ TỤC</span>
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-  // import router from '@/router'
+  import router from '@/router'
   // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     props: {
@@ -109,7 +109,14 @@
         //   path: '/danh-sach-ho-so/' + currentParams.index,
         //   query: currentQuery
         // })
-        vm.$router.push('/danh-sach-ho-so/' + 0)
+        router.push({
+          path: '/danh-sach-ho-so/' + 0,
+          query: {
+            recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            q: '/o/rest/v2/dossiers/todo?owner=true&order=true&step=110,130,510'
+          }
+        })
         // window.history.back()
       },
       filterDossierTemplateSend () {
