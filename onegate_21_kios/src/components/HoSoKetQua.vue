@@ -70,6 +70,7 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      vm.$store.commit('setFullScreen', false)
       vm.doLoadingDataHoSo()
       setInterval(function () {
         vm.doLoadingDataHoSo()

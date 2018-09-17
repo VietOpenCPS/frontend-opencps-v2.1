@@ -1264,7 +1264,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     font-size: 26px !important;
     font-weight: bolder;
 }
-::placeholder {
+.kios-item ::placeholder {
     font-size: 16px !important
 }
 
@@ -1332,7 +1332,7 @@ table > thead > tr > th.column {
 .select-border .input-group__details {
     display: none;
 }
-.select-border .input-group__input .icon, .input-border .input-group__input .icon{
+.kios-item .select-border .input-group__input .icon,.kios-item .input-border .input-group__input .icon{
     font-size: 24px !important;
     color: #0b72ba !important
 }
