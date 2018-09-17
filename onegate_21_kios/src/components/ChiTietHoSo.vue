@@ -112,7 +112,7 @@
                     <div class="xs12 sm12 pb-1 overHidden" v-if="dossierDetail.dossierNote&&dossierDetail.dossierNote!=='null'">
                       <v-tooltip top>
                         <span slot="activator" class="text-bold ">{{dossierDetail.dossierNote}} </span>
-                        <span class="pl-0"> {{dossierDetail.dossierNote}} </span>
+                        <span class="pl-0" v-html="dossierDetail.dossierNote"> </span>
                       </v-tooltip>
                     </div>
                     <div class="xs12 sm12 pb-1" v-if="dossierDetail.extendDate">

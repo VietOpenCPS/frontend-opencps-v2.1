@@ -1618,28 +1618,28 @@ export default {
         dossierSubStatus: item.dossierSubStatus
       }
       vm.dossierId = item.dossierId
-      if (vm.$router.history.current.query.hasOwnProperty('step')) {
+      // if (vm.$router.history.current.query.hasOwnProperty('step')) {
+      //   vm.$store.dispatch('pullNextactions', filter).then(result => {
+      //     vm.btnDossierDynamics = result
+      //   })
+      // } else {
+      if (item.dossierStatus === '' || item.dossierSubStatus === '') {
         vm.$store.dispatch('pullNextactions', filter).then(result => {
           vm.btnDossierDynamics = result
         })
       } else {
-        if (item.dossierStatus === '' || item.dossierSubStatus === '') {
+        vm.btnStepsDynamics = []
+        var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
+        Promise.all(getbuttonAction).then(result => {
+          vm.btnDossierDynamics = result[0]
+          vm.btnStepsDynamics = result[1]
+        }).catch(reject => {
           vm.$store.dispatch('pullNextactions', filter).then(result => {
             vm.btnDossierDynamics = result
           })
-        } else {
-          vm.btnStepsDynamics = []
-          var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
-          Promise.all(getbuttonAction).then(result => {
-            vm.btnDossierDynamics = result[0]
-            vm.btnStepsDynamics = result[1]
-          }).catch(reject => {
-            vm.$store.dispatch('pullNextactions', filter).then(result => {
-              vm.btnDossierDynamics = result
-            })
-          })
-        }
+        })
       }
+      // }
     },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
