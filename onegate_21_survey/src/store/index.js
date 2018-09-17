@@ -155,8 +155,6 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('className', data.className)
           params.append('classPk', data.classPk)
-          params.append('applicantIdNo', data.applicantIdNo)
-          params.append('dossierNo', data.dossierNo)
           params.append('email', '')
           params.append('fullName', '')
           axios.post(support.initData.votingApi + '/' + data.votingId + '/results', params, config).then(result => {
