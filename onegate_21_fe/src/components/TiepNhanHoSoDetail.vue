@@ -113,19 +113,29 @@
         </v-btn>
       </v-tab> -->
       <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
+        <v-btn flat class="px-0 py-0 mx-0 my-0" 
+          :loading="loadingAction"
+          :disabled="loadingAction"
+        >
           <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
           <v-icon size="20">save</v-icon>
+          <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
       <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && tiepNhanState"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
+        <v-btn flat class="px-0 py-0 mx-0 my-0"
+          :loading="loadingAction"
+          :disabled="loadingAction"
+        >
           <span>Tiếp nhận và thêm mới</span>  &nbsp;
           <v-icon size="20">note_add</v-icon>
         </v-btn>
       </v-tab>
       <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
+        <v-btn flat class="px-0 py-0 mx-0 my-0"
+          :loading="loadingAction"
+          :disabled="loadingAction"
+        >
           Lưu &nbsp;
           <v-icon size="20">save</v-icon>
         </v-btn>
@@ -185,7 +195,8 @@ export default {
     showThuPhi: false,
     inputTypes: [1, 3],
     outputTypes: [2],
-    sampleCount: 0
+    sampleCount: 0,
+    loadingAction: false
   }),
   computed: {
     loading () {
@@ -339,6 +350,7 @@ export default {
     },
     tiepNhanHoSo (type) {
       var vm = this
+      vm.loadingAction = true
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
@@ -375,59 +387,72 @@ export default {
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            var initData = vm.$store.getters.loadingInitData
-            let actionUser = initData.user.userName ? initData.user.userName : ''
-            //
-            var paymentsOut = {}
-            if (vm.showThuPhi) {
-              paymentsOut = {
-                requestPayment: vm.payments['requestPayment'],
-                paymentNote: vm.payments['paymentNote'],
-                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            if (vm.formCode !== 'UPDATE') {
+              var initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              //
+              var paymentsOut = {}
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
               }
-            }
-            let dataPostAction = {
-              dossierId: vm.dossierId,
-              actionCode: 1100,
-              actionNote: '',
-              actionUser: actionUser,
-              payload: {},
-              security: '',
-              assignUsers: '',
-              payment: paymentsOut,
-              createDossiers: '',
-              dueDate: tempData.dueDate
-            }
-            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              if (!type) {
-                console.log('run !type', type)
-                vm.goBack()
-                vm.tiepNhanState = false
-              } else {
-                // tạo hồ sơ mới
-                vm.dossierId = result.dossierId
-                vm.$refs.thongtinchunghoso.changeDossierNo(result.dossierNo)
-                let current = vm.$router.history.current
-                let newQuery = current.query
-                let dataCreateDossier = vm.$store.getters.getDataCreateDossier
-                vm.$store.dispatch('postDossier', dataCreateDossier).then(function (result) {
-                  let queryString = '?'
-                  for (let key in newQuery) {
-                    if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-                      queryString += key + '=' + newQuery[key] + '&'
+              var payloadDate = {
+                'dueDate': tempData.dueDate,
+                'receiveDate': vm.receiveDateEdit
+              }
+              let dataPostAction = {
+                dossierId: vm.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: payloadDate,
+                security: '',
+                assignUsers: '',
+                payment: paymentsOut,
+                createDossiers: ''
+              }
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                vm.loadingAction = false
+                if (!type) {
+                  console.log('run !type', type)
+                  vm.goBack()
+                  vm.tiepNhanState = false
+                } else {
+                  // tạo hồ sơ mới
+                  let current = vm.$router.history.current
+                  let newQuery = current.query
+                  let dataCreateDossier = vm.$store.getters.getDataCreateDossier
+                  vm.loadingAction = true
+                  vm.$store.dispatch('postDossier', dataCreateDossier).then(function (result) {
+                    vm.loadingAction = false
+                    vm.dossierId = result.dossierId
+                    vm.$refs.thongtinchunghoso.changeDossierNo(result.dossierNo)
+                    let queryString = '?'
+                    for (let key in newQuery) {
+                      if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                        queryString += key + '=' + newQuery[key] + '&'
+                      }
                     }
-                  }
-                  console.log('queryString=====', queryString)
-                  vm.$router.push({
-                    path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString
+                    console.log('queryString=====', queryString)
+                    vm.$router.push({
+                      path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString
+                    })
+                  }).catch(reject => {
+                    vm.loadingAction = false
                   })
-                }).catch(reject => {})
-              }
-            })
+                }
+              }).catch(reject => {
+                vm.loadingAction = false
+              })
+            }
           }).catch(rejectXhr => {
+            vm.loadingAction = false
             console.log('rejectXhr==========', rejectXhr)
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
