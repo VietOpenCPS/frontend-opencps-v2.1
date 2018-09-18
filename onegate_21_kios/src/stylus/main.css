@@ -1368,6 +1368,13 @@ table > thead > tr > th.column {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+.validDanhGiaCLDV {
+    z-index: 10000;
+    background-color: #ffffff;
+    width: calc(100% - 350px);
+    position: fixed;
+    bottom: 272px;
+}
 .vue-touch-keyboard .keyboard .key {
     font-size: 25px !important
 }
@@ -1462,11 +1469,11 @@ table > thead > tr > th.column {
     max-height: 380px
 }
 .wrap-scroll-tableservice {
-    max-height: 400px
+    max-height: 335px
 }
 .wrap-scroll-domain {
     border: 1px solid #d3d3d3;
-    max-height: 400px
+    max-height: 335px
 }
 .wrap-scroll-votting {
     border: 1px solid #d3d3d3;

@@ -99,17 +99,22 @@
         </div>
       </div>
     </div>
-    <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-    <v-layout row wrap v-else>
-      <v-flex xs12 class="text-xs-center" mt-5>
-        <v-progress-circular
-          :size="100"
-          :width="1"
-          color="primary"
-          indeterminate
-        ></v-progress-circular>
-      </v-flex>
-    </v-layout>
+    <div v-if="agencyLists !== null && agencyLists !== undefined && agencyLists.length > 0">
+      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
+      <v-layout row wrap v-else>
+        <v-flex xs12 class="text-xs-center" mt-5>
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </v-flex>
+      </v-layout>
+    </div>
+    <v-alert v-else :value="true" outline color="info" icon="info">
+      Không có dữ liệu báo cáo.
+    </v-alert>
   </div>
 </template>
 
@@ -303,6 +308,7 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
+          vm.agencyLists = result
           putData = result
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
@@ -321,7 +327,7 @@ export default {
             window.open(result, '_blank')
           })
         } else {
-          alert('Không tìm thấy dữ liệu báo cáo.')
+          vm.agencyLists = []
         }
       })
     },
@@ -342,6 +348,7 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
+          vm.agencyLists = result
           putData = result
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
@@ -358,7 +365,7 @@ export default {
             vm.pdfBlob = result
           })
         } else {
-          alert('Không tìm thấy dữ liệu báo cáo.')
+          vm.agencyLists = []
         }
       })
     },

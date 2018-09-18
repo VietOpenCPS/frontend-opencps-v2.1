@@ -57,6 +57,7 @@ export default {
   beforeCreate () {
     var vm = this
     vm.$nextTick(function () {
+      console.log('run detailforward')
       let currentQuery = vm.$router.history.current.query
       if (currentQuery.hasOwnProperty('step')) {
         vm.step = currentQuery.step
