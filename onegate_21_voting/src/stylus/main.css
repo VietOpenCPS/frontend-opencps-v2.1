@@ -89,3 +89,17 @@ ul#captcha li:focus
 ul#captcha li:hover {
   box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
+
+body .card__title.headline {
+    padding: 5px 16px;
+    font-size: 16px !important;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #0b72ba;
+}
+
+body .absolute__btn_panel {
+    position: absolute;
+    top: 3px;
+    right: 0;
+}

@@ -2,7 +2,7 @@
   <div style="height: 100%; background-color: #ffff; padding-top: 20px;">
     <v-layout row wrap>
       <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
-        <h3 class="text-center">CHỌN CƠ QUAN ĐỂ ĐÁNH GÍA CÁN BỘ</h3>
+        <h3 class="text-center">CHỌN CƠ QUAN ĐỂ ĐÁNH GIÁ CÁN BỘ</h3>
       </v-flex>
       <v-flex xs12 sm2>
       </v-flex>
@@ -10,7 +10,7 @@
         <v-layout row wrap>
           <v-flex xs12 sm4 v-for="(item, index) in govAgencys" :key="index + 'gov'" style="padding-left: 5px; padding-right: 5px;">
             <v-chip class="text-xs-center" style="width: 100%; min-height: 40px; cursor: pointer;" label color="primary" text-color="white" @click="viewListEmployee(item)">
-              <span style="cursor: pointer;">{{item.administrationName}}</span>
+              <span style="cursor: pointer;">{{item.itemName}}</span>
             </v-chip>
             <!-- <v-btn style="width: 100%;" color="success" @click="viewListEmployee(item)">{{item.administrationName}}</v-btn> -->
           </v-flex>
@@ -54,9 +54,9 @@ export default {
   methods: {
     viewListEmployee (item) {
       router.push({
-        path: '/danh-sach-can-bo/' + item.administrationCode,
+        path: '/danh-sach-can-bo/' + item.itemCode,
         query: {
-          administrationName: item.administrationName
+          itemName: item.itemName
         }
       })
     }

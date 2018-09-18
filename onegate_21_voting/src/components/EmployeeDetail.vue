@@ -15,8 +15,8 @@
      <v-flex xs12 sm10>
       <v-layout row wrap>
         <v-flex xs12 sm12 class="text-xs-center mt-4 mb-5">
-          <h3 class="text-xs-center">ĐÁNH GÍA CÁN BỘ CÔNG CHỨC</h3>
-          <h3 style="text-transform: uppercase; color: #237ff9;" class="text-xs-center">{{administrationName}}</h3>
+          <h3 class="text-xs-center">ĐÁNH GIÁ CÁN BỘ CÔNG CHỨC</h3>
+          <h3 style="text-transform: uppercase; color: #237ff9;" class="text-xs-center">{{itemName}}</h3>
         </v-flex>
         <v-flex xs12 sm12>
         <div style="margin-bottom: 15px;">
@@ -36,30 +36,20 @@
               <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
               </v-radio>
             </v-radio-group>
+            <v-layout wrap class="ml-3" style="margin-top:-21px">
+              <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
+                <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
+              </v-flex>
+            </v-layout>
           </div>
-        </div>
-        <div style="margin-top: 5px; clear: both;">
-          <v-layout row wrap>
-            <v-flex xs12 sm4 class="mr-4">
-              <v-text-field
-              label="Chứng minh thư nhân dân"
-              v-model="applicantIdNo"
-              :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-              required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm3>
-              <v-text-field
-              label="Mã hồ sơ"
-              v-model="dossierNo"
-              :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-              required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm12 class="mb-3" v-if="showCaptcha">
-              <captcha ref="captcha"></captcha>
-            </v-flex>
-          </v-layout>
+          <div class="mt-3 ml-4 mr-3" v-if="item.commentable">
+            <v-text-field
+            v-model="item['comment']"
+            label="Ý kiến khác"
+            multi-line
+            rows="2"
+            ></v-text-field>
+          </div>
         </div>
         </v-flex>
       </v-layout>
@@ -67,9 +57,45 @@
     <v-flex xs12 sm1>
     </v-flex>
     <v-flex xs12 sm12 class="text-xs-center mt-2">
-      <v-btn @click="doVottingResultSubmit" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">Gửi kết quả đánh gía</v-btn>
+      <v-btn @click="dialogShowApplicantIdNo = true" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">Gửi kết quả đánh giá</v-btn>
     </v-flex>
   </v-layout>
+  <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
+    <v-card>
+      <v-card-title class="headline">Nhập số CMND, mã hồ sơ</v-card-title>
+      <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogShowApplicantIdNo = false">
+        <v-icon>clear</v-icon>
+      </v-btn>
+      <v-card-text>
+        <v-layout row wrap>
+          <v-flex xs12 sm12>
+            <v-text-field
+            label="Chứng minh thư nhân dân"
+            v-model="applicantIdNo"
+            :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+            required
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm12>
+            <v-text-field
+            label="Mã hồ sơ"
+            v-model="dossierNo"
+            :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+            required
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm12 class="mb-3" v-if="showCaptcha">
+            <captcha ref="captcha"></captcha>
+          </v-flex>
+        </v-layout>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="green darken-1" flat @click.native="doVottingResultSubmit">Đồng ý</v-btn>
+        <v-btn color="green darken-1" flat @click.native="goBack">Quay lại</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   </v-form>
 </div>
 </template>
@@ -91,11 +117,12 @@ export default {
     workingUnit: {},
     employee: {},
     votingItems: [],
-    administrationName: '',
+    itemName: '',
     btnLoading: false,
     votingDialog_hidden_loading: false,
     validFormVoting: false,
-    showCaptcha: false
+    showCaptcha: false,
+    dialogShowApplicantIdNo: false
   }),
   computed: {
     loading () {
@@ -107,7 +134,7 @@ export default {
     console.log('landing---------')
     let currentQuery = vm.$router.history.current.query
     if (currentQuery !== null && currentQuery !== undefined && currentQuery !== 'undefined') {
-      vm.administrationName = currentQuery.administrationName
+      vm.itemName = currentQuery.itemName
       vm.employee = currentQuery
       console.log(vm.employee)
       vm.$store.dispatch('loadImageEmployee', vm.employee).then(resultUrl => {
@@ -117,7 +144,7 @@ export default {
     }
     vm.$nextTick(function () {
       vm.$store.dispatch('loadVoting', {
-        className: vm.itemCode,
+        className: 'employee',
         classPk: vm.id
       }).then(result => {
         vm.votingItems = result
@@ -164,10 +191,17 @@ export default {
       Promise.all(arrAction).then(results => {
         toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         vm.votingDialog_hidden_loading = false
+        vm.dialogShowApplicantIdNo = false
+        router.push('/danh-sach-can-bo/' + vm.itemCode)
       }).catch(xhr => {
         toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         vm.votingDialog_hidden_loading = false
+        vm.dialogShowApplicantIdNo = false
       })
+    },
+    goBack () {
+      var vm = this
+      router.push('/danh-sach-can-bo/' + vm.itemCode)
     }
   },
   filters: {

@@ -2,14 +2,14 @@
   <div style="height: 100%; background-color: #ffff;">
     <v-layout row wrap>
      <v-flex xs12 sm12 class="text-xs-center mt-4 mb-5">
-          <h3 class="text-xs-center">ĐÁNH GÍA CÁN BỘ CÔNG CHỨC</h3>
-          <h3 style="text-transform: uppercase; color: #237ff9;" class="text-xs-center">{{administrationName}}</h3>
+          <h3 class="text-xs-center">ĐÁNH GIÁ CÁN BỘ CÔNG CHỨC</h3>
+          <h3 style="text-transform: uppercase; color: #237ff9;" class="text-xs-center">{{itemName}}</h3>
       </v-flex>
      <v-flex xs12 sm1>
      </v-flex>
      <v-flex xs12 sm10>
        <v-layout row wrap>
-         <v-flex xs4 sm3 v-for="(item, index) in employeeItems" class="text-xs-center" :key="index">
+         <v-flex xs4 sm3 v-for="(item, index) in employeeItems" class="text-xs-center mb-3" :key="index">
            <v-card style="width: 200px; margin: 0 auto; padding: 10px 0;">
               <img v-if="item['imageUrl']" style="width: 166px; height: 166px;" src="item['imageUrl']"/>
               <img v-else style="width: 166px; height: 166px;" src="https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?k=6&m=476085198&s=612x612&w=0&h=5cDQxXHFzgyz8qYeBQu2gCZq1_TN0z40e_8ayzne0X0="/> <br>
@@ -40,7 +40,7 @@ export default {
   },
   data: () => ({
     govAgencyName: {},
-    administrationName: '',
+    itemName: '',
     employeeItems: [],
     btnLoading: false
   }),
@@ -53,8 +53,8 @@ export default {
     var vm = this
     console.log('landing---------', vm.itemCode)
     let currentQuery = vm.$router.history.current.query
-    if (currentQuery.hasOwnProperty('administrationName')) {
-      vm.administrationName = currentQuery.administrationName
+    if (currentQuery.hasOwnProperty('itemName')) {
+      vm.itemName = currentQuery.itemName
     }
     vm.$nextTick(function () {
       vm.$store.dispatch('loadEmployees', {
@@ -94,7 +94,7 @@ export default {
     viewVotings (item, index) {
       var vm = this
       var query = item
-      query['administrationName'] = vm.administrationName
+      query['itemName'] = vm.itemName
       router.push({
         path: '/danh-sach-can-bo/' + vm.itemCode + '/' + item.employeeId,
         query: query

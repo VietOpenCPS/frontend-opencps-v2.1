@@ -6,7 +6,7 @@ module.exports = {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../../docs'),
-    assetsSubDirectory: 'o/opencps-frontend/danh_gia_can_bo',
+    assetsSubDirectory: 'o/opencps-frontend/khao_sat',
     assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
@@ -25,7 +25,7 @@ module.exports = {
     env: require('./dev.env'),
     port: 1080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'o/opencps-frontend/danh_gia_can_bo',
+    assetsSubDirectory: 'o/opencps-frontend/khao_sat',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
