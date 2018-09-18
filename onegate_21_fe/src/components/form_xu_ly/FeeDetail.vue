@@ -40,6 +40,7 @@
                 <p class="mt-1 mb-0" v-else>{{currency(data_payment.serviceAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <!--  -->
+              <v-flex xs12 sm2></v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="viaPortal === 2 || viaPortal === '2'">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
