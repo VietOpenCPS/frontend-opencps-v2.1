@@ -82,16 +82,18 @@
         </v-flex>
       </v-layout>
     </div>
-    <div class="wrap-scroll wrap-scroll-domain list-domain mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
-      <v-list class="py-0">
-        <template v-for="(item, index) in listLinhVuc" >
-          <v-list-tile :key="index" @click="filterDomain(item)">
-            <v-list-tile-content>
-              <v-list-tile-title v-html="item.domainName"></v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </template>
-      </v-list>
+    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+      <div class="wrap-scroll wrap-scroll-domain list-domain">
+        <v-list class="py-0">
+          <template v-for="(item, index) in listLinhVuc" >
+            <v-list-tile :key="index" @click="filterDomain(item)">
+              <v-list-tile-content>
+                <v-list-tile-title v-html="item.domainName"></v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </template>
+        </v-list>
+      </div>
       <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
@@ -99,62 +101,64 @@
         </div>
       </div>
     </div>
-    <div class="mt-4 wrap-scroll wrap-scroll-tableservice" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected" :class="visible ? 'overlayActive': ''">
-      <v-data-table
-        :headers="headersTable"
-        :items="listThuTuc"
-        hide-actions
-        class="table-bordered table-thu-tuc ml-2"
-      >
-        <template slot="items" slot-scope="props">
-          <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
-            <td class="text-xs-center">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
-              </div>
-            </td>
-            <td class="text-xs-left" >
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{props.item.serviceName}}</span>
-              </div>
-            </td>
-            <td class="text-xs-left">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>
-                  <span>{{props.item.domainName}}</span>
-                </span>
-              </div>
-            </td>
-            <td class="text-xs-center">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>
-                  <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
-                    Mức độ {{props.item.maxLevel}}
-                  </v-chip>
-                  <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
-                </span>
-              </div>
-            </td>
-          </tr>
-        </template>
-        <template slot="no-data">
-          <div class="text-xs-center mt-2">
-            Không có thủ tục nào được tìm thấy
-          </div>
-        </template>
-      </v-data-table>
+    <div class="mt-4" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected" :class="visible ? 'overlayActive': ''">
+      <div class="wrap-scroll wrap-scroll-tableservice">
+        <v-data-table
+          :headers="headersTable"
+          :items="listThuTuc"
+          hide-actions
+          class="table-bordered table-thu-tuc ml-2"
+        >
+          <template slot="items" slot-scope="props">
+            <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
+                </div>
+              </td>
+              <td class="text-xs-left" >
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.serviceName}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.domainName}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
+                      Mức độ {{props.item.maxLevel}}
+                    </v-chip>
+                    <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </template>
+          <template slot="no-data">
+            <div class="text-xs-center mt-2">
+              Không có thủ tục nào được tìm thấy
+            </div>
+          </template>
+        </v-data-table>
+      </div>
       <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2">
           <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 

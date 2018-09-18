@@ -102,7 +102,8 @@ export const store = new Vuex.Store({
       postalWardCode: ''
     },
     viaPostal: 0,
-    data_phancong: []
+    data_phancong: [],
+    dataCreateDossier: {}
   },
   actions: {
     clearError ({commit}) {
@@ -138,7 +139,7 @@ export const store = new Vuex.Store({
     //         orginURL = window.location.href.substr(0, coma)
     //       }
     //       /* test local */
-    //       // orginURL = 'http://127.0.0.1:8081/api/initdata'
+    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
     //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
     //         let serializable = response.data
     //         commit('setInitData', serializable)
@@ -2536,6 +2537,9 @@ export const store = new Vuex.Store({
     },
     setActiveGetCounter (state, payload) {
       state.activeGetCounter = payload
+    },
+    setDataCreateDossier (state, payload) {
+      state.dataCreateDossier = payload
     }
   },
   getters: {
@@ -2680,6 +2684,9 @@ export const store = new Vuex.Store({
     },
     dataPhanCong (state) {
       return state.data_phancong
+    },
+    getDataCreateDossier (state) {
+      return state.dataCreateDossier
     }
   }
 })

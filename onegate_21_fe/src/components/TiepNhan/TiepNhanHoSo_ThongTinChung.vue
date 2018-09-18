@@ -163,7 +163,6 @@
           vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
         }
         vm.minDate = vm.getCurentDateTime('date')
-        console.log('dueDateInput', vm.dueDateInput)
       },
       getthongtinchunghoso () {
         return this.thongTinChungHoSo
@@ -179,6 +178,9 @@
       changeDate () {
         this.thongTinChungHoSo['dueDate'] = this.getDuedate()
         // console.log('dueDate', this.thongTinChungHoSo.dueDate)
+      },
+      changeDossierNo (val) {
+        this.thongTinChungHoSo['dossierNo'] = val
       },
       getDuedate () {
         var vm = this

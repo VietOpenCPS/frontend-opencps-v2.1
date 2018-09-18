@@ -1589,6 +1589,7 @@ export default {
         templateNo: vm.templateNo,
         originality: vm.getOriginality()
       }
+      vm.$store.commit('setDataCreateDossier', data)
       vm.loadingAction = true
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.loadingAction = false

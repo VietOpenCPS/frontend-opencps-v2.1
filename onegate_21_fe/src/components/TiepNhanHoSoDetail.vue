@@ -112,16 +112,22 @@
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab> -->
-      <v-tab href="#tab-2" @click="tiepNhanHoSo" v-if="originality !== 1 && tiepNhanState"> 
+      <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
-          <v-icon>save</v-icon>
+          <v-icon size="20">save</v-icon>
+        </v-btn>
+      </v-tab>
+      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && tiepNhanState"> 
+        <v-btn flat class="px-0 py-0 mx-0 my-0">
+          <span>Tiếp nhận và thêm mới</span>  &nbsp;
+          <v-icon size="20">note_add</v-icon>
         </v-btn>
       </v-tab>
       <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           Lưu &nbsp;
-          <v-icon>save</v-icon>
+          <v-icon size="20">save</v-icon>
         </v-btn>
       </v-tab>
       <!-- <v-tab href="#tab-3" @click="boSungHoSo">
@@ -331,11 +337,11 @@ export default {
         }, 500)
       }
     },
-    tiepNhanHoSo () {
+    tiepNhanHoSo (type) {
       var vm = this
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
+      var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
@@ -361,7 +367,7 @@ export default {
         // if (vm.$refs.thanhphanhoso) {
         //   vm.$refs.thanhphanhoso.saveMark()
         // }
-        let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
+        var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
         tempData['briefNote'] = vm.briefNote
@@ -383,10 +389,6 @@ export default {
                 shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
               }
             }
-            // var payloadDate = {
-            //   'dueDate': tempData.dueDate,
-            //   'receiveDate': vm.receiveDateEdit
-            // }
             let dataPostAction = {
               dossierId: vm.dossierId,
               actionCode: 1100,
@@ -400,18 +402,30 @@ export default {
               dueDate: tempData.dueDate
             }
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-              let currentQuery = vm.$router.history.current.query
-              // router.push({
-              //   path: vm.$router.history.current.path,
-              //   query: {
-              //     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-              //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-              //     q: currentQuery['q']
-              //   }
-              // })
-              vm.goBack()
-              vm.tiepNhanState = false
+              if (!type) {
+                console.log('run !type', type)
+                vm.goBack()
+                vm.tiepNhanState = false
+              } else {
+                // tạo hồ sơ mới
+                vm.dossierId = result.dossierId
+                vm.$refs.thongtinchunghoso.changeDossierNo(result.dossierNo)
+                let current = vm.$router.history.current
+                let newQuery = current.query
+                let dataCreateDossier = vm.$store.getters.getDataCreateDossier
+                vm.$store.dispatch('postDossier', dataCreateDossier).then(function (result) {
+                  let queryString = '?'
+                  for (let key in newQuery) {
+                    if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                      queryString += key + '=' + newQuery[key] + '&'
+                    }
+                  }
+                  console.log('queryString=====', queryString)
+                  vm.$router.push({
+                    path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString
+                  })
+                }).catch(reject => {})
+              }
             })
           }).catch(rejectXhr => {
             console.log('rejectXhr==========', rejectXhr)
