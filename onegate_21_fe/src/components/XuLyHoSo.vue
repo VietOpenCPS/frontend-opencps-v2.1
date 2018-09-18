@@ -100,6 +100,7 @@
         <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
         <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
         <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
+        <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
         <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
         <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
@@ -192,6 +193,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import EditDate from './form_xu_ly/EditDate.vue'
 export default {
   props: ['index'],
   components: {
@@ -203,7 +205,8 @@ export default {
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
-    'thanh-phan-ho-so': ThanhPhanHoSo
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'ngay-hen-tra': EditDate
   },
   data: () => ({
     headersTable: [
@@ -255,6 +258,8 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showThuPhi: false,
+    showEditDate: false,
+    dueDateEdit: '',
     checkInput: 0,
     viaPortalDetail: 0,
     showThucHienThanhToanDienTu: false,
@@ -367,6 +372,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showThuPhi = false
+      vm.showEditDate = false
       vm.showThucHienThanhToanDienTu = false
       vm.dossierItemDialogPick = dossierItem
       vm.itemDialogPick = item
@@ -423,6 +429,12 @@ export default {
             isPopup = true
             vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
           }
+        }
+        if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
+          isPopup = true
+          vm.showEditDate = true
+          vm.dueDateEdit = result.receiving.dueDate !== '' ? new Date(result.receiving.dueDate) : ''
+          vm.receiveDateEdit = result.receiving.receiveDate
         }
       }
       if (isPopup) {
@@ -543,6 +555,15 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let result = vm.$refs.kypheduyettailieu.doExport()
+      }
+      if (vm.showEditDate) {
+        let date = vm.$refs.ngayhentra.getDateInput()
+        console.log('dueDateEdit', date)
+        let payload = {
+          'dueDate': date,
+          'receiveDate': vm.receiveDateEdit
+        }
+        filter['payload'] = payload
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
