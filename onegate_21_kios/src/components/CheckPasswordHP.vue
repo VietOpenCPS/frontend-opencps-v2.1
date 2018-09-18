@@ -128,7 +128,7 @@ export default {
           }
           vm.$store.commit('setFilterDossierKey', payload)
           let newQuery = {
-            dossierNo: vm.filterDossierKey.dossierNo,
+            keyword: vm.filterDossierKey.dossierNo,
             applicantIdNo: vm.filterDossierKey.applicantIdNo
           }
           let queryString = '?'
@@ -157,7 +157,7 @@ export default {
               vm.dialogError = true
             } else if (result.status && result.status.toString() === '200') {
               vm.$store.commit('setDossierDetail', result.data)
-              let queryString = '?dossierNo=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
+              let queryString = '?keyword=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
               vm.$router.push({
                 path: '/tra-cuu-ho-so-homepage' + queryString
               })
