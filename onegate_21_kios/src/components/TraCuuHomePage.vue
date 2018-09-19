@@ -51,7 +51,6 @@
           hide-actions
           id="tracuuhoso"
           class="table-tracuu table-landing table-bordered"
-          :class="visible ? 'overlayActive': ''"
           >
             <template slot="items" slot-scope="props">
               <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
@@ -187,7 +186,7 @@ export default {
       vm.$store.commit('setFullScreen', true)
       let current = vm.$router.history.current
       let newQuery = current.query
-      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
+      $('#dossierNoKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
       $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
       if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
         let inputs = document.querySelectorAll('input')
@@ -214,7 +213,7 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
+      $('#dossierNoKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
       $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
       // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
       vm.hosoDatasPage = 1
@@ -243,7 +242,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['dossierNo'] = $('#dossierNoKey').val()
+      newQuery['keyword'] = $('#dossierNoKey').val()
       vm.$store.commit('setDossierNoSearch', $('#dossierNoKey').val())
       newQuery['applicantIdNo'] = $('#applicantIdNoKey').val()
       vm.$store.commit('setApplicantIdNoSearch', $('#applicantIdNoKey').val())
@@ -306,7 +305,7 @@ export default {
       var filter = null
       filter = {
         page: vm.hosoDatasPage,
-        dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
+        dossierNo: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         applicantName: currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '',
         applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
       }
@@ -326,7 +325,7 @@ export default {
       var filter = null
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
-        dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
+        dossierNo: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
         secretCode: vm.filterDossierKey.secretCode
       }

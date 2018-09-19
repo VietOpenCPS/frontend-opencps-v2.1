@@ -13,7 +13,7 @@
     <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn outline flat color="primary" class="kios-btn" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.itemName}}</v-btn>
+          <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.itemName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>

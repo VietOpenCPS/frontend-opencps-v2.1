@@ -1,7 +1,7 @@
 <template>
   <div class="mt-3 px-2 py-0 kios-item">
     <div class="wrap-scroll px-2 py-2" :class="votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
-      <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index">
+      <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
         <div class="text-bold">
           {{index + 1}}.&nbsp; {{ item.subject }}
         </div>
@@ -15,40 +15,42 @@
         </v-layout>
       </div>
     </div>
-    <v-layout wrap class="mt-4">
-      <v-flex xs12 sm6 class="pr-3">
-        <v-layout wrap>
-          <div style="width:110px" class="text-bold">Mã hồ sơ </div>
-          <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-            <div class="input-group__input">
-              <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
-              <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+    <div :class="visible ? 'validDanhGiaCLDV': ''">
+      <v-layout wrap class="mt-4">
+        <v-flex xs12 sm6 class="pr-3">
+          <v-layout wrap>
+            <div style="width:110px" class="text-bold">Mã hồ sơ </div>
+            <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-group__input">
+                <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
+                <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+              </div>
             </div>
-          </div>
-        </v-layout>
-      </v-flex>
-      <v-flex xs12 sm6 class="pl-3">
-        <v-layout wrap>
-          <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
-          <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-            <div class="input-group__input">
-              <input id="applicantIdNo" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-              <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+          </v-layout>
+        </v-flex>
+        <v-flex xs12 sm6 class="pl-3">
+          <v-layout wrap>
+            <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
+            <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-group__input">
+                <input id="applicantIdNo" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
+                <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+              </div>
+              <div class="mt-2" v-if="!validPass2">
+                <div class="input-group__messages" style="color:red">Số CMND là bắt buộc</div>
+              </div>
             </div>
-            <div class="mt-2" v-if="!validPass2">
-              <div class="input-group__messages" style="color:red">Số CMND là bắt buộc</div>
-            </div>
-          </div>
-        </v-layout>
-      </v-flex>
-    </v-layout>
-    <div class="text-xs-center mt-4">
-      <v-btn color="primary"
-        :loading="loadingAction"
-        :disabled="loadingAction"
-        @click="submitVoting"
-        class="kios-btn"
-      >Gửi kết quả đánh giá</v-btn>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+      <div class="text-xs-center mt-4">
+        <v-btn color="primary"
+          :loading="loadingAction"
+          :disabled="loadingAction"
+          @click="submitVoting"
+          class="kios-btn"
+        >Gửi kết quả đánh giá</v-btn>
+      </div>
     </div>
     <v-btn class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
