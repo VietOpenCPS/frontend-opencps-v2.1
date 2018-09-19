@@ -1,24 +1,11 @@
 <template>
   <div class="form-chitiet">
     <div class="row-header">
-      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
+      <div class="background-triangle-big"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2" v-if="isDVC">
-              <v-select
-                :items="agencyLists"
-                v-model="govAgency"
-                autocomplete
-                item-text="itemName"
-                item-value="itemCode"
-                return-object
-                :hide-selected="true"
-                @change="changeGov"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE === 'REPORT_01'">
+            <v-flex xs6 sm2 class="px-2">
               <v-select
                 :items="years"
                 v-model="year"
@@ -30,91 +17,70 @@
                 >
               </v-select>
             </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE === 'REPORT_01'">
+            <v-flex xs6 sm2 class="px-2">
               <v-select
-                :items="months"
-                v-model="month"
+                :items="years"
+                v-model="year"
                 autocomplete
                 item-text="name"
                 item-value="value"
                 :hide-selected="true"
-                @change="changeMonth"
+                @change="changeYear"
                 >
               </v-select>
             </v-flex>
-            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
-              <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
+             <v-flex xs6 sm2 class="px-2">
+              <v-select
+                :items="years"
+                v-model="year"
+                autocomplete
+                item-text="name"
+                item-value="value"
+                :hide-selected="true"
+                @change="changeYear"
+                >
+              </v-select>
             </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
-              <v-menu
-                ref="menufromDate"
-                :close-on-content-click="false"
-                v-model="menufromDate"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                max-width="290px"
-                min-width="290px"
-              >
-                <v-text-field
-                  slot="activator"
-                  v-model="fromDateFormatted"
-                  append-icon="event"
-                  @blur="fromDate = parseDate(fromDateFormatted)"
-                ></v-text-field>
-                <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
-              </v-menu>
-            </v-flex>
-            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
-              <v-subheader class="pl-0 text-header">Đến ngày: </v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
-              <v-menu
-                ref="menutoDate"
-                :close-on-content-click="false"
-                v-model="menutoDate"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                max-width="290px"
-                min-width="290px"
-              >
-                <v-text-field
-                  slot="activator"
-                  v-model="toDateFormatted"
-                  append-icon="event"
-                  @blur="toDate = parseDate(toDateFormatted)"
-                ></v-text-field>
-                <v-date-picker v-model="toDate" no-title @input="changeToDate"></v-date-picker>
-              </v-menu>
+             <v-flex xs6 sm2 class="px-2">
+              <v-text-field solo placeholder="nhập từ khoá ..." v-model="value"></v-text-field>
             </v-flex>
             <v-flex class="px-2 text-right">
               <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
-                Xuất Excel
+                <v-icon>search</v-icon> &nbsp;
+                Tìm kiếm
               </v-btn>
             </v-flex>
           </v-layout>
         </div>
       </div>
     </div>
-    <div v-if="agencyLists !== null && agencyLists !== undefined && agencyLists.length > 0">
-      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <v-layout row wrap v-else>
-        <v-flex xs12 class="text-xs-center" mt-5>
-          <v-progress-circular
-            :size="100"
-            :width="1"
-            color="primary"
-            indeterminate
-          ></v-progress-circular>
-        </v-flex>
-      </v-layout>
-    </div>
-    <v-alert v-if="pdfBlob === null || pdfBlob === undefined || pdfBlob !== '' " :value="true" outline color="info" icon="info">
-      Không có dữ liệu báo cáo.
-    </v-alert>
+    <v-layout row wrap v-if="true">
+      <v-data-table
+        :headers="headers"
+        :items="desserts"
+        hide-actions
+        class="btn--block my-0"
+      >
+        <template slot="items" slot-scope="props">
+          <td></td>
+          <td class="text-xs-right"></td>
+          <td class="text-xs-right"></td>
+          <td class="text-xs-right"></td>
+          <td class="text-xs-right"></td>
+          <td class="text-xs-right"></td>
+        </template>
+      </v-data-table>
+    </v-layout>
+    <v-layout row wrap v-else>
+      <v-flex xs12 class="text-xs-center" mt-5>
+        <v-progress-circular
+          :size="100"
+          :width="1"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
@@ -129,6 +95,33 @@ export default {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    headers: [
+      {
+        text: 'STT',
+        align: 'left',
+        sortable: false
+      },
+      {
+        text: 'Tên thủ tục',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Lĩnh vực thủ tục',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mức độ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: '',
+        align: 'center',
+        sortable: false
+      }
+    ],
     isDVC: false,
     isCallBack: true,
     fromDate: null,
@@ -308,7 +301,6 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
-          vm.agencyLists = result
           putData = result
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
@@ -327,7 +319,7 @@ export default {
             window.open(result, '_blank')
           })
         } else {
-          vm.agencyLists = []
+          alert('Không tìm thấy dữ liệu báo cáo.')
         }
       })
     },
@@ -348,7 +340,6 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
-          vm.agencyLists = result
           putData = result
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
@@ -365,7 +356,7 @@ export default {
             vm.pdfBlob = result
           })
         } else {
-          vm.agencyLists = []
+          alert('Không tìm thấy dữ liệu báo cáo.')
         }
       })
     },
