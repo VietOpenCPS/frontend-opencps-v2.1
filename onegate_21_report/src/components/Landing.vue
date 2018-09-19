@@ -112,7 +112,7 @@
         </v-flex>
       </v-layout>
     </div>
-    <v-alert v-else :value="true" outline color="info" icon="info">
+    <v-alert v-if="pdfBlob === null || pdfBlob === undefined || pdfBlob !== '' " :value="true" outline color="info" icon="info">
       Không có dữ liệu báo cáo.
     </v-alert>
   </div>
