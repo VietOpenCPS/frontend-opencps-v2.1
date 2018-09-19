@@ -101,7 +101,12 @@
     </div>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <v-layout row wrap v-else>
+      <div v-else>
+        <v-alert :value="true" outline color="info" icon="info">
+          Không có dữ liệu báo cáo.
+        </v-alert>
+      </div>
+      <v-layout row wrap v-if="isShowLoading">
         <v-flex xs12 class="text-xs-center" mt-5>
           <v-progress-circular
             :size="100"
@@ -111,9 +116,7 @@
           ></v-progress-circular>
         </v-flex>
       </v-layout>
-      <v-alert v-if="pdfBlob === null || pdfBlob === undefined || pdfBlob !== '' " :value="true" outline color="info" icon="info">
-        Không có dữ liệu báo cáo.
-      </v-alert>
+      
     </div>
   </div>
 </template>
@@ -216,6 +219,7 @@ export default {
     govAgency: null,
     danhSachBaoCao: [],
     pdfBlob: null,
+    isShowLoading: false,
     documentTYPE: 'REPORT_01'
   }),
   computed: {
@@ -345,6 +349,7 @@ export default {
         filter['agency'] = vm.govAgency['itemCode']
       }
       vm.pdfBlob = null
+      vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
@@ -363,9 +368,11 @@ export default {
           }
           vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
             vm.pdfBlob = result
+            vm.isShowLoading = false
           })
         } else {
           vm.agencyLists = []
+          vm.isShowLoading = false
         }
       })
     },
