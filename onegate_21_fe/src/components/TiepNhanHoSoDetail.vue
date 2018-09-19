@@ -129,6 +129,7 @@
         >
           <span>Tiếp nhận và thêm mới</span>  &nbsp;
           <v-icon size="20">note_add</v-icon>
+          <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
       <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1"> 
@@ -138,6 +139,7 @@
         >
           Lưu &nbsp;
           <v-icon size="20">save</v-icon>
+          <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
       <!-- <v-tab href="#tab-3" @click="boSungHoSo">
@@ -153,9 +155,13 @@
         </v-btn>
       </v-tab> -->
       <v-tab href="#tab-5" @click="goBack">
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
+        <v-btn flat class="px-0 py-0 mx-0 my-0"
+          :loading="loadingAction"
+          :disabled="loadingAction"
+        >
           Quay lại &nbsp;
           <v-icon>undo</v-icon>
+          <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
     </v-tabs>
@@ -386,6 +392,7 @@ export default {
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
+            vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             if (vm.formCode !== 'UPDATE') {
               var initData = vm.$store.getters.loadingInitData
@@ -417,10 +424,10 @@ export default {
                 payment: paymentsOut,
                 createDossiers: ''
               }
+              vm.loadingAction = true
               vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                 vm.loadingAction = false
                 if (!type) {
-                  console.log('run !type', type)
                   vm.goBack()
                   vm.tiepNhanState = false
                 } else {
