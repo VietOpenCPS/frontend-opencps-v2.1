@@ -99,7 +99,7 @@
         </div>
       </div>
     </div>
-    <div v-if="agencyLists !== null && agencyLists !== undefined && agencyLists.length > 0">
+    <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
       <v-layout row wrap v-else>
         <v-flex xs12 class="text-xs-center" mt-5>
@@ -111,10 +111,10 @@
           ></v-progress-circular>
         </v-flex>
       </v-layout>
+      <v-alert v-if="pdfBlob === null || pdfBlob === undefined || pdfBlob !== '' " :value="true" outline color="info" icon="info">
+        Không có dữ liệu báo cáo.
+      </v-alert>
     </div>
-    <v-alert v-if="pdfBlob === null || pdfBlob === undefined || pdfBlob !== '' " :value="true" outline color="info" icon="info">
-      Không có dữ liệu báo cáo.
-    </v-alert>
   </div>
 </template>
 
