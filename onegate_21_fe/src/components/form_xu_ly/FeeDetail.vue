@@ -181,7 +181,12 @@ export default {
           vm.totalFee = advanceAmount
         } else if (vm.payments.requestPayment === 2) {
           let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
-          vm.totalFee = feeAmount + serviceAmount
+          let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
+          if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+            vm.totalFee = feeAmount + serviceAmount + shipAmount
+          } else {
+            vm.totalFee = feeAmount + serviceAmount
+          }
         } else {
           let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
           let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0

@@ -848,7 +848,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChuHoSo', response.data)
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
-          // commit('setDichVuChuyenPhatKetQua', response.data)
+          commit('setDichVuChuyenPhatKetQua', response.data)
         }).catch(rejectXhr => {
           console.log('put dossier catch')
           reject(rejectXhr)
