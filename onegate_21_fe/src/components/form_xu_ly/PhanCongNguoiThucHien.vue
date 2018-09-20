@@ -8,19 +8,19 @@
           </div>Chọn người thực hiện
         </div>
         <v-card >
-          <v-card-text v-if="type === 1" class="py-1">
+          <div v-if="type === 1" class="px-2 py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               slot="activator"
               v-model="item.assigned"
               :label="item.userName"
               @change = 'changeAssigned($event, index)'
-              style="display:inline-block"
+              style="display:inline-block;min-width:170px;max-width:170px"
               :title="item.userName"
               ></v-checkbox>
             </v-layout>
             <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
-          </v-card-text>
+          </div>
           <!--  -->
           <v-card-text v-else class="px-2 py-1">
             <v-layout wrap class="my-1">

@@ -2230,12 +2230,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              // if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-              //   dataReturn.unshift({
-              //     'domainCode': '',
-              //     'domainName': 'toàn bộ lĩnh vực'
-              //   })
-              // }
               resolve(dataReturn)
             } else {
               resolve([])

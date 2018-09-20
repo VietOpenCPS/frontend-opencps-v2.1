@@ -60,41 +60,41 @@
           <v-card-text class="pt-0">
             <v-layout wrap>
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 1" >
-                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
+                <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 1">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 1" style="padding-top:7px">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 1" ></v-flex>
               <!-- requestPayment === 2 -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 2">
-                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
+                <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 2">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 2" style="padding-top:7px">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 2"></v-flex>
               <!-- requestPayment === 5" -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Tổng: </v-subheader>
+                <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Đã tạm nộp: </v-subheader>
+                <v-subheader class="pl-0 text-right"><span class="text-bold">Đã tạm nộp: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
                 <!-- <span>{{data_payment.advanceAmount}} vnđ</span> -->
                 <span>{{currency((Number(data_payment.advanceAmount.toString().replace(/\./g, ''))).toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
               <!--  -->
               <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
-                <v-subheader class="pl-0 text-right">Còn phải nộp: </v-subheader>
+                <v-subheader class="pl-0 text-right"><span class="text-bold">Còn phải nộp: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-2" v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
@@ -205,6 +205,12 @@ export default {
       }, 200)
     }
   },
+  watch: {
+    viaPortal (val) {
+      console.log('viaPortal', val)
+      this.changeFee()
+    }
+  },
   methods: {
     changeFee () {
       var vm = this
@@ -214,8 +220,13 @@ export default {
         let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
         vm.totalFee = advanceAmount
       } else if (val.requestPayment === 2) {
-        let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
-        vm.totalFee = feeAmount + serviceAmount
+        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
+        let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
+        if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+          vm.totalFee = feeAmount + serviceAmount + shipAmount
+        } else {
+          vm.totalFee = feeAmount + serviceAmount
+        }
       } else {
         let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
         let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
