@@ -159,7 +159,7 @@
         label="Đăng ký kết quả tại nhà"
         v-model="dichVuChuyenPhatKetQua.viaPostal"
         :value="2"
-        @change="changeViaPostal"
+        @change="changeViaPostal($event)"
       ></v-checkbox>
     </div>
   </div>
@@ -314,8 +314,19 @@ export default {
       })
     },
     changeViaPostal (event) {
-      this.$store.commit('setViaPostal', event ? 2 : 1)
+      console.log('changeViaPostal', event)
+      this.$store.commit('setViaPostal', event === 2 ? 2 : 1)
       this.$emit('changeViapostal', event)
+      let dataChuyenPhat = {
+        viaPostal: event === 2 ? 2 : 1,
+        postalServiceCode: this.dichVuChuyenPhatKetQua.postalServiceCode ? this.dichVuChuyenPhatKetQua.postalServiceCode : '',
+        postalAddress: this.dichVuChuyenPhatKetQua.postalAddress ? this.dichVuChuyenPhatKetQua.postalAddress : '',
+        postalCityCode: this.dichVuChuyenPhatKetQua.postalCityCode ? this.dichVuChuyenPhatKetQua.postalCityCode : '',
+        postalDistrictCode: this.dichVuChuyenPhatKetQua.postalDistrictCode ? this.dichVuChuyenPhatKetQua.postalDistrictCode : '',
+        postalWardCode: this.dichVuChuyenPhatKetQua.postalWardCode ? this.dichVuChuyenPhatKetQua.postalWardCode : ''
+      }
+      this.$store.commit('setDichVuChuyenPhatKetQua', dataChuyenPhat)
+      console.log('dichVuChuyenPhatKetQua', this.dichVuChuyenPhatKetQua)
     }
   }
 }

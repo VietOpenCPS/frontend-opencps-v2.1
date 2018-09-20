@@ -4,7 +4,7 @@ import Landing from '@/components/Landing'
 import NotFound from '@/components/NotFound'
 
 const routes = [
-  { path: '/bao-cao/:index', name: 'Landing', component: Landing, props: true },
+  { path: '/thu-tuc-hanh-chinh', name: 'Landing', component: Landing, props: true },
   { path: '*', name: 'NotFound', component: NotFound }
 ]
 
