@@ -13,18 +13,20 @@
           item-text="administrationName"
           item-value="administrationCode"
           :hide-selected="true"
+          clearable
           @change="changeAdministration"
         ></v-select>
       </v-flex>
       <v-flex xs3 class="pl-2 pr-2">
         <v-select
           class="select-border"
-          :items="domainList"
+          :items="domainListCurrent"
           v-model="domainSelected"
           placeholder="Chọn lĩnh vực"
           item-text="domainName"
           item-value="domainCode"
           :hide-selected="true"
+          clearable
           @change="changeDomain"
         ></v-select>
       </v-flex>
@@ -35,41 +37,35 @@
           v-model="levelSelected"
           autocomplete
           placeholder="Chọn mức độ"
-          item-text="levelName"
+          item-text="textLevel"
           item-value="level"
           :hide-selected="true"
           @change="changeLevel"
           clearable
         >
-          <template slot="item" slot-scope="data">
-            <template>
-              <v-list-tile-content>
-                <v-list-tile-title >Mức độ {{data.item.level}}</v-list-tile-title>
-              </v-list-tile-content>
-            </template>
-          </template>
         </v-select>
       </v-flex>
       <v-flex xs3 class="pl-2 pr-2">
         <div style="position:relative">
-          <v-text-field class="input-border"
+          <v-text-field class="input-border input-search"
             placeholder="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
-            @keyup.enter="filterServiceinfos()"
+            @keyup.enter="filterServiceName()"
+            clearable
           ></v-text-field>
-          <v-icon color="primary" @click="filterServiceinfos()" class="hover-pointer" style="position:absolute;top:28px;right:10px">search</v-icon>
+          <v-icon color="primary" @click="filterServiceName()" class="hover-pointer" style="position:absolute;top:28px;right:10px">search</v-icon>
         </div>
       </v-flex>
     </v-layout>
-    <div class="mt-4" v-if="true">
+    <div class="mt-4">
       <v-data-table
         :headers="headers"
         :items="serviceInfoList"
         hide-actions
-        class="table-bordered btn--block my-0"
+        class="table-bordered my-0"
       >
         <template slot="items" slot-scope="props">
-          <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
+          <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer">
             <td class="text-xs-center">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
@@ -78,7 +74,7 @@
                 <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
               </div>
             </td>
-            <td class="text-xs-left" >
+            <td class="text-xs-left" @click="viewDetail(props.item)">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -102,10 +98,9 @@
               </content-placeholders>
               <div v-else>
                 <span>
-                  <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
+                  <v-chip class="mx-0 my-0 mt-1" small disabled label :color="getColor(props.item.maxLevel)" text-color="white" >
                     Mức độ {{props.item.maxLevel}}
                   </v-chip>
-                  <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
                 </span>
               </div>
             </td>
@@ -114,12 +109,15 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span v-if="props.item.maxLevel === 3">
-                  Nộp hồ sơ
-                </span>
-                <span v-else>
-                  Xem hướng dẫn
-                </span>
+                <v-menu bottom right offset-y>
+                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-list>
+                    <v-list-tile>
+                      <v-list-tile-title>{{props.item.administrationName}}</v-list-tile-title>
+                    </v-list-tile>
+                  </v-list>
+                </v-menu>
               </div>
             </td>
           </tr>
@@ -159,6 +157,7 @@ export default {
     domainListCurrent: [],
     domainSelected: {},
     levelSelected: {},
+    serviceNameKey: '',
     loading: false,
     headers: [
       {
@@ -203,6 +202,14 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.doLoadingThuTuc()
     })
   },
   updated () {
@@ -215,25 +222,42 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
+      vm.domainListCurrent = []
+      if (currentQuery.hasOwnProperty('agency')) {
+        vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
+          return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
+        })
+      } else {
+        vm.domainListCurrent = vm.domainList
+      }
+      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
+    },
+    domainList (val) {
+      var vm = this
+      if (vm.govAgencySelected) {
+        vm.domainListCurrent = val.filter(function (itemLinhVuc) {
+          return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
+        })
+      } else {
+        vm.domainListCurrent = val
+      }
     }
   },
   methods: {
     changeAdministration () {
       var vm = this
       setTimeout(function () {
-        // if (vm.govAgencySelected) {
-        //   vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
-        //     return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
-        //   })
-        // } else {
-        //   vm.domainListCurrent = vm.domainList
-        // }
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['agency'] = vm.govAgencySelected
+        newQuery['domain'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -276,6 +300,27 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['level'] = vm.levelSelected
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        router.push({
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    filterServiceName () {
+      var vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -337,7 +382,11 @@ export default {
       })
     },
     viewDetail (item) {
+      console.log('item', item)
       var vm = this
+      vm.$router.push({
+        path: '/thu-tuc-hanh-chinh/' + item.serviceInfoId
+      })
     },
     getColor (level) {
       if (level === 2) {

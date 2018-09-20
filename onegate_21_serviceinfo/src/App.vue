@@ -11,7 +11,7 @@
         <v-tab key="tab-3" ripple class="primary--text">
           Mức độ
         </v-tab>
-        <v-tab-item key="tab-1" class="list-coquan">
+        <v-tab-item key="tab-1" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
           <v-card>
             <v-list class="pt-0">
               <v-list-tile v-for="item in govAgencyList" :key="item.administrationCode"
@@ -31,7 +31,7 @@
             </v-list>
           </v-card>
         </v-tab-item>
-        <v-tab-item key="tab-2" class="list-coquan">
+        <v-tab-item key="tab-2" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
           <v-card>
             <v-list class="pt-0">
               <v-list-tile v-for="item in domainList" :key="item.domainCode"
@@ -51,7 +51,7 @@
             </v-list>
           </v-card>
         </v-tab-item>
-        <v-tab-item key="tab-3" class="list-coquan">
+        <v-tab-item key="tab-3" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
           <v-card>
             <v-list class="pt-0">
               <v-list-tile v-for="item in levelList" :key="item.level"
@@ -74,7 +74,7 @@
       </v-tabs>
     </v-navigation-drawer>
   
-    <v-content class="ml-3">
+    <v-content class="ml-2">
       <router-view></router-view>
     </v-content>
   
@@ -143,7 +143,6 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
-        console.log('currentParams', currentParams)
         vm.currentAgency = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
