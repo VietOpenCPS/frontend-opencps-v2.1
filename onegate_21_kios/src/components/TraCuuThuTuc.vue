@@ -53,8 +53,8 @@
       <v-flex xs4 class="pl-2 pr-2">
         <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
           <div class="input-group__input">
-            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos()" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
-            <i aria-hidden="true" @click="filterServiceinfos()" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos('keyword')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
+            <i aria-hidden="true" @click="filterServiceinfos('keyword')" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
           </div>
         </div>
       </v-flex>
@@ -75,14 +75,15 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div class="mt-4" v-if="!loading && !activeDetailService && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
           <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
-    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+      <!-- danh sách lĩnh vực -->
       <div class="wrap-scroll wrap-scroll-domain list-domain">
         <v-list class="py-0">
           <template v-for="(item, index) in listLinhVuc" >
@@ -101,7 +102,8 @@
         </div>
       </div>
     </div>
-    <div class="mt-4" v-if="!loading && !activeDetailService && govAgencySelected && linhVucSelected" :class="visible ? 'overlayActive': ''">
+    <!-- danh sách thủ tục -->
+    <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
       <div class="wrap-scroll wrap-scroll-tableservice">
         <v-data-table
           :headers="headersTable"
@@ -166,6 +168,7 @@
         </div>
       </div>
     </div>
+    <!-- chi tiết thủ tục -->
     <div class="mt-4" v-if="!loading && activeDetailService">
       <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
     </div>
@@ -228,6 +231,7 @@ export default {
         sortable: false
       }
     ],
+    showListThuTuc: false,
     //
     visible: false,
     layout: 'normal',
@@ -325,8 +329,9 @@ export default {
           vm.totalPaggingLinhVuc = 0
         })
       }
-      if (vm.govAgencySelected && vm.linhVucSelected) {
+      if (vm.linhVucSelected || $('#serviceNameKey').val() !== '') {
         vm.doLoadingThuTuc()
+        vm.showListThuTuc = true
       }
       if (currentQuery.hasOwnProperty('detail')) {
         vm.$store.commit('setActiveDetailService', true)
@@ -336,8 +341,11 @@ export default {
     }
   },
   methods: {
-    filterServiceinfos () {
+    filterServiceinfos (type) {
       var vm = this
+      if (type === 'keyword' && $('#serviceNameKey').val() !== '') {
+        vm.showListThuTuc = true
+      }
       vm.visible = false
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -396,6 +404,7 @@ export default {
     },
     changeAdministration () {
       var vm = this
+      vm.showListThuTuc = false
       vm.listLinhVuc = []
       vm.linhVucSelected = ''
       vm.levelSelected = ''
@@ -427,6 +436,7 @@ export default {
     },
     changeDomain () {
       var vm = this
+      vm.showListThuTuc = true
       setTimeout(function () {
         if (vm.linhVucSelected) {
           vm.filterServiceinfos()
