@@ -24,8 +24,8 @@
                 :key="item.dossierId" :class="index%2===1 ? 'active': ''">
                   <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
                   <v-flex class="px-2 py-2 td" style="width: calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.submitDate}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.finishDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.receiveDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.dueDate}}</span></v-flex>
                 </v-layout>
               </div>
             </marquee>
@@ -34,8 +34,8 @@
               :key="item.dossierId" :class="index%2===1 ? 'active': ''">
                 <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
                 <v-flex class="px-2 py-2 td" style="width: calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.submitDate}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.finishDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.receiveDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.dueDate}}</span></v-flex>
               </v-layout>
             </div>
           </div>
