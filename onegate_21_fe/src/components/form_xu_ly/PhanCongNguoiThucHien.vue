@@ -15,7 +15,7 @@
               v-model="item.assigned"
               :label="item.userName"
               @change = 'changeAssigned($event, index)'
-              style="display:inline-block;min-width:170px;max-width:170px"
+              style="display:inline-block;min-width:190px;max-width:190px"
               :title="item.userName"
               ></v-checkbox>
             </v-layout>
