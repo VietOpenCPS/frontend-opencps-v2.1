@@ -9,7 +9,10 @@ export const store = new Vuex.Store({
   state: {
     initData: support.initData,
     loading: false,
-    index: 0
+    index: 0,
+    agencyList: [],
+    domainList: [],
+    levelList: []
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -32,22 +35,100 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    getAgencyLists ({commit, state}, filter) {
+    // loadInitResource ({commit, state}) {
+    //   if (state.initData == null) {
+    //     return new Promise((resolve, reject) => {
+    //       let param = {}
+    //       let orginURL = window.location.href
+    //       let coma = window.location.href.lastIndexOf('#/')
+    //       if (coma > 0) {
+    //         orginURL = window.location.href.substr(0, coma)
+    //       }
+    //       /* test local */
+    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
+    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+    //         let serializable = response.data
+    //         commit('setInitData', serializable)
+    //         resolve(serializable)
+    //       }).catch(function (error) {
+    //         console.log(error)
+    //         reject(error)
+    //       })
+    //     })
+    //   } else {
+    //     return new Promise((resolve, reject) => {
+    //       resolve(state.initData)
+    //     })
+    //   }
+    // },
+    getGovAgency ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
+              groupId: state.initData.groupId
             }
           }
-          axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+          // test local
+          axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
               resolve(dataReturn)
             } else {
-              resolve(null)
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getDomain ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getLevelList ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceinfos/statistics/levels', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/levels', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              for (let key in dataReturn) {
+                dataReturn[key]['textLevel'] = 'Mức độ ' + dataReturn[key].level
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
             }
           }).catch(function (error) {
             console.log(error)
@@ -56,96 +137,70 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getAgencyReportLists ({commit, state}, filter) {
+    getServiceLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
+              groupId: state.initData.groupId
             },
             params: {
-              year: filter.year,
-              month: filter.month,
-              group: filter.group,
-              reporting: false,
-              agency: filter['agency']
+              start: filter.page * 15 - 15,
+              end: filter.page * 15,
+              administration: filter.administration ? filter.administration : '',
+              keyword: filter.keyword ? filter.keyword : '',
+              level: filter.level ? filter.level : 0,
+              domain: filter.domain ? filter.domain : ''
             }
           }
-          let requestURL = ''
-          if (filter.document === 'REPORT_01') {
-            requestURL = '/o/rest/statistics'
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = {
-                  data: serializable.data
-                }
-                resolve(dataReturn)
-              } else {
-                resolve(null)
-              }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
-          } else {
-            requestURL = '/o/rest/v2/dossiers'
-            param.params['sort'] = 'domainCode'
-            param.params['fromReceiveDate'] = filter.fromDate
-            param.params['toReceiveDate'] = filter.toDate
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = serializable
-                resolve(dataReturn)
-              } else {
-                resolve(null)
-              }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
-          }
+          // test local
+          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
         })
       })
     },
-    doStatisticReportPrint ({commit, state}, filter) {
+    getServiceDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          axios({
-            method: 'PUT',
-            url: '/o/rest/v2_1/statistics/report/' + filter.document,
+          let param = {
             headers: {
               groupId: state.initData.groupId
-            },
-            responseType: 'blob',
-            data: filter.data
-          }).then(function (response) {
-            console.log('serializable', response)
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + filter.index, param).then(function (response) {
             let serializable = response.data
-            let file = window.URL.createObjectURL(serializable)
-            resolve(file)
+            resolve(serializable)
           }).catch(function (error) {
+            console.log(error)
             reject(error)
           })
         })
       })
     }
-    // ----End---------
   },
   mutations: {
     setLoading (state, payload) {
       state.loading = payload
     },
-    setMenuConfigToDo (state, payload) {
-      state.trangThaiHoSoList = payload
-    },
-    setIndex (state, payload) {
-      state.index = payload
-    },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setAgencyList (state, payload) {
+      state.agencyList = payload
+    },
+    setDomainList (state, payload) {
+      state.domainList = payload
+    },
+    setLevelList (state, payload) {
+      state.levelList = payload
     }
   },
   getters: {
@@ -155,8 +210,14 @@ export const store = new Vuex.Store({
     index (state) {
       return state.index
     },
-    loadingMenuConfigToDo (state) {
-      return support.trangThaiHoSoList
+    getAgencyList (state) {
+      return state.agencyList
+    },
+    getDomainList (state) {
+      return state.domainList
+    },
+    getLevelList (state) {
+      return state.levelList
     }
   }
 })

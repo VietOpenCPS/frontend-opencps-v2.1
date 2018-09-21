@@ -1,104 +1,168 @@
 <template>
-  <div class="form-chitiet">
+  <div class="list-thu-tuc">
     <div class="row-header">
       <div class="background-triangle-big"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs12 pl-3 text-ellipsis text-bold">
-          <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="years"
-                v-model="year"
-                autocomplete
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="years"
-                v-model="year"
-                autocomplete
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-select>
-            </v-flex>
-             <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="years"
-                v-model="year"
-                autocomplete
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-select>
-            </v-flex>
-             <v-flex xs6 sm2 class="px-2">
-              <v-text-field solo placeholder="nhập từ khoá ..." v-model="value"></v-text-field>
-            </v-flex>
-            <v-flex class="px-2 text-right">
-              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
-                <v-icon>search</v-icon> &nbsp;
-                Tìm kiếm
-              </v-btn>
-            </v-flex>
-          </v-layout>
+    </div>
+    <v-layout wrap class="mt-2">
+      <v-flex xs3 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="govAgencyList"
+          v-model="govAgencySelected"
+          placeholder="Chọn cơ quan"
+          item-text="administrationName"
+          item-value="administrationCode"
+          :hide-selected="true"
+          clearable
+          @change="changeAdministration"
+        ></v-select>
+      </v-flex>
+      <v-flex xs3 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="domainListCurrent"
+          v-model="domainSelected"
+          placeholder="Chọn lĩnh vực"
+          item-text="domainName"
+          item-value="domainCode"
+          :hide-selected="true"
+          clearable
+          @change="changeDomain"
+        ></v-select>
+      </v-flex>
+      <v-flex xs3 class="pl-2 pr-2">
+        <v-select
+          class="select-border"
+          :items="levelList"
+          v-model="levelSelected"
+          autocomplete
+          placeholder="Chọn mức độ"
+          item-text="textLevel"
+          item-value="level"
+          :hide-selected="true"
+          @change="changeLevel"
+          clearable
+        >
+        </v-select>
+      </v-flex>
+      <v-flex xs3 class="pl-2 pr-2">
+        <div style="position:relative">
+          <v-text-field class="input-border input-search"
+            placeholder="Nhập tên thủ tục hành chính"
+            v-model="serviceNameKey"
+            @keyup.enter="filterServiceName()"
+            clearable
+          ></v-text-field>
+          <v-icon color="primary" @click="filterServiceName()" class="hover-pointer" style="position:absolute;top:28px;right:10px">search</v-icon>
+        </div>
+      </v-flex>
+    </v-layout>
+    <div class="mt-4">
+      <v-data-table
+        :headers="headers"
+        :items="serviceInfoList"
+        hide-actions
+        class="table-bordered my-0"
+      >
+        <template slot="items" slot-scope="props">
+          <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer">
+            <td class="text-xs-center">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
+              </div>
+            </td>
+            <td class="text-xs-left" @click="viewDetail(props.item)">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.serviceName}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>
+                  <span>{{props.item.domainName}}</span>
+                </span>
+              </div>
+            </td>
+            <td class="text-xs-center">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>
+                  <v-chip class="mx-0 my-0 mt-1" small disabled label :color="getColor(props.item.maxLevel)" text-color="white" >
+                    Mức độ {{props.item.maxLevel}}
+                  </v-chip>
+                </span>
+              </div>
+            </td>
+            <td class="text-xs-center">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <v-menu bottom right offset-y>
+                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-list>
+                    <v-list-tile>
+                      <v-list-tile-title>{{props.item.administrationName}}</v-list-tile-title>
+                    </v-list-tile>
+                  </v-list>
+                </v-menu>
+              </div>
+            </td>
+          </tr>
+        </template>
+        <template slot="no-data">
+          <div class="text-xs-center mt-2">
+            Không có thủ tục nào được tìm thấy
+          </div>
+        </template>
+      </v-data-table>
+      <div v-if="totalThuTuc > 10" class="text-xs-right layout wrap" style="position: relative;">
+        <div class="flex pagging-table px-2"> 
+          <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
+            @tiny:change-page="paggingData" ></tiny-pagination> 
         </div>
       </div>
     </div>
-    <v-layout row wrap v-if="true">
-      <v-data-table
-        :headers="headers"
-        :items="desserts"
-        hide-actions
-        class="btn--block my-0"
-      >
-        <template slot="items" slot-scope="props">
-          <td></td>
-          <td class="text-xs-right"></td>
-          <td class="text-xs-right"></td>
-          <td class="text-xs-right"></td>
-          <td class="text-xs-right"></td>
-          <td class="text-xs-right"></td>
-        </template>
-      </v-data-table>
-    </v-layout>
-    <v-layout row wrap v-else>
-      <v-flex xs12 class="text-xs-center" mt-5>
-        <v-progress-circular
-          :size="100"
-          :width="1"
-          color="primary"
-          indeterminate
-        ></v-progress-circular>
-      </v-flex>
-    </v-layout>
   </div>
 </template>
 
 <script>
 import router from '@/router'
-import VueFriendlyIframe from 'vue-friendly-iframe'
+import Vue from 'vue/dist/vue.min.js'
+import $ from 'jquery'
 import support from '../store/support.json'
-
+import TinyPagination from './Pagination.vue'
 export default {
-  props: ['index', 'id'],
+  props: [],
   components: {
-    'vue-friendly-iframe': VueFriendlyIframe
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
+    serviceInfoList: [],
+    totalThuTuc: 0,
+    thutucPage: 1,
+    govAgencySelected: {},
+    domainListCurrent: [],
+    domainSelected: {},
+    levelSelected: {},
+    serviceNameKey: '',
+    loading: false,
     headers: [
       {
         text: 'STT',
-        align: 'left',
+        align: 'center',
         sortable: false
       },
       {
@@ -107,7 +171,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Lĩnh vực thủ tục',
+        text: 'Lĩnh vực',
         align: 'center',
         sortable: false
       },
@@ -117,327 +181,221 @@ export default {
         sortable: false
       },
       {
-        text: '',
+        text: 'Thao tác',
         align: 'center',
         sortable: false
       }
-    ],
-    isDVC: false,
-    isCallBack: true,
-    fromDate: null,
-    menufromDate: false,
-    fromDateFormatted: null,
-    toDate: null,
-    menutoDate: false,
-    toDateFormatted: null,
-    danhSachBaoCaos: [],
-    years: [
-      {
-        'value': '',
-        'name': 'Lọc theo năm'
-      },
-      {
-        'value': '2017',
-        'name': 'năm 2017'
-      },
-      {
-        'value': '2018',
-        'name': 'năm 2018'
-      },
-      {
-        'value': '2019',
-        'name': 'năm 2019'
-      }
-    ],
-    year: (new Date()).getFullYear() + '',
-    months: [
-      {
-        'value': '0',
-        'name': 'Cả năm'
-      },
-      {
-        'value': '1',
-        'name': 'tháng 1'
-      },
-      {
-        'value': '2',
-        'name': 'tháng 2'
-      },
-      {
-        'value': '3',
-        'name': 'tháng 3'
-      },
-      {
-        'value': '4',
-        'name': 'tháng 4'
-      },
-      {
-        'value': '5',
-        'name': 'tháng 5'
-      },
-      {
-        'value': '6',
-        'name': 'tháng 6'
-      },
-      {
-        'value': '7',
-        'name': 'tháng 7'
-      },
-      {
-        'value': '8',
-        'name': 'tháng 8'
-      },
-      {
-        'value': '9',
-        'name': 'tháng 9'
-      },
-      {
-        'value': '10',
-        'name': 'tháng 10'
-      },
-      {
-        'value': '11',
-        'name': 'tháng 11'
-      },
-      {
-        'value': '12',
-        'name': 'tháng 12'
-      }
-    ],
-    month: ((new Date()).getMonth() + 1) + '',
-    agencyLists: [],
-    govAgency: null,
-    danhSachBaoCao: [],
-    pdfBlob: null,
-    documentTYPE: 'REPORT_01'
+    ]
   }),
   computed: {
-    loadingMenuConfigToDo () {
-      return this.$store.getters.loadingMenuConfigToDo
+    govAgencyList () {
+      return this.$store.getters.getAgencyList
+    },
+    domainList () {
+      return this.$store.getters.getDomainList
+    },
+    levelList () {
+      return this.$store.getters.getLevelList
     }
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.isDVC = vm.getReportCongDVC()
-      vm.danhSachBaoCao = vm.loadingMenuConfigToDo
-      let currentQuerys = vm.$router.history.current.query
-      if (currentQuerys.hasOwnProperty('fromDate')) {
-        vm.fromDateFormatted = currentQuerys.fromDate
-      } else {
-        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
-      }
-      if (currentQuerys.hasOwnProperty('toDate')) {
-        vm.toDateFormatted = currentQuerys.toDate
-      } else {
-        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
-      }
-      if (vm.isDVC) {
-        vm.$store.dispatch('getAgencyLists').then(function (result) {
-          vm.agencyLists = result
-          if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
-            vm.govAgency = vm.agencyLists[0]
-            vm.doPrintReport()
-          }
-        })
-      } else {
-        vm.doPrintReport()
-      }
+      var vm = this
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.doLoadingThuTuc()
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
-      if (vm.isCallBack) {
-        vm.isCallBack = false
-        vm.danhSachBaoCao = vm.loadingMenuConfigToDo
-        let currentParams = vm.$router.history.current.params
-        let currentQuerys = vm.$router.history.current.query
-        if (vm.isCallBack) {
-          vm.isCallBack = false
-          vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
-          if (currentQuerys.hasOwnProperty('fromDate')) {
-            vm.fromDateFormatted = currentQuerys.fromDate
-          } else {
-            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
-          }
-          if (currentQuerys.hasOwnProperty('toDate')) {
-            vm.toDateFormatted = currentQuerys.toDate
-          } else {
-            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
-          }
-        }
-      }
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.doPrintReport()
+      vm.domainListCurrent = []
+      if (currentQuery.hasOwnProperty('agency')) {
+        vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
+          return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
+        })
+      } else {
+        vm.domainListCurrent = vm.domainList
+      }
+      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.doLoadingThuTuc()
     },
-    fromDate (val) {
-      this.fromDateFormatted = this.formatDate(this.fromDate)
-    },
-    toDate (val) {
-      this.toDateFormatted = this.formatDate(this.toDate)
+    domainList (val) {
+      var vm = this
+      if (vm.govAgencySelected) {
+        vm.domainListCurrent = val.filter(function (itemLinhVuc) {
+          return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
+        })
+      } else {
+        vm.domainListCurrent = val
+      }
     }
   },
   methods: {
-    doExcelFunc () {
-      let vm = this
-      vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
-      let filter = {
-        document: vm.documentTYPE,
-        year: vm.year,
-        month: vm.month,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
-      }
-      if (vm.isDVC) {
-        filter['agency'] = vm.govAgency['itemCode']
-      }
-      vm.pdfBlob = null
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        let putData = {}
-        if (result !== null && result !== undefined) {
-          putData = result
-          if (vm.documentTYPE === 'REPORT_01') {
-            putData['year'] = vm.year
-            putData['month'] = vm.month
-          } else {
-            putData['fromDate'] = vm.fromDateFormatted
-            putData['toDate'] = vm.toDateFormatted
+    changeAdministration () {
+      var vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agency'] = vm.govAgencySelected
+        newQuery['domain'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
           }
-          putData['reportType'] = 'excel'
-          let filterPostData = {
-            document: vm.documentTYPE,
-            data: putData
+        }
+        router.push({
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
-          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
-            console.log(result)
-            window.open(result, '_blank')
-          })
+        })
+      }, 100)
+    },
+    changeDomain () {
+      var vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['domain'] = vm.domainSelected
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        router.push({
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    changeLevel () {
+      var vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['level'] = vm.levelSelected
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        router.push({
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    filterServiceName () {
+      var vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['keyword'] = vm.serviceNameKey
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        router.push({
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    doLoadingThuTuc () {
+      var vm = this
+      vm.serviceInfoList = []
+      vm.loading = true
+      let currentQuery = router.history.current.query
+      var filter = null
+      filter = {
+        page: currentQuery.page ? currentQuery.page : 1,
+        administration: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+        keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
+        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      }
+      vm.$store.dispatch('getServiceLists', filter).then(function (result) {
+        vm.loading = false
+        if (result.data) {
+          vm.serviceInfoList = result.data
+          vm.thutucPage = Number(currentQuery.page) ? Number(currentQuery.page) : 1
+          vm.totalThuTuc = result.total
         } else {
-          alert('Không tìm thấy dữ liệu báo cáo.')
+          vm.totalThuTuc = 0
+          vm.serviceInfoList = []
         }
+        vm.serviceItemTotal = result.total
+      }).catch(reject => {
+        vm.loading = false
+        vm.serviceInfoList = []
+        vm.totalThuTuc = 0
+        vm.thutucPage = 1
       })
     },
-    doPrintReport () {
+    paggingData (config) {
       let vm = this
-      vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
-      let filter = {
-        document: vm.documentTYPE,
-        year: vm.year,
-        month: vm.month,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['page'] = ''
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
       }
-      if (vm.isDVC) {
-        filter['agency'] = vm.govAgency['itemCode']
+      queryString += 'page=' + config.page
+      vm.$router.push({
+        path: current.path + queryString
+      })
+    },
+    viewDetail (item) {
+      console.log('item', item)
+      var vm = this
+      vm.$router.push({
+        path: '/thu-tuc-hanh-chinh/' + item.serviceInfoId
+      })
+    },
+    getColor (level) {
+      if (level === 2) {
+        return 'green'
+      } else if (level === 3) {
+        return 'orange darken-1'
+      } else if (level === 4) {
+        return 'red'
       }
-      vm.pdfBlob = null
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        let putData = {}
-        if (result !== null && result !== undefined) {
-          putData = result
-          if (vm.documentTYPE === 'REPORT_01') {
-            putData['year'] = vm.year
-            putData['month'] = vm.month
-          } else {
-            putData['fromDate'] = vm.fromDateFormatted
-            putData['toDate'] = vm.toDateFormatted
-          }
-          let filterPostData = {
-            document: vm.documentTYPE,
-            data: putData
-          }
-          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
-            vm.pdfBlob = result
-          })
-        } else {
-          alert('Không tìm thấy dữ liệu báo cáo.')
-        }
-      })
-    },
-    changeYear (item) {
-      let vm = this
-      vm.year = item
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate
-        }
-      })
-    },
-    changeMonth (item) {
-      let vm = this
-      vm.month = item
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate
-        }
-      })
-    },
-    changeGov (item) {
-      let vm = this
-      vm.govAgency = item
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate
-        }
-      })
-    },
-    changeFromDate () {
-      let vm = this
-      vm.menufromDate = false
-      vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted
-        }
-      })
-    },
-    changeToDate () {
-      let vm = this
-      vm.menutoDate = false
-      vm.toDateFormatted = vm.formatDate(vm.toDate)
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted
-        }
-      })
-    },
-    formatDate (date) {
-      if (!date) return null
-      console.log('formatDate', date)
-      const [year, month, day] = date.split('-')
-      return `${day}/${month}/${year}`
-    },
-    parseDate (date) {
-      if (!date) return null
-      console.log('parseDate', date)
-      const [day, month, year] = date.split('/')
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     }
   }
 }

@@ -356,7 +356,6 @@ export default {
     },
     tiepNhanHoSo (type) {
       var vm = this
-      vm.loadingAction = true
       console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
@@ -367,6 +366,7 @@ export default {
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
+        vm.loadingAction = true
         if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
           return
         }

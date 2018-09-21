@@ -10,18 +10,10 @@ import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
 import axios from 'axios'
 
-// axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
-
-Vue.mixin({
-  methods: {
-    getReportCongDVC: function () {
-      return false
-    }
-  }
-})
 
 new Vue({ // eslint-disable-line no-new
   el: '#app',
