@@ -114,7 +114,8 @@
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list>
                     <v-list-tile>
-                      <v-list-tile-title>{{props.item.administrationName}}</v-list-tile-title>
+                      <v-list-tile-title v-if="props.item.maxLevel === 3" @click="createDossier(props.item)">{{props.item.administrationName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(props.item)">{{props.item.administrationName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -135,6 +136,18 @@
         </div>
       </div>
     </div>
+    <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
+      <v-card>
+        <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
+        <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceConfigs.serviceInstruction"></v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
+            Đóng
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -158,6 +171,8 @@ export default {
     domainSelected: {},
     levelSelected: {},
     serviceNameKey: '',
+    serviceDetail: '',
+    dialogGuide: false,
     loading: false,
     headers: [
       {
@@ -387,6 +402,15 @@ export default {
       vm.$router.push({
         path: '/thu-tuc-hanh-chinh/' + item.serviceInfoId
       })
+    },
+    createDossier (item) {
+      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigs.serviceConfigId
+      window.open(url)
+    },
+    viewGuide (item) {
+      var vm = this
+      vm.serviceDetail = item
+      vm.dialogGuide = true
     },
     getColor (level) {
       if (level === 2) {
