@@ -32,7 +32,7 @@
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile v-for="subItem in item.items" :key="subItem.stepCode"
-            v-on:click.native="filterSteps(subItem)"
+            v-on:click.native="filterSteps(subItem, index)"
             :class="{'list__tile--active': String(currentStep) === String(subItem.stepCode)}"
             >
             <v-list-tile-action>
@@ -148,12 +148,12 @@
           }
         })
       },
-      filterSteps (item) {
+      filterSteps (item, index) {
         let currentQuery = this.$router.history.current.query
         let currentParams = this.$router.history.current.params
         console.log('currentParams', currentParams)
         console.log('currentQuery', currentQuery)
-        let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
+        let queryString = this.trangThaiHoSoList[index].queryParams
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
         if (currentQuery !== null && currentQuery !== undefined) {
@@ -164,7 +164,7 @@
         }
         this.currentStep = String(item.stepCode)
         router.push({
-          path: '/danh-sach-ho-so/' + currentParams.index,
+          path: '/danh-sach-ho-so/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
             q: queryString + item.stepCode,
