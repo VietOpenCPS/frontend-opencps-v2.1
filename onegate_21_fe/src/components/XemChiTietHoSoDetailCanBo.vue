@@ -567,21 +567,21 @@ export default {
   updated () {
     var vm = this
     vm.$nextTick(function () {
-      let currentParams = vm.$router.history.current.params
-      let currentQuery = vm.$router.history.current.query
-      if (currentParams.hasOwnProperty('activeTab') && vm.isCallBack) {
-        vm.isCallBack = false
-        vm.btnDossierDynamics = []
-        vm.btnIndex = -1
-        vm.activeTab = currentQuery.activeTab
-        vm.btnIndex = currentQuery['btnIndex']
-        if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
-          vm.actionSpecial = currentQuery['actionSpecial']
-        }
-        vm.thongTinChiTietHoSo['dossierId'] = vm.id
-        vm.btnStateVisible = true
-        vm.getNextActions()
-      }
+      // let currentParams = vm.$router.history.current.params
+      // let currentQuery = vm.$router.history.current.query
+      // if (currentParams.hasOwnProperty('activeTab') && vm.isCallBack) {
+      //   vm.isCallBack = false
+      //   vm.btnDossierDynamics = []
+      //   vm.btnIndex = -1
+      //   vm.activeTab = currentQuery.activeTab
+      //   vm.btnIndex = currentQuery['btnIndex']
+      //   if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
+      //     vm.actionSpecial = currentQuery['actionSpecial']
+      //   }
+      //   vm.thongTinChiTietHoSo['dossierId'] = vm.id
+      //   vm.btnStateVisible = true
+      //   vm.getNextActions()
+      // }
     })
   },
   watch: {
