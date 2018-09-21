@@ -35,6 +35,32 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    // loadInitResource ({commit, state}) {
+    //   if (state.initData == null) {
+    //     return new Promise((resolve, reject) => {
+    //       let param = {}
+    //       let orginURL = window.location.href
+    //       let coma = window.location.href.lastIndexOf('#/')
+    //       if (coma > 0) {
+    //         orginURL = window.location.href.substr(0, coma)
+    //       }
+    //       /* test local */
+    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
+    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+    //         let serializable = response.data
+    //         commit('setInitData', serializable)
+    //         resolve(serializable)
+    //       }).catch(function (error) {
+    //         console.log(error)
+    //         reject(error)
+    //       })
+    //     })
+    //   } else {
+    //     return new Promise((resolve, reject) => {
+    //       resolve(state.initData)
+    //     })
+    //   }
+    // },
     getGovAgency ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -97,6 +123,9 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
+              for (let key in dataReturn) {
+                dataReturn[key]['textLevel'] = 'Mức độ ' + dataReturn[key].level
+              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -135,8 +164,27 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getServiceDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + filter.index, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
-    // ----End---------
   },
   mutations: {
     setLoading (state, payload) {

@@ -260,10 +260,13 @@ table.datatable thead th:first-child, table.datatable tbody tr td:first-child{
     max-width: 100px !important;
 }
 table.datatable thead th:nth-child(3), table.datatable tbody tr td:nth-child(3){
-    max-width: 150px !important;
+    min-width: 200px;
 }
 table.datatable thead th:nth-child(4), table.datatable tbody tr td:nth-child(4){
-    max-width: 100px !important;
+    min-width: 100px;
+}
+table.datatable thead th:nth-child(5), table.datatable tbody tr td:nth-child(5){
+    min-width: 120px;
 }
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
@@ -363,6 +366,9 @@ body .menu_header_list .input-group--select .input-group__selections__comma {
 }
 .vdatetime-slot__not-available, .vdatetime-slot__available {
     display: none 
+}
+.hover-pointer:hover {
+    cursor: pointer;
 }
 .copyPaste {
     display: none !important;
@@ -2383,9 +2389,6 @@ body .expansion-panel .expansion-panel__body div > .card {
 #editor-video-preloader {
     width: 100%;
 }
-viewer-pdf-toolbar {
-    display: block !important;
-}
 body .fade-transition-leave-active {
     display: none !important;
 }
@@ -2438,6 +2441,10 @@ body table.table tbody .input-group--selection-controls.checkbox.input-group--di
 .input-group__input input {
     height: 36px;
 }
+.input-search .input-group__icon-clearable {
+    margin-right: 25px;
+    height: 100%;
+}
 .select-border .input-group__input {
     border: 1px solid #0b72ba;
     height: 36px;
@@ -2466,8 +2473,11 @@ body table.table tbody .input-group--selection-controls.checkbox.input-group--di
 .list-coquan .list__tile {
     height: 36px;
 }
+.list-coquan .list__tile__action .icon {
+    padding-left: 0px !important;
+}
 .list-coquan .list__tile__action {
-    min-width: 30px
+    min-width: 22px
 }
 .status__counter {
     position: absolute;
@@ -2484,4 +2494,10 @@ body table.table tbody .input-group--selection-controls.checkbox.input-group--di
 }
 .list__tile--active, .navigation-drawer .list__group__header--active {
     background: #e1e2e1;
+}
+.table-detail-domain tbody tr td:nth-child(1) {
+    width: 148px
+}
+.menu__content {
+    margin-top: 6px !important;
 }
