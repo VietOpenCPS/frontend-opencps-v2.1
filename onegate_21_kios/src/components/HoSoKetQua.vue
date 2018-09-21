@@ -18,7 +18,7 @@
             </v-layout>
           </div>
           <div class="dossierList">
-            <marquee behavior="scroll" direction="up" v-if="dossierList.length > 9">
+            <marquee behavior="scroll" direction="up" v-if="dossierList.length > 5">
               <div class="wrap-list">
                 <v-layout class="wrap" v-for="(item, index) in dossierList"
                 :key="item.dossierId" :class="index%2===1 ? 'active': ''">
