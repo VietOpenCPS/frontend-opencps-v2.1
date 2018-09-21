@@ -7,7 +7,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    initData: support.initData,
+    initData: {},
     loading: false,
     index: 0,
     agencyList: [],
