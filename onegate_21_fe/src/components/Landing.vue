@@ -194,6 +194,7 @@
             :hide-selected="true"
             @change="changeDomain"
             clearable
+            box
           ></v-select>
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
@@ -208,6 +209,7 @@
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
+            box
           ></v-select>
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
@@ -216,6 +218,8 @@
               placeholder="Nhập mã hồ sơ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
+              append-icon="search"
+              box
             ></v-text-field>
             <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
           </div>
