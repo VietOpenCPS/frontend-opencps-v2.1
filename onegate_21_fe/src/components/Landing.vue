@@ -194,7 +194,7 @@
             :hide-selected="true"
             @change="changeDomain"
             clearable
-            box
+            class="input-group--text-field-box"
           ></v-select>
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
@@ -209,7 +209,7 @@
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
-            box
+            class="input-group--text-field-box"
           ></v-select>
         </v-flex>
         <v-flex xs4 class="pl-2 pr-2">
