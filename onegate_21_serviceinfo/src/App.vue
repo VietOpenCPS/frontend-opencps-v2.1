@@ -1,7 +1,8 @@
 <template>
   <v-app>
     <v-navigation-drawer app clipped floating width="310">
-      <v-tabs v-model="active" color="#fff" slider-color="#fff0">
+      <v-tabs v-model="active">
+        <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab key="tab-1" ripple class="primary--text">
           Cơ quan quản lý
         </v-tab>
@@ -74,7 +75,7 @@
       </v-tabs>
     </v-navigation-drawer>
   
-    <v-content class="ml-2">
+    <v-content>
       <router-view></router-view>
     </v-content>
   
