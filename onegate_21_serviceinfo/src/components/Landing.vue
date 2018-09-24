@@ -54,7 +54,6 @@
             clearable
             box
             append-icon="search"
-            :append-icon-cb="filterServiceName()"
           ></v-text-field>
         </div>
       </v-flex>
