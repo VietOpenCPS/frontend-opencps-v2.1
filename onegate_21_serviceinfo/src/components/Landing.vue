@@ -3,7 +3,7 @@
     <div class="row-header">
       <div class="background-triangle-big"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
     </div>
-    <v-layout wrap class="white pb-3">
+    <v-layout wrap class="white py-2">
       <v-flex xs3 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
