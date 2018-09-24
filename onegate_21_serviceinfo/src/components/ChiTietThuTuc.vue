@@ -183,6 +183,7 @@ export default {
     loadingAction: false,
     serviceDetail: '',
     serviceConfigDetail: '',
+    active: null,
     dialogGuide: false
   }),
   computed: {},
