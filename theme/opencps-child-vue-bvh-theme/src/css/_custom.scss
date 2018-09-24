@@ -1,6 +1,71 @@
-/* These inject tags are used for dynamically creating imports for themelet styles, you can place them where ever you like in this file. */
+// Main Variable
+$main-color: #071d30;
+$main-color-dark: #0d2434;
 
-/* inject:imports */
-/* endinject */
 
-/* This file allows you to override default styles in one central location for easier upgrade and maintenance. */
+
+//Import
+@import url(app.11d1b6b1d25cd9d53cb070c74c246190.css);
+@import url(slick.css);
+@import url(slick-theme.css);
+
+@import "base_style";
+
+@import url(custom-style.css);
+
+
+
+/*------------------------------
+			Global
+------------------------------*/
+body {
+	font-family: 'Roboto', sans-serif;
+	font-size: 13px;
+	color: #333;
+	overflow-x: hidden;
+	
+	a, a:hover, a:focus {
+		color: inherit;
+		text-decoration: none;
+	}
+	
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	
+	.portlet {
+		margin: 0;
+		
+		.portlet-content {
+			padding: 0;
+			border: 0;
+			background-color: transparent;
+			
+			h2 {
+				display: none;
+			}
+		}
+	}
+	
+	#content {
+		min-height: -webkit-calc(100vh - 110px);
+		min-height: calc(100vh - 110px);
+		padding: 0;
+	}
+	
+	.truncated {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: block;
+	}
+	
+	.pointer {
+		
+		&:hover {
+			cursor: pointer;
+		}
+	}
+}
