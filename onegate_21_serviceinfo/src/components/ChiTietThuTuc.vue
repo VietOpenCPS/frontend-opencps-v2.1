@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-0">
+  <div>
     <v-card>
       <div class="row-header">
         <div class="background-triangle-big"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
@@ -28,9 +28,10 @@
         </v-layout>
         <div class="mt-3">
           <v-tabs
+            icons-and-text
             v-model="active"
-            color="#fff" slider-color="#fff0"
           >
+            <v-tabs-slider color="primary"></v-tabs-slider>
             <v-tab key="1" ripple class="mr-2"> Thông tin chung </v-tab>
             <v-tab key="2" ripple class="mr-2"> Trình tự thực hiện</v-tab>
             <v-tab key="3" ripple class="mr-2"> Thành phần hồ sơ </v-tab>
@@ -44,36 +45,36 @@
                       <table class="datatable table">
                         <tbody>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
-                            <td class="pt-2"><span>{{serviceDetail.administrationName}}</span></td>
+                            <td width="200"><span class="text-bold">Cơ quan quản lý</span></td>
+                            <td><span>{{serviceDetail.administrationName}}</span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Lĩnh vực</span></td>
-                            <td class="pt-2"><span>{{serviceDetail.domainName}}</span></td>
+                            <td><span class="text-bold">Lĩnh vực</span></td>
+                            <td><span>{{serviceDetail.domainName}}</span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Cách thực hiện</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.methodText"></span></td>
+                            <td><span class="text-bold">Cách thực hiện</span></td>
+                            <td><span v-html="serviceDetail.methodText"></span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Thời gian giải quyết</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.durationText"></span></td>
+                            <td><span class="text-bold">Thời gian giải quyết</span></td>
+                            <td><span v-html="serviceDetail.durationText"></span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Đối tượng</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.applicantText"></span></td>
+                            <td><span class="text-bold">Đối tượng</span></td>
+                            <td><span v-html="serviceDetail.applicantText"></span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Kết quả giải quyết</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.resultText"></span></td>
+                            <td><span class="text-bold">Kết quả giải quyết</span></td>
+                            <td><span v-html="serviceDetail.resultText"></span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Lệ phí</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.feeText"></span></td>
+                            <td><span class="text-bold">Lệ phí</span></td>
+                            <td><span v-html="serviceDetail.feeText"></span></td>
                           </tr>
                           <tr>
-                            <td class="pt-2"><span class="text-bold">Căn cứ pháp lý</span></td>
-                            <td class="pt-2"><span v-html="serviceDetail.regularText"></span></td>
+                            <td><span class="text-bold">Căn cứ pháp lý</span></td>
+                            <td><span v-html="serviceDetail.regularText"></span></td>
                           </tr>
                         </tbody>
                       </table>
@@ -256,3 +257,13 @@ export default {
   }
 }
 </script>
+
+<style>
+  .table-detail-domain table.table tbody td:first-child {
+    border-left: 0;
+    padding: 0 15px;
+  }
+  .table-detail-domain .table.table tbody td {
+    height: 36px;
+  }
+</style>
