@@ -5,8 +5,8 @@
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
-              <div style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex; min-height: 38px;">
+              <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
+                <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;">
@@ -166,7 +166,7 @@
           <v-layout row wrap>
             <v-flex xs12 sm12>
               <div v-for="(itemFileView, index) in fileViews" :key="index">
-                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 15px;">
                   <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">
                     <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                     <v-icon v-else>attach_file</v-icon>

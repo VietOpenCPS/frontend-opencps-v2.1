@@ -12,7 +12,7 @@
             <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.eForm}'>
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header" @click="stateView = false">
-                  <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                  <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px;">
                     <span class="text-bold mr-2">{{index + 1}}.</span>
                     <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.eForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i> <i v-if="item.eForm" style="font-size: 10px;color: #0d71bb;">({{item.daKhai ? 'Đã khai' : 'Chưa khai '}})</i></span>
                   </div>
@@ -78,7 +78,7 @@
           <v-layout row wrap>
             <v-flex xs12 sm12>
               <div v-for="(itemFileView, index) in fileViews">
-                <div style="width: calc(100% - 370px);display: flex;align-items: center;min-height: 38px;background: #fff;padding-left: 15px;">
+                <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px;">
                   <!-- <span class="text-bold mr-2">{{index + 1}}.</span> -->
                   <span @click="viewFile2(itemFileView)" class="ml-3">{{itemFileView.displayName}}</span>
                   <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)">

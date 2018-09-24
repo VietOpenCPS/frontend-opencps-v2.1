@@ -65,32 +65,34 @@
             NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
-        <v-tabs-items v-model="activeTab">
+        <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
-            <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
-              <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
-                <span>Chuyển đến bởi: </span>
-                <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
-                  <span> - Ý kiến: </span>
-                  <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
-                </span>
-              </p>
-              <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
-                <span>Người thực hiện: &nbsp;</span>
-                <span v-for="(item, index) in usersNextAction" :key="item.userId">
-                  &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
-                </span> - 
-                <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
-                  {{stepOverdueNextAction}}
-                </span>
-              </p>
-            </div>
-            <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
-              <p class="mb-2">
-                Hồ sơ đã hoàn thành quá trình xử lý
-              </p>
+            <div class="px-4 pt-2">
+              <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
+                <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
+                  <span>Chuyển đến bởi: </span>
+                  <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
+                  <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
+                    <span> - Ý kiến: </span>
+                    <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
+                  </span>
+                </p>
+                <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                  <span>Người thực hiện: &nbsp;</span>
+                  <span v-for="(item, index) in usersNextAction" :key="item.userId">
+                    &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                  </span> - 
+                  <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                    {{stepOverdueNextAction}}
+                  </span>
+                </p>
+              </div>
+              <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
+                <p class="mb-2">
+                  Hồ sơ đã hoàn thành quá trình xử lý
+                </p>
+              </div>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
               <v-expansion-panel class="expansion-pl">
@@ -104,8 +106,8 @@
               </v-expansion-panel>
             </div>
             <!-- Action button -->
-            <div class="py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              <v-btn color="primary" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+            <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
@@ -143,8 +145,8 @@
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-                <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+              <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                   :loading="loadingActionProcess"
                   :disabled="loadingActionProcess"
                   >
@@ -204,12 +206,13 @@
                         </div>
                         <!--  -->
                         <div style="position:relative">
-                          <v-text-field class="pl-5 my-3"
+                          <v-text-field class="pl-4 my-3"
                           v-model="messageChat"
-                          placeholder="Nhập trao đổi"
+                          label="Nhập trao đổi"
                           @keyup.enter="postChat"
+                          box
                           ></v-text-field>
-                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position:absolute;top:0px;right:5px">send</v-icon>
+                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 18px;font-size: 14px;">send</v-icon>
                         </div>
                       </v-flex>
                     </v-card-text>

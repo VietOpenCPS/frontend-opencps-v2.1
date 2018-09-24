@@ -1,0 +1,172 @@
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+/*---------- Header ----------*/
+#banner {
+	background: url("../images/bg-header.png") center center no-repeat;
+    padding: 15px 0;
+    background-size: cover;
+
+    .container {
+    	padding: 0;
+    }
+
+    .logo {
+    	text-transform: uppercase;
+	    font-weight: bold;
+	    > a {
+	    	display: block;
+	    }
+
+	    img {
+	    	margin-right: 15px;
+    		float: left;
+	    }
+
+	    .text-logo {
+	    	margin-top: 5px;
+		    color: #f26522;
+		    white-space: nowrap;
+		    text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+		    text-align: center;
+		    font-weight: bold;
+		    font-size: 18px;
+
+		    span {
+		    	font-size: 24px;
+			    color: #0054a6;
+			    display: block;
+			    margin-top: 10px;
+		    }
+	    }
+    }
+}
+
+/*---------- Footer ----------*/
+#footer {
+    color: white;
+    margin-top: 20px;
+    background: $main-color;
+    background: url("../images/bg-footer.png") center center repeat-y;
+    background-size: 100% auto;
+
+    .first {
+    	padding-top: 30px;
+    	padding-bottom: 20px;
+    }
+
+    .site-name {
+    	text-transform: uppercase;
+
+    	span {
+    		display: block;
+		    font-weight: bold;
+		    font-size: 18px;
+		    line-height: 26px;
+		    margin-bottom: 15px;
+    	}
+    }
+
+    .contact {
+    	margin-left: auto;
+
+    	p {
+    		margin-bottom: 5px;
+    	}
+    }
+
+    .last {
+    	padding: 10px 15px;
+	    background-color: $main-color-dark;
+	    font-size: 12px;
+    }
+}
+
+/*---------- Navbar ----------*/
+#navigation {
+	background-color: #00497f;
+	font-family: 'Roboto', sans-serif;
+	border: 0;
+    border-radius: 0;
+	margin-bottom: 0;
+
+	.container {
+		padding: 0;
+	}
+
+	ul {
+		overflow: hidden;
+
+		li {
+			float: left;
+
+			a {
+				font-size: 14px;
+				color: white;
+				display: block;
+				line-height: 42px;
+				white-space: nowrap;
+			    position: relative;
+			    padding: 0 20px;
+			    font-weight: bold;
+
+			    &:focus {
+			    	outline: none;
+			    }
+			}
+
+			&.selected, &.selected:hover, &:hover {
+
+				a {
+					color: white;
+					background-color: #0054a6;
+				}
+			}
+		}
+
+		ul {
+			display: none;
+		}
+	}
+}
+
+
+
+
+/*------------------------------
+			ALIGN-EQUAL
+------------------------------*/
+.eq-height {display: -webkit-box; display: flex;}
+.eq-height-break {display: -webkit-box; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap}
+.align-middle {display: -webkit-box; display: flex; -webkit-align-items: center; align-items: center}
+.align-center {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center}
+.center-all {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center}
+.align-space-around {display: -webkit-box; display: flex; -webkit-justify-content: space-around; justify-content: space-around;}
+.align-space-between {display: -webkit-box; display: flex; -webkit-justify-content: space-between; justify-content: space-between;}
+.flex-break {-webkit-flex-wrap: wrap; flex-wrap: wrap;}
+
+
+.eq-height-lg {display: -webkit-box; display: flex;}
+.eq-height-break-lg {display: -webkit-box; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap}
+.align-middle-lg {display: -webkit-box; display: flex; -webkit-align-items: center; align-items: center}
+.align-center-lg {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center}
+.center-all-lg {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center}
+.align-space-around-lg {display: -webkit-box; display: flex; -webkit-justify-content: space-around; justify-content: space-around;}
+.align-space-between-lg {display: -webkit-box; display: flex; -webkit-justify-content: space-between; justify-content: space-between;}
+
+@media (max-width: 767px) {
+	.eq-height-lg, .eq-height-break-lg, .align-middle-lg, .align-center-lg, .center-all-lg, .align-space-around-lg, .align-space-between-lg {
+		display: block;
+		/* overflow: hidden; */
+	}
+
+	.eq-height-sm {display: -webkit-box; display: flex;}
+	.eq-height-break-sm {display: -webkit-box; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap}
+	.align-middle-sm {display: -webkit-box; display: flex; -webkit-align-items: center; align-items: center}
+	.align-center-sm {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center}
+	.center-all-sm {display: -webkit-box; display: flex; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center}
+	.align-space-around-sm {display: -webkit-box; display: flex; -webkit-justify-content: space-around; justify-content: space-around;}
+	.align-space-between-sm {display: -webkit-box; display: flex; -webkit-justify-content: space-between; justify-content: space-between;}
+}

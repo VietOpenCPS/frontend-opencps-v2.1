@@ -182,7 +182,7 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="originality !== 1">
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs4 class="pl-2 pr-2 input-group--text-field-box">
           <v-select
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -196,7 +196,7 @@
             clearable
           ></v-select>
         </v-flex>
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs4 class="pl-2 pr-2 input-group--text-field-box">
           <v-select
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -216,8 +216,11 @@
               placeholder="Nhập mã hồ sơ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
+              append-icon="search"
+              box
+              :append-icon-cb="changeDossierNoKey"
             ></v-text-field>
-            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
+            <!-- <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon> -->
           </div>
         </v-flex>
       </v-layout>
