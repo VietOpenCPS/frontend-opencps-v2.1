@@ -6,7 +6,7 @@
       <span>Ý kiến cán bộ</span> <span v-if="user_note === 2" class="red--text text--darken-3">*</span>
       </div>
       <v-card>
-        <v-card-text class="py-2 px-2">
+        <v-card-text class="py-2 px-4">
           <v-layout wrap>
             <v-flex xs12>
               <v-form v-model="valid" ref="userNoteForm">
@@ -15,6 +15,8 @@
                   multi-line
                   :rows="4"
                   :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
+                  box
+                  label="nhập ý kiến"
                 ></v-text-field>
               </v-form>
             </v-flex>
