@@ -12,7 +12,7 @@
             <v-expansion-panel class="expaned__list__data">
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
-                  <div style="align-items: center;background: #fff; padding-left: 15px;" :style="{width: checkStyle(item)}">
+                  <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                     <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
                       <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                       <div class="header__tphs">
@@ -35,7 +35,7 @@
                   </div>
                 </div>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
-                  <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 15px; font-size: 12px;">
+                  <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <v-icon v-if="itemFileView.eForm">border_color</v-icon>
                       <v-icon v-else>attach_file</v-icon>

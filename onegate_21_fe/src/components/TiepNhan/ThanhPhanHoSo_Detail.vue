@@ -12,7 +12,7 @@
             <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header">
-                  <div style="width: calc(100% - 350px);display: flex;align-items: center;background: #fff;padding-left: 15px;">
+                  <div style="width: calc(100% - 350px);display: flex;align-items: center;background: #fff;padding-left: 25px;">
                     <span class="text-bold mr-2">{{index + 1}}.</span>
                     <span @click="loadAlpcaForm(item)">{{item.partName}} <span v-if="item.required" style="color: red"> (*)</span> <i v-if="item.hasForm" style="font-size: 10px;color: #0d71bb;">(Form trực tuyến)</i></span>
                   </div>
