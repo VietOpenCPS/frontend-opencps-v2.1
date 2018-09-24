@@ -5,11 +5,11 @@ $main-color-dark: #0d2434;
 
 
 //Import
-@import url(app.4e8c0a25c8c8c527b17c28f1e346be6a.css);
+@import url(app.fd93d0271d73c9f338999362599345b3.css);
 @import url(slick.css);
 @import url(slick-theme.css);
 
-@import url(base_style.scss);
+@import "base_style";
 
 @import url(custom-style.css);
 
