@@ -257,16 +257,16 @@ body .input-group--text-field input, body .input-group--text-field textarea {
     font-size: 14px;
 }
 table.datatable thead th:first-child, table.datatable tbody tr td:first-child{
-    max-width: 100px !important;
+    width: 50px;
 }
 table.datatable thead th:nth-child(3), table.datatable tbody tr td:nth-child(3){
-    min-width: 200px;
+    width: 200px;
 }
 table.datatable thead th:nth-child(4), table.datatable tbody tr td:nth-child(4){
-    min-width: 100px;
+    width: 100px;
 }
 table.datatable thead th:nth-child(5), table.datatable tbody tr td:nth-child(5){
-    min-width: 120px;
+    width: 150px;
 }
 table .stt_column , table .action_column {
     padding: 2px 5px !important;
@@ -2470,6 +2470,9 @@ body table.table tbody .input-group--selection-controls.checkbox.input-group--di
     background-color: #0b72ba;
     color: #ffffff;
 }
+.tabs__item--active:hover {
+    color: #ffffff !important;
+}
 .list-coquan .list__tile {
     height: 36px;
 }
@@ -2496,7 +2499,7 @@ body table.table tbody .input-group--selection-controls.checkbox.input-group--di
     background: #e1e2e1;
 }
 .table-detail-domain tbody tr td:nth-child(1) {
-    width: 148px
+    width: 148px !important
 }
 .menu__content {
     margin-top: 6px !important;

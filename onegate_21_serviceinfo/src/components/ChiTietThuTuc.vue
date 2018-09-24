@@ -81,12 +81,12 @@
                   </div>
                 </v-card-text>
                 <v-menu bottom right offset-y class="ml-2 my-2">
-                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile>
-                      <v-list-tile-title v-if="serviceDetail.maxLevel === 3" @click="createDossier(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
+                  <v-list v-if="serviceDetail.serviceConfigs">
+                    <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
+                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -98,12 +98,12 @@
                   <div v-html="serviceDetail.processText"></div>
                 </v-card-text>
                 <v-menu bottom right offset-y class="ml-2 mb-2">
-                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile>
-                      <v-list-tile-title v-if="serviceDetail.maxLevel === 3" @click="createDossier(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
+                  <v-list v-if="serviceDetail.serviceConfigs">
+                    <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
+                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -125,12 +125,12 @@
                   </div>
                 </v-card-text>
                 <v-menu bottom right offset-y class="ml-2 mb-2">
-                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile>
-                      <v-list-tile-title v-if="serviceDetail.maxLevel === 3" @click="createDossier(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
+                  <v-list v-if="serviceDetail.serviceConfigs">
+                    <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
+                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -142,12 +142,12 @@
                   <div v-html="serviceDetail.conditionText"></div>
                 </v-card-text>
                 <v-menu bottom right offset-y class="ml-2 mb-2">
-                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile>
-                      <v-list-tile-title v-if="serviceDetail.maxLevel === 3" @click="createDossier(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(serviceDetail)">{{serviceDetail.administrationName}}</v-list-tile-title>
+                  <v-list v-if="serviceDetail.serviceConfigs">
+                    <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
+                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -160,7 +160,7 @@
     <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
       <v-card>
         <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-        <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceConfigs.serviceInstruction"></v-card-text>
+        <v-card-text v-if="serviceConfigDetail" style="max-height: 400px" v-html="serviceConfigDetail.serviceInstruction"></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -182,6 +182,7 @@ export default {
     loading: false,
     loadingAction: false,
     serviceDetail: '',
+    serviceConfigDetail: '',
     dialogGuide: false
   }),
   computed: {},
@@ -204,11 +205,12 @@ export default {
   watch: {},
   methods: {
     createDossier (item) {
-      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigs.serviceConfigId
+      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url)
     },
     viewGuide (item) {
       var vm = this
+      vm.serviceConfigDetail = item
       vm.dialogGuide = true
     },
     downloadFileTemplate (item) {
@@ -224,6 +226,17 @@ export default {
           return [fileData]
         } else {
           return false
+        }
+      }
+    },
+    serviceConfigs (config) {
+      if (Array.isArray(config)) {
+        return config
+      } else {
+        if (config.hasOwnProperty('serviceConfigId')) {
+          return [config]
+        } else {
+          return []
         }
       }
     },
