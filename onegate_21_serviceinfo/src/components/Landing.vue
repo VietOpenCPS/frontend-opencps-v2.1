@@ -110,12 +110,12 @@
               </content-placeholders>
               <div v-else>
                 <v-menu bottom right offset-y>
-                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel === 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile>
-                      <v-list-tile-title v-if="props.item.maxLevel === 3" @click="createDossier(props.item)">{{props.item.administrationName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(props.item)">{{props.item.administrationName}}</v-list-tile-title>
+                  <v-list v-if="props.item.serviceConfigs">
+                    <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
+                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -129,7 +129,7 @@
           </div>
         </template>
       </v-data-table>
-      <div v-if="totalThuTuc > 10" class="text-xs-right layout wrap" style="position: relative;">
+      <div class="text-xs-right layout wrap mt-3" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -139,7 +139,7 @@
     <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
       <v-card>
         <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-        <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceConfigs.serviceInstruction"></v-card-text>
+        <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
@@ -404,13 +404,24 @@ export default {
       })
     },
     createDossier (item) {
-      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigs.serviceConfigId
+      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url)
     },
     viewGuide (item) {
       var vm = this
       vm.serviceDetail = item
       vm.dialogGuide = true
+    },
+    serviceConfigs (config) {
+      if (Array.isArray(config)) {
+        return config
+      } else {
+        if (config.hasOwnProperty('serviceConfigId')) {
+          return [config]
+        } else {
+          return []
+        }
+      }
     },
     getColor (level) {
       if (level === 2) {

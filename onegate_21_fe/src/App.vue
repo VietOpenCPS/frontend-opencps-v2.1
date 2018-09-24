@@ -28,7 +28,7 @@
               </span>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile v-for="subItem in item.items" :key="subItem.stepCode"
+          <v-list-tile v-if="item.items && item.items.length > 1" v-for="subItem in item.items" :key="subItem.stepCode"
             v-on:click.native="filterSteps(subItem)"
             :class="{'list__tile--active': String(currentStep) === String(subItem.stepCode)}"
             >
