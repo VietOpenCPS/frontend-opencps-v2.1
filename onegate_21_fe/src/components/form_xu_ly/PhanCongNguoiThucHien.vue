@@ -8,7 +8,7 @@
           </div>Chọn người thực hiện
         </div>
         <v-card >
-          <div v-if="type === 1" class="px-2 py-1">
+          <div v-if="type === 1" class="px-4 py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               slot="activator"
@@ -22,7 +22,7 @@
             <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
           </div>
           <!--  -->
-          <v-card-text v-else class="px-2 py-1">
+          <v-card-text v-else class="px-4 py-1">
             <v-layout wrap class="my-1">
               <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId">
                 <v-layout wrap>

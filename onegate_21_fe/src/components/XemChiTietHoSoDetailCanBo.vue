@@ -208,11 +208,11 @@
                         <div style="position:relative">
                           <v-text-field class="pl-4 my-3"
                           v-model="messageChat"
-                          placeholder="Nhập trao đổi"
+                          label="Nhập trao đổi"
                           @keyup.enter="postChat"
                           box
                           ></v-text-field>
-                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position:absolute;top:0px;right:5px">send</v-icon>
+                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 16px;font-size: 14px;">send</v-icon>
                         </div>
                       </v-flex>
                     </v-card-text>
