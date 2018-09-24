@@ -10,7 +10,7 @@
         <v-card >
           <v-card-text>
             <v-layout wrap class="pl-2">
-              <v-icon color="blue" class="hover-pointer ml-3" @click="showDatePicker">event</v-icon>
+              <v-icon color="primary" class="hover-pointer" @click="showDatePicker">event</v-icon>
               <vue-ctk-date-time-picker
                 ref="datepicker" 
                 style="width:auto!important"
