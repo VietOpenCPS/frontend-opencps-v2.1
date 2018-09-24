@@ -7,6 +7,14 @@
 	</compatibility>
 	<theme id="opencps-child-vue-bvh" name="opencps-child-vue-bvh">
 		<template-extension>ftl</template-extension>
+		<settings>
+			<setting configurable="true" key="m_sitename" type="text" value=""></setting>
+			<setting configurable="true" key="m_main_responsibility" type="text" value=""></setting>
+			<setting configurable="true" key="m_address" type="text" value=""></setting>
+			<setting configurable="true" key="m_phone" type="text" value=""></setting>
+			<setting configurable="true" key="m_email" type="text" value=""></setting>
+			<setting configurable="true" key="m_copyright" type="text" value=""></setting>
+		</settings>
 		<portlet-decorator id="barebone" name="Barebone">
 			<portlet-decorator-css-class>portlet-barebone</portlet-decorator-css-class>
 		</portlet-decorator>
