@@ -65,7 +65,7 @@
             NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
-        <v-tabs-items v-model="activeTab">
+        <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
             <div class="px-4 pt-2">
@@ -145,8 +145,8 @@
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
-              <div class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-                <v-btn color="primary" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+              <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
                   :loading="loadingActionProcess"
                   :disabled="loadingActionProcess"
                   >
@@ -212,7 +212,7 @@
                           @keyup.enter="postChat"
                           box
                           ></v-text-field>
-                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 16px;font-size: 14px;">send</v-icon>
+                          <v-icon @click="postChat" color="blue" class="hover-pointer" style="position: absolute;right: 10px;bottom: 18px;font-size: 14px;">send</v-icon>
                         </div>
                       </v-flex>
                     </v-card-text>
