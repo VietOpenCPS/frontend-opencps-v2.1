@@ -218,8 +218,9 @@
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
               box
+              :append-icon-cb="changeDossierNoKey"
             ></v-text-field>
-            <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon>
+            <!-- <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon> -->
           </div>
         </v-flex>
       </v-layout>
@@ -268,7 +269,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="menuType !== 3 && originality !== 1"
+        :select-all="menuType !== 3 && originality !== 1 && btnDynamics.length > 0"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào!"
         hide-actions
@@ -276,7 +277,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th v-if="menuType !== 3 && originality !== 1">
+          <th v-if="menuType !== 3 && originality !== 1 && btnDynamics.length > 0">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -302,7 +303,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td v-if="menuType !== 3 && originality !== 1">
+          <td v-if="menuType !== 3 && originality !== 1 && btnDynamics.length > 0">
             <v-checkbox
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"

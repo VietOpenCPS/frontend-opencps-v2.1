@@ -53,7 +53,7 @@
           class="table-tracuu table-landing table-bordered"
           >
             <template slot="items" slot-scope="props">
-              <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
+              <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer" @click="viewDetail(props.item)">
                 <td class="text-xs-left">
                   <content-placeholders v-if="loadingTable">
                     <content-placeholders-text :lines="1" />

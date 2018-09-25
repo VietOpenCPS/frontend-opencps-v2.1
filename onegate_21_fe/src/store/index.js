@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
     loading: false,
     loadingTable: false,
     loadingDynamicBtn: false,
+    loadingGov: false,
     error: null,
     user: null,
     index: 0,
@@ -2027,7 +2028,11 @@ export const store = new Vuex.Store({
             params: {
             }
           }
+          commit('setLoadingGov', true)
+          // test local
           axios.get(state.initData.serviceConfigByGovApi, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+            commit('setLoadingGov', false)
             let serializable = response.data
             if (serializable.govAgencies) {
               resolve(serializable.govAgencies)
@@ -2036,6 +2041,7 @@ export const store = new Vuex.Store({
             }
           }).catch(function (error) {
             console.log(error)
+            commit('setLoadingGov', false)
             reject(error)
           })
         })
@@ -2328,6 +2334,9 @@ export const store = new Vuex.Store({
     setLoadingTable (state, payload) {
       state.loadingTable = payload
     },
+    setLoadingGov (state, payload) {
+      state.loadingGov = payload
+    },
     setError (state, payload) {
       state.error = payload
     },
@@ -2542,6 +2551,9 @@ export const store = new Vuex.Store({
     },
     loadingTable (state) {
       return state.loadingTable
+    },
+    loadingGov (state) {
+      return state.loadingGov
     },
     error (state) {
       return state.error
