@@ -4,7 +4,13 @@
       :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0"
     >
       <div class="mx-2">
-        <v-btn block color="primary" v-on:click.native="doAddDVC()">Thêm mới hồ sơ</v-btn>
+        <v-btn block color="primary" v-on:click.native="doAddDVC()"
+          :loading="loadingGov"
+          :disabled="loadingGov"
+        >
+          Thêm mới hồ sơ
+          <span slot="loader">Loading...</span>
+        </v-btn>
       </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -75,6 +81,9 @@
     computed: {
       currentIndex () {
         return this.$store.getters.index
+      },
+      loadingGov () {
+        return this.$store.getters.loadingGov
       }
     },
     created () {

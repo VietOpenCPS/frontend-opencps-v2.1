@@ -13,6 +13,13 @@
       <section class="kios-content-wrapper" @mousemove="stopInterval()" @click="stopInterval()">
         <div class="tab-item">
           <div class="left" :class="fullScreen ? 'smallScreen' : ''">
+            <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
+              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
+              <p class="ml-2 my-0">
+                <span class="text-bold">Kết quả hồ sơ</span><br>
+                <span>Tra cứu kết quả hồ sơ</span>
+              </p>
+            </a>
             <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
               <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-search-50.png"></p>
               <p class="ml-2 my-0">
@@ -108,7 +115,9 @@
       goPage (page) {
         var vm = this
         let queryString
-        if (page === 'tracuuhoso') {
+        if (page === 'ketquahoso') {
+          queryString = '/'
+        } else if (page === 'tracuuhoso') {
           queryString = '/tra-cuu-ho-so'
         } else if (page === 'tracuuthutuc') {
           queryString = '/tra-cuu-thu-tuc'
