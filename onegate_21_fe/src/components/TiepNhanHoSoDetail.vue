@@ -195,6 +195,7 @@ export default {
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
     payments: {},
+    paymentProfile: {},
     briefNote: '',
     receiveDateEdit: '',
     viaPortalDetail: 0,
@@ -246,8 +247,14 @@ export default {
                 result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                // if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 2 && resAction.payment.requestPayment !== '2') {
+                  // add thanh toán điện tử
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
+                  // current
+                  /* vm.showThuPhi = true
+                  vm.payments = resAction.payment */
+                  //
                 }
                 // call initData thong tin chung ho so
                 if (vm.$refs.thongtinchunghoso) {

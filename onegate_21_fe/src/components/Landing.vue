@@ -1253,7 +1253,7 @@ export default {
       if (item) {
         setTimeout(function () {
           vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
-            return (itemThuTuc.serviceCode.indexOf(item.domainCode) === 0)
+            return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
           })
         }, 100)
       } else {
