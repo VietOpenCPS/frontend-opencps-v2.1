@@ -207,7 +207,7 @@ export default {
   watch: {},
   methods: {
     createDossier (item) {
-      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+      let url = '/web/bo-van-hoa/quan-ly-ho-so#/add-dvc/' + item.serviceConfigId
       window.open(url)
     },
     viewGuide (item) {
