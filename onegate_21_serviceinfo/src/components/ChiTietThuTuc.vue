@@ -265,5 +265,6 @@ export default {
   }
   .table-detail-domain .table.table tbody td {
     height: 36px;
+    vertical-align: middle;
   }
 </style>
