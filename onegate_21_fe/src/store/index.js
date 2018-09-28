@@ -104,7 +104,8 @@ export const store = new Vuex.Store({
     },
     viaPostal: 0,
     data_phancong: [],
-    dataCreateDossier: {}
+    dataCreateDossier: {},
+    paymentProfile: {}
   },
   actions: {
     clearError ({commit}) {
@@ -1641,10 +1642,9 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           },
           params: {
-            // abc: data.abc
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.dossierId + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
@@ -2543,6 +2543,9 @@ export const store = new Vuex.Store({
     },
     setDataCreateDossier (state, payload) {
       state.dataCreateDossier = payload
+    },
+    setPaymentProfile (state, payload) {
+      state.paymentProfile = payload
     }
   },
   getters: {
@@ -2693,6 +2696,9 @@ export const store = new Vuex.Store({
     },
     getDataCreateDossier (state) {
       return state.dataCreateDossier
+    },
+    getPaymentProfile (state) {
+      return state.paymentProfile
     }
   }
 })
