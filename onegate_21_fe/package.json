@@ -16,6 +16,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.1.1",
+    "bootstrap-datetimepicker-npm": "^4.17.37-npm",
     "compression-webpack-plugin": "^1.1.11",
     "glyphicons": "^0.2.0",
     "handlebars": "^4.0.11",
