@@ -591,6 +591,31 @@ export const store = new Vuex.Store({
         })
       })
     },
+    uploadPaymentFile ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let files = $('#' + data.selector)[0].files
+        let file = files[0]
+        let formData = new FormData()
+        formData.append('displayName', file.name)
+        formData.append('fileType', file.type)
+        formData.append('fileSize', file.size)
+        formData.append('file', file)
+        console.log('formData', formData)
+        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(function (response) {
+          resolve(response.data)
+          console.log('Tải file thành công')
+        }).catch(function (xhr) {
+          console.log(xhr)
+          toastr.error('Tải file thất bại')
+          reject(xhr)
+        })
+      })
+    },
     getDetailDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -812,7 +837,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('applicantName', data.applicantName)
         dataPutdossier.append('dossierNo', data.dossierNo)
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', Number(data.applicantIdNo))
+        dataPutdossier.append('applicantIdNo', data.applicantIdNo)
         dataPutdossier.append('address', data.address)
         dataPutdossier.append('cityCode', data.cityCode)
         dataPutdossier.append('districtCode', data.districtCode)
@@ -820,7 +845,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('contactTelNo', data.contactTelNo)
         dataPutdossier.append('contactEmail', data.contactEmail)
         dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', Number(data.delegateIdNo))
+        dataPutdossier.append('delegateIdNo', data.delegateIdNo)
         dataPutdossier.append('delegateTelNo', data.delegateTelNo)
         dataPutdossier.append('delegateEmail', data.delegateEmail)
         dataPutdossier.append('delegateAddress', data.delegateAddress)

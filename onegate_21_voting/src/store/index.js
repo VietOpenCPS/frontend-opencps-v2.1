@@ -140,6 +140,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    checkPermisionVoting ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            },
+            params: {
+              applicantIdNo: filter.applicantIdNo,
+              dossierNo: filter.dossierNo
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/votings/checkpermission', config).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/votings/checkpermission', config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
@@ -155,10 +179,6 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('className', data.className)
           params.append('classPk', data.classPk)
-          params.append('applicantIdNo', data.applicantIdNo)
-          params.append('dossierNo', data.dossierNo)
-          params.append('email', '')
-          params.append('fullName', '')
           axios.post(support.initData.votingApi + '/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {

@@ -58,7 +58,10 @@
         </div>
       </v-flex>
     </v-layout>
-    <div class="service__info__table">
+    <content-placeholders class="mt-3" v-if="loading">
+      <content-placeholders-text :lines="10" />
+    </content-placeholders>
+    <div v-else class="service__info__table">
       <v-data-table
         :headers="headers"
         :items="serviceInfoList"
@@ -83,7 +86,7 @@
                 <span>{{props.item.serviceName}}</span>
               </div>
             </td>
-            <td class="text-xs-left">
+            <td class="text-xs-left" style="min-width: 150px">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -405,8 +408,8 @@ export default {
       })
     },
     createDossier (item) {
-      let url = '/web/bo-van-hoa/quan-ly-ho-so#/add-dvc/' + item.serviceConfigId
-      window.open(url)
+      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+      window.open(url, "_self")
     },
     viewGuide (item) {
       var vm = this

@@ -57,7 +57,11 @@
     <v-flex xs12 sm1>
     </v-flex>
     <v-flex xs12 sm12 class="text-xs-center mt-2">
-      <v-btn @click="dialogShowApplicantIdNo = true" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">Gửi kết quả đánh giá</v-btn>
+      <v-btn @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">Gửi kết quả đánh giá</v-btn>
+      <v-btn @click="goBack" color="primary">
+        <v-icon size="16">undo</v-icon>&nbsp;
+        Quay lại 
+      </v-btn>
     </v-flex>
   </v-layout>
   <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
@@ -91,8 +95,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="green darken-1" flat @click.native="doVottingResultSubmit">Đồng ý</v-btn>
-        <v-btn color="green darken-1" flat @click.native="goBack">Quay lại</v-btn>
+        <v-btn color="green darken-1" flat @click.native="doVottingSubmit">Đồng ý</v-btn>
+        <v-btn color="green darken-1" flat @click.native="() => dialogShowApplicantIdNo = false">Quay lại</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -164,37 +168,55 @@ export default {
   watch: {
   },
   methods: {
-    doVottingResultSubmit: function () {
+    submitResultVoting: function () {
       var vm = this
-      // if (vm.$refs.captcha) {
-      //   if (!vm.$refs.captcha.checkValidCatcha()) {
-      //     toastr.error('Xác nhận sai. Vui lòng kiểm tra lại!')
-      //     return
-      //   }
-      // } else {
-      //   vm.showCaptcha = true
-      //   return
-      // }
+      vm.votingDialog_hidden_loading = true
+      // var isSigned = window.themeDisplay.isSignedIn()
+      var isSigned = false
+      if (isSigned) {
+        vm.doVottingResultSubmit()
+      } else {
+        vm.votingDialog_hidden_loading = false
+        vm.dialogShowApplicantIdNo = true
+      }
+    },
+    doVottingSubmit () {
+      var vm = this
       if (!vm.$refs.formVoting.validate()) {
         vm.votingDialog_hidden_loading = false
         return
+      } else {
+        let filter = {
+          applicantIdNo: vm.applicantIdNo,
+          dossierNo: vm.dossierNo
+        }
+        vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
+          console.log('result', result)
+          if (result.hasPermission === true || result.hasPermission === 'true') {
+            vm.doVottingResultSubmit()
+          } else {
+            toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
+          }
+        }).catch(xhr => {
+          toastr.error('Lỗi hệ thống')
+        })
       }
-      vm.votingDialog_hidden_loading = true
+    },
+    doVottingResultSubmit: function () {
+      var vm = this
       let arrAction = []
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = vm.itemCode
         vm.votingItems[key]['classPk'] = vm.id
-        vm.votingItems[key]['applicantIdNo'] = vm.applicantIdNo
-        vm.votingItems[key]['dossierNo'] = vm.dossierNo
         arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
       }
       Promise.all(arrAction).then(results => {
-        toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-        vm.votingDialog_hidden_loading = false
+        toastr.success('Gửi đánh giá thành công thành công')
         vm.dialogShowApplicantIdNo = false
+        vm.votingDialog_hidden_loading = false
         router.push('/danh-sach-can-bo/' + vm.itemCode)
       }).catch(xhr => {
-        toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+        toastr.error('Gửi đánh giá thất bại')
         vm.votingDialog_hidden_loading = false
         vm.dialogShowApplicantIdNo = false
       })

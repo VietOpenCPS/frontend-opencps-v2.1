@@ -141,7 +141,7 @@
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- thanh toán điện tử -->
-              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile"></thanh-toan-dien-tu>
+              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :dossierId="dossierId"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
