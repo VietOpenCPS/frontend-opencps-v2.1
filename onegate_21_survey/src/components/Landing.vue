@@ -16,8 +16,8 @@
                   <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
                   </v-radio>
                 </v-radio-group>
-                <v-layout wrap class="ml-3" style="margin-top:-21px">
-                  <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
+                <v-layout wrap class="ml-3" style="margin-top:-10px">
+                  <v-flex style="margin-left:18px" v-for="(item2, index2) in item.answers" :key="index2">
                     <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
                   </v-flex>
                 </v-layout>

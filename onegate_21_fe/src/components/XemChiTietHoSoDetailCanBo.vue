@@ -140,6 +140,8 @@
               <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+              <!-- thanh toán điện tử -->
+              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
@@ -356,6 +358,7 @@ import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
@@ -371,6 +374,7 @@ export default {
     'phan-cong': PhanCong,
     'tra-ket-qua': TraKetQua,
     'thu-phi': ThuPhi,
+    'thanh-toan-dien-tu': ThucHienThanhToanDienTu,
     'ky-duyet': KyDuyet,
     'y-kien-can-bo': YkienCanBoThucHien,
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
@@ -424,6 +428,7 @@ export default {
     showKyPheDuyetTaiLieu: false,
     showTraKetQua: false,
     showThuPhi: false,
+    showThanhToanDienTu: false,
     showEditDate: false,
     showExtendDateEdit: false,
     checkInput: 0,
@@ -436,6 +441,7 @@ export default {
     userNote: 0,
     partView: '',
     stateView: false,
+    paymentProfile: '',
     payment_type: 0,
     type_assign: 0,
     returnFiles: [],
@@ -783,6 +789,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showThuPhi = false
+      vm.showThanhToanDienTu = false
       vm.showEditDate = false
       vm.showExtendDateEdit = false
       vm.showThucHienThanhToanDienTu = false
@@ -844,11 +851,29 @@ export default {
           vm.returnFiles = result.returnFiles
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+          // add thanh toán điện tử
+          // if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+          //   let filter = {
+          //     dossierId: vm.dossierId
+          //   }
+          //   vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+          //     vm.paymentProfile = result
+          //     isPopup = true
+          //     vm.showThanhToanDienTu = true
+          //   }).catch(reject => {
+          //   })
+          // } else {
+          //   isPopup = true
+          //   vm.showThuPhi = true
+          //   vm.payments = result.payment
+          //   vm.viaPortalDetail = dossierItem.viaPostal
+          // }
           isPopup = true
           vm.showThuPhi = true
           vm.payments = result.payment
           vm.viaPortalDetail = dossierItem.viaPostal
         }
+        console.log('paymentProfile', vm.paymentProfile)
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
           vm.showEditDate = true
@@ -1115,6 +1140,10 @@ export default {
       }
       if (vm.showThuPhi) {
         filter['payment'] = paymentsOut
+      }
+      if (vm.showThanhToanDienTu) {
+        let paymentProfile = vm.$store.getters.getPaymentProfile
+        console.log('paymentProfile', paymentProfile)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
