@@ -5,8 +5,8 @@
         <a href="/web/cong-dich-vu-cong">
           <img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/logo.png">
           <div>
-            <p class="text-bold">Tỉnh Phú Thọ</p>
-            <span class="text-bold">Hệ thống một cửa điện tử và dịch vụ công trực tuyến</span>
+            <p class="text-bold">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG TỈNH PHÚ THỌ</p>
+            <span class="text-bold">HỆ THỐNG MỘT CỬA ĐIỆN TỬ VÀ DỊCH VỤ CÔNG TRỰC TUYẾN</span>
           </div>
         </a>
       </header>
