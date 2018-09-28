@@ -81,7 +81,7 @@
               </v-flex>
               <v-flex xs12 sm1></v-flex>
             </v-layout>
-
+            <!--  -->
             <v-layout wrap style="position: relative">
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
@@ -108,7 +108,25 @@
                   </v-icon>
                 </span>
               </v-flex>
-            </v-layout>
+            </v-layout>   
+            <!--  -->
+            <v-card>
+              <input
+              type="file"
+              style="display: none"
+              :id="'paymentFile1'"
+              @change="uploadPaymentFile($event)"
+              >
+              <span>Tải file báo thanh toán</span>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile()">
+                  <v-badge>
+                    <v-icon size="16" color="primary">cloud_upload</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Tải file lên</span>
+              </v-tooltip>
+            </v-card>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -124,6 +142,9 @@ export default {
     paymentProfile: {
       type: Object,
       default: () => {}
+    },
+    dossierId: {
+      type: Number
     }
   },
   data: () => ({
@@ -192,6 +213,27 @@ export default {
         paymentNote: vm.paymentProfile.confirmNote
       }
       vm.$store.commit('setPaymentProfile', vm.data_payment)
+    },
+    uploadPaymentFile (e) {
+      var vm = this
+      // vm.dossierTemplatesItemSelect = data
+      // vm.progressUploadPart = data.partNo
+      var data = {}
+      data['dossierId'] = vm.dossierId
+      data['selector'] = 'paymentFile1'
+      // data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
+      vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
+        // vm.progressUploadPart = ''
+        // vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+        //   vm.dossierFilesItems = result
+        // })
+      }).catch(function (xhr) {
+        // vm.progressUploadPart = ''
+      })
+    },
+    pickFile () {
+      var vm = this
+      document.getElementById('paymentFile1').click()
     },
     currency (value) {
       if (value) {
