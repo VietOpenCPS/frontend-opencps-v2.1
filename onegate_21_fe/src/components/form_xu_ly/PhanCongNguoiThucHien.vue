@@ -57,7 +57,7 @@
   </div>
 </template>
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 import toggleButton from '../toggleButton.vue'
 export default {
   components: {
@@ -106,7 +106,7 @@ export default {
   created () {
     var vm = this
     setTimeout(function () {
-      $('.btn-tgl').addClass('btn-hidden')
+      window.$('.btn-tgl').addClass('btn-hidden')
     }, 200)
   },
   mounted () {
@@ -127,10 +127,10 @@ export default {
       var vm = this
       if (event) {
         vm.assign_items[index].assigned = 1
-        $(`#btn-${index}`).removeClass('btn-hidden')
+        window.$(`#btn-${index}`).removeClass('btn-hidden')
       } else {
         vm.assign_items[index].assigned = 0
-        $(`#btn-${index}`).addClass('btn-hidden')
+        window.$(`#btn-${index}`).addClass('btn-hidden')
       }
       // console.log('vm.assign_items', vm.assign_items)
     },
@@ -138,10 +138,10 @@ export default {
       var vm = this
       if (event.value) {
         vm.assign_items[index].assigned = 1
-        $(`#btn-${index}`).removeClass('btn-hidden')
+        window.$(`#btn-${index}`).removeClass('btn-hidden')
       } else {
         vm.assign_items[index].assigned = 2
-        $(`#btn-${index}`).addClass('btn-hidden')
+        window.$(`#btn-${index}`).addClass('btn-hidden')
       }
       // console.log('vm.assign_items', vm.assign_items)
     },
