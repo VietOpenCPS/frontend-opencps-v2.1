@@ -56,6 +56,8 @@
                   v-model="briefNote"
                   multi-line
                   :rows="2"
+                  box
+                  label="nhập nội dung..."
                 ></v-text-field>
               </v-card-text>
             </v-card>

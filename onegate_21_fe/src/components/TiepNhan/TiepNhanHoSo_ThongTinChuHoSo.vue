@@ -170,7 +170,7 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn" style="width: 270px;margin-top: 4px;" v-if="originality !== 1">
+        <div class="absolute__btn" style="width: 270px;" v-if="originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>

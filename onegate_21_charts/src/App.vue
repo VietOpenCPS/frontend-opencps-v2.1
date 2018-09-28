@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="report__chart">
     
     <v-content>
       <router-view></router-view>
