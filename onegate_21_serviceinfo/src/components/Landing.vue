@@ -130,7 +130,7 @@
           </div>
         </template>
       </v-data-table>
-      <div class="text-xs-right layout wrap" style="position: relative;">
+      <div class="text-xs-right layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -405,7 +405,7 @@ export default {
       })
     },
     createDossier (item) {
-      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+      let url = '/web/bo-van-hoa/quan-ly-ho-so#/add-dvc/' + item.serviceConfigId
       window.open(url)
     },
     viewGuide (item) {
