@@ -255,7 +255,7 @@
 </template>
 
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 // import * as utils from '../store/onegate_utils'
 import toastr from 'toastr'
 export default {
@@ -561,7 +561,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
         vm.$store.dispatch('loadFormData', item).then(resData => {
-          $('#formAlpaca' + item.partNo + vm.id).empty()
+          window.$('#formAlpaca' + item.partNo + vm.id).empty()
           var formScript, formData
           /* eslint-disable */
           if (resScript) {
@@ -576,7 +576,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          $('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
+          window.$('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
         })
       })
     },
@@ -655,7 +655,7 @@ export default {
           vm.progressUploadPart = ''
         })
       } else {
-        if ($('#file' + data.partNo)[0].files.length === 0) {
+        if (window.$('#file' + data.partNo)[0].files.length === 0) {
           vm.progressUploadPart = ''
           return
         }

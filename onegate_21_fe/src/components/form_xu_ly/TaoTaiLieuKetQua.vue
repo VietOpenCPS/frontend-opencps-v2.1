@@ -138,7 +138,7 @@
 </template>
 
 <script>
-  import $ from 'jquery'
+  // import $ from 'jquery'
   import toastr from 'toastr'
   export default {
     props: {
@@ -289,7 +289,7 @@
         item['dossierId'] = vm.detailDossier.dossierId
         vm.$store.dispatch('loadFormScript', item).then(resScript => {
           vm.$store.dispatch('loadFormData', item).then(resData => {
-            $('#formAlpaca' + item.partNo + vm.id).empty()
+            window.$('#formAlpaca' + item.partNo + vm.id).empty()
             var formScript, formData
             /* eslint-disable */
             if (resScript) {
@@ -304,7 +304,7 @@
             }
             /* eslint-disable */
             formScript.data = formData
-            $('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
+            window.$('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
           })
         })
       },

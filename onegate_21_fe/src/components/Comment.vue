@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 // import axios from 'axios'
 import 'jquery-textcomplete'
 import 'jquery-comments'
@@ -105,7 +105,7 @@ export default {
     },
     initComment: function () {
       var vm = this
-      $('#comments-container-el').comments({
+      window.$('#comments-container-el').comments({
         profilePictureURL: 'https://png.icons8.com/material/50/000000/guest-male.png',
         textareaRows: 2,
         enableAttachments: true,
@@ -176,7 +176,7 @@ export default {
           let promise = vm.$store.dispatch('loadCommentItems', dataGet)
           promise.then(result => {
             var data = []
-            $.each(result, function (index, item) {
+            window.$.each(result, function (index, item) {
               vm.comment = item
               vm.formatComment(vm.comment)
               data.push(vm.comment)
@@ -193,7 +193,7 @@ export default {
           data.opinion = document.getElementById('opinion').checked
           vm.$store.dispatch('postComment', data).then(result => {
             if (result.opinion) {
-              $('.opinion').hide()
+              window.$('.opinion').hide()
             }
             document.getElementById('opinion').checked = false
             vm.comment = result
@@ -244,9 +244,9 @@ export default {
               }
             }
           }
-          $(comments).each(function (index, comment) {
+          window.$(comments).each(function (index, comment) {
             var formData = new FormData()
-            $(Object.keys(comment)).each(function (index, key) {
+            window.$(Object.keys(comment)).each(function (index, key) {
               var value = comment[key]
               if (value) {
                 formData.append(key, value)
@@ -266,7 +266,7 @@ export default {
             formData.append('email', '')
             formData.append('fullname', vm.initData.user.userName)
             formData.append('opinion', document.getElementById('opinion').checked)
-            $.ajax({
+            window.$.ajax({
               url: vm.initData.commentApi + '/uploads',
               dataType: 'json',
               type: 'POST',
@@ -280,14 +280,14 @@ export default {
               processData: false,
               success: function (comment) {
                 if (comment.opinion) {
-                  $('.opinion').hide()
+                  window.$('.opinion').hide()
                 }
                 document.getElementById('opinion').checked = false
                 vm.formatComment(comment)
                 successfulUploads.push(vm.comment)
                 serverResponded()
                 if (comment.opinion) {
-                  $('.opinion').hide()
+                  window.$('.opinion').hide()
                 }
                 document.getElementById('opinion').checked = false
               },

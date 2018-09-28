@@ -351,8 +351,8 @@
 
 <script>
 import router from '@/router'
-import $ from 'jquery'
-import '../store/jquery_comment'
+// import $ from 'jquery'
+import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -1440,7 +1440,7 @@ export default {
             }
             /* eslint-disable */
             formScript.data = formData
-            $('#formAlpaca' + item.partNo).alpaca(formScript)
+            window.$('#formAlpaca' + item.partNo).alpaca(formScript)
           })
         })
       }
