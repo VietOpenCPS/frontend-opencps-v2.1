@@ -171,8 +171,7 @@ export default {
     submitResultVoting: function () {
       var vm = this
       vm.votingDialog_hidden_loading = true
-      // var isSigned = window.themeDisplay.isSignedIn()
-      var isSigned = false
+      var isSigned = window.themeDisplay.isSignedIn()
       if (isSigned) {
         vm.doVottingResultSubmit()
       } else {
