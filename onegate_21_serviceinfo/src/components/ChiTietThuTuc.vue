@@ -81,7 +81,7 @@
                     </div>
                   </div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 my-2" style="position: relative;">
+                <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;">
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -98,7 +98,7 @@
                 <v-card-text>
                   <div v-html="serviceDetail.processText"></div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -125,7 +125,7 @@
                     </div>
                   </div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -142,7 +142,7 @@
                 <v-card-text>
                   <div v-html="serviceDetail.conditionText"></div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
