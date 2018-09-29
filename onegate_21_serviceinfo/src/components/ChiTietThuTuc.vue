@@ -81,7 +81,7 @@
                     </div>
                   </div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 my-2">
+                <v-menu bottom right offset-y class="ml-2 my-2" style="position: relative;">
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -208,7 +208,7 @@ export default {
   methods: {
     createDossier (item) {
       let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-      window.open(url, "_self")
+      window.open(url, '_self')
     },
     viewGuide (item) {
       var vm = this
