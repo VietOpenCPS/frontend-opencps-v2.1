@@ -466,6 +466,8 @@ export default {
               }).catch(reject => {
                 vm.loadingAction = false
               })
+            } else {
+              vm.goBack()
             }
           }).catch(rejectXhr => {
             vm.loadingAction = false

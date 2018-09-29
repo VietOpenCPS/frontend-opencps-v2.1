@@ -335,6 +335,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDetailDossierQR ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              secretKey: filter.secretKey
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers/' + filter.dossierId, param).then(function (response) {
+            let serializable = response.data
+            console.log('response', response)
+            resolve(response)
+          }).catch(function (error) {
+            console.log('error', error)
+            reject(error)
+          })
+        })
+      })
+    },
     getListHistoryProcessingItems ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -436,8 +460,6 @@ export const store = new Vuex.Store({
           params.append('className', data.className)
           params.append('classPk', data.classPk)
           params.append('selected', data.selected)
-          params.append('dossierNo', data.dossierNo)
-          params.append('applicantIdNo', data.applicantIdNo)
           // test local
           // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
           axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
@@ -445,6 +467,30 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
+          })
+        })
+      })
+    },
+    checkPermisionVoting ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            },
+            params: {
+              applicantIdNo: filter.applicantIdNo,
+              dossierNo: filter.dossierNo
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/votings/checkpermission', config).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/votings/checkpermission', config).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
           })
         })
       })
