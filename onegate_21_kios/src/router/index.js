@@ -13,6 +13,7 @@ import HoSoKetQua from '@/components/HoSoKetQua'
 import DanhSachCanBo from '@/components/DanhSachCanBo'
 import CheckPassword from '@/components/CheckPassword'
 import CheckPasswordHP from '@/components/CheckPasswordHP'
+import ChiTietHoSoQR from '@/components/ChiTietHoSoQR'
 
 const routes = [
   { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
@@ -27,7 +28,8 @@ const routes = [
   { path: '/ho-so-co-ket-qua', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
   { path: '/danh-sach-can-bo', name: 'DanhSachCanBo', component: DanhSachCanBo, props: false },
   { path: '/ma-truy-cap', name: 'CheckPassword', component: CheckPassword, props: false },
-  { path: '/ma-truy-cap-ho-so', name: 'CheckPasswordHP', component: CheckPasswordHP, props: false }
+  { path: '/ma-truy-cap-ho-so', name: 'CheckPasswordHP', component: CheckPasswordHP, props: false },
+  { path: '/tra-cuu-thong-tin-ho-so/:index', name: 'ChiTietHoSoQR', component: ChiTietHoSoQR, props: true }
 ]
 
 Vue.use(Router)

@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0">
+  <div class="py-0" style="width: 80%; margin:auto">
     <v-card>
       <v-layout wrap class="wrap-password px-0 py-0">
         <div style="width: calc(100% - 150px)">
@@ -153,14 +153,14 @@ export default {
             vm.loading = false
             vm.dialogCheckPass = false
             vm.clearDialog()
-            if (result.status && result.status.toString() === '203') {
-              vm.dialogError = true
-            } else if (result.status && result.status.toString() === '200') {
+            if (result.status && result.status.toString() === '200') {
               vm.$store.commit('setDossierDetail', result.data)
               let queryString = '?keyword=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
               vm.$router.push({
                 path: '/tra-cuu-ho-so-homepage' + queryString
               })
+            } else {
+              vm.dialogError = true
             }
           }).catch(function (reject) {
             vm.dialogCheckPass = false

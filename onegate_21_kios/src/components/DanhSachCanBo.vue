@@ -18,9 +18,9 @@
               <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Số điện thoại</span></v-flex>
             </v-layout>
           </div>
-          <div class="" style="border-left:1px solid #dedede">
+          <div class="dossierList" style="border-left:1px solid #dedede">
             <!-- <marquee behavior="scroll" direction="up"> -->
-              <div class="">
+              <div class="wrap-list">
                 <div class="text-bold px-2 py-2 td" style="background-color: #dede;">
                   I.	CÁN BỘ TRỰC THUỘC TRUNG TÂM
                 </div>
