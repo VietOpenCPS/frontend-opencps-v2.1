@@ -325,9 +325,6 @@
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
-            <content-placeholders>
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>

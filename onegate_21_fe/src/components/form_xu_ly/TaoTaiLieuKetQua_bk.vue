@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 // import * as utils from '../store/onegate_utils'
 import toastr from 'toastr'
 export default {
@@ -309,7 +309,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          $('#formAlpaca' + item.partNo).alpaca(formScript)
+          window.$('#formAlpaca' + item.partNo).alpaca(formScript)
         })
       })
     },

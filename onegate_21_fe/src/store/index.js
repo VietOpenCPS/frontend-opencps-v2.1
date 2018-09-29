@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
-import $ from 'jquery'
+// import $ from 'jquery'
 // import router from '@/router'
 
 Vue.use(toastr)
@@ -530,7 +530,7 @@ export const store = new Vuex.Store({
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         console.log('upload')
-        let files = $('#file' + data.partNo)[0].files
+        let files = window.$('#file' + data.partNo)[0].files
         let file = files[0]
         let formData = new FormData()
         if (data.partType === 3) {
@@ -593,7 +593,7 @@ export const store = new Vuex.Store({
     },
     uploadPaymentFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = $('#' + data.selector)[0].files
+        let files = window.$('#' + data.selector)[0].files
         let file = files[0]
         let formData = new FormData()
         formData.append('displayName', file.name)
@@ -1009,7 +1009,7 @@ export const store = new Vuex.Store({
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       console.log('alpaca')
       let id = data['id'] ? data['id'] : 'nm'
-      $('#formAlpaca' + data.dossierPartNo + id).empty()
+      window.$('#formAlpaca' + data.dossierPartNo + id).empty()
       /* eslint-disable */
       var formScript, formData
       if (data.formScript) {
@@ -1024,7 +1024,7 @@ export const store = new Vuex.Store({
       }
       /* eslint-disable */
       formScript.data = formData
-      $('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
+      window.$('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
     },
     putAlpacaForm ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
@@ -1036,7 +1036,7 @@ export const store = new Vuex.Store({
         }
         let id = data['id'] ? data['id'] : 'nm'
         try {
-          var control = $('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
+          var control = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
           var formData = control.getValue()
           console.log('Data Form ------', data)
           console.log('formData-------', formData)
@@ -1087,7 +1087,7 @@ export const store = new Vuex.Store({
         try {
           let id = data['id'] ? data['id'] : 'nm'
           var dataPostEform = new FormData()
-          var control = $('#formAlpaca' + data.partNo + id).alpaca('get')
+          var control = window.$('#formAlpaca' + data.partNo + id).alpaca('get')
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
@@ -1255,7 +1255,7 @@ export const store = new Vuex.Store({
                 console.log('formData======', formData)
                 formReport.data = formData
                 console.log('formReport_____FINAL=======', formReport)
-                $('#alpacajs_form_plugin').alpaca(formReport)
+                window.$('#alpacajs_form_plugin').alpaca(formReport)
               }).catch(function (error) {
                 console.log(error)
                 item.html = true
