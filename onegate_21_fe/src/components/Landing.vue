@@ -366,7 +366,7 @@
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                 </v-list-tile>
-                <v-list-tile @click="viewDetail(props.item, props.index)">
+                <v-list-tile @click="viewDetail(props.item, props.index)" :disabled="!props.item['permission']">
                   Xem chi tiết
                     <!-- <g-recaptcha data-sitekey="6Le9NG4UAAAAAAckfnDTZiaBB8pS95DMU77OWuw8" :data-validate="validate" :data-callback="callback" data-language="vi" style="width: 100%">
                       <span>Xem chi tiết</span>
@@ -1146,9 +1146,9 @@ export default {
         var filter = null
         if (vm.menuType !== 3) {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1165,9 +1165,9 @@ export default {
           }
         } else {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
@@ -1845,10 +1845,10 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
-      // console.log('permission: ', item.permission)
-      // if (item.permission !== null && item.permission !== '') {
-      router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-      // }
+      console.log('permission: ', item.permission)
+      if (item.permission !== null && item.permission !== '') {
+        router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      }
     },
     keywordEventChange (data) {
       let vm = this

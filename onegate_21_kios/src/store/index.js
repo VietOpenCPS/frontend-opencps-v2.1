@@ -8,7 +8,7 @@ Vue.use(Vuex)
 Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
-    initData: {},
+    initData: support.initData,
     totalEmployee: 0,
     filterDossierKey: {
       dossierNo: '',

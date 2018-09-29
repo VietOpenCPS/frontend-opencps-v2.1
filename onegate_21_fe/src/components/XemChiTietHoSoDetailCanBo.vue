@@ -117,7 +117,7 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Action special -->
-              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0">
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && checkActionSpecial(btnStepsDynamics)">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
@@ -132,8 +132,12 @@
                 </v-list>
               </v-menu>
             </div>
+            <content-placeholders v-if="loadingAction">
+              <content-placeholders-img />
+              <content-placeholders-heading />
+            </content-placeholders>
             <!--  -->
-            <v-layout wrap v-if="dialogActionProcess">
+            <v-layout wrap v-if="dialogActionProcess && !loadingAction">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -1613,6 +1617,34 @@ export default {
       console.log('state view result', data)
       var vm = this
       vm.stateViewResult = data
+    },
+    checkActionSpecial (btnAction) {
+      var vm = this
+      if (Array.isArray(btnAction)) {
+        var checkValue = 0
+        $(btnAction).each(function (index, item) {
+          // check theo người thực hiện
+          if (item.form !== 'PRINT_01' && item.form !== 'PRINT_02' && item.form !== 'PRINT_03'
+          && item.form !== 'GUIDE' && item.form !== 'PREVIEW' && item.form !== 'BETIMES') {
+            let userArr = vm.$store.getters.getUsersNextAction
+            if (userArr.length > 0) {
+              let check = userArr.filter(function (item) {
+                return item['userId'].toString() === vm.currentUser['userId'].toString()
+              })
+              if (check.length > 0) {
+                checkValue += 1
+              }
+            }
+          }
+        })
+        if (checkValue > 0) {
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
     }
   },
   filters: {
