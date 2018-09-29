@@ -15,7 +15,7 @@
                         <span v-if="item.required" style="color: red"> (*) </span>
                         &nbsp;&nbsp;
                       </span>
-                      <span>{{item.partTip}}</span>
+                      <span v-if="item.partTip">{{item.partTip}}</span>
                     </v-tooltip>
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
@@ -683,7 +683,7 @@ export default {
     },
     deleteSingleFileEform (item, index) {
       var vm = this
-      let x = confirm('Bạn có muốn xóa?')
+      let x = confirm('Bạn có chắc chắn muốn xóa file đính kèm này không?')
       if (x) {
         vm.dossierFilesItems.forEach(file => {
           if (file.dossierPartNo === item.partNo && file.eForm) {

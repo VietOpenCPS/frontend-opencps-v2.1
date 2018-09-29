@@ -147,6 +147,7 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.contactTelNo"
+                    type="number"
                     append-icon="phone"
                     ></v-text-field>
                   </v-flex>
@@ -325,6 +326,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateTelNo"
+                      type="number"
                       append-icon="phone"
                       ></v-text-field>
                     </v-flex>

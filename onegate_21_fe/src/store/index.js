@@ -2115,6 +2115,8 @@ export const store = new Vuex.Store({
             params: {
             }
           }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
           axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {

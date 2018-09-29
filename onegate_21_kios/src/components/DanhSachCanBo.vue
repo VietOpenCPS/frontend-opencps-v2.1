@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0 kios-item">
+  <div class="py-0 kios-item" style="width: 80%;margin: auto">
     <div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
@@ -9,18 +9,18 @@
           <h4 class="py-3 ml-3 text-xs-center">
             <span style="color:#065694">DANH SÁCH CÁN BỘ LÀM VIỆC TẠI TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</span>
           </h4>
-          <div class="mt-3"> 
+          <div class="mt-3" style="border-left:1px solid #dedede"> 
             <v-layout class="wrap">
               <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Ảnh</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 250px"><span class="text-bold">Họ và tên</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width:calc(100% - 800px)"><span class="text-bold"> Chức vụ</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 200px"><span class="text-bold">Họ và tên</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width:calc(100% - 850px)"><span class="text-bold"> Chức vụ</span></v-flex>
               <v-flex class="px-2 py-2 th" style="width: 250px"><span class="text-bold">Đơn vị/cơ quan công tác</span></v-flex>
               <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Số điện thoại</span></v-flex>
             </v-layout>
           </div>
-          <div class="dossierList">
+          <div class="" style="border-left:1px solid #dedede">
             <!-- <marquee behavior="scroll" direction="up"> -->
-              <div class="wrap-list">
+              <div class="">
                 <div class="text-bold px-2 py-2 td" style="background-color: #dede;">
                   I.	CÁN BỘ TRỰC THUỘC TRUNG TÂM
                 </div>
@@ -29,12 +29,12 @@
                   <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
                     <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
                   </v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.fullName}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width:calc(100% - 800px)">
+                  <v-flex class="px-2 py-2 td" style="width: 200px"><span>{{item.fullName}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width:calc(100% - 850px)">
                     <span> {{item.jobPos}}</span>
                   </v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.workingUnit}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td text-xs-center" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
                 </v-layout>
                 <!--  -->
                 <div class="text-bold px-2 py-2 td" style="background-color: #dede;">
@@ -45,12 +45,12 @@
                   <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
                     <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
                   </v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.fullName}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width:calc(100% - 800px)">
+                  <v-flex class="px-2 py-2 td" style="width: 200px"><span>{{item.fullName}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width:calc(100% - 850px)">
                     <span> {{item.jobPos}}</span>
                   </v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.workingUnit}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td text-xs-center" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
                 </v-layout>
               </div>
             <!-- </marquee> -->

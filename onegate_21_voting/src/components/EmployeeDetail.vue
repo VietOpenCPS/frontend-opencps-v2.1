@@ -57,7 +57,9 @@
     <v-flex xs12 sm1>
     </v-flex>
     <v-flex xs12 sm12 class="text-xs-center mt-2">
-      <v-btn @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">Gửi kết quả đánh giá</v-btn>
+      <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">
+        Gửi kết quả đánh giá
+      </v-btn>
       <v-btn @click="goBack" color="primary">
         <v-icon size="16">undo</v-icon>&nbsp;
         Quay lại 
