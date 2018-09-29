@@ -27,7 +27,7 @@
                 <v-layout class="wrap" v-for="(item, index) in employeeList"
                 :key="index" v-if="item.userType === '0'">
                   <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
-                    <img :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
+                    <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
                   </v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.fullName}}</span></v-flex>
                   <v-flex class="px-2 py-2 td" style="width:calc(100% - 800px)">
@@ -43,7 +43,7 @@
                 <v-layout class="wrap" v-for="(item, index) in employeeList"
                 :key="index" v-if="item.userType === '1'">
                   <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
-                    <img :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
+                    <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
                   </v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.fullName}}</span></v-flex>
                   <v-flex class="px-2 py-2 td" style="width:calc(100% - 800px)">
