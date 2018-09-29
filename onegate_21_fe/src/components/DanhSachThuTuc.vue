@@ -76,7 +76,7 @@
       </div>
       <v-list class="py-0">
         <template v-for="(item, index) in serviceOptionsProcess" >
-          <v-list-tile :key="index" style="border-bottom: 1px solid #dede;">
+          <v-list-tile class="px-2 py-1" :key="index" style="border-bottom: 1px solid #dede;">
             <v-list-tile-content>
               <v-list-tile-title v-html="item.optionName"></v-list-tile-title>
             </v-list-tile-content>

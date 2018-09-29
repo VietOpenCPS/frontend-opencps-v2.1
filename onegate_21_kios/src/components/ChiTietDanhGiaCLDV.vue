@@ -16,14 +16,17 @@
       </div>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
-      <v-layout wrap class="mt-4">
+      <v-layout wrap class="mt-4" v-if="!isSigned && votingItems.length > 0">
         <v-flex xs12 sm6 class="pr-3">
           <v-layout wrap>
-            <div style="width:110px" class="text-bold">Mã hồ sơ </div>
+            <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
             <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
               <div class="input-group__input">
                 <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
                 <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+              </div>
+              <div class="mt-2" v-if="!validPass1">
+                <div class="input-group__messages" style="color:red">Mã hồ sơ là bắt buộc</div>
               </div>
             </div>
           </v-layout>
@@ -52,7 +55,7 @@
         >Gửi kết quả đánh giá</v-btn>
       </div>
     </div>
-    <v-btn class="back-btn" @click="goBack" fab color="primary">
+    <v-btn v-if="votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
     </v-btn>
     <div class="virtual-keyboard" v-if="visible">
@@ -65,6 +68,7 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import toastr from 'toastr'
 import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: ['administration'],
@@ -75,6 +79,7 @@ export default {
     loading: false,
     loadingAction: false,
     votingItems: [],
+    isSigned: false,
     validPass1: true,
     validPass2: true,
     //
@@ -91,6 +96,8 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
+      vm.isSigned = window.themeDisplay.isSignedIn()
+      // vm.isSigned = true
       vm.validPass2 = true
       let filter = {
         className: 'govagency',
@@ -109,31 +116,56 @@ export default {
   methods: {
     submitVoting () {
       var vm = this
-      if ($('#applicantIdNo').val() === '') {
-        vm.validPass2 = false
-      } else {
-        vm.validPass2 = true
-      }
-      if (vm.validPass2) {
-        let arrAction = []
-        if (vm.votingItems.length > 0) {
-          vm.loadingAction = true
-          for (var index in vm.votingItems) {
-            vm.votingItems[index]['className'] = 'govagency'
-            vm.votingItems[index]['classPk'] = vm.administration
-            vm.votingItems[index]['dossierNo'] = $('#dossierIdNoKey').val()
-            vm.votingItems[index]['applicantIdNo'] = $('#applicantIdNo').val()
-            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+      if (!vm.isSigned) {
+        if ($('#applicantIdNo').val() === '') {
+          vm.validPass2 = false
+        } else {
+          vm.validPass2 = true
+        }
+        if ($('#dossierIdNoKey').val() === '') {
+          vm.validPass1 = false
+        } else {
+          vm.validPass1 = true
+        }
+        if (vm.validPass1 && vm.validPass2) {
+          let filter = {
+            applicantIdNo: vm.applicantIdNo,
+            dossierNo: vm.dossierNo
           }
-          Promise.all(arrAction).then(results => {
-            vm.loadingAction = false
-            vm.$router.push({
-              path: '/danh-gia-cldv'
-            })
+          vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
+            console.log('result', result)
+            if (result.hasPermission === true || result.hasPermission === 'true') {
+              vm.doResultVoting()
+            } else {
+              toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
+            }
           }).catch(xhr => {
-            vm.loadingAction = false
+            toastr.error('Lỗi hệ thống')
           })
         }
+      } else {
+        vm.doResultVoting()
+      }
+    },
+    doResultVoting () {
+      var vm = this
+      let arrAction = []
+      if (vm.votingItems.length > 0) {
+        vm.loadingAction = true
+        for (var index in vm.votingItems) {
+          vm.votingItems[index]['className'] = 'govagency'
+          vm.votingItems[index]['classPk'] = vm.administration
+          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingAction = false
+          toastr.success('Đánh giá của bạn được gửi thành công')
+          vm.$router.push({
+            path: '/danh-gia-cldv'
+          })
+        }).catch(xhr => {
+          vm.loadingAction = false
+        })
       }
     },
     goBack () {
