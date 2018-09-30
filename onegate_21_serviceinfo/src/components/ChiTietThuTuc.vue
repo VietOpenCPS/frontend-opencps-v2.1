@@ -208,7 +208,7 @@ export default {
   methods: {
     createDossier (item) {
       let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-      window.open(url, "_self")
+      window.open(url, '_self')
     },
     viewGuide (item) {
       var vm = this
