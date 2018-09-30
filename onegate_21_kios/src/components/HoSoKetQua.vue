@@ -25,7 +25,7 @@
                   <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
                   <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.dueDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
                 </v-layout>
               </div>
             </marquee>
@@ -35,7 +35,7 @@
                 <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
                 <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
                 <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.dueDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
               </v-layout>
             </div>
           </div>
