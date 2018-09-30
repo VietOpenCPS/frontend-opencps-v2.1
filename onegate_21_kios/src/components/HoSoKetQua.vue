@@ -85,7 +85,7 @@ export default {
       vm.loading = true
       var filter = {
         fromDate: vm.fromDate(),
-        toDate: vm.toDate()
+        toDate: vm.fromDate()
       }
       vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false
