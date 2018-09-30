@@ -106,8 +106,8 @@ export const store = new Vuex.Store({
             },
             params: {
               step: 300,
-              fromFinishDate: filter.fromDate,
-              toFinishDate: filter.toDate
+              fromReleaseDate: filter.fromDate,
+              toReleaseDate: filter.toDate
             }
           }
           // test local

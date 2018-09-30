@@ -1541,6 +1541,9 @@ header a {
 	text-transform: uppercase;
 	font-size: 18px;
 }
+.mobile {
+	font-size: 14px;
+}
 header a div>p{
     color: #00204f
 }
