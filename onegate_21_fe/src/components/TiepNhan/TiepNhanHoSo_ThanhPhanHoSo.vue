@@ -196,7 +196,7 @@
             <v-progress-linear v-if="loadingAddOther" class="my-0" :indeterminate="true"></v-progress-linear>
             <v-card-text class="pb-0 pt-4">
               <v-layout wrap>
-                <v-flex xs12 class="px-2 pb-3">
+                <v-flex xs12 class="px-2 pb-3 fix__label">
                   <v-text-field
                   label="Tên giấy tờ:"
                   v-model="otherDossierTemplate"
