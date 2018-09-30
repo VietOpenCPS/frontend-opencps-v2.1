@@ -348,7 +348,7 @@
               <v-list>
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDynamics" :key="i + '_menu_' + props.item.dossierId" 
-                  @click="btnActionEvent(props.item, item, props.index, false)" 
+                  @click="btnActionEvent(props.item, item, props.index, false)"
                   v-if="menuType === 3"
                   >
                   <v-list-tile-title>{{item.title}}{{item.tiltle}}</v-list-tile-title>

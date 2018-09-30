@@ -28,8 +28,8 @@
 <script>
 // import $ from 'jquery'
 // import axios from 'axios'
-import 'jquery-textcomplete'
-import 'jquery-comments'
+// import 'jquery-textcomplete'
+// import 'jquery-comments'
 export default {
   props: ['classPK', 'className'],
   data: () => ({
