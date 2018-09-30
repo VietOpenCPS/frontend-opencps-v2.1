@@ -19,10 +19,6 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
-        $('.mWrapper > header').css('display', 'none')
-        $('.mWrapper > nav').css('display', 'none')
-        $('.mWrapper > footer').css('display', 'none')
-        vm.setInterval()
       })
     },
     computed: {
@@ -32,11 +28,6 @@
     },
     mounted () {
       var vm = this
-      vm.$nextTick(function () {
-        $('.mWrapper > header').css('display', 'none')
-        $('.mWrapper > nav').css('display', 'none')
-        $('.mWrapper > footer').css('display', 'none')
-      })
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
