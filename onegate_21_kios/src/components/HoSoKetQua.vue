@@ -114,8 +114,8 @@ export default {
       return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
     },
     toDate () {
-      let value = new Date()
-      return `${(value.getDate() + 1).toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+      let value = new Date((new Date()).getTime() + 86400000)
+      return `${(value.getDate()).toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
     }
   }
 }

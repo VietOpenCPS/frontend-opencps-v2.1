@@ -2,7 +2,7 @@
   <v-app>
     <v-content>
       <header>
-        <a href="/web/cong-dich-vu-cong">
+        <a href="/web/cong-dich-vu-cong" :class="!isKios?'mobile':''">
           <img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/logo.png">
           <div>
             <p class="text-bold">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG TỈNH PHÚ THỌ</p>
@@ -10,7 +10,7 @@
           </div>
         </a>
       </header>
-      <section class="kios-content-wrapper" @mousemove="stopInterval()" @click="stopInterval()">
+      <section :class="isKios ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
         <div class="tab-item">
           <div class="left" :class="fullScreen ? 'smallScreen' : ''">
             <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
@@ -61,15 +61,26 @@
       workingUnitList: [],
       currentIndex: 0,
       interVal: '',
-      loading: true
+      loading: true,
+      isKios: true
     }),
     created () {
       var vm = this
       vm.$nextTick(function () {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
-        vm.setInterval()
+        if (!newQuery.hasOwnProperty('secretKey')) {
+          vm.setInterval()
+          vm.isKios = true
+          // console.log('isKios')
+        } else {
+          vm.isKios = false
+          // console.log('NOT Kios')
+        }
       })
     },
     computed: {
