@@ -49,6 +49,11 @@
       </v-list>
     </v-navigation-drawer>
     <v-content>
+      <v-btn color="red"
+        v-if="window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139'"
+      >
+        DELETE
+      </v-btn>
       <router-view v-if="trangThaiHoSoList.length !== 0"></router-view>
       <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
