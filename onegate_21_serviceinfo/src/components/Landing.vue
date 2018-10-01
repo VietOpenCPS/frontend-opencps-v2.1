@@ -408,7 +408,8 @@ export default {
       })
     },
     createDossier (item) {
-      let url = '/web/cong-dich-vu-cong/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+      let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+      let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url, '_self')
     },
     viewGuide (item) {
