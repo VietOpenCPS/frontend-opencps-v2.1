@@ -49,11 +49,6 @@
       </v-list>
     </v-navigation-drawer>
     <v-content>
-      <v-btn color="red"
-        v-if="isAdminSuper"
-      >
-        DELETE
-      </v-btn>
       <router-view v-if="trangThaiHoSoList.length !== 0"></router-view>
       <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
@@ -72,8 +67,7 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0,
-      isAdminSuper: false
+      detailState: 0
     }),
     computed: {
       currentIndex () {
@@ -107,9 +101,6 @@
             }
             vm.loadingCounter()
             vm.loading = false
-            if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
-              vm.isAdminSuper = true
-            }
           }
         })
       })

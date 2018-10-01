@@ -253,6 +253,13 @@
     </v-layout>
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
+        v-if="isAdminSuper"
+      >
+        DELETE
+      </v-btn>
+
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -597,6 +604,7 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    isAdminSuper: false,
     dossierCountingShow: false,
     dossierCounting: [],
     advSearchToolsSelected: [],
@@ -820,6 +828,9 @@ export default {
         vm.hosoDatasPage = parseInt(query['page'])
       } else {
         vm.hosoDatasPage = 1
+      }
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
+        vm.isAdminSuper = true
       }
     })
   },
