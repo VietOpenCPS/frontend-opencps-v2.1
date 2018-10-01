@@ -232,7 +232,7 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
-        vm.briefNote = result.briefNote ? result.briefNote : ''
+        vm.briefNote = result.serviceName ? result.serviceName : ''
         result['editable'] = false
         if (result.dossierStatus === '') {
           vm.$store.dispatch('pullNextactions', result).then(result2 => {
@@ -397,7 +397,7 @@ export default {
         var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
-        tempData['briefNote'] = vm.briefNote
+        tempData['serviceName'] = vm.briefNote
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {

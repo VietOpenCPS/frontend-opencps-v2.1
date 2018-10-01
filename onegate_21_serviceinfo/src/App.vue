@@ -1,5 +1,5 @@
 <template>
-  <v-app class="mt-2">
+  <v-app>
     <v-navigation-drawer app clipped floating width="310">
       <v-tabs v-model="active" class="service__info__menu">
         <v-tabs-slider color="primary"></v-tabs-slider>
@@ -75,7 +75,7 @@
       </v-tabs>
     </v-navigation-drawer>
   
-    <v-content class="ml-2">
+    <v-content>
       <router-view></router-view>
     </v-content>
   
@@ -111,10 +111,11 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('current', current)
         console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.$store.commit('setAgencyList', result)
-          if (vm.govAgencyList.length > 0 && !newQuery.hasOwnProperty('agency')) {
+          if (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) {
             vm.currentAgency = vm.govAgencyList[0].administrationCode
             let queryString = '?'
             newQuery['page'] = 1
@@ -130,6 +131,8 @@
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
             })
+          } else {
+            vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
         vm.$store.dispatch('getDomain').then(function (result) {
@@ -220,7 +223,6 @@
     }
   }
 </script>
-
 <style>
   .service__info__menu .tabs__container {
     border-bottom: 1px solid #0072c0;
