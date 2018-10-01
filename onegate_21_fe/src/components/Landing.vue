@@ -1610,13 +1610,13 @@ export default {
           }
           // console.log(vm.selected)
           if (vm.selected.length > 0) {
+            let deleteIds = []
             for (let key in vm.selected) {
-              alert(vm.selected[key]['dossierId'])
-              filter['dossierId'] = vm.selected[key]['dossierId']
-              vm.$store.dispatch('deleteDossier', filter).then(function (result) {
-                console.log('remove item: ', vm.selected[key])
-              })
+              deleteIds.push(vm.selected[key]['dossierId'])
             }
+            filter['dossierId'] = deleteIds
+            vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
+            })
           } else {
             alert('no item selected')
           }
