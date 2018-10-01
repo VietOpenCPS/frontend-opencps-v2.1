@@ -286,7 +286,6 @@
       <template slot="headers" slot-scope="props">
         <tr>
           <th v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
-            {{isAdminSuper}}
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -321,7 +320,6 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
-            {{isAdminSuper}}
             <v-checkbox
               v-model="props.selected"
               primary
@@ -1011,7 +1009,6 @@ export default {
         vm.isAdminSuper = true
       }
       if (vm.isAdminSuper) {
-        alert(123)
         vm.selected = vm.hosoDatas
       } else {
         if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
