@@ -1609,8 +1609,9 @@ export default {
             dossierId: 0
           }
           // console.log(vm.selected)
-          if (vm.selected.length > 1) {
+          if (vm.selected.length > 0) {
             for (let key in vm.selected) {
+              alert(vm.selected[key]['dossierId'])
               filter['dossierId'] = vm.selected[key]['dossierId']
               vm.$store.dispatch('deleteDossier', filter).then(function (result) {
                 console.log('remove item: ', vm.selected[key])
