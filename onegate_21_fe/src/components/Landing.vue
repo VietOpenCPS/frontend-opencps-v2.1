@@ -277,7 +277,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="menuType !== 3 && originality !== 1 && btnDynamics.length > 0"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào!"
         hide-actions
@@ -285,8 +285,17 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th v-if="menuType !== 3 && originality !== 1 && btnDynamics.length > 0">
+          <th v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
+            {{isAdminSuper}}
             <v-checkbox
+              :input-value="props.all"
+              :indeterminate="props.indeterminate"
+              primary
+              hide-details
+              @click.native="toggleAll"
+              v-if="isAdminSuper"
+            ></v-checkbox>
+            <v-checkbox v-else
               :input-value="props.all"
               :indeterminate="props.indeterminate"
               :disabled="!thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
@@ -311,8 +320,16 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td v-if="menuType !== 3 && originality !== 1 && btnDynamics.length > 0">
+          <td v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
+            {{isAdminSuper}}
             <v-checkbox
+              v-model="props.selected"
+              primary
+              hide-details
+              color="primary"
+              v-if="isAdminSuper"
+            ></v-checkbox>
+            <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"
               primary
@@ -829,9 +846,6 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-      if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
-        vm.isAdminSuper = true
-      }
     })
   },
   updated () {
@@ -993,15 +1007,23 @@ export default {
   methods: {
     toggleAll () {
       var vm = this
-      if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
-        return
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
+        vm.isAdminSuper = true
+      }
+      if (vm.isAdminSuper) {
+        alert(123)
+        vm.selected = vm.hosoDatas
       } else {
-        if (vm.selected.length) {
-          vm.selected = []
+        if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
+          return
         } else {
-          vm.selected = vm.hosoDatas.filter(function (item) {
-            return item['assigned'] !== 0
-          })
+          if (vm.selected.length) {
+            vm.selected = []
+          } else {
+            vm.selected = vm.hosoDatas.filter(function (item) {
+              return item['assigned'] !== 0
+            })
+          }
         }
       }
     },
@@ -1198,6 +1220,9 @@ export default {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
+          if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
+            vm.isAdminSuper = true
+          }
         }).catch(reject => {
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
@@ -1577,12 +1602,12 @@ export default {
       let vm = this
       let x = confirm('Bạn có muốn thực hiện hành động này?')
       if (x) {
-        let filter = {
-          dossierId: dossierItem.dossierId
-        }
         let currentQuery = vm.$router.history.current.query
         //
         if (isGroup) {
+          let filter = {
+            dossierId: 0
+          }
           // console.log(vm.selected)
           if (vm.selected.length > 1) {
             for (let key in vm.selected) {
@@ -1595,6 +1620,9 @@ export default {
             alert('no item selected')
           }
         } else {
+          let filter = {
+            dossierId: dossierItem.dossierId
+          }
           vm.$store.dispatch('deleteDossier', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
