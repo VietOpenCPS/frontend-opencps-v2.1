@@ -1,5 +1,5 @@
 <template>
-  <v-app class="mt-2">
+  <v-app>
     <v-navigation-drawer app clipped floating width="310">
       <v-tabs v-model="active" class="service__info__menu">
         <v-tabs-slider color="primary"></v-tabs-slider>
@@ -130,6 +130,8 @@
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
             })
+          } else {
+            vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
         vm.$store.dispatch('getDomain').then(function (result) {
