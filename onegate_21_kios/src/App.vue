@@ -125,6 +125,7 @@
       },
       goPage (page) {
         var vm = this
+        vm.$store.commit('setActiveDetailService', false)
         let queryString
         if (page === 'ketquahoso') {
           queryString = '/'

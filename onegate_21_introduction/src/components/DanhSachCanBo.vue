@@ -51,9 +51,9 @@
         <!-- </marquee> -->
       </div>
     </div>
-    <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
+    <!-- <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
       <v-icon dark>home</v-icon>
-    </v-btn>
+    </v-btn> -->
   </div>
 </template>
 

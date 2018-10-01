@@ -11,16 +11,19 @@
     </div>
     <v-expansion-panel v-if="String(serviceCode) === '0' && !selectOption" expand class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
-        <div slot='header' class="ml-3"><v-icon style="
+        <div slot='header' class="ml-3">
+          <v-icon style="
             font-size: 14px;
             margin-top: -4px;
             padding-right: 5px;
-        ">account_balance</v-icon> {{itemGov.govAgencyName}}</div>
+          ">account_balance</v-icon>
+          {{itemGov.govAgencyName}}
+        </div>
         <v-card>
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <!-- Cap 2 -->
             <v-expansion-panel expand class="expand__select__domain">
-              <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains'>
+              <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
                 <div slot='header' style="margin-left: 14px;">
                    <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
                    <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
