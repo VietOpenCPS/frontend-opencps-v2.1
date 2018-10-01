@@ -177,7 +177,7 @@ export default {
     serviceNameKey: '',
     serviceDetail: '',
     dialogGuide: false,
-    loading: false,
+    loading: true,
     headers: [
       {
         text: 'STT',

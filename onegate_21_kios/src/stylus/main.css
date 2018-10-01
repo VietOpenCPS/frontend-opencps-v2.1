@@ -21,7 +21,7 @@
     text-transform: uppercase;
 }
 .text-bold {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 .receipt-wrapper .head .left hr {
     width: 50%;
@@ -1669,4 +1669,20 @@ header span {
 }
 .tabs__items {
     overflow: hidden !important
+}
+@media screen and (min-width: 500px) {
+	.detailQR_desktop {
+		display: block;
+    }
+    .detailQR_mobile {
+		display: none;
+	}
+}
+@media screen and (max-width: 500px) {
+	.detailQR_mobile {
+		display: block;
+    }
+    .detailQR_desktop {
+		display: none;
+    }
 }
