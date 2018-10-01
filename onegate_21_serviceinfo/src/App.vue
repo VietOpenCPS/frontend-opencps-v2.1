@@ -75,7 +75,7 @@
       </v-tabs>
     </v-navigation-drawer>
   
-    <v-content class="ml-2">
+    <v-content>
       <router-view></router-view>
     </v-content>
   
