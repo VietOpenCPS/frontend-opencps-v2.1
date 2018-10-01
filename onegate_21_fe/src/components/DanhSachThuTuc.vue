@@ -43,7 +43,7 @@
                           </v-btn>
                           <v-list v-if="serviceOptions.length > 1">
                             <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                            @click="selectServiceOption(itemOption, itemGov.govAgencyCode)">
+                            @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
                             <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
@@ -76,7 +76,7 @@
       </div>
       <v-list class="py-0">
         <template v-for="(item, index) in serviceOptionsProcess" >
-          <v-list-tile :key="index" style="border-bottom: 1px solid #dede;">
+          <v-list-tile class="px-2 py-1" :key="index" style="border-bottom: 1px solid #dede;">
             <v-list-tile-content>
               <v-list-tile-title v-html="item.optionName"></v-list-tile-title>
             </v-list-tile-content>
@@ -103,7 +103,8 @@
       serviceInfoIdSelect: '',
       serviceOptionsProcess: [],
       selectOption: false,
-      govAgencyCodeSelect: ''
+      govAgencyCodeSelect: '',
+      loadingMutiple: true
     }),
     computed: {
       currentIndex () {
@@ -143,6 +144,8 @@
         console.log('govAgencyCode++++++++++', govAgencyCode)
         var vm = this
         vm.serviceConfigSelect = item
+        vm.govAgencyCodeSelect = govAgencyCode
+        vm.serviceInfoIdSelect = item.serviceInfoId
         vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
           if (result.length === 1) {
             vm.selectOption = false
@@ -172,8 +175,12 @@
           }
         })
       },
-      selectServiceOption (item, govAgencyCode) {
+      selectServiceOption (item, govAgencyCode, itemServiceConfig) {
         var vm = this
+        vm.serviceConfigSelect = itemServiceConfig
+        vm.govAgencyCodeSelect = govAgencyCode
+        vm.serviceInfoIdSelect = itemServiceConfig.serviceInfoId
+        vm.loadingMutiple = true
         console.log('govAgencyCode+++++++++++', govAgencyCode)
         vm.$store.dispatch('getServiceInfo', {
           serviceInfoId: vm.serviceConfigSelect.serviceInfoId

@@ -15,7 +15,7 @@
                         <span v-if="item.required" style="color: red"> (*) </span>
                         &nbsp;&nbsp;
                       </span>
-                      <span>{{item.partTip}}</span>
+                      <span v-if="item.partTip">{{item.partTip}}</span>
                     </v-tooltip>
                     <v-tooltip top v-if="item.hasForm && item.daKhai">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
@@ -196,7 +196,7 @@
             <v-progress-linear v-if="loadingAddOther" class="my-0" :indeterminate="true"></v-progress-linear>
             <v-card-text class="pb-0 pt-4">
               <v-layout wrap>
-                <v-flex xs12 class="px-2 pb-3">
+                <v-flex xs12 class="px-2 pb-3 fix__label">
                   <v-text-field
                   label="Tên giấy tờ:"
                   v-model="otherDossierTemplate"
@@ -683,7 +683,7 @@ export default {
     },
     deleteSingleFileEform (item, index) {
       var vm = this
-      let x = confirm('Bạn có muốn xóa?')
+      let x = confirm('Bạn có chắc chắn muốn xóa file đính kèm này không?')
       if (x) {
         vm.dossierFilesItems.forEach(file => {
           if (file.dossierPartNo === item.partNo && file.eForm) {

@@ -348,7 +348,7 @@
               <v-list>
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDynamics" :key="i + '_menu_' + props.item.dossierId" 
-                  @click="processPullBtnDetail(props.item, item, props.index, i)" 
+                  @click="btnActionEvent(props.item, item, props.index, false)"
                   v-if="menuType === 3"
                   >
                   <v-list-tile-title>{{item.title}}{{item.tiltle}}</v-list-tile-title>
@@ -356,7 +356,7 @@
                 <v-list-tile v-for="(item, i) in btnDossierDynamics" :key="i + '_' + props.item.dossierId" 
                   @click="processPullBtnDetail(props.item, item, props.index, i)" 
                   :disabled="item['enable'] === 2 || String(props.item['permission']).indexOf('write') === -1"
-                  v-if="item['enable'] > 0 || item['autoEvent'] === 'special' && menuType !== 3"
+                  v-if="(item['enable'] > 0 || item['autoEvent'] === 'special') && menuType !== 3"
                   >
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>

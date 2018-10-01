@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="mt-2">
     <v-navigation-drawer app clipped floating width="310">
       <v-tabs v-model="active" class="service__info__menu">
         <v-tabs-slider color="primary"></v-tabs-slider>
@@ -75,7 +75,7 @@
       </v-tabs>
     </v-navigation-drawer>
   
-    <v-content>
+    <v-content class="ml-2">
       <router-view></router-view>
     </v-content>
   
@@ -111,9 +111,10 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.$store.commit('setAgencyList', result)
-          if (vm.govAgencyList.length > 0) {
+          if (vm.govAgencyList.length > 0 && !newQuery.hasOwnProperty('agency')) {
             vm.currentAgency = vm.govAgencyList[0].administrationCode
             let queryString = '?'
             newQuery['page'] = 1

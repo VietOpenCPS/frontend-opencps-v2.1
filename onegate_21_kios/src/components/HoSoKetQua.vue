@@ -11,10 +11,10 @@
           </h4>
           <div class="mt-3"> 
             <v-layout class="wrap">
-              <v-flex class="px-2 py-2 th" style="width: 250px"><span class="text-bold">Mã hồ sơ</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: calc(100% - 550px)"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Ngày nộp</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 150px"><span class="text-bold">Ngày có kết quả</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 25%"><span class="text-bold">Mã hồ sơ</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 35%"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 20%"><span class="text-bold">Ngày nộp</span></v-flex>
+              <v-flex class="px-2 py-2 th" style="width: 20%"><span class="text-bold">Ngày có kết quả</span></v-flex>
             </v-layout>
           </div>
           <div class="dossierList">
@@ -22,20 +22,20 @@
               <div class="wrap-list">
                 <v-layout class="wrap" v-for="(item, index) in dossierList"
                 :key="item.dossierId" :class="index%2===1 ? 'active': ''">
-                  <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width:calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.receiveDate}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.dueDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
+                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
                 </v-layout>
               </div>
             </marquee>
             <div class="wrap-list" v-else>
               <v-layout class="wrap" v-for="(item, index) in dossierList"
               :key="item.dossierId" :class="index%2===1 ? 'active': ''">
-                <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.dossierNo}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width:calc(100% - 550px)"><span> {{item.applicantName}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.receiveDate}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 150px"><span>{{item.dueDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
+                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
               </v-layout>
             </div>
           </div>
@@ -85,7 +85,7 @@ export default {
       vm.loading = true
       var filter = {
         fromDate: vm.fromDate(),
-        toDate: vm.toDate()
+        toDate: vm.fromDate()
       }
       vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false
@@ -114,8 +114,8 @@ export default {
       return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
     },
     toDate () {
-      let value = new Date()
-      return `${(value.getDate() + 1).toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+      let value = new Date((new Date()).getTime() + 86400000)
+      return `${(value.getDate()).toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
     }
   }
 }
