@@ -115,7 +115,9 @@
         console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.$store.commit('setAgencyList', result)
-          if (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) {
+          if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) || 
+            (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
+          ) {
             vm.currentAgency = vm.govAgencyList[0].administrationCode
             let queryString = '?'
             newQuery['page'] = 1
