@@ -103,13 +103,13 @@
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
               <!-- brief note -->
-              <div class="xs12 sm12 pb-1 overHidden">
+              <!-- <div class="xs12 sm12 pb-1 overHidden">
                 <span class="pr-2">Nội dung: </span>
                 <v-tooltip top v-if="thongTinChiTietHoSo.briefNote">
                   <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.briefNote}}</span>
                   <span class="pl-0">{{thongTinChiTietHoSo.briefNote}} </span>
                 </v-tooltip>
-              </div>
+              </div> -->
             </v-flex>
             <v-flex xs12 sm4 v-else>
               <div class="xs12 sm12 pb-1" style="color:#0b72ba">Ghi chú:</div>
