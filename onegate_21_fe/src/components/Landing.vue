@@ -252,13 +252,7 @@
       </v-flex>
     </v-layout>
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
-      <v-btn color="red"
-        v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139'"
-      >
-        DELETE
-      </v-btn>
-
+      
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
