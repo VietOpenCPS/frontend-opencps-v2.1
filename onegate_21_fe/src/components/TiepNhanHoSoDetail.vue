@@ -2,7 +2,8 @@
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
     <div class="row-header">
       <div class="background-triangle-big"> 
-        <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span> 
+        <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
+        <span v-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
         <span v-else>THÊM MỚI HỒ SƠ</span> 
       </div>
       <div class="layout row wrap header_tools row-blue">
@@ -119,12 +120,12 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
+          <span v-if="formCode === 'UPDATE' || formCode === 'COPY'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
           <v-icon size="20">save</v-icon>
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
-      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && tiepNhanState"> 
+      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0"
           :loading="loadingAction"
           :disabled="loadingAction"
@@ -403,7 +404,7 @@ export default {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            if (vm.formCode !== 'UPDATE') {
+            if (vm.formCode !== 'UPDATE' || vm.formCode !== 'COPY') {
               var initData = vm.$store.getters.loadingInitData
               let actionUser = initData.user.userName ? initData.user.userName : ''
               //
