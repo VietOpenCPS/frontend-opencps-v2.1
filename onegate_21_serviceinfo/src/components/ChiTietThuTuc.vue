@@ -180,7 +180,7 @@ export default {
   props: ['index'],
   components: {},
   data: () => ({
-    loading: false,
+    loading: true,
     loadingAction: false,
     serviceDetail: '',
     serviceConfigDetail: '',
@@ -257,7 +257,6 @@ export default {
   }
 }
 </script>
-
 <style>
   .table-detail-domain table.table tbody td:first-child {
     border-left: 0;

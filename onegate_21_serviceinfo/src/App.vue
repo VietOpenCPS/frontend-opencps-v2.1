@@ -111,10 +111,11 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('current', current)
         console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.$store.commit('setAgencyList', result)
-          if (vm.govAgencyList.length > 0 && !newQuery.hasOwnProperty('agency')) {
+          if (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) {
             vm.currentAgency = vm.govAgencyList[0].administrationCode
             let queryString = '?'
             newQuery['page'] = 1
@@ -222,7 +223,6 @@
     }
   }
 </script>
-
 <style>
   .service__info__menu .tabs__container {
     border-bottom: 1px solid #0072c0;
