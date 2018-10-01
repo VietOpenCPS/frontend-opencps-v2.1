@@ -12,19 +12,30 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-	<@liferay_util["include"] page=top_head_include />
+	<#if permissionChecker.isOmniadmin()>
 	
-	<!-- Mainly scripts -->
+		<@liferay_util["include"] page=top_head_include />
+	
+	</#if>
+	
 	<script>
         window.__define = window.define;
         window.__require = window.require;
         window.define = undefined;
         window.require = undefined;
     </script>
-
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/jquery.min.js"></script>
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/slick.min.js"></script>
-
+    
+	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/bootstrap.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/handlebars.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/alpaca.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/moment-with-locales.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery-comments.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery.textcomplete.js"></script>
+	
 	<script>
         window.define = window.__define;
         window.require = window.__require;
@@ -35,9 +46,8 @@
 
 <body class="${css_class}">
 
-<@liferay_util["include"] page=body_top_include />
-
 <#if permissionChecker.isOmniadmin()>
+	<@liferay_util["include"] page=body_top_include />
 	<@liferay.control_menu />
 <#else>
 	<style>
@@ -103,9 +113,13 @@
 	</footer>
 </div>
 
-<@liferay_util["include"] page=body_bottom_include />
+<#if permissionChecker.isOmniadmin()>
 
-<@liferay_util["include"] page=bottom_include />
+	<@liferay_util["include"] page=body_bottom_include />
+
+	<@liferay_util["include"] page=bottom_include />
+	
+</#if>
 
 <!-- inject:js -->
 <!-- endinject -->
