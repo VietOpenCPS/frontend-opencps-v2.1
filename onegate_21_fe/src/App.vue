@@ -50,7 +50,7 @@
     </v-navigation-drawer>
     <v-content>
       <v-btn color="red"
-        v-if="window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139'"
+        v-if="isAdminSuper"
       >
         DELETE
       </v-btn>
@@ -72,7 +72,8 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0
+      detailState: 0,
+      isAdminSuper: false
     }),
     computed: {
       currentIndex () {
@@ -106,6 +107,9 @@
             }
             vm.loadingCounter()
             vm.loading = false
+            if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
+              vm.isAdminSuper = true
+            }
           }
         })
       })
