@@ -99,7 +99,7 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xsls</span>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xls, xlsx</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
