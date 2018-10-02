@@ -608,10 +608,10 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          console.log('Tải file thành công')
+          console.log('Tải file lên thành công')
         }).catch(function (xhr) {
           console.log(xhr)
-          toastr.error('Tải file thất bại')
+          toastr.error('Tải file lên thất bại')
           reject(xhr)
         })
       })
@@ -695,7 +695,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getPaymentFiles ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     viewFile ({commit, state, dispatch}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    viewPaymentFile ({commit, state, dispatch}, data) {
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
@@ -1803,30 +1838,6 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             reject(error)
           })
-        })
-      })
-    },
-    deleteDossierPatch ({commit, state}, filter) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId,
-              'Accept': 'application/json'
-            }
-          }
-          for (let keydk in filter.dossierId) {
-            axios.delete(state.initData.getNextAction + '/' + filter.dossierId[keydk] , param).then(function (response) {
-              let serializable = response.data
-              store.dispatch('getActiveGetCounter', !state.activeGetCounter)
-              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-              resolve(serializable)
-            }).catch(function (error) {
-              console.log(error)
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-              reject(error)
-            })
-          }
         })
       })
     },

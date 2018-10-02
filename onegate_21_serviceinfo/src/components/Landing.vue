@@ -226,6 +226,14 @@ export default {
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      if (currentQuery.hasOwnProperty('agency')) {
+        let filterDomain = {
+          agencyCode: currentQuery['agency']
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
+      }
       vm.doLoadingThuTuc()
     })
   },

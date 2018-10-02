@@ -136,7 +136,9 @@
     },
     watch: {
       dueDateInput (val) {
-        this.thongTinChungHoSo['dueDate'] = this.getDuedateF(val)
+        if (this.editable) {
+          this.thongTinChungHoSo['dueDate'] = this.getDuedateF(val)
+        }
       }
     },
     methods: {
