@@ -52,8 +52,6 @@
             v-model="serviceNameKey"
             @keyup.enter="filterServiceName()"
             box
-            append-icon="search"
-            :append-icon-cb="filterServiceName()"
           ></v-text-field>
         </div>
       </v-flex>
@@ -290,10 +288,7 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
-          query: {
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
+          path: '/thu-tuc-hanh-chinh' + queryString
         })
       }, 100)
     },
