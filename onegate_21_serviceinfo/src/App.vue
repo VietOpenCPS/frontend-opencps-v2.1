@@ -137,7 +137,10 @@
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
-        vm.$store.dispatch('getDomain').then(function (result) {
+        let filterDomain = {
+          agencyCode: ''
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.$store.commit('setDomainList', result)
         })
         vm.$store.dispatch('getLevelList').then(function (result) {

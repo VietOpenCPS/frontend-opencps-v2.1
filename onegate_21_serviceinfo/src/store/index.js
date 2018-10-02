@@ -91,6 +91,9 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              agency: data.agencyCode
             }
           }
           // test local
