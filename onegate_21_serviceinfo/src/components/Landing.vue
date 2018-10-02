@@ -277,6 +277,7 @@ export default {
         newQuery['page'] = 1
         newQuery['agency'] = vm.govAgencySelected
         newQuery['domain'] = ''
+        newQuery['keyword'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -298,6 +299,7 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['domain'] = vm.domainSelected
+        newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -319,6 +321,7 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['level'] = vm.levelSelected
+        newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'

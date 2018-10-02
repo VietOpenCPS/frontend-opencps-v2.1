@@ -18,52 +18,52 @@ export const store = new Vuex.Store({
     loading: false
   },
   actions: {
-    loadInitResource ({commit, state}) {
-      return new Promise((resolve, reject) => {
-        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-          state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
-          state.initData['user'] = {
-            'userName': window.themeDisplay.getUserName(),
-            'userEmail': '',
-            'userId': window.themeDisplay.getUserId()
-          }
-        } else {
-          state.initData['groupId'] = 0
-          state.initData['user'] = {
-            'userName': '',
-            'userEmail': '',
-            'userId': 20103
-          }
-        }
-        resolve(state.initData)
-      })
-    },
     // loadInitResource ({commit, state}) {
-    //   if (state.initData == null) {
-    //     return new Promise((resolve, reject) => {
-    //       let param = {}
-    //       let orginURL = window.location.href
-    //       let coma = window.location.href.lastIndexOf('#/')
-    //       if (coma > 0) {
-    //         orginURL = window.location.href.substr(0, coma)
+    //   return new Promise((resolve, reject) => {
+    //     if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+    //       state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
+    //       state.initData['user'] = {
+    //         'userName': window.themeDisplay.getUserName(),
+    //         'userEmail': '',
+    //         'userId': window.themeDisplay.getUserId()
     //       }
-    //       /* test local */
-    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
-    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
-    //         let serializable = response.data
-    //         commit('setInitData', serializable)
-    //         resolve(serializable)
-    //       }).catch(function (error) {
-    //         console.log(error)
-    //         reject(error)
-    //       })
-    //     })
-    //   } else {
-    //     return new Promise((resolve, reject) => {
-    //       resolve(state.initData)
-    //     })
-    //   }
+    //     } else {
+    //       state.initData['groupId'] = 0
+    //       state.initData['user'] = {
+    //         'userName': '',
+    //         'userEmail': '',
+    //         'userId': 20103
+    //       }
+    //     }
+    //     resolve(state.initData)
+    //   })
     // },
+    loadInitResource ({commit, state}) {
+      if (state.initData == null) {
+        return new Promise((resolve, reject) => {
+          let param = {}
+          let orginURL = window.location.href
+          let coma = window.location.href.lastIndexOf('#/')
+          if (coma > 0) {
+            orginURL = window.location.href.substr(0, coma)
+          }
+          /* test local */
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+            let serializable = response.data
+            commit('setInitData', serializable)
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      } else {
+        return new Promise((resolve, reject) => {
+          resolve(state.initData)
+        })
+      }
+    },
     loadUser ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -72,9 +72,10 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // axios.get('http://127.0.0.1:8081/api/applicants/' + data.applicantId, param).then(result1 => {
-          axios.get('/o/rest/v2/users' + '/' + data.userId + '/profile', param).then(result1 => {
-            resolve(result1)
+          // test local
+          axios.get('http://127.0.0.1:8081/api/users/' + data.userId + '/profile', param).then(result1 => {
+          // axios.get('/o/rest/v2/users' + '/' + data.userId + '/profile', param).then(result1 => {
+            resolve(result1.data)
           }).catch(xhr => {
             reject(xhr)
           })
@@ -126,8 +127,9 @@ export const store = new Vuex.Store({
               parent: data.parent
             }
           }
-          // axios.get('http://127.0.0.1:8081/api/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
-          axios.get('/o/rest/v2/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
+          // test local
+          axios.get('http://127.0.0.1:8081/api/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
+          // axios.get('/o/rest/v2/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
             let serializable = response.data
             resolve(response.data)
           }, error => {
