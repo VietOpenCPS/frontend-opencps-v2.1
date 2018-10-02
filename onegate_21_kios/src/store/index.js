@@ -105,7 +105,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              step: 300,
+              step: '300,310,400',
               fromReleaseDate: filter.fromDate,
               toReleaseDate: filter.toDate
             }
