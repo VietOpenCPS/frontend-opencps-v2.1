@@ -288,7 +288,10 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString
+          path: '/thu-tuc-hanh-chinh' + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
         })
       }, 100)
     },
