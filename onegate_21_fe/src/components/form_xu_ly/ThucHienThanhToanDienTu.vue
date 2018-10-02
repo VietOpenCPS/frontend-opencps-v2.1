@@ -111,12 +111,7 @@
             </v-layout>   
             <!--  -->
             <v-card>
-              <input
-              type="file"
-              style="display: none"
-              :id="'paymentFile1'"
-              @change="uploadPaymentFile($event)"
-              >
+              <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
               <span>Tải lên file báo thanh toán</span>
               <v-progress-circular
               :width="2"
@@ -135,13 +130,13 @@
               </v-tooltip>
             </v-card>
             <!-- view file -->
-            <div>
-              <span v-on:click.stop="viewFile(itemFileView)" class="ml-3" style="cursor: pointer;">
-                <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
-                {{itemFileView.displayName}} - 
-                <i>{{itemFileView.modifiedDate}}</i>
+            <div v-if="paymentFile">
+              <span v-on:click.stop="viewFile(paymentFile)" class="ml-3" style="cursor: pointer;">
+                <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
+                {{paymentFile.displayName}} - 
+                <i>{{paymentFile.modifiedDate}}</i>
               </span>
-              <v-btn icon ripple v-on:click.stop="deleteFile(itemFileView)" class="mx-0 my-0">
+              <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
                 <v-icon style="color: red">delete_outline</v-icon>
               </v-btn>
             </div>
@@ -168,7 +163,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -193,6 +188,7 @@ export default {
   },
   data: () => ({
     data_payment: {},
+    paymentFile: '',
     money: {
       decimal: '',
       thousands: '.',
@@ -263,17 +259,15 @@ export default {
     },
     uploadPaymentFile (e) {
       var vm = this
-      // vm.dossierTemplatesItemSelect = data
-      // vm.progressUploadPart = data.partNo
       vm.progressUploadPart = true
       var data = {}
       data['dossierId'] = vm.dossierId
       data['selector'] = 'paymentFile1'
-      // data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
+        console.log('uploadPayment1')
         vm.progressUploadPart = false
-        vm.$store.dispatch('getPaymentFiles', vm.thongTinHoSo.dossierId).then(result => {
-          vm.dossierFilesItems = result
+        vm.$store.dispatch('getPaymentFiles', vm.dossierId).then(result => {
+          vm.paymentFile = result
         })
       }).catch(function (xhr) {
         vm.progressUploadPart = false
@@ -285,34 +279,30 @@ export default {
         return
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+        var url = vm.initDataResource.dossierApi + '/' + vm.dossierId + '/payment/confirmfile'
         window.open(url)
       } else {
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
-        data['dossierId'] = vm.thongTinHoSo.dossierId
+        data['dossierId'] = vm.dossierId
         vm.$store.dispatch('viewPaymentFile', data).then(result => {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview' + vm.id).src = result
+          document.getElementById('dialogPDFPreview').src = result
         })
       }
     },
-    deleteFile (item, index) {
+    deleteFile (item) {
       var vm = this
-      let x = confirm('Bạn có muốn xóa?')
+      let x = confirm('Bạn có chắc chắn xóa file?')
       if (x) {
-        item['dossierId'] = vm.thongTinHoSo.dossierId
+        item['dossierId'] = vm.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          vm.fileViews.splice(index, 1)
-          vm.stateView = true
-          vm.partView = item.dossierPartNo
-          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-            vm.dossierFilesItems = result
-            vm.setDaKhai(vm.dossierFilesItems)
+          toastr.success('Xóa file thành công.')
+          vm.$store.dispatch('getPaymentFiles', vm.dossierId).then(result => {
+            vm.paymentFile = result
           })
         }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Xóa file thất bại.')
         })
       }
     },

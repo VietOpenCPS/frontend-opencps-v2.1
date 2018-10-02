@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
-// import $ from 'jquery'
+import $ from 'jquery'
 // import router from '@/router'
 
 Vue.use(toastr)
@@ -111,52 +111,52 @@ export const store = new Vuex.Store({
     clearError ({commit}) {
       commit('clearError')
     },
-    loadInitResource ({commit, state}) {
-      return new Promise((resolve, reject) => {
-        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-          state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
-          state.initData['user'] = {
-            'userName': window.themeDisplay.getUserName(),
-            'userEmail': '',
-            'userId': window.themeDisplay.getUserId()
-          }
-        } else {
-          state.initData['groupId'] = 0
-          state.initData['user'] = {
-            'userName': '',
-            'userEmail': '',
-            'userId': 20103
-          }
-        }
-        resolve(state.initData)
-      })
-    },
     // loadInitResource ({commit, state}) {
-    //   if (state.initData == null) {
-    //     return new Promise((resolve, reject) => {
-    //       let param = {}
-    //       let orginURL = window.location.href
-    //       let coma = window.location.href.lastIndexOf('#/')
-    //       if (coma > 0) {
-    //         orginURL = window.location.href.substr(0, coma)
+    //   return new Promise((resolve, reject) => {
+    //     if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+    //       state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
+    //       state.initData['user'] = {
+    //         'userName': window.themeDisplay.getUserName(),
+    //         'userEmail': '',
+    //         'userId': window.themeDisplay.getUserId()
     //       }
-    //       /* test local */
-    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
-    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
-    //         let serializable = response.data
-    //         commit('setInitData', serializable)
-    //         resolve(serializable)
-    //       }).catch(function (error) {
-    //         console.log(error)
-    //         reject(error)
-    //       })
-    //     })
-    //   } else {
-    //     return new Promise((resolve, reject) => {
-    //       resolve(state.initData)
-    //     })
-    //   }
+    //     } else {
+    //       state.initData['groupId'] = 0
+    //       state.initData['user'] = {
+    //         'userName': '',
+    //         'userEmail': '',
+    //         'userId': 20103
+    //       }
+    //     }
+    //     resolve(state.initData)
+    //   })
     // },
+    loadInitResource ({commit, state}) {
+      if (state.initData == null) {
+        return new Promise((resolve, reject) => {
+          let param = {}
+          let orginURL = window.location.href
+          let coma = window.location.href.lastIndexOf('#/')
+          if (coma > 0) {
+            orginURL = window.location.href.substr(0, coma)
+          }
+          /* test local */
+          orginURL = 'http://127.0.0.1:8081/api/initdata'
+          axios.get(orginURL + support.renderURLInit, param).then(function (response) {
+            let serializable = response.data
+            commit('setInitData', serializable)
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      } else {
+        return new Promise((resolve, reject) => {
+          resolve(state.initData)
+        })
+      }
+    },
     loadMenuConfigToDo ({commit, state}) {
       commit('setLoadingDynamicBtn', true)
       if (state.trangThaiHoSoList === null) {
@@ -593,14 +593,17 @@ export const store = new Vuex.Store({
     },
     uploadPaymentFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = window.$('#' + data.selector)[0].files
+        console.log('data', data)
+        let files = $('#' + data.selector)[0].files
         let file = files[0]
         let formData = new FormData()
         formData.append('displayName', file.name)
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
         formData.append('file', file)
-        console.log('formData', formData)
+        for (let key of formData.entries()) {
+          console.log(key[0] + ', ' + key[1])
+        }
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -738,7 +741,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -767,16 +770,16 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   'groupId': state.initData.groupId
+          //   'groupId': state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            'groupId': state.initData.groupId
+          }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -846,16 +849,16 @@ export const store = new Vuex.Store({
         commit('setLoading', false)
         console.log('put dossier')
         let options = {
-          headers: {
-            groupId: state.initData.groupId,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
-          }
-          // test local
           // headers: {
-          //   groupId: state.initData.groupId
+          //   groupId: state.initData.groupId,
+          //   'Accept': 'application/json',
+          //   'Content-Type': 'application/x-www-form-urlencoded',
+          //   'cps_auth': state.initData.cps_auth
           // }
+          // test local
+          headers: {
+            groupId: state.initData.groupId
+          }
         }
         var applicantType = ''
         if (!data.userType) {
@@ -1658,8 +1661,8 @@ export const store = new Vuex.Store({
           }
           var params = new URLSearchParams()
           // test local
-          axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
-          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+          // axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
+          axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig
             if (serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {
@@ -2090,8 +2093,8 @@ export const store = new Vuex.Store({
           }
           commit('setLoadingGov', true)
           // test local
-          axios.get(state.initData.serviceConfigByGovApi, param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+          // axios.get(state.initData.serviceConfigByGovApi, param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
             commit('setLoadingGov', false)
             let serializable = response.data
             if (serializable.govAgencies) {
@@ -2151,8 +2154,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
-          axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
+          // axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               resolve(serializable.data)
@@ -2262,8 +2265,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2296,8 +2299,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -2321,8 +2324,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          // axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data

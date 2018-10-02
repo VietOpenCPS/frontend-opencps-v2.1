@@ -147,7 +147,6 @@
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :dossierId="dossierId"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
-              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
@@ -856,26 +855,26 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          // if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
-          //   let filter = {
-          //     dossierId: vm.dossierId
-          //   }
-          //   vm.$store.dispatch('loadDossierPayments', filter).then(result => {
-          //     vm.paymentProfile = result
-          //     isPopup = true
-          //     vm.showThanhToanDienTu = true
-          //   }).catch(reject => {
-          //   })
-          // } else {
-          //   isPopup = true
-          //   vm.showThuPhi = true
-          //   vm.payments = result.payment
-          //   vm.viaPortalDetail = dossierItem.viaPostal
-          // }
-          isPopup = true
-          vm.showThuPhi = true
-          vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+          if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+            let filter = {
+              dossierId: vm.dossierId
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+              isPopup = true
+              vm.showThanhToanDienTu = true
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
+          // isPopup = true
+          // vm.showThuPhi = true
+          // vm.payments = result.payment
+          // vm.viaPortalDetail = dossierItem.viaPostal
         }
         console.log('paymentProfile', vm.paymentProfile)
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
@@ -1147,7 +1146,7 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        console.log('paymentProfile', paymentProfile)
+        console.log('paymentProfile1', paymentProfile)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()

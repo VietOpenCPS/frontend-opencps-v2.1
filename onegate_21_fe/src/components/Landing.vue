@@ -1177,9 +1177,9 @@ export default {
         var filter = null
         if (vm.menuType !== 3) {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1196,9 +1196,9 @@ export default {
           }
         } else {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test Local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
@@ -1845,12 +1845,32 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment !== '') {
-          isPopup = true
-          vm.showThuPhi = true
-          vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+        // if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment !== '') {
+        //   isPopup = true
+        //   vm.showThuPhi = true
+        //   vm.payments = result.payment
+        //   vm.viaPortalDetail = dossierItem.viaPostal
+        // }
+        // add thanh toán điện tử
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+          if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+            let filter = {
+              dossierId: vm.dossierId
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+              isPopup = true
+              vm.showThanhToanDienTu = true
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
         }
+        //
         if (result.hasOwnProperty('overdue')) {
           isPopup = true
         }
