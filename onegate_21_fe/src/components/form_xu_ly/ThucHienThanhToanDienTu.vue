@@ -176,7 +176,10 @@
 </template>
 
 <script>
-
+import router from '@/router'
+import Vue from 'vue/dist/vue.min.js'
+import $ from 'jquery'
+import toastr from 'toastr'
 import {VMoney} from 'v-money'
 export default {
   props: {
@@ -277,41 +280,41 @@ export default {
       })
     },
     viewFile (data) {
-      // var vm = this
-      // if (data.fileSize === 0) {
-      //   return
-      // }
-      // if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
-      //   var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
-      //   window.open(url)
-      // } else {
-      //   vm.dialogPDFLoading = true
-      //   vm.dialogPDF = true
-      //   data['dossierId'] = vm.thongTinHoSo.dossierId
-      //   vm.$store.dispatch('viewPaymentFile', data).then(result => {
-      //     vm.dialogPDFLoading = false
-      //     document.getElementById('dialogPDFPreview' + vm.id).src = result
-      //   })
-      // }
+      var vm = this
+      if (data.fileSize === 0) {
+        return
+      }
+      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
+        var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+        window.open(url)
+      } else {
+        vm.dialogPDFLoading = true
+        vm.dialogPDF = true
+        data['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('viewPaymentFile', data).then(result => {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPDFPreview' + vm.id).src = result
+        })
+      }
     },
     deleteFile (item, index) {
       var vm = this
-      // let x = confirm('Bạn có muốn xóa?')
-      // if (x) {
-      //   item['dossierId'] = vm.thongTinHoSo.dossierId
-      //   vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-      //     toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-      //     vm.fileViews.splice(index, 1)
-      //     vm.stateView = true
-      //     vm.partView = item.dossierPartNo
-      //     vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-      //       vm.dossierFilesItems = result
-      //       vm.setDaKhai(vm.dossierFilesItems)
-      //     })
-      //   }).catch(reject => {
-      //     toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-      //   })
-      // }
+      let x = confirm('Bạn có muốn xóa?')
+      if (x) {
+        item['dossierId'] = vm.thongTinHoSo.dossierId
+        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.fileViews.splice(index, 1)
+          vm.stateView = true
+          vm.partView = item.dossierPartNo
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.setDaKhai(vm.dossierFilesItems)
+          })
+        }).catch(reject => {
+          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+        })
+      }
     },
     pickFile () {
       var vm = this
