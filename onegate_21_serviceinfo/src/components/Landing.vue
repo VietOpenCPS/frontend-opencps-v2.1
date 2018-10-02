@@ -51,9 +51,7 @@
             placeholder="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
             @keyup.enter="filterServiceName()"
-            clearable
             box
-            append-icon="search"
           ></v-text-field>
         </div>
       </v-flex>
@@ -243,9 +241,15 @@ export default {
       let currentQuery = newRoute.query
       vm.domainListCurrent = []
       if (currentQuery.hasOwnProperty('agency')) {
-        vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
-          return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
+        let filterDomain = {
+          agencyCode: currentQuery['agency']
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
         })
+        // vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
+        //   return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
+        // })
       } else {
         vm.domainListCurrent = vm.domainList
       }
@@ -255,17 +259,17 @@ export default {
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
-    },
-    domainList (val) {
-      var vm = this
-      if (vm.govAgencySelected) {
-        vm.domainListCurrent = val.filter(function (itemLinhVuc) {
-          return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
-        })
-      } else {
-        vm.domainListCurrent = val
-      }
     }
+    // domainList (val) {
+    //   var vm = this
+    //   if (vm.govAgencySelected) {
+    //     vm.domainListCurrent = val.filter(function (itemLinhVuc) {
+    //       return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
+    //     })
+    //   } else {
+    //     vm.domainListCurrent = val
+    //   }
+    // }
   },
   methods: {
     changeAdministration () {
@@ -277,6 +281,7 @@ export default {
         newQuery['page'] = 1
         newQuery['agency'] = vm.govAgencySelected
         newQuery['domain'] = ''
+        newQuery['keyword'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -298,6 +303,7 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['domain'] = vm.domainSelected
+        newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -319,6 +325,7 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['level'] = vm.levelSelected
+        newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'

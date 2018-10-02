@@ -115,8 +115,8 @@
         console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.$store.commit('setAgencyList', result)
-          if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) || 
-            (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
+          if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
+          (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
           ) {
             vm.currentAgency = vm.govAgencyList[0].administrationCode
             let queryString = '?'
@@ -137,7 +137,10 @@
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
-        vm.$store.dispatch('getDomain').then(function (result) {
+        let filterDomain = {
+          agencyCode: ''
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.$store.commit('setDomainList', result)
         })
         vm.$store.dispatch('getLevelList').then(function (result) {

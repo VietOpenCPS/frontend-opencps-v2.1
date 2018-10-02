@@ -89,7 +89,7 @@
                 label-idle="Cập nhật ảnh ký sô"
                 accepted-file-types="image/jpeg, image/png"
                 :server='serverImgEsign'
-                v-bind:files="filesImgAvatar"
+                v-bind:files="fileImgEsign"
                 v-on:init="loadImgEsign"/>
             </v-flex>
             <v-flex xs6 sm6 class="mt-2">
@@ -98,7 +98,7 @@
                 label-idle="Cập nhật chứng thư gốc"
                 accepted-file-types="image/jpeg, image/png"
                 :server='serverEsignCert'
-                v-bind:files="myFiles"
+                v-bind:files="fileEsignCert"
                 v-on:init="loadEsignCert"/>
             </v-flex>
           </v-layout>
@@ -258,7 +258,7 @@
             v-bind:files="filesImgAvatar"
             v-on:init="loadImgAvatar"/>
         </v-card-text>
-        <div class="px-3 py-3" v-if="userType === 'employee'">
+        <div class="px-3 py-3" v-if="user.className === 'employee'">
           <div class="text-bold text-xs-center mb-2">{{user.fullName}}</div>
           <div>
             <span>Ngày sinh:</span>&nbsp; <span class="text-bold">{{user.birthdate}}</span>
@@ -315,47 +315,16 @@ export default {
     cityCode: '',
     districtCode: '',
     wardCode: '',
-    user: {
-      userId: 123,
-      fullName: 'Nguyễn Vũ Nam',
-      birthDay: '20/09/1985',
-      telNo: '0868979395',
-      email: 'namnv@sct.phutho.gov',
-      nameAccount: 'namnv@sct.phutho.gov',
-      contactCode: 'EMP001',
-      jobposKeySign: 'Mis',
-      locationKeySign: 'HaNoi',
-      imageUrl: '',
-      applicantType: 'citizen'
-    },
-    userType: 'employee',
+    user: {},
     serverImgAvatar: {
     },
     filesImgAvatar: [],
     serverImgEsign: {
-      url: '',
-      process: {
-        url: '',
-        method: 'PUT',
-        withCredentials: false,
-        headers: {},
-        timeout: 5000,
-        onload: null,
-        onerror: null
-      }
     },
+    fileEsignCert: [],
     serverEsignCert: {
-      url: '',
-      process: {
-        url: '',
-        method: 'PUT',
-        withCredentials: false,
-        headers: {},
-        timeout: 5000,
-        onload: null,
-        onerror: null
-      }
     },
+    fileImgEsign: [],
     passWord: '',
     newPassWord: '',
     againNewPassWord: '',
@@ -375,12 +344,65 @@ export default {
         }
         vm.$store.dispatch('loadUser', filter).then(result => {
           vm.user = result
+          console.log('user', vm.user)
           vm.getUserDetail(vm.user)
         }).catch(xhr => {
         })
         vm.filesImgAvatar = ['/o/rest/v2/users/' + result['user'].userId + '/photo']
         vm.serverImgAvatar = {
           url: '/o/rest/v2/users/' + result['user'].userId + '/photo',
+          process: {
+            url: '',
+            method: 'PUT',
+            withCredentials: false,
+            headers: {
+              groupId: result.groupId
+            },
+            timeout: 5000,
+            onload: vm.loadImgAvatar,
+            onerror: vm.loadImgAvatar
+          },
+          load: {
+            url: '',
+            method: 'GET',
+            withCredentials: false,
+            headers: {
+              groupId: result.groupId
+            },
+            timeout: 5000,
+            onload: null,
+            onerror: null
+          }
+        }
+        vm.fileImgEsign = ['/o/rest/v2/users/' + result['user'].userId + '/esign']
+        vm.serverImgEsign = {
+          url: '/o/rest/v2/users/' + result['user'].userId + '/esign',
+          process: {
+            url: '',
+            method: 'PUT',
+            withCredentials: false,
+            headers: {
+              groupId: result.groupId
+            },
+            timeout: 5000,
+            onload: vm.loadImgAvatar,
+            onerror: vm.loadImgAvatar
+          },
+          load: {
+            url: '',
+            method: 'GET',
+            withCredentials: false,
+            headers: {
+              groupId: result.groupId
+            },
+            timeout: 5000,
+            onload: null,
+            onerror: null
+          }
+        }
+        vm.fileEsignCert = ['/o/rest/v2/users/' + result['user'].userId + '/esigncert']
+        vm.serverEsignCert = {
+          url: '/o/rest/v2/users/' + result['user'].userId + '/esigncert',
           process: {
             url: '',
             method: 'PUT',
@@ -445,7 +467,7 @@ export default {
             vm.wardItems = resultWards.data
           })
         }
-      } else if (vm.userType === 'employee') {
+      } else if (user['className'] === 'employee') {
       }
     },
     onChangeCity (data) {

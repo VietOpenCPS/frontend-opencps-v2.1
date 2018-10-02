@@ -1292,9 +1292,15 @@ export default {
       vm.linhVucSelected = item
       if (item) {
         setTimeout(function () {
-          vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
-            return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
+          let domain = {
+            domainCode: vm.linhVucSelected
+          }
+          vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
+            vm.listThuTucHanhChinh = result
           })
+          // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
+          //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
+          // })
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
