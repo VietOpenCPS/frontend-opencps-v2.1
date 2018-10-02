@@ -571,9 +571,9 @@ export default {
         }
         vm.thongTinChiTietHoSo['dossierId'] = vm.id
         vm.btnStateVisible = true
-        if (currentQuery['btnIndex'].toString() !== '111' && currentQuery['btnIndex'].toString() !== '333') {
-          vm.getNextActions()
-        }
+        // if (currentQuery['btnIndex'].toString() !== '111' && currentQuery['btnIndex'].toString() !== '333') {
+        //   vm.getNextActions()
+        // }
       }
     })
   },
