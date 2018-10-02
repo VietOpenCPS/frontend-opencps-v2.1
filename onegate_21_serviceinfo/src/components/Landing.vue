@@ -52,8 +52,6 @@
             v-model="serviceNameKey"
             @keyup.enter="filterServiceName()"
             box
-            append-icon="search"
-            :append-icon-cb="filterServiceName()"
           ></v-text-field>
         </div>
       </v-flex>
