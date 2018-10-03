@@ -329,6 +329,7 @@ export default {
         let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
+        tempData['originality'] = vm.originality
         console.log('data put dossier -->', tempData)
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -399,6 +400,7 @@ export default {
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
         tempData['serviceName'] = vm.briefNote
+        tempData['originality'] = vm.originality
         console.log('data put dossier -->', tempData)
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           vm.loadingAction = false
