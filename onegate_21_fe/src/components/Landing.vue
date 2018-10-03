@@ -1854,13 +1854,13 @@ export default {
         // add thanh toán điện tử
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+            isPopup = true
             let filter = {
               dossierId: vm.dossierId
             }
             vm.$store.dispatch('loadDossierPayments', filter).then(result => {
               vm.paymentProfile = result
-              isPopup = true
-              vm.showThanhToanDienTu = true
+              // vm.showThanhToanDienTu = true
             }).catch(reject => {
             })
           } else {
