@@ -179,7 +179,7 @@ class Index extends React.Component {
           </Grid>
           <Grid item>
             { avatarURL === '' ? 
-              abc
+              'abc'
             :
               <Chip
                 onClick={this.handleToggle}
