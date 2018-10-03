@@ -266,7 +266,7 @@ export default {
         paymentAmount: vm.totalFee,
         paymentNote: vm.paymentProfile.confirmNote
       }
-      vm.$store.commit('setPaymentProfile', vm.data_payment)
+      // vm.$store.commit('setPaymentProfile', vm.data_payment)
     },
     uploadPaymentFile (e) {
       var vm = this

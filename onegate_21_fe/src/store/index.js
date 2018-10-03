@@ -1846,6 +1846,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    deleteDossierPatch ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          for (let keydk in filter.dossierId) {
+            axios.delete(state.initData.getNextAction + '/' + filter.dossierId[keydk] , param).then(function (response) {
+              let serializable = response.data
+              store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              reject(error)
+            })
+          }
+        })
+      })
+    },
     doPrint01 ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

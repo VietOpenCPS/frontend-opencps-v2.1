@@ -875,7 +875,7 @@ export default {
           // vm.payments = result.payment
           // vm.viaPortalDetail = dossierItem.viaPostal
         }
-        console.log('paymentProfile', vm.paymentProfile)
+        // console.log('paymentProfile', vm.paymentProfile)
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
           vm.showEditDate = true
@@ -1149,6 +1149,7 @@ export default {
         if (paymentProfile['paymentFile']) {
           validThanhToanDienTu = true
           filter['payment'] = {
+            requestPayment: 2 ,
             advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
             feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
             paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
