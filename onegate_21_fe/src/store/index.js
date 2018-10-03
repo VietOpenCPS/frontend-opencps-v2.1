@@ -600,7 +600,7 @@ export const store = new Vuex.Store({
         formData.append('displayName', file.name)
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
-        formData.append('file', file)
+        // formData.append('file', file)
         for (let key of formData.entries()) {
           console.log(key[0] + ', ' + key[1])
         }
@@ -1707,7 +1707,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.dossierId + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment' + data.dossierId + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
