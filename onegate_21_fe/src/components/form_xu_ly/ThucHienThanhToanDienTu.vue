@@ -117,8 +117,15 @@
               :id="'paymentFile1'"
               @change="uploadPaymentFile($event)"
               >
-              <span>Tải file báo thanh toán</span>
-              <v-tooltip top>
+              <span>Tải lên file báo thanh toán</span>
+              <v-progress-circular
+              :width="2"
+              :size="25"
+              color="green"
+              indeterminate
+              v-if="progressUploadPart"
+              ></v-progress-circular>
+              <v-tooltip top v-else>
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile()">
                   <v-badge>
                     <v-icon size="16" color="primary">cloud_upload</v-icon>
@@ -127,10 +134,44 @@
                 <span>Tải file lên</span>
               </v-tooltip>
             </v-card>
+            <!-- view file -->
+            <div>
+              <span v-on:click.stop="viewFile(itemFileView)" class="ml-3" style="cursor: pointer;">
+                <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
+                {{itemFileView.displayName}} - 
+                <i>{{itemFileView.modifiedDate}}</i>
+              </span>
+              <v-btn icon ripple v-on:click.stop="deleteFile(itemFileView)" class="mx-0 my-0">
+                <v-icon style="color: red">delete_outline</v-icon>
+              </v-btn>
+            </div>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -161,7 +202,10 @@ export default {
     feeTamThu: 0,
     feeTong: 0,
     checkPaid: true,
-    activeEdit: true
+    activeEdit: true,
+    progressUploadPart: false,
+    dialogPDF: false,
+    dialogPDFLoading: true
   }),
   directives: {money: VMoney},
   created () {
@@ -218,18 +262,56 @@ export default {
       var vm = this
       // vm.dossierTemplatesItemSelect = data
       // vm.progressUploadPart = data.partNo
+      vm.progressUploadPart = true
       var data = {}
       data['dossierId'] = vm.dossierId
       data['selector'] = 'paymentFile1'
       // data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
-        // vm.progressUploadPart = ''
-        // vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
-        //   vm.dossierFilesItems = result
-        // })
+        vm.progressUploadPart = false
+        vm.$store.dispatch('getPaymentFiles', vm.thongTinHoSo.dossierId).then(result => {
+          vm.dossierFilesItems = result
+        })
       }).catch(function (xhr) {
-        // vm.progressUploadPart = ''
+        vm.progressUploadPart = false
       })
+    },
+    viewFile (data) {
+      // var vm = this
+      // if (data.fileSize === 0) {
+      //   return
+      // }
+      // if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
+      //   var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+      //   window.open(url)
+      // } else {
+      //   vm.dialogPDFLoading = true
+      //   vm.dialogPDF = true
+      //   data['dossierId'] = vm.thongTinHoSo.dossierId
+      //   vm.$store.dispatch('viewPaymentFile', data).then(result => {
+      //     vm.dialogPDFLoading = false
+      //     document.getElementById('dialogPDFPreview' + vm.id).src = result
+      //   })
+      // }
+    },
+    deleteFile (item, index) {
+      var vm = this
+      // let x = confirm('Bạn có muốn xóa?')
+      // if (x) {
+      //   item['dossierId'] = vm.thongTinHoSo.dossierId
+      //   vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+      //     toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+      //     vm.fileViews.splice(index, 1)
+      //     vm.stateView = true
+      //     vm.partView = item.dossierPartNo
+      //     vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+      //       vm.dossierFilesItems = result
+      //       vm.setDaKhai(vm.dossierFilesItems)
+      //     })
+      //   }).catch(reject => {
+      //     toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+      //   })
+      // }
     },
     pickFile () {
       var vm = this

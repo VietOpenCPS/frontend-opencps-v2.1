@@ -12,11 +12,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-	<#if permissionChecker.isOmniadmin()>
-	
-		<@liferay_util["include"] page=top_head_include />
-	
-	</#if>
+	<@liferay_util["include"] page=top_head_include />
 	
 	<!-- Mainly scripts -->
 	<script>
@@ -43,14 +39,14 @@
         window.__define = undefined;
         window.__require = undefined;
     </script>
+
 </head>
 
 <body class="${css_class}">
 
+<@liferay_util["include"] page=body_top_include />
 <#if permissionChecker.isOmniadmin()>
 
-	<@liferay_util["include"] page=body_top_include />
-	<@liferay.control_menu />
 <#else>
 	<style>
 		html .has-control-menu #wrapper {
@@ -114,16 +110,6 @@
 	    <div class="text-center last">${copyright}</div>
 	</footer>
 </div>
-
-<#if permissionChecker.isOmniadmin()>
-
-	<@liferay_util["include"] page=body_bottom_include />
-
-	<@liferay_util["include"] page=bottom_include />
-	
-</#if>
-<!-- inject:js -->
-<!-- endinject -->
 
 </body>
 
