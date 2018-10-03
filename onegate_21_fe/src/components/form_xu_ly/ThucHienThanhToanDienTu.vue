@@ -80,7 +80,7 @@
             <div v-if="paymentProfile.hasOwnProperty('epaymentProfile') && paymentProfile.epaymentProfile['bank']">
               <div v-if="!paymentFile">
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
-                <span>Tải lên file báo thanh toán</span>
+                <span>Tải lên file báo thanh toán <span style="color:red">*</span></span>
                 <v-progress-circular
                 :width="2"
                 :size="25"
@@ -116,7 +116,7 @@
               </div>
             </div>
             <!-- paymentNote -->
-            <v-layout wrap style="position: relative">
+            <!-- <v-layout wrap style="position: relative">
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <div v-if="activeEdit == false" class="pl-2">
@@ -142,7 +142,7 @@
                   </v-icon>
                 </span>
               </v-flex>
-            </v-layout> 
+            </v-layout>  -->
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -235,7 +235,8 @@ export default {
             serviceAmount: serviceAmount,
             shipAmount: shipAmount,
             paymentAmount: vm.totalFee,
-            paymentNote: vm.paymentProfile.confirmNote
+            paymentNote: vm.paymentProfile.confirmNote,
+            paymentFile: vm.paymentFile
           }
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         }, 200)
@@ -278,6 +279,8 @@ export default {
         vm.progressUploadPart = false
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result
+          vm.data_payment['paymentFile'] = vm.paymentFile
+          vm.$store.commit('setPaymentProfile', vm.data_payment)
           console.log('vm.paymentFile', vm.paymentFile)
         })
       }).catch(function (xhr) {
@@ -290,8 +293,9 @@ export default {
         return
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
-        let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
-        // let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
+        // test local
+        // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
+        let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
         window.open(url)
       } else {
         vm.dialogPDFLoading = true
@@ -310,10 +314,9 @@ export default {
         item['dossierId'] = vm.dossierId
         vm.$store.dispatch('deletePaymentFile', item).then(resFile => {
           toastr.success('Xóa file thành công.')
-          // vm.$store.dispatch('getPaymentFiles', vm.dossierId).then(result => {
-          //   vm.paymentFile = result
-          // })
           vm.paymentFile = ''
+          vm.data_payment['paymentFile'] = vm.paymentFile
+          vm.$store.commit('setPaymentProfile', vm.data_payment)
         }).catch(reject => {
           toastr.error('Xóa file thất bại.')
         })
@@ -322,8 +325,8 @@ export default {
     downloadPaymentFile (item) {
       let vm = this
       // test local
-      let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
-      // let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
+      // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
+      let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
       window.open(url)
     },
     pickFile () {

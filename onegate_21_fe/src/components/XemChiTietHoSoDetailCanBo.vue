@@ -1112,6 +1112,7 @@ export default {
       var validPhanCong = true
       var validYKien = true
       var validTreHan = true
+      var validThanhToanDienTu = true
       vm.loadingActionProcess = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1145,7 +1146,20 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        console.log('paymentProfile1', paymentProfile)
+        if (paymentProfile['paymentFile']) {
+          validThanhToanDienTu = true
+          filter['payment'] = {
+            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
+            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
+            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
+            paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
+            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : '',
+            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : ''
+          }
+        } else {
+          validThanhToanDienTu = false
+        }
+        console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
@@ -1194,7 +1208,7 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien && validTreHan) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
