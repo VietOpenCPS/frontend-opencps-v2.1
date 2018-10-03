@@ -110,36 +110,44 @@
               </v-flex>
             </v-layout>   
             <!--  -->
-            <v-card>
-              <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
-              <span>Tải lên file báo thanh toán</span>
-              <v-progress-circular
-              :width="2"
-              :size="25"
-              color="green"
-              indeterminate
-              v-if="progressUploadPart"
-              ></v-progress-circular>
-              <v-tooltip top v-else>
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile()">
-                  <v-badge>
-                    <v-icon size="16" color="primary">cloud_upload</v-icon>
-                  </v-badge>
+            <v-card v-if="paymentProfile.hasOwnProperty('epaymentProfile') && paymentProfile.epaymentProfile['bank']">
+              <div v-if="!paymentFile">
+                <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
+                <span>Tải lên file báo thanh toán</span>
+                <v-progress-circular
+                :width="2"
+                :size="25"
+                color="green"
+                indeterminate
+                v-if="progressUploadPart"
+                ></v-progress-circular>
+                <v-tooltip top v-else>
+                  <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile()">
+                    <v-badge>
+                      <v-icon size="16" color="primary">cloud_upload</v-icon>
+                    </v-badge>
+                  </v-btn>
+                  <span>Tải file lên</span>
+                </v-tooltip>
+              </div>
+              <!-- view file -->
+              <div v-else>
+                <span v-on:click.stop="viewFile(paymentFile)" class="ml-3" style="cursor: pointer;">
+                  <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
+                  {{paymentFile.displayName}} - 
+                  <i>{{paymentFile.modifiedDate}}</i>
+                </span>
+                <v-tooltip top>
+                  <v-btn slot="activator" v-on:click.stop="downloadPaymentFile(item)">
+                    <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                  </v-btn>
+                  <span>Tải xuống</span>
+                </v-tooltip>
+                <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
+                  <v-icon style="color: red">delete_outline</v-icon>
                 </v-btn>
-                <span>Tải file lên</span>
-              </v-tooltip>
+              </div>
             </v-card>
-            <!-- view file -->
-            <div v-if="paymentFile">
-              <span v-on:click.stop="viewFile(paymentFile)" class="ml-3" style="cursor: pointer;">
-                <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
-                {{paymentFile.displayName}} - 
-                <i>{{paymentFile.modifiedDate}}</i>
-              </span>
-              <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
-                <v-icon style="color: red">delete_outline</v-icon>
-              </v-btn>
-            </div>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -151,10 +159,10 @@
           <v-icon>clear</v-icon>
         </v-btn>
         <div v-if="dialogPDFLoading" style="
-            min-height: 600px;
-            text-align: center;
-            margin: auto;
-            padding: 25%;
+          min-height: 600px;
+          text-align: center;
+          margin: auto;
+          padding: 25%;
         ">
           <v-progress-circular
             :size="100"
@@ -163,7 +171,7 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="dialogPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
     </v-dialog>
@@ -210,26 +218,33 @@ export default {
   created () {
     var vm = this
     if (vm.paymentProfile) {
-      setTimeout(function () {
-        let feeAmount = vm.paymentProfile.feeAmount ? Number(vm.paymentProfile.feeAmount.toString().replace(/\./g, '')) : 0
-        let advanceAmount = vm.paymentProfile.advanceAmount ? Number(vm.paymentProfile.advanceAmount.toString().replace(/\./g, '')) : 0
-        let serviceAmount = vm.paymentProfile.serviceAmount ? Number(vm.paymentProfile.serviceAmount.toString().replace(/\./g, '')) : 0
-        let shipAmount = vm.paymentProfile.shipAmount ? Number(vm.paymentProfile.shipAmount.toString().replace(/\./g, '')) : 0
-        vm.feeTong = feeAmount + serviceAmount + shipAmount
-        vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
-        if (vm.totalFee < 0) {
-          vm.totalFee = 0
+      if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
+        if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
+          let url = vm.paymentProfile.epaymentProfile.url
+          window.open(url, '_self')
         }
-        vm.data_payment = {
-          advanceAmount: advanceAmount,
-          feeAmount: feeAmount,
-          serviceAmount: serviceAmount,
-          shipAmount: shipAmount,
-          paymentAmount: vm.totalFee,
-          paymentNote: vm.paymentProfile.confirmNote
-        }
-        vm.$store.commit('setPaymentProfile', vm.data_payment)
-      }, 200)
+      } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
+        setTimeout(function () {
+          let feeAmount = vm.paymentProfile.feeAmount ? Number(vm.paymentProfile.feeAmount.toString().replace(/\./g, '')) : 0
+          let advanceAmount = vm.paymentProfile.advanceAmount ? Number(vm.paymentProfile.advanceAmount.toString().replace(/\./g, '')) : 0
+          let serviceAmount = vm.paymentProfile.serviceAmount ? Number(vm.paymentProfile.serviceAmount.toString().replace(/\./g, '')) : 0
+          let shipAmount = vm.paymentProfile.shipAmount ? Number(vm.paymentProfile.shipAmount.toString().replace(/\./g, '')) : 0
+          vm.feeTong = feeAmount + serviceAmount + shipAmount
+          vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
+          if (vm.totalFee < 0) {
+            vm.totalFee = 0
+          }
+          vm.data_payment = {
+            advanceAmount: advanceAmount,
+            feeAmount: feeAmount,
+            serviceAmount: serviceAmount,
+            shipAmount: shipAmount,
+            paymentAmount: vm.totalFee,
+            paymentNote: vm.paymentProfile.confirmNote
+          }
+          vm.$store.commit('setPaymentProfile', vm.data_payment)
+        }, 200)
+      }
     }
   },
   watch: {
@@ -274,12 +289,12 @@ export default {
       })
     },
     viewFile (data) {
-      var vm = this
+      let vm = this
       if (data.fileSize === 0) {
         return
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.dossierId + '/payment/confirmfile'
+        let url = vm.initDataResource.dossierApi + '/' + vm.dossierId + '/payment/confirmfile'
         window.open(url)
       } else {
         vm.dialogPDFLoading = true
@@ -287,7 +302,7 @@ export default {
         data['dossierId'] = vm.dossierId
         vm.$store.dispatch('viewPaymentFile', data).then(result => {
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          document.getElementById('dialogPreview').src = result
         })
       }
     },
@@ -296,15 +311,21 @@ export default {
       let x = confirm('Bạn có chắc chắn xóa file?')
       if (x) {
         item['dossierId'] = vm.dossierId
-        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+        vm.$store.dispatch('deletePaymentFile', item).then(resFile => {
           toastr.success('Xóa file thành công.')
-          vm.$store.dispatch('getPaymentFiles', vm.dossierId).then(result => {
-            vm.paymentFile = result
-          })
+          // vm.$store.dispatch('getPaymentFiles', vm.dossierId).then(result => {
+          //   vm.paymentFile = result
+          // })
+          vm.paymentFile = ''
         }).catch(reject => {
           toastr.error('Xóa file thất bại.')
         })
       }
+    },
+    downloadPaymentFile (item) {
+      let vm = this
+      let url = vm.initDataResource.dossierApi + '/' + vm.dossierId + '/payment/confirmfile'
+      window.open(url)
     },
     pickFile () {
       var vm = this
