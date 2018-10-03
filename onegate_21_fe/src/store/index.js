@@ -888,7 +888,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
-        if (data.originality !==1) {
+        if (data.originality !== 1) {
           dataPutdossier.append('serviceName', data.serviceName)
         }
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
@@ -1840,6 +1840,30 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             reject(error)
           })
+        })
+      })
+    },
+    deleteDossierPatch ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          for (let keydk in filter.dossierId) {
+            axios.delete(state.initData.getNextAction + '/' + filter.dossierId[keydk] , param).then(function (response) {
+              let serializable = response.data
+              store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(serializable)
+            }).catch(function (error) {
+              console.log(error)
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              reject(error)
+            })
+          }
         })
       })
     },
