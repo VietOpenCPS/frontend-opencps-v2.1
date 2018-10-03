@@ -706,8 +706,8 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
-          if (response.data.data) {
-            resolve(response.data.data)
+          if (response.data) {
+            resolve(response.data)
           } else {
             resolve([])
           }
@@ -1709,7 +1709,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment' + data.dossierId + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment/' + data.dossierId + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
