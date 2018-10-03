@@ -141,13 +141,11 @@
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
-              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :dossierId="dossierId"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
-              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
@@ -856,26 +854,26 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          // if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
-          //   let filter = {
-          //     dossierId: vm.dossierId
-          //   }
-          //   vm.$store.dispatch('loadDossierPayments', filter).then(result => {
-          //     vm.paymentProfile = result
-          //     isPopup = true
-          //     vm.showThanhToanDienTu = true
-          //   }).catch(reject => {
-          //   })
-          // } else {
-          //   isPopup = true
-          //   vm.showThuPhi = true
-          //   vm.payments = result.payment
-          //   vm.viaPortalDetail = dossierItem.viaPostal
-          // }
-          isPopup = true
-          vm.showThuPhi = true
-          vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+          if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+            let filter = {
+              dossierId: vm.dossierId
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+              isPopup = true
+              vm.showThanhToanDienTu = true
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
+          // isPopup = true
+          // vm.showThuPhi = true
+          // vm.payments = result.payment
+          // vm.viaPortalDetail = dossierItem.viaPostal
         }
         console.log('paymentProfile', vm.paymentProfile)
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
@@ -1114,6 +1112,7 @@ export default {
       var validPhanCong = true
       var validYKien = true
       var validTreHan = true
+      var validThanhToanDienTu = true
       vm.loadingActionProcess = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1147,7 +1146,20 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        console.log('paymentProfile', paymentProfile)
+        if (paymentProfile['paymentFile']) {
+          validThanhToanDienTu = true
+          filter['payment'] = {
+            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
+            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
+            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
+            paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
+            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : '',
+            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : ''
+          }
+        } else {
+          validThanhToanDienTu = false
+        }
+        console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
@@ -1196,7 +1208,7 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien && validTreHan) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
         vm.validateAction = true
       } else {
         vm.validateAction = false

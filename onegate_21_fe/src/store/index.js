@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
-// import $ from 'jquery'
+import $ from 'jquery'
 // import router from '@/router'
 
 Vue.use(toastr)
@@ -593,14 +593,17 @@ export const store = new Vuex.Store({
     },
     uploadPaymentFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = window.$('#' + data.selector)[0].files
+        console.log('data', data)
+        let files = $('#' + data.selector)[0].files
         let file = files[0]
         let formData = new FormData()
         formData.append('displayName', file.name)
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
-        formData.append('file', file)
-        console.log('formData', formData)
+        // formData.append('file', file)
+        for (let key of formData.entries()) {
+          console.log(key[0] + ', ' + key[1])
+        }
         axios.post(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', formData, {
           headers: {
             'groupId': state.initData.groupId,
@@ -703,8 +706,8 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
-          if (response.data.data) {
-            resolve(response.data.data)
+          if (response.data) {
+            resolve(response.data)
           } else {
             resolve([])
           }
@@ -738,7 +741,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -888,7 +891,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
-        if (data.originality !==1) {
+        if (data.originality !== 1) {
           dataPutdossier.append('serviceName', data.serviceName)
         }
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
@@ -1706,7 +1709,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.dossierId + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment/' + data.dossierId + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
