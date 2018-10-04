@@ -375,7 +375,8 @@ export default {
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken
+              Token: window.Liferay.authToken,
+              'Content-Type': 'multipart/form-data'
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
@@ -403,7 +404,8 @@ export default {
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken
+              Token: window.Liferay.authToken,
+              'Content-Type': 'multipart/form-data'
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
@@ -431,7 +433,8 @@ export default {
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken
+              Token: window.Liferay.authToken,
+              'Content-Type': 'multipart/form-data'
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
