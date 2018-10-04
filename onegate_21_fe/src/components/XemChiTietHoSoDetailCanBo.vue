@@ -854,9 +854,7 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          let currentParams = vm.$router.history.current.params
-          let currentQuery = vm.$router.history.current.query
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && currentQuery['step'] === '610') {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && dossierItem['stepCode'] === 610) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
@@ -1151,7 +1149,7 @@ export default {
         if (paymentProfile && paymentProfile['paymentFile']) {
           validThanhToanDienTu = true
           filter['payment'] = {
-            requestPayment: 3 ,
+            requestPayment: 3,
             advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
             feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
             paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
