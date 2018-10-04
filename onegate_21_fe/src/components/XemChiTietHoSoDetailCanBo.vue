@@ -854,14 +854,16 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if (result.payment.requestPayment === 2 || result.payment.requestPayment === '2') {
+          let currentParams = vm.$router.history.current.params
+          let currentQuery = vm.$router.history.current.query
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && currentQuery['step'] === '610') {
             isPopup = true
+            vm.showThanhToanDienTu = true
             let filter = {
               dossierId: vm.dossierId
             }
             vm.$store.dispatch('loadDossierPayments', filter).then(result => {
               vm.paymentProfile = result
-              vm.showThanhToanDienTu = true
             }).catch(reject => {
             })
           } else {
@@ -1146,10 +1148,10 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        if (paymentProfile['paymentFile']) {
+        if (paymentProfile && paymentProfile['paymentFile']) {
           validThanhToanDienTu = true
           filter['payment'] = {
-            requestPayment: 2 ,
+            requestPayment: 3 ,
             advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
             feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
             paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
@@ -1282,7 +1284,7 @@ export default {
           if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
             vm.printDocument = true
           }
-          if (vm.checkInput === 2 && vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+          if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
             router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
           }
           vm.checkInput = 0
