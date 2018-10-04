@@ -78,7 +78,7 @@
             </v-layout>  -->
             <!-- epayment -->
             <div v-if="paymentProfile.hasOwnProperty('epaymentProfile') && paymentProfile.epaymentProfile['bank']">
-              <div v-if="!paymentFile">
+              <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
                 <span>Tải lên file báo thanh toán <span style="color:red">*</span></span>
                 <v-progress-circular
@@ -98,7 +98,7 @@
                 </v-tooltip>
               </div>
               <!-- view file -->
-              <div v-else>
+              <div>
                 <span v-on:click.stop="viewFile(paymentFile)" style="cursor: pointer;">
                   <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
                   {{paymentFile.displayName}}.{{paymentFile.fileType}} - 
@@ -110,9 +110,9 @@
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
-                <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
+                <!-- <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
                   <v-icon style="color: red">delete_outline</v-icon>
-                </v-btn>
+                </v-btn> -->
               </div>
             </div>
             <!-- paymentNote -->
@@ -185,8 +185,9 @@ export default {
       type: Object,
       default: () => {}
     },
-    dossierId: {
-      type: Number
+    detailDossier: {
+      type: Object,
+      default: () => {}
     }
   },
   data: () => ({
@@ -272,7 +273,8 @@ export default {
       var vm = this
       vm.progressUploadPart = true
       var data = {}
-      data['dossierId'] = vm.dossierId
+      data['dossierId'] = vm.detailDossier.dossierId
+      data['referenceUid'] = vm.detailDossier.referenceUid
       data['selector'] = 'paymentFile1'
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
         console.log('uploadPayment1')
@@ -295,12 +297,13 @@ export default {
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
         // test local
         // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
-        let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
+        let url = '/o/rest/v2/dossiers/' + vm.detailDossier.dossierId + '/payments/' + vm.detailDossier.referenceUid + '/confirmfile'
         window.open(url)
       } else {
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
-        data['dossierId'] = vm.dossierId
+        data['dossierId'] = vm.detailDossier.dossierId
+        data['referenceUid'] = vm.detailDossier.referenceUid
         vm.$store.dispatch('viewPaymentFile', data).then(result => {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPreview').src = result
@@ -326,7 +329,7 @@ export default {
       let vm = this
       // test local
       // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
-      let url = '/o/rest/v2/dossiers/' + vm.dossierId + '/payment/confirmfile'
+      let url = '/o/rest/v2/dossiers/' + vm.detailDossier.dossierId + '/payments/' + vm.detailDossier.referenceUid + '/confirmfile'
       window.open(url)
     },
     pickFile () {

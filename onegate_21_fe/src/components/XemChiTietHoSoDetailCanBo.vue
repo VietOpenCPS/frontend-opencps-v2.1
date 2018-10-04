@@ -144,7 +144,7 @@
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- thanh toán điện tử -->
-              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :dossierId="dossierId"></thanh-toan-dien-tu>
+              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
@@ -854,13 +854,12 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          let currentParams = vm.$router.history.current.params
-          let currentQuery = vm.$router.history.current.query
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && currentQuery['step'] === '610') {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && dossierItem['stepCode'] === 610) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
-              dossierId: vm.dossierId
+              dossierId: vm.dossierId,
+              referenceUid: dossierItem.referenceUid
             }
             vm.$store.dispatch('loadDossierPayments', filter).then(result => {
               vm.paymentProfile = result
@@ -1151,7 +1150,7 @@ export default {
         if (paymentProfile && paymentProfile['paymentFile']) {
           validThanhToanDienTu = true
           filter['payment'] = {
-            requestPayment: 3 ,
+            requestPayment: 3,
             advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
             feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
             paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',

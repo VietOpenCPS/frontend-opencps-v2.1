@@ -1709,7 +1709,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.dossierId + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
