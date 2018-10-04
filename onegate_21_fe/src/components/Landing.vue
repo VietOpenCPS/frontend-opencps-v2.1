@@ -181,7 +181,7 @@
     </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
-      <v-layout wrap v-if="originality !== 1">
+      <v-layout wrap v-if="originality !== 1 && menuType !== 3">
         <v-flex xs4 class="pl-2 pr-2 input-group--text-field-box">
           <v-select
             :items="listLinhVuc"
@@ -1269,7 +1269,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if (String(newQuery['q']).indexOf('&step') === -1) {
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
         queryString += 'step=' + newQuery['step'] + '&'
       }
       if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
@@ -1321,7 +1321,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if (String(newQuery['q']).indexOf('&step') === -1) {
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
         queryString += 'step=' + newQuery['step'] + '&'
       }
       queryString += 'domain=' + vm.domainCode
