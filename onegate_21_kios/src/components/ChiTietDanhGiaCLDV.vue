@@ -129,8 +129,8 @@ export default {
         }
         if (vm.validPass1 && vm.validPass2) {
           let filter = {
-            applicantIdNo: vm.applicantIdNo,
-            dossierNo: vm.dossierNo
+            applicantIdNo: $('#applicantIdNo').val(),
+            dossierNo: $('#dossierIdNoKey').val()
           }
           vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
             console.log('result', result)

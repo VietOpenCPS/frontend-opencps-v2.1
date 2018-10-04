@@ -101,7 +101,7 @@
     </div>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div v-else>
+      <div v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
