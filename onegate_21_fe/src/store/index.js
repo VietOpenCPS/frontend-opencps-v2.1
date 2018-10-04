@@ -105,7 +105,7 @@ export const store = new Vuex.Store({
     viaPostal: 0,
     data_phancong: [],
     dataCreateDossier: {},
-    paymentProfile: {}
+    paymentProfile: ''
   },
   actions: {
     clearError ({commit}) {
@@ -597,14 +597,14 @@ export const store = new Vuex.Store({
         let files = $('#' + data.selector)[0].files
         let file = files[0]
         let formData = new FormData()
-        formData.append('displayName', file.name)
-        formData.append('fileType', file.type)
-        formData.append('fileSize', file.size)
-        // formData.append('file', file)
-        for (let key of formData.entries()) {
-          console.log(key[0] + ', ' + key[1])
-        }
-        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', formData, {
+        // formData.append('displayName', file.name)
+        // formData.append('fileType', file.type)
+        // formData.append('fileSize', file.size)
+        formData.append('file', file)
+        // for (let key of formData.entries()) {
+        //   console.log(key[0] + ', ' + key[1])
+        // }
+        axios.put(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', formData, {
           headers: {
             'groupId': state.initData.groupId,
             'Content-Type': 'multipart/form-data'
@@ -705,7 +705,7 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
           if (response.data) {
             resolve(response.data)
           } else {
@@ -741,7 +741,7 @@ export const store = new Vuex.Store({
           },
           responseType: 'blob'
         }
-        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payment/confirmfile', param).then(function (response) {
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
         }).catch(function (xhr) {
@@ -1709,7 +1709,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment/' + data.dossierId + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.dossierId + '/epaymentprofile'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
