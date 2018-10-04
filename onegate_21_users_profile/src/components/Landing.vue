@@ -1,29 +1,32 @@
 <template>
-  <v-layout wrap>
-    <v-flex class="xs12 sm9">
-      <v-card class="mx-3 my-3">
+  <v-layout wrap style="
+    max-width: 1300px;
+    margin: 0 auto;
+  ">
+    <v-flex class="xs12 sm8">
+      <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
         <div class="row-header">
           <div class="background-triangle-big">
             <span v-if="currentTab">THÔNG TIN TÀI KHOẢN</span>
             <span v-else>THAY ĐỔI MẬT KHẨU</span>
           </div>
           <div class="layout row wrap header_tools">
-            <div class="flex xs4 sm3 text-right" style="margin-left: auto;">
-              <v-btn v-if="currentTab" color="primary" @click="()=>currentTab = !currentTab" flat class="my-0 mx-0 btn-border-left" active-class="temp_active">
+            <div class="flex text-right" style="margin-left: auto;">
+              <v-btn v-if="currentTab" color="primary" v-on:click.native="currentTab = !currentTab" flat class="my-0 btn-border-left" active-class="temp_active">
                 <v-icon>verified_user</v-icon>&nbsp;
                 <span>Đổi mật khẩu</span>
               </v-btn>
-              <v-btn v-else color="primary" @click="()=>currentTab = !currentTab" flat class="my-0 mx-0 btn-border-left" active-class="temp_active">
+              <v-btn v-else color="primary" v-on:click.native="currentTab = !currentTab" flat class="my-0 btn-border-left" active-class="temp_active">
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 <span>Thông tin tài khoản</span>
               </v-btn>
             </div>
           </div> 
         </div>
-        <v-form v-if="currentTab" ref="form" v-model="valid" lazy-validation>
-          <v-layout v-if="user['className'] === 'employee'" wrap class="px-3">
+        <v-form v-if="currentTab" ref="form" v-model="valid" lazy-validation class="py-3 px-3">
+          <v-layout v-if="user['className'] === 'employee'" wrap>
             <!-- row:1 -->
-            <v-flex xs6 sm6 class="pr-3">
+            <v-flex xs6 sm6>
               <v-text-field
                 label="Tên người dùng"
                 v-model="user.fullName"
@@ -32,7 +35,7 @@
                 required
               ></v-text-field>
             </v-flex>
-            <v-flex xs6 sm3 class="pr-3">
+            <v-flex xs6 sm3>
               <v-text-field
                 label="Số điện thoại"
                 v-model="user.telNo"
@@ -49,7 +52,7 @@
               ></v-text-field>
             </v-flex>
             <!-- row:2 -->
-            <v-flex xs6 sm6 class="pr-3">
+            <v-flex xs6 sm6>
               <v-text-field
                 label="Tài khoản đăng nhập"
                 v-model="user.email"
@@ -102,9 +105,9 @@
                 v-on:init="loadEsignCert"/>
             </v-flex>
           </v-layout>
-          <v-layout v-else wrap class="px-3">
+          <v-layout v-else wrap>
             <!-- row:1 -->
-            <v-flex xs6 sm4 class="pr-3">
+            <v-flex xs6 sm4>
               <v-text-field
                 label="Họ và tên"
                 v-model="user.applicantName"
@@ -113,7 +116,7 @@
                 required
               ></v-text-field>
             </v-flex>
-            <v-flex xs4 class="pr-3">
+            <v-flex xs4>
               <v-text-field
                 label="Điện thoại"
                 v-model="user.contactTelNo"
@@ -132,6 +135,7 @@
                 label="Địa chỉ"
                 v-model="user.address"
                 box
+                multi-line
               ></v-text-field>
             </v-flex>
             <v-flex xs6 sm4 class="pr-3 input-group--text-field-box">
@@ -141,7 +145,6 @@
                 v-model="user.cityCode"
                 item-text="itemName"
                 item-value="itemCode"
-                @change="onChangeCity"
                 autocomplete
                 :hide-selected="true"
               ></v-select>
@@ -154,7 +157,6 @@
                 v-model="user.districtCode"
                 item-text="itemName"
                 item-value="itemCode"
-                @change="onChangeDistrict"
                 autocomplete
                 :hide-selected="true"
               ></v-select>
@@ -164,7 +166,6 @@
                 label="Xã/phường"
                 :items="wardItems"
                 v-model="user.wardCode"
-                @change="onChangeWard"
                 item-text="itemName"
                 item-value="itemCode"
                 autocomplete
@@ -184,11 +185,11 @@
           </div>
         </v-form>
         <v-form v-else ref="form" v-model="valid" lazy-validation>
-          <v-layout wrap class="px-3 py-3">
+          <v-layout wrap>
             <v-flex xs3>
               <v-subheader>Mật khẩu hiện tại</v-subheader>
             </v-flex>
-            <v-flex xs9 class="pr-3">
+            <v-flex xs9>
               <v-text-field
                 v-model="passWord"
                 box
@@ -204,7 +205,7 @@
             <v-flex xs3>
               <v-subheader>Mật khẩu mới</v-subheader>
             </v-flex>
-            <v-flex xs9 class="pr-3">
+            <v-flex xs9>
               <v-text-field
                 v-model="newPassWord"
                 box
@@ -220,7 +221,7 @@
             <v-flex xs3>
               <v-subheader>Nhập lại mật khẩu mới</v-subheader>
             </v-flex>
-            <v-flex xs9 class="pr-3">
+            <v-flex xs9>
               <v-text-field
                 v-model="againNewPassWord"
                 box
@@ -247,18 +248,20 @@
       </v-card>
     </v-flex>
     <!-- content-right -->
-    <v-flex class="xs12 sm3">
-      <v-card class="mr-3 my-3">
-        <v-card-text style="height: 100px;border:1px solid #dedede">
+    <v-flex class="xs12 sm4 px-3">
+      <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
+        <v-card-text style="height: 180px;">
           <file-pond
             ref="pond"
-            label-idle="Cập nhật ảnh đại diện"
+            name="file"
+            label-idle="<strong><i aria-hidden='true' class='icon material-icons' style='font-size: 80px;'>photo_camera</i></strong>"
+            allow-multiple="false"
             accepted-file-types="image/jpeg, image/png"
             :server='serverImgAvatar'
             v-bind:files="filesImgAvatar"
             v-on:init="loadImgAvatar"/>
         </v-card-text>
-        <div class="px-3 py-3" v-if="user.className === 'employee'">
+        <v-card-text v-if="user.className === 'employee'">
           <div class="text-bold text-xs-center mb-2">{{user.fullName}}</div>
           <div>
             <span>Ngày sinh:</span>&nbsp; <span class="text-bold">{{user.birthdate}}</span>
@@ -269,21 +272,37 @@
           <div>
             <span>Số điện thoại:</span>&nbsp; <span class="text-bold">{{user.telNo}}</span>
           </div>
-        </div>
-        <div class="px-3 py-3" v-else>
-          <div class="text-bold text-xs-center mb-2">{{user.applicantName}}</div>
-          <div>
-            <span v-if="applicantIdType == 'citizen'">Số CMND/Hộ chiếu:</span>
-            <span v-else>Mã số thuế:</span>
-            &nbsp; <span class="text-bold">{{user.applicantIdNo}}</span>
+        </v-card-text>
+        <v-card-text v-else>
+          <div class="text-bold text-xs-center label__user_profile">{{user.applicantName}} nguyen van a</div>
+          <div class="text-xs-center label__user_profile">
+            <a href="javascript:;" style="
+              text-decoration: none;
+              border-bottom: 1px dashed;
+            ">binhth@fds.vn</a>
           </div>
-          <div>
-            <span>Ngày cấp:</span>&nbsp; <span class="text-bold">{{user.applicantIdDate}}</span>
+          <div class="text-xs-center label__user_profile">
+            Xã Việt Đoàn, huyện Tiên Du, tỉnh Bắc Ninh, số 183 chợ sơn khu phố 1 phường 2 đặc chủng khu vực
           </div>
-          <div>
-            <span>Thư điện tử:</span>&nbsp; <span class="text-bold">{{user.contactEmail}}</span>
-          </div>
-        </div>
+          <hr class="my-3" style="
+            border: 0;
+            border-top: 1px solid rgba(0,0,0,.1);
+          ">
+          <v-layout row wrap>
+            <v-flex xs4>
+              <v-subheader class="pr-0">Mã số thuế: </v-subheader>
+            </v-flex>
+            <v-flex xs8>
+              <v-subheader>125458129</v-subheader>
+            </v-flex>
+            <v-flex xs4>
+              <v-subheader class="pr-0">Ngày cấp: </v-subheader>
+            </v-flex>
+            <v-flex xs8>
+              <v-subheader>14/08/2008</v-subheader>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
       </v-card>
     </v-flex>
   </v-layout>
@@ -291,8 +310,6 @@
 
 <script>
 import router from '@/router'
-import Vue from 'vue/dist/vue.min.js'
-import $ from 'jquery'
 import support from '../store/support.json'
 import vueFilePond from 'vue-filepond'
 import 'filepond/dist/filepond.min.css'
@@ -348,9 +365,9 @@ export default {
           vm.getUserDetail(vm.user)
         }).catch(xhr => {
         })
-        vm.filesImgAvatar = ['/o/rest/v2/users/' + result['user'].userId + '/photo']
+        vm.filesImgAvatar = ['/o/gate/v2/users/' + result['user'].userId + '/photo']
         vm.serverImgAvatar = {
-          url: '/o/rest/v2/users/' + result['user'].userId + '/photo',
+          url: '/o/gate/v2/users/' + result['user'].userId + '/photo',
           process: {
             url: '',
             method: 'PUT',
@@ -374,9 +391,9 @@ export default {
             onerror: null
           }
         }
-        vm.fileImgEsign = ['/o/rest/v2/users/' + result['user'].userId + '/esign']
+        vm.fileImgEsign = ['/o/gate/v2/users/' + result['user'].userId + '/esign']
         vm.serverImgEsign = {
-          url: '/o/rest/v2/users/' + result['user'].userId + '/esign',
+          url: '/o/gate/v2/users/' + result['user'].userId + '/esign',
           process: {
             url: '',
             method: 'PUT',
@@ -400,9 +417,9 @@ export default {
             onerror: null
           }
         }
-        vm.fileEsignCert = ['/o/rest/v2/users/' + result['user'].userId + '/esigncert']
+        vm.fileEsignCert = ['/o/gate/v2/users/' + result['user'].userId + '/esigncert']
         vm.serverEsignCert = {
-          url: '/o/rest/v2/users/' + result['user'].userId + '/esigncert',
+          url: '/o/gate/v2/users/' + result['user'].userId + '/esigncert',
           process: {
             url: '',
             method: 'PUT',
@@ -514,3 +531,32 @@ export default {
   }
 }
 </script>
+
+<style>
+  body .filepond--panel-center {
+    height: 80px!important;
+    border-radius: 50%!important;
+    width: 170.047px;
+    margin: 0 auto;
+  }
+  .filepond--drop-label label {
+    height: 180px;
+    position: relative;
+  }
+  .filepond--panel-bottom, .filepond--panel-top {
+    display: none;
+  }
+  .label__user_profile {
+    padding: 5px 0;
+  }
+  .user__profile_container .input-group {
+    padding: 5px 10px 0;
+  }
+  .user__profile_container .input-group--text-field label {
+    position: initial;
+    color: #212121 !important;
+  }
+  .user__profile_container .input-group--text-field-box:not(.input-group--textarea).input-group--multi-line .input-group__input {
+    padding-top: 5px;
+  }
+</style>
