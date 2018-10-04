@@ -31,6 +31,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery-comments.js"></script>
 	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery.textcomplete.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/slick.min.js"></script>
 	
 	<script>
         window.define = window.__define;

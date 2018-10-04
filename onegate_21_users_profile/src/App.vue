@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-content>
+    <v-content class="user__profile_container">
       <router-view></router-view>
     </v-content>
   </v-app>
