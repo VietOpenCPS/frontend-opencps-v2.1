@@ -144,7 +144,7 @@
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- thanh toán điện tử -->
-              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :dossierId="dossierId"></thanh-toan-dien-tu>
+              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
@@ -858,7 +858,8 @@ export default {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
-              dossierId: vm.dossierId
+              dossierId: vm.dossierId,
+              referenceUid: dossierItem.referenceUid
             }
             vm.$store.dispatch('loadDossierPayments', filter).then(result => {
               vm.paymentProfile = result
