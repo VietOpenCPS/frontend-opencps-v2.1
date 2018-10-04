@@ -324,6 +324,7 @@ export default {
     FilePond
   },
   data: () => ({
+    valid: false,
     loading: false,
     currentTab: true,
     cityItems: [],
