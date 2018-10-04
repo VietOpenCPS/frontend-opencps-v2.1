@@ -374,7 +374,8 @@ export default {
             method: 'PUT',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
@@ -385,7 +386,8 @@ export default {
             method: 'GET',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: null,
@@ -400,7 +402,8 @@ export default {
             method: 'PUT',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
@@ -411,7 +414,8 @@ export default {
             method: 'GET',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: null,
@@ -426,7 +430,8 @@ export default {
             method: 'PUT',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
@@ -437,7 +442,8 @@ export default {
             method: 'GET',
             withCredentials: false,
             headers: {
-              groupId: result.groupId
+              groupId: result.groupId,
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: null,
