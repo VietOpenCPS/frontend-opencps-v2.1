@@ -144,7 +144,7 @@
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
               <!-- thanh toán điện tử -->
-              <thanh-toan-dien-tu v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
+              <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
@@ -1146,17 +1146,18 @@ export default {
         filter['payment'] = paymentsOut
       }
       if (vm.showThanhToanDienTu) {
+        vm.$refs.epayment.validPayment()
         let paymentProfile = vm.$store.getters.getPaymentProfile
         if (paymentProfile && paymentProfile['paymentFile']) {
           validThanhToanDienTu = true
           filter['payment'] = {
             requestPayment: 3,
-            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : '',
-            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : '',
-            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : '',
+            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : 0,
+            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : 0,
+            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : 0,
             paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
-            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : '',
-            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : ''
+            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : 0,
+            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : 0
           }
         } else {
           validThanhToanDienTu = false
