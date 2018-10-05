@@ -479,11 +479,11 @@ export default {
         dossierTemplates.forEach(template => {
           template['daKhai'] = false
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType)
           })
           if (itemFind) {
             template['daKhai'] = true
-          } else if (!itemFind && template.hasForm) {
+          } else {
             template['daKhai'] = false
           }
           dossierFiles.forEach(dossierFile => {
@@ -637,9 +637,9 @@ export default {
       vm.progressUploadPart = data.partNo
       data['dossierId'] = vm.thongTinHoSo.dossierId
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
-      vm.dossierTemplateItems[index]['daKhai'] = true
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
+          vm.dossierTemplateItems[index]['daKhai'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result

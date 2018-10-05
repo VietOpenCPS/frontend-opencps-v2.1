@@ -9,73 +9,63 @@
           <span>{{paymentProfile.paymentFee}}</span>
         </div>
         <v-card>
-          <!-- <v-card-text class="pb-1">
+          <v-card-text class="px-4 pb-1">
             <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3>
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="paymentProfile.feeAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                ></v-text-field>
+                <p class="mt-1 mb-0">{{currency(Number(paymentProfile.feeAmount))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
-
-              <v-flex xs12 sm2 class="pt-1">
+              <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right">Phí: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 class="pt-1">
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="paymentProfile.serviceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                ></v-text-field>
+              <v-flex xs12 sm3>
+                <p class="mt-1 mb-0">{{currency(Number(paymentProfile.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <v-flex xs12 sm2></v-flex>
-              <v-flex xs12 sm2>
+              <v-flex xs12 sm2 v-if="detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2'">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3>
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="paymentProfile.shipAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                ></v-text-field>
+                <p class="mt-1 mb-0" v-if="detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2'">
+                  {{currency(Number(paymentProfile.shipAmount))}} &nbsp;&nbsp; vnđ
+                </p>
               </v-flex>
             </v-layout>
-          </v-card-text> -->
+          </v-card-text>
           <v-card-text class="px-4 pt-0">
-            <!-- <v-layout wrap>
+            <v-layout wrap>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
               <v-flex xs12 sm3 style="padding-top:7px">
-                <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
+                <span>{{currency(Number(feeTong))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Đã tạm nộp: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3>
-                <v-text-field
-                  @keyup="changeFee"
-                  v-model="paymentProfile.advanceAmount"
-                  v-money="money"
-                  suffix="vnđ"
-                ></v-text-field>
+              <v-flex xs12 sm3 style="padding-top:7px">
+                <span>{{currency(Number(paymentProfile.advanceAmount))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1></v-flex>
               <v-flex xs12 sm2>
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Còn phải nộp: </span></v-subheader>
               </v-flex>
               <v-flex xs12 sm3 style="padding-top:7px">
-                <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
+                <span>{{currency(totalFee)}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <v-flex xs12 sm1></v-flex>
-            </v-layout>  -->
+            </v-layout>
+            <!-- paymentNote -->
+            <v-layout wrap style="position: relative">
+              <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
+              <v-flex style="width:calc(100% - 80px)">
+                <p class="px-2 my-0 py-1">
+                  {{paymentProfile.confirmNote}} &nbsp;&nbsp;
+                </p>
+              </v-flex>
+            </v-layout> 
             <!-- epayment -->
             <div v-if="paymentProfile.hasOwnProperty('epaymentProfile') && paymentProfile.epaymentProfile['bank']">
               <div>
@@ -98,7 +88,7 @@
                 </v-tooltip>
               </div>
               <!-- view file -->
-              <div>
+              <div v-if="paymentFile">
                 <span v-on:click.stop="viewFile(paymentFile)" style="cursor: pointer;">
                   <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
                   {{paymentFile.displayName}}.{{paymentFile.fileType}} - 
@@ -114,35 +104,8 @@
                   <v-icon style="color: red">delete_outline</v-icon>
                 </v-btn> -->
               </div>
+              <span v-if="!epaymentValid" style="color:#f44336">* Yêu cầu tải lên file báo thanh toán</span>
             </div>
-            <!-- paymentNote -->
-            <!-- <v-layout wrap style="position: relative">
-              <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
-              <v-flex style="width:calc(100% - 80px)">
-                <div v-if="activeEdit == false" class="pl-2">
-                  <v-text-field class="py-0"
-                  v-model="paymentProfile.confirmNote"
-                  @change="changeFee"
-                  multi-line
-                  :readonly='activeEdit'
-                  required
-                  ></v-text-field>
-                </div>
-                <p class="px-2 my-0 py-1" v-if="activeEdit||paymentProfile.confirmNote===''">
-                  {{paymentProfile.confirmNote}} &nbsp;&nbsp;
-                  <v-icon color="blue" size="20" class="hover-pointer btn-add mx-0 my-0" title="Sửa" v-on:click.stop="activeEdit = false" 
-                  v-if="activeEdit==true" grey darken-4>
-                    create
-                  </v-icon>
-                </p>
-                <span style="position:absolute;top:15px; right:10px">
-                  <v-icon color="green" size="25" class="hover-pointer btn-add mx-0 my-0" v-on:click.stop="activeEdit = true" 
-                  v-if="activeEdit==false" grey darken-4>
-                    check
-                  </v-icon>
-                </span>
-              </v-flex>
-            </v-layout>  -->
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -193,6 +156,7 @@ export default {
   data: () => ({
     data_payment: {},
     paymentFile: '',
+    epaymentValid: true,
     money: {
       decimal: '',
       thousands: '.',
@@ -212,63 +176,42 @@ export default {
   }),
   directives: {money: VMoney},
   created () {
-    var vm = this
-    if (vm.paymentProfile) {
-      if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
-        if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
-          let url = vm.paymentProfile.epaymentProfile.url
-          window.open(url, '_self')
-        }
-      } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
-        setTimeout(function () {
-          let feeAmount = vm.paymentProfile.feeAmount ? Number(vm.paymentProfile.feeAmount.toString().replace(/\./g, '')) : 0
-          let advanceAmount = vm.paymentProfile.advanceAmount ? Number(vm.paymentProfile.advanceAmount.toString().replace(/\./g, '')) : 0
-          let serviceAmount = vm.paymentProfile.serviceAmount ? Number(vm.paymentProfile.serviceAmount.toString().replace(/\./g, '')) : 0
-          let shipAmount = vm.paymentProfile.shipAmount ? Number(vm.paymentProfile.shipAmount.toString().replace(/\./g, '')) : 0
-          vm.feeTong = feeAmount + serviceAmount + shipAmount
-          vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
+  },
+  watch: {
+    paymentProfile (val) {
+      var vm = this
+      if (vm.paymentProfile) {
+        if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
+          console.log('feeTong', vm.feeTong)
+          if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
+            let url = vm.paymentProfile.epaymentProfile.url
+            window.open(url, '_self')
+          }
+        } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
+          vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
+          if (vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') {
+            vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
+          }
+          console.log('feeTong', vm.feeTong)
+          vm.totalFee = vm.feeTong - Number(vm.paymentProfile.advanceAmount)
           if (vm.totalFee < 0) {
             vm.totalFee = 0
           }
           vm.data_payment = {
-            advanceAmount: advanceAmount,
-            feeAmount: feeAmount,
-            serviceAmount: serviceAmount,
-            shipAmount: shipAmount,
+            advanceAmount: vm.paymentProfile.advanceAmount,
+            feeAmount: vm.paymentProfile.feeAmount,
+            serviceAmount: vm.paymentProfile.serviceAmount,
+            shipAmount: vm.paymentProfile.shipAmount,
             paymentAmount: vm.totalFee,
             paymentNote: vm.paymentProfile.confirmNote,
             paymentFile: vm.paymentFile
           }
           vm.$store.commit('setPaymentProfile', vm.data_payment)
-        }, 200)
+        }
       }
     }
   },
-  watch: {
-  },
   methods: {
-    changeFee () {
-      var vm = this
-      let val = vm.paymentProfile
-      let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
-      let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
-      let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
-      let shipAmount = Number(val.shipAmount.toString().replace(/\./g, ''))
-      vm.feeTong = feeAmount + serviceAmount + shipAmount
-      vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
-      if (vm.totalFee < 0) {
-        vm.totalFee = 0
-      }
-      vm.data_payment = {
-        advanceAmount: advanceAmount,
-        feeAmount: feeAmount,
-        serviceAmount: serviceAmount,
-        shipAmount: shipAmount,
-        paymentAmount: vm.totalFee,
-        paymentNote: vm.paymentProfile.confirmNote
-      }
-      // vm.$store.commit('setPaymentProfile', vm.data_payment)
-    },
     uploadPaymentFile (e) {
       var vm = this
       vm.progressUploadPart = true
@@ -277,13 +220,15 @@ export default {
       data['referenceUid'] = vm.detailDossier.referenceUid
       data['selector'] = 'paymentFile1'
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
-        console.log('uploadPayment1')
+        vm.epaymentValid = true
         vm.progressUploadPart = false
+        vm.paymentFile = result
+        vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.$store.commit('setPaymentProfile', vm.data_payment)
         vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.$store.commit('setPaymentProfile', vm.data_payment)
-          console.log('vm.paymentFile', vm.paymentFile)
         })
       }).catch(function (xhr) {
         vm.progressUploadPart = false
@@ -338,10 +283,16 @@ export default {
     },
     currency (value) {
       if (value) {
-        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
-        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : 0
       }
-      return ''
+      return 0
+    },
+    validPayment () {
+      if (this.paymentFile) {
+        this.epaymentValid = true
+      } else {
+        this.epaymentValid = false
+      }
     },
     goBack () {
       window.history.back()

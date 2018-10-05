@@ -182,7 +182,7 @@
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="originality !== 1">
-        <v-flex xs4 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex xs3 class="pl-2 pr-2 input-group--text-field-box">
           <v-select
             :items="listLinhVuc"
             v-model="linhVucSelected"
@@ -196,7 +196,7 @@
             clearable
           ></v-select>
         </v-flex>
-        <v-flex xs4 class="pl-2 pr-2 input-group--text-field-box">
+        <v-flex xs3 class="pl-2 pr-2 input-group--text-field-box">
           <v-select
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
@@ -210,7 +210,20 @@
             clearable
           ></v-select>
         </v-flex>
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-select
+            :items="listDichVu"
+            v-model="dichVuSelected"
+            placeholder="Chọn dịch vụ:"
+            autocomplete
+            item-text="optionName"
+            item-value="processOptionId"
+            return-object
+            :hide-selected="true"
+            @change="changeDichVuConfigs"
+          ></v-select>
+        </v-flex>
+        <v-flex xs3 class="pl-2 pr-2">
           <div style="position:relative">
             <v-text-field
               placeholder="Nhập mã hồ sơ"
@@ -1178,7 +1191,7 @@ export default {
         if (vm.menuType !== 3) {
           filter = {
             queryParams: querySet,
-            /*  test Local */
+            /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
@@ -1197,7 +1210,7 @@ export default {
         } else {
           filter = {
             queryParams: querySet,
-            /*  test Local */
+            /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
@@ -1269,7 +1282,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if (String(newQuery['q']).indexOf('&step') === -1) {
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
         queryString += 'step=' + newQuery['step'] + '&'
       }
       if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
@@ -1321,7 +1334,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if (String(newQuery['q']).indexOf('&step') === -1) {
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
         queryString += 'step=' + newQuery['step'] + '&'
       }
       queryString += 'domain=' + vm.domainCode
