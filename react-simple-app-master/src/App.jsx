@@ -19,7 +19,7 @@ import deepOrange from '@material-ui/core/colors/deepOrange';
 import Button from '@material-ui/core/Button';
 
 const themeDisplay = window.themeDisplay;
-
+// axios.defaults.headers.common['Token'] = window.Liferay.authToken
 const styles = theme => ({
   root: {
     textAlign: 'right',
@@ -88,7 +88,8 @@ class App extends React.Component {
       avatarURL: '',
       notificationCount: 0,
       isShowUserMenu: false,
-      toggle_exclusive: 0
+      toggle_exclusive: 0,
+      userData: {}
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
@@ -126,11 +127,13 @@ class App extends React.Component {
       })
       if (themeDisplay.isSignedIn()) {
         let param = {
-          responseType: 'blob'
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {}
         }
-        axios.get('/o/rest/v2/users/' + themeDisplay.getUserId() + '/photo', param).then(function (response) {
-          let avatarURLStr = window.URL.createObjectURL(response.data)
-          vm.setState({ avatarURL: avatarURLStr })
+        axios.get('/o/gate/v2/users/' + themeDisplay.getUserId(), param).then(function (response) {
+          vm.setState({ userData: response.data })
         }).catch(function (error) {
           console.log(error)
         })
@@ -168,7 +171,7 @@ class App extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { open, isSignedIn, userNameLogin, avatarURL, notificationCount, forgottenURL, anchorEl } = this.state;
+    const { open, isSignedIn, userNameLogin, avatarURL, notificationCount, forgottenURL, anchorEl, userData } = this.state;
     
     return (
       <div>
@@ -206,7 +209,7 @@ class App extends React.Component {
             </IconButton>
           </Grid>
           <Grid item>
-            { avatarURL === '' ? 
+            { userData.avatar === '' ? 
               <Grid container>
                 <Grid item>
                 <Avatar className={classes.orangeAvatar}>N</Avatar>
@@ -217,7 +220,7 @@ class App extends React.Component {
                   onClick={this.handleToggle}
                   className={classes.btnNameAvata}
                 >
-                  {userNameLogin}
+                  {userData.userName}
                   <ExpandMoreIcon />
                 </Button>
                 </Grid>
@@ -225,8 +228,8 @@ class App extends React.Component {
             :
               <Chip
                 onClick={this.handleToggle}
-                avatar={<Avatar src={avatarURL} />}
-                label={userNameLogin}
+                avatar={<Avatar src={userData.avatar} />}
+                label={userData.userName}
                 className={classes.chip}
                 style={chipStyle}
                 onDelete={this.handleToggle}
