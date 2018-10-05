@@ -444,7 +444,8 @@ export default {
         cityCode: this.thongTinChuHoSo.cityCode,
         address: this.thongTinChuHoSo.address,
         districtCode: this.thongTinChuHoSo.districtCode,
-        wardCode: this.thongTinChuHoSo.wardCode
+        wardCode: this.thongTinChuHoSo.wardCode,
+        contactTelNo: this.thongTinChuHoSo.contactTelNo
       }
       return data
     }

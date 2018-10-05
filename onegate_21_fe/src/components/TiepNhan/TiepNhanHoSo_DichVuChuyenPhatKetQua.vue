@@ -5,147 +5,150 @@
         
         <v-slide-y-transition>
           <span v-if="dichVuChuyenPhatKetQua.viaPostal === 1">
-            <v-icon size="16">check_circle</v-icon> <strong>Đăng ký kết quả tại nhà</strong> để điền thông tin chuyển phát tận nhà
+            <v-icon size="16">check_circle</v-icon> <b>Đăng ký kết quả tại nhà</b> để điền thông tin chuyển phát tận nhà
           </span>
-          <v-layout v-else wrap>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Dịch vụ đăng ký: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm10>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-select
-                v-else
-                :items="postalServiceItems"
-                item-text="itemName"
-                item-value="itemCode"
-                v-model="dichVuChuyenPhatKetQua.postalServiceCode"
-                autocomplete
-              ></v-select>
-            </v-flex>
-            <!--  -->
-            <!--  -->
-            <!-- <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">SĐT người nhận: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-text-field
-                v-else
-                v-model="dichVuChuyenPhatKetQua.postalTelNo"
-                append-icon="phone"
-                :required='dichVuChuyenPhatKetQua.viaPostal'
-              ></v-text-field>
-            </v-flex> -->
-            <!-- <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Mã bưu cục: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-select
-                v-else
-                :items="vnPostItems"
-                item-text="itemName"
-                item-value="itemCode"
-                v-model="dichVuChuyenPhatKetQua.vnPostCode"
-                :required='dichVuChuyenPhatKetQua.viaPostal'
-                autocomplete
-              ></v-select>
-            </v-flex> -->
-            <v-flex xs12>
+          <v-form v-else v-model="valid_dichvuchuyenphat" ref="formDichVuChuyenPhat" lazy-validation>
+            <v-layout wrap>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Dịch vụ đăng ký: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm10>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="postalServiceItems"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  v-model="dichVuChuyenPhatKetQua.postalServiceCode"
+                  autocomplete
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                ></v-select>
+              </v-flex>
+              <!--  -->
+              <!--  -->
+              <!-- <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Mã bưu cục: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="vnPostItems"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  v-model="dichVuChuyenPhatKetQua.vnPostCode"
+                  :required='dichVuChuyenPhatKetQua.viaPostal'
+                  autocomplete
+                ></v-select>
+              </v-flex> -->
+              <v-flex xs12>
 
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Địa chỉ trả kết quả: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm10>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-text-field
-                v-else
-                v-model="dichVuChuyenPhatKetQua.postalAddress"
-                multi-line
-                rows="2"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-select
-                v-else
-                :items="citys"
-                item-text="itemName"
-                item-value="itemCode"
-                @change="onChangeResultCity"
-                v-model="dichVuChuyenPhatKetQua.postalCityCode"
-                autocomplete
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-select
-                v-else
-                :items="resultDistricts"
-                item-text="itemName"
-                item-value="itemCode"
-                @change="onChangeResultDistrict"
-                v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
-                autocomplete
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-subheader v-else class="pl-0">Xã/Phường: </v-subheader>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <content-placeholders class="mt-1" v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <v-select
-                v-else
-                :items="resultWards"
-                item-text="itemName"
-                item-value="itemCode"
-                v-model="dichVuChuyenPhatKetQua.postalWardCode"
-                autocomplete
-              ></v-select>
-            </v-flex>
-          </v-layout>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Địa chỉ trả kết quả: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="dichVuChuyenPhatKetQua.postalAddress"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">SĐT người nhận: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-text-field
+                  v-else
+                  v-model="dichVuChuyenPhatKetQua.postalTelNo"
+                  append-icon="phone"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="citys"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  @change="onChangeResultCity"
+                  v-model="dichVuChuyenPhatKetQua.postalCityCode"
+                  autocomplete
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="resultDistricts"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  @change="onChangeResultDistrict"
+                  v-model="dichVuChuyenPhatKetQua.postalDistrictCode"
+                  autocomplete
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Xã/Phường: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="resultWards"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  v-model="dichVuChuyenPhatKetQua.postalWardCode"
+                  autocomplete
+                ></v-select>
+              </v-flex>
+            </v-layout>
+          </v-form>
         </v-slide-y-transition>
         
       </v-card-text>
@@ -168,6 +171,7 @@
 <script>
 export default {
   data: () => ({
+    valid_dichvuchuyenphat: false,
     citys: [],
     resultDistricts: [],
     resultWards: [],
@@ -191,6 +195,9 @@ export default {
     }
   },
   created () {
+    if (this.postalServiceItems.length > 0) {
+      this.dichVuChuyenPhatKetQua.postalServiceCode = this.postalServiceItems[0].itemCode
+    }
   },
   watch: {
     thongTinChuHoSoBindChuyenPhat (val) {
@@ -199,6 +206,7 @@ export default {
       vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
       vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
       vm.dichVuChuyenPhatKetQua.postalAddress = val.address
+      vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
       var filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 0,
@@ -327,6 +335,10 @@ export default {
       }
       this.$store.commit('setDichVuChuyenPhatKetQua', dataChuyenPhat)
       console.log('dichVuChuyenPhatKetQua', this.dichVuChuyenPhatKetQua)
+    },
+    validDichVuChuyenPhat () {
+      var vm = this
+      return vm.$refs.formDichVuChuyenPhat.validate()
     }
   }
 }

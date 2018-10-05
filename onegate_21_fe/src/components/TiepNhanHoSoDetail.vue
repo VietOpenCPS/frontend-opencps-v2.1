@@ -311,6 +311,9 @@ export default {
         if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
           return
         }
+        if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+          return
+        }
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
         let listAction = []
@@ -379,6 +382,11 @@ export default {
       if (vm.$refs.thongtinchuhoso.showValid()) {
         vm.loadingAction = true
         if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          vm.loadingAction = false
+          return
+        }
+        if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+          vm.loadingAction = false
           return
         }
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
