@@ -1063,7 +1063,7 @@ export default {
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
-        if (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '') {
+        if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
             thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
             return thuTuc
