@@ -368,22 +368,20 @@ export default {
         })
         vm.filesImgAvatar = ['/o/gate/v2/users/' + result['user'].userId + '/photo']
         vm.serverImgAvatar = {
-          url: '/o/gate/v2/users/' + result['user'].userId + '/photo',
           process: {
-            url: '',
+            url: '/o/gate-upload/v2/users/' + result['user'].userId + '/photo',
             method: 'PUT',
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken,
-              'Content-Type': 'multipart/form-data'
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
             onerror: vm.loadImgAvatar
           },
           load: {
-            url: '',
+            url: '/o/gate/v2/users/' + result['user'].userId + '/photo',
             method: 'GET',
             withCredentials: false,
             headers: {
@@ -397,22 +395,20 @@ export default {
         }
         vm.fileImgEsign = ['/o/gate/v2/users/' + result['user'].userId + '/esign']
         vm.serverImgEsign = {
-          url: '/o/gate/v2/users/' + result['user'].userId + '/esign',
           process: {
-            url: '',
+            url: '/o/gate-upload/v2/users/' + result['user'].userId + '/esign',
             method: 'PUT',
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken,
-              'Content-Type': 'multipart/form-data'
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
             onerror: vm.loadImgAvatar
           },
           load: {
-            url: '',
+            url: '/o/gate/v2/users/' + result['user'].userId + '/esign',
             method: 'GET',
             withCredentials: false,
             headers: {
@@ -426,22 +422,20 @@ export default {
         }
         vm.fileEsignCert = ['/o/gate/v2/users/' + result['user'].userId + '/esigncert']
         vm.serverEsignCert = {
-          url: '/o/gate/v2/users/' + result['user'].userId + '/esigncert',
           process: {
-            url: '',
+            url: '/o/gate-upload/v2/users/' + result['user'].userId + '/esigncert',
             method: 'PUT',
             withCredentials: false,
             headers: {
               groupId: result.groupId,
-              Token: window.Liferay.authToken,
-              'Content-Type': 'multipart/form-data'
+              Token: window.Liferay.authToken
             },
             timeout: 5000,
             onload: vm.loadImgAvatar,
             onerror: vm.loadImgAvatar
           },
           load: {
-            url: '',
+            url: '/o/gate/v2/users/' + result['user'].userId + '/esigncert',
             method: 'GET',
             withCredentials: false,
             headers: {
