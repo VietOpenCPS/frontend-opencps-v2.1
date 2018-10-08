@@ -1056,6 +1056,7 @@ export default {
       })
     },
     checkKQhasFile (item) {
+      var vm = this
       if (vm.partTypes === 2 || vm.partTypes === '2') {
         var hasFile = vm.dossierFilesItems.find(file => {
           return item.partNo === file.dossierPartNo
