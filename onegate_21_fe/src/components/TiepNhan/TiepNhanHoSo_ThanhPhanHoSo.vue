@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkKQhasFile(item) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
@@ -1054,6 +1054,20 @@ export default {
       }).catch(reject => {
         console.log('error')
       })
+    },
+    checkKQhasFile (item) {
+      if (vm.partTypes === 2 || vm.partTypes === '2') {
+        var hasFile = vm.dossierFilesItems.find(file => {
+          return item.partNo === file.dossierPartNo
+        })
+        if (hasFile) {
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return true
+      }
     }
   }
 }

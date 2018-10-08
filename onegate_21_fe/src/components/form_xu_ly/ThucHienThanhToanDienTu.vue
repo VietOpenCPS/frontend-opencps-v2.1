@@ -62,15 +62,19 @@
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <p class="px-2 my-0 py-1">
-                  {{paymentProfile.confirmNote}} &nbsp;&nbsp;
+                  {{paymentProfile.paymentNote}} &nbsp;&nbsp;
                 </p>
               </v-flex>
-            </v-layout> 
+            </v-layout>
             <!-- epayment -->
-            <div v-if="paymentProfile.hasOwnProperty('epaymentProfile') && paymentProfile.epaymentProfile['bank']">
+            <v-btn v-if="paymentProfile.keypayUrl" color="info" class="ml-0 mr-2" @click.native="toKeyPay(paymentProfile.keypayUrl)">
+              <v-icon>payment</v-icon> &nbsp;
+              Thanh toán điện tử
+            </v-btn>
+            <div>
               <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
-                <span>Tải lên file báo thanh toán <span style="color:red">*</span></span>
+                <span>Tải lên file báo thanh toán chuyển khoản <span style="color:red">*</span></span>
                 <v-progress-circular
                 :width="2"
                 :size="25"
@@ -181,33 +185,33 @@ export default {
     paymentProfile (val) {
       var vm = this
       if (vm.paymentProfile) {
-        if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
-          console.log('feeTong', vm.feeTong)
-          if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
-            let url = vm.paymentProfile.epaymentProfile.url
-            window.open(url, '_self')
-          }
-        } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
-          vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
-          if (vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') {
-            vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
-          }
-          console.log('feeTong', vm.feeTong)
-          vm.totalFee = vm.feeTong - Number(vm.paymentProfile.advanceAmount)
-          if (vm.totalFee < 0) {
-            vm.totalFee = 0
-          }
-          vm.data_payment = {
-            advanceAmount: vm.paymentProfile.advanceAmount,
-            feeAmount: vm.paymentProfile.feeAmount,
-            serviceAmount: vm.paymentProfile.serviceAmount,
-            shipAmount: vm.paymentProfile.shipAmount,
-            paymentAmount: vm.totalFee,
-            paymentNote: vm.paymentProfile.confirmNote,
-            paymentFile: vm.paymentFile
-          }
-          vm.$store.commit('setPaymentProfile', vm.data_payment)
+        // if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
+        //   console.log('feeTong', vm.feeTong)
+        //   if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
+        //     let url = vm.paymentProfile.epaymentProfile.url
+        //     window.open(url, '_self')
+        //   }
+        // } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
+        vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
+        if (vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') {
+          vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
         }
+        console.log('feeTong', vm.feeTong)
+        vm.totalFee = vm.feeTong - Number(vm.paymentProfile.advanceAmount)
+        if (vm.totalFee < 0) {
+          vm.totalFee = 0
+        }
+        vm.data_payment = {
+          advanceAmount: vm.paymentProfile.advanceAmount,
+          feeAmount: vm.paymentProfile.feeAmount,
+          serviceAmount: vm.paymentProfile.serviceAmount,
+          shipAmount: vm.paymentProfile.shipAmount,
+          paymentAmount: vm.totalFee,
+          paymentNote: vm.paymentProfile.paymentNote,
+          paymentFile: vm.paymentFile
+        }
+        vm.$store.commit('setPaymentProfile', vm.data_payment)
+        // }
       }
     }
   },
@@ -293,6 +297,9 @@ export default {
       } else {
         this.epaymentValid = false
       }
+    },
+    toKeyPay (item) {
+      window.open(item, '_self')
     },
     goBack () {
       window.history.back()
