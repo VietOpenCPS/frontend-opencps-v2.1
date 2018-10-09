@@ -870,13 +870,6 @@ export default {
             vm.showThuPhi = true
             vm.payments = result.payment
             vm.viaPortalDetail = dossierItem.viaPostal
-            if (result.payment.requestPayment === 5) {
-              let filter = dossierItem
-              console.log('run get file', filter)
-              vm.$store.dispatch('getPaymentFiles', filter).then(result => {
-                vm.paymentFile = result
-              })
-            }
           }
           // isPopup = true
           // vm.showThuPhi = true
@@ -1154,8 +1147,10 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
+        let valid = vm.$refs.epayment.validPayment()
+        console.log('valid', valid)
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        if (paymentProfile && paymentProfile['paymentFile']) {
+        if (paymentProfile && paymentProfile['paymentFile'] && valid) {
           validThanhToanDienTu = true
           filter['payment'] = {
             requestPayment: 3,
