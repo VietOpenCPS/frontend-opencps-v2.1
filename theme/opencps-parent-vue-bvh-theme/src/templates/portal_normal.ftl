@@ -47,6 +47,14 @@
 <@liferay_util["include"] page=body_top_include />
 
 <#if permissionChecker.isOmniadmin()>
+	<style>
+		html .has-control-menu #wrapper {
+			margin-top: 0 !important;
+		}
+		html body.open #wrapper {
+			padding-left: 0 !important;
+		}
+	</style>
 <#else>
 	<style>
 		html .has-control-menu #wrapper {
