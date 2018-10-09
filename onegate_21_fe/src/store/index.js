@@ -107,7 +107,8 @@ export const store = new Vuex.Store({
     viaPostal: 0,
     data_phancong: [],
     dataCreateDossier: {},
-    paymentProfile: ''
+    paymentProfile: '',
+    paymentFileName: ''
   },
   actions: {
     clearError ({commit}) {
@@ -700,6 +701,30 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
+          if (response.data) {
+            resolve(response.data)
+          } else {
+            resolve([])
+          }
+          if (response.headers['content-disposition']) {
+            commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1])
+          } else {
+            commit('setPaymentFileName', 'file báo thanh toán')
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
+    putPayments ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.initData.dossierApi + '/keypay/' + data.dossierId + '/' + data.referenceUid, param).then(function (response) {
           if (response.data) {
             resolve(response.data)
           } else {
@@ -2656,6 +2681,9 @@ export const store = new Vuex.Store({
     },
     setPaymentProfile (state, payload) {
       state.paymentProfile = payload
+    },
+    setPaymentFileName (state, payload) {
+      state.paymentFileName = payload
     }
   },
   getters: {
@@ -2809,6 +2837,9 @@ export const store = new Vuex.Store({
     },
     getPaymentProfile (state) {
       return state.paymentProfile
+    },
+    getPaymentFileName (state) {
+      return state.paymentFileName
     }
   }
 })
