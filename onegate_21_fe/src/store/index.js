@@ -81,7 +81,8 @@ export const store = new Vuex.Store({
       cityCode: '',
       districtCode: '',
       wardCode: '',
-      address: ''
+      address: '',
+      contactTelNo: ''
     },
     thongTinNguoiNopHoSo: {
       sameUser: true,
@@ -100,7 +101,8 @@ export const store = new Vuex.Store({
       postalAddress: '',
       postalCityCode: '',
       postalDistrictCode: '',
-      postalWardCode: ''
+      postalWardCode: '',
+      postalTelNo: ''
     },
     viaPostal: 0,
     data_phancong: [],
@@ -236,10 +238,6 @@ export const store = new Vuex.Store({
             axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
               let serializable = response.data
               let thuTucArray = Array.from(serializable.data)
-              // thuTucArray.unshift({
-              //   'serviceConfigId': '0',
-              //   'serviceName': 'Toàn bộ thủ tục'
-              // })
               commit('setListThuTucHanhChinh', thuTucArray)
               resolve(thuTucArray)
             }).catch(function (error) {
@@ -251,10 +249,6 @@ export const store = new Vuex.Store({
       } else {
         return new Promise((resolve, reject) => {
           let thuTucArray = Array.from(state.listThuTucHanhChinh)
-          // thuTucArray.unshift({
-          //   'serviceConfigId': '0',
-          //   'serviceName': 'Toàn bộ thủ tục'
-          // })
           resolve(thuTucArray)
         })
       }
@@ -2321,19 +2315,14 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              domain: data.domainCode
+              domain: data.domain
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          axios.get(state.initData.getListThuTucHanhChinh, param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
+            let thuTucArray = Array.from(serializable.data)
+            commit('setListThuTucHanhChinh', thuTucArray)
+            resolve(thuTucArray)
           }).catch(function (error) {
             console.log(error)
             reject(error)
@@ -2530,7 +2519,8 @@ export const store = new Vuex.Store({
         cityCode: payload.cityCode,
         districtCode: payload.districtCode,
         wardCode: payload.wardCode,
-        address: payload.address
+        address: payload.address,
+        contactTelNo: payload.contactTelNo
       }
     },
     setThongTinNguoiNopHoSo (state, payload) {
@@ -2543,7 +2533,8 @@ export const store = new Vuex.Store({
         postalAddress: payload.postalAddress ? payload.postalAddress : '',
         postalCityCode: payload.postalCityCode ? payload.postalCityCode : '',
         postalDistrictCode: payload.postalDistrictCode ? payload.postalDistrictCode : '',
-        postalWardCode: payload.postalWardCode ? payload.postalWardCode : ''
+        postalWardCode: payload.postalWardCode ? payload.postalWardCode : '',
+        postalTelNo: payload.postalTelNo ? payload.postalTelNo : ''
       }
       state.dichVuChuyenPhatKetQua = tempData
     },

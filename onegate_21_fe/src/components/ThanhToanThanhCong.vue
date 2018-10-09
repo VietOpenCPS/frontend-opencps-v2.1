@@ -1,0 +1,149 @@
+<template>
+  <div>
+    <v-card>
+      <div class="row-header">
+        <div class="background-triangle-big"> <span>THANH TOÁN ĐIỆN TỬ</span> </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+              Quay lại &nbsp;
+              <v-icon size="16">undo</v-icon>
+            </v-btn>
+          </div>
+        </div> 
+      </div>
+      <div>
+        <div class="mx-2 my-3">
+          <v-alert outline :value="true" type="success">
+            Giao dịch thanh toán thành công
+          </v-alert>
+        </div>
+        <v-card>
+          <v-card-text class="px-0 py-0">
+            <div class="table-bordered">
+              <div class="table__overflow">
+                <table class="datatable table">
+                  <tbody>
+                    <tr>
+                      <td width="200"><span class="text-bold">Tên hồ sơ</span></td>
+                      <td><span>{{dossierDetail.serviceName}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Mã hồ sơ</span></td>
+                      <td><span>{{dossierDetail.dossierNo}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Cơ quan thực hiện</span></td>
+                      <td><span>{{dossierDetail.govAgencyName}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Tên phí, lệ phí</span></td>
+                      <td><span>{{dossierDetail.paymentFee}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Tổng tiền</span></td>
+                      <td><span>{{currency(dossierDetail.paymentAmount)}} VNĐ</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Mã giao dịch trực tuyến</span></td>
+                      <td><span>{{dossierDetail.transId}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Mã tra cứu trên cổng thanh toán</span></td>
+                      <td><span>{{dossierDetail.goodCode}}</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="text-bold">Cổng thanh toán</span></td>
+                      <td><span>{{dossierDetail.paymentPortal}}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
+    </v-card>
+  </div>
+</template>
+
+<script>
+import router from '@/router'
+import Vue from 'vue/dist/vue.min.js'
+export default {
+  props: [],
+  components: {},
+  data: () => ({
+    loading: true,
+    loadingAction: false,
+    dossierDetail: {
+      serviceName: '',
+      dossierNo: '',
+      govAgencyName: '',
+      paymentFee: '',
+      paymentAmount: '',
+      transId: '',
+      goodCode: '',
+      paymentPortal: ''
+    }
+  }),
+  computed: {},
+  created () {
+    let vm = this
+    vm.$nextTick(function () {
+      var vm = this
+      let query = vm.$router.history.current.query
+      let dossierId = query.dossierId
+      vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
+        vm.dossierDetail['serviceName'] = resultDossier.serviceName
+        vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
+        vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
+        vm.dossierDetail['transId'] = query.transId
+        vm.dossierDetail['goodCode'] = query.goodCode
+        vm.dossierDetail['paymentPortal'] = query.paymentPortal
+        let filter = {
+          dossierId: resultDossier.dossierId,
+          referenceUid: resultDossier.referenceUid
+        }
+        vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+          vm.dossierDetail['paymentFee'] = result.paymentFee
+          vm.dossierDetail['paymentAmount'] = result.paymentAmount
+          let filter = {
+            dossierId: resultDossier.dossierId,
+            actionCode: 6200,
+            payment: {
+              requestPayment: 3,
+              advanceAmount: result.advanceAmount ? result.advanceAmount : 0,
+              feeAmount: result.feeAmount ? result.feeAmount : 0,
+              paymentAmount: result.paymentAmount ? result.paymentAmount : 0,
+              paymentNote: result.paymentNote ? result.paymentNote : '',
+              serviceAmount: result.serviceAmount ? result.serviceAmount : 0,
+              shipAmount: result.shipAmount ? result.shipAmount : 0
+            }
+          }
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          })
+        }).catch(reject => {
+        })
+      })
+    })
+  },
+  watch: {},
+  methods: {
+    currency (value) {
+      if (value) {
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : 0
+      }
+      return 0
+    },
+    goBack () {
+      var vm = this
+      let current = vm.$router.history.current
+      vm.$router.push({
+        path: current.path
+      })
+    }
+  }
+}
+</script>
+

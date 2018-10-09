@@ -350,7 +350,7 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 150px;margin-top: 4px;" v-if="thongTinNguoiNopHoSo.sameUser">
+          <div class="absolute__btn" style="width: 150px;margin-top: 4px;">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -444,7 +444,8 @@ export default {
         cityCode: this.thongTinChuHoSo.cityCode,
         address: this.thongTinChuHoSo.address,
         districtCode: this.thongTinChuHoSo.districtCode,
-        wardCode: this.thongTinChuHoSo.wardCode
+        wardCode: this.thongTinChuHoSo.wardCode,
+        contactTelNo: this.thongTinChuHoSo.contactTelNo
       }
       return data
     }
@@ -465,11 +466,11 @@ export default {
           delegateTelNo: value.contactTelNo,
           delegateIdNo: value.applicantIdNo
         }
-        if (!vm.thongTinChuHoSo.userType) {
-          vm.thongTinNguoiNopHoSo.sameUser = false
-        } else {
-          vm.thongTinNguoiNopHoSo.sameUser = true
-        }
+        // if (!vm.thongTinChuHoSo.userType) {
+        //   vm.thongTinNguoiNopHoSo.sameUser = false
+        // } else {
+        //   vm.thongTinNguoiNopHoSo.sameUser = true
+        // }
         if (vm.thongTinNguoiNopHoSo.sameUser) {
           if (value.cityCode && value.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
             vm.onChangeDelegateCity(value.cityCode)
@@ -488,16 +489,22 @@ export default {
         let dataChuHoSo = vm.thongTinChuHoSo
         if (value.sameUser) {
           let dataNguoiNopHoSo = {
-            applicantName: value.delegateName,
-            cityCode: value.delegateCityCode,
-            address: value.delegateAddress,
-            districtCode: value.delegateDistrictCode,
-            wardCode: value.delegateWardCode,
-            contactEmail: value.delegateEmail,
-            contactTelNo: value.delegateTelNo,
-            applicantIdNo: value.delegateIdNo
+            delegateName: dataChuHoSo.applicantName,
+            delegateCityCode: dataChuHoSo.cityCode,
+            delegateAddress: dataChuHoSo.address,
+            delegateDistrictCode: dataChuHoSo.districtCode,
+            delegateWardCode: dataChuHoSo.wardCode,
+            delegateEmail: dataChuHoSo.contactEmail,
+            delegateTelNo: dataChuHoSo.contactTelNo,
+            delegateIdNo: dataChuHoSo.applicantIdNo
           }
-          vm.thongTinChuHoSo = Object.assign(vm.thongTinChuHoSo, dataNguoiNopHoSo)
+          if (dataChuHoSo.cityCode && dataChuHoSo.cityCode !== vm.thongTinNguoiNopHoSo['delegateCityCode']) {
+            vm.onChangeDelegateCity(dataChuHoSo.cityCode)
+          }
+          if (dataChuHoSo.districtCode && dataChuHoSo.districtCode !== vm.thongTinNguoiNopHoSo['delegateDistrictCode']) {
+            vm.onChangeDelegateDistrict(dataChuHoSo.districtCode)
+          }
+          vm.thongTinNguoiNopHoSo = Object.assign(vm.thongTinNguoiNopHoSo, dataNguoiNopHoSo)
         } else {
           this.$store.dispatch('resetThongTinNguoiNopHoSo')
         }
@@ -633,63 +640,63 @@ export default {
     onChangeWard (data) {
       this.$store.commit('setWardVal', data)
     },
-    eventInput (event) {
-      var vm = this
-      vm.thongTinNguoiNopHoSo.delegateIdNo = []
-      setTimeout(function () {
-        if (event.length !== 0) {
-          vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
-        }
-        if (vm.thongTinNguoiNopHoSo['delegateIdNo'][0]) {
-          console.log('vm.thongTinNguoiNopHoSo[delegateIdNo][0]==========', vm.thongTinNguoiNopHoSo['delegateIdNo'][0])
-          vm.thongTinNguoiNopHoSo['delegateName'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['applicantName'] ? vm.thongTinNguoiNopHoSo['delegateName'][0]['applicantName'] : ''
-          vm.thongTinNguoiNopHoSo['delegateAddress'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] : ''
-          vm.thongTinNguoiNopHoSo['delegateTelNo'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] : ''
-          vm.thongTinNguoiNopHoSo['delegateEmail'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] : ''
-          vm.thongTinNguoiNopHoSo['delegateCityCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] : ''
-          vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] : ''
-          vm.thongTinNguoiNopHoSo['delegateWardCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] : ''
-          if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
-            vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
-          }
-          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
-            vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
-          }
-        }
-        return false
-      }, 100)
-    },
-    eventInput2 (event) {
-      var vm = this
-      vm.thongTinChuHoSo['applicantIdNo'] = []
-      setTimeout(function () {
-        if (event.length !== 0) {
-          vm.thongTinChuHoSo['applicantIdNo'] = [event[event.length - 1]]
-        }
-        if (vm.thongTinChuHoSo['applicantIdNo'][0]) {
-          console.log('vm.thongTinChuHoSo[applicantIdNo][0]==========', vm.thongTinChuHoSo['applicantIdNo'][0])
-          vm.thongTinChuHoSo['applicantName'] = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] : ''
-          vm.thongTinChuHoSo['address'] = vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : ''
-          vm.thongTinChuHoSo['contactTelNo'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] : ''
-          vm.thongTinChuHoSo['contactEmail'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] : ''
-          vm.thongTinChuHoSo.cityCode = vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : ''
-          vm.thongTinChuHoSo.districtCode = vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : ''
-          vm.thongTinChuHoSo.wardCode = vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
-          if (vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business') {
-            vm.thongTinChuHoSo.userType = false
-          } else {
-            vm.thongTinChuHoSo.userType = true
-          }
-          if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
-            vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
-          }
-          if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
-            vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
-          }
-        }
-        return false
-      }, 100)
-    },
+    // eventInput (event) {
+    //   var vm = this
+    //   vm.thongTinNguoiNopHoSo.delegateIdNo = []
+    //   setTimeout(function () {
+    //     if (event.length !== 0) {
+    //       vm.thongTinNguoiNopHoSo.delegateIdNo = [event[event.length - 1]]
+    //     }
+    //     if (vm.thongTinNguoiNopHoSo['delegateIdNo'][0]) {
+    //       console.log('vm.thongTinNguoiNopHoSo[delegateIdNo][0]==========', vm.thongTinNguoiNopHoSo['delegateIdNo'][0])
+    //       vm.thongTinNguoiNopHoSo['delegateName'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['applicantName'] ? vm.thongTinNguoiNopHoSo['delegateName'][0]['applicantName'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateAddress'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['address'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateTelNo'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactTelNo'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateEmail'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['contactEmail'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateCityCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['cityCode'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['districtCode'] : ''
+    //       vm.thongTinNguoiNopHoSo['delegateWardCode'] = vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] ? vm.thongTinNguoiNopHoSo['delegateIdNo'][0]['wardCode'] : ''
+    //       if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+    //         vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+    //       }
+    //       if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+    //         vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
+    //       }
+    //     }
+    //     return false
+    //   }, 100)
+    // },
+    // eventInput2 (event) {
+    //   var vm = this
+    //   vm.thongTinChuHoSo['applicantIdNo'] = []
+    //   setTimeout(function () {
+    //     if (event.length !== 0) {
+    //       vm.thongTinChuHoSo['applicantIdNo'] = [event[event.length - 1]]
+    //     }
+    //     if (vm.thongTinChuHoSo['applicantIdNo'][0]) {
+    //       console.log('vm.thongTinChuHoSo[applicantIdNo][0]==========', vm.thongTinChuHoSo['applicantIdNo'][0])
+    //       vm.thongTinChuHoSo['applicantName'] = vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['applicantName'] : ''
+    //       vm.thongTinChuHoSo['address'] = vm.thongTinChuHoSo['applicantIdNo'][0]['address'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['address'] : ''
+    //       vm.thongTinChuHoSo['contactTelNo'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactTelNo'] : ''
+    //       vm.thongTinChuHoSo['contactEmail'] = vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['contactEmail'] : ''
+    //       vm.thongTinChuHoSo.cityCode = vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['cityCode'] : ''
+    //       vm.thongTinChuHoSo.districtCode = vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['districtCode'] : ''
+    //       vm.thongTinChuHoSo.wardCode = vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] ? vm.thongTinChuHoSo['applicantIdNo'][0]['wardCode'] : ''
+    //       if (vm.thongTinChuHoSo['applicantIdNo'][0]['applicantIdType'] === 'business') {
+    //         vm.thongTinChuHoSo.userType = false
+    //       } else {
+    //         vm.thongTinChuHoSo.userType = true
+    //       }
+    //       if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
+    //         vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+    //       }
+    //       if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+    //         vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
+    //       }
+    //     }
+    //     return false
+    //   }, 100)
+    // },
     querySelections (val) {
       var vm = this
       let params = {
@@ -798,12 +805,12 @@ export default {
       var vm = this
       vm.selectedSearchItem = item
       console.log('selectedSearchItem', vm.selectedSearchItem)
-      if (item['applicantIdType'] === 'business') {
-        vm.thongTinChuHoSo.userType = false
-        vm.thongTinNguoiNopHoSo.sameUser = false
-      } else {
-        vm.thongTinChuHoSo.userType = true
-      }
+      // if (item['applicantIdType'] === 'business') {
+      //   vm.thongTinChuHoSo.userType = false
+      //   vm.thongTinNguoiNopHoSo.sameUser = false
+      // } else {
+      //   vm.thongTinChuHoSo.userType = true
+      // }
       vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
       //
       vm.thongTinChuHoSo['applicantName'] = item['applicantName'] ? item['applicantName'] : ''

@@ -1063,10 +1063,12 @@ export default {
     processListTTHC (currentQuery) {
       let vm = this
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
-        vm.listThuTucHanhChinh = result.map(thuTuc => {
-          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
-          return thuTuc
-        })
+        if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
+          vm.listThuTucHanhChinh = result.map(thuTuc => {
+            thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            return thuTuc
+          })
+        }
         vm.listThuTuc = result.map(thuTuc => {
           thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
           return thuTuc
@@ -1123,6 +1125,15 @@ export default {
               vm.domainCode = vm.linhVucSelected['domainCode']
             }
           }
+          let domain = {
+            domain: vm.linhVucSelected.domainCode
+          }
+          vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
+            vm.listThuTucHanhChinh = result.map(thuTuc => {
+              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              return thuTuc
+            })
+          })
         } else {
           vm.linhVucSelected = null
         }
@@ -1213,9 +1224,9 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
-            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
-            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : '',
-            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : '',
+            agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
+            service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
+            template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
             domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.domainCode,
             status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
@@ -1305,15 +1316,18 @@ export default {
       vm.linhVucSelected = item
       if (item) {
         setTimeout(function () {
-          // let domain = {
-          //   domainCode: vm.linhVucSelected.domainCode
-          // }
-          // vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
-          //   vm.listThuTucHanhChinh = result
-          // })
-          vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
-            return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
+          let domain = {
+            domain: vm.linhVucSelected.domainCode
+          }
+          vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
+            vm.listThuTucHanhChinh = result.map(thuTuc => {
+              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              return thuTuc
+            })
           })
+          // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
+          //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
+          // })
         }, 100)
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
