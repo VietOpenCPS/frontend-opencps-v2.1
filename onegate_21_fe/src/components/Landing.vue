@@ -292,7 +292,7 @@
         item-key="dossierId"
         :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper"
         class="table-landing table-bordered"
-        no-data-text="Không có hồ sơ nào!"
+        no-data-text="Không có hồ sơ nào"
         hide-actions
       >
       <!--  -->
@@ -632,6 +632,7 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
+    // test local
     isAdminSuper: false,
     dossierCountingShow: false,
     dossierCounting: [],
@@ -846,6 +847,9 @@ export default {
     },
     currentUser () {
       return this.$store.getters.loadingInitData.user
+    },
+    activeLoadingDataHoSo () {
+      return this.$store.getters.activeLoadingDataHoSo
     }
   },
   created () {
@@ -1013,6 +1017,12 @@ export default {
           vm.doLoadingDataHoSo()
         }
       }
+    },
+    activeLoadingDataHoSo (val) {
+      var vm = this
+      setTimeout(function () {
+        vm.doLoadingDataHoSo()
+      }, 100)
     }
   },
   methods: {
@@ -1022,7 +1032,11 @@ export default {
         vm.isAdminSuper = true
       }
       if (vm.isAdminSuper) {
-        vm.selected = vm.hosoDatas
+        if (vm.selected.length) {
+          vm.selected = []
+        } else {
+          vm.selected = vm.hosoDatas
+        }
       } else {
         if (!vm.thuTucHanhChinhSelected || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '0') || (vm.thuTucHanhChinhSelected && vm.thuTucHanhChinhSelected.serviceConfigId === '')) {
           return
@@ -1188,6 +1202,7 @@ export default {
     },
     doLoadingDataHoSo () {
       let vm = this
+      vm.selected = []
       let currentQuery = router.history.current.query
       console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
@@ -1630,7 +1645,7 @@ export default {
     },
     doDeleteDossier (dossierItem, item, index, isGroup) {
       let vm = this
-      let x = confirm('Bạn có muốn thực hiện hành động này?')
+      let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
       if (x) {
         let currentQuery = vm.$router.history.current.query
         //
@@ -1638,7 +1653,7 @@ export default {
           let filter = {
             dossierId: 0
           }
-          // console.log(vm.selected)
+          console.log(vm.selected)
           if (vm.selected.length > 0) {
             let deleteIds = []
             for (let key in vm.selected) {
