@@ -93,10 +93,9 @@
               </div>
               <!-- view file -->
               <div v-if="paymentFile">
-                <span v-on:click.stop="viewFile(paymentFile)" style="cursor: pointer;">
-                  <v-icon v-if="paymentFile.fileSize !== 0">attach_file</v-icon>
-                  {{paymentFile.displayName}}.{{paymentFile.fileType}} - 
-                  <i>{{paymentFile.modifiedDate}}</i>
+                <span v-on:click.stop="viewFile()" style="cursor: pointer;">
+                  <v-icon>attach_file</v-icon>
+                  {{paymentFileName}}
                 </span>
                 <v-tooltip top>
                   <v-btn icon ripple slot="activator" v-on:click.stop="downloadPaymentFile(item)" class="mx-0 my-0">
@@ -181,6 +180,11 @@ export default {
   directives: {money: VMoney},
   created () {
   },
+  computed: {
+    paymentFileName () {
+      return this.$store.getters.getPaymentFileName
+    }
+  },
   watch: {
     paymentProfile (val) {
       var vm = this
@@ -238,26 +242,18 @@ export default {
         vm.progressUploadPart = false
       })
     },
-    viewFile (data) {
+    viewFile () {
       let vm = this
-      if (data.fileSize === 0) {
-        return
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: vm.detailDossier.dossierId,
+        referenceUid: vm.detailDossier.referenceUid
       }
-      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar') {
-        // test local
-        // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
-        let url = '/o/rest/v2/dossiers/' + vm.detailDossier.dossierId + '/payments/' + vm.detailDossier.referenceUid + '/confirmfile'
-        window.open(url)
-      } else {
-        vm.dialogPDFLoading = true
-        vm.dialogPDF = true
-        data['dossierId'] = vm.detailDossier.dossierId
-        data['referenceUid'] = vm.detailDossier.referenceUid
-        vm.$store.dispatch('viewPaymentFile', data).then(result => {
-          vm.dialogPDFLoading = false
-          document.getElementById('dialogPreview').src = result
-        })
-      }
+      vm.$store.dispatch('viewPaymentFile', filter).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPreview').src = result
+      })
     },
     deleteFile (item) {
       var vm = this

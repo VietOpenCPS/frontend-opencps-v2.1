@@ -142,7 +142,7 @@
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
@@ -870,6 +870,13 @@ export default {
             vm.showThuPhi = true
             vm.payments = result.payment
             vm.viaPortalDetail = dossierItem.viaPostal
+            if (result.payment.requestPayment === 5) {
+              let filter = dossierItem
+              console.log('run get file', filter)
+              vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+                vm.paymentFile = result
+              })
+            }
           }
           // isPopup = true
           // vm.showThuPhi = true
