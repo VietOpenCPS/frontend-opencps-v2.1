@@ -20,6 +20,7 @@ export const store = new Vuex.Store({
     user: null,
     index: 0,
     activeGetCounter: false,
+    activeLoadingDataHoSo: false,
     trangThaiHoSoList: null,
     listThuTucHanhChinh: null,
     checkInput: 0,
@@ -707,7 +708,7 @@ export const store = new Vuex.Store({
             resolve([])
           }
           if (response.headers['content-disposition']) {
-            commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1])
+            commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
           } else {
             commit('setPaymentFileName', 'file báo thanh toán')
           }
@@ -1331,6 +1332,9 @@ export const store = new Vuex.Store({
     getActiveGetCounter ({commit, state}, data) {
       commit('setActiveGetCounter', data)
     },
+    getActiveLoadingDataHoSo ({commit, state}, data) {
+      commit('setActiveLoadingDataHoSo', data)
+    },
     setDefaultCityCode ({commit, state}, data) {
       state.thongTinChuHoSo.cityCode = data
     },
@@ -1874,14 +1878,25 @@ export const store = new Vuex.Store({
               'Accept': 'application/json'
             }
           }
+          var activeFinish = 1
+          let selectedLength = filter['dossierId'].length
           for (let keydk in filter.dossierId) {
             axios.delete(state.initData.getNextAction + '/' + filter.dossierId[keydk] , param).then(function (response) {
               let serializable = response.data
-              store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+              activeFinish += 1
+              if (activeFinish === selectedLength) {
+                store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+                store.dispatch('getActiveLoadingDataHoSo', !state.activeLoadingDataHoSo)
+              }
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               resolve(serializable)
             }).catch(function (error) {
               console.log(error)
+              activeFinish += 1
+              if (activeFinish === selectedLength) {
+                store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+                store.dispatch('getActiveLoadingDataHoSo', !state.activeLoadingDataHoSo)
+              }
               toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
               reject(error)
             })
@@ -2676,6 +2691,9 @@ export const store = new Vuex.Store({
     setActiveGetCounter (state, payload) {
       state.activeGetCounter = payload
     },
+    setActiveLoadingDataHoSo (state, payload) {
+      state.activeLoadingDataHoSo = payload
+    },
     setDataCreateDossier (state, payload) {
       state.dataCreateDossier = payload
     },
@@ -2744,6 +2762,9 @@ export const store = new Vuex.Store({
     },
     activeGetCounter (state) {
       return state.activeGetCounter
+    },
+    activeLoadingDataHoSo (state) {
+      return state.activeLoadingDataHoSo
     },
     thanhPhanHoSo (state) {
       return state.thanhPhanHoSo

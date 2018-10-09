@@ -67,14 +67,19 @@
               </v-flex>
             </v-layout>
             <!-- epayment -->
-            <v-btn v-if="paymentProfile.keypayUrl" color="info" class="ml-0 mr-2" @click.native="toKeyPay(paymentProfile.keypayUrl)">
+            <p class="mb-0"><span class="red--text">* </span>&nbsp;Lựa chọn hình thức thanh toán:</p>
+            <v-btn dark small v-if="paymentProfile.keypayUrl" color="blue darken-1" class="ml-3 mr-2" @click.native="() => isBank = true">
+              <v-icon>account_balance</v-icon> &nbsp;
+              Thanh toán chuyển khoản
+            </v-btn>
+            <v-btn dark small v-if="paymentProfile.keypayUrl" color="amber accent-4" class="ml-2 mr-2" @click.native="toKeyPay(paymentProfile.keypayUrl)">
               <v-icon>payment</v-icon> &nbsp;
               Thanh toán điện tử
             </v-btn>
-            <div>
+            <div v-if="isBank" class="ml-3">
               <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
-                <span>Tải lên file báo thanh toán chuyển khoản <span style="color:red">*</span></span>
+                <span>Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
                 <v-progress-circular
                 :width="2"
                 :size="25"
@@ -94,7 +99,7 @@
               <!-- view file -->
               <div v-if="paymentFile">
                 <span v-on:click.stop="viewFile()" style="cursor: pointer;">
-                  <v-icon>attach_file</v-icon>
+                  <v-icon color="blue">insert_drive_file</v-icon>
                   {{paymentFileName}}
                 </span>
                 <v-tooltip top>
@@ -103,12 +108,10 @@
                   </v-btn>
                   <span>Tải xuống</span>
                 </v-tooltip>
-                <!-- <v-btn icon ripple v-on:click.stop="deleteFile(paymentFile)" class="mx-0 my-0">
-                  <v-icon style="color: red">delete_outline</v-icon>
-                </v-btn> -->
               </div>
               <span v-if="!epaymentValid" style="color:#f44336">* Yêu cầu tải lên file báo thanh toán</span>
             </div>
+            <p v-if="!isBank && errorNotSelect" style="color:#f44336">* Yêu cầu lựa chọn hình thức thanh toán</p>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -157,7 +160,15 @@ export default {
     }
   },
   data: () => ({
-    data_payment: {},
+    data_payment: {
+      advanceAmount: '',
+      feeAmount: '',
+      serviceAmount: '',
+      shipAmount: '',
+      paymentAmount: '',
+      paymentNote: '',
+      paymentFile: ''
+    },
     paymentFile: '',
     epaymentValid: true,
     money: {
@@ -175,27 +186,36 @@ export default {
     activeEdit: true,
     progressUploadPart: false,
     dialogPDF: false,
-    dialogPDFLoading: true
+    dialogPDFLoading: true,
+    isBank: false,
+    errorNotSelect: false
   }),
   directives: {money: VMoney},
   created () {
+    var vm = this
+    if (vm.detailDossier.hasOwnProperty('dossierId')) {
+      let filter = vm.detailDossier
+      vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+        vm.paymentFile = result
+        vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.$store.commit('setPaymentProfile', vm.data_payment)
+      })
+    }
   },
   computed: {
     paymentFileName () {
       return this.$store.getters.getPaymentFileName
+    },
+    isBank (val) {
+      if (val === true) {
+        this.errorNotSelect = false
+      }
     }
   },
   watch: {
     paymentProfile (val) {
       var vm = this
       if (vm.paymentProfile) {
-        // if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && !vm.paymentProfile.epaymentProfile.bank) {
-        //   console.log('feeTong', vm.feeTong)
-        //   if (vm.paymentProfile.epaymentProfile.hasOwnProperty('url') && !vm.paymentProfile.epaymentProfile.url) {
-        //     let url = vm.paymentProfile.epaymentProfile.url
-        //     window.open(url, '_self')
-        //   }
-        // } else if (vm.paymentProfile.hasOwnProperty('epaymentProfile') && vm.paymentProfile.epaymentProfile.bank) {
         vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
         if (vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') {
           vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
@@ -217,6 +237,17 @@ export default {
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         // }
       }
+    },
+    detailDossier (val) {
+      var vm = this
+      if (val.hasOwnProperty('dossierId')) {
+        let filter = val
+        vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+          vm.paymentFile = result
+          vm.data_payment['paymentFile'] = vm.paymentFile
+          vm.$store.commit('setPaymentProfile', vm.data_payment)
+        })
+      }
     }
   },
   methods: {
@@ -227,20 +258,26 @@ export default {
       data['dossierId'] = vm.detailDossier.dossierId
       data['referenceUid'] = vm.detailDossier.referenceUid
       data['selector'] = 'paymentFile1'
-      vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
-        vm.epaymentValid = true
+      let file = $('#paymentFile1')[0].files[0]
+      if (!file || (file.type !== 'image/png' && file.type !== 'image/jpeg' && file.type !== 'image/jpeg')) {
+        toastr.error('Định dạng tải lên không đúng')
         vm.progressUploadPart = false
-        vm.paymentFile = result
-        vm.data_payment['paymentFile'] = vm.paymentFile
-        vm.$store.commit('setPaymentProfile', vm.data_payment)
-        vm.$store.dispatch('getPaymentFiles', data).then(result => {
+      } else {
+        vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
+          vm.epaymentValid = true
+          vm.progressUploadPart = false
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.$store.commit('setPaymentProfile', vm.data_payment)
+          vm.$store.dispatch('getPaymentFiles', data).then(result => {
+            vm.paymentFile = result
+            vm.data_payment['paymentFile'] = vm.paymentFile
+            vm.$store.commit('setPaymentProfile', vm.data_payment)
+          })
+        }).catch(function (xhr) {
+          vm.progressUploadPart = false
         })
-      }).catch(function (xhr) {
-        vm.progressUploadPart = false
-      })
+      }
     },
     viewFile () {
       let vm = this
@@ -292,6 +329,16 @@ export default {
         this.epaymentValid = true
       } else {
         this.epaymentValid = false
+      }
+      if (!this.isBank) {
+        this.errorNotSelect = true
+      } else {
+        this.errorNotSelect = false
+      }
+      if (this.isBank === false) {
+        return false
+      } else {
+        return true
       }
     },
     toKeyPay (item) {

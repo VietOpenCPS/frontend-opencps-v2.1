@@ -84,6 +84,9 @@
       },
       loadingGov () {
         return this.$store.getters.loadingGov
+      },
+      activeGetCounter () {
+        return this.$store.getters.activeGetCounter
       }
     },
     created () {
@@ -144,6 +147,12 @@
         } else {
           vm.detailState = 0
         }
+      },
+      activeGetCounter (val) {
+        var vm = this
+        setTimeout(function () {
+          vm.loadingCounter()
+        }, 300)
       }
     },
     methods: {
