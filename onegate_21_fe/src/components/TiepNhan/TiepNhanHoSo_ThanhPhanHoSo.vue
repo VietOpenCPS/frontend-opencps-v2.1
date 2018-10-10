@@ -42,7 +42,6 @@
                   v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck"
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
-                  v-on:click.stop=""
                   @keyup.enter="changeFileComment(item, index)"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">

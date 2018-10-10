@@ -93,39 +93,26 @@ export default {
     vm.$nextTick(function () {
       var vm = this
       let query = vm.$router.history.current.query
-      let dossierId = query.dossierId
-      vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
-        vm.dossierDetail['serviceName'] = resultDossier.serviceName
-        vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
-        vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
-        vm.dossierDetail['transId'] = query.transId
-        vm.dossierDetail['goodCode'] = query.goodCode
-        vm.dossierDetail['paymentPortal'] = query.paymentPortal
-        let filter = {
-          dossierId: resultDossier.dossierId,
-          referenceUid: resultDossier.referenceUid
-        }
-        vm.$store.dispatch('loadDossierPayments', filter).then(result => {
-          vm.dossierDetail['paymentFee'] = result.paymentFee
-          vm.dossierDetail['paymentAmount'] = result.paymentAmount
+      let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
+      if (dossierId) {
+        vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
+          vm.dossierDetail['serviceName'] = resultDossier.serviceName
+          vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
+          vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName
+          vm.dossierDetail['transId'] = query.transId
+          vm.dossierDetail['goodCode'] = query.goodCode
+          vm.dossierDetail['paymentPortal'] = query.paymentPortal
           let filter = {
             dossierId: resultDossier.dossierId,
-            actionCode: 6200,
-            payment: {
-              requestPayment: 3,
-              advanceAmount: result.advanceAmount ? result.advanceAmount : 0,
-              feeAmount: result.feeAmount ? result.feeAmount : 0,
-              paymentAmount: result.paymentAmount ? result.paymentAmount : 0,
-              paymentNote: result.paymentNote ? result.paymentNote : '',
-              serviceAmount: result.serviceAmount ? result.serviceAmount : 0,
-              shipAmount: result.shipAmount ? result.shipAmount : 0
-            }
+            referenceUid: resultDossier.referenceUid
           }
-          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+          vm.$store.dispatch('putPayments', filter).then(result => {
+            vm.dossierDetail['paymentFee'] = result.paymentFee
+            vm.dossierDetail['paymentAmount'] = result.paymentAmount
+          }).catch(reject => {
           })
-        }).catch(reject => {
         })
-      })
+      }
     })
   },
   watch: {},
@@ -138,10 +125,9 @@ export default {
     },
     goBack () {
       var vm = this
-      let current = vm.$router.history.current
-      vm.$router.push({
-        path: current.path
-      })
+      let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+      let url = redirectURL + '/dich-vu-cong#/'
+      window.open(url, '_self')
     }
   }
 }

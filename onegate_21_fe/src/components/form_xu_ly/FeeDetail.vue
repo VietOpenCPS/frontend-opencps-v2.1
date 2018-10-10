@@ -128,10 +128,46 @@
                 </span>
               </v-flex>
             </v-layout>
+            <div v-if="paymentFile && data_payment.requestPayment === 5">
+              <span><span class="red--text">* </span>&nbsp;File báo thanh toán:</span>&nbsp;
+              <span v-on:click.stop="viewFile()" style="cursor: pointer;">
+                <v-icon>attach_file</v-icon>
+                {{paymentFileName}}
+              </span>
+              <v-tooltip top>
+                <v-btn icon ripple slot="activator" v-on:click.stop="downloadPaymentFile(item)" class="mx-0 my-0">
+                  <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                </v-btn>
+                <span>Tải xuống</span>
+              </v-tooltip>
+            </div>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <div v-if="dialogPDFLoading" style="
+          min-height: 600px;
+          text-align: center;
+          margin: auto;
+          padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -147,6 +183,10 @@ export default {
     viaPortal: {
       type: Number,
       default: () => 0
+    },
+    detailDossier: {
+      type: Object,
+      default: () => {}
     }
   },
   model: {
@@ -166,7 +206,8 @@ export default {
     feeTamThu: 0,
     feeTong: 0,
     checkPaid: true,
-    activeEdit: true
+    activeEdit: true,
+    paymentFile: ''
   }),
   directives: {money: VMoney},
   created () {
@@ -198,6 +239,12 @@ export default {
             vm.feeTong = feeAmount + serviceAmount
             vm.totalFee = feeAmount + serviceAmount - advanceAmount
           }
+          if (vm.payments.requestPayment === 5) {
+            let filter = vm.detailDossier
+            vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+              vm.paymentFile = result
+            })
+          }
         }
         if (vm.totalFee < 0) {
           vm.totalFee = 0
@@ -205,10 +252,25 @@ export default {
       }, 200)
     }
   },
+  computed: {
+    paymentFileName () {
+      return this.$store.getters.getPaymentFileName
+    }
+  },
   watch: {
     viaPortal (val) {
       console.log('viaPortal', val)
       this.changeFee()
+    },
+    detailDossier (val) {
+      var vm = this
+      if (vm.payments.requestPayment === 5) {
+        let filter = val
+        console.log('run get paymentfile', filter)
+        vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+          vm.paymentFile = result
+        })
+      }
     }
   },
   methods: {
@@ -242,6 +304,26 @@ export default {
       if (vm.totalFee < 0) {
         vm.totalFee = 0
       }
+    },
+    viewFile () {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      let filter = {
+        dossierId: vm.detailDossier.dossierId,
+        referenceUid: vm.detailDossier.referenceUid
+      }
+      vm.$store.dispatch('viewPaymentFile', filter).then(result => {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPreview').src = result
+      })
+    },
+    downloadPaymentFile (item) {
+      let vm = this
+      // test local
+      // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
+      let url = '/o/rest/v2/dossiers/' + vm.detailDossier.dossierId + '/payments/' + vm.detailDossier.referenceUid + '/confirmfile'
+      window.open(url)
     },
     currency (value) {
       if (value) {

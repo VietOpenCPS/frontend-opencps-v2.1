@@ -142,7 +142,7 @@
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
@@ -1147,8 +1147,10 @@ export default {
       }
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
+        let valid = vm.$refs.epayment.validPayment()
+        console.log('valid', valid)
         let paymentProfile = vm.$store.getters.getPaymentProfile
-        if (paymentProfile && paymentProfile['paymentFile']) {
+        if (paymentProfile && paymentProfile['paymentFile'] && valid) {
           validThanhToanDienTu = true
           filter['payment'] = {
             requestPayment: 3,
