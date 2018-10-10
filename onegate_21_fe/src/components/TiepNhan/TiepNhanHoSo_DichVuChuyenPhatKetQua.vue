@@ -86,6 +86,8 @@
                   v-else
                   v-model="dichVuChuyenPhatKetQua.postalTelNo"
                   append-icon="phone"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 sm2>
@@ -331,7 +333,8 @@ export default {
         postalAddress: this.dichVuChuyenPhatKetQua.postalAddress ? this.dichVuChuyenPhatKetQua.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatKetQua.postalCityCode ? this.dichVuChuyenPhatKetQua.postalCityCode : '',
         postalDistrictCode: this.dichVuChuyenPhatKetQua.postalDistrictCode ? this.dichVuChuyenPhatKetQua.postalDistrictCode : '',
-        postalWardCode: this.dichVuChuyenPhatKetQua.postalWardCode ? this.dichVuChuyenPhatKetQua.postalWardCode : ''
+        postalWardCode: this.dichVuChuyenPhatKetQua.postalWardCode ? this.dichVuChuyenPhatKetQua.postalWardCode : '',
+        postalTelNo: this.dichVuChuyenPhatKetQua.postalTelNo ? this.dichVuChuyenPhatKetQua.postalTelNo : ''
       }
       this.$store.commit('setDichVuChuyenPhatKetQua', dataChuyenPhat)
       console.log('dichVuChuyenPhatKetQua', this.dichVuChuyenPhatKetQua)
