@@ -171,13 +171,13 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-        <div class="absolute__btn" style="width: 270px;" v-if="originality !== 1">
+        <div class="absolute__btn" style="width: 380px;" v-if="originality !== 1">
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-radio-group v-else v-model="thongTinChuHoSo.userType" row>
             <v-radio label="Công dân" :value="true"></v-radio>
-            <v-radio label="Doanh nghiệp" :value="false"></v-radio>
+            <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
           </v-radio-group>
         </div>
         <div style="position: relative;" v-if="originality !== 1">
@@ -391,7 +391,7 @@ export default {
       },
       'false': {
         cmtnd: 'Mã số thuế',
-        nguoi_nop: 'Tên tổ chức'
+        nguoi_nop: 'Tên tổ chức, doanh nghiệp'
       }
     },
     thongTinChuHoSo: {

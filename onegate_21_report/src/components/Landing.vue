@@ -345,7 +345,7 @@ export default {
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
       }
-      if (vm.isDVC) {
+      if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
       }
       vm.pdfBlob = null
@@ -353,7 +353,6 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
-          vm.agencyLists = result
           putData = result
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year

@@ -37,9 +37,8 @@
             v-model="lePhi.paymentNote"
             multi-line
             rows="2"
-            v-if="lePhi.editable"
           ></v-text-field>
-          <span v-else>{{lePhi.paymentNote}}</span>
+          <!-- <span v-else>{{lePhi.paymentNote}}</span> -->
         </v-flex>
       </v-layout>
     </v-card-text>
