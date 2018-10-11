@@ -28,6 +28,32 @@
                 <span class="pr-2">Điện thoại: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
               </div>
+              <div class="xs12 sm12 pb-1">
+                <v-menu offset-y>
+                  <span slot="activator" class="pr-2">
+                    Thông tin người nộp
+                    <v-icon color="blue" size="22">arrow_drop_down</v-icon>
+                  </span>
+                  <v-list class="px-2 pt-1">
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Tên người nộp:</span>
+                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Địa chỉ:</span>
+                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateAddress}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Thư điện tử:</span>
+                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateEmail}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Số điện thoại:</span>
+                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateTelNo}} </span>
+                    </div>
+                  </v-list>
+                </v-menu>
+              </div>
             </v-flex>
             <!--  -->
             <v-flex xs12 sm4 class="pr-3" v-if="originality === 1">
