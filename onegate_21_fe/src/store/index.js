@@ -259,26 +259,30 @@ export const store = new Vuex.Store({
       commit('setLoadingTable', true)
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            agency: filter.agency ? filter.agency : '',
+            service: filter.service ? filter.service : '',
+            template: filter.template ? filter.template : '',
+            status: filter.status ? filter.status : '',
+            register: filter.register ? filter.register : '',
+            keyword: filter.keyword ? filter.keyword : '',
+            domain: filter.domain ? filter.domain : '',
+            substatus: filter.substatus ? filter.substatus : '',
+            year: filter.year ? filter.year : 0,
+            month: filter.month ? filter.month : 0,
+            top: filter.top ? filter.top : '',
+            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+          }
+          if (filter['originality']) {
+            paramSearch['originality'] = filter.originality
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
             },
-            params: {
-              start: filter.page * 15 - 15,
-              end: filter.page * 15,
-              agency: filter.agency ? filter.agency : '',
-              service: filter.service ? filter.service : '',
-              template: filter.template ? filter.template : '',
-              status: filter.status ? filter.status : '',
-              register: filter.register ? filter.register : '',
-              keyword: filter.keyword ? filter.keyword : '',
-              domain: filter.domain ? filter.domain : '',
-              substatus: filter.substatus ? filter.substatus : '',
-              year: filter.year ? filter.year : 0,
-              month: filter.month ? filter.month : 0,
-              top: filter.top ? filter.top : '',
-              dossierNo: filter.dossierNo ? filter.dossierNo : ''
-            }
+            params: paramSearch
           }
           axios.get(filter.queryParams, param).then(function (response) {
             let serializable = response.data
