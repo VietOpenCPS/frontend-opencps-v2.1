@@ -1250,6 +1250,7 @@ export default {
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
+            originality: currentQuery.hasOwnProperty('originality') ? currentQuery.originality : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkKQhasFile(item) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data">
           <v-expansion-panel-content hide-actions :value="false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
@@ -342,6 +342,7 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  watch: {},
   methods: {
     resetCounterTemplate ({commit, state}, data) {
       var vm = this
@@ -407,6 +408,19 @@ export default {
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
+        if (vm.partTypes.includes(2) && vm.dossierTemplateItems.length > 0) {
+          let dossierTemplateKQ = []
+          vm.dossierTemplateItems.forEach(item => {
+            let hasKQ = vm.dossierFilesItems.find(file => {
+              return (item.partNo === file.dossierPartNo && item.partType === 2)
+            })
+            if (hasKQ) {
+              dossierTemplateKQ.push(item)
+            }
+          })
+          vm.dossierTemplateItems = dossierTemplateKQ
+          console.log('dossierTemplateItems555', vm.dossierTemplateItems)
+        }
         vm.changeStateViewResult()
         setTimeout(function (argument) {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
@@ -840,18 +854,16 @@ export default {
     },
     changeFileMark (event, index) {
       var vm = this
-      console.log('event=====', event)
       let item = vm.dossierTemplateItems[index]
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['fileMark'] = event
       item['checkInput'] = vm.checkInput
-      console.log('item-mark-------', item)
       vm.$store.dispatch('postDossierMark', item)
       vm.dossierTemplateItems[index].fileMark = event
     },
     changeFileCheck (event, index) {
       var vm = this
-      console.log('event=====', event)
+      // console.log('event=====', event)
       let item = vm.dossierTemplateItems[index]
       item['dossierId'] = vm.thongTinHoSo.dossierId
       item['fileCheck'] = event
@@ -862,13 +874,13 @@ export default {
       } else {
         item['fileComment'] = ''
       }
-      console.log('item-check-------', item)
+      // console.log('item-check-------', item)
       vm.$store.dispatch('postDossierMark', item)
       vm.dossierTemplateItems[index].fileCheck = event
     },
     changeFileComment (item, index) {
       var vm = this
-      console.log('item-------', item)
+      // console.log('item-------', item)
       if (item.fileComment === null || item.fileComment === undefined || item.fileComment === '') {
         return
       }
@@ -876,7 +888,7 @@ export default {
       item['fileComment'] = item.fileComment
       item['checkInput'] = vm.checkInput
       item['stateEditFileCheck'] = !item['stateEditFileCheck']
-      console.log('item-comment-------', item)
+      // console.log('item-comment-------', item)
       vm.$store.dispatch('postDossierMark', item)
       vm.dossierTemplateItems[index].fileComment = item.fileComment
     },
@@ -958,7 +970,7 @@ export default {
           vm.loadingAddOther = false
         })
       } else {
-        console.log('dossierTemplatesItemSelect ', vm.dossierTemplatesItemSelect)
+        // console.log('dossierTemplatesItemSelect ', vm.dossierTemplatesItemSelect)
         let params = vm.dossierTemplatesItemSelect
         params['dossierId'] = vm.thongTinHoSo.dossierId
         params['displayName'] = data
@@ -966,7 +978,7 @@ export default {
         vm.$store.dispatch('uploadSingleFile', params).then(function (result1) {
           vm.progressUploadPart = ''
           vm.dialogAddOtherTemp = false
-          console.log('success!!!!!!!!!!!!!!')
+          // console.log('success!!!!!!!!!!!!!!')
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result2 => {
             vm.dossierFilesItems = result2
             vm.recountFileTemplates()
@@ -1001,7 +1013,7 @@ export default {
     addOtherTemplate () {
       var vm = this
       if (vm.$refs.form.validate()) {
-        console.log('add')
+        // console.log('add')
         vm.changeOtherDossierTemp(vm.otherDossierTemplate)
       }
     },
@@ -1056,7 +1068,7 @@ export default {
     },
     checkKQhasFile (item) {
       var vm = this
-      if (vm.partTypes === 2 || vm.partTypes === '2') {
+      if (vm.partTypes.includes(2)) {
         var hasFile = vm.dossierFilesItems.find(file => {
           return item.partNo === file.dossierPartNo
         })
