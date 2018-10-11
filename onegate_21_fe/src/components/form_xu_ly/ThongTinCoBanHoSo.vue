@@ -29,7 +29,7 @@
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
               </div>
               <div class="xs12 sm12 pb-1">
-                <v-menu offset-y>
+                <v-menu offset-y style="position:relative !important;">
                   <span slot="activator" class="pr-2">
                     Thông tin người nộp
                     <v-icon color="blue" size="22">arrow_drop_down</v-icon>

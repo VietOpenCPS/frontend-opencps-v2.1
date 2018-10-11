@@ -531,6 +531,7 @@ export default {
       if (vm.showPhanCongNguoiThucHien) {
         filter['toUsers'] = vm.assign_items
         let result = vm.$refs.phancong.doExport()
+        console.log('validPhanCong', result)
         if (result) {
           validPhanCong = true
         } else {
@@ -615,31 +616,33 @@ export default {
           })
         }
       } else {
-        vm.loadingActionProcess = true
-        vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          vm.countProcessed += 1
-          vm.dossierSelected[index]['statusAction'] = true
-          if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-            vm.dialog_statusAction = true
-          } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
-            vm.loadingActionProcess = false
-            vm.loadingAction = false
-            vm.btnStateVisible = false
-          }
-          // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
-        }).catch(function (reject) {
-          vm.countProcessed += 1
-          vm.activeNotify = true
-          vm.dossierSelected[index]['statusAction'] = false
-          if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
-            vm.dialog_statusAction = true
-          } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
-            vm.loadingActionProcess = false
-            vm.loadingAction = false
-            vm.btnStateVisible = false
-          }
-          // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
-        })
+        if (vm.validateAction) {
+          vm.loadingActionProcess = true
+          vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+            vm.countProcessed += 1
+            vm.dossierSelected[index]['statusAction'] = true
+            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+              vm.dialog_statusAction = true
+            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+              vm.loadingActionProcess = false
+              vm.loadingAction = false
+              vm.btnStateVisible = false
+            }
+            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          }).catch(function (reject) {
+            vm.countProcessed += 1
+            vm.activeNotify = true
+            vm.dossierSelected[index]['statusAction'] = false
+            if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length && vm.activeNotify) {
+              vm.dialog_statusAction = true
+            } else if (vm.countProcessed === vm.dossierProcess.length * vm.actionExits.length) {
+              vm.loadingActionProcess = false
+              vm.loadingAction = false
+              vm.btnStateVisible = false
+            }
+            // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
+          })
+        }
       }
     },
     doPrint02 (dossierItem, item, index, isGroup) {
