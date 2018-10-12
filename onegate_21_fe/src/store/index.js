@@ -706,10 +706,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
-          if (response.data) {
-            resolve(response.data)
+          if (response.status === 200 || response.status === '200') {
+            resolve('hasPayment')
           } else {
-            resolve([])
+            resolve('')
           }
           if (response.headers['content-disposition']) {
             commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))

@@ -145,7 +145,7 @@
         let thongTinChungHoSoTemp = {
           serviceName: data.serviceName,
           dossierTemplateName: data.dossierTemplateName,
-          dossierNo: data.dossierNo,
+          dossierNo: data.dossierNo ? data.dossierNo : '',
           receiveDate: data.receivingDate ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
           dueDate: data.receivingDuedate ? data.receivingDuedate : data.dueDate,
           durationDate: data.durationDate,

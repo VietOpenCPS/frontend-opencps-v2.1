@@ -41,7 +41,9 @@
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Địa chỉ:</span>
-                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateAddress}} </span>
+                      <span class="pl-0 text-bold "> 
+                        {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}
+                      </span>
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Thư điện tử:</span>
