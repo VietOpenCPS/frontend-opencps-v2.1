@@ -28,7 +28,7 @@
                 <span class="pr-2">Điện thoại: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.contactTelNo}} </span>
               </div>
-              <div class="xs12 sm12 pb-1">
+              <div class="xs12 sm12 pb-1" v-if="!thongTinChiTietHoSo.online">
                 <v-menu offset-y style="position:relative !important;">
                   <span slot="activator" class="pr-2">
                     Thông tin người nộp

@@ -85,8 +85,9 @@
           vm.loading = false
           if (result) {
             vm.trangThaiHoSoList = result
+            let route = vm.$router.history.current
             let currentParams = vm.$router.history.current.params
-            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
+            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0 && route.name !== 'ThanhToanThanhCong') {
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
                 router.push({
