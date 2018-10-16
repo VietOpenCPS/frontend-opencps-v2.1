@@ -97,8 +97,9 @@
           vm.loading = false
           if (result.length !== 0) {
             vm.trangThaiHoSoList = result
+            let route = vm.$router.history.current
             let currentParams = vm.$router.history.current.params
-            if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
+            if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode') && route.name !== 'ThanhToanThanhCong') {
               vm.trangThaiHoSoList[0]['active'] = true
               router.push({
                 path: '/danh-sach-ho-so/0',

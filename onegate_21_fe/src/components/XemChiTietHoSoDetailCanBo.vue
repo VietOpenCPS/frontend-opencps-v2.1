@@ -304,7 +304,7 @@
                   <td class="text-xs-center">{{props.index + 1}}</td>
                   <td class="text-xs-left">{{props.item.sequenceRole}}</td>
                   <td class="text-xs-left">{{props.item.sequenceName}}</td>
-                  <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
+                  <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
                   <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
                   <td class="text-xs-left">
                     <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
@@ -1678,6 +1678,13 @@ export default {
         return item.actionOverdue
       }))
       return maxDue
+    },
+    getThoiHanQuyDinh (val) {
+      if (val > 0) {
+        return val + ' ngày'
+      } else {
+        return ''
+      }
     }
   }
 }
