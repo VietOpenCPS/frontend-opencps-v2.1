@@ -729,7 +729,8 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        axios.get(state.initData.dossierApi + '/keypay/' + data.dossierId + '/' + data.referenceUid, param).then(function (response) {
+        let dataPut = new URLSearchParams()
+        axios.put(state.initData.dossierApi + '/keypay/' + data.referenceUid + '/' + data.referenceUid, dataPut, param).then(function (response) {
           if (response.data) {
             resolve(response.data)
           } else {
