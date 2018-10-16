@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <div class="row-header">
-        <div class="background-triangle-big"> <span>THANH TOÁN ĐIỆN TỬ</span> </div>
+        <div class="background-triangle-big"> <span>THÔNG TIN THANH TOÁN</span> </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -18,9 +18,9 @@
             Giao dịch thanh toán thành công
           </v-alert>
         </div>
-        <v-card>
+        <v-card class="mx-2">
           <v-card-text class="px-0 py-0">
-            <div class="table-bordered">
+            <div class="table-bordered" style="border-top: 1px solid #dedede;">
               <div class="table__overflow">
                 <table class="datatable table">
                   <tbody>
@@ -102,13 +102,13 @@ export default {
           vm.dossierDetail['transId'] = query.transId
           vm.dossierDetail['goodCode'] = query.goodCode
           vm.dossierDetail['paymentPortal'] = query.paymentPortal
+          vm.dossierDetail['paymentAmount'] = query.net_cost
           let filter = {
             dossierId: resultDossier.dossierId,
             referenceUid: resultDossier.referenceUid
           }
           vm.$store.dispatch('putPayments', filter).then(result => {
             vm.dossierDetail['paymentFee'] = result.paymentFee
-            vm.dossierDetail['paymentAmount'] = result.paymentAmount
           }).catch(reject => {
           })
         })
