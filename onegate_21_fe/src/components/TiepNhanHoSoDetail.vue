@@ -48,7 +48,7 @@
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            Nội dung &nbsp;&nbsp;&nbsp;&nbsp;
+            Tên hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
           </div>
           <div>
             <v-card>
@@ -58,7 +58,7 @@
                   multi-line
                   :rows="2"
                   box
-                  label="nhập nội dung..."
+                  label="nhập tên hồ sơ..."
                 ></v-text-field>
               </v-card-text>
             </v-card>
@@ -233,7 +233,7 @@ export default {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
         vm.dossierId = result.dossierId
-        vm.briefNote = result.serviceName ? result.serviceName : ''
+        vm.briefNote = result.dossierName ? result.dossierName : ''
         result['editable'] = false
         if (result.dossierStatus === '') {
           vm.$store.dispatch('pullNextactions', result).then(result2 => {
@@ -407,7 +407,7 @@ export default {
         var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
         tempData['dossierId'] = vm.dossierId
         tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
-        tempData['serviceName'] = vm.briefNote
+        tempData['dossierName'] = vm.briefNote
         tempData['originality'] = vm.originality
         console.log('data put dossier -->', tempData)
         vm.$store.dispatch('putDossier', tempData).then(function (result) {

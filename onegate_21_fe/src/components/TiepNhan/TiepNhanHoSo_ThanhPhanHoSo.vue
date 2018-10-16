@@ -369,6 +369,7 @@ export default {
     },
     initData (data) {
       var vm = this
+      console.log('partTypes', vm.partTypes)
       var arrTemp = []
       // console.log('dossierId++++++++', data.dossierId)
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
@@ -492,11 +493,11 @@ export default {
         dossierTemplates.forEach(template => {
           template['daKhai'] = false
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType)
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm
           })
           if (itemFind) {
             template['daKhai'] = true
-          } else {
+          } else if (!itemFind && template.hasForm) {
             template['daKhai'] = false
           }
           dossierFiles.forEach(dossierFile => {
@@ -646,6 +647,7 @@ export default {
     },
     onUploadSingleFile (e, data, index) {
       var vm = this
+      console.log('vm.dossierTemplateItems[index]', vm.dossierTemplateItems[index])
       vm.dossierTemplatesItemSelect = data
       vm.progressUploadPart = data.partNo
       data['dossierId'] = vm.thongTinHoSo.dossierId
@@ -760,7 +762,7 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             // vm.recountFileTemplates()
-            vm.setDaKhai(vm.dossierFilesItems)
+            vm.setDaKhai(item)
           })
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
