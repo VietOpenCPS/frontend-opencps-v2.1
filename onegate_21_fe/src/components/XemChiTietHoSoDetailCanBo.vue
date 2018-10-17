@@ -1201,7 +1201,10 @@ export default {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
       if (vm.showKyPheDuyetTaiLieu) {
-        let result = vm.$refs.kypheduyettailieu.doExport()
+        let resultTmp = vm.$refs.kypheduyettailieu.doExport()
+        if (resultTmp.activeKS) {
+          vm.$refs.kypheduyettailieu.kySo(result)
+        }
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
