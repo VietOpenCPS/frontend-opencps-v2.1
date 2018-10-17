@@ -197,6 +197,7 @@ export default {
       let filter = vm.detailDossier
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
+        console.log('paymentFile Result', vm.paymentFile)
         vm.data_payment['paymentFile'] = vm.paymentFile
         vm.$store.commit('setPaymentProfile', vm.data_payment)
       })

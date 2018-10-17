@@ -706,10 +706,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', param).then(function (response) {
-          if (response.data) {
-            resolve(response.data)
+          if (response.status === 200 || response.status === '200') {
+            resolve('hasPayment')
           } else {
-            resolve([])
+            resolve('')
           }
           if (response.headers['content-disposition']) {
             commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
@@ -729,7 +729,9 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        axios.get(state.initData.dossierApi + '/keypay/' + data.dossierId + '/' + data.referenceUid, param).then(function (response) {
+        let dataPut = new URLSearchParams()
+        axios.put(state.initData.dossierApi + '/keypay/' + data.referenceUid + '/' + data.referenceUid, dataPut, param).then(function (response) {
+          store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           if (response.data) {
             resolve(response.data)
           } else {
@@ -916,7 +918,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
         dataPutdossier.append('applicantNote', data.applicantNote)
         if (data.originality !== 1) {
-          dataPutdossier.append('serviceName', data.serviceName)
+          dataPutdossier.append('dossierName', data.dossierName)
         }
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
