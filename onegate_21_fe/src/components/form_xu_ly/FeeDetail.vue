@@ -218,8 +218,10 @@ export default {
         let feeAmount = vm.payments.feeAmount ? Number(vm.payments.feeAmount.toString().replace(/\./g, '')) : 0
         // let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
         if (vm.payments.requestPayment === 1) {
-          let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
-          vm.totalFee = advanceAmount
+          // let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
+          let serviceAmount = Number(vm.payments.serviceAmount)
+          vm.feeTong = feeAmount + serviceAmount
+          vm.totalFee = feeAmount + serviceAmount
         } else if (vm.payments.requestPayment === 2) {
           let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
           let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
@@ -239,7 +241,7 @@ export default {
             vm.feeTong = feeAmount + serviceAmount
             vm.totalFee = feeAmount + serviceAmount - advanceAmount
           }
-          if (vm.payments.requestPayment === 5) {
+          if (vm.payments.requestPayment === 5 && vm.detailDossier.stepCode === 620) {
             let filter = vm.detailDossier
             vm.$store.dispatch('getPaymentFiles', filter).then(result => {
               vm.paymentFile = result
@@ -279,8 +281,10 @@ export default {
       let val = vm.data_payment
       let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
       if (val.requestPayment === 1) {
-        let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
-        vm.totalFee = advanceAmount
+        // let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
+        let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
+        vm.feeTong = feeAmount + serviceAmount
+        vm.totalFee = feeAmount + serviceAmount
       } else if (val.requestPayment === 2) {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0

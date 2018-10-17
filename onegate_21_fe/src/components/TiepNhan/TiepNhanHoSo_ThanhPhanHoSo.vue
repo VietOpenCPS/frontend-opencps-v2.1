@@ -654,7 +654,9 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          vm.dossierTemplateItems[index]['daKhai'] = true
+          if (!vm.dossierTemplateItems[index]['hasForm']) {
+            vm.dossierTemplateItems[index]['daKhai'] = true
+          }
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
@@ -705,6 +707,7 @@ export default {
             file['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
               console.log('success!')
+              vm.dossierTemplateItems[index].daKhai = false
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
                 vm.recountFileTemplates()
@@ -718,7 +721,6 @@ export default {
             })
           }
         })
-        vm.dossierTemplateItems[index].daKhai = false
       }
     },
     previewFileEfom (item, index) {
