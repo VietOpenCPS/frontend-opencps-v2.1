@@ -82,7 +82,8 @@
                   <span>Người thực hiện: &nbsp;</span>
                   <span v-for="(item, index) in usersNextAction" :key="item.userId">
                     &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
-                  </span> - 
+                  </span>
+                  <span v-if="stepOverdueNextAction"> - </span>
                   <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                     {{stepOverdueNextAction}}
                   </span>
@@ -1200,7 +1201,10 @@ export default {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
       if (vm.showKyPheDuyetTaiLieu) {
-        let result = vm.$refs.kypheduyettailieu.doExport()
+        let resultTmp = vm.$refs.kypheduyettailieu.doExport()
+        if (resultTmp.activeKS) {
+          vm.$refs.kypheduyettailieu.kySo(result)
+        }
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
