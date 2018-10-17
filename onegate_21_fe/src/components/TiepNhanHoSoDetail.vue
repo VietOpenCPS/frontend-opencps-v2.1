@@ -413,7 +413,7 @@ export default {
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           vm.loadingAction = false
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          if (vm.formCode === 'UPDATE' || vm.formCode === 'COPY') {
+          if (vm.formCode === 'UPDATE') {
             vm.goBack()
           } else {
             var initData = vm.$store.getters.loadingInitData

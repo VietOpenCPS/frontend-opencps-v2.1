@@ -82,7 +82,8 @@
                   <span>Người thực hiện: &nbsp;</span>
                   <span v-for="(item, index) in usersNextAction" :key="item.userId">
                     &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
-                  </span> - 
+                  </span>
+                  <span v-if="stepOverdueNextAction"> - </span>
                   <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
                     {{stepOverdueNextAction}}
                   </span>
