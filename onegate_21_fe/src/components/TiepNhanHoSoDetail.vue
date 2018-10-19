@@ -120,7 +120,7 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          <span v-if="formCode === 'UPDATE' || formCode === 'COPY'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
+          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
           <v-icon size="20">save</v-icon>
           <span slot="loader">Loading...</span>
         </v-btn>

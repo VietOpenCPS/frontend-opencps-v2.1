@@ -63,7 +63,7 @@
         Bạn không có quyền thao tác!
       </v-alert>
     </v-content>
-    
+    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </v-app>
 </template>
 
