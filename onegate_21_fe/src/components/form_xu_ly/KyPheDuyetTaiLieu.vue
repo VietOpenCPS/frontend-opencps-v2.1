@@ -9,7 +9,7 @@
         </div>
         <v-card >
           <v-card-text class='px-0 py-0'>
-            <v-tabs icons-and-text class='mb-4' v-model='tabActive'>
+            <!-- <v-tabs icons-and-text class='mb-4' v-model='tabActive'>
               <v-tabs-slider color='primary'></v-tabs-slider>
               <v-tab :key='1' href='#tabs-1' @click='changeActive'>
                 <v-btn flat class='px-0 py-0 mx-0 my-0'>Ký kết quả hồ sơ</v-btn>
@@ -20,7 +20,6 @@
               <v-tab :key='3' href='#tabs-4' @click='changeActive'>
                 <v-btn flat class='px-0 py-0 mx-0 my-0'>Yêu cầu trình lại</v-btn>
               </v-tab>
-              <!--  -->
               <v-tabs-items class='px-3 py-3'>
                 <v-tab-item id='tabs-1' :key='1' reverse-transition='fade-transition' transition='fade-transition'>
                   <v-checkbox 
@@ -50,7 +49,12 @@
                   ></v-text-field>
                 </v-tab-item>
               </v-tabs-items>
-            </v-tabs>
+            </v-tabs> -->
+            <v-checkbox
+              class="ml-3"
+              v-model='activeKS'
+              label='Sử dụng chữ ký số'
+            ></v-checkbox>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -90,6 +94,7 @@ export default {
       return exportData
     },
     kySo (item) {
+      console.log('run ky so', item)
       var vm = this
       var fileArr = item.createFiles
       var idArr = []

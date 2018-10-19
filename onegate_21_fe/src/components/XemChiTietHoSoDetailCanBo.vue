@@ -1202,7 +1202,8 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
-        if (resultTmp.activeKS) {
+        console.log('resultTmp', resultTmp)
+        if (resultTmp.useKS) {
           vm.$refs.kypheduyettailieu.kySo(result)
         }
       }

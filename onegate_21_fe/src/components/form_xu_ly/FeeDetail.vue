@@ -207,7 +207,9 @@ export default {
     feeTong: 0,
     checkPaid: true,
     activeEdit: true,
-    paymentFile: ''
+    paymentFile: '',
+    dialogPDF: false,
+    dialogPDFLoading: true
   }),
   directives: {money: VMoney},
   created () {

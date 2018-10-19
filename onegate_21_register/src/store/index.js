@@ -58,8 +58,8 @@ export const store = new Vuex.Store({
         dataPostApplicant.append('password', data.password)
         console.log('dataPostApplicant', dataPostApplicant)
         // test local
-        axios.post('http://127.0.0.1:8081/api/applicant', dataPostApplicant, configs).then(function (response) {
-        // axios.post('/o/rest/v2/applicants', dataPostApplicant, configs).then(function (response) {
+        // axios.post('http://127.0.0.1:8081/api/applicant', dataPostApplicant, configs).then(function (response) {
+        axios.post('/o/rest/v2/applicants', dataPostApplicant, configs).then(function (response) {
           toastr.success('Đăng ký thành công')
           resolve(response.data)
         }).catch(function (errorRes, response) {

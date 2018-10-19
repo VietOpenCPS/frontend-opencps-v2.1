@@ -8,7 +8,7 @@ import 'babel-polyfill'
 import axios from 'axios'
 import './stylus/main.css'
 
-// axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = false
