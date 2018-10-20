@@ -273,7 +273,7 @@ export default {
 </script>
 <style>
   .bg-gif-register {
-    background: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-theme/images/bg-gif-register.gif') no-repeat center center;
+    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/register/img/bg-gif-register.gif') no-repeat center center;
     padding-top: 77.961783%;
     background-size: contain;
   }
