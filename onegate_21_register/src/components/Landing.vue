@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout wrap class="white py-2">
+    <v-layout wrap class="py-2">
       <v-flex xs12 sm8 class="px-3">
         <div class="bg-gif-register"></div>
       </v-flex>
@@ -171,6 +171,7 @@ export default {
     valid: false,
     applicantType: true,
     applicantName: '',
+    applicantIdNo: '',
     menuApplicantIdDate: false,
     applicantIdDate: null,
     applicantIdDateFormatted: null,
@@ -194,9 +195,6 @@ export default {
     }
   }),
   computed: {
-    govAgencyList () {
-      return this.$store.getters.getAgencyList
-    }
   },
   created () {
     var vm = this
@@ -273,7 +271,7 @@ export default {
 </script>
 <style>
   .bg-gif-register {
-    background: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-theme/images/bg-gif-register.gif') no-repeat center center;
+    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/register/img/bg-gif-register.gif') no-repeat center center;
     padding-top: 77.961783%;
     background-size: contain;
   }

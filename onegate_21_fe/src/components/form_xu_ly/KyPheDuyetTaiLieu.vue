@@ -118,12 +118,12 @@ export default {
       var isKyOk = item.eSignature
       if (isKyOk) {
         if (!plugin().valid) {
-          alert('Plugin is not working :(')
+          alert('Plugin is not working')
           isKyOk = false
           return
         }
         if (waitingFiles) {
-          alert('Tệp điện tử chưa sẵn sàng. Xin vui lòng chờ một lát!')
+          alert('Tệp điện tử chưa sẵn sàng. Xin vui lòng chờ trong giây lát')
           return
         }
         if (idArr) {
