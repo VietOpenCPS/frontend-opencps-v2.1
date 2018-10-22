@@ -58,7 +58,7 @@ export const store = new Vuex.Store({
         dataPostApplicant.append('password', data.password)
         console.log('dataPostApplicant', dataPostApplicant)
         // test local
-        // axios.post('http://127.0.0.1:8081/api/applicant', dataPostApplicant, configs).then(function (response) {
+        // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
         axios.post('/o/rest/v2/applicants', dataPostApplicant, configs).then(function (response) {
           toastr.success('Đăng ký thành công')
           resolve(response.data)
@@ -88,6 +88,8 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
         axios.get('/o/rest/v2/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
           resolve(response.data)
           toastr.success('Xác thực thành công')
@@ -104,6 +106,8 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
         axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot', param).then(function (response) {
           resolve(response.data)
           // toastr.success('Xác thực thành công')
@@ -120,9 +124,15 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
+        axios.get('/o/rest/v2/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
           resolve(response.data)
-          // toastr.success('Xác thực thành công')
+          toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
+          setTimeout(function () {
+            let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            window.open(redirectURL, '_self')
+          }, 500)
         }).catch(function (xhr) {
           reject(xhr)
           toastr.error('Yêu cầu thất bại. Vui lòng thử lại')

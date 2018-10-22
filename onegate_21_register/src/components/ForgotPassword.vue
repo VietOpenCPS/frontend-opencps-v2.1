@@ -81,7 +81,7 @@ export default {
         vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
           vm.loading = false
           router.push({
-            path: '/xac-thuc-cap-lai-mat-khau'
+            path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
           })
         }).catch(function (reject) {
           vm.loading = false

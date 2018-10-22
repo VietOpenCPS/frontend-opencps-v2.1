@@ -1,9 +1,6 @@
 <template>
   <div>
     <v-layout class="mt-4" wrap style="max-width:550px;margin: 0 auto">
-      <!-- <v-flex xs12>
-        <h4>XÁC THỰC TÀI KHOẢN</h4>
-      </v-flex> -->
       <nav class="toolbar theme--dark primary py-2" data-booted="true">
         <div class="toolbar__content"  style="justify-content: center">
           <h4>XÁC THỰC TÀI KHOẢN</h4>
@@ -85,10 +82,11 @@ export default {
         vm.$store.dispatch('confirmPIN', filter).then(function (result) {
           vm.loading = false
           setTimeout(function () {
-            $('form[name=login_form] #input_login').val(result.email)
-            $('form[name=login_form] #input_password').val(result.token)
-            $('form[name=login_form] #input_action').val('confirm_account')
-            $('form[name=login_form]').submit()
+            $('input[name=_npmreactlogin_login]').val(result.email)
+            $('input[name=_npmreactlogin_password]').val(result.token)
+            $('.action-btn-login-input button.btn-login').click()
+            // $('form[name=login_form] #input_action').val('confirm_account')
+            // $('form[name=login_form]').submit()
           }, 2000)
         }).catch(function (reject) {
           vm.loading = false
