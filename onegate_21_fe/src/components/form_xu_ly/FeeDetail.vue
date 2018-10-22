@@ -51,8 +51,9 @@
                   v-model="data_payment.shipAmount"
                   v-money="money"
                   suffix="vnđ"
-                  :class="!data_payment.editable?'inputDisable':''"
+                  v-if="data_payment.editable === 1 || data_payment.editable === 3"
                 ></v-text-field>
+                <p class="mt-1 mb-0" v-else>{{currency(data_payment.shipAmount.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <v-flex xs12 sm2></v-flex>
             </v-layout>

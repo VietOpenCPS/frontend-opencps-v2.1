@@ -147,8 +147,8 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.contactTelNo"
-                    type="number"
                     append-icon="phone"
+                    :rules="[rules.telNo]"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm2>
@@ -164,6 +164,7 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.contactEmail"
+                    :rules="[rules.email]"
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -326,7 +327,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateTelNo"
-                      type="number"
+                      :rules="[rules.telNo]"
                       append-icon="phone"
                       ></v-text-field>
                     </v-flex>
@@ -342,6 +343,7 @@
                       </content-placeholders>
                       <v-text-field
                       v-else
+                      :rules="[rules.email]"
                       v-model="thongTinNguoiNopHoSo.delegateEmail"
                       ></v-text-field>
                     </v-flex>
@@ -422,7 +424,22 @@ export default {
     search2: null,
     searchQuery: '',
     selectedSearchItem: null,
-    searchOptions: {}
+    searchOptions: {},
+    rules: {
+      required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+      email: (value) => {
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      passWord: (value) => {
+        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      telNo: (value) => {
+        const pattern = /^([0-9]{0,})$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      }
+    }
   }),
   computed: {
     loading () {
