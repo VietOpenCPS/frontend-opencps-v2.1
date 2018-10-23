@@ -354,6 +354,11 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
+          if (filter['agency']) {
+            putData['flagAgency'] = 0
+          } else {
+            putData['flagAgency'] = 1
+          }
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
             putData['month'] = vm.month
