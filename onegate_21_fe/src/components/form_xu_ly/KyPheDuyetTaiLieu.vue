@@ -96,10 +96,15 @@ export default {
     kySo (item) {
       console.log('run ky so', item)
       var vm = this
-      var fileArr = item.createFiles
+      var fileArr
+      if (Array.isArray(item.createFiles)) {
+        fileArr = item.createFiles
+      } else {
+        fileArr = [item.createFiles]
+      }
       var idArr = []
       var waitingFiles = false
-      if (fileArr) {
+      if (fileArr.length > 0) {
         var length = fileArr.length
         for (var i = 0; i < length; i++) {
           var fileDetail = fileArr[i]
@@ -115,6 +120,7 @@ export default {
           }
         }
       }
+      console.log('idArr', idArr)
       var isKyOk = item.eSignature
       if (isKyOk) {
         if (!plugin().valid) {
