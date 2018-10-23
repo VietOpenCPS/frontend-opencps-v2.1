@@ -349,6 +349,7 @@
         </v-tabs-items>
       </v-tabs>
     </div>
+    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </div>
 </template>
 

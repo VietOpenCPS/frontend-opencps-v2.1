@@ -72,6 +72,7 @@ export default {
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
       let dataForm = {
+        userCode: currentQuery.hasOwnProperty('active_user_id') ? currentQuery.active_user_id : '',
         confirmCode: vm.confirmCode
       }
       console.log('dataForm', dataForm)
