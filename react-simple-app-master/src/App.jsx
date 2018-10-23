@@ -18,8 +18,10 @@ import { withStyles } from '@material-ui/core/styles';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import Button from '@material-ui/core/Button';
 
+import { ToastContainer, toast } from 'react-toastify';
+
 const themeDisplay = window.themeDisplay;
-// axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
 const styles = theme => ({
   root: {
     textAlign: 'right',
@@ -155,6 +157,25 @@ class App extends React.Component {
     }
   };
 
+  goToDangNhap() {
+    axios.post('/o/gate/v2/login', {}, {
+      headers: {
+        'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+      }
+    }).then(function (response) {
+      console.log(response.data)
+      if (response.data !== '' && response.data !== 'ok') {
+        window.location.href = response.data
+      } else if (response.data === 'ok') {
+        window.location.href = window.themeDisplay.getURLHome()
+      } else {
+        toast.error("Đăng nhập thất bại.", { autoClose: 2000 });
+      }
+    }).catch(function (error) {
+      toast.error("Đăng nhập thất bại.", { autoClose: 2000 });
+    })
+  };
+
   doUserInfo() {
     if (themeDisplay !== null && themeDisplay !== undefined) {
       // eslint-disable-next-line
@@ -179,10 +200,10 @@ class App extends React.Component {
           <div className="login-wrapper">
             <div className="login-input">
               <div className="ico ico-user">
-                <input type="text" placeholder="Tài khoản đăng nhập" name="_npmreactlogin_login" />
+                <input type="text" placeholder="Tài khoản đăng nhập" name="_npmreactlogin_login" id="_npmreactlogin_login" />
               </div>
               <div className="ico ico-pass">
-                <input type="password" placeholder="Mật khẩu" name="_npmreactlogin_password" />
+                <input type="password" placeholder="Mật khẩu" name="_npmreactlogin_password" id="_npmreactlogin_password" />
               </div>
             </div>
             <div className="login-input">
@@ -191,7 +212,8 @@ class App extends React.Component {
               </div> 
               <div className="action-btn-login-input">
                 <button onClick={this.goToDangKyPage} type="button" className="btn-register">Đăng ký</button>
-                <button type="submit" className="btn-login">Đăng nhập</button>
+                <button onClick={this.goToDangNhap} type="button" className="btn-login">Đăng nhập</button>
+                <ToastContainer autoClose={2000} />
               </div>
             </div>
           </div>

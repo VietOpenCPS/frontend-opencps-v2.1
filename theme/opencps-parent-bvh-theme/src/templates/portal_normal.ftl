@@ -5,18 +5,21 @@
 <html class="${root_css_class}" dir="<@liferay.language key="lang.dir" />" lang="${w3c_language_id}">
 
 <head>
-	<title>${the_title} - ${company_name}</title>
+	<title>Hệ thống Dịch vụ công trực tuyến</title>
 
 	<meta content="initial-scale=1.0, width=device-width" name="viewport" />
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<!-- <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,400i,700&amp;subset=vietnamese" rel="stylesheet"> -->
+	<base href="/">
+	
+	<link href="${themeDisplay.getPathThemeRoot()}/images/favicon.ico" rel="Shortcut Icon">
 
 	<@liferay_util["include"] page=top_head_include />
 	
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet" />
-	<link href="${themeDisplay.getPathThemeRoot()}/css/claycustom.css?t=123" rel="stylesheet" />
-	
+	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=4243424243241111243" rel="stylesheet" type="text/css">
+	<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=6564464123" rel="stylesheet" type="text/css">
+
 	<!-- Mainly scripts -->
 	<script>
         window.__define = window.define;
@@ -92,7 +95,7 @@
 					<span>HỆ THỐNG MỘT CỬA ĐIỆN TỬ VÀ DỊCH VỤ CÔNG TRỰC TUYẾN</span>
 				</div>
 			</a>
-			<@liferay_portlet["runtime"] portletName="npmreactlogin"/>
+			<div id="react-root" style="float: right;width: 100%;"></div>
 		</div>
 	</header>
 		
@@ -134,6 +137,14 @@
 	    <div class="text-center last">${copyright}</div>
 	</footer>
 </div>
+
+<!-- inject:js -->
+	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=65722572255"></script>
+	<#if permissionChecker.isOmniadmin()>
+		<@liferay_util["include"] page=body_bottom_include />
+		<@liferay_util["include"] page=bottom_include />
+	</#if>
+<!-- endinject -->
 
 </body>
 

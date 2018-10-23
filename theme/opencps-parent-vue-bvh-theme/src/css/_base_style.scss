@@ -45,9 +45,13 @@
 }
 
 /*---------- Footer ----------*/
+body #app {
+    max-width: 1300px;
+    margin: 0 auto;
+    margin-top: 6px;
+}
 #footer {
     color: white;
-    margin-top: 20px;
     background: $main-color;
     background: url("../images/bg-footer.png") center center repeat-y;
     background-size: 100% auto;
@@ -672,7 +676,7 @@
 	.hidden__temp {
 		opacity: 0;
 	}
-	.portlet-boundary_npmreactlogin_ .navigation-drawer--right>.navigation-drawer__border {
+	#react-root .navigation-drawer--right>.navigation-drawer__border {
 		position: absolute;
 		top: 0;
 		height: 100%;
@@ -683,51 +687,51 @@
 		z-index: -1;
 		filter: blur(200px);
 	}
-	.portlet-boundary_npmreactlogin_ .navigation-drawer .list {
+	#react-root .navigation-drawer .list {
 		background: transparent;
 	}
-	.portlet-boundary_npmreactlogin_ .navigation-drawer>.list .list__tile:hover {
+	#react-root .navigation-drawer>.list .list__tile:hover {
 		background: transparent !important;
 	}
-	.portlet-boundary_npmreactlogin_ .btn-toggle--selected {
+	#react-root .btn-toggle--selected {
 		box-shadow: none !important;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .v-divider {
+	#react-root .theme--light .v-divider {
 		border-color: #eee;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .v-list__tile__content {
+	#react-root .theme--light .v-list__tile__content {
 		height: 30px;
 	}
-	.portlet-boundary_npmreactlogin_ .navigation-drawer>.list .list__tile {
+	#react-root .navigation-drawer>.list .list__tile {
 			height: 42px;
 			padding: 0 16px !important;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .btn-toggle {
+	#react-root .theme--light .btn-toggle {
 			width: 100%;
 		background: #fff;
 		border-radius: 4px;
 		height: 20px;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .btn-toggle .btn {
+	#react-root .theme--light .btn-toggle .btn {
 			height: 20px;
 			opacity: 1;
 		font-size: 10px;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .v-list__tile__title {
+	#react-root .theme--light .v-list__tile__title {
 			font-size: 24px;
 		padding-left: 10px;
 		color: #383838;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light .btn--small {
+	#react-root .theme--light .btn--small {
 		height: 18px !important;
 		width: 18px !important;
 	}
-	body .portlet-boundary_npmreactlogin_  .v-navigation-drawer--is-mobile:not(.v-navigation-drawer--close), 
-	body .portlet-boundary_npmreactlogin_ .v-navigation-drawer--temporary:not(.v-navigation-drawer--close) {
+	body #react-root  .v-navigation-drawer--is-mobile:not(.v-navigation-drawer--close), 
+	body #react-root .v-navigation-drawer--temporary:not(.v-navigation-drawer--close) {
 		-webkit-box-shadow: 0 1px 3px -1px rgba(0,0,0,.2), 1px 1px 5px -5px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
 		box-shadow: 0 1px 3px -1px rgba(0,0,0,.2), 1px 1px 5px -5px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
 	}
-	.portlet-boundary_npmreactlogin_ .overlay--absolute {
+	#react-root .overlay--absolute {
 		opacity: 0;
 	}
 	
@@ -828,24 +832,24 @@
 		background-color: #0072bc;
 		cursor: pointer;
 	}
-	.portlet-boundary_npmreactlogin_ .application--wrap {
+	#react-root .application--wrap {
 		min-height: unset;
 	}
-	.portlet-boundary_npmreactlogin_ .application.theme--light {
+	#react-root .application.theme--light {
 		background: transparent !important;
 		width: 100%;
 	}
-	.portlet-boundary_npmreactlogin_ .application--wrap {
+	#react-root .application--wrap {
 		border-top: none !important;
 	}
-	.portlet-boundary_npmreactlogin_ .login-wrapper input {
+	#react-root .login-wrapper input {
 		background-color: #fff;
 	}
-	.portlet-boundary_npmreactlogin_ .navigation-drawer{
+	#react-root .navigation-drawer{
 		height: 100vh !important;
 		z-index: 11;
 	}
-	.portlet-boundary_npmreactlogin_ .badge__badge {
+	#react-root .badge__badge {
 		font-size: 10px;
 		border-radius: 4px;
 		height: 16px;
@@ -856,7 +860,7 @@
 		min-width: 18px;
 		z-index: 10;
 	}
-	.portlet-boundary_npmreactlogin_ {
+	#react-root {
 		min-width: 300px;
 		width: 100%;
 	}
@@ -870,39 +874,43 @@
 	body #banner .navigation-drawer--fixed {
 		position: fixed !important;
 	}
-	.portlet-boundary_npmreactlogin_ .btn-toggle .btn__content {
+	#react-root .btn-toggle .btn__content {
 		text-transform: none;
 		background: #929292;
 		color: #fff;
 		font-size: 10px !important;
 	}
-	.portlet-boundary_npmreactlogin_ .btn-toggle .btn--active .btn__content {
+	#react-root span {
+		color: #fff;
+		font-size: 13px;
+	}
+	#react-root .btn-toggle .btn--active .btn__content {
 		background: #fff;
 		color: inherit;
 	}
-	.portlet-boundary_npmreactlogin_ .btn-toggle .btn--active .btn__content::before {
+	#react-root .btn-toggle .btn--active .btn__content::before {
 		opacity: 0;
 	}
-	.portlet-boundary_npmreactlogin_ .theme--light.chip,
-	.portlet-boundary_npmreactlogin_ .theme--light .chip {
+	#react-root .theme--light.chip,
+	#react-root .theme--light .chip {
 		background: transparent !important;
 	}
-	.portlet-boundary_npmreactlogin_ .menu__content {
+	#react-root .menu__content {
 		margin-top: 0;
 	}
-	.portlet-boundary_npmreactlogin_ .menu__content .list {
+	#react-root .menu__content .list {
 		margin-bottom: 0;
 		padding: 0;
 	}
-	.portlet-boundary_npmreactlogin_ .menu__content .list>div > .list__tile {
+	#react-root .menu__content .list>div > .list__tile {
 		height: 32px;
 		font-size: 13px;
 		cursor: pointer;
 	}
-	.portlet-boundary_npmreactlogin_ .menu__content .list>div:hover {
+	#react-root .menu__content .list>div:hover {
 		background-color: #eee !important;
 	}
-	.portlet-boundary_npmreactlogin_ .menu__content .list>div {
+	#react-root .menu__content .list>div {
 		border-bottom: 1px dashed #ddd;
 		display: block;
 		padding: 0;
@@ -911,15 +919,15 @@
 		color: rgba(0,0,0,.87);
 		position: relative;
 	}
-	.portlet-boundary_npmreactlogin_ .chip .avatar {
+	#react-root .chip .avatar {
 		margin-right: 2px;
 	}
-	.portlet-boundary_npmreactlogin_ .chip .avatar img {
+	#react-root .chip .avatar img {
 		width: 24px;
 		height: 24px;
 		margin-right: 0px !important;
 	}
-	.portlet-boundary_npmreactlogin_ .list__tile__action {
+	#react-root .list__tile__action {
 		min-width: 25px;
 	}
 	#banner .application--wrap {
