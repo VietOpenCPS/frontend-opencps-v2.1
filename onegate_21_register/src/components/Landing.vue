@@ -33,7 +33,7 @@
                   :placeholder="applicantType ? 'Số CMND/ Hộ chiếu' : 'Mã số thuế'"
                   v-model="applicantIdNo"
                   box
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  :rules="applicantType ? [rules.required] : [rules.required, rules.taxCode]"
                   required
                 ></v-text-field>
               </v-flex>
@@ -191,6 +191,15 @@ export default {
       passWord: (value) => {
         const pattern = /^(?![0-9]{6,})[0-9a-zA-Z]{6,}$/
         return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+      },
+      taxCode: (value) => {
+        if (value.length === 10) {
+          const pattern = /^(([0-9]{10,10}))$/
+          return pattern.test(value) || 'Mã số thuế gồm 10 hoặc 13 ký tự 0-9'
+        } else {
+          const pattern = /^(([0-9]{13,13}))$/
+          return pattern.test(value) || 'Mã số thuế gồm 10 hoặc 13 ký tự 0-9'
+        }
       }
     }
   }),
