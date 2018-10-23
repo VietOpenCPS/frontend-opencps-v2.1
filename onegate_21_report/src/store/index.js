@@ -100,8 +100,8 @@ export const store = new Vuex.Store({
               param.params['fromFinishDate'] = filter.fromDate
               param.params['toFinishDate'] = filter.toDate
             } else if (filter.document === 'REPORT_09') {
-              param.params['fromReceiveNotDoneDate'] = filter.fromDate
-              param.params['toReceiveNotDoneDate'] = filter.toDate
+              param.params['fromReleaseDate'] = filter.fromDate
+              param.params['toReleaseDate'] = filter.toDate
             } else {
               param.params['fromReceiveDate'] = filter.fromDate
               param.params['toReceiveDate'] = filter.toDate
