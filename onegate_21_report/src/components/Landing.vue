@@ -331,7 +331,7 @@ export default {
             window.open(result, '_blank')
           })
         } else {
-          vm.agencyLists = []
+          // vm.agencyLists = []
         }
       })
     },
@@ -370,7 +370,7 @@ export default {
             vm.isShowLoading = false
           })
         } else {
-          vm.agencyLists = []
+          // vm.agencyLists = []
           vm.isShowLoading = false
         }
       })
@@ -384,7 +384,8 @@ export default {
           year: vm.year,
           month: vm.month,
           fromDate: vm.fromDate,
-          toDate: vm.toDate
+          toDate: vm.toDate,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
     },
@@ -397,7 +398,8 @@ export default {
           year: vm.year,
           month: vm.month,
           fromDate: vm.fromDate,
-          toDate: vm.toDate
+          toDate: vm.toDate,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
     },
@@ -410,7 +412,8 @@ export default {
           year: vm.year,
           month: vm.month,
           fromDate: vm.fromDate,
-          toDate: vm.toDate
+          toDate: vm.toDate,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
     },
@@ -424,7 +427,8 @@ export default {
           year: vm.year,
           month: vm.month,
           fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted
+          toDate: vm.toDateFormatted,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
     },
@@ -438,7 +442,8 @@ export default {
           year: vm.year,
           month: vm.month,
           fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted
+          toDate: vm.toDateFormatted,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
     },
