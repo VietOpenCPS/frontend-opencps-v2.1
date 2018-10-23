@@ -96,8 +96,16 @@ export const store = new Vuex.Store({
           } else {
             requestURL = '/o/rest/v2/dossiers'
             param.params['sort'] = 'domainCode'
-            param.params['fromReceiveDate'] = filter.fromDate
-            param.params['toReceiveDate'] = filter.toDate
+            if (filter.document === 'REPORT_05') {
+              param.params['fromFinishDate'] = filter.fromDate
+              param.params['toFinishDate'] = filter.toDate
+            } else if (filter.document === 'REPORT_09') {
+              param.params['fromReceiveNotDoneDate'] = filter.fromDate
+              param.params['toReceiveNotDoneDate'] = filter.toDate
+            } else {
+              param.params['fromReceiveDate'] = filter.fromDate
+              param.params['toReceiveDate'] = filter.toDate
+            }
             axios.get(requestURL, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
