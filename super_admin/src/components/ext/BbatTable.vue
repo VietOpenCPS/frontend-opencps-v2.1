@@ -44,13 +44,13 @@
         border-top: 1px solid #dcdcdc;
     ">
         <v-progress-linear v-if="showLoadingTable" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
-        <v-flex xs12>
+        <v-flex xs12 v-if="pageTotalCounter > 0">
           <tiny-pagination :total="pageTotalCounter" :page="page" @tiny:change-page="paggingData" custom-class="custom-tiny-class"></tiny-pagination> 
         </v-flex>
       </v-layout>
-      <div style="overflow: hidden;overflow-x: scroll;border-left: 1px solid gainsboro;">
-        <div id="table_filter" v-show="showFilter"></div>
-        <div id="table_database"></div>
+      <div  v-if="dataSocket['tableData'] !== '[]'" style="overflow: hidden;overflow-x: scroll;border-left: 1px solid gainsboro;">
+        <div :id="'table_filter_' + tableName" v-show="showFilter"></div>
+        <div :id="'table_database_' + tableName"></div>
       </div>
     </v-card>
     <v-menu
@@ -155,9 +155,23 @@
             vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')[dataObj.title]
             vm.generateTable()
           }
-          if (vm.dataSocket['pageTotalCounter'] !== null && vm.dataSocket['pageTotalCounter'] !== undefined) {
+          if (dataObj.respone === 'pageTotalCounter') {
             vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
             vm.showLoadingTable = false
+          } else if (dataObj.respone === 'listTableMenu') {
+            // console.log(vm.$parent.$parent.$parent.items[2])
+            let listTableMenu = vm.$store.getters.getlistTableMenu
+            let dataMenu = eval('( ' + vm.dataSocket['listTableMenu'] + ' )')
+            for (let key in dataMenu) {
+              listTableMenu[2].children.push({
+                icon: 'arrow_right',
+                link: '/table/' + dataMenu[key][1],
+                code: dataMenu[key][1],
+                text: dataMenu[key][2]
+              })
+            }
+            console.log('menu: ' , listTableMenu)
+            vm.$store.commit('setlistTableMenu', listTableMenu)
           }
           if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get') {
             let currentPath = vm.$router.history.current.path
@@ -269,7 +283,7 @@
             }
             colWidths.push(columns[key]['width'])
           }
-          window.$('#table_filter').jexcel({
+          window.$('#table_filter_' + vm.tableName).jexcel({
             data: [dataFilter],
             colHeaders: objectConfig.headersName,
             colWidths: colWidths,
@@ -301,19 +315,19 @@
             columns: columns
           })
         } else {
-          window.$('#table_filter').jexcel('destroy');
+          window.$('#table_filter_' + vm.tableName).jexcel('destroy');
         }
       },
       generateTable () {
         let vm = this
-        let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )');
+        let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )')
         let columns = eval('( ' + objectConfig.columns + ' )')
         let colWidths = []
         for (let key in columns) {
           colWidths.push(columns[key]['width'])
         }
         vm.columnsDataFilter = columns
-        window.$('#table_database').jexcel({
+        window.$('#table_database_' + vm.tableName).jexcel({
           data: eval('( ' + vm.dataSocket['tableData'] + ' )'),
           colHeaders: objectConfig.headersName,
           colWidths: colWidths,
@@ -326,7 +340,7 @@
             vm.show(window.event); 
           },
           onsort: function (e) {
-            window.$('#table_database').jexcel('orderBy', window.$(e).next().val())
+            window.$('#table_database_' + vm.tableName).jexcel('orderBy', window.$(e).next().val())
           },
           columns: columns
         })
