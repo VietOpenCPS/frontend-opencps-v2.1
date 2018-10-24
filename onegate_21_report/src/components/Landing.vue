@@ -248,6 +248,7 @@ export default {
           vm.agencyLists = result
           if (vm.agencyLists !== null && vm.agencyLists !== undefined && vm.agencyLists.length > 0) {
             vm.govAgency = vm.agencyLists[0]
+            console.log('run created')
             vm.doPrintReport()
           }
         })
@@ -285,6 +286,7 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
+      console.log('run watch')
       vm.doPrintReport()
     },
     fromDate (val) {
@@ -354,7 +356,7 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all') {
+          if (filter['agency'] === 'all' || !filter['agency']) {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
