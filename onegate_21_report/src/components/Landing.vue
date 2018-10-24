@@ -310,7 +310,7 @@ export default {
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
       }
-      vm.pdfBlob = null
+      // vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
