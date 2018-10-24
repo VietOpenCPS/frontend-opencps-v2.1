@@ -25,15 +25,19 @@
           {{nameScreen}}
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn dark flat v-on:click.native="deleteRecord">
+          <v-icon>delete</v-icon> &nbsp;
+          Xoá bản ghi
+        </v-btn>
         <v-icon dark>more_vert</v-icon>
-        <v-btn dark icon>
+        <v-btn dark icon v-on:click.native="backToList">
           <v-icon>undo</v-icon>
         </v-btn>
       </v-toolbar>
       <div class="grid-list mt-2" v-if="showDetailForm">
-        <bbat-table-editor-component :table-config="dataSocket.tableConfig" :detail-data="dataSocket.detail"></bbat-table-editor-component>
+        <bbat-table-editor-component ref="bbatForm" :table-config="dataSocket.tableConfig" :detail-data="dataSocket.detail" :id="id"></bbat-table-editor-component>
       </div>
-      <v-alert v-else
+      <v-alert v-if="noDetail"
         :value="true"
         color="warning"
         icon="priority_high"
@@ -67,18 +71,30 @@
         ],
         nameScreen: '',
         showDetailForm: false,
+        noDetail: false,
         dataSocket: {}
       }
     },
     created () {
       var vm = this
       vm.$nextTick(function () {
+        vm.noDetail = false
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && vm.dataSocket['detail'] !== '[]') {
-            vm.nameScreen = eval('( ' + vm.dataSocket['detail'] + ' )')[0][dataObj.title]
+          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+            if (vm.dataSocket['detail'] !== '[]') {
+              vm.nameScreen = eval('( ' + vm.dataSocket['detail'] + ' )')[0][dataObj.title]
+              vm.showDetailForm = true
+              vm.noDetail = false
+            } else {
+              vm.noDetail = true
+            }
+          }
+          if (String(vm.id) === '0') {
+            vm.nameScreen = 'Thêm mới dữ liệu'
             vm.showDetailForm = true
+            vm.noDetail = false
           }
         }
         setTimeout(() => {
@@ -87,7 +103,7 @@
               type: 'admin',
               cmd: 'get',
               config: true,
-              code: 'abc',
+              code: vm.$router.history.current.params.tableName,
               respone: 'tableConfig'
             }
           )
@@ -95,13 +111,13 @@
             {
               type: 'admin',
               cmd: 'get',
-              code: 'abc',
+              code: vm.$router.history.current.params.tableName,
               respone: 'detail',
               responeType: 'detail',
               filter: [
                 {
                   'key': 'id',
-                  'value': vm.id,
+                  'value_filter': vm.id,
                   'compare': '=',
                   'type': 'number'
                 }
@@ -112,6 +128,26 @@
       })
     },
     methods: {
+      backToList () {
+        let vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push(currentPath.substring(0, currentPath.indexOf('/editor/')))
+      },
+      deleteRecord () {
+        let vm = this
+        var result = confirm('Bạn có muốn xoá bản ghi này?');
+        if (result) {
+          vm.$socket.sendObj(
+            {
+              type: 'admin',
+              cmd:  'delete',
+              respone: 'detail',
+              id: vm.id,
+              code: vm.$router.history.current.params.tableName
+            }
+          )
+        }
+      }
     }
   }
 </script>
