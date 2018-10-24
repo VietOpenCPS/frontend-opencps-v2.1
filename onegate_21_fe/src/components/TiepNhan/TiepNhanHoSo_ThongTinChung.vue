@@ -160,6 +160,8 @@
           thongTinChungHoSoTemp.dueDate = data.receivingDuedate
         } else if (data.receivingDuedate && !data.editable) {
           thongTinChungHoSoTemp.dueDate = data.receivingDuedate ? vm.dateTimeView(data.receivingDuedate) : data.dueDate
+        } else {
+          thongTinChungHoSoTemp.dueDate = data.dueDate
         }
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable
