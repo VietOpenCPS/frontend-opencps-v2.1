@@ -46,7 +46,7 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               dataReturn.unshift({
-                'itemCode': '',
+                'itemCode': 'all',
                 'itemName': 'toàn bộ'
               })
               resolve(dataReturn)

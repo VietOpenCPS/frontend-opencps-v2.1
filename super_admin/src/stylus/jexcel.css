@@ -43,6 +43,7 @@
 .jexcel > thead > tr, .jexcel > tbody > tr
 {
     display:flex;
+    min-height: 36px;
 }
 .jexcel > thead > tr > td 
 {
@@ -488,3 +489,67 @@ table.jexcel > tbody > tr:nth-child(even) > td:first-child {
 .jexcel.bossanova-ui {
     width: 100%;
 }
+
+body .vue-tiny-pagination .v-text-field {
+    padding: 0;
+}
+body .tiny-pagination {
+    display: flex;
+    list-style: none;
+    margin: .2rem 0;
+    padding: .2rem 0
+  }
+  
+  body .tiny-pagination li:first-child {
+    border-left: 1px solid #ccc
+  }
+  
+  body .tiny-pagination li {
+    margin: 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    height: 30px;
+    width: 30px;
+  }
+  
+  body .tiny-pagination li .pagination__navigation {
+    border: 0
+  }
+  
+  body .vue-tiny-pagination {
+    display: -webkit-box;
+    display: flex
+  }
+  
+  body .vue-tiny-pagination>div {
+    max-width: 120px !important
+  }
+  body .vue-tiny-pagination .material-icons {
+    line-height: 29px;
+    width: 30px;
+    font-size: 18px;
+  }
+  .v-menu__content {
+    -webkit-box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+  }
+  .vue-tiny-pagination .v-select:not(.v-text-field--single-line) .v-select__slot > input {
+    text-align: right;
+  }
+  .text-bold {
+    font-weight: 700;
+    }
+  #table_filter thead {
+    display: none;
+  }
+  #table_filter tbody tr {
+    min-height: 36px !important;
+  }
+  body .jexcel_corner {
+    display: none;
+  }
+  .pagination__navigation--disabled {
+    opacity: .6;
+    pointer-events: none;
+  }

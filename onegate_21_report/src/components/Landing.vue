@@ -354,10 +354,10 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency']) {
-            putData['flagAgency'] = 0
-          } else {
+          if (filter['agency'] === 'all') {
             putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
           }
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
