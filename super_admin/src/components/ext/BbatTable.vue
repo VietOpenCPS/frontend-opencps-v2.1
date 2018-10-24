@@ -150,49 +150,42 @@
         }
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
-          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined) {
-            vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')[dataObj.title]
-            vm.generateTable()
-          }
-          if (dataObj.respone === 'pageTotalCounter') {
-            vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
-            vm.showLoadingTable = false
-          } else if (dataObj.respone === 'listTableMenu') {
-            // console.log(vm.$parent.$parent.$parent.items[2])
-            let listTableMenu = vm.$store.getters.getlistTableMenu
-            let dataMenu = eval('( ' + vm.dataSocket['listTableMenu'] + ' )')
-            for (let key in dataMenu) {
-              listTableMenu[2].children.push({
-                icon: 'arrow_right',
-                link: '/table/' + dataMenu[key][1],
-                code: dataMenu[key][1],
-                text: dataMenu[key][2]
+          if (dataObj['status'] === '200') {
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined) {
+              vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')[dataObj.title]
+              vm.generateTable()
+            }
+            if (dataObj.respone === 'pageTotalCounter') {
+              vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
+              vm.showLoadingTable = false
+            } else if (dataObj.respone === 'listTableMenu') {
+              // console.log(vm.$parent.$parent.$parent.items[2])
+              let listTableMenu = vm.$store.getters.getlistTableMenu
+              let dataMenu = eval('( ' + vm.dataSocket['listTableMenu'] + ' )')
+              for (let key in dataMenu) {
+                listTableMenu[2].children.push({
+                  icon: 'arrow_right',
+                  link: '/table/' + dataMenu[key][1],
+                  code: dataMenu[key][1],
+                  text: dataMenu[key][2]
+                })
+              }
+              console.log('menu: ' , listTableMenu)
+              vm.$store.commit('setlistTableMenu', listTableMenu)
+            }
+            if (dataObj['cmd'] !== 'get') {
+              let currentPath = vm.$router.history.current.path
+              vm.$router.push({
+                path: currentPath.substring(0, currentPath.indexOf('/editor/')),
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
               })
             }
-            console.log('menu: ' , listTableMenu)
-            vm.$store.commit('setlistTableMenu', listTableMenu)
-          }
-          if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get') {
-            let currentPath = vm.$router.history.current.path
-            vm.$router.push({
-              path: currentPath.substring(0, currentPath.indexOf('/editor/')),
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
           }
         }
         setTimeout(() => {
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd: 'get',
-              config: true,
-              code: vm.$router.history.current.params.tableName,
-              respone: 'tableConfig'
-            }
-          )
           vm.getData()
         }, 10)
       })
@@ -235,6 +228,15 @@
         for (var key in vm.filterData) {
           vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key]
         }
+        vm.$socket.sendObj(
+          {
+            type: 'admin',
+            cmd: 'get',
+            config: true,
+            code: vm.$router.history.current.params.tableName,
+            respone: 'tableConfig'
+          }
+        )
         vm.$socket.sendObj(
           {
             type: 'admin',

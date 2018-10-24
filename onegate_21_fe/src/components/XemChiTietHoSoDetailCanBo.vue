@@ -73,7 +73,7 @@
                 <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                   <span>Chuyển đến bởi: </span>
                   <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                  <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
+                  <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
                     <span> - Ý kiến: </span>
                     <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                   </span>

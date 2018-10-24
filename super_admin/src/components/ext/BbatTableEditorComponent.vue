@@ -51,7 +51,7 @@
     <v-layout v-else row wrap>
       <v-flex xs12>
         <div id="video-preloader" class="video-preloader">
-          <video id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
+          <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
       </div>
       </v-flex>
     </v-layout>
@@ -80,7 +80,12 @@
     created() {
       var vm = this
       vm.$nextTick(function() {
-        vm.detailForm = eval('( ' + eval('( ' + vm.tableConfig + ' )').detailColumns + ' )')
+        if ((eval('( ' + vm.tableConfig + ' )').detailColumns !== '')) {
+          vm.detailForm = eval('( ' + eval('( ' + vm.tableConfig + ' )').detailColumns + ' )')
+        } else {
+          let videoElement = document.getElementById('editor-video-preloader')
+          videoElement.play()
+        }
         if (vm.detailData !== null && vm.detailData !== undefined) {
           vm.data = eval('( ' + vm.detailData + ' )')[0]
         } else {
