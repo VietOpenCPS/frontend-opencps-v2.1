@@ -117,6 +117,15 @@
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
+              <!-- Action rollBack -->
+              <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
+                @click="rollBackDossier(true)"
+                :loading="loadingAction"
+                :disabled="loadingAction"
+              >
+                Quay lại bước trước
+                <span slot="loader">Loading...</span>
+              </v-btn>
               <!-- Action special -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && checkActionSpecial(btnStepsDynamics)">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -166,7 +175,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable && currentUser.userId === thongTinChiTietHoSo.lastActionUserId" @click="rollBack()">Quay lui hồ sơ</v-btn>
+              <v-btn color="primary" v-if="rollbackable" @click="rollBackDossier()">Quay lại bước trước</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -554,6 +563,7 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
+      console.log('user', this.$store.getters.loadingInitData.user)
       return this.$store.getters.loadingInitData.user
     }
   },
@@ -1110,6 +1120,23 @@ export default {
         vm.btnStateVisible = false
       })
     },
+    rollBackDossier (isSpecial) {
+      var vm = this
+      let result = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        actionCode: 9000
+      }
+      if (isSpecial) {
+        vm.doActionSpecial(result)
+      } else {
+        vm.$store.dispatch('postAction', result).then(function (result) {
+          vm.getNextActions()
+          vm.rollbackable = false
+          vm.btnStateVisible = true
+        }).catch(function (reject) {
+        })
+      }
+    },
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
       var validPhanCong = true
@@ -1365,8 +1392,10 @@ export default {
     doActionSpecial (filter) {
       var vm = this
       let currentQuery = vm.$router.history.current.query
+      vm.loadingAction = true
       vm.$store.dispatch('postAction', filter).then(function (result) {
         console.log('result======', result)
+        vm.loadingAction = false
         vm.dialogActionProcess = false
         vm.loadingActionProcess = false
         vm.btnStateVisible = false
@@ -1388,6 +1417,7 @@ export default {
         })
       }).catch(function (reject) {
         vm.loadingActionProcess = false
+        vm.loadingAction = false
       })
     },
     getNextActions () {
