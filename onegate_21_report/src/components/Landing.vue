@@ -316,6 +316,11 @@ export default {
         if (result !== null && result !== undefined) {
           // vm.agencyLists = result
           putData = result
+          if (filter['agency'] === 'all' || !filter['agency']) {
+            putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
+          }
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
             putData['month'] = vm.month
