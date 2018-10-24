@@ -42,10 +42,10 @@
               <!--  -->
               <v-flex xs12 sm2></v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="viaPortal === 2 || viaPortal === '2'">
+              <v-flex xs12 sm2 v-if="(viaPortal === 2 || viaPortal === '2') && data_payment.shipAmount !== 0">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="viaPortal === 2 || viaPortal === '2'">
+              <v-flex xs12 sm3 v-if="(viaPortal === 2 || viaPortal === '2') && data_payment.shipAmount !== 0">
                 <v-text-field
                   @keyup="changeFee"
                   v-model="data_payment.shipAmount"
@@ -228,7 +228,7 @@ export default {
         } else if (vm.payments.requestPayment === 2) {
           let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
           let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
-          if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+          if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
             vm.totalFee = feeAmount + serviceAmount + shipAmount
           } else {
             vm.totalFee = feeAmount + serviceAmount
@@ -237,7 +237,7 @@ export default {
           let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
           let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
           let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
-          if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+          if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
             vm.feeTong = feeAmount + serviceAmount + shipAmount
             vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
           } else {
@@ -291,7 +291,7 @@ export default {
       } else if (val.requestPayment === 2) {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
-        if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+        if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
           vm.totalFee = feeAmount + serviceAmount + shipAmount
         } else {
           vm.totalFee = feeAmount + serviceAmount
@@ -300,7 +300,7 @@ export default {
         let advanceAmount = Number(val.advanceAmount.toString().replace(/\./g, ''))
         let serviceAmount = Number(val.serviceAmount.toString().replace(/\./g, ''))
         let shipAmount = Number(val.shipAmount.toString().replace(/\./g, ''))
-        if (vm.viaPortal === 2 || vm.viaPortal === '2') {
+        if ((vm.viaPortal === 2 || vm.viaPortal === '2') && shipAmount !== 0) {
           vm.feeTong = feeAmount + serviceAmount + shipAmount
           vm.totalFee = feeAmount + serviceAmount + shipAmount - advanceAmount
         } else {

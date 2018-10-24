@@ -41,6 +41,8 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             }
           }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
           axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -78,6 +80,8 @@ export const store = new Vuex.Store({
           }
           let requestURL = ''
           if (filter.document === 'REPORT_01') {
+            // test local
+            // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = '/o/rest/statistics'
             axios.get(requestURL, param).then(function (response) {
               let serializable = response.data

@@ -164,7 +164,7 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.contactEmail"
-                    :rules="[rules.email]"
+                    :rules="thongTinChuHoSo.contactEmail ? [rules.email] : ''"
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -343,8 +343,8 @@
                       </content-placeholders>
                       <v-text-field
                       v-else
-                      :rules="[rules.email]"
                       v-model="thongTinNguoiNopHoSo.delegateEmail"
+                      :rules="thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : ''"
                       ></v-text-field>
                     </v-flex>
                   </v-layout>
