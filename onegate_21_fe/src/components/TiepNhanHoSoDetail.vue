@@ -3,7 +3,7 @@
     <div class="row-header">
       <div class="background-triangle-big"> 
         <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
-        <span v-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
+        <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
         <span v-else>THÊM MỚI HỒ SƠ</span> 
       </div>
       <div class="layout row wrap header_tools row-blue">
@@ -201,6 +201,8 @@ export default {
     paymentProfile: {},
     briefNote: '',
     receiveDateEdit: '',
+    editableDate: false,
+    dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
@@ -248,6 +250,8 @@ export default {
                 result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
                 result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
                 result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                 // if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 2 && resAction.payment.requestPayment !== '2') {
@@ -431,7 +435,7 @@ export default {
               }
             }
             var payloadDate = {
-              'dueDate': tempData.dueDate,
+              'dueDate': vm.editableDate && tempData.dueDate ? tempData.dueDate : vm.dueDateEdit,
               'receiveDate': vm.receiveDateEdit
             }
             let dataPostAction = {
