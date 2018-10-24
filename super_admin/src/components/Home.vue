@@ -106,121 +106,31 @@
     data: () => ({
       dialog: false,
       drawer: null,
-      items: [
-        {
-          icon: 'keyboard_arrow_up',
-          'icon-alt': 'keyboard_arrow_down',
-          text: 'Nghiệp vụ',
-          model: true,
-          children: [
-            {
-              icon: 'group_add',
-              link: '/can_bo',
-              code: 'can_bo',
-              text: 'Cán bộ'
-            },
-            {
-              icon: 'filter_1',
-              link: '/thu_tuc_hanh_chinh',
-              code: 'thu_tuc_hanh_chinh',
-              text: 'Thủ tục hành chính'
-            },
-            {
-              icon: 'filter_2',
-              link: '/mau_ho_so',
-              code: 'mau_ho_so',
-              text: 'Mẫu hồ sơ'
-            },
-            {
-              icon: 'filter_3',
-              link: '/quy_trinh_thu_tuc',
-              code: 'quy_trinh_thu_tuc',
-              text: 'Quy trình thủ tục'
-            },
-            {
-              icon: 'filter_4',
-              link: '/dich_vu_cong',
-              code: 'dich_vu_cong',
-              text: 'Dịch vụ công'
-            },
-            {
-              icon: 'import_export',
-              link: '/import/tool_import',
-              code: 'import',
-              text: 'Import'
-            }
-          ]
-        },
-        {
-          icon: 'keyboard_arrow_up',
-          'icon-alt': 'keyboard_arrow_down',
-          text: 'Dữ liệu dùng chung',
-          model: false,
-          children: [
-            {
-              icon: 'arrow_right',
-              link: '/opencps_dictcollection',
-              code: 'opencps_dictcollection',
-              text: 'Nhóm danh mục'
-            },
-            {
-              icon: 'arrow_right',
-              link: '/opencps_dictgroup',
-              code: 'opencps_dictgroup',
-              text: 'Nhóm dữ liệu danh mục'
-            },
-            {
-              icon: 'arrow_right',
-              link: '/opencps_dictitem',
-              code: 'opencps_dictitem',
-              text: 'Dữ liệu danh mục'
-            },
-            {
-              icon: 'arrow_right',
-              link: '/opencps_holiday',
-              code: 'opencps_holiday',
-              text: 'Ngày nghỉ lễ'
-            },
-            {
-              icon: 'arrow_right',
-              link: '/opencps_worktime',
-              code: 'opencps_worktime',
-              text: 'Ngày làm việc trong tuần'
-            },
-            {
-              icon: 'arrow_right',
-              link: '/opencps_notificationtemplate',
-              code: 'opencps_notificationtemplate',
-              text: 'Mẫu thông báo'
-            }
-          ]
-        },
-        {
-          icon: 'keyboard_arrow_up',
-          'icon-alt': 'keyboard_arrow_down',
-          text: 'Bảng dữ liệu DB',
-          model: false,
-          children: [
-          ]
-        },
-        {
-          icon: 'keyboard_arrow_up',
-          'icon-alt': 'keyboard_arrow_down',
-          text: 'Cấu hình',
-          model: false,
-          children: [
-            {
-              icon: 'apps',
-              link: '/table/opencps_adminconfig',
-              code: 'opencps_adminconfig',
-              text: 'Danh sách màn hình'
-            }
-          ]
-        }
-      ]
+      dataSocket: {}
     }),
     props: {
       tableName: String
+    },
+    computed: {
+      items () {
+        return this.$store.getters.getlistTableMenu
+      },
+    },
+    created () {
+      var vm = this
+        setTimeout(() => {
+          vm.$socket.sendObj(
+            {
+              type: 'admin',
+              cmd: 'get',
+              responeType: 'menu',
+              code: 'opencps_adminconfig',
+              respone: 'listTableMenu',
+              start: -1,
+              end: -1
+            }
+          )
+        }, 10)
     }
   }
 </script>
