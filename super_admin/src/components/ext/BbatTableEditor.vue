@@ -35,7 +35,7 @@
         </v-btn>
       </v-toolbar>
       <div class="grid-list mt-2" v-if="showDetailForm">
-        <bbat-table-editor-component ref="bbatForm" :table-config="dataSocket.tableConfig" :detail-data="dataSocket.detail" :id="id"></bbat-table-editor-component>
+        <bbat-table-editor-component ref="bbatForm" :table-config="dataSocket.tableConfig" :detail-data="dataSocket.detail" :id="id" :table-name="tableName"></bbat-table-editor-component>
       </div>
       <v-alert v-if="noDetail"
         :value="true"

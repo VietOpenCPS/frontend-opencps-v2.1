@@ -45,7 +45,7 @@
               v-for="(child, i) in item.children"
               :key="i"
               :class='{"list__active": tableName === child.code}'
-              :to="child.link"
+              :to="child.link + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1"
             >
               <v-list-tile-action v-if="child.icon">
                 <v-icon>{{ child.icon }}</v-icon>

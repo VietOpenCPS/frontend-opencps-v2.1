@@ -27,14 +27,14 @@ export const store = new Vuex.Store({
           },
           {
             icon: 'filter_1',
-            link: '/table/thu_tuc_hanh_chinh',
-            code: 'thu_tuc_hanh_chinh',
+            link: '/table/opencps_serviceinfo',
+            code: 'opencps_serviceinfo',
             text: 'Thủ tục hành chính'
           },
           {
             icon: 'filter_2',
-            link: '/table/mau_ho_so',
-            code: 'mau_ho_so',
+            link: '/table/opencps_dossiertemplate',
+            code: 'opencps_dossiertemplate',
             text: 'Mẫu hồ sơ'
           },
           {
@@ -45,8 +45,8 @@ export const store = new Vuex.Store({
           },
           {
             icon: 'filter_4',
-            link: '/table/dich_vu_cong',
-            code: 'dich_vu_cong',
+            link: '/table/opencps_serviceconfig',
+            code: 'opencps_serviceconfig',
             text: 'Dịch vụ công'
           },
           {
@@ -98,6 +98,12 @@ export const store = new Vuex.Store({
             link: '/table/opencps_notificationtemplate',
             code: 'opencps_notificationtemplate',
             text: 'Mẫu thông báo'
+          },
+          {
+            icon: 'arrow_right',
+            link: '/table/opencps_workingunit',
+            code: 'opencps_workingunit',
+            text: 'Tổ chức, phòng ban'
           }
         ]
       },

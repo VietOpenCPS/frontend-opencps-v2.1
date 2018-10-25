@@ -11,8 +11,13 @@ import 'codemirror/theme/base16-light.css'
 import 'codemirror/mode/javascript/javascript.js'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import VueNativeSock from 'vue-native-websocket'
+import VueContentPlaceholders from 'vue-content-placeholders'
 
-Vue.use(VueNativeSock, 'ws://localhost:8080/o/socket-gate', 
+Vue.use(VueContentPlaceholders)
+
+let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
+
+Vue.use(VueNativeSock, 'ws://localhost:8080/o/socket-gate?groupId='+ groupId, 
   {
     store: store,
     format: 'json',

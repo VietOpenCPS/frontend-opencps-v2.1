@@ -465,24 +465,24 @@ table.jexcel > tbody > tr:nth-child(even) > td:first-child {
     background: #efefef;
 }
 
-#table_filter tr {
+.table_filter tr {
     position: relative;
 }
-#table_filter > table.jexcel {
+.table_filter > table.jexcel {
     margin-top: 0;
     background-color: #FFF59D;
 }
-#table_filter > table.jexcel > tbody > tr:first-child > td:first-child,
-#table_filter > .jexcel > tbody > tr.selected > td:first-child {
+.table_filter > table.jexcel > tbody > tr:first-child > td:first-child,
+.table_filter > .jexcel > tbody > tr.selected > td:first-child {
     background: #fff690 !important;
     border-right: 0;
     color: transparent;
 }
 
-#table_filter .highlight {
+.table_filter .highlight {
     border: none !important;
 }
-#table_filter .jexcel > tbody > tr:first-child > td {
+.table_filter .jexcel > tbody > tr:first-child > td {
     border-bottom: 1px;
 }
 
@@ -540,10 +540,10 @@ body .tiny-pagination {
   .text-bold {
     font-weight: 700;
     }
-  #table_filter thead {
+  .table_filter thead {
     display: none;
   }
-  #table_filter tbody tr {
+  .table_filter tbody tr {
     min-height: 36px !important;
   }
   body .jexcel_corner {
@@ -552,4 +552,23 @@ body .tiny-pagination {
   .pagination__navigation--disabled {
     opacity: .6;
     pointer-events: none;
+  }
+
+  body .v-text-field--box.v-textarea .v-text-field__slot {
+    margin-right: -40px;
+  }
+  body .error--text {
+    color: #C62828 !important;
+    caret-color: #C62828 !important;
+  }
+  body .vue-content-placeholders-text__line {
+    min-height: 44px;
+    width: 100% !important;
+    margin-bottom: 8px;
+    border-bottom: 1px solid;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+  body .v-select .v-input__icon .v-icon {
+    font-size: 20px;
   }
