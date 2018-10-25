@@ -146,8 +146,8 @@
           serviceName: data.serviceName,
           dossierTemplateName: data.dossierTemplateName,
           dossierNo: data.dossierNo ? data.dossierNo : '',
-          receiveDate: data.editable ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
-          dueDate: data.editable ? data.receivingDuedate : data.dueDate,
+          dueDate: null,
+          receiveDate: data.receivingDate ? vm.dateTimeView(data.receivingDate) : data.receiveDate,
           durationDate: data.durationDate,
           dossierId: data.dossierId,
           dossierIdCTN: data.dossierIdCTN,
@@ -155,6 +155,13 @@
           dossierStatusText: data.dossierStatusText,
           durationUnit: data.durationUnit,
           durationCount: data.durationCount
+        }
+        if (data.receivingDuedate && data.editable) {
+          thongTinChungHoSoTemp.dueDate = data.receivingDuedate
+        } else if (data.receivingDuedate && !data.editable) {
+          thongTinChungHoSoTemp.dueDate = data.receivingDuedate ? vm.dateTimeView(data.receivingDuedate) : data.dueDate
+        } else {
+          thongTinChungHoSoTemp.dueDate = data.dueDate
         }
         vm.thongTinChungHoSo = thongTinChungHoSoTemp
         vm.editable = data.editable

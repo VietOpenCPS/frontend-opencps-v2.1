@@ -24,11 +24,11 @@
                 <p class="mt-1 mb-0">{{currency(Number(paymentProfile.serviceAmount))}} &nbsp;&nbsp; vnđ</p>
               </v-flex>
               <v-flex xs12 sm2></v-flex>
-              <v-flex xs12 sm2 v-if="detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2'">
+              <v-flex xs12 sm2 v-if="(detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2') && paymentProfile.shipAmount !== 0">
                 <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
               </v-flex>
               <v-flex xs12 sm3>
-                <p class="mt-1 mb-0" v-if="detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2'">
+                <p class="mt-1 mb-0" v-if="(detailDossier.viaPostal === 2 || detailDossier.viaPostal === '2') && paymentProfile.shipAmount !== 0">
                   {{currency(Number(paymentProfile.shipAmount))}} &nbsp;&nbsp; vnđ
                 </p>
               </v-flex>
@@ -218,7 +218,7 @@ export default {
       var vm = this
       if (vm.paymentProfile) {
         vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount)
-        if (vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') {
+        if ((vm.detailDossier.viaPostal === 2 || vm.detailDossier.viaPostal === '2') && vm.paymentProfile.shipAmount !== 0) {
           vm.feeTong = Number(vm.paymentProfile.feeAmount) + Number(vm.paymentProfile.serviceAmount) + Number(vm.paymentProfile.shipAmount)
         }
         console.log('feeTong', vm.feeTong)

@@ -73,7 +73,7 @@
                 <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
                   <span>Chuyển đến bởi: </span>
                   <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                  <span v-if="thongTinChiTietHoSo.lastActionNote&&thongTinChiTietHoSo.lastActionNote!=='null'">
+                  <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
                     <span> - Ý kiến: </span>
                     <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                   </span>
@@ -118,14 +118,14 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Action rollBack -->
-              <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
+              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
                 @click="rollBackDossier(true)"
                 :loading="loadingAction"
                 :disabled="loadingAction"
               >
                 Quay lại bước trước
                 <span slot="loader">Loading...</span>
-              </v-btn>
+              </v-btn> -->
               <!-- Action special -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && checkActionSpecial(btnStepsDynamics)">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
