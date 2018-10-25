@@ -310,11 +310,9 @@ export default {
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
       }
-      // vm.pdfBlob = null
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
-          // vm.agencyLists = result
           putData = result
           if (filter['agency'] === 'all' || !filter['agency']) {
             putData['flagAgency'] = 1
@@ -338,7 +336,6 @@ export default {
             window.open(result, '_blank')
           })
         } else {
-          // vm.agencyLists = []
         }
       })
     },
