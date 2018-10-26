@@ -19,6 +19,7 @@ export const store = new Vuex.Store({
     error: null,
     user: null,
     index: 0,
+    kysoSuccess: false,
     activeGetCounter: false,
     activeLoadingDataHoSo: false,
     trangThaiHoSoList: null,
@@ -2694,6 +2695,9 @@ export const store = new Vuex.Store({
     setCommentItems (state, payload) {
       state.commentItems = payload
     },
+    setKysoSuccess (state, payload) {
+      state.kysoSuccess = payload
+    },
     setActiveGetCounter (state, payload) {
       state.activeGetCounter = payload
     },
@@ -2765,6 +2769,9 @@ export const store = new Vuex.Store({
     },
     thongTinChuHoSoBindChuyenPhat (state) {
       return state.thongTinChuHoSoBindChuyenPhat
+    },
+    kysoSuccess (state) {
+      return state.kysoSuccess
     },
     activeGetCounter (state) {
       return state.activeGetCounter
