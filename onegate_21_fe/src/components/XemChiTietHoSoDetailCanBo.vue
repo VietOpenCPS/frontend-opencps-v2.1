@@ -155,7 +155,7 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
-              <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
+              <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" :dataEsign="dataEsign" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
@@ -439,6 +439,7 @@ export default {
     showPhanCongNguoiThucHien: false,
     showTaoTaiLieuKetQua: false,
     showKyPheDuyetTaiLieu: false,
+    dataEsign: '',
     showTraKetQua: false,
     showThuPhi: false,
     showThanhToanDienTu: false,
@@ -565,6 +566,9 @@ export default {
     currentUser () {
       console.log('user', this.$store.getters.loadingInitData.user)
       return this.$store.getters.loadingInitData.user
+    },
+    kysoSuccess () {
+      return this.$store.getters.kysoSuccess
     }
   },
   created () {
@@ -858,6 +862,7 @@ export default {
         if (result.hasOwnProperty('eSignature') && result.eSignature) {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
+          vm.dataEsign = result
         }
         if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined' && result.returnFiles.length > 0) {
           isPopup = true
@@ -1143,6 +1148,7 @@ export default {
       var validYKien = true
       var validTreHan = true
       var validThanhToanDienTu = true
+      var validKySo = true
       vm.loadingActionProcess = true
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1228,13 +1234,6 @@ export default {
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       }
-      if (vm.showKyPheDuyetTaiLieu) {
-        let resultTmp = vm.$refs.kypheduyettailieu.doExport()
-        console.log('resultTmp', result)
-        if (resultTmp.useKS) {
-          vm.$refs.kypheduyettailieu.kySo(result)
-        }
-      }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
         let note = ''
@@ -1246,7 +1245,19 @@ export default {
         }
         filter['userNote'] = note
       }
-      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
+      if (vm.showKyPheDuyetTaiLieu) {
+        let resultTmp = vm.$refs.kypheduyettailieu.doExport()
+        console.log('resultTmp', result)
+        if (resultTmp.useKS) {
+          // vm.$refs.kypheduyettailieu.kySo(result)
+          if (vm.kysoSuccess) {
+            validKySo = true
+          } else {
+            validKySo = false
+          }
+        }
+      }
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validKySo) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
