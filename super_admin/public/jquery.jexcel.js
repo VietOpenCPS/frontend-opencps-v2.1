@@ -2319,7 +2319,7 @@ var methods = {
             var currentStatus = true;
         }
 
-        if ($.fn.jexcel.ignoreEvents != true) {
+        if ($.fn.jexcel.ignoreEvents != true && $.fn.jexcel.defaults[id] !== null && $.fn.jexcel.defaults[id] !== undefined) {
             if ($.fn.jexcel.defaults[id].onblur) {
                 if (typeof($.fn.jexcel.defaults[id].onblur) == 'function') {
                     if (previousStatus == true && currentStatus == false) {

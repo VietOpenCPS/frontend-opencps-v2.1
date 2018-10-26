@@ -34,7 +34,7 @@
           <v-icon>add_circle</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-layout row wrap style="
+      <v-layout v-if="pageTotalCounter > 0" row wrap style="
         position: fixed;
         bottom: 0;
         width: -webkit-calc( 100% - 300px );
@@ -44,15 +44,31 @@
         border-top: 1px solid #dcdcdc;
     ">
         <v-progress-linear v-if="showLoadingTable" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
-        <v-flex xs12 v-if="pageTotalCounter > 0">
+        <v-flex xs12>
           <tiny-pagination :total="pageTotalCounter" :page="page" @tiny:change-page="paggingData" custom-class="custom-tiny-class"></tiny-pagination> 
         </v-flex>
       </v-layout>
-      <div  v-if="dataSocket['tableData'] !== '[]'" style="overflow: hidden;overflow-x: scroll;border-left: 1px solid gainsboro;">
-        <div :id="'table_filter_' + tableName" v-show="showFilter"></div>
-        <div :id="'table_database_' + tableName"></div>
+      <div style="overflow: hidden;overflow-x: scroll;border-left: 1px solid gainsboro;">
+        <div class="table_filter" :id="'table_filter_' + tableName" v-show="showFilter"></div>
+        <div :id="'table_database_' + tableName" v-show="!problem"></div>
       </div>
     </v-card>
+    <v-card v-show="problem" class="px-2 mx-1 mb-5" style="overflow: hidden;">
+      <div id="video-preloader" class="video-preloader">
+        <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
+      </div>
+    </v-card>
+    <v-card v-if="dataSocket['tableData'] === '[]'" class="px-2 mx-1 mb-5" style="overflow: hidden;">
+      <v-alert
+        :value="true"
+        color="info"
+        icon="info"
+        outline
+      >
+        Không tìm thấy kết quả {{nameScreen}}
+      </v-alert>
+    </v-card>
+    
     <v-menu
       v-model="showMenu"
       :position-x="x"
@@ -89,6 +105,7 @@
     },
     data () {
       return {
+        problem: true,
         showLoadingTable: true,
         nameScreen: '',
         showFilter: false,
@@ -129,7 +146,11 @@
       '$route': function (newRoute, oldRoute) {
         console.debug(oldRoute)
         let vm = this
+        vm.problem = true
         let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('state_change') && String(currentQuery['state_change']) !== '0') {
+          vm.showFilter = false
+        }
         if (currentQuery.hasOwnProperty('page')) {
           vm.page = parseInt(currentQuery.page)
         } else {
@@ -148,19 +169,20 @@
         } else {
           vm.page = 1
         }
+        let videoElement = document.getElementById('editor-video-preloader')
+        videoElement.play()
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           if (dataObj['status'] === '200') {
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined) {
-              vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')[dataObj.title]
+              vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')['name']
               vm.generateTable()
             }
             if (dataObj.respone === 'pageTotalCounter') {
               vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
               vm.showLoadingTable = false
             } else if (dataObj.respone === 'listTableMenu') {
-              // console.log(vm.$parent.$parent.$parent.items[2])
               let listTableMenu = vm.$store.getters.getlistTableMenu
               let dataMenu = eval('( ' + vm.dataSocket['listTableMenu'] + ' )')
               for (let key in dataMenu) {
@@ -171,15 +193,20 @@
                   text: dataMenu[key][2]
                 })
               }
-              console.log('menu: ' , listTableMenu)
               vm.$store.commit('setlistTableMenu', listTableMenu)
             }
             if (dataObj['cmd'] !== 'get') {
               let currentPath = vm.$router.history.current.path
+              let currentQuery = vm.$router.history.current.query
+              let page = 1
+              if (currentQuery.hasOwnProperty('page')) {
+                page = currentQuery['page']
+              }
               vm.$router.push({
                 path: currentPath.substring(0, currentPath.indexOf('/editor/')),
                 query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                  page: page
                 }
               })
             }
@@ -196,6 +223,7 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
+        newQuery['state_change'] = '0'
         newQuery['renew'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
@@ -225,8 +253,13 @@
       },
       getData () {
         let vm = this
-        for (var key in vm.filterData) {
-          vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key]
+        console.log(vm.showFilter)
+        if (!vm.showFilter) {
+          vm.columnsDataFilter = []
+        } else {
+          for (var key in vm.filterData) {
+            vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key]
+          }
         }
         vm.$socket.sendObj(
           {
@@ -244,8 +277,8 @@
             code: vm.$router.history.current.params.tableName,
             respone: 'tableData',
             filter: vm.columnsDataFilter,
-            start: vm.page * 15 - 15,
-            end: vm.page * 15
+            start: vm.page * 10 - 10,
+            end: vm.page * 10
           }
         )
         vm.$socket.sendObj(
@@ -258,6 +291,12 @@
             filter: vm.columnsDataFilter
           }
         )
+        vm.problem = true
+        setTimeout(() => {
+          if (window.$('#table_database_' + vm.tableName).is(':empty')) {
+            vm.rePullData()
+          }
+        }, 200)
       },
       show (e) {
         e.preventDefault()
@@ -277,6 +316,7 @@
           let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )');
           let columns = eval('( ' + objectConfig.columns + ' )')
           let colWidths = []
+          let colAlignments = []
           for (let key in columns) {
             if (columns[key]['type'] === 'checkbox') {
               dataFilter.push(false)
@@ -284,12 +324,13 @@
               dataFilter.push('')
             }
             colWidths.push(columns[key]['width'])
+            colAlignments.push(columns[key]['colAlignments'])
           }
           window.$('#table_filter_' + vm.tableName).jexcel({
             data: [dataFilter],
             colHeaders: objectConfig.headersName,
             colWidths: colWidths,
-            colAlignments: [ 'left', 'left', 'left', 'left' ],
+            colAlignments: colAlignments,
             allowInsertRow:false,
             allowManualInsertRow:false,
             allowInsertColumn:false,
@@ -301,7 +342,6 @@
             },
             onchange: function (instance, cell, value) {
               let cellIndex = cell[0].cellIndex - 1
-              console.log(vm.filterData)
               vm.filterData[cellIndex] = value
               let currentPath = vm.$router.history.current.path
               vm.$router.push({
@@ -310,9 +350,6 @@
                   renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
                 }
               })
-            },
-            onsort: function (e) {
-              window.$('#table_database').jexcel('orderBy', window.$(e).next().val())
             },
             columns: columns
           })
@@ -325,15 +362,20 @@
         let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )')
         let columns = eval('( ' + objectConfig.columns + ' )')
         let colWidths = []
+        let colAlignments = []
         for (let key in columns) {
           colWidths.push(columns[key]['width'])
+          colAlignments.push(columns[key]['colAlignments'])
         }
         vm.columnsDataFilter = columns
         window.$('#table_database_' + vm.tableName).jexcel({
           data: eval('( ' + vm.dataSocket['tableData'] + ' )'),
           colHeaders: objectConfig.headersName,
           colWidths: colWidths,
-          colAlignments: [ 'left', 'left', 'left', 'left' ],
+          colAlignments: colAlignments,
+          updateSelection: function () {
+            return false
+          },
           onselection: function(instance, firstColumn) {
             var cellName1 = window.$(instance).jexcel('getColumnNameFromId', window.$(firstColumn).prop('id'));
             vm.currentIndex = cellName1.substring(1) - 1
@@ -346,6 +388,7 @@
           },
           columns: columns
         })
+        vm.problem = false
       },
       toEditor (id) {
         let vm = this

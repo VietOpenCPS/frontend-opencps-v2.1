@@ -33,6 +33,15 @@ const routes = [
         }
       },
       {
+        path: '/table/opencps_process/ext/editor/:id',
+        name: 'QuyTrinhThuTuc',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/QuyTrinhThuTuc.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/:tableName/tool_import',
         name: 'Import',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/import.vue'),
