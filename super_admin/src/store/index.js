@@ -21,9 +21,9 @@ export const store = new Vuex.Store({
         children: [
           {
             icon: 'group_add',
-            link: '/table/can_bo',
-            code: 'can_bo',
-            text: 'Cán bộ'
+            link: '/table/opencps_employee',
+            code: 'opencps_employee',
+            text: 'Quản lý nhân sự'
           },
           {
             icon: 'filter_1',
