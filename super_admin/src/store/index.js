@@ -169,8 +169,8 @@ export const store = new Vuex.Store({
           }
         }
         // test local
-        axios.get('http://127.0.0.1:8081/api/jobpos', param).then(function (response) {
-        // axios.get('/o/rest/v2/jobpos', param).then(function (response) {
+        // axios.get('http://127.0.0.1:8081/api/jobpos', param).then(function (response) {
+        axios.get('/o/rest/v2/jobpos', param).then(function (response) {
           let seriable = response.data
           if (seriable) {
             resolve(seriable.data)
@@ -188,8 +188,8 @@ export const store = new Vuex.Store({
           }
         }
         // test local
-        axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
-        // axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
+        // axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
           let seriable = response.data
           if (seriable) {
             resolve(seriable.data)
@@ -207,10 +207,67 @@ export const store = new Vuex.Store({
           }
         }
         // test local
-        axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
-        // axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
+        // axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
           let seriable = response.data
-          if (seriable) {
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getDossierTemplate ({state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/dossiertemplates', param).then(function (response) {
+        axios.get('/o/rest/v2/dossiertemplates', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getEmployee ({state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/employees', param).then(function (response) {
+        axios.get('/o/rest/v2/employees', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getDossierPart ({state}, template) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/dossiertemplates/' + template + '/parts', param).then(function (response) {
+        axios.get('/o/rest/v2/dossiertemplates/' + template + '/parts', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
             resolve(seriable.data)
           }
         }).catch(function (xhr) {
@@ -226,8 +283,111 @@ export const store = new Vuex.Store({
           }
         }
         // test local
-        axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + id, param).then(function (response) {
-        // axios.get('/o/rest/v2/serviceprocesses/' + id, param).then(function (response) {
+        // axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + id, param).then(function (response) {
+        axios.get('/o/rest/v2/serviceprocesses/' + id, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getProcessStepsDetail ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + filter.processId + '/steps/' + filter.stepCode, param).then(function (response) {
+        axios.get('/o/rest/v2/serviceprocesses/' + filter.processId + '/steps/' + filter.stepCode, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getProcessStep ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
+        axios.get('/o/rest/v2/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getProcessAction ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
+        axios.get('/o/rest/v2/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getProcessActionsDetail ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + filter.processId + '/actions/' + filter.actionCode, param).then(function (response) {
+        axios.get('/o/rest/v2/serviceprocesses/' + filter.processId + '/actions/' + filter.actionCode, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    deleteProcessAction ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.delete('http://127.0.0.1:8081/api/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.actionCode, param).then(function (response) {
+        axios.delete('/o/rest/v2/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.actionCode, param).then(function (response) {
           let seriable = response.data
           if (seriable) {
             resolve(seriable)
@@ -260,8 +420,8 @@ export const store = new Vuex.Store({
         dataPostProcess.append('serverNo', data.serverNo)
         if (data.type === 'add') {
           // test local
-          axios.post('http://127.0.0.1:8081/api/serviceprocesses', dataPostProcess, options).then(function (response) {
-          // axios.post('/o/rest/v2/serviceprocesses', dataPostProcess, options).then(function (response) {
+          // axios.post('http://127.0.0.1:8081/api/serviceprocesses', dataPostProcess, options).then(function (response) {
+          axios.post('/o/rest/v2/serviceprocesses', dataPostProcess, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
           }).catch(function (error) {
@@ -270,8 +430,118 @@ export const store = new Vuex.Store({
           })
         } else {
           // test local
-          axios.put('http://127.0.0.1:8081/api/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
-          // axios.put('/o/rest/v2/serviceprocesses', dataPostProcess, options).then(function (response) {
+          // axios.put('http://127.0.0.1:8081/api/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
+          axios.put('/o/rest/v2/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        }
+      })
+    },
+    postProcessStep ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        var dataPostStep = new URLSearchParams()
+        dataPostStep.append('stepCode', data.stepCode)
+        dataPostStep.append('stepName', data.stepName)
+        dataPostStep.append('sequenceNo', data.sequenceNo)
+        dataPostStep.append('dossierStatus', data.dossierStatus)
+        dataPostStep.append('dossierSubStatus', data.dossierSubStatus)
+        dataPostStep.append('durationCount', data.durationCount)
+        dataPostStep.append('customProcessUrl', data.customProcessUrl)
+        dataPostStep.append('briefNote', data.briefNote)
+        dataPostStep.append('stepInstruction', data.stepInstruction)
+        dataPostStep.append('lockState', data.lockState)
+        if (data.type === 'add') {
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
+          axios.post('/o/rest/v2/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        } else {
+          // test local
+          // axios.put('http://127.0.0.1:8081/api/serviceprocesses/' + data.currentProcess + '/steps/' + data.stepCode, dataPostStep, options).then(function (response) {
+          axios.put('/o/rest/v2/serviceprocesses/' + data.currentProcess + '/steps/' + data.stepCode, dataPostStep, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        }
+      })
+    },
+    deleteProcessStep ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.delete('http://127.0.0.1:8081/api/serviceprocesses/' + filter.currentProcess + '/steps/' + filter.stepCode, param).then(function (response) {
+        axios.delete('/o/rest/v2/serviceprocesses/' + filter.currentProcess + '/steps/' + filter.stepCode, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    postProcessAction ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        var dataPostAction = new URLSearchParams()
+        dataPostAction.append('actionCode', data.actionCode)
+        dataPostAction.append('actionName', data.actionName)
+        dataPostAction.append('preStepCode', data.preStepCode)
+        dataPostAction.append('postStepCode', data.postStepCode)
+        dataPostAction.append('autoEvent', data.autoEvent)
+        dataPostAction.append('preCondition', data.preCondition)
+        dataPostAction.append('allowAssignUser', data.allowAssignUser)
+        dataPostAction.append('assignUserId', data.assignUserId)
+        dataPostAction.append('requestPayment', data.requestPayment)
+        dataPostAction.append('paymentFee', data.paymentFee)
+        dataPostAction.append('syncActionCode', data.syncActionCode)
+        dataPostAction.append('rollbackable', data.rollbackable)
+        dataPostAction.append('createDossierNo', data.createDossierNo)
+        dataPostAction.append('eSignature', data.eSignature)
+        dataPostAction.append('configNote', data.configNote)
+        dataPostAction.append('dossiertemplatesFileFilter', data.dossierTemplateNo)
+        dataPostAction.append('createDossiers', data.createDossiers)
+        if (data.type === 'add') {
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
+          axios.post('/o/rest/v2/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        } else {
+          // test local
+          // axios.put('http://127.0.0.1:8081/api/serviceprocesses/' + data.currentProcess + '/actions/' + data.actionCode, dataPostAction, options).then(function (response) {
+          axios.put('/o/rest/v2/serviceprocesses/' + data.currentProcess + '/actions/' + data.actionCode, dataPostAction, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
           }).catch(function (error) {

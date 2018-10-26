@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-tabs v-model="active">
-      <v-tabs-slider color="primary"></v-tabs-slider>
+      <v-tabs-slider color="blue"></v-tabs-slider>
       <v-tab key="tab-1" href="#tab-1" ripple @click="changeTab('process')">
         Thông tin quy trình
       </v-tab>
@@ -12,7 +12,7 @@
         Thao tác
       </v-tab>
       <v-tab-item class="pt-3" id="tab-1" key="tab-1" transition="fade-transition" reverse-transition="fade-transition">
-        <v-card>
+        <v-card style="margin-bottom:40px">
           <v-form ref="formAddProcess" v-model="validAddProcess" lazy-validation class="px-3">
             <v-layout wrap>
               <v-flex xs12 sm3>
@@ -80,7 +80,7 @@
               </v-flex>
               <v-flex xs12 sm9>
                 <v-layout wrap>
-                  <v-flex xs12 sm7>
+                  <v-flex xs12 sm6>
                     <v-select
                       box
                       :items="jobposList"
@@ -91,19 +91,53 @@
                       clearable
                     ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm5 class="pl-3">
+                  <v-flex xs12 sm4 class="pl-2">
                     <v-radio-group v-model="currentProcess.moderator" row>
                       <v-radio label="Theo dõi" :value="0"></v-radio>
                       <v-radio label="Thực hiện" :value="1"></v-radio>
                     </v-radio-group>
                   </v-flex>
-                  <v-flex xs12 sm7>
+                  <v-flex xs12 sm2 class="pl-2">
+                    <v-btn color="blue"
+                      class="mb-2"
+                      @click="createProcessRole"
+                    >
+                      <v-icon size="24">add</v-icon>&nbsp;
+                      Thêm
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs12 sm6>
                     <v-text-field
                       placeholder="Điều kiện phân công xử lý"
                       v-model="currentProcess.condition"
                       box
                     ></v-text-field>
                   </v-flex>
+                  <!--  -->
+                  <v-flex xs12 sm10>
+                    <v-data-table
+                      v-if="processRoleList.length>0"
+                      :headers="headerProcessRoles"
+                      :items="processRoleList"
+                      hide-actions
+                      class="elevation-1"
+                    >
+                      <template slot="items" slot-scope="props">
+                        <td class="text-xs-left">{{ props.item.role }}</td>
+                        <td class="text-xs-left">{{ props.item.moderatorText }}</td>
+                        <td class="text-xs-left">{{ props.item.condition }}</td>
+                        <td class="justify-center layout px-0">
+                          <v-icon small class="mr-2" @click="editStep(props.item)">
+                            edit
+                          </v-icon>
+                          <v-icon small @click="deleteStep(props.item)">
+                            delete
+                          </v-icon>
+                        </td>
+                      </template>
+                    </v-data-table>
+                  </v-flex>
+                  <!--  -->
                 </v-layout>
               </v-flex>
               <!--  -->
@@ -168,7 +202,7 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-if="id === 0 || id === '0'"
                 :loading="loading"
                 :disabled="loading"
@@ -177,7 +211,7 @@
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-else
                 :loading="loading"
                 :disabled="loading"
@@ -186,13 +220,6 @@
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
               </v-btn>
-              <!-- <v-btn color="primary"
-                :loading="loading"
-                :disabled="loading"
-              >
-                <v-icon>reply</v-icon>&nbsp;
-                Quay lại
-              </v-btn> -->
             </v-flex>
           </v-form>
         </v-card>
@@ -200,11 +227,12 @@
       <!-- Process Step -->
       <v-tab-item id="tab-2" key="tab-2" transition="fade-transition" reverse-transition="fade-transition">
         <!-- Danh sách step -->
-        <v-card class="py-2 px-3" v-if="!activeStepDetail">
-          <v-btn color="primary"
+        <v-card class="py-2 px-3" v-if="!activeStepDetail" style="margin-bottom:40px">
+          <v-btn color="blue"
             :loading="loading"
             :disabled="loading"
             class="mb-2"
+            @click="createStep"
           >
             <v-icon>add_circle_outline</v-icon>&nbsp;
             Thêm bước xử lý
@@ -216,9 +244,13 @@
             class="elevation-1"
           >
             <template slot="items" slot-scope="props">
-              <td>{{ props.item.stepName }}</td>
+              <td class="text-xs-center">
+                <div>
+                  <span>{{listStepPage * 15 - 15 + props.index + 1}}</span>
+                </div>
+              </td>
               <td class="text-xs-left">{{ props.item.stepName }}</td>
-              <td class="text-xs-left">{{ props.item.dossierStatus }}</td>
+              <td class="text-xs-left">{{ props.item.dossierStatusText }}</td>
               <td class="text-xs-left">{{ props.item.durationCount }}</td>
               <td class="justify-center layout px-0">
                 <v-icon
@@ -241,7 +273,7 @@
           </v-data-table>
         </v-card>
         <!-- Chi tiết step -->
-        <v-card class="pt-2" v-else>
+        <v-card class="pt-2" v-else style="margin-bottom:40px">
           <v-form ref="formAddStep" v-model="validAddStep" lazy-validation class="px-3">
             <v-layout wrap>
               <v-flex xs12 sm6 class="pr-2">
@@ -257,7 +289,7 @@
               <v-flex xs12 sm6 class="pl-2">
                 <div>Số thứ tự</div>
                 <v-text-field
-                  placeholder="Nhập tên bước"
+                  placeholder="Nhập số thứ tự"
                   v-model="currentStep.sequenceNo"
                   box
                 ></v-text-field>
@@ -337,8 +369,6 @@
                       placeholder="Điều kiện phân công xử lý"
                       v-model="currentStep.condition"
                       box
-                      :rules="[rules.required]"
-                      required
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -389,27 +419,28 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-if="currentStepId === 0 || currentStepId === '0'"
                 :loading="loading"
                 :disabled="loading"
-                @click="addStep"
+                @click="updateStep('add')"
               >
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-else
                 :loading="loading"
                 :disabled="loading"
-                @click="updateStep"
+                @click="updateStep('update')"
               >
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
               </v-btn>
-              <v-btn color="primary"
+              <v-btn color="blue"
                 :loading="loading"
                 :disabled="loading"
+                @click="goBackStepList"
               >
                 <v-icon>reply</v-icon>&nbsp;
                 Quay lại
@@ -421,11 +452,12 @@
       <!-- Process Action -->
       <v-tab-item id="tab-3" key="tab-3" transition="fade-transition" reverse-transition="fade-transition">
         <!-- Danh sách Action -->
-        <v-card class="py-2 px-3" v-if="!activeActionDetail">
-          <v-btn color="primary"
+        <v-card class="py-2 px-3" v-if="!activeActionDetail" style="margin-bottom:40px">
+          <v-btn color="blue"
             :loading="loading"
             :disabled="loading"
             class="mb-2"
+            @click="createAction"
           >
             <v-icon>add_circle_outline</v-icon>&nbsp;
             Thêm thao tác
@@ -437,7 +469,11 @@
             class="elevation-1"
           >
             <template slot="items" slot-scope="props">
-              <td>{{ props.item.actionName }}</td>
+              <td class="text-xs-center">
+                <div>
+                  <span>{{listActionPage * 15 - 15 + props.index + 1}}</span>
+                </div>
+              </td>
               <td class="text-xs-left">{{ props.item.actionName }}</td>
               <td class="text-xs-left">{{ props.item.preStepName }}</td>
               <td class="text-xs-left">{{ props.item.postStepName }}</td>
@@ -462,8 +498,8 @@
           </v-data-table>
         </v-card>
         <!-- Chi tiết Action -->
-        <v-card class="pt-2" v-else>
-          <v-form ref="formAddStep" v-model="validAddStep" lazy-validation class="px-3">
+        <v-card class="pt-2" v-else style="margin-bottom:40px">
+          <v-form ref="formAddAction" v-model="validAddAction" lazy-validation class="px-3">
             <v-layout wrap>
               <v-flex xs12 sm6 class="pr-2">
                 <div>Tên thao tác <span style="color:red">(*)</span></div>
@@ -498,7 +534,7 @@
                   box
                   :items="autoEventList"
                   v-model="currentAction.autoEvent"
-                  item-text="name"
+                  item-text="text"
                   item-value="value"
                   :hide-selected="true"
                   clearable
@@ -509,10 +545,10 @@
                 <div>Bước thực hiện thao tác <span style="color:red">(*)</span></div>
                 <v-select
                   box
-                  :items="stepActionList"
+                  :items="stepList"
                   v-model="currentAction.preStepCode"
-                  item-text="title"
-                  item-value="roleId"
+                  item-text="stepName"
+                  item-value="stepCode"
                   :hide-selected="true"
                   clearable
                   :rules="[rules.required]"
@@ -523,10 +559,10 @@
                 <div>Bước sau thực hiện thao tác <span style="color:red">(*)</span></div>
                 <v-select
                   box
-                  :items="stepActionList"
+                  :items="stepList"
                   v-model="currentAction.postStepCode"
-                  item-text="title"
-                  item-value="roleId"
+                  item-text="stepName"
+                  item-value="stepCode"
                   :hide-selected="true"
                   clearable
                   :rules="[rules.required]"
@@ -551,6 +587,19 @@
                 <v-checkbox label="Cho phép rollback" v-model="currentAction.rollbackable"></v-checkbox>
               </v-flex>
               <!--  -->
+              <v-flex xs12 sm6 class="pr-2">
+                <div>Người được chọn ngầm định</div>
+                <v-select
+                  box
+                  :items="employeeList"
+                  v-model="currentAction.assignUserId"
+                  item-text="fullName"
+                  item-value="employeeId"
+                  :hide-selected="true"
+                  clearable
+                ></v-select>
+              </v-flex>
+              <!--  -->
               <v-flex xs12 sm12>
                 <v-flex xs12>
                   <div>Mẫu hồ sơ</div>
@@ -560,29 +609,46 @@
                     box
                     :items="dossierTemplateList"
                     v-model="currentAction.dossierTemplateNo"
-                    item-text="title"
-                    item-value="roleId"
+                    item-text="templateName"
+                    item-value="dossierTemplateId"
                     :hide-selected="true"
                     clearable
+                    @change="getDossierParts"
                   ></v-select>
                 </v-flex>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm6 class="pr-2">
-                <div>Tạo tài liệu mới</div>
-                <v-text-field
-                  placeholder=""
-                  v-model="currentAction.createDossierFiles"
-                  box
-                ></v-text-field>
+                <v-flex xs12 sm12 class="">
+                  <div>Tài liệu tạo mới</div>
+                </v-flex>
+                <v-flex xs12 sm12 class="">
+                  <v-select
+                    box
+                    :items="dossierPartList"
+                    v-model="currentAction.createDossierFiles"
+                    item-text="partName"
+                    item-value="fileTemplateNo"
+                    :hide-selected="true"
+                    clearable
+                  ></v-select>
+                </v-flex>
               </v-flex>
               <v-flex xs12 sm6 class="pl-2">
-                <div>Kết quả trả về</div>
-                <v-text-field
-                  placeholder=""
-                  v-model="currentAction.returnDossierFiles"
-                  box
-                ></v-text-field>
+                <v-flex xs12 sm12 class="">
+                  <div>Kết quả trả về</div>
+                </v-flex>
+                <v-flex xs12 sm12 class="">
+                  <v-select
+                    box
+                    :items="dossierPartList"
+                    v-model="currentAction.returnDossierFiles"
+                    item-text="partName"
+                    item-value="fileTemplateNo"
+                    :hide-selected="true"
+                    clearable
+                  ></v-select>
+                </v-flex>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm12>
@@ -594,8 +660,8 @@
                     box
                     :items="requestPaymentList"
                     v-model="currentAction.requestPayment"
-                    item-text="title"
-                    item-value="roleId"
+                    item-text="text"
+                    item-value="value"
                     :hide-selected="true"
                     clearable
                   ></v-select>
@@ -615,7 +681,7 @@
                 <div>Cấu hình cơ quan</div>
                 <v-text-field
                   placeholder=""
-                  v-model="currentAction.syncActionCode"
+                  v-model="currentAction.createDossier"
                   box
                 ></v-text-field>
               </v-flex>
@@ -648,27 +714,28 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-if="currentActionId === 0 || currentActionId === '0'"
                 :loading="loading"
                 :disabled="loading"
-                @click="addAction"
+                @click="updateAction('add')"
               >
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="primary"
+              <v-btn color="blue"
                 v-else
                 :loading="loading"
                 :disabled="loading"
-                @click="updateAction"
+                @click="updateAction('update')"
               >
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
               </v-btn>
-              <v-btn color="primary"
+              <v-btn color="blue"
                 :loading="loading"
                 :disabled="loading"
+                @click="goBackActionList"
               >
                 <v-icon>reply</v-icon>&nbsp;
                 Quay lại
@@ -694,6 +761,44 @@
         currentActionId: '',
         loading: false,
         active: null,
+        processRoleList: [
+          {
+            role: 'Nguyễn Văn Nam',
+            roleId: 102,
+            moderator: 0,
+            moderatorText: 'Theo dõi',
+            condition: 'viaPostal'
+          },
+          {
+            role: 'Vũ Văn Hùng',
+            roleId: 103,
+            moderator: 1,
+            moderatorText: 'Thực hiện',
+            condition: 'eSignature'
+          }
+        ],
+        headerProcessRoles: [
+          {
+            text: 'Tên',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Vai trò',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Điều kiện',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false
+          }
+        ],
         // serviceProcesses Data
         currentProcess: {
           processNo: '',
@@ -710,7 +815,7 @@
           generateDueDate: '',
           dueDatePattern: '',
           generatePassword: false,
-          directNotification: false,
+          directNotification: false
         },
         validAddProcess: false,
         // PROCESS STEP DATA
@@ -742,6 +847,8 @@
           }
         ],
         stepList: [],
+        listStepPage: 1,
+        listActionPage: 1,
         currentStep: {
           stepName: '',
           dossierStatus: '',
@@ -754,7 +861,8 @@
           lockState: '',
           stepInstruction: '',
           briefNote: '',
-          customProcessUrl: ''
+          customProcessUrl: '',
+          sequenceNo: ''
         },
         validAddStep: false,
         // PROCESS ACTION DATA
@@ -787,10 +895,28 @@
         ],
         actionList: [],
         stepActionList: [],
-        autoEventList: [],
-        assignTypeList: [],
+        autoEventList: [
+          { text: 'listener', value: 'listener' },
+          { text: 'timmer', value: 'timmer' },
+          { text: 'special', value: 'special' }
+        ],
+        assignTypeList: [
+          { text: 'Không phân công', value: 0 },
+          { text: 'Chỉ phân công người thực hiện', value: 1 },
+          { text: 'Phân công thực hiện và phối hợp', value: 2 },
+          { text: 'Phân công thực hiện,phối hợp và theo dõi', value: 3 }
+        ],
         dossierTemplateList: [],
-        requestPaymentList: [],
+        dossierPartList: [],
+        employeeList: [],
+        requestPaymentList: [
+          { text: 'Không thay đổi trạng thái', value: 0 },
+          { text: 'Yêu cầu nộp tiền tạm ứng', value: 1 },
+          { text: 'Yêu cầu quyết toán phí', value: 2 },
+          { text: 'Báo đã nộp phí trực tuyến', value: 3 },
+          { text: 'Yêu cầu nộp lại phí trực tuyến', value: 4 },
+          { text: 'Xác nhận hoàn thành thu phí', value: 5 }
+        ],
         currentAction: {
           actionName: '',
           actionCode: '',
@@ -801,9 +927,10 @@
           allowAssignUser: '',
           rollbackable: false,
           dossierTemplateNo: '',
-          createDossierFiles: '',
-          returnDossierFiles: '',
+          createDossierFiles: null,
+          returnDossierFiles: null,
           requestPayment: '',
+          createDossier: '',
           syncActionCode: '',
           configNote: '',
           createDossierNo: false,
@@ -829,7 +956,8 @@
         vm.currentStepId = vm.activeStep && currentQuery.hasOwnProperty('stepCode') && currentQuery.stepCode ? Number(currentQuery.stepCode) : 0
         vm.activeAction = currentQuery.hasOwnProperty('action') && currentQuery.action === 'true'
         vm.activeActionDetail = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.actionCode
-        vm.currentActionId = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.actionCode ? Number(currentQuery.activeAction) : 0
+        vm.currentActionId = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.actionCode ? Number(currentQuery.actionCode) : 0
+        console.log('currentActionId', vm.currentActionId)
         if (vm.activeStep) {
           vm.active = 'tab-2'
         } else if (vm.activeAction) {
@@ -858,7 +986,7 @@
         vm.currentStepId = vm.activeStep && currentQuery.hasOwnProperty('stepCode') && currentQuery.stepCode ? Number(currentQuery.stepCode) : 0
         vm.activeAction = currentQuery.hasOwnProperty('action') && currentQuery.action === 'true'
         vm.activeActionDetail = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.actionCode
-        vm.currentActionId = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.activeAction ? Number(currentQuery.activeAction) : 0
+        vm.currentActionId = vm.activeAction && currentQuery.hasOwnProperty('actionCode') && currentQuery.actionCode ? Number(currentQuery.actionCode) : 0
         if (vm.activeStep) {
           vm.active = 'tab-2'
         } else if (vm.activeAction) {
@@ -911,18 +1039,141 @@
           console.log(reject)
         })
       },
-      getEmployees () {},
-      getDossierTemplates () {},
-      getProcessSteps () {},
-      getProcessActions () {},
+      getProcessStepsDetail (stepCode) {
+        var vm = this
+        let filter = {
+          processId: vm.id,
+          stepCode: stepCode
+        }
+        vm.$store.dispatch('getProcessStepsDetail', filter).then(function (result) {
+          vm.currentStep = result
+          vm.changeDossierStatus()
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getEmployees () {
+        var vm = this
+        vm.$store.dispatch('getEmployee').then(function (result) {
+          vm.employeeList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getDossierTemplates () {
+        var vm = this
+        vm.$store.dispatch('getDossierTemplate').then(function (result) {
+          vm.dossierTemplateList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getDossierParts () {
+        var vm = this
+        if (vm.currentAction.dossierTemplateNo) {
+          vm.$store.dispatch('getDossierPart', vm.currentAction.dossierTemplateNo).then(function (result) {
+            vm.dossierPartList = result
+          }).catch(reject => {
+            console.log(reject)
+          })
+        } else {
+          vm.dossierPartList = []
+        }
+      },
+      getProcessSteps (id) {
+        var vm = this
+        let currentQuery = vm.$router.history.current.query
+        let filter = {
+          processId: id,
+          page: currentQuery.page ? currentQuery.page : 1
+        }
+        vm.$store.dispatch('getProcessStep', filter).then(function (result) {
+          vm.stepList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getProcessActions () {
+        var vm = this
+        let currentQuery = vm.$router.history.current.query
+        let filter = {
+          processId: vm.id,
+          page: currentQuery.page ? currentQuery.page : 1
+        }
+        vm.$store.dispatch('getProcessAction', filter).then(function (result) {
+          vm.actionList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getProcessActionDetail (actionCode) {
+        var vm = this
+        let filter = {
+          processId: vm.id,
+          actionCode: actionCode
+        }
+        vm.$store.dispatch('getProcessActionsDetail', filter).then(function (result) {
+          vm.currentAction = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       getProcessRoles () {},
       //
       doDetailContent () {
         var vm = this
-        // let currentQuery = vm.$router.history.current.query
+        let currentQuery = vm.$router.history.current.query
         // let currentParams = vm.$router.history.current.params
         if (Number(vm.id) > 0 && !vm.activeStep && !vm.activeAction) {
           vm.getProcessDetail(vm.id)
+        } else if (vm.activeStep && !vm.activeStepDetail) {
+          vm.getProcessSteps(vm.id)
+        } else if (vm.activeStep && vm.activeStepDetail) {
+          vm.currentStep = {
+            stepName: '',
+            dossierStatus: '',
+            dossierSubStatus: '',
+            durationCount: '',
+            stepCode: '',
+            roleId: '',
+            moderator: 0,
+            condition: '',
+            lockState: '',
+            stepInstruction: '',
+            briefNote: '',
+            customProcessUrl: '',
+            sequenceNo: ''
+          }
+          if (Number(currentQuery.stepCode) > 0) {
+            vm.getProcessStepsDetail(currentQuery.stepCode)
+          }
+        } else if (vm.activeAction && !vm.activeActionDetail) {
+          vm.getProcessActions(vm.id)
+        } else if (vm.activeAction && vm.activeActionDetail) {
+          vm.getProcessSteps(vm.id)
+          vm.getDossierTemplates()
+          vm.getEmployees()
+          vm.currentAction = {
+            actionName: '',
+            actionCode: '',
+            preCondition: '',
+            autoEvent: '',
+            preStepCode: '',
+            postStepCode: '',
+            allowAssignUser: '',
+            rollbackable: false,
+            dossierTemplateNo: '',
+            createDossierFiles: null,
+            returnDossierFiles: null,
+            requestPayment: '',
+            syncActionCode: '',
+            configNote: '',
+            createDossierNo: false,
+            eSignature: false
+          }
+          if (Number(currentQuery.actionCode) > 0) {
+            vm.getProcessActionDetail(currentQuery.actionCode)
+          }
         }
       },
       updateProcess (type) {
@@ -932,7 +1183,13 @@
           vm.currentProcess['type'] = type
           vm.$store.dispatch('postProcess', vm.currentProcess).then(function (result) {
             if (type === 'add') {
-              vm.$router.push(currentPath.replace(0, result.serviceProcessId))
+              vm.$router.push({
+                path: currentPath.replace(0, result.serviceProcessId),
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+              // vm.$router.push(currentPath.replace(0, result.serviceProcessId))
             } else {
               vm.currentProcess = result
             }
@@ -941,22 +1198,122 @@
           })
         }
       },
+      createStep () {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?step=true&stepCode=0',
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+        // vm.$router.push(currentPath + '?step=true&stepCode=0')
+      },
+      updateStep (type) {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        if (vm.$refs.formAddStep.validate()) {
+          vm.currentStep['type'] = type
+          vm.currentStep['currentProcess'] = vm.id
+          vm.$store.dispatch('postProcessStep', vm.currentStep).then(function (result) {
+            if (type === 'add') {
+              vm.$router.push({
+                path: currentPath + '?step=true&stepCode=' + result.stepCode,
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+              // vm.$router.push(currentPath + '?step=true&stepCode=' + result.stepCode)
+            } else {
+              vm.currentStep = result
+            }
+          }).catch(reject => {
+            console.log(reject)
+          })
+        }
+      },
       editStep (itemStep) {
-        console.log(itemStep)
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?step=true&stepCode=' + itemStep.stepCode,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+        // vm.$router.push(currentPath + '?step=true&stepCode=' + itemStep.stepCode)
       },
       deleteStep (itemStep) {
-        console.log(itemStep)
+        var vm = this
+        let filter = {
+          currentProcess: vm.id,
+          stepCode: itemStep.stepCode
+        }
+        vm.$store.dispatch('deleteProcessStep', filter).then(function (result) {
+          console.log(result)
+          vm.getProcessSteps(vm.id)
+        }).catch(reject => {
+          console.log(reject)
+        })
       },
-      addStep () {},
-      updateStep () {},
+      createAction () {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?action=true&actionCode=0',
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+        // vm.$router.push(currentPath + '?action=true&actionCode=0')
+      },
+      updateAction (type) {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        if (vm.$refs.formAddAction.validate()) {
+          vm.currentAction['type'] = type
+          vm.currentAction['currentProcess'] = vm.id
+          vm.$store.dispatch('postProcessAction', vm.currentAction).then(function (result) {
+            if (type === 'add') {
+              vm.$router.push({
+                path: currentPath + '?action=true&actionCode=' + result.actionCode,
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+              // vm.$router.push(currentPath + '?action=true&actionCode=' + result.actionCode)
+            } else {
+              vm.currentAction = result
+            }
+          }).catch(reject => {
+            console.log(reject)
+          })
+        }
+      },
       editAction (itemAction) {
-        console.log(itemAction)
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?action=true&actionCode=' + itemAction.actionCode,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+        // vm.$router.push(currentPath + '?action=true&actionCode=' + itemAction.actionCode)
       },
       deleteAction (itemAction) {
-        console.log(itemAction)
+        var vm = this
+        let filter = {
+          currentProcess: vm.id,
+          actionCode: itemAction.actionCode
+        }
+        vm.$store.dispatch('deleteProcessAction', filter).then(function (result) {
+          console.log(result)
+          vm.getProcessActions(vm.id)
+        }).catch(reject => {
+          console.log(reject)
+        })
       },
-      addAction () {},
-      updateAction () {},
       changeTab (tab) {
         let vm = this
         let currentPath = vm.$router.history.current.path
@@ -964,13 +1321,36 @@
           vm.$router.push(currentPath)
         } else if (tab === 'step') {
           if (Number(vm.id) > 0) {
-            vm.$router.push(currentPath + '?step=true')
+            vm.$router.push({
+              path: currentPath + '?step=true&page=' + vm.listStepPage,
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+            // vm.$router.push(currentPath + '?step=true&page=' + vm.listStepPage)
           } else {
             vm.$router.push(currentPath)
           }
         } else {
-          vm.$router.push(currentPath + '?action=true')
+          vm.$router.push({
+            path: currentPath + '?action=true&page=' + vm.listActionPage,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+          // vm.$router.push(currentPath + '?action=true&page=' + vm.listActionPage)
         }
+      },
+      createProcessRole () {},
+      goBackStepList () {
+        let vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push(currentPath + '?step=true')
+      },
+      goBackActionList () {
+        let vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push(currentPath + '?action=true')
       },
       backToList () {
         let vm = this
