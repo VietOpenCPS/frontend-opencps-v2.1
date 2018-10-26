@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import axios from 'axios'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    initData: {},
     tocken: '',
     user: null,
     socket: {
@@ -129,9 +130,157 @@ export const store = new Vuex.Store({
           }
         ]
       }
-    ]
+    ],
+    jobPosList: [],
+    dossierStatusList: [],
+    dossierSubStatusList: [],
+    employeesList: [],
+    dossierTemplatesList: [],
+    processStepList: [],
+    processActionList: [],
+    processRoleList: []
   },
   actions: {
+    loadInitResource ({state}) {
+      return new Promise((resolve) => {
+        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+          state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
+          state.initData['user'] = {
+            'userName': window.themeDisplay.getUserName(),
+            'userEmail': '',
+            'userId': window.themeDisplay.getUserId()
+          }
+        } else {
+          state.initData['groupId'] = 0
+          state.initData['user'] = {
+            'userName': '',
+            'userEmail': '',
+            'userId': 20103
+          }
+        }
+        resolve(state.initData)
+      })
+    },
+    getJobposList ({state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        axios.get('http://127.0.0.1:8081/api/jobpos', param).then(function (response) {
+        // axios.get('/o/rest/v2/jobpos', param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getDossierStatusList ({state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
+        // axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getDossierSubStatusList ({state}, dossierStatus) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
+        // axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    getProcessDetail ({state}, id) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        axios.get('http://127.0.0.1:8081/api/serviceprocesses/' + id, param).then(function (response) {
+        // axios.get('/o/rest/v2/serviceprocesses/' + id, param).then(function (response) {
+          let seriable = response.data
+          if (seriable) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    postProcess ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        var dataPostProcess = new URLSearchParams()
+        dataPostProcess.append('processNo', data.processNo)
+        dataPostProcess.append('processName', data.processName)
+        dataPostProcess.append('description', data.description)
+        dataPostProcess.append('durationCount', data.durationCount)
+        dataPostProcess.append('durationUnit', data.durationUnit)
+        dataPostProcess.append('generateDossierNo', data.generateDossierNo)
+        dataPostProcess.append('dossierNoPattern', data.dossierNoPattern)
+        dataPostProcess.append('generateDueDate', data.generateDueDate)
+        dataPostProcess.append('dueDatePattern', data.dueDatePattern)
+        dataPostProcess.append('generatePassword', data.generatePassword)
+        dataPostProcess.append('directNotification', data.directNotification)
+        dataPostProcess.append('serverNo', data.serverNo)
+        if (data.type === 'add') {
+          // test local
+          axios.post('http://127.0.0.1:8081/api/serviceprocesses', dataPostProcess, options).then(function (response) {
+          // axios.post('/o/rest/v2/serviceprocesses', dataPostProcess, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        } else {
+          // test local
+          axios.put('http://127.0.0.1:8081/api/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
+          // axios.put('/o/rest/v2/serviceprocesses', dataPostProcess, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        }
+      })
+    }
   },
   mutations: {
     SOCKET_ONOPEN (state, event) {
@@ -157,11 +306,62 @@ export const store = new Vuex.Store({
     },
     setlistTableMenu (state, payload) {
       state.listTableMenu = payload
+    },
+    setInitData (state, payload) {
+      state.initData = payload
+    },
+    setJobPosList (state, payload) {
+      state.jobPosList = payload
+    },
+    setDossierStatusList (state, payload) {
+      state.dossierStatusList = payload
+    },
+    setDossierSubStatusList (state, payload) {
+      state.dossierSubStatusList = payload
+    },
+    setEmployeesList (state, payload) {
+      state.employeesList = payload
+    },
+    setDossierTemplatesList (state, payload) {
+      state.dossierTemplatesList = payload
+    },
+    setProcessStepList (state, payload) {
+      state.processStepList = payload
+    },
+    setProcessActionList (state, payload) {
+      state.processActionList = payload
+    },
+    setProcessRoleList (state, payload) {
+      state.processRoleList = payload
     }
   },
   getters: {
     getlistTableMenu (state) {
       return state.listTableMenu
+    },
+    getJobPosList (state) {
+      return state.jobPosList
+    },
+    getDossierStatusList (state) {
+      return state.dossierStatusList
+    },
+    getDossierSubStatusList (state) {
+      return state.dossierSubStatusList
+    },
+    getEmployeesList (state) {
+      return state.employeesList
+    },
+    getDossierTemplatesList (state) {
+      return state.dossierTemplatesList
+    },
+    getProcessStepList (state) {
+      return state.processStepList
+    },
+    getProcessActionList (state) {
+      return state.processActionList
+    },
+    getProcessRoleList (state) {
+      return state.processRoleList
     }
   }
 })

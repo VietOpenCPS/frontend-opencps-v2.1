@@ -51,10 +51,15 @@
               </v-tabs-items>
             </v-tabs> -->
             <v-checkbox
+              v-if="!kysoSuccess"
               class="ml-3"
               v-model='activeKS'
-              label='Sử dụng chữ ký số'
+              label='Chọn để thực hiện ký số'
+              :disabled="activeKS"
             ></v-checkbox>
+            <v-alert v-else outline :value="true" type="success" class="mx-2">
+              Đã thực hiện ký số
+            </v-alert>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -70,15 +75,29 @@ function plugin0 () {
 var plugin = plugin0
 export default {
   props: {
-    detailDossier: {}
+    detailDossier: {},
+    dataEsign: {}
   },
   data: () => ({
     tabActive: 'tabs-1',
-    activeKS: true,
+    activeKS: false,
     noteReason: '',
     thongTinHoSo: {}
   }),
   created () {},
+  computed: {
+    kysoSuccess () {
+      return this.$store.getters.kysoSuccess
+    }
+  },
+  watch: {
+    activeKS (val) {
+      var vm = this
+      if (val === true) {
+        vm.kySo(vm.dataEsign)
+      }
+    }
+  },
   mounted () {},
   methods: {
     changeActive () {
@@ -124,12 +143,14 @@ export default {
       var isKyOk = item.eSignature
       if (isKyOk) {
         if (!plugin().valid) {
-          alert('Plugin is not working')
           isKyOk = false
+          vm.activeKS = false
+          alert('Plugin ký số không hoạt động')
           return
         }
         if (waitingFiles) {
           alert('Tệp điện tử chưa sẵn sàng. Xin vui lòng chờ trong giây lát')
+          vm.activeKS = false
           return
         }
         if (idArr) {
@@ -190,13 +211,16 @@ export default {
               }
               vm.completeKyDuyetManyYCGiamDinh(signs.join(','), signFieldNames.join(','), fileNames.join(','), fileEntryIds.join(','), paramObj, actionName)
             } else {
-              alert('Plugin is not working')
+              vm.activeKS = false
+              alert('Plugin ký số không hoạt động')
             }
           } else {
-            alert('Cảnh báo: Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
+            vm.activeKS = false
+            alert('Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
           }
         },
         error: function (result) {
+          vm.activeKS = false
         }
       })
     },
@@ -227,15 +251,19 @@ export default {
           console.log(result)
           var msg = result.msg
           if (msg === 'success') {
-            toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            vm.$store.commit('setKysoSuccess', true)
+            toastr.success('Thực hiện ký số thành công.')
           } else if (msg === 'fileEntryId') {
             alert('Cảnh báo: Không tìm thấy file bản thảo. Tạm dừng tiến trình đóng dấu số')
+            vm.activeKS = false
           } else {
             alert(msg)
+            vm.activeKS = false
           }
         },
         error: function () {
-          alert('ky so false')
+          vm.activeKS = false
+          alert('Thực hiện ký số thất bại')
         }
       })
     },
