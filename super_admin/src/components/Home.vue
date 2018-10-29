@@ -8,7 +8,7 @@
       width="240"
       dark
     >
-      <div class="sidebar-background" style="background-image: url(&quot;http://localhost:8081/static/img/bg__default.png&quot;);"></div>
+      <div class="sidebar-background" style="background-image: url(&quot;/o/vue-admin/images/bg_menu.jpg&quot;);"></div>
       <v-list dense>
         <template v-for="item in items">
           <v-layout

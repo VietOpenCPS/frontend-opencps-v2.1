@@ -9,7 +9,6 @@ import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/mode/javascript/javascript.js'
-import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@syncfusion/ej2-base/styles/material.css'
 import '@syncfusion/ej2-vue-inputs/styles/material.css'
 import VueNativeSock from 'vue-native-websocket'
@@ -20,8 +19,8 @@ Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
-
-Vue.use(VueNativeSock, 'ws://localhost:8080/o/socket-gate?groupId='+ groupId, 
+let portalURL = window.themeDisplay !== undefined ? window.themeDisplay.getPortalURL() : 'localhost:8080'
+Vue.use(VueNativeSock, 'ws://' + portalURL.replace('http://', '') + '/o/socket-gate?groupId='+ groupId + '&portalURL=' + portalURL, 
   {
     store: store,
     format: 'json',
@@ -37,6 +36,25 @@ Vue.use(VueCodemirror, {
   theme: 'base16-light',
   lineNumbers: true,
   line: true,
+})
+
+Vue.mixin({
+  methods: {
+    getScopeGroupId: function () {
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+        return window.themeDisplay.getScopeGroupId()
+      } else {
+        return 0
+      }
+    },
+    getAuthToken: function () {
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+        return window.Liferay.authToken
+      } else {
+        return ''
+      }
+    }
+  }
 })
 
 new Vue({
