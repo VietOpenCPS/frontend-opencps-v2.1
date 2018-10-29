@@ -335,6 +335,23 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getProcessRole ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/roles', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     getProcessActionsDetail ({state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -519,6 +536,61 @@ export const store = new Vuex.Store({
           }
         }).catch(function (xhr) {
           reject(xhr)
+        })
+      })
+    },
+    getStepRole ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps/' + filter.stepId + '/roles', param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable.data)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    postStepRoles ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        var dataPostProcessRoles = new URLSearchParams()
+        dataPostProcessRoles.append('roleId', data.stepRoles.roleId)
+        dataPostProcessRoles.append('moderator', data.stepRoles.moderator)
+        dataPostProcessRoles.append('condition', data.stepRoles.condition)
+        axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles', dataPostProcessRoles, options).then(function (response) {
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+          // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+        })
+      })
+    },
+    deleteStepRoles ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json'
+          }
+        }
+        axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles/' + data.stepRoles.roleId, options).then(function (response) {
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+          // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
         })
       })
     },
