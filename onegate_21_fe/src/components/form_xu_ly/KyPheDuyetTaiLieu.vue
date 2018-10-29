@@ -233,7 +233,8 @@ export default {
         async: false,
         dataType: 'json',
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId()
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': Liferay.authToken
         },
         data: {
           actionCode: paramObj['actionCode'],
