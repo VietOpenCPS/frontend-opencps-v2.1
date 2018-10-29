@@ -10,9 +10,18 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/mode/javascript/javascript.js'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
+import '@syncfusion/ej2-base/styles/material.css'
+import '@syncfusion/ej2-vue-inputs/styles/material.css'
 import VueNativeSock from 'vue-native-websocket'
+import VueContentPlaceholders from 'vue-content-placeholders'
+import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 
-Vue.use(VueNativeSock, 'ws://localhost:8080/o/socket-gate', 
+Vue.use(UploaderPlugin)
+Vue.use(VueContentPlaceholders)
+
+let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
+
+Vue.use(VueNativeSock, 'ws://localhost:8080/o/socket-gate?groupId='+ groupId, 
   {
     store: store,
     format: 'json',

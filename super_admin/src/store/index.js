@@ -24,32 +24,32 @@ export const store = new Vuex.Store({
         children: [
           {
             icon: 'group_add',
-            link: '/table/can_bo',
-            code: 'can_bo',
-            text: 'Cán bộ'
+            link: '/table/opencps_employee',
+            code: 'opencps_employee',
+            text: 'Quản lý nhân sự'
           },
           {
             icon: 'filter_1',
-            link: '/table/thu_tuc_hanh_chinh',
-            code: 'thu_tuc_hanh_chinh',
+            link: '/table/opencps_serviceinfo',
+            code: 'opencps_serviceinfo',
             text: 'Thủ tục hành chính'
           },
           {
             icon: 'filter_2',
-            link: '/table/mau_ho_so',
-            code: 'mau_ho_so',
+            link: '/table/opencps_dossiertemplate',
+            code: 'opencps_dossiertemplate',
             text: 'Mẫu hồ sơ'
           },
           {
             icon: 'filter_3',
-            link: '/table/quy_trinh_thu_tuc',
-            code: 'quy_trinh_thu_tuc',
+            link: '/table/opencps_serviceprocess',
+            code: 'opencps_serviceprocess',
             text: 'Quy trình thủ tục'
           },
           {
             icon: 'filter_4',
-            link: '/table/dich_vu_cong',
-            code: 'dich_vu_cong',
+            link: '/table/opencps_serviceconfig',
+            code: 'opencps_serviceconfig',
             text: 'Dịch vụ công'
           },
           {
@@ -101,6 +101,12 @@ export const store = new Vuex.Store({
             link: '/table/opencps_notificationtemplate',
             code: 'opencps_notificationtemplate',
             text: 'Mẫu thông báo'
+          },
+          {
+            icon: 'arrow_right',
+            link: '/table/opencps_workingunit',
+            code: 'opencps_workingunit',
+            text: 'Tổ chức, phòng ban'
           }
         ]
       },
@@ -155,6 +161,25 @@ export const store = new Vuex.Store({
           }
         }
         resolve(state.initData)
+      })
+    },
+    getServiceFileTemplate ({state}, pk) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/employees', param).then(function (response) {
+        axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
       })
     },
     getJobposList ({state}) {

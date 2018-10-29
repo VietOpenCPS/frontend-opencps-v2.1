@@ -33,7 +33,7 @@ const routes = [
         }
       },
       {
-        path: '/table/opencps_process/ext/editor/:id',
+        path: '/table/opencps_serviceprocess/ext/editor/:id',
         name: 'QuyTrinhThuTuc',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/QuyTrinhThuTuc.vue'),
         props: true,
