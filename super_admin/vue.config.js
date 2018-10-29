@@ -9,23 +9,23 @@ module.exports = {
       config.module.rule('images').use('url-loader')
         .loader('file-loader') // replaces the url-loader
         .tap(options => Object.assign(options, {
-          name: 'images/register/[name].[ext]'
+          name: '../../docs/o/opencps-frontend/super_admin/images/[name].[ext]'
         }))
       config.module.rule('svg').use('file-loader')
         .tap(options => Object.assign(options, {
-          name: 'images/register/[name].[ext]'
+          name: '../../docs/o/opencps-frontend/super_admin/images/[name].[ext]'
         }))
     },
     css: {
       extract: {
-        filename: 'css/register/[name].css',
-        chunkFilename: 'css/register/[name].css'
+        filename: '../../docs/o/opencps-frontend/super_admin/css/[name].css',
+        chunkFilename: '../../docs/o/opencps-frontend/super_admin/css/[name].css'
       }
     },
     configureWebpack: {
       output: {
-        filename: 'js/register/[name].js',
-        chunkFilename: 'js/register/[name].js'
+        filename: '../../docs/o/opencps-frontend/super_admin/js/[name].js',
+        chunkFilename: '../../docs/o/opencps-frontend/super_admin/js/[name].js'
       }
     }
   }
