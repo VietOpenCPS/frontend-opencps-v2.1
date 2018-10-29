@@ -25,6 +25,7 @@
         </content-placeholders>
         <v-autocomplete v-if="item.type === 'selects' && pullOk"
           v-model="data[item.model]"
+          :menu-props="data[item.model]+''"
           :items="item.hasOwnProperty('datasource') ? item.datasource : dataSocket[item['datasource_key']]"
           :item-text="item.itemText"
           :item-value="item.itemValue"
@@ -217,8 +218,8 @@
         password: '',
         rightAttached: false,
         rightAccount: false,
-        pullOk: true,
-        dsfdsf: false,
+        pullOk: false,
+        pullCounter: 0,
         valid: true,
         loading: false,
         data: {},
@@ -253,7 +254,9 @@
             vm.processDataSource()
           } else {
             let videoElement = document.getElementById('editor-video-preloader')
-            videoElement.play()
+            if (videoElement !== null && videoElement !== undefined) {
+              videoElement.play()
+            }
           }
           if (vm.detailData !== null && vm.detailData !== undefined) {
             vm.data = eval('( ' + vm.detailData + ' )')[0]
@@ -303,11 +306,15 @@
             let currentPath = vm.$router.history.current.path
             vm.$router.push(currentPath.substring(0, currentPath.indexOf('/editor/')))
           }
-          if (dataObj['type'] === 'api') {
-            vm.pullOk = false
-            setTimeout(() => {
-              vm.pullOk = true
-            }, 200)
+          if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+            vm.pullCounter = vm.pullCounter - 1
+            console.log(vm.pullCounter)
+            // vm.pullCounter = vm.pullCounter - 1
+            if (vm.pullCounter === 0) {
+              setTimeout(() => {
+                vm.pullOk = true
+              }, 500)
+            }
           }
         }
       })
@@ -351,8 +358,8 @@
               respone: item.concatina['datasource_key'],
               api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
               headers: {
-                'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
-                'groupId': 38043
+                'Token': vm.getAuthToken(),
+                'groupId': vm.getScopeGroupId()
               }
             }
           )
@@ -363,6 +370,7 @@
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
+            vm.pullCounter = vm.pullCounter + 1
             vm.$socket.sendObj(
               {
                 type: 'api',
@@ -370,8 +378,8 @@
                 respone: vm.detailForm[key]['datasource_key'],
                 api: vm.detailForm[key]['datasource_api'],
                 headers: {
-                  'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
-                  'groupId': 38127
+                  'Token': vm.getAuthToken(),
+                  'groupId': vm.getScopeGroupId()
                 }
               }
             )
