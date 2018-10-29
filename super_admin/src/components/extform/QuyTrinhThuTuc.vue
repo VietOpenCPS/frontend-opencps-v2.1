@@ -267,8 +267,11 @@
                     :disabled="loading"
                     @click="updateProcess('update')"
                   >
-                    <v-icon>save</v-icon>&nbsp;
-                    Cập nhật
+                    Ghi lại
+                  </v-btn>
+                  <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
+                    <v-icon>undo</v-icon> &nbsp;
+                    Quay lại
                   </v-btn>
                 </v-flex>
               </v-form>
@@ -1509,7 +1512,7 @@
       backToList () {
         let vm = this
         let currentPath = vm.$router.history.current.path
-        vm.$router.push(currentPath.substring(0, currentPath.indexOf('/editor/')))
+        vm.$router.push(currentPath.substring(0, currentPath.indexOf('/ext/editor/')))
       }
     }
   }
