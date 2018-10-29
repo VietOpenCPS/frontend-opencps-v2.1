@@ -826,3 +826,6 @@ body .e-upload .e-file-select-wrap .e-file-select {
     .e-upload-done-list .e-upload-files .e-upload-file-list .container {
         border-bottom: 1px dashed #c3c3cd;
     }
+    body .v-tabs__item.v-tabs__item--active {
+        background: #0064c726;
+    }
