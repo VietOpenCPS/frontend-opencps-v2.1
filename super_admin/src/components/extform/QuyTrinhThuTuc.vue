@@ -66,11 +66,14 @@
                       required
                     ></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm5 class="pl-3">
-                    <v-radio-group v-model="currentProcess.durationUnit" row>
-                      <v-radio label="Tính theo ngày" :value="0"></v-radio>
-                      <v-radio label="Tính theo giờ" :value="1"></v-radio>
-                    </v-radio-group>
+                  <v-flex xs12 sm5 class="pl-2">
+                    <v-select
+                      box
+                      :items="[{text:'Tính theo ngày', value: 0}, {text:'Tính theo giờ', value: 1}]"
+                      v-model="currentProcess.durationUnit"
+                      item-text="text"
+                      item-value="value"
+                    ></v-select>
                   </v-flex>
                 </v-layout>
               </v-flex>
@@ -80,38 +83,47 @@
               </v-flex>
               <v-flex xs12 sm9>
                 <v-layout wrap>
-                  <v-flex xs12 sm6>
+                  <v-flex xs12 sm4>
                     <v-select
                       box
                       :items="jobposList"
-                      v-model="currentProcess.roleId"
+                      v-model="processRoleId"
                       item-text="title"
                       item-value="jobPosId"
                       :hide-selected="true"
+                      return-object
                       clearable
                     ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm4 class="pl-2">
-                    <v-radio-group v-model="currentProcess.moderator" row>
-                      <v-radio label="Theo dõi" :value="0"></v-radio>
-                      <v-radio label="Thực hiện" :value="1"></v-radio>
-                    </v-radio-group>
+                  <v-flex xs12 sm3 class="pl-2">
+                    <v-select
+                      box
+                      :items="[{text:'Theo dõi', value: 0}, {text:'Thực hiện', value: 1}]"
+                      v-model="processModerator"
+                      item-text="text"
+                      item-value="value"
+                      :disabled="processRoleId?false:true"
+                      return-object
+                      cleable
+                    ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm2 class="pl-2">
-                    <v-btn color="blue"
-                      class="mb-2"
-                      @click="createProcessRole"
+                  <v-flex xs12 sm3 class="pl-2">
+                    <v-text-field
+                      placeholder="Điều kiện phân công xử lý"
+                      v-model="processCondition"
+                      :disabled="processRoleId?false:true"
+                      box
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm2 class="pl-2 text-xs-right">
+                    <v-btn color="blue darken-3" dark
+                      class="mr-0"
+                      @click="createItemRole"
+                      :disabled="processRoleId?false:true"
                     >
                       <v-icon size="24">add</v-icon>&nbsp;
                       Thêm
                     </v-btn>
-                  </v-flex>
-                  <v-flex xs12 sm6>
-                    <v-text-field
-                      placeholder="Điều kiện phân công xử lý"
-                      v-model="currentProcess.condition"
-                      box
-                    ></v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm10>
@@ -120,17 +132,18 @@
                       :headers="headerProcessRoles"
                       :items="processRoleList"
                       hide-actions
-                      class="elevation-1"
+                      class="elevation-1 table-bordered"
+                      style="border: 1px solid #dedede"
                     >
                       <template slot="items" slot-scope="props">
                         <td class="text-xs-left">{{ props.item.role }}</td>
                         <td class="text-xs-left">{{ props.item.moderatorText }}</td>
                         <td class="text-xs-left">{{ props.item.condition }}</td>
                         <td class="justify-center layout px-0">
-                          <v-icon small class="mr-2" @click="editStep(props.item)">
+                          <v-icon small class="mr-2">
                             edit
                           </v-icon>
-                          <v-icon small @click="deleteStep(props.item)">
+                          <v-icon small>
                             delete
                           </v-icon>
                         </td>
@@ -153,6 +166,7 @@
                       box
                       :rules="currentProcess.generateDossierNo ? [rules.required] : []"
                       :required="currentProcess.generateDossierNo"
+                      :disabled="currentProcess.generateDossierNo?false:true"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
@@ -161,8 +175,9 @@
                       placeholder="Cấu hình sinh ngày hẹn trả"
                       v-model="currentProcess.dueDatePattern"
                       box
-                      :rules="currentProcess.dueDatePattern ? [rules.required] : []"
-                      :required="currentProcess.dueDatePattern"
+                      :rules="currentProcess.generateDueDate ? [rules.required] : []"
+                      :required="currentProcess.generateDueDate"
+                      :disabled="currentProcess.generateDueDate?false:true"
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -202,7 +217,7 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-if="id === 0 || id === '0'"
                 :loading="loading"
                 :disabled="loading"
@@ -211,7 +226,7 @@
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-else
                 :loading="loading"
                 :disabled="loading"
@@ -228,7 +243,7 @@
       <v-tab-item id="tab-2" key="tab-2" transition="fade-transition" reverse-transition="fade-transition">
         <!-- Danh sách step -->
         <v-card class="py-2 px-3" v-if="!activeStepDetail" style="margin-bottom:40px">
-          <v-btn color="blue"
+          <v-btn color="blue darken-3" dark
             :loading="loading"
             :disabled="loading"
             class="mb-2"
@@ -347,31 +362,72 @@
                   <v-flex xs12>
                     <div>Vai trò xử lý</div>
                   </v-flex>
-                  <v-flex xs12 sm6 class="">
+                  <v-flex xs12 sm3 class="">
                     <v-select
                       box
                       :items="jobposList"
-                      v-model="currentStep.roleId"
+                      v-model="stepRoleId"
                       item-text="title"
                       item-value="jobPosId"
                       :hide-selected="true"
                       clearable
                     ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm6 class="pl-3">
-                    <v-radio-group v-model="currentStep.moderator" row>
-                      <v-radio label="Theo dõi" :value="0"></v-radio>
-                      <v-radio label="Thực hiện" :value="1"></v-radio>
-                    </v-radio-group>
+                  <v-flex xs12 sm3 class="px-2">
+                    <v-select
+                      box
+                      :items="[{text:'Theo dõi', value: 0}, {text:'Thực hiện', value: 1}]"
+                      v-model="stepModerator"
+                      item-text="text"
+                      item-value="value"
+                      :disabled="stepRoleId?false:true"
+                      cleable
+                    ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm6>
+                  <v-flex xs12 sm4 class="pl-2">
                     <v-text-field
                       placeholder="Điều kiện phân công xử lý"
-                      v-model="currentStep.condition"
+                      v-model="stepCondition"
+                      :disabled="stepRoleId?false:true"
                       box
                     ></v-text-field>
                   </v-flex>
+                  <v-flex xs12 sm2 class="pl-2 text-xs-right">
+                    <v-btn color="blue darken-3" dark
+                      class="mr-0"
+                      @click="createStepRole"
+                      :disabled="stepRoleId?false:true"
+                    >
+                      <v-icon size="24">add</v-icon>&nbsp;
+                      Thêm
+                    </v-btn>
+                  </v-flex>
                 </v-layout>
+              </v-flex>
+              <!--  -->
+              <v-flex xs12 sm10 class="mb-3">
+                <v-data-table
+                  v-if="stepRoleList.length>0"
+                  :headers="headerProcessRoles"
+                  :items="stepRoleList"
+                  hide-actions
+                  class="elevation-1 table-bordered"
+                  style="border: 1px solid #dedede"
+                >
+                  <template slot="items" slot-scope="props">
+                    <td class="text-xs-left">{{ props.item.role }}</td>
+                    <td class="text-xs-left">{{ props.item.moderatorText }}</td>
+                    <td class="text-xs-left">{{ props.item.condition }}</td>
+                    <td class="justify-center layout px-0">
+                      <v-icon small class="mr-2">
+                        edit
+                      </v-icon>
+                      <v-icon small>
+                        delete
+                      </v-icon>
+                    </td>
+                  </template>
+                </v-data-table>
               </v-flex>
               <!--  -->
               <v-flex xs12 sm12>
@@ -419,7 +475,7 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-if="currentStepId === 0 || currentStepId === '0'"
                 :loading="loading"
                 :disabled="loading"
@@ -428,7 +484,7 @@
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-else
                 :loading="loading"
                 :disabled="loading"
@@ -437,7 +493,7 @@
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
               </v-btn>
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 :loading="loading"
                 :disabled="loading"
                 @click="goBackStepList"
@@ -453,7 +509,7 @@
       <v-tab-item id="tab-3" key="tab-3" transition="fade-transition" reverse-transition="fade-transition">
         <!-- Danh sách Action -->
         <v-card class="py-2 px-3" v-if="!activeActionDetail" style="margin-bottom:40px">
-          <v-btn color="blue"
+          <v-btn color="blue darken-3" dark
             :loading="loading"
             :disabled="loading"
             class="mb-2"
@@ -697,10 +753,10 @@
               <!--  -->
               <v-flex xs12 sm12>
                 <v-layout wrap>
-                  <v-flex xs12 sm6 class="pr-2">
+                  <v-flex xs12 sm3 class="pr-2">
                     <v-checkbox label="Sinh mã số tiếp nhận" v-model="currentAction.createDossierNo"></v-checkbox>
                   </v-flex>
-                  <v-flex xs12 sm6 class="pl-2">
+                  <v-flex xs12 sm3 class="pl-2">
                     <v-checkbox label="Có ký số điện tử" v-model="currentAction.eSignature"></v-checkbox>
                   </v-flex>
                 </v-layout>
@@ -714,7 +770,7 @@
               background: white;
               z-index: 2;
             ">
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-if="currentActionId === 0 || currentActionId === '0'"
                 :loading="loading"
                 :disabled="loading"
@@ -723,7 +779,7 @@
                 <v-icon>add_circle_outline</v-icon>&nbsp;
                 Thêm mới
               </v-btn>
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 v-else
                 :loading="loading"
                 :disabled="loading"
@@ -732,7 +788,7 @@
                 <v-icon>save</v-icon>&nbsp;
                 Cập nhật
               </v-btn>
-              <v-btn color="blue"
+              <v-btn color="blue darken-3" dark
                 :loading="loading"
                 :disabled="loading"
                 @click="goBackActionList"
@@ -753,6 +809,12 @@
     props: ['id'],
     data () {
       return {
+        processRoleId: '',
+        processModerator: '',
+        processCondition: '',
+        stepRoleId: '',
+        stepModerator: '',
+        stepCondition: '',
         activeStep: false,
         activeStepDetail: false,
         currentStepId: '',
@@ -762,6 +824,22 @@
         loading: false,
         active: null,
         processRoleList: [
+          {
+            role: 'Nguyễn Văn Nam',
+            roleId: 102,
+            moderator: 0,
+            moderatorText: 'Theo dõi',
+            condition: 'viaPostal'
+          },
+          {
+            role: 'Vũ Văn Hùng',
+            roleId: 103,
+            moderator: 1,
+            moderatorText: 'Thực hiện',
+            condition: 'eSignature'
+          }
+        ],
+        stepRoleList: [
           {
             role: 'Nguyễn Văn Nam',
             roleId: 102,
@@ -1183,6 +1261,11 @@
           vm.currentProcess['type'] = type
           vm.$store.dispatch('postProcess', vm.currentProcess).then(function (result) {
             if (type === 'add') {
+              if (vm.processRoleList.length > 0) {
+                for (let roleItem in vm.processRoleList) {
+                  vm.createProcessRoles(result.serviceProcessId, roleItem)
+                }
+              }
               vm.$router.push({
                 path: currentPath.replace(0, result.serviceProcessId),
                 query: {
@@ -1197,6 +1280,29 @@
             console.log(reject)
           })
         }
+      },
+      createItemRole () {
+        let vm = this
+        let itemAdd = {
+          roleId: vm.processRoleId.jobPosId,
+          role: vm.processRoleId.title,
+          moderator: vm.processModerator.moderator,
+          moderatorText: vm.processModerator.text,
+          condition: vm.processCondition
+        }
+        vm.processRoleList.unshift(itemAdd)
+      },
+      createProcessRoles (processId, processRoles) {
+        var vm = this
+        let filter = {
+          processId: processId,
+          processRoles: processRoles
+        }
+        vm.$store.dispatch('postProcessRoles', filter).then(function (result) {
+          vm.currentProcess = result
+        }).catch(reject => {
+          console.log(reject)
+        })
       },
       createStep () {
         var vm = this
@@ -1341,7 +1447,7 @@
           // vm.$router.push(currentPath + '?action=true&page=' + vm.listActionPage)
         }
       },
-      createProcessRole () {},
+      createStepRole () {},
       goBackStepList () {
         let vm = this
         let currentPath = vm.$router.history.current.path
