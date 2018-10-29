@@ -3,12 +3,18 @@
     <v-content>
         <router-view></router-view>
     </v-content>
+    <go-top :size="42" bg-color="#0064c7"></go-top>
   </v-app>
 </template>
 
 <script>
+  import GoTop from '@inotom/vue-go-top'
+
   export default {
     data: () => ({}),
+    components: {
+      GoTop
+    },
     computed: {
       user () {
         return this.$store.getters.user

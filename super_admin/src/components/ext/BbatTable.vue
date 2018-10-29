@@ -58,16 +58,6 @@
         <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
       </div>
     </v-card>
-    <v-card v-if="dataSocket['tableData'] === '[]'" class="px-2 mx-1 mb-5" style="overflow: hidden;">
-      <v-alert
-        :value="true"
-        color="info"
-        icon="info"
-        outline
-      >
-        Không tìm thấy kết quả {{nameScreen}}
-      </v-alert>
-    </v-card>
     
     <v-menu
       v-model="showMenu"
@@ -196,18 +186,19 @@
               vm.$store.commit('setlistTableMenu', listTableMenu)
             }
             if (dataObj['cmd'] !== 'get') {
-              let currentPath = vm.$router.history.current.path
-              let currentQuery = vm.$router.history.current.query
-              let page = 1
-              if (currentQuery.hasOwnProperty('page')) {
-                page = currentQuery['page']
-              }
-              vm.$router.push({
-                path: currentPath.substring(0, currentPath.indexOf('/editor/')),
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                  page: page
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
                 }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
               })
             }
           }
@@ -240,6 +231,7 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
+        newQuery['state_change'] = '0'
         newQuery['page'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
@@ -253,13 +245,21 @@
       },
       getData () {
         let vm = this
-        console.log(vm.showFilter)
         if (!vm.showFilter) {
           vm.columnsDataFilter = []
         } else {
           for (var key in vm.filterData) {
             vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key]
           }
+        }
+        let query = vm.$router.history.current.query
+        if (query.hasOwnProperty('pk')) {
+          vm.columnsDataFilter.push({
+            key: query['col'],
+            value_filter: query['pk'],
+            compare: "=",
+            type: isNaN(query['pk']) ? 'text' : 'number'
+          })
         }
         vm.$socket.sendObj(
           {
@@ -291,12 +291,12 @@
             filter: vm.columnsDataFilter
           }
         )
-        vm.problem = true
         setTimeout(() => {
           if (window.$('#table_database_' + vm.tableName).is(':empty')) {
             vm.rePullData()
           }
         }, 200)
+        vm.problem = true
       },
       show (e) {
         e.preventDefault()
@@ -343,12 +343,19 @@
             onchange: function (instance, cell, value) {
               let cellIndex = cell[0].cellIndex - 1
               vm.filterData[cellIndex] = value
-              let currentPath = vm.$router.history.current.path
-              vm.$router.push({
-                path: currentPath.substring(0, currentPath.indexOf('/editor/')),
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
                 }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: current.path + queryString
               })
             },
             columns: columns
@@ -399,8 +406,11 @@
         } else {
           idEditor = id
         }
+        let current = vm.$router.history.current
+        let newQuery = current.query
         vm.$router.push({
-          path: '/table/' + vm.tableName + '/editor/' + idEditor
+          path: '/table/' + vm.tableName + '/editor/' + idEditor,
+          query: newQuery
         })
       },
       deleteRecord () {

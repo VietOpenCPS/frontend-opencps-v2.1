@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",
+    "@inotom/vue-go-top": "^1.0.2",
+    "@syncfusion/ej2-vue-inputs": "^16.3.27",
     "axios": "^0.18.0",
     "cors": "^2.8.4",
     "roboto-fontface": "*",

@@ -40,8 +40,8 @@ export const store = new Vuex.Store({
           },
           {
             icon: 'filter_3',
-            link: '/table/quy_trinh_thu_tuc',
-            code: 'quy_trinh_thu_tuc',
+            link: '/table/opencps_serviceprocess',
+            code: 'opencps_serviceprocess',
             text: 'Quy trình thủ tục'
           },
           {
@@ -159,6 +159,25 @@ export const store = new Vuex.Store({
           }
         }
         resolve(state.initData)
+      })
+    },
+    getServiceFileTemplate ({state}, pk) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/employees', param).then(function (response) {
+        axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+          let seriable = response.data
+          if (seriable.data) {
+            resolve(seriable)
+          }
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
       })
     },
     getJobposList ({state}) {
