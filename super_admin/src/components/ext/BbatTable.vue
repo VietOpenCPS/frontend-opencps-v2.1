@@ -408,10 +408,17 @@
         }
         let current = vm.$router.history.current
         let newQuery = current.query
-        vm.$router.push({
-          path: '/table/' + vm.tableName + '/editor/' + idEditor,
-          query: newQuery
-        })
+        if (eval('( ' + vm.dataSocket['tableConfig'] + ' )')['extForm']) {
+          vm.$router.push({
+            path: '/table/' + vm.tableName + '/ext/editor/' + idEditor,
+            query: newQuery
+          })
+        } else {
+          vm.$router.push({
+            path: '/table/' + vm.tableName + '/editor/' + idEditor,
+            query: newQuery
+          })
+        }
       },
       deleteRecord () {
         let vm = this
