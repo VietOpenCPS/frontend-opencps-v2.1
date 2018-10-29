@@ -4,7 +4,20 @@
       margin-bottom: 100px;
     ">
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
-        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + id">
+        <datetime-picker v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
+        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['dependency'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + id">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
+          {{item.label}}
+        </v-btn>
+        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['popup']" v-on:click.native="showAccount(item)">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
+          {{item.label}}
+        </v-btn>
+        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['attached']" v-on:click.native="showAttached(item)">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk">
@@ -18,6 +31,7 @@
           box
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
+          :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
         ></v-autocomplete>
         <v-text-field v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
@@ -43,14 +57,16 @@
           v-model="data[item.model]"
         ></v-switch>
       </v-flex>
-      <v-flex xs12 class="text-right" style="
+      <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
           position: fixed;
           bottom: 0;
-          width: -webkit-calc( 100% - 300px );
-          width: calc( 100% - 300px );
+          width: -webkit-calc( 100% - 308px );
+          width: calc( 100% - 308px );
           background: white;
-          z-index: 2;
+          z-index: 4;
+          border-top: 1px solid #dcdcdc;
       ">
+        <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
         <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark
           :loading="loading"
           :disabled="loading"
@@ -72,14 +88,129 @@
         </div>
       </v-flex>
     </v-layout>
+    <v-navigation-drawer
+      v-model="rightAttached"
+      right
+      app
+      fixed
+      temporary
+      style="background: #fff;"
+      :width="500"
+    >
+      <v-card>
+        <v-card-title primary-title class="pb-0">
+          <v-layout row wrap>
+            <v-flex xs12 class="text-center title">
+              {{layoutNameDynamic}}
+              <v-btn class="my-0" flat icon color="primary" v-on:click.native="rightAttached = false">
+                <v-icon>clear</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+      <v-card>
+        <v-card-title primary-title class="pb-0 pt-2">
+          <v-layout row wrap>
+            <v-flex xs12>
+
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+    </v-navigation-drawer>
+    <v-navigation-drawer
+      v-model="rightAccount"
+      right
+      app
+      fixed
+      temporary
+      style="background: #fff;"
+    >
+      <v-card>
+        <v-card-title primary-title class="pb-0">
+          <v-layout row wrap>
+            <v-flex xs12 class="text-center title">
+              {{layoutNameDynamic}}
+              <v-btn class="my-0" flat icon color="primary" v-on:click.native="rightAccount = false">
+                <v-icon>clear</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+      <v-card>
+        <v-card-title primary-title class="pb-0 pt-2">
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-text-field
+                v-model="screenLogin"
+                label="Tên đăng nhập" 
+                box 
+                readonly
+              >
+              </v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                v-model="emailLogin"
+                label="Tài khoản đăng nhập" 
+                box 
+                readonly
+              >
+              </v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+      <v-divider></v-divider>
+      <v-card>
+        <v-card-title primary-title class="pb-0 pt-2">
+          <v-layout row wrap>
+            <v-flex xs12 class="text-center title">
+              Đổi mật khẩu
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+      <v-card>
+        <v-card-title primary-title class="pt-2">
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-text-field
+                v-model="password"
+                label="Mật khẩu mới" 
+                box 
+              >
+              </v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-btn block color="blue darken-3" dark>Xác nhận</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-title>
+      </v-card>
+      
+    </v-navigation-drawer>
   </v-form>
 </template>
 
 <script>
+  import DatetimePicker from './DatetimePicker.vue'
+
   export default {
     props: ['tableConfig', 'detailData', 'id', 'tableName'],
+    components: {
+      DatetimePicker
+    },
     data() {
       return {
+        layoutNameDynamic: '',
+        screenLogin: '',
+        emailLogin: '',
+        password: '',
+        rightAttached: false,
+        rightAccount: false,
         pullOk: true,
         dsfdsf: false,
         valid: true,
@@ -96,6 +227,10 @@
         },
         rules: {
           required: value => !!value || 'Bắt buộc phải nhập.',
+          number: value => {
+            const pattern = /\d/
+            return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
+          },
           email: value => {
             const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             return pattern.test(value) || 'Sai định dạng thư điện tử.'
@@ -201,9 +336,9 @@
       },
       processDataSource () {
         let vm = this
-        vm.pullOk = false
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
+            vm.pullOk = false
             vm.$socket.sendObj(
               {
                 type: 'api',
@@ -218,6 +353,16 @@
             )
           }
         }
+      },
+      showAccount (item) {
+        let vm = this
+        vm.layoutNameDynamic = item['label']
+        vm.rightAccount = !vm.rightAccount
+      },
+      showAttached (item) {
+        let vm = this
+        vm.layoutNameDynamic = item['label']
+        vm.rightAttached = !vm.rightAttached
       }
     }
   }
