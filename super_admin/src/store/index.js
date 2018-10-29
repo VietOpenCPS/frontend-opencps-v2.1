@@ -184,412 +184,530 @@ export const store = new Vuex.Store({
     },
     getJobposList ({state}) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/jobpos', param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/jobpos', param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getDossierStatusList ({state}) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/dictcollections/DOSSIER_STATUS/dictitems', param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getDossierSubStatusList ({state}, dossierStatus) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/dictcollections/DOSSIER_STATUS/dictitems?parent=' + dossierStatus, param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getDossierTemplate ({state}) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/dossiertemplates', param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/dossiertemplates', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getEmployee ({state}) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/employees', param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/employees', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getDossierPart ({state}, template) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/dossiertemplates/' + template + '/parts', param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/dossiertemplates/' + template + '/parts', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getProcessDetail ({state}, id) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/serviceprocesses/' + id, param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + id, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getProcessStepsDetail ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps/' + filter.stepCode, param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps/' + filter.stepCode, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getProcessStep ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
-          },
-          params: {
-            start: filter.page * 15 - 15,
-            end: filter.page * 15
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.page * 15 - 15,
+              end: filter.page * 15
+            }
           }
-        }
-        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getProcessAction ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
-          },
-          params: {
-            start: filter.page * 15 - 15,
-            end: filter.page * 15
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.page * 15 - 15,
+              end: filter.page * 15
+            }
           }
-        }
-        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable.data)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getProcessRole ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/roles', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     getProcessActionsDetail ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions/' + filter.actionCode, param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions/' + filter.actionCode, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     deleteProcessAction ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.actionCode, param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.actionCode, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
     postProcess ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        var dataPostProcess = new URLSearchParams()
-        dataPostProcess.append('processNo', data.processNo)
-        dataPostProcess.append('processName', data.processName)
-        dataPostProcess.append('description', data.description)
-        dataPostProcess.append('durationCount', data.durationCount)
-        dataPostProcess.append('durationUnit', data.durationUnit)
-        dataPostProcess.append('generateDossierNo', data.generateDossierNo)
-        dataPostProcess.append('dossierNoPattern', data.dossierNoPattern)
-        dataPostProcess.append('generateDueDate', data.generateDueDate)
-        dataPostProcess.append('dueDatePattern', data.dueDatePattern)
-        dataPostProcess.append('generatePassword', data.generatePassword)
-        dataPostProcess.append('directNotification', data.directNotification)
-        dataPostProcess.append('serverNo', data.serverNo)
-        if (data.type === 'add') {
-          axios.post(state.endPointApi + '/serviceprocesses', dataPostProcess, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        } else {
-          axios.put(state.endPointApi + '/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        }
+          var dataPostProcess = new URLSearchParams()
+          dataPostProcess.append('processNo', data.processNo)
+          dataPostProcess.append('processName', data.processName)
+          dataPostProcess.append('description', data.description)
+          dataPostProcess.append('durationCount', data.durationCount)
+          dataPostProcess.append('durationUnit', data.durationUnit)
+          dataPostProcess.append('generateDossierNo', data.generateDossierNo)
+          dataPostProcess.append('dossierNoPattern', data.dossierNoPattern)
+          dataPostProcess.append('generateDueDate', data.generateDueDate)
+          dataPostProcess.append('dueDatePattern', data.dueDatePattern)
+          dataPostProcess.append('generatePassword', data.generatePassword)
+          dataPostProcess.append('directNotification', data.directNotification)
+          dataPostProcess.append('serverNo', data.serverNo)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/serviceprocesses', dataPostProcess, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          } else {
+            axios.put(state.endPointApi + '/serviceprocesses/' + data.serviceProcessId, dataPostProcess, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          }
+        })
       })
     },
     postProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        var dataPostProcessRoles = new URLSearchParams()
-        dataPostProcessRoles.append('roleId', data.processRoles.roleId)
-        dataPostProcessRoles.append('moderator', data.processRoles.moderator)
-        dataPostProcessRoles.append('condition', data.processRoles.condition)
-        axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles', dataPostProcessRoles, options).then(function (response) {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          resolve(response.data)
-        }).catch(function (error) {
-          reject(error)
-          // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          var dataPostProcessRoles = new URLSearchParams()
+          dataPostProcessRoles.append('roleId', data.processRoles.roleId)
+          dataPostProcessRoles.append('moderator', data.processRoles.moderator)
+          dataPostProcessRoles.append('condition', data.processRoles.condition)
+          axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles', dataPostProcessRoles, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
         })
       })
     },
     putProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        var dataPostProcessRoles = new URLSearchParams()
-        dataPostProcessRoles.append('moderator', data.processRoles.moderator)
-        dataPostProcessRoles.append('condition', data.processRoles.condition)
-        axios.put(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, dataPostProcessRoles, options).then(function (response) {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          resolve(response.data)
-        }).catch(function (error) {
-          reject(error)
-          // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          var dataPostProcessRoles = new URLSearchParams()
+          dataPostProcessRoles.append('moderator', data.processRoles.moderator)
+          dataPostProcessRoles.append('condition', data.processRoles.condition)
+          axios.put(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, dataPostProcessRoles, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
         })
       })
     },
     deleteProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, options).then(function (response) {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          resolve(response.data)
-        }).catch(function (error) {
-          reject(error)
-          // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
         })
       })
     },
     postProcessStep ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        var dataPostStep = new URLSearchParams()
-        dataPostStep.append('stepCode', data.stepCode)
-        dataPostStep.append('stepName', data.stepName)
-        dataPostStep.append('sequenceNo', data.sequenceNo)
-        dataPostStep.append('dossierStatus', data.dossierStatus)
-        dataPostStep.append('dossierSubStatus', data.dossierSubStatus)
-        dataPostStep.append('durationCount', data.durationCount)
-        dataPostStep.append('customProcessUrl', data.customProcessUrl)
-        dataPostStep.append('briefNote', data.briefNote)
-        dataPostStep.append('stepInstruction', data.stepInstruction)
-        dataPostStep.append('lockState', data.lockState)
-        if (data.type === 'add') {
-          axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        } else {
-          axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps/' + data.stepCode, dataPostStep, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        }
+          var dataPostStep = new URLSearchParams()
+          dataPostStep.append('stepCode', data.stepCode)
+          dataPostStep.append('stepName', data.stepName)
+          dataPostStep.append('sequenceNo', data.sequenceNo)
+          dataPostStep.append('dossierStatus', data.dossierStatus)
+          dataPostStep.append('dossierSubStatus', data.dossierSubStatus)
+          dataPostStep.append('durationCount', data.durationCount)
+          dataPostStep.append('customProcessUrl', data.customProcessUrl)
+          dataPostStep.append('briefNote', data.briefNote)
+          dataPostStep.append('stepInstruction', data.stepInstruction)
+          dataPostStep.append('lockState', data.lockState)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          } else {
+            axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps/' + data.stepCode, dataPostStep, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          }
+        })
       })
     },
     deleteProcessStep ({state}, filter) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/steps/' + filter.stepCode, param).then(function (response) {
-          let seriable = response.data
-          if (seriable) {
-            resolve(seriable)
+          axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/steps/' + filter.stepCode, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getStepRole ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps/' + filter.stepId + '/roles', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    postStepRoles ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostProcessRoles = new URLSearchParams()
+          dataPostProcessRoles.append('roleId', data.stepRoles.roleId)
+          dataPostProcessRoles.append('moderator', data.stepRoles.moderator)
+          dataPostProcessRoles.append('condition', data.stepRoles.condition)
+          axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles', dataPostProcessRoles, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        })
+      })
+    },
+    deleteStepRoles ({ state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles/' + data.stepRoles.roleId, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
         })
       })
     },
     postProcessAction ({ state }, data) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Accept': 'application/json'
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
           }
-        }
-        var dataPostAction = new URLSearchParams()
-        dataPostAction.append('actionCode', data.actionCode)
-        dataPostAction.append('actionName', data.actionName)
-        dataPostAction.append('preStepCode', data.preStepCode)
-        dataPostAction.append('postStepCode', data.postStepCode)
-        dataPostAction.append('autoEvent', data.autoEvent)
-        dataPostAction.append('preCondition', data.preCondition)
-        dataPostAction.append('allowAssignUser', data.allowAssignUser)
-        dataPostAction.append('assignUserId', data.assignUserId)
-        dataPostAction.append('requestPayment', data.requestPayment)
-        dataPostAction.append('paymentFee', data.paymentFee)
-        dataPostAction.append('syncActionCode', data.syncActionCode)
-        dataPostAction.append('rollbackable', data.rollbackable)
-        dataPostAction.append('createDossierNo', data.createDossierNo)
-        dataPostAction.append('eSignature', data.eSignature)
-        dataPostAction.append('configNote', data.configNote)
-        dataPostAction.append('dossiertemplatesFileFilter', data.dossierTemplateNo)
-        dataPostAction.append('createDossiers', data.createDossiers)
-        if (data.type === 'add') {
-          axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        } else {
-          axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions/' + data.actionCode, dataPostAction, options).then(function (response) {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            resolve(response.data)
-          }).catch(function (error) {
-            reject(error)
-            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          })
-        }
+          var dataPostAction = new URLSearchParams()
+          dataPostAction.append('actionCode', data.actionCode)
+          dataPostAction.append('actionName', data.actionName)
+          dataPostAction.append('preStepCode', data.preStepCode)
+          dataPostAction.append('postStepCode', data.postStepCode)
+          dataPostAction.append('autoEvent', data.autoEvent)
+          dataPostAction.append('preCondition', data.preCondition)
+          dataPostAction.append('allowAssignUser', data.allowAssignUser)
+          dataPostAction.append('assignUserId', data.assignUserId)
+          dataPostAction.append('requestPayment', data.requestPayment)
+          dataPostAction.append('paymentFee', data.paymentFee)
+          dataPostAction.append('syncActionCode', data.syncActionCode)
+          dataPostAction.append('rollbackable', data.rollbackable)
+          dataPostAction.append('createDossierNo', data.createDossierNo)
+          dataPostAction.append('eSignature', data.eSignature)
+          dataPostAction.append('configNote', data.configNote)
+          dataPostAction.append('dossiertemplatesFileFilter', data.dossierTemplateNo)
+          dataPostAction.append('createDossiers', data.createDossiers)
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          } else {
+            axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions/' + data.actionCode, dataPostAction, options).then(function (response) {
+              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          }
+        })
       })
     }
   },

@@ -443,7 +443,7 @@
                     </v-layout>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm10 class="mb-3">
+                  <v-flex xs12 sm12>
                     <v-data-table
                       v-if="stepRoleList.length>0"
                       :headers="headerProcessRoles"
@@ -453,14 +453,11 @@
                       style="border: 1px solid #dedede"
                     >
                       <template slot="items" slot-scope="props">
-                        <td class="text-xs-left">{{ props.item.role }}</td>
-                        <td class="text-xs-left">{{ props.item.moderatorText }}</td>
+                        <td class="text-xs-left">{{ props.item.roleName }}</td>
+                        <td class="text-xs-left">{{ props.item.moderator|moderatorText }}</td>
                         <td class="text-xs-left">{{ props.item.condition }}</td>
                         <td class="justify-center layout px-0">
-                          <v-icon small class="mr-2">
-                            edit
-                          </v-icon>
-                          <v-icon small>
+                          <v-icon small @click="deleteProcessRoles(props.item)">
                             delete
                           </v-icon>
                         </td>
@@ -631,6 +628,7 @@
                       item-text="text"
                       item-value="value"
                       :hide-selected="true"
+                      return-object
                       clearable
                     ></v-select>
                   </v-flex>
@@ -874,38 +872,8 @@
         currentActionId: '',
         loading: false,
         active: null,
-        processRoleList: [
-          {
-            role: 'Nguyễn Văn Nam',
-            roleId: 102,
-            moderator: 0,
-            moderatorText: 'Theo dõi',
-            condition: 'viaPostal'
-          },
-          {
-            role: 'Vũ Văn Hùng',
-            roleId: 103,
-            moderator: 1,
-            moderatorText: 'Thực hiện',
-            condition: 'eSignature'
-          }
-        ],
-        stepRoleList: [
-          {
-            role: 'Nguyễn Văn Nam',
-            roleId: 102,
-            moderator: 0,
-            moderatorText: 'Theo dõi',
-            condition: 'viaPostal'
-          },
-          {
-            role: 'Vũ Văn Hùng',
-            roleId: 103,
-            moderator: 1,
-            moderatorText: 'Thực hiện',
-            condition: 'eSignature'
-          }
-        ],
+        processRoleList: [],
+        stepRoleList: [],
         headerProcessRoles: [
           {
             text: 'Tên',
@@ -1164,6 +1132,7 @@
         var vm = this
         vm.$store.dispatch('getProcessDetail', id).then(function (result) {
           vm.currentProcess = result
+          vm.getProcessRoles()
         }).catch(reject => {
           console.log(reject)
         })
@@ -1176,6 +1145,7 @@
         }
         vm.$store.dispatch('getProcessStepsDetail', filter).then(function (result) {
           vm.currentStep = result
+          vm.getStepRoles(result.stepCode)
           vm.changeDossierStatus()
         }).catch(reject => {
           console.log(reject)
@@ -1247,7 +1217,17 @@
           console.log(reject)
         })
       },
-      getProcessRoles () {},
+      getProcessRoles () {
+        var vm = this
+        let filter = {
+          processId: vm.id
+        }
+        vm.$store.dispatch('getProcessRole', filter).then(function (result) {
+          vm.processRoleList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       //
       doDetailContent () {
         var vm = this
@@ -1336,12 +1316,16 @@
         let vm = this
         let itemAdd = {
           roleId: vm.processRoleId.jobPosId,
-          role: vm.processRoleId.title,
-          moderator: vm.processModerator.moderator,
+          roleName: vm.processRoleId.title,
+          moderator: vm.processModerator.value,
           moderatorText: vm.processModerator.text,
           condition: vm.processCondition
         }
-        vm.processRoleList.unshift(itemAdd)
+        if (Number(vm.id) > 0) {
+          vm.createProcessRoles(vm.id, itemAdd)
+        } else {
+          vm.processRoleList.unshift(itemAdd)
+        }
       },
       createProcessRoles (processId, processRoles) {
         var vm = this
@@ -1350,7 +1334,21 @@
           processRoles: processRoles
         }
         vm.$store.dispatch('postProcessRoles', filter).then(function (result) {
-          vm.currentProcess = result
+          console.log(result)
+          vm.getProcessRoles()
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      deleteProcessRoles (processRoles) {
+        var vm = this
+        let filter = {
+          processId: vm.id,
+          processRoles: processRoles
+        }
+        vm.$store.dispatch('deleteProcessRoles', filter).then(function (result) {
+          console.log(result)
+          vm.getProcessRoles()
         }).catch(reject => {
           console.log(reject)
         })
@@ -1400,6 +1398,53 @@
         })
         // vm.$router.push(currentPath + '?step=true&stepCode=' + itemStep.stepCode)
       },
+      createItemStepRole () {
+        let vm = this
+        let currentQuery = vm.$router.history.current.query
+        let stepCode = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
+        let itemAdd = {
+          roleId: vm.stepRoleId.jobPosId,
+          roleName: vm.stepRoleId.title,
+          moderatorText: vm.stepModerator.text,
+          moderator: vm.stepModerator.value,
+          condition: vm.stepCondition
+        }
+        if (stepCode > 0) {
+          vm.createStepRoles(stepCode, itemAdd)
+        } else {
+          vm.stepRoleList.unshift(itemAdd)
+        }
+      },
+      createStepRoles (stepId, stepRoles) {
+        var vm = this
+        let filter = {
+          processId: vm.id,
+          stepRoles: stepRoles,
+          stepId: stepId
+        }
+        vm.$store.dispatch('postStepRoles', filter).then(function (result) {
+          console.log(result)
+          vm.getStepRoles()
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      deleteStepRoles (stepRoles) {
+        var vm = this
+        let currentQuery = vm.$router.history.current.query
+        let stepId = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
+        let filter = {
+          processId: vm.id,
+          stepRoles: stepRoles,
+          stepId: stepId
+        }
+        vm.$store.dispatch('deleteStepRoles', filter).then(function (result) {
+          console.log(result)
+          vm.getStepRoles()
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       deleteStep (itemStep) {
         var vm = this
         let filter = {
@@ -1409,6 +1454,18 @@
         vm.$store.dispatch('deleteProcessStep', filter).then(function (result) {
           console.log(result)
           vm.getProcessSteps(vm.id)
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
+      getStepRoles (stepId) {
+        var vm = this
+        let filter = {
+          processId: vm.id,
+          stepId: stepId
+        }
+        vm.$store.dispatch('getStepRole', filter).then(function (result) {
+          vm.stepRoleList = result
         }).catch(reject => {
           console.log(reject)
         })
@@ -1513,6 +1570,15 @@
         let vm = this
         let currentPath = vm.$router.history.current.path
         vm.$router.push(currentPath.substring(0, currentPath.indexOf('/ext/editor/')))
+      }
+    },
+    filters: {
+      moderatorText (arg) {
+        if (arg === 0 || arg === '0') {
+          return 'Theo dõi'
+        } else {
+          return 'Thực hiện'
+        }
       }
     }
   }
