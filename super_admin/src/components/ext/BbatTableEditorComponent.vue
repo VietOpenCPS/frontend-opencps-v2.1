@@ -25,7 +25,6 @@
         </content-placeholders>
         <v-autocomplete v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
-          :menu-props="data[item.model]"
           :items="dataSocket[item['datasource_key']]"
           :item-text="item.itemText"
           :item-value="item.itemValue"
@@ -37,7 +36,6 @@
         ></v-autocomplete>
         <v-autocomplete v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
-          :menu-props="data[item.model]"
           :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"

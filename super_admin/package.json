@@ -13,6 +13,7 @@
     "@syncfusion/ej2-vue-inputs": "^16.3.27",
     "axios": "^0.18.0",
     "cors": "^2.8.4",
+    "file-saver": "^2.0.0-rc.4",
     "roboto-fontface": "*",
     "vue": "^2.5.17",
     "vue-codemirror": "^4.0.5",

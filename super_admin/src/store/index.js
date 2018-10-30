@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import saveAs from 'file-saver'
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -163,15 +165,69 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    getServiceFileTemplate ({state}, pk) {
+    downloadServiceFileTemplate ({state}, item) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/octet-stream'
+            },
+            responseType: 'blob'
+          }
+          axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function (data) {
+            saveAs(data.data, item['uuid'] + '.' + item['extension'])
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    updateServiceFileTemplate ({state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+          axios.put('http://localhost:8080/o/gate/v2/filetemplate/' + data['item']['serviceInfoId'] + '/' + data['item']['fileTemplateNo'], {
+            fileTemplateNo: data['fileTemplateNo'],
+            templateName: data['templateName']
+          }, param).then(function () {
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    removeServiceFileTemplate ({state}, item) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.delete('http://localhost:8080/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function () {
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getServiceFileTemplate ({state}, pk) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable)
