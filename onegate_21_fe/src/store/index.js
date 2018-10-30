@@ -930,8 +930,8 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
           dataPutdossier.append('postalAddress', data.postalAddress)
           dataPutdossier.append('postalCityCode', data.postalCityCode)
-          dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
-          dataPutdossier.append('postalWardCode', data.postalWardCode)
+          // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
+          // dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
@@ -1739,7 +1739,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
@@ -1796,13 +1796,17 @@ export const store = new Vuex.Store({
               }
             }
             axios.get(state.initData.dossierApi, param).then(function (response) {
-              let serializable = response.data.data
-              if (serializable.length > 0) {
-                for (var key in serializable) {
-                  serializable[key].dossierLog = []
-                }
+              let serializable = response.data
+              // if (serializable.length > 0) {
+              //   for (var key in serializable) {
+              //     serializable[key].dossierLog = []
+              //   }
+              // }
+              if (serializable.data) {
+                resolve(serializable.data)
+              } else {
+                resolve([])
               }
-              resolve(serializable)
             }).catch(function (error) {
               reject(error)
             })
@@ -2254,6 +2258,31 @@ export const store = new Vuex.Store({
                   'itemName': 'toàn bộ'
                 })
               }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getVNPOSTcode ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/ADMINISTRATIVE_REGION/dictitems', param).then(function (response) {
+          axios.get('/o/rest/v2/dictcollections/VNPOST_CITY_CODE/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
               resolve(dataReturn)
             } else {
               resolve([])
