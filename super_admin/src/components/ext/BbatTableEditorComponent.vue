@@ -10,7 +10,7 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
-        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['popup'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAccount(item)">
+        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['account'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAccount(item)">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
@@ -20,13 +20,25 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
-        <content-placeholders v-if="item.type === 'selects' && !pullOk">
+        <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-autocomplete v-if="item.type === 'selects' && pullOk"
+        <v-autocomplete v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
-          :menu-props="data[item.model]+''"
-          :items="item.hasOwnProperty('datasource') ? item.datasource : dataSocket[item['datasource_key']]"
+          :menu-props="data[item.model]"
+          :items="dataSocket[item['datasource_key']]"
+          :item-text="item.itemText"
+          :item-value="item.itemValue"
+          box
+          :label="item.required ? item['label'] + ' 💥': item['label']" 
+          :rules="processRules(item.rules)"
+          :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
+          @change="processChangeDataSource($event, item)"
+        ></v-autocomplete>
+        <v-autocomplete v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
+          v-model="data[item.model]"
+          :menu-props="data[item.model]"
+          :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
@@ -218,7 +230,7 @@
         password: '',
         rightAttached: false,
         rightAccount: false,
-        pullOk: false,
+        pullOk: true,
         pullCounter: 0,
         valid: true,
         loading: false,
@@ -235,7 +247,7 @@
         rules: {
           required: value => !!value || 'Bắt buộc phải nhập.',
           number: value => {
-            const pattern = /\d/
+            const pattern = /^\d+$/
             return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
           },
           email: value => {
@@ -249,8 +261,8 @@
       var vm = this
       vm.$nextTick(function() {
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
-          if ((eval('( ' + vm.tableConfig + ' )').detailColumns !== '')) {
-            vm.detailForm = eval('( ' + eval('( ' + vm.tableConfig + ' )').detailColumns + ' )')
+          if (vm.tableConfig['detailColumns'] !== '') {
+            vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')
             vm.processDataSource()
           } else {
             let videoElement = document.getElementById('editor-video-preloader')
@@ -259,7 +271,7 @@
             }
           }
           if (vm.detailData !== null && vm.detailData !== undefined) {
-            vm.data = eval('( ' + vm.detailData + ' )')[0]
+            vm.data = vm.detailData[0]
           } else {
             vm.data = {}
           }
@@ -295,10 +307,20 @@
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
           if (dataObj.respone === 'detail') {
-            vm.data = eval('( ' + vm.dataSocket[dataObj.respone] + ' )')
+            console.log(vm.dataSocket['detail'])
+            console.log((vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined))
+            if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+              if (vm.dataSocket['detail'].length === 0) {
+                vm.data = {}
+              } else {
+                vm.data = vm.dataSocket[dataObj.respone][0]
+              }
+            } else {
+              vm.data = {}
+            }
           }
-          if (dataObj.respone === 'tableConfig') {
-            vm.detailForm = eval('( ' + eval('( ' + vm.dataSocket[dataObj.respone] + ' )').detailColumns + ' )')
+          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+            vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
             vm.processDataSource()
           }
           vm.loading = false
@@ -308,12 +330,8 @@
           }
           if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
             vm.pullCounter = vm.pullCounter - 1
-            console.log(vm.pullCounter)
-            // vm.pullCounter = vm.pullCounter - 1
             if (vm.pullCounter === 0) {
-              setTimeout(() => {
-                vm.pullOk = true
-              }, 500)
+              vm.pullOk = true
             }
           }
         }
@@ -332,6 +350,10 @@
         let vm = this
         if (vm.$refs.form.validate()) {
           vm.loading = true
+          let dataPOST = Object.assign({}, vm.data)
+          delete dataPOST['expandoBridge']
+          delete dataPOST['modelAttributes']
+          delete dataPOST['stagedModelType']
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -339,7 +361,7 @@
               respone: 'detail',
               id: vm.id,
               code: vm.$router.history.current.params.tableName,
-              data: Object.assign({}, vm.data)
+              data: dataPOST
             }
           )
         }
@@ -351,6 +373,7 @@
         let vm = this
         if (item.hasOwnProperty('concatina')) {
           vm.pullOk = false
+          vm.pullCounter = vm.pullCounter + 1
           vm.$socket.sendObj(
             {
               type: 'api',
@@ -358,7 +381,7 @@
               respone: item.concatina['datasource_key'],
               api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
               headers: {
-                'Token': vm.getAuthToken(),
+                'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
                 'groupId': vm.getScopeGroupId()
               }
             }
@@ -371,14 +394,18 @@
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
+            let apiURL = vm.detailForm[key]['datasource_api']
+            if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
+              apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']
+            }
             vm.$socket.sendObj(
               {
                 type: 'api',
                 cmd: 'get',
                 respone: vm.detailForm[key]['datasource_key'],
-                api: vm.detailForm[key]['datasource_api'],
+                api: apiURL,
                 headers: {
-                  'Token': vm.getAuthToken(),
+                  'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
                   'groupId': vm.getScopeGroupId()
                 }
               }

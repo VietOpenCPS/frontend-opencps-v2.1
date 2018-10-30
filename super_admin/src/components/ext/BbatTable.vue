@@ -125,17 +125,10 @@
       }
     },
     watch: {
-      dataSocket: {
-        handler: function (value) {
-          if (value['tableConfig'] !== null && value['tableConfig'] !== undefined && value['tableData'] !== null && value['tableData'] !== undefined) {
-            this.generateTable()
-          }
-        },
-        deep: true
-      },
       '$route': function (newRoute, oldRoute) {
         console.debug(oldRoute)
         let vm = this
+        vm.dataSocket = {}
         vm.problem = true
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('state_change') && String(currentQuery['state_change']) !== '0') {
@@ -160,13 +153,15 @@
           vm.page = 1
         }
         let videoElement = document.getElementById('editor-video-preloader')
-        videoElement.play()
+        if (videoElement !== null && videoElement !== undefined) {
+          videoElement.play()
+        }
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           if (dataObj['status'] === '200') {
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined) {
-              vm.nameScreen = eval('( ' +vm.dataSocket['tableConfig']+ ' )')['name']
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
+              vm.nameScreen = vm.dataSocket['tableConfig']['name']
               vm.generateTable()
             }
             if (dataObj.respone === 'pageTotalCounter') {
@@ -174,7 +169,7 @@
               vm.showLoadingTable = false
             } else if (dataObj.respone === 'listTableMenu') {
               let listTableMenu = vm.$store.getters.getlistTableMenu
-              let dataMenu = eval('( ' + vm.dataSocket['listTableMenu'] + ' )')
+              let dataMenu = vm.dataSocket['listTableMenu']
               for (let key in dataMenu) {
                 listTableMenu[2].children.push({
                   icon: 'arrow_right',
@@ -250,6 +245,8 @@
         } else {
           for (var key in vm.filterData) {
             vm.columnsDataFilter[key]['value_filter'] = vm.filterData[key]
+            delete vm.columnsDataFilter[key]['source']
+            delete vm.columnsDataFilter[key]['options']
           }
         }
         let query = vm.$router.history.current.query
@@ -291,11 +288,6 @@
             filter: vm.columnsDataFilter
           }
         )
-        setTimeout(() => {
-          if (window.$('#table_database_' + vm.tableName).is(':empty')) {
-            vm.rePullData()
-          }
-        }, 200)
         vm.problem = true
       },
       show (e) {
@@ -313,7 +305,7 @@
         if (vm.showFilter) {
           let dataFilter = [
           ]
-          let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )');
+          let objectConfig = vm.dataSocket['tableConfig']
           let columns = eval('( ' + objectConfig.columns + ' )')
           let colWidths = []
           let colAlignments = []
@@ -366,8 +358,9 @@
       },
       generateTable () {
         let vm = this
-        let objectConfig = eval('( ' + vm.dataSocket['tableConfig'] + ' )')
+        let objectConfig = vm.dataSocket['tableConfig']
         let columns = eval('( ' + objectConfig.columns + ' )')
+        console.log(columns)
         let colWidths = []
         let colAlignments = []
         for (let key in columns) {
@@ -376,7 +369,7 @@
         }
         vm.columnsDataFilter = columns
         window.$('#table_database_' + vm.tableName).jexcel({
-          data: eval('( ' + vm.dataSocket['tableData'] + ' )'),
+          data: vm.dataSocket['tableData'],
           colHeaders: objectConfig.headersName,
           colWidths: colWidths,
           colAlignments: colAlignments,
@@ -401,14 +394,14 @@
         let vm = this
         let idEditor = 0
         if (id === -1) {
-          let tempTableData = eval('( ' + vm.dataSocket['tableData'] + ' )')
+          let tempTableData = vm.dataSocket['tableData']
           idEditor = tempTableData[vm.currentIndex][0]
         } else {
           idEditor = id
         }
         let current = vm.$router.history.current
         let newQuery = current.query
-        if (eval('( ' + vm.dataSocket['tableConfig'] + ' )')['extForm']) {
+        if (vm.dataSocket['tableConfig']['extForm']) {
           vm.$router.push({
             path: '/table/' + vm.tableName + '/ext/editor/' + idEditor,
             query: newQuery
@@ -425,7 +418,7 @@
         var result = confirm('Bạn có muốn xoá bản ghi này?');
         if (result) {
           let idEditor = 0
-          let tempTableData = eval('( ' + vm.dataSocket['tableData'] + ' )')
+          let tempTableData = vm.dataSocket['tableData']
           idEditor = tempTableData[vm.currentIndex][0]
           vm.$socket.sendObj(
             {

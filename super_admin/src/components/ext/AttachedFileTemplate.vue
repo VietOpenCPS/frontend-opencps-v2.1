@@ -57,7 +57,7 @@
                     </li>
                   </ul>
                 </div>
-                <ejs-uploader id='templateupload' name="UploadFiles" :template='fileTemplate' :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :failure= "onFailure" :progress = "onProgress" :removing= "onFileRemove">
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove">
                 </ejs-uploader>
             </div>
         </div>
@@ -73,22 +73,6 @@
 
   Vue.use(UploaderPlugin)
 
-  var demoVue = Vue.component('demo', {
-      template: `<div class='container'>
-                    <span class='wrapper'>
-                    <span :class="['icon sf-icon-' +data.type]"></span>
-                    <span class='name file-name'>{{data.name}} <br/><small>( {{(data.size / (1024 * 1024)).toFixed(2)}} MB )</small></span>
-                    <span v-show="data.status !== 'File uploaded successfully'" class='upload-status'>{{data.status}}</span>
-                    <span class='e-icons e-file-remove-btn' title='Remove'></span>
-                    </span>
-                </div>`,
-    data() {
-      return {
-        data: {}
-      }
-    }
-  })
-
   export default {
     data () {
       return {
@@ -99,10 +83,7 @@
           removeUrl: ''
         },
         extensions: '.pdf, .png, .txt',
-        dropArea: "dropArea",
-        fileTemplate: function (){
-            return { template: demoVue }
-        }
+        dropArea: "dropArea"
       }
     },
     props: ['pickItem', 'pk'],
@@ -156,26 +137,6 @@
         */
         li.remove()
         this.loadFileTemplate()
-      },
-      onFailure: function(args) {
-        let li = this.getLiElement(args)
-        li.querySelector('.upload-status').innerHTML = args.file.status
-        li.querySelector('.upload-status').classList.add('upload-failed')
-      },
-      getLiElement: function(args) {
-        let liElements = document.getElementsByClassName('e-upload')[0].querySelectorAll('.e-upload-files > li')
-        let li
-        for (let i= 0; i < liElements.length; i++) {
-          if ( liElements[i].getAttribute('data-file-name') === args.file.name ) {
-            li = liElements[i]
-          }
-        }
-        return li
-      },
-      onProgress: function(args) {
-        let progressValue = Math.round((args.e.loaded / args.e.total) * 100) + '%'
-        let li = this.getLiElement(args)
-        li.querySelector('.upload-status').innerHTML = args.file.status + '(' + progressValue + ' )'
       },
       onFileRemove: function (args) {
         args.postRawFile = false

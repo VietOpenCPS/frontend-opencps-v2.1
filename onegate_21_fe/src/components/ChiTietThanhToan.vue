@@ -16,13 +16,13 @@
                   <v-subheader class="pl-0 text-right">Lệ phí: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm2>
-                  <p class="mt-1 mb-0">{{payments.feeAmount ? currency(payments.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
+                  <p class="pt-2 mb-0">{{payments.feeAmount ? currency(payments.feeAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
                 </v-flex>
                 <v-flex xs12 sm2 class="pt-1">
                   <v-subheader class="pl-0 text-right">Phí: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3 class="pt-1">
-                  <p class="mt-1 mb-0">{{payments.serviceAmount ? currency(payments.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
+                  <p class="pt-2 mb-0">{{payments.serviceAmount ? currency(payments.serviceAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
                 </v-flex>
                 <v-flex xs12 sm3></v-flex>
                 <!--  -->
@@ -30,7 +30,7 @@
                   <v-subheader class="pl-0 text-right">Phí chuyển phát: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm2 v-if="(dossierDetail.viaPortal === 2 || dossierDetail.viaPortal === '2') && payments.shipAmount !== 0">
-                  <p class="mt-1 mb-0">{{payments.shipAmount ? currency(payments.shipAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
+                  <p class="pt-2 mb-0">{{payments.shipAmount ? currency(payments.shipAmount.toString().replace(/\./g, '')) : 0}} &nbsp;&nbsp; vnđ</p>
                 </v-flex>
                 <v-flex xs12 sm8 v-if="(dossierDetail.viaPortal === 2 || dossierDetail.viaPortal === '2') && payments.shipAmount !== 0"></v-flex>
                 <!--  -->
@@ -68,7 +68,7 @@
                   <v-subheader class="pl-0 text-right">Trạng thái: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{dossierDetail.dossierStatusText}}</p>
+                  <p class="pt-2 mb-0">{{dossierDetail.dossierStatusText}}</p>
                 </v-flex>
                 <v-flex xs12 sm7></v-flex>
                 <div v-if="Number(paymentStatus) >= 3">

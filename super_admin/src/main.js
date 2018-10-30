@@ -14,13 +14,16 @@ import '@syncfusion/ej2-vue-inputs/styles/material.css'
 import VueNativeSock from 'vue-native-websocket'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
+import axios from 'axios'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 let portalURL = window.themeDisplay !== undefined ? window.themeDisplay.getPortalURL() : 'localhost:8080'
-Vue.use(VueNativeSock, 'ws://' + portalURL.replace('http://', '') + '/o/socket-gate?groupId='+ groupId + '&portalURL=' + portalURL, 
+let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
+
+Vue.use(VueNativeSock, 'ws://' + portalURL.replace('http://', '') + '/o/socket-gate?groupId='+ groupId + '&portalURL=' + portalURL + '&Token=' + token, 
   {
     store: store,
     format: 'json',
@@ -28,6 +31,9 @@ Vue.use(VueNativeSock, 'ws://' + portalURL.replace('http://', '') + '/o/socket-g
     reconnectionDelay: 3000
   }
 )
+
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['groupId'] = groupId
 
 Vue.config.productionTip = true
 
@@ -63,3 +69,4 @@ new Vue({
   store,
   render: h => h(App)
 })
+

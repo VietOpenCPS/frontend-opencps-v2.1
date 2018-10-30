@@ -82,9 +82,9 @@
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
             if (vm.dataSocket['detail'] !== '[]') {
-              vm.nameScreen = eval('( ' + vm.dataSocket['detail'] + ' )')[0][dataObj.title]
+              vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
               vm.showDetailForm = true
               vm.noDetail = false
             } else {
