@@ -185,7 +185,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable" @click="rollBackDossier()">Quay lại bước trước</v-btn>
+              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
