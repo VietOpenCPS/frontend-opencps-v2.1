@@ -246,10 +246,11 @@
                     :disabled="loading"
                     @click="updateProcess('update')"
                   >
-                    Ghi lại
+                    <v-icon>save</v-icon>&nbsp;
+                    Cập nhật
                   </v-btn>
                   <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
-                    <v-icon>undo</v-icon> &nbsp;
+                    <v-icon>reply</v-icon>&nbsp;
                     Quay lại
                   </v-btn>
                 </v-flex>
@@ -497,7 +498,7 @@
                     <v-icon>save</v-icon>&nbsp;
                     Cập nhật
                   </v-btn>
-                  <v-btn color="blue darken-3" dark
+                  <v-btn color="red darken-3" dark
                     :loading="loading"
                     :disabled="loading"
                     @click="goBackStepList"
@@ -770,7 +771,7 @@
                     <v-icon>save</v-icon>&nbsp;
                     Cập nhật
                   </v-btn>
-                  <v-btn color="blue darken-3" dark
+                  <v-btn color="red darken-3" dark
                     :loading="loading"
                     :disabled="loading"
                     @click="goBackActionList"
