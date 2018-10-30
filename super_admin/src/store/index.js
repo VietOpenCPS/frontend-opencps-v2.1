@@ -13,8 +13,8 @@ export const store = new Vuex.Store({
       message: '',
       reconnectError: false
     },
-    endPointLocal: 'http://127.0.0.1:8081/api',
     endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
     listTableMenu: [
       {
         icon: 'keyboard_arrow_up',
@@ -184,7 +184,7 @@ export const store = new Vuex.Store({
     },
     getJobposList ({state}) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -203,7 +203,7 @@ export const store = new Vuex.Store({
     },
     getDossierStatusList ({state}) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -222,7 +222,7 @@ export const store = new Vuex.Store({
     },
     getDossierSubStatusList ({state}, dossierStatus) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -241,7 +241,7 @@ export const store = new Vuex.Store({
     },
     getDossierTemplate ({state}) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -260,7 +260,7 @@ export const store = new Vuex.Store({
     },
     getEmployee ({state}) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -279,7 +279,7 @@ export const store = new Vuex.Store({
     },
     getDossierPart ({state}, template) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -298,7 +298,7 @@ export const store = new Vuex.Store({
     },
     getProcessDetail ({state}, id) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -317,7 +317,7 @@ export const store = new Vuex.Store({
     },
     getProcessStepsDetail ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -336,7 +336,7 @@ export const store = new Vuex.Store({
     },
     getProcessStep ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -359,7 +359,7 @@ export const store = new Vuex.Store({
     },
     getProcessAction ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -382,7 +382,7 @@ export const store = new Vuex.Store({
     },
     getProcessRole ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -401,7 +401,7 @@ export const store = new Vuex.Store({
     },
     getProcessActionsDetail ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -420,7 +420,7 @@ export const store = new Vuex.Store({
     },
     deleteProcessAction ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -439,7 +439,7 @@ export const store = new Vuex.Store({
     },
     postProcess ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -481,7 +481,7 @@ export const store = new Vuex.Store({
     },
     postProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -504,7 +504,7 @@ export const store = new Vuex.Store({
     },
     putProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -526,7 +526,7 @@ export const store = new Vuex.Store({
     },
     deleteProcessRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -545,7 +545,7 @@ export const store = new Vuex.Store({
     },
     postProcessStep ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -585,7 +585,7 @@ export const store = new Vuex.Store({
     },
     deleteProcessStep ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -604,7 +604,7 @@ export const store = new Vuex.Store({
     },
     getStepRole ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -623,7 +623,7 @@ export const store = new Vuex.Store({
     },
     postStepRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -646,7 +646,7 @@ export const store = new Vuex.Store({
     },
     deleteStepRoles ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,
@@ -665,7 +665,7 @@ export const store = new Vuex.Store({
     },
     postProcessAction ({ state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let options = {
             headers: {
               'groupId': state.initData.groupId,

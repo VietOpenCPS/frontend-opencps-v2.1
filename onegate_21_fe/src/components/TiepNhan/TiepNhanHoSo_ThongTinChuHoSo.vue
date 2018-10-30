@@ -459,7 +459,7 @@ export default {
     ThongTinChuHoSoBindChuyenPhat () {
       let data = {
         cityCode: this.thongTinChuHoSo.cityCode,
-        address: this.thongTinChuHoSo.address,
+        address: this.thongTinChuHoSo.address + '- ' + this.thongTinChuHoSo.wardName + '- ' + this.thongTinChuHoSo.districtName + '- ' + this.thongTinChuHoSo.cityName,
         districtCode: this.thongTinChuHoSo.districtCode,
         wardCode: this.thongTinChuHoSo.wardCode,
         contactTelNo: this.thongTinChuHoSo.contactTelNo
@@ -568,7 +568,10 @@ export default {
         contactName: data.contactName,
         contactTelNo: data.contactTelNo,
         address: data.address,
-        applicantName: data.applicantName
+        applicantName: data.applicantName,
+        cityName: data.cityName,
+        districtName: data.districtName,
+        wardName: data.wardName
       }
       let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
