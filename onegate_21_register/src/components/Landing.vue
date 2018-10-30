@@ -144,7 +144,7 @@
     <v-dialog scrollable v-model="dialogRules" persistent max-width="600">
       <v-card>
         <v-card-title class="headline">Điều khoản sử dụng</v-card-title>
-        <v-card-text style="max-height: 600px" v-html="'Đây là điều khoản của FDS'"></v-card-text>
+        <v-card-text style="max-height: 600px" v-html="ruleContent"></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" flat="flat" @click.native="dialogRules = false">
@@ -180,6 +180,7 @@ export default {
     passWord: '',
     rePassWord: '',
     agreeRules: false,
+    ruleContent: '',
     e1: true,
     e2: true,
     rules: {
@@ -211,6 +212,7 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let currentQuery = current.query
+      vm.getDieuKhoan()
     })
   },
   updated () {
@@ -260,6 +262,12 @@ export default {
     changeApplicantType () {
       var vm = this
       console.log(vm.applicantType)
+    },
+    getDieuKhoan () {
+      let vm = this
+      vm.$store.dispatch('getDieuKhoan').then(function (result) {
+        vm.ruleContent = result
+      })
     },
     viewRules () {
       let vm = this
