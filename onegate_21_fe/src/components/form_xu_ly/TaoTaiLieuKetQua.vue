@@ -310,6 +310,7 @@
       },
       saveAlpacaForm (item, index) {
         var vm = this
+        console.log('itemSave', item)
         var fileFind = vm.dossierFilesItems.find(itemFile => {
           return itemFile.dossierPartNo === item.partNo && itemFile.eForm
         })
@@ -317,6 +318,10 @@
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+            })
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
@@ -329,6 +334,17 @@
           vm.createFiles[index].daKhai = true
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
+            // var changeCreateFile = {
+            //   createFiles: []
+            // }
+            // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
+            //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
+            //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
+            //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
+            //     }
+            //   }
+            // }
+            // vm.$store.commit('setDataCreateFile', changeCreateFile)
           }).catch(reject => {
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
@@ -407,6 +423,17 @@
                 if (fileViewsTemp) {
                   vm.fileViews = fileViewsTemp
                 }
+                // var changeCreateFile = {
+                //   createFiles: []
+                // }
+                // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
+                //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
+                //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
+                //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
+                //     }
+                //   }
+                // }
+                // vm.$store.commit('setDataCreateFile', changeCreateFile)
               })
             })
           }

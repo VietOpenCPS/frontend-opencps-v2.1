@@ -603,6 +603,10 @@ export default {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+            vm.dossierFilesItems = resFiles
+          }).catch(reject => {
+          })
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn được thực hiện thất bại.')

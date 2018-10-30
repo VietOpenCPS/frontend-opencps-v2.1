@@ -580,6 +580,9 @@ export default {
       var vm = this
       return vm.getOriginality()
     },
+    dataCreateFile () {
+      return this.$store.getters.getDataCreateFile
+    },
     getCheckInput () {
       return this.$store.getters.getCheckInput
     },
@@ -884,6 +887,7 @@ export default {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
           vm.dataEsign = result
+          // vm.$store.commit('setDataCreateFile', result)
         }
         if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined' && result.returnFiles.length > 0) {
           isPopup = true
