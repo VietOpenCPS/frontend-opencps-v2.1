@@ -60,11 +60,11 @@
             THANH TOÁN
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1">
+        <!-- <v-tab :key="4" href="#tabs-4" v-if="originality !== 1" @click="loadHoSoLienThong()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LIÊN THÔNG
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
@@ -311,7 +311,9 @@
             </v-card>
           </v-tab-item>
           <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
-            <div>Thông tin liên thông</div>
+            <v-card>
+              <ho-so-lien-thong :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
+            </v-card>
           </v-tab-item>
           <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <div>
@@ -398,6 +400,7 @@ import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
+import HoSoLienThong from './HoSoLienThong.vue'
 export default {
   props: ['index', 'id'],
   components: {
@@ -414,7 +417,8 @@ export default {
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'ngay-hen-tra': EditDate,
     'ngay-gia-han': ExtendDateEdit,
-    'chi-tiet-thanh-toan': ChiTietThanhToan
+    'chi-tiet-thanh-toan': ChiTietThanhToan,
+    'ho-so-lien-thong': HoSoLienThong
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -565,7 +569,8 @@ export default {
       message: 'Thực hiện thành công!'
     },
     stateViewResult: true,
-    stateViewDocument: true
+    stateViewDocument: true,
+    listLienThong: []
   }),
   computed: {
     loading () {
@@ -644,6 +649,7 @@ export default {
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
+        // vm.loadHoSoLienThong()
         vm.getNextActions()
         vm.runComment()
         // console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
@@ -1646,6 +1652,15 @@ export default {
         vm.paymentDetail = result
         console.log('paymentProfile', vm.paymentProfile)
       }).catch(reject => {
+      })
+    },
+    loadHoSoLienThong () {
+      var vm = this
+      let dossierId = vm.thongTinChiTietHoSo.dossierId
+      vm.$store.dispatch('loadDossierLienThong', dossierId).then(result => {
+        vm.listLienThong = result
+      }).catch(reject => {
+        console.log(reject)
       })
     },
     printViewDocument () {

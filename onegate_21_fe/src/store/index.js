@@ -1739,7 +1739,7 @@ export const store = new Vuex.Store({
           params: {
           }
         }
-        let url = state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/epaymentprofile'
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/payment'
         return new Promise((resolve, reject) => {
           axios.get(url, config).then(function (response) {
             resolve(response.data)
@@ -1796,13 +1796,17 @@ export const store = new Vuex.Store({
               }
             }
             axios.get(state.initData.dossierApi, param).then(function (response) {
-              let serializable = response.data.data
-              if (serializable.length > 0) {
-                for (var key in serializable) {
-                  serializable[key].dossierLog = []
-                }
+              let serializable = response.data
+              // if (serializable.length > 0) {
+              //   for (var key in serializable) {
+              //     serializable[key].dossierLog = []
+              //   }
+              // }
+              if (serializable.data) {
+                resolve(serializable.data)
+              } else {
+                resolve([])
               }
-              resolve(serializable)
             }).catch(function (error) {
               reject(error)
             })
