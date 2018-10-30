@@ -12,7 +12,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }}: </v-subheader>
+                    <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -21,6 +21,8 @@
                     <v-text-field
                       v-if="originality === 1 || originality === '1'"
                       v-model="thongTinChuHoSo.applicantIdNo"
+                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                      required
                     ></v-text-field>
                     <suggestions
                       v-if="originality === 3 || originality === '3'"
@@ -40,7 +42,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}: </v-subheader>
+                    <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm6>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -49,6 +51,8 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.applicantName"
+                    :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                    required
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm2>
@@ -72,7 +76,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
+                    <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -94,7 +98,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
+                    <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -116,7 +120,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Xã/Phường: </v-subheader>
+                    <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -192,7 +196,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">CMND/Hộ chiếu: </v-subheader>
+                      <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -201,6 +205,8 @@
                       <v-text-field
                       v-if="originality === 1 || originality === '1'"
                       v-model="thongTinNguoiNopHoSo.delegateIdNo"
+                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                      required
                       ></v-text-field>
                       <!--  -->
                       <suggestions
@@ -221,7 +227,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Họ và tên: </v-subheader>
+                      <v-subheader v-else class="pl-0">Họ và tên <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -230,6 +236,8 @@
                       <v-text-field
                       v-else
                       v-model="thongTinNguoiNopHoSo.delegateName"
+                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                      required
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -253,7 +261,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố: </v-subheader>
+                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -275,7 +283,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Quận/Huyện: </v-subheader>
+                      <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -297,7 +305,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Xã/Phường: </v-subheader>
+                      <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -459,7 +467,7 @@ export default {
     ThongTinChuHoSoBindChuyenPhat () {
       let data = {
         cityCode: this.thongTinChuHoSo.cityCode,
-        address: this.thongTinChuHoSo.address + '- ' + this.thongTinChuHoSo.wardName + '- ' + this.thongTinChuHoSo.districtName + '- ' + this.thongTinChuHoSo.cityName,
+        address: this.thongTinChuHoSo.address,
         districtCode: this.thongTinChuHoSo.districtCode,
         wardCode: this.thongTinChuHoSo.wardCode,
         contactTelNo: this.thongTinChuHoSo.contactTelNo

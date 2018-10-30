@@ -13,7 +13,7 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">Dịch vụ đăng ký: </v-subheader>
+                <v-subheader v-else class="pl-0">Dịch vụ đăng ký <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm10>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -59,7 +59,7 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">Địa chỉ trả kết quả: </v-subheader>
+                <v-subheader v-else class="pl-0">Địa chỉ trả kết quả<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm6>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -76,7 +76,7 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-subheader v-else class="pl-0">SĐT người nhận: </v-subheader>
+                <v-subheader v-else class="pl-0">SĐT người nhận<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
               </v-flex>
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -91,6 +91,27 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 sm2>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-subheader v-else class="pl-0">Bưu cục<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <content-placeholders class="mt-1" v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-select
+                  v-else
+                  :items="vnPostItems"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  v-model="dichVuChuyenPhatKetQua.postalCityCode"
+                  autocomplete
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                ></v-select>
+              </v-flex>
+              <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
@@ -148,7 +169,7 @@
                   v-model="dichVuChuyenPhatKetQua.postalWardCode"
                   autocomplete
                 ></v-select>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
           </v-form>
         </v-slide-y-transition>
@@ -197,6 +218,10 @@ export default {
     }
   },
   created () {
+    let vm = this
+    vm.$store.dispatch('getVNPOSTcode').then(result => {
+      vm.vnPostItems = result
+    })
     if (this.postalServiceItems.length > 0) {
       this.dichVuChuyenPhatKetQua.postalServiceCode = this.postalServiceItems[0].itemCode
     }
@@ -204,9 +229,9 @@ export default {
   watch: {
     thongTinChuHoSoBindChuyenPhat (val) {
       var vm = this
-      vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
-      vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
-      vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
+      // vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
+      // vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
+      // vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
       vm.dichVuChuyenPhatKetQua.postalAddress = val.address
       vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
       var filter = {
@@ -214,12 +239,12 @@ export default {
         level: 0,
         parent: 0
       }
-      if (val.cityCode) {
-        vm.onChangeResultCity(val.cityCode)
-      }
-      if (val.districtCode) {
-        vm.onChangeResultDistrict(val.districtCode)
-      }
+      // if (val.cityCode) {
+      //   vm.onChangeResultCity(val.cityCode)
+      // }
+      // if (val.districtCode) {
+      //   vm.onChangeResultDistrict(val.districtCode)
+      // }
     }
   },
   mounted () {
@@ -267,33 +292,33 @@ export default {
       // }
       // vm.dichVuChuyenPhatKetQua = dichVuChuyenPhatKetQuaTemp
       vm.$nextTick(function () {
-        var filter = {
-          collectionCode: 'ADMINISTRATIVE_REGION',
-          level: 0,
-          parent: 0
-        }
-        vm.$store.getters.getDictItems(filter).then(function (result) {
-          vm.citys = result.data
-        })
-        if (data.postalCityCode) {
-          filter.parent = data.postalCityCode
-          filter.level = 1
-          vm.$store.getters.getDictItems(filter).then(function (result) {
-            vm.resultDistricts = result.data
-          })
-        }
-        if (data.postalDistrictCode) {
-          filter.parent = data.postalDistrictCode
-          filter.level = 1
-          vm.$store.getters.getDictItems(filter).then(function (result) {
-            vm.resultWards = result.data
-          })
-        }
-        filter = {
-          collectionCode: 'VNPOST_CODE',
-          level: 0,
-          parent: 0
-        }
+        // var filter = {
+        //   collectionCode: 'ADMINISTRATIVE_REGION',
+        //   level: 0,
+        //   parent: 0
+        // }
+        // vm.$store.getters.getDictItems(filter).then(function (result) {
+        //   vm.citys = result.data
+        // })
+        // if (data.postalCityCode) {
+        //   filter.parent = data.postalCityCode
+        //   filter.level = 1
+        //   vm.$store.getters.getDictItems(filter).then(function (result) {
+        //     vm.resultDistricts = result.data
+        //   })
+        // }
+        // if (data.postalDistrictCode) {
+        //   filter.parent = data.postalDistrictCode
+        //   filter.level = 1
+        //   vm.$store.getters.getDictItems(filter).then(function (result) {
+        //     vm.resultWards = result.data
+        //   })
+        // }
+        // filter = {
+        //   collectionCode: 'VNPOST_CODE',
+        //   level: 0,
+        //   parent: 0
+        // }
         // vm.$store.getters.getDictItems(filter).then(function (result) {
         //   vm.vnPostItems = result.data
         // })
