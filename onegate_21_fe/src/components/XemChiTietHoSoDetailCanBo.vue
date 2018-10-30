@@ -55,12 +55,22 @@
             <span v-if="thongTinChiTietHoSo.finishDate">THÀNH PHẦN HỒ SƠ VÀ KẾT QUẢ</span> <span v-else>THÀNH PHẦN HỒ SƠ</span>
           </v-btn>
         </v-tab>
-        <v-tab :key="3" href="#tabs-3" @click="loadDossierActions()" v-if="originality !== 1">
+        <v-tab v-if="paymentDetail" :key="3" href="#tabs-3" @click="loadThanhToan()">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            THANH TOÁN
+          </v-btn>
+        </v-tab>
+        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            LIÊN THÔNG
+          </v-btn>
+        </v-tab>
+        <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#tabs-4" @click="loadDossierLogs()">
+        <v-tab :key="6" href="#tabs-6" @click="loadDossierLogs()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             NHẬT KÝ SỬA ĐỔI
           </v-btn>
@@ -295,7 +305,15 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-tab-item>
-          <v-tab-item id="tabs-3" v-if="originality !== 1" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card>
+              <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+            <div>Thông tin liên thông</div>
+          </v-tab-item>
+          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <div>
               <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
@@ -333,7 +351,7 @@
               </v-data-table>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">
@@ -371,6 +389,7 @@ import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
 import TraKetQua from './form_xu_ly/TraKetQua.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
@@ -394,7 +413,8 @@ export default {
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'ngay-hen-tra': EditDate,
-    'ngay-gia-han': ExtendDateEdit
+    'ngay-gia-han': ExtendDateEdit,
+    'chi-tiet-thanh-toan': ChiTietThanhToan
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -455,6 +475,7 @@ export default {
     userNote: 0,
     partView: '',
     stateView: false,
+    paymentDetail: '',
     paymentProfile: '',
     payment_type: 0,
     type_assign: 0,
@@ -564,7 +585,6 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
-      console.log('user', this.$store.getters.loadingInitData.user)
       return this.$store.getters.loadingInitData.user
     },
     kysoSuccess () {
@@ -623,9 +643,10 @@ export default {
       vm.dossierId = data
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
+        vm.loadThanhToan()
         vm.getNextActions()
         vm.runComment()
-        console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
+        // console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -633,7 +654,6 @@ export default {
             vm.documents.push(resultDocuments)
           }
         })
-        console.log('vm.$refs========', vm.$refs)
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.initData(resultDossier)
         }
@@ -646,7 +666,6 @@ export default {
         if (resultDossier['dossierSubStatus']) {
           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
             vm.btnStepsDynamics = result
-            console.log('btnStepsDynamics', vm.btnStepsDynamics)
           })
         }
       })
@@ -720,7 +739,6 @@ export default {
           info: '1,2'
         }
         vm.$store.dispatch('loadDossierSyncs', dataParams).then(resultSyncs => {
-          console.log('resultSyncs++++++++++++++++', resultSyncs)
           if (resultSyncs !== null && resultSyncs !== undefined && resultSyncs !== 'undefined') {
             if (Array.isArray(resultSyncs)) {
               vm.dossierSyncs = resultSyncs
@@ -788,7 +806,6 @@ export default {
           actionId: item.processActionId
         }
         vm.$store.dispatch('loadPlugin', filter).then(resultPlugin => {
-          console.log('resultPlugin+++++++++', resultPlugin)
           vm.stepModel = resultPlugin
         }).catch(reject => {
           vm.stepModel = null
@@ -796,7 +813,6 @@ export default {
       }
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {
-      console.log('result Nextaction', result)
       let vm = this
       let isPopup = false
       vm.dossierId = dossierItem.dossierId
@@ -840,7 +856,6 @@ export default {
           vm.showFormBoSungThongTinNgan = true
         }
         if (result.hasOwnProperty('allowAssignUser') && result.allowAssignUser !== 0) {
-          console.log('allowAssignUser', result.toUsers)
           if (Array.isArray(result.toUsers)) {
             vm.assign_items = result.toUsers
           } else {
@@ -893,7 +908,6 @@ export default {
           // vm.payments = result.payment
           // vm.viaPortalDetail = dossierItem.viaPostal
         }
-        // console.log('paymentProfile', vm.paymentProfile)
         if ((result.hasOwnProperty('receiving') && result.receiving !== null && result.receiving !== undefined && result.receiving !== 'undefined' && result.receiving.editable === true)) {
           isPopup = true
           vm.showEditDate = true
@@ -913,7 +927,7 @@ export default {
           vm.typeExtendDate = 'betimes'
         }
       }
-      console.log('isPopup========222222', isPopup)
+      // console.log('isPopup========222222', isPopup)
       if (isPopup) {
         vm.loadingAction = false
         vm.dialogActionProcess = true
@@ -1183,7 +1197,6 @@ export default {
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
         let valid = vm.$refs.epayment.validPayment()
-        console.log('valid', valid)
         let paymentProfile = vm.$store.getters.getPaymentProfile
         if (paymentProfile && paymentProfile['paymentFile'] && valid) {
           validThanhToanDienTu = true
@@ -1199,11 +1212,11 @@ export default {
         } else {
           validThanhToanDienTu = false
         }
-        console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
+        // console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
-        console.log('dueDateEdit', date)
+        // console.log('dueDateEdit', date)
         // filter['dueDate'] = date ? date : ''
         // filter['receiveDate'] = vm.receiveDateEdit ? vm.receiveDateEdit : ''
         let payload = {
@@ -1214,7 +1227,7 @@ export default {
       }
       if (vm.showExtendDateEdit) {
         let data = vm.$refs.ngaygiahan.doExport()
-        console.log('extendDateEdit', data.extendDate)
+        // console.log('extendDateEdit', data.extendDate)
         if (data.valid) {
           validTreHan = true
         } else {
@@ -1247,7 +1260,7 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
-        console.log('resultTmp', result)
+        // console.log('resultTmp', result)
         if (resultTmp.useKS) {
           // vm.$refs.kypheduyettailieu.kySo(result)
           if (vm.kysoSuccess) {
@@ -1270,7 +1283,7 @@ export default {
         if (x && vm.validateAction) {
           vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            console.log('result======', result)
+            // console.log('result======', result)
             vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -1286,8 +1299,8 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
-            console.log('vm.rollbackable======', vm.rollbackable)
-            console.log('vm.printDocument======', vm.printDocument)
+            // console.log('vm.rollbackable======', vm.rollbackable)
+            // console.log('vm.printDocument======', vm.printDocument)
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1314,7 +1327,7 @@ export default {
         }
         vm.loadingActionProcess = true
         vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-          console.log('result======', result)
+          // console.log('result======', result)
           vm.loadingAction = false
           vm.dialogActionProcess = false
           vm.loadingActionProcess = false
@@ -1405,7 +1418,7 @@ export default {
       let currentQuery = vm.$router.history.current.query
       vm.loadingAction = true
       vm.$store.dispatch('postAction', filter).then(function (result) {
-        console.log('result======', result)
+        // console.log('result======', result)
         vm.loadingAction = false
         vm.dialogActionProcess = false
         vm.loadingActionProcess = false
@@ -1474,7 +1487,7 @@ export default {
             }
           }
         }
-        console.log('vm.checkInput======', vm.getCheckInput)
+        // console.log('vm.checkInput======', vm.getCheckInput)
         vm.checkInput = vm.getCheckInput
         if (vm.getCheckInput !== null && vm.getCheckInput !== undefined) {
           if (vm.checkInput !== 0) {
@@ -1535,7 +1548,6 @@ export default {
       stepModel['dossierId'] = vm.thongTinChiTietHoSo.dossierId
       if (stepModel.allowAssignUser > 0) {
         vm.$store.dispatch('reassignDossier', stepModel).then(resReassign => {
-          console.log(resReassign)
           let params = {
             dossierId: vm.dossierId,
             actionCode: stepModel.actionCode,
@@ -1612,7 +1624,7 @@ export default {
     },
     loadTPHS () {
       var vm = this
-      console.log('loadTPHS')
+      // console.log('loadTPHS')
       if (vm.$refs.thanhphanhoso1) {
         setTimeout(function () {
           vm.$refs.thanhphanhoso1.initData(vm.thongTinChiTietHoSo)
@@ -1623,6 +1635,18 @@ export default {
           vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
         }, 150)
       }
+    },
+    loadThanhToan () {
+      var vm = this
+      let filter = {
+        dossierId: vm.dossierId,
+        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+      }
+      vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+        vm.paymentDetail = result
+        console.log('paymentProfile', vm.paymentProfile)
+      }).catch(reject => {
+      })
     },
     printViewDocument () {
       let vm = this
