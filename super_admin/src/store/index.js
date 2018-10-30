@@ -165,20 +165,20 @@ export const store = new Vuex.Store({
     },
     getServiceFileTemplate ({state}, pk) {
       return new Promise((resolve, reject) => {
-        let param = {
-          headers: {
-            groupId: state.initData.groupId
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
           }
-        }
-        // test local
-        // axios.get('http://127.0.0.1:8081/api/employees', param).then(function (response) {
-        axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
-          let seriable = response.data
-          if (seriable.data) {
-            resolve(seriable)
-          }
-        }).catch(function (xhr) {
-          reject(xhr)
+          axios.get('/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
         })
       })
     },
@@ -717,7 +717,7 @@ export const store = new Vuex.Store({
       state.socket.isConnected = true
     },
     SOCKET_ONCLOSE (state, event) {
-      console.debug(event)
+      console.log('SOCKET_ONCLOSE', event)
       state.socket.isConnected = false
     },
     SOCKET_ONERROR (state, event) {
@@ -727,8 +727,8 @@ export const store = new Vuex.Store({
       state.message = message
     },
     [WebSocket.WS_RECONNECT](state, count) {
-      console.debug(state)
-      console.debug(count)
+      console.log('WS_RECONNECT', state)
+      console.log('WS_RECONNECT', count)
     },
     [WebSocket.WS_RECONNECT_ERROR](state) {
       state.socket.reconnectError = true
