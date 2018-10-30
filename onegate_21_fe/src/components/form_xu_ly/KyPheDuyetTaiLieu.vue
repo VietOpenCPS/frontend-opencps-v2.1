@@ -234,7 +234,7 @@ export default {
         dataType: 'json',
         headers: {
           'groupId': window.themeDisplay.getScopeGroupId(),
-          'Authorization': 'Basic Y3VjdHJ1b25nLmNudGJkQGxpZmVyYXkuY29tOjEyMzQ1'
+          'Token': Liferay.authToken
         },
         data: {
           actionCode: paramObj['actionCode'],
