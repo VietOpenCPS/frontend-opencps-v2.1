@@ -13,8 +13,8 @@ export const store = new Vuex.Store({
       message: '',
       reconnectError: false
     },
-    endPointApi: '/o/rest/v2',
-    // endPointApi: 'http://127.0.0.1:8081/api',
+    // endPointApi: '/o/rest/v2',
+    endPointApi: 'http://127.0.0.1:8081/api',
     listTableMenu: [
       {
         icon: 'keyboard_arrow_up',
