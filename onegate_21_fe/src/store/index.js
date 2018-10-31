@@ -109,6 +109,7 @@ export const store = new Vuex.Store({
     viaPostal: 0,
     data_phancong: [],
     dataCreateDossier: {},
+    dataCreateFile: [],
     paymentProfile: '',
     paymentFileName: ''
   },
@@ -2561,6 +2562,9 @@ export const store = new Vuex.Store({
     setThanhPhanHosoTemplates (state, payload) {
       state.thanhPhanHoSo.dossierTemplates = payload
     },
+    setDataCreateFile (state, payload) {
+      state.dataCreateFile = payload
+    },
     setCheckInput (state, payload) {
       state.checkInput = payload
     },
@@ -2840,6 +2844,9 @@ export const store = new Vuex.Store({
           return store.dispatch('loadDictItems', filter)
         }
       }
+    },
+    getDataCreateFile (state) {
+      return state.dataCreateFile
     },
     getCheckInput (state) {
       return state.checkInput

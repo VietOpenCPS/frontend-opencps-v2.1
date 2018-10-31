@@ -68,18 +68,21 @@
                   <v-subheader class="pl-0 text-right">Trạng thái: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{dossierDetail.dossierStatusText}}</p>
+                  <p class="pt-2 mb-0">{{dossierDetail.dossierSubStatusText?dossierDetail.dossierSubStatusText:dossierDetail.dossierStatusText}}</p>
                 </v-flex>
                 <v-flex xs12 sm7></v-flex>
-                <div v-if="Number(paymentStatus) >= 3">
+                <v-layout wrap v-if="Number(payments.paymentStatus) >= 3">
                   <v-flex xs12 sm2>
                     <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3>
-                    <p class="mt-1 mb-0">{{payments.paymentMethod}}</p>
+                    <p class="pt-2 mb-0">{{payments.paymentMethod}}</p>
                   </v-flex>
-                  <v-flex xs12 sm12 v-if="paymentFile" class="pl-3">
-                    <span><span class="red--text">* </span>&nbsp;Chứng từ kèm theo:</span>&nbsp;
+                  <v-flex xs12 sm7></v-flex>
+                  <v-flex xs12 sm2 v-if="paymentFile">
+                    <v-subheader class="pl-0 text-right">Chứng từ kèm theo: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm10 v-if="paymentFile" >
                     <span v-on:click.stop="viewFile()" style="cursor: pointer;">
                       <v-icon>attach_file</v-icon>
                       {{paymentFileName}}
@@ -91,14 +94,14 @@
                       <span>Tải xuống</span>
                     </v-tooltip>
                   </v-flex>
-                </div>
+                </v-layout>
               </v-layout>
             </v-card-text>
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
       <!--  -->
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -110,38 +113,31 @@
             <v-card-text class="px-0 py-0">
               <v-layout wrap>
                 <v-flex xs12 sm2>
-                  <v-subheader class="pl-0 text-right">Mã số thuế cơ quan : </v-subheader>
-                </v-flex>
-                <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{payments.govAgencyTaxNo}}</p>
-                </v-flex>
-                <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Mẫu số hóa đơn : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{payments.invoiceTemplateNo}}</p>
+                  <p class="pt-2 mb-0">{{payments.invoiceTemplateNo}}</p>
                 </v-flex>
-                <v-flex xs12 sm2></v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Ký hiệu hóa đơn : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{payments.invoiceIssueNo}}</p>
+                  <p class="pt-2 mb-0">{{payments.invoiceIssueNo}}</p>
                 </v-flex>
+                <v-flex xs12 sm2></v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Số hóa đơn trên hệ thống : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{getEinvoiceNo(payments.einvoice)}}</p>
+                  <p class="pt-2 mb-0">{{getEinvoiceNo(payments.einvoice)}}</p>
                 </v-flex>
-                <v-flex xs12 sm2></v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Mã tra cứu trên hệ thống : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="mt-1 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
+                  <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
                 </v-flex>
-                <v-flex xs12 sm7></v-flex>
+                <v-flex xs12 sm2></v-flex>
                 <v-flex xs12 sm4 class="mb-3">
                   <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 

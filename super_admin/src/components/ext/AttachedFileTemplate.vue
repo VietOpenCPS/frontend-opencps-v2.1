@@ -49,7 +49,7 @@
                             <v-text-field
                               label="Số biểu mẫu" 
                               v-model="item['fileTemplateNo']"
-                              @change="processUpdateDataFileAttach(item, index)"
+                              @change="processUpdateDataFileAttach($event, item, index)"
                               @click.stop=""
                             >
                             </v-text-field>
@@ -58,7 +58,7 @@
                             <v-text-field
                               label="Tên biểu mẫu" 
                               v-model="item['templateName']"
-                              @change="processUpdateDataFileAttach(item, index)"
+                              @change="processUpdateDataFileAttach($event, item, index)"
                             >
                             </v-text-field>
                           </v-flex>
@@ -68,7 +68,7 @@
                     </li>
                   </ul>
                 </div>
-                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove">
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
         </div>
@@ -130,6 +130,11 @@
       }
     },
     methods: {
+      addHeaders (args) {
+        let vm = this
+        args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
+        args.currentRequest.setRequestHeader('groupId', vm.getScopeGroupId())
+      },
       loadFileTemplate () {
         let vm = this
         vm.$store.dispatch('getServiceFileTemplate', vm.pk).then(function (result) {
@@ -182,10 +187,9 @@
           alert('Tải file xảy ra lỗi.' + reject)
         })
       },
-      processUpdateDataFileAttach (item, index) {
+      processUpdateDataFileAttach (val, item, index) {
         let vm = this
         vm.loading = true
-        console.log(vm.rawData[index])
         let data = {
           item: vm.rawData[index],
           fileTemplateNo: item['fileTemplateNo'],

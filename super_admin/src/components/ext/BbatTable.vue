@@ -26,6 +26,10 @@
           {{nameScreen}}
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn dark flat v-on:click.native="backToCode" v-if="depen">
+          <v-icon>undo</v-icon> &nbsp;
+          {{backTableName}}
+        </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
           <v-icon>refresh</v-icon>
         </v-btn>
@@ -95,6 +99,8 @@
     },
     data () {
       return {
+        backTableName: '',
+        depen: false,
         problem: true,
         showLoadingTable: true,
         nameScreen: '',
@@ -162,6 +168,12 @@
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
             if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
               vm.nameScreen = vm.dataSocket['tableConfig']['name']
+              vm.backTableName = vm.dataSocket['tableConfig']['dependency_title']
+              if (vm.dataSocket['tableConfig'].hasOwnProperty('dependency_title')) {
+                vm.depen = true
+              } else {
+                vm.depen = false
+              }
               vm.generateTable()
             }
             if (dataObj.respone === 'pageTotalCounter') {
@@ -412,6 +424,13 @@
             query: newQuery
           })
         }
+      },
+      backToCode () {
+        let vm = this
+        let query = vm.$router.history.current.query
+        vm.$router.push({
+          path: vm.dataSocket['tableConfig']['dependency_link'] + '/' + query['pk']
+        })
       },
       deleteRecord () {
         let vm = this

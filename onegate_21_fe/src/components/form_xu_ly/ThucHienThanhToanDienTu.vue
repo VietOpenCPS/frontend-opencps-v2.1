@@ -72,7 +72,7 @@
               <v-icon>account_balance</v-icon> &nbsp;
               Thanh toán chuyển khoản
             </v-btn>
-            <v-btn dark small color="amber accent-4" class="ml-2 mr-2" @click.native="toKeyPay(paymentProfile.keypayUrl)">
+            <v-btn v-if="getEPaymentProfile(paymentProfile.epaymentProfile)" dark small color="amber accent-4" class="ml-2 mr-2" @click.native="toKeyPay(getEPaymentProfile(paymentProfile.epaymentProfile).keypayUrl)">
               <v-icon>payment</v-icon> &nbsp;
               Thanh toán điện tử
             </v-btn>
@@ -197,7 +197,6 @@ export default {
       let filter = vm.detailDossier
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
-        console.log('paymentFile Result', vm.paymentFile)
         vm.data_payment['paymentFile'] = vm.paymentFile
         vm.$store.commit('setPaymentProfile', vm.data_payment)
       })
@@ -292,6 +291,13 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPreview').src = result
       })
+    },
+    getEPaymentProfile (paymentProfile) {
+      if (paymentProfile) {
+        return JSON.parse(paymentProfile)
+      } else {
+        return ''
+      }
     },
     deleteFile (item) {
       var vm = this

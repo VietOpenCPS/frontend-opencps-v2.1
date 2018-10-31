@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    snackbarerror: false,
     initData: {},
     tocken: '',
     user: null,
@@ -165,7 +166,7 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    downloadServiceFileTemplate ({state}, item) {
+    downloadServiceFileTemplate ({commit, state}, item) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -175,16 +176,17 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob'
           }
-          axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function (data) {
+          axios.get('/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function (data) {
             saveAs(data.data, item['uuid'] + '.' + item['extension'])
             resolve({status: true})
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    updateServiceFileTemplate ({state}, data) {
+    updateServiceFileTemplate ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -192,18 +194,19 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('http://localhost:8080/o/gate/v2/filetemplate/' + data['item']['serviceInfoId'] + '/' + data['item']['fileTemplateNo'], {
+          axios.put('/o/gate/v2/filetemplate/' + data['item']['serviceInfoId'] + '/' + data['item']['fileTemplateNo'], {
             fileTemplateNo: data['fileTemplateNo'],
             templateName: data['templateName']
           }, param).then(function () {
             resolve({status: true})
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    removeServiceFileTemplate ({state}, item) {
+    removeServiceFileTemplate ({commit, state}, item) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -211,15 +214,16 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.delete('http://localhost:8080/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function () {
+          axios.delete('/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function () {
             resolve({status: true})
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getServiceFileTemplate ({state}, pk) {
+    getServiceFileTemplate ({commit, state}, pk) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -227,18 +231,19 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('http://localhost:8080/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+          axios.get('/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable)
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getJobposList ({state}) {
+    getJobposList ({commit, state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -253,11 +258,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getDossierStatusList ({state}) {
+    getDossierStatusList ({commit, state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -272,11 +278,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getDossierSubStatusList ({state}, dossierStatus) {
+    getDossierSubStatusList ({commit, state}, dossierStatus) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -291,11 +298,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getDossierTemplate ({state}) {
+    getDossierTemplate ({commit, state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -310,11 +318,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getEmployee ({state}) {
+    getEmployee ({commit, state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -329,11 +338,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getDossierPart ({state}, template) {
+    getDossierPart ({commit, state}, template) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -348,11 +358,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessDetail ({state}, id) {
+    getProcessDetail ({commit, state}, id) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -367,11 +378,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessStepsDetail ({state}, filter) {
+    getProcessStepsDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -386,11 +398,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessStep ({state}, filter) {
+    getProcessStep ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -409,11 +422,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessAction ({state}, filter) {
+    getProcessAction ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -432,11 +446,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessRole ({state}, filter) {
+    getProcessRole ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -451,11 +466,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getProcessActionsDetail ({state}, filter) {
+    getProcessActionsDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -470,11 +486,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    deleteProcessAction ({state}, filter) {
+    deleteProcessAction ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -489,11 +506,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    postProcess ({ state }, data) {
+    postProcess ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -529,13 +547,14 @@ export const store = new Vuex.Store({
               resolve(response.data)
             }).catch(function (error) {
               reject(error)
+              commit('setsnackbarerror', true)
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           }
         })
       })
     },
-    postProcessRoles ({ state }, data) {
+    postProcessRoles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -553,12 +572,13 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
+            commit('setsnackbarerror', true)
             // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       })
     },
-    putProcessRoles ({ state }, data) {
+    putProcessRoles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -575,12 +595,13 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
+            commit('setsnackbarerror', true)
             // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       })
     },
-    deleteProcessRoles ({ state }, data) {
+    deleteProcessRoles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -594,12 +615,13 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
+            commit('setsnackbarerror', true)
             // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       })
     },
-    postProcessStep ({ state }, data) {
+    postProcessStep ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -633,13 +655,14 @@ export const store = new Vuex.Store({
               resolve(response.data)
             }).catch(function (error) {
               reject(error)
+              commit('setsnackbarerror', true)
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           }
         })
       })
     },
-    deleteProcessStep ({state}, filter) {
+    deleteProcessStep ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -654,11 +677,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    getStepRole ({state}, filter) {
+    getStepRole ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -673,11 +697,12 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
+            commit('setsnackbarerror', true)
           })
         })
       })
     },
-    postStepRoles ({ state }, data) {
+    postStepRoles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -695,12 +720,13 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
+            commit('setsnackbarerror', true)
             // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       })
     },
-    deleteStepRoles ({ state }, data) {
+    deleteStepRoles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -714,12 +740,13 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }).catch(function (error) {
             reject(error)
+            commit('setsnackbarerror', true)
             // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         })
       })
     },
-    postProcessAction ({ state }, data) {
+    postProcessAction ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let options = {
@@ -760,6 +787,7 @@ export const store = new Vuex.Store({
               resolve(response.data)
             }).catch(function (error) {
               reject(error)
+              commit('setsnackbarerror', true)
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           }
@@ -818,6 +846,9 @@ export const store = new Vuex.Store({
     },
     setProcessRoleList (state, payload) {
       state.processRoleList = payload
+    },
+    setsnackbarerror (state, payload) {
+      state.snackbarerror = payload
     }
   },
   getters: {
@@ -847,6 +878,9 @@ export const store = new Vuex.Store({
     },
     getProcessRoleList (state) {
       return state.processRoleList
+    },
+    getsnackbarerror (state) {
+      return state.snackbarerror
     }
   }
 })
