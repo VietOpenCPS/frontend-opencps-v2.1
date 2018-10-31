@@ -81,6 +81,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDieuKhoan ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/PRIVACY', param).then(function (response) {
+          axios.get('/o/rest/v2/dictcollections/PRIVACY', param).then(function (response) {
+            if (response.data) {
+              let dataReturn = response.data
+              resolve(dataReturn)
+            } else {
+              resolve('')
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     confirmPIN ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let param = {

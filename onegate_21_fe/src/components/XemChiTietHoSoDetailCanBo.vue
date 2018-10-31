@@ -185,7 +185,7 @@
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
+              <!-- <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn> -->
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!-- Trao đổi thảo luận -->
@@ -580,6 +580,9 @@ export default {
       var vm = this
       return vm.getOriginality()
     },
+    dataCreateFile () {
+      return this.$store.getters.getDataCreateFile
+    },
     getCheckInput () {
       return this.$store.getters.getCheckInput
     },
@@ -884,6 +887,7 @@ export default {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
           vm.dataEsign = result
+          // vm.$store.commit('setDataCreateFile', result)
         }
         if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined' && result.returnFiles.length > 0) {
           isPopup = true

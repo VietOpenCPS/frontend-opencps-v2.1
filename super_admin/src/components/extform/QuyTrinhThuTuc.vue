@@ -304,6 +304,11 @@
                 <template slot="no-data">
                 </template>
               </v-data-table>
+              <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+                <v-flex xs12>
+                  <tiny-pagination :total="pageTotalStep" :page="pageStep" @tiny:change-page="paggingStepData" custom-class="custom-tiny-class"></tiny-pagination> 
+                </v-flex>
+              </div>
             </v-card>
             <!-- Chi tiết step -->
             <v-card class="pt-2" v-else style="margin-bottom:40px">
@@ -557,6 +562,11 @@
                 <template slot="no-data">
                 </template>
               </v-data-table>
+              <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+                <v-flex xs12>
+                  <tiny-pagination :total="pageTotalAction" :page="pageAction" @tiny:change-page="paggingActionData" custom-class="custom-tiny-class"></tiny-pagination> 
+                </v-flex>
+              </div>
             </v-card>
             <!-- Chi tiết Action -->
             <v-card class="pt-2" v-else style="margin-bottom:40px">
@@ -790,8 +800,12 @@
 </template>
 
 <script>
+  import TinyPagination from '../ext/TinyPagination.vue'
   export default {
     props: ['id'],
+    components: {
+      'tiny-pagination': TinyPagination
+    },
     data () {
       return {
         breadCrumbsitems: [
@@ -863,6 +877,8 @@
         },
         validAddProcess: false,
         // PROCESS STEP DATA
+        pageTotalStep: 0,
+        pageStep: 1,
         headerStep: [
           {
             text: 'STT',
@@ -910,6 +926,8 @@
         },
         validAddStep: false,
         // PROCESS ACTION DATA
+        pageTotalAction: 0,
+        pageAction: 1,
         headerAction: [
           {
             text: 'STT',
@@ -1126,6 +1144,38 @@
           vm.dossierPartList = []
         }
       },
+      paggingStepData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
+      },
+      paggingActionData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
+      },
       getProcessSteps (id) {
         var vm = this
         let currentQuery = vm.$router.history.current.query
@@ -1133,8 +1183,10 @@
           processId: id,
           page: currentQuery.page ? currentQuery.page : 1
         }
+        vm.pageTotalStep = 0
         vm.$store.dispatch('getProcessStep', filter).then(function (result) {
           vm.stepList = result
+          vm.pageTotalStep = vm.stepList.length
         }).catch(reject => {
           console.log(reject)
         })
@@ -1146,8 +1198,10 @@
           processId: vm.id,
           page: currentQuery.page ? currentQuery.page : 1
         }
+        vm.pageTotalAction = 0
         vm.$store.dispatch('getProcessAction', filter).then(function (result) {
           vm.actionList = result
+          vm.pageTotalAction = vm.actionList.length
         }).catch(reject => {
           console.log(reject)
         })
