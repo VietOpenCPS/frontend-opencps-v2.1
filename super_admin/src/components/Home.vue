@@ -82,14 +82,18 @@
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">Quản trị dữ liệu</span>
       </v-toolbar-title>
-      <v-text-field
+      <v-autocomplete
+        :items="items[2].children"
+        item-text="text"
+        item-value="link"
         flat
         solo-inverted
         hide-details
         prepend-inner-icon="search"
         label="Search"
         class="hidden-sm-and-down"
-      ></v-text-field>
+        @change="redirectFilter($event)"
+      ></v-autocomplete>
       <v-spacer style="max-width: 25px;"></v-spacer>
       <v-btn icon>
         <v-icon>notifications</v-icon>
@@ -98,6 +102,25 @@
     <v-container fluid>
       <router-view></router-view>
     </v-container>
+    <v-snackbar
+      v-model="snackbarerror"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="red darken-3"
+    >
+      Yêu cầu thực hiện thất bại
+      <v-btn
+        icon
+        @click="closeError()"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -115,22 +138,24 @@
       items () {
         return this.$store.getters.getlistTableMenu
       },
+      snackbarerror: {
+        // getter
+        get: function() {
+          return this.$store.getters.getsnackbarerror
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setsnackbarerror', newValue)
+        }
+      }
     },
-    created () {
-      var vm = this
-        setTimeout(() => {
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd: 'get',
-              responeType: 'menu',
-              code: 'opencps_adminconfig',
-              respone: 'listTableMenu',
-              start: -1,
-              end: -1
-            }
-          )
-        }, 10)
+    methods: {
+      redirectFilter (val) {
+        this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
+      },
+      closeError () {
+        this.$store.commit('setsnackbarerror', false)
+      }
     }
   }
 </script>

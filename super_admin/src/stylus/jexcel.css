@@ -631,7 +631,7 @@ body .e-upload .e-file-select-wrap .e-file-select {
         border-top: none;
     }
     .customdroparea #dropArea .e-upload .e-upload-files .e-upload-file-list {
-        min-height: 0;
+        min-height: 90px;
     }
     .customdroparea #drop {
         padding: 15px;
@@ -804,7 +804,7 @@ body .e-upload .e-file-select-wrap .e-file-select {
         white-space: nowrap;
     }
     body .e-upload .e-upload-files .e-upload-file-list {
-        border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+        border-bottom: 1px dashed rgb(195, 195, 205);
     }
     .e-upload .e-upload-files .e-file-delete-btn.e-icons::before {
         color: #C62828;
@@ -829,3 +829,19 @@ body .e-upload .e-file-select-wrap .e-file-select {
     body .v-tabs__item.v-tabs__item--active {
         background: #0064c726;
     }
+    .customdroparea #drop::before {
+        content: '+';
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        font-size: 24px;
+        opacity: 0.3;
+        top: 8px;
+        left: 0;
+        pointer-events: none;
+    }
+/*
+    body .jexcel.bossanova-ui td .results {
+      margin-top: -45px !important;
+    }
+*/

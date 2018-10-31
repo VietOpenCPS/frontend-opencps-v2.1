@@ -23,17 +23,25 @@
                             ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
                           </p>
                         </div>
-                        <v-btn flat icon color="primary" style="
-                          position: absolute;
-                          right: 5px;
-                          top: 32px;
-                        ">
+                        <v-btn flat icon color="primary" 
+                          v-on:click.native="processDownloadFileAttach(item)"
+                          :loading="loading"
+                          :disabled="loading"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                            top: 32px;
+                          ">
                           <v-icon size="14">link</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="red darken-3" style="
-                          position: absolute;
-                          right: 5px;
-                        ">
+                        <v-btn flat icon color="red darken-3" 
+                          v-on:click.native="processDeleteFileAttach(item)"
+                          :loading="loadingRemove"
+                          :disabled="loadingRemove"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                          ">
                           <v-icon size="14">delete</v-icon>
                         </v-btn>
                         <v-layout row wrap>
@@ -41,6 +49,8 @@
                             <v-text-field
                               label="Số biểu mẫu" 
                               v-model="item['fileTemplateNo']"
+                              @change="processUpdateDataFileAttach($event, item, index)"
+                              @click.stop=""
                             >
                             </v-text-field>
                           </v-flex>
@@ -48,6 +58,7 @@
                             <v-text-field
                               label="Tên biểu mẫu" 
                               v-model="item['templateName']"
+                              @change="processUpdateDataFileAttach($event, item, index)"
                             >
                             </v-text-field>
                           </v-flex>
@@ -57,7 +68,7 @@
                     </li>
                   </ul>
                 </div>
-                <ejs-uploader id='templateupload' name="UploadFiles" :template='fileTemplate' :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :failure= "onFailure" :progress = "onProgress" :removing= "onFileRemove">
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
         </div>
@@ -73,25 +84,11 @@
 
   Vue.use(UploaderPlugin)
 
-  var demoVue = Vue.component('demo', {
-      template: `<div class='container'>
-                    <span class='wrapper'>
-                    <span :class="['icon sf-icon-' +data.type]"></span>
-                    <span class='name file-name'>{{data.name}} <br/><small>( {{(data.size / (1024 * 1024)).toFixed(2)}} MB )</small></span>
-                    <span v-show="data.status !== 'File uploaded successfully'" class='upload-status'>{{data.status}}</span>
-                    <span class='e-icons e-file-remove-btn' title='Remove'></span>
-                    </span>
-                </div>`,
-    data() {
-      return {
-        data: {}
-      }
-    }
-  })
-
   export default {
     data () {
       return {
+        loadingRemove: false,
+        loading: false,
         fileTemplateData: [],
         fileTemplateTotal: 0,
         path:  {
@@ -100,9 +97,7 @@
         },
         extensions: '.pdf, .png, .txt',
         dropArea: "dropArea",
-        fileTemplate: function (){
-            return { template: demoVue }
-        }
+        rawData: []
       }
     },
     props: ['pickItem', 'pk'],
@@ -135,11 +130,22 @@
       }
     },
     methods: {
+      addHeaders (args) {
+        let vm = this
+        args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
+        args.currentRequest.setRequestHeader('groupId', vm.getScopeGroupId())
+      },
       loadFileTemplate () {
         let vm = this
         vm.$store.dispatch('getServiceFileTemplate', vm.pk).then(function (result) {
           vm.fileTemplateData = result.data
           vm.fileTemplateTotal = result.total
+          for (let key in vm.fileTemplateData) {
+            vm.rawData.push({
+              fileTemplateNo: vm.fileTemplateData[key]['fileTemplateNo'],
+              serviceInfoId: vm.fileTemplateData[key]['serviceInfoId']
+            })
+          }
           let rightAttachedCounter = document.getElementById('rightAttachedCounter')
           if (rightAttachedCounter !== null && rightAttachedCounter !== undefined && vm.fileTemplateTotal > 0) {
             rightAttachedCounter.innerHTML = 'Tổng số: ' + vm.fileTemplateTotal + ' '
@@ -148,37 +154,53 @@
           console.log(reject)
         })
       },
-      onSuccess: function(args) {
-        let li = this.getLiElement(args)
-        /*
-        li.querySelector('.upload-status').innerHTML = args.file.status
-        li.querySelector('.upload-status').classList.add('upload-success')
-        */
-        li.remove()
-        this.loadFileTemplate()
-      },
-      onFailure: function(args) {
-        let li = this.getLiElement(args)
-        li.querySelector('.upload-status').innerHTML = args.file.status
-        li.querySelector('.upload-status').classList.add('upload-failed')
-      },
-      getLiElement: function(args) {
-        let liElements = document.getElementsByClassName('e-upload')[0].querySelectorAll('.e-upload-files > li')
-        let li
-        for (let i= 0; i < liElements.length; i++) {
-          if ( liElements[i].getAttribute('data-file-name') === args.file.name ) {
-            li = liElements[i]
-          }
-        }
-        return li
-      },
-      onProgress: function(args) {
-        let progressValue = Math.round((args.e.loaded / args.e.total) * 100) + '%'
-        let li = this.getLiElement(args)
-        li.querySelector('.upload-status').innerHTML = args.file.status + '(' + progressValue + ' )'
+      onSuccess: function() {
+        setTimeout(() => {
+          document.getElementById('dropArea').querySelectorAll(".e-upload-success").forEach(e => e.parentNode.removeChild(e))
+          this.loadFileTemplate()
+        }, 2000)
       },
       onFileRemove: function (args) {
         args.postRawFile = false
+      },
+      processDeleteFileAttach (item) {
+        let vm = this
+        if (confirm('Bạn có chắc muốn xoá bản ghi này?')) {
+          vm.loadingRemove = true
+          vm.$store.dispatch('removeServiceFileTemplate', item).then(function () {
+            vm.loadingRemove = false
+            vm.loadFileTemplate()
+          }).catch(reject => {
+            vm.loadingRemove = false
+            alert('Xoá file xảy ra lỗi.' + reject)
+          })
+        }
+        
+      },
+      processDownloadFileAttach (item) {
+        let vm = this
+        vm.loading = true
+        vm.$store.dispatch('downloadServiceFileTemplate', item).then(function () {
+          vm.loading = false
+        }).catch(reject => {
+          vm.loading = false
+          alert('Tải file xảy ra lỗi.' + reject)
+        })
+      },
+      processUpdateDataFileAttach (val, item, index) {
+        let vm = this
+        vm.loading = true
+        let data = {
+          item: vm.rawData[index],
+          fileTemplateNo: item['fileTemplateNo'],
+          templateName: item['templateName']
+        }
+        vm.$store.dispatch('updateServiceFileTemplate', data).then(function () {
+          vm.loading = false
+        }).catch(reject => {
+          vm.loading = false
+          alert('Tải file xảy ra lỗi.' + reject)
+        })
       }
     }
   }
