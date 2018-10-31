@@ -22,13 +22,13 @@
           <v-icon>edit</v-icon>
         </v-btn>
         <v-toolbar-title class="ml-0">
-          {{nameScreen}}
+          {{currentProcessName}}
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn dark flat v-on:click.native="deleteRecord">
+        <!-- <v-btn dark flat v-on:click.native="deleteRecord">
           <v-icon>delete</v-icon> &nbsp;
           Xoá bản ghi
-        </v-btn>
+        </v-btn> -->
         <v-icon dark>more_vert</v-icon>
         <v-btn dark icon v-on:click.native="backToList">
           <v-icon>undo</v-icon>
@@ -104,7 +104,7 @@
                   <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm4 class="pl-0">
-                        <v-select
+                        <v-autocomplete
                           box
                           label="Vai trò xử lý"
                           :items="jobposList"
@@ -114,7 +114,7 @@
                           :hide-selected="true"
                           return-object
                           clearable
-                        ></v-select>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm3 class="pl-2">
                         <v-select
@@ -157,14 +157,11 @@
                           style="border: 1px solid #dedede"
                         >
                           <template slot="items" slot-scope="props">
-                            <td class="text-xs-left">{{ props.item.role }}</td>
-                            <td class="text-xs-left">{{ props.item.moderatorText }}</td>
-                            <td class="text-xs-left">{{ props.item.condition }}</td>
-                            <td class="justify-center layout px-0">
-                              <v-icon small class="mr-2">
-                                edit
-                              </v-icon>
-                              <v-icon small>
+                            <td class="text-xs-left" width="40%">{{ props.item.roleName }}</td>
+                            <td class="text-xs-left" width="25%">{{ props.item.moderator|moderatorText }}</td>
+                            <td class="text-xs-left" width="25%">{{ props.item.condition }}</td>
+                            <td class="text-xs-center px-0" width="10%">
+                              <v-icon small color="red" @click="deleteProcessRoles(props.item, props.index)">
                                 delete
                               </v-icon>
                             </td>
@@ -264,7 +261,7 @@
               <v-btn color="blue darken-3" dark
                 :loading="loading"
                 :disabled="loading"
-                class="mb-2"
+                class="mb-3"
                 @click="createStep"
               >
                 <v-icon>add_circle_outline</v-icon>&nbsp;
@@ -274,27 +271,28 @@
                 :headers="headerStep"
                 :items="stepList"
                 hide-actions
-                class="elevation-1"
+                class="elevation-1 table-bordered"
+                style="border: 1px solid #dedede"
               >
                 <template slot="items" slot-scope="props">
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" width="5%">
                     <div>
-                      <span>{{listStepPage * 15 - 15 + props.index + 1}}</span>
+                      <span>{{listStepPage * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left">{{ props.item.stepName }}</td>
-                  <td class="text-xs-left">{{ props.item.dossierStatusText }}</td>
-                  <td class="text-xs-left">{{ props.item.durationCount }}</td>
-                  <td class="justify-center layout px-0">
+                  <td class="text-xs-left" width="50%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
+                  <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
+                  <td class="text-xs-center px-0" width="15%">
                     <v-icon
-                      small
-                      class="mr-2"
+                      small color="blue"
+                      class="mr-3"
                       @click="editStep(props.item)"
                     >
                       edit
                     </v-icon>
                     <v-icon
-                      small
+                      small color="red"
                       @click="deleteStep(props.item)"
                     >
                       delete
@@ -332,7 +330,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Trạng thái chính "
                       :items="dossierStatusList"
@@ -344,7 +342,7 @@
                       :rules="[rules.required]"
                       required
                       @change="changeDossierStatus"
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-text-field
@@ -357,7 +355,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Trạng thái phụ"
                       :items="dossierSubStatusList"
@@ -366,7 +364,7 @@
                       item-value="itemCode"
                       :hide-selected="true"
                       clearable
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6>
                     <v-text-field
@@ -379,7 +377,7 @@
                   <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm3 class="pl-0">
-                        <v-select
+                        <v-autocomplete
                           label="Vai trò xử lý"
                           box
                           :items="jobposList"
@@ -387,8 +385,9 @@
                           item-text="title"
                           item-value="jobPosId"
                           :hide-selected="true"
+                          return-object
                           clearable
-                        ></v-select>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm3 class="px-2">
                         <v-select
@@ -398,6 +397,7 @@
                           item-text="text"
                           item-value="value"
                           :disabled="stepRoleId?false:true"
+                          return-object
                           cleable
                         ></v-select>
                       </v-flex>
@@ -412,7 +412,7 @@
                       <v-flex xs12 sm2 class="pl-2 text-xs-right">
                         <v-btn color="blue darken-3" dark
                           class="mr-0"
-                          @click="createStepRole"
+                          @click="createItemStepRole"
                           :disabled="stepRoleId?false:true"
                         >
                           <v-icon size="24">add</v-icon>&nbsp;
@@ -432,11 +432,11 @@
                       style="border: 1px solid #dedede"
                     >
                       <template slot="items" slot-scope="props">
-                        <td class="text-xs-left">{{ props.item.roleName }}</td>
-                        <td class="text-xs-left">{{ props.item.moderator|moderatorText }}</td>
-                        <td class="text-xs-left">{{ props.item.condition }}</td>
-                        <td class="justify-center layout px-0">
-                          <v-icon small @click="deleteProcessRoles(props.item)">
+                        <td class="text-xs-left" width="40%">{{ props.item.roleName }}</td>
+                        <td class="text-xs-left" width="25%">{{ props.item.moderator|moderatorText }}</td>
+                        <td class="text-xs-left" width="25%">{{ props.item.condition }}</td>
+                        <td class="text-xs-center px-0" width="10%">
+                          <v-icon color="red" small @click="deleteStepRoles(props.item, props.index)">
                             delete
                           </v-icon>
                         </td>
@@ -475,6 +475,9 @@
                       v-model="currentStep.customProcessUrl"
                       box
                     ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 class="pl-2">
+                    <v-checkbox label="Cho phép sửa hồ sơ" v-model="currentStep.editable"></v-checkbox>
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-right" style="
@@ -522,7 +525,7 @@
               <v-btn color="blue darken-3" dark
                 :loading="loading"
                 :disabled="loading"
-                class="mb-2"
+                class="mb-3"
                 @click="createAction"
               >
                 <v-icon>add_circle_outline</v-icon>&nbsp;
@@ -532,27 +535,28 @@
                 :headers="headerAction"
                 :items="actionList"
                 hide-actions
-                class="elevation-1"
+                class="elevation-1 table-bordered"
+                style="border: 1px solid #dedede"
               >
                 <template slot="items" slot-scope="props">
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" width="5%">
                     <div>
-                      <span>{{listActionPage * 15 - 15 + props.index + 1}}</span>
+                      <span>{{listActionPage * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left">{{ props.item.preStepName }}</td>
-                  <td class="text-xs-left">{{ props.item.postStepName }}</td>
-                  <td class="justify-center layout px-0">
+                  <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
+                  <td class="text-xs-left" width="30%">{{ props.item.preStepName }}</td>
+                  <td class="text-xs-left" width="30%">{{ props.item.postStepName }}</td>
+                  <td class="text-xs-center px-0" width="15%">
                     <v-icon
-                      small
-                      class="mr-2"
+                      small color="blue"
+                      class="mr-3"
                       @click="editAction(props.item)"
                     >
                       edit
                     </v-icon>
                     <v-icon
-                      small
+                      small color="red"
                       @click="deleteAction(props.item)"
                     >
                       delete
@@ -605,13 +609,12 @@
                       item-text="text"
                       item-value="value"
                       :hide-selected="true"
-                      return-object
                       clearable
                     ></v-select>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
-                    <v-select
+                    <v-autocomplete
                       label="Bước thực hiện thao tác"
                       box
                       :items="stepList"
@@ -622,10 +625,10 @@
                       clearable
                       :rules="[rules.required]"
                       required
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Bước sau thực hiện thao tác"
                       :items="stepList"
@@ -636,7 +639,7 @@
                       clearable
                       :rules="[rules.required]"
                       required
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
@@ -656,7 +659,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Người được chọn ngầm định"
                       :items="employeeList"
@@ -665,11 +668,11 @@
                       item-value="employeeId"
                       :hide-selected="true"
                       clearable
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Mẫu hồ sơ"
                       :items="dossierTemplateList"
@@ -679,11 +682,11 @@
                       :hide-selected="true"
                       clearable
                       @change="getDossierParts"
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Tài liệu tạo mới"
                       :items="dossierPartList"
@@ -692,10 +695,10 @@
                       item-value="fileTemplateNo"
                       :hide-selected="true"
                       clearable
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
-                    <v-select
+                    <v-autocomplete
                       box
                       label="Kết quả trả về"
                       :items="dossierPartList"
@@ -704,7 +707,7 @@
                       item-value="fileTemplateNo"
                       :hide-selected="true"
                       clearable
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
@@ -718,6 +721,13 @@
                       :hide-selected="true"
                       clearable
                     ></v-select>
+                  </v-flex>
+                  <v-flex xs12 sm12 v-if="Number(currentAction.requestPayment) > 0">
+                    <v-text-field
+                      label="Chuỗi cấu hình tính phí"
+                      v-model="currentAction.paymentFee"
+                      box
+                    ></v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
@@ -819,6 +829,7 @@
           }
         ],
         nameScreen: '',
+        currentProcessName: '',
         processRoleId: '',
         processModerator: '',
         processCondition: '',
@@ -922,7 +933,8 @@
           stepInstruction: '',
           briefNote: '',
           customProcessUrl: '',
-          sequenceNo: ''
+          sequenceNo: '',
+          editable: false
         },
         validAddStep: false,
         // PROCESS ACTION DATA
@@ -992,6 +1004,7 @@
           createDossierFiles: null,
           returnDossierFiles: null,
           requestPayment: '',
+          paymentFee: '',
           createDossier: '',
           syncActionCode: '',
           configNote: '',
@@ -1097,6 +1110,7 @@
         var vm = this
         vm.$store.dispatch('getProcessDetail', id).then(function (result) {
           vm.currentProcess = result
+          vm.currentProcessName = result.processName
           vm.getProcessRoles()
         }).catch(reject => {
           console.log(reject)
@@ -1252,8 +1266,10 @@
             stepInstruction: '',
             briefNote: '',
             customProcessUrl: '',
-            sequenceNo: ''
+            sequenceNo: '',
+            editable: false
           }
+          vm.stepRoleList = []
           if (Number(currentQuery.stepCode) > 0) {
             vm.getProcessStepsDetail(currentQuery.stepCode)
           }
@@ -1273,8 +1289,8 @@
             allowAssignUser: '',
             rollbackable: false,
             dossierTemplateNo: '',
-            createDossierFiles: null,
-            returnDossierFiles: null,
+            createDossierFiles: '',
+            returnDossierFiles: '',
             requestPayment: '',
             syncActionCode: '',
             configNote: '',
@@ -1294,8 +1310,8 @@
           vm.$store.dispatch('postProcess', vm.currentProcess).then(function (result) {
             if (type === 'add') {
               if (vm.processRoleList.length > 0) {
-                for (let roleItem in vm.processRoleList) {
-                  vm.createProcessRoles(result.serviceProcessId, roleItem)
+                for (let key in vm.processRoleList) {
+                  vm.createProcessRoles(result.serviceProcessId, vm.processRoleList[key])
                 }
               }
               vm.$router.push({
@@ -1341,18 +1357,25 @@
           console.log(reject)
         })
       },
-      deleteProcessRoles (processRoles) {
+      deleteProcessRoles (processRoles, index) {
         var vm = this
-        let filter = {
-          processId: vm.id,
-          processRoles: processRoles
+        if (Number(vm.id) > 0) {
+          let x = confirm('Xác nhận xóa dữ liệu')
+          if (x) {
+            let filter = {
+              processId: vm.id,
+              processRoles: processRoles
+            }
+            vm.$store.dispatch('deleteProcessRoles', filter).then(function (result) {
+              console.log(result)
+              vm.getProcessRoles()
+            }).catch(reject => {
+              console.log(reject)
+            })
+          }
+        } else {
+          vm.processRoleList.splice(index, 1)
         }
-        vm.$store.dispatch('deleteProcessRoles', filter).then(function (result) {
-          console.log(result)
-          vm.getProcessRoles()
-        }).catch(reject => {
-          console.log(reject)
-        })
       },
       createStep () {
         var vm = this
@@ -1373,6 +1396,11 @@
           vm.currentStep['currentProcess'] = vm.id
           vm.$store.dispatch('postProcessStep', vm.currentStep).then(function (result) {
             if (type === 'add') {
+              if (vm.stepRoleList.length > 0) {
+                for (let key in vm.stepRoleList) {
+                  vm.createStepRoles(result.stepCode, vm.stepRoleList[key])
+                }
+              }
               vm.$router.push({
                 path: currentPath + '?step=true&stepCode=' + result.stepCode,
                 query: {
@@ -1425,39 +1453,50 @@
         }
         vm.$store.dispatch('postStepRoles', filter).then(function (result) {
           console.log(result)
-          vm.getStepRoles()
+          vm.getStepRoles(stepId)
         }).catch(reject => {
           console.log(reject)
         })
       },
-      deleteStepRoles (stepRoles) {
+      deleteStepRoles (stepRoles, index) {
         var vm = this
         let currentQuery = vm.$router.history.current.query
         let stepId = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
-        let filter = {
-          processId: vm.id,
-          stepRoles: stepRoles,
-          stepId: stepId
+        if (Number(stepId) > 0) {
+          let x = confirm('Xác nhận xóa dữ liệu')
+          if (x) {
+            let filter = {
+              processId: vm.id,
+              stepRoles: stepRoles,
+              stepId: stepId
+            }
+            vm.$store.dispatch('deleteStepRoles', filter).then(function (result) {
+              console.log(result)
+              vm.getStepRoles()
+            }).catch(reject => {
+              console.log(reject)
+            })
+          }
+        } else {
+          vm.stepRoleList.splice(index, 1)
         }
-        vm.$store.dispatch('deleteStepRoles', filter).then(function (result) {
-          console.log(result)
-          vm.getStepRoles()
-        }).catch(reject => {
-          console.log(reject)
-        })
       },
       deleteStep (itemStep) {
-        var vm = this
-        let filter = {
-          currentProcess: vm.id,
-          stepCode: itemStep.stepCode
+        let x = confirm('Xác nhận xóa dữ liệu')
+        if (x) {
+          var vm = this
+          let filter = {
+            currentProcess: vm.id,
+            stepCode: itemStep.stepCode
+          }
+          vm.$store.dispatch('deleteProcessStep', filter).then(function () {
+            setTimeout (function () {
+              vm.getProcessSteps(vm.id)
+            }, 300)
+          }).catch(reject => {
+            console.log(reject)
+          })
         }
-        vm.$store.dispatch('deleteProcessStep', filter).then(function (result) {
-          console.log(result)
-          vm.getProcessSteps(vm.id)
-        }).catch(reject => {
-          console.log(reject)
-        })
       },
       getStepRoles (stepId) {
         var vm = this
@@ -1517,17 +1556,20 @@
         // vm.$router.push(currentPath + '?action=true&actionCode=' + itemAction.actionCode)
       },
       deleteAction (itemAction) {
-        var vm = this
-        let filter = {
-          currentProcess: vm.id,
-          actionCode: itemAction.actionCode
+        let x = confirm('Xác nhận xóa dữ liệu')
+        if (x) {
+          var vm = this
+          let filter = {
+            currentProcess: vm.id,
+            processActionId: itemAction.processActionId
+          }
+          vm.$store.dispatch('deleteProcessAction', filter).then(function (result) {
+            console.log(result)
+            vm.getProcessActions(vm.id)
+          }).catch(reject => {
+            console.log(reject)
+          })
         }
-        vm.$store.dispatch('deleteProcessAction', filter).then(function (result) {
-          console.log(result)
-          vm.getProcessActions(vm.id)
-        }).catch(reject => {
-          console.log(reject)
-        })
       },
       changeTab (tab) {
         let vm = this
@@ -1556,7 +1598,6 @@
           // vm.$router.push(currentPath + '?action=true&page=' + vm.listActionPage)
         }
       },
-      createStepRole () {},
       goBackStepList () {
         let vm = this
         let currentPath = vm.$router.history.current.path
@@ -1575,7 +1616,7 @@
     },
     filters: {
       moderatorText (arg) {
-        if (arg === 0 || arg === '0') {
+        if (arg === false || arg === 'false' || arg === 0 || arg === '0') {
           return 'Theo dõi'
         } else {
           return 'Thực hiện'

@@ -411,8 +411,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              start: filter.page * 15 - 15,
-              end: filter.page * 15
+              start: filter.page * 10 - 10,
+              end: filter.page * 10
             }
           }
           axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
@@ -435,8 +435,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              start: filter.page * 15 - 15,
-              end: filter.page * 15
+              start: filter.page * 10 - 10,
+              end: filter.page * 10
             }
           }
           axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
@@ -499,7 +499,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.actionCode, param).then(function (response) {
+          axios.delete(state.endPointApi + '/serviceprocesses/' + filter.currentProcess + '/actions/' + filter.processActionId, param).then(function (response) {
             let seriable = response.data
             if (seriable) {
               resolve(seriable)
@@ -564,8 +564,16 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostProcessRoles = new URLSearchParams()
+          var moderator = data.processRoles.moderator
           dataPostProcessRoles.append('roleId', data.processRoles.roleId)
-          dataPostProcessRoles.append('moderator', data.processRoles.moderator)
+          if (data.processRoles.moderator === false || data.processRoles.moderator === 'false') {
+            moderator = 0
+          }
+          if (data.processRoles.moderator === true || data.processRoles.moderator === 'true') {
+            moderator = 1
+          }
+          dataPostProcessRoles.append('moderator', moderator)
+          dataPostProcessRoles.append('roleName', data.processRoles.roleName)
           dataPostProcessRoles.append('condition', data.processRoles.condition)
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles', dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -641,6 +649,7 @@ export const store = new Vuex.Store({
           dataPostStep.append('briefNote', data.briefNote)
           dataPostStep.append('stepInstruction', data.stepInstruction)
           dataPostStep.append('lockState', data.lockState)
+          dataPostStep.append('editable', data.editable)
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -712,8 +721,16 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostProcessRoles = new URLSearchParams()
+          var moderator = data.stepRoles.moderator
+          if (data.stepRoles.moderator === false || data.stepRoles.moderator === 'false') {
+            moderator = 0
+          }
+          if (data.stepRoles.moderator === true || data.stepRoles.moderator === 'true') {
+            moderator = 1
+          }
           dataPostProcessRoles.append('roleId', data.stepRoles.roleId)
-          dataPostProcessRoles.append('moderator', data.stepRoles.moderator)
+          dataPostProcessRoles.append('roleName', data.stepRoles.roleName)
+          dataPostProcessRoles.append('moderator', moderator)
           dataPostProcessRoles.append('condition', data.stepRoles.condition)
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles', dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -768,11 +785,13 @@ export const store = new Vuex.Store({
           dataPostAction.append('paymentFee', data.paymentFee)
           dataPostAction.append('syncActionCode', data.syncActionCode)
           dataPostAction.append('rollbackable', data.rollbackable)
+          dataPostAction.append('createDossierFiles', data.createDossierFiles)
+          dataPostAction.append('returnDossierFiles', data.returnDossierFiles)
           dataPostAction.append('createDossierNo', data.createDossierNo)
           dataPostAction.append('eSignature', data.eSignature)
           dataPostAction.append('configNote', data.configNote)
-          dataPostAction.append('dossiertemplatesFileFilter', data.dossierTemplateNo)
-          dataPostAction.append('createDossiers', data.createDossiers)
+          dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo)
+          dataPostAction.append('createDossiers', data.createDossier)
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')

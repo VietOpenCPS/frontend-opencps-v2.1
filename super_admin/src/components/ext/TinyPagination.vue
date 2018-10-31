@@ -3,14 +3,14 @@
     <div style="text-align: left;position: absolute;line-height: 46px;">Tổng số <span class="text-bold primary--text">{{total}}</span> bản ghi. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" style="justify-content: flex-end; -webkit-justify-content: flex-end;">
       <div class="px-3 xs2 flex">
-        <v-select
+        <v-autocomplete
           v-bind:items="totalPagesData"
           v-model="currentPage"
           item-text="text"
           item-value="value"
           autocomplete
           @input="goToPage"
-        ></v-select>
+        ></v-autocomplete>
       </div>
       <ul class="tiny-pagination" :class="customClass">
         <li class="page-item" :class="classFirstPage">
