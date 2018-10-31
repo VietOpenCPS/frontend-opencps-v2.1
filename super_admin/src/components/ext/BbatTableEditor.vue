@@ -91,6 +91,19 @@
               vm.noDetail = true
             }
           }
+          if (dataObj.respone === 'listTableMenu') {
+            let listTableMenu = vm.$store.getters.getlistTableMenu
+            let dataMenu = vm.dataSocket['listTableMenu']
+            for (let key in dataMenu) {
+              listTableMenu[2].children.push({
+                icon: 'arrow_right',
+                link: '/table/' + dataMenu[key][1],
+                code: dataMenu[key][1],
+                text: dataMenu[key][2]
+              })
+            }
+            vm.$store.commit('setlistTableMenu', listTableMenu)
+          }
           if (String(vm.id) === '0') {
             vm.nameScreen = 'Thêm mới dữ liệu'
             vm.showDetailForm = true
@@ -130,8 +143,21 @@
     methods: {
       backToList () {
         let vm = this
-        let currentPath = vm.$router.history.current.path
-        vm.$router.push(currentPath.substring(0, currentPath.indexOf('/editor/')))
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let currentPath = current.path
+        let queryString = '?'
+        newQuery['state_change'] = '0'
+        newQuery['renew'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        vm.$router.push({
+          path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+        })
       },
       deleteRecord () {
         let vm = this
