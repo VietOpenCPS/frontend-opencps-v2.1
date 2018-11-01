@@ -20,6 +20,10 @@
 	
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=12312211199123" rel="stylesheet" type="text/css">
 
+	<#if permissionChecker.isOmniadmin()>
+		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=12312211199123" rel="stylesheet" type="text/css">
+	</#if>
+
 	<script>
         window.__define = window.define;
         window.__require = window.require;
@@ -50,6 +54,20 @@
 </head>
 
 <body class="${css_class}">
+
+<#if permissionChecker.isOmniadmin()>
+	<@liferay_util["include"] page=body_top_include />
+	<@liferay.control_menu />
+<#else>
+	<style>
+		html .has-control-menu #wrapper {
+			margin-top: 0 !important;
+		}
+		html body.open #wrapper {
+			padding-left: 0 !important;
+		}
+	</style>
+</#if>
 
 <div class="" id="wrapper">
 	<header id="banner">		
@@ -96,6 +114,12 @@
 
 <!-- inject:js -->
 	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=65722572255"></script>
+
+	<#if permissionChecker.isOmniadmin()>
+		<@liferay_util["include"] page=body_bottom_include />
+		<@liferay_util["include"] page=bottom_include />
+	</#if>
+
 <!-- endinject -->
 
 </body>

@@ -34,7 +34,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/socket-gate?group
   }
 )
 
-// axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay.authToken
 axios.defaults.headers.common['groupId'] = groupId
 
 Vue.config.productionTip = true
