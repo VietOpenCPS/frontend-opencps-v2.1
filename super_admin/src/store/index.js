@@ -8,8 +8,16 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     snackbarerror: false,
+    snackbarsocket: false,
+    refreshSocket: 0,
     initData: {},
     tocken: '',
+    loginUser: [
+      {
+        'email': '',
+        'role': ''
+      }
+    ],
     user: null,
     socket: {
       isConnected: false,
@@ -818,9 +826,17 @@ export const store = new Vuex.Store({
     SOCKET_ONOPEN (state, event) {
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
+      setTimeout(() => {
+        if (state.socket.isConnected && state.refreshSocket === 3) {
+          state.refreshSocket = 0
+          window.location.reload(true)
+        }
+      }, 4000)
     },
     SOCKET_ONCLOSE (state, event) {
       console.log('SOCKET_ONCLOSE', event)
+      state.refreshSocket = 3
+      state.snackbarsocket = true
       state.socket.isConnected = false
     },
     SOCKET_ONERROR (state, event) {
@@ -868,6 +884,22 @@ export const store = new Vuex.Store({
     },
     setsnackbarerror (state, payload) {
       state.snackbarerror = payload
+    },
+    setsnackbarsocket (state, payload) {
+      state.snackbarsocket = payload
+    },
+    setloginUser (state, payload) {
+      console.log('payload', payload)
+      let currentLogin = payload[0]
+      if (currentLogin['role'] === 'Administrator') {
+        console.log('admin login')
+      } else if (currentLogin['role'] === 'Administrator_data') {
+        state.listTableMenu.splice(3, 1)
+      } else {
+        state.listTableMenu.splice(2, 1)
+        state.listTableMenu.splice(2, 1)
+      }
+      state.loginUser = payload
     }
   },
   getters: {
@@ -900,6 +932,12 @@ export const store = new Vuex.Store({
     },
     getsnackbarerror (state) {
       return state.snackbarerror
+    },
+    getsnackbarsocket (state) {
+      return state.snackbarsocket
+    },
+    getloginUser (state) {
+      return state.loginUser[0]
     }
   }
 })

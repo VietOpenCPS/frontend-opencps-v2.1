@@ -159,6 +159,9 @@ export default {
           paramObj.actionUser = window.themeDisplay.getUserName()
           paramObj.actionNote = ''
           paramObj.postStepCode = item.postStepCode
+          paramObj.payload = item.payload
+          paramObj.assignUsers = item.assignUsers
+          paramObj.payment = item.payment
           var strIdArr = idArr.join(';')
           var actionName = item.actionName
           console.log(strIdArr)
@@ -234,7 +237,7 @@ export default {
         dataType: 'json',
         headers: {
           'groupId': window.themeDisplay.getScopeGroupId(),
-          'Token': Liferay.authToken
+          'Token': window.Liferay.authToken
         },
         data: {
           actionCode: paramObj['actionCode'],
@@ -243,6 +246,9 @@ export default {
           assignUserId: paramObj['assignUserId'],
           postStepCode: paramObj['postStepCode'],
           subUsers: paramObj['subUsers'],
+          payload: paramObj['payload'],
+          assignUsers: paramObj['assignUsers'],
+          payment: paramObj['payment'],
           sign: signs,
           signFieldName: signFieldNames,
           fileName: fileNames,

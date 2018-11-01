@@ -28,6 +28,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/socket-gate?group
   {
     store: store,
     format: 'json',
+    reconnection: true,
     reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
     reconnectionDelay: 3000
   }
@@ -84,6 +85,21 @@ new Vue({
             end: -1
           }
         )
+        vm.$socket.sendObj(
+          {
+            type: 'api',
+            cmd: 'get',
+            respone: 'loginUser',
+            api: '/o/gate/v2/user/login',
+            headers: {
+              'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
+              'groupId': vm.getScopeGroupId()
+            }
+          }
+        )
+        if (vm.$router.history.current.path === '/') {
+          vm.$router.push('/table/opencps_employee')
+        }
       }, 10)
     })
   }
