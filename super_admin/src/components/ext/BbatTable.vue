@@ -179,16 +179,20 @@
             if (dataObj.respone === 'pageTotalCounter') {
               vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
               vm.showLoadingTable = false
+            } else if (dataObj.respone === 'loginUser') {
+              vm.$store.commit('setloginUser', dataObj['loginUser'])
             } else if (dataObj.respone === 'listTableMenu') {
               let listTableMenu = vm.$store.getters.getlistTableMenu
-              let dataMenu = vm.dataSocket['listTableMenu']
-              for (let key in dataMenu) {
-                listTableMenu[2].children.push({
-                  icon: 'arrow_right',
-                  link: '/table/' + dataMenu[key][1],
-                  code: dataMenu[key][1],
-                  text: dataMenu[key][2]
-                })
+              if (listTableMenu.length > 2) {
+                let dataMenu = vm.dataSocket['listTableMenu']
+                for (let key in dataMenu) {
+                  listTableMenu[2].children.push({
+                    icon: 'arrow_right',
+                    link: '/table/' + dataMenu[key][1],
+                    code: dataMenu[key][1],
+                    text: dataMenu[key][2]
+                  })
+                }
               }
               vm.$store.commit('setlistTableMenu', listTableMenu)
             }
@@ -372,7 +376,6 @@
         let vm = this
         let objectConfig = vm.dataSocket['tableConfig']
         let columns = eval('( ' + objectConfig.columns + ' )')
-        console.log(columns)
         let colWidths = []
         let colAlignments = []
         for (let key in columns) {

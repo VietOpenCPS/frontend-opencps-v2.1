@@ -314,7 +314,9 @@
             } else {
               vm.data = {}
             }
-          }
+          } else if (dataObj.respone === 'loginUser') {
+            vm.$store.commit('setloginUser', dataObj['loginUser'])
+          } 
           if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
             vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
             vm.processDataSource()

@@ -27,7 +27,7 @@
             </v-flex>
           </v-layout>
           <v-list-group
-            v-else-if="item.children"
+            v-else-if="item.hasOwnProperty('children')"
             v-model="item.model"
             :key="item.text"
             :append-icon="item.model ? item.icon : item['icon-alt']"
@@ -42,6 +42,7 @@
               </v-list-tile-content>
             </v-list-tile>
             <v-list-tile
+              v-if="item.hasOwnProperty('children')"
               v-for="(child, i) in item.children"
               :key="i"
               :class='{"list__active": tableName === child.code}'
@@ -83,7 +84,7 @@
         <span class="hidden-sm-and-down">Quản trị dữ liệu</span>
       </v-toolbar-title>
       <v-autocomplete
-        :items="items[2].children"
+        :items="getItemSearch()"
         item-text="text"
         item-value="link"
         flat
@@ -95,8 +96,17 @@
         @change="redirectFilter($event)"
       ></v-autocomplete>
       <v-spacer style="max-width: 25px;"></v-spacer>
-      <v-btn icon>
-        <v-icon>notifications</v-icon>
+      <v-btn v-if="loginUser['role'] === 'Administrator'" flat class="mx-0 my-0" v-on:click.native="redirectControlPanel()">
+        <v-avatar size="32px" tile>
+          <v-icon>settings</v-icon>
+        </v-avatar>
+        Cấu hình trang
+      </v-btn>
+      <v-btn flat class="mr-2 my-0 ml-0">
+        <v-avatar size="32px" tile>
+          <v-icon dark>account_circle</v-icon>
+        </v-avatar>
+          {{loginUser['email']}}
       </v-btn>
     </v-toolbar>
     <v-container fluid>
@@ -121,6 +131,33 @@
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
+    <v-snackbar
+      v-model="snackbarsocket"
+      :bottom="true"
+      :left="false"
+      :multi-line="true"
+      :right="false"
+      :timeout="0"
+      :top="true"
+      :vertical="false"
+      color="red darken-3"
+    >
+      <v-progress-circular
+        :size="20"
+        :width="1"
+        color="white"
+        indeterminate
+      ></v-progress-circular>
+      &nbsp;
+      Mất kết nối, tự động kết nối lại trong giây lát ... 
+      
+      <v-btn
+        icon
+        @click="reloadPage()"
+      >
+        <v-icon>replay</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -138,6 +175,9 @@
       items () {
         return this.$store.getters.getlistTableMenu
       },
+      loginUser () {
+        return this.$store.getters.getloginUser
+      },
       snackbarerror: {
         // getter
         get: function() {
@@ -147,6 +187,16 @@
         set: function(newValue) {
           this.$store.commit('setsnackbarerror', newValue)
         }
+      },
+      snackbarsocket: {
+        // getter
+        get: function() {
+          return this.$store.getters.getsnackbarsocket
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setsnackbarsocket', newValue)
+        }
       }
     },
     methods: {
@@ -155,6 +205,26 @@
       },
       closeError () {
         this.$store.commit('setsnackbarerror', false)
+      },
+      reloadPage () {
+        window.location.reload(true)
+      },
+      redirectControlPanel () {
+        let controlPanelURL = ''
+        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+          controlPanelURL = window.themeDisplay.getLayoutRelativeControlPanelURL()
+        }
+        window.location.href = controlPanelURL + '?p_p_id=com_liferay_layout_admin_web_portlet_GroupPagesPortlet'
+      },
+      getItemSearch () {
+        let vm = this
+        if (vm.items.length === 2) {
+          return vm.items[1].children
+        } else if (vm.items.length > 2) {
+          return vm.items[2].children
+        } else {
+          return []
+        }
       }
     }
   }
