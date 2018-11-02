@@ -259,25 +259,20 @@ export default {
       data['referenceUid'] = vm.detailDossier.referenceUid
       data['selector'] = 'paymentFile1'
       let file = $('#paymentFile1')[0].files[0]
-      if (!file || (file.type !== 'image/png' && file.type !== 'image/jpeg' && file.type !== 'image/jpeg')) {
-        toastr.error('Định dạng tải lên không đúng')
+      vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
+        vm.epaymentValid = true
         vm.progressUploadPart = false
-      } else {
-        vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
-          vm.epaymentValid = true
-          vm.progressUploadPart = false
+        vm.paymentFile = result
+        vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.$store.commit('setPaymentProfile', vm.data_payment)
+        vm.$store.dispatch('getPaymentFiles', data).then(result => {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.$store.commit('setPaymentProfile', vm.data_payment)
-          vm.$store.dispatch('getPaymentFiles', data).then(result => {
-            vm.paymentFile = result
-            vm.data_payment['paymentFile'] = vm.paymentFile
-            vm.$store.commit('setPaymentProfile', vm.data_payment)
-          })
-        }).catch(function (xhr) {
-          vm.progressUploadPart = false
         })
-      }
+      }).catch(function (xhr) {
+        vm.progressUploadPart = false
+      })
     },
     viewFile () {
       let vm = this

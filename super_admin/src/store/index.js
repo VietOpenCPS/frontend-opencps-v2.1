@@ -425,8 +425,8 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
             let seriable = response.data
-            if (seriable.data) {
-              resolve(seriable.data)
+            if (seriable) {
+              resolve(seriable)
             }
           }).catch(function (xhr) {
             reject(xhr)
@@ -449,8 +449,8 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/actions', param).then(function (response) {
             let seriable = response.data
-            if (seriable.data) {
-              resolve(seriable.data)
+            if (seriable) {
+              resolve(seriable)
             }
           }).catch(function (xhr) {
             reject(xhr)

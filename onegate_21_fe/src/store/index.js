@@ -16,6 +16,9 @@ export const store = new Vuex.Store({
     loadingTable: false,
     loadingDynamicBtn: false,
     loadingGov: false,
+    validFileUpload: false,
+    fileTypeTPHS: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf'],
+    fileTypePAYMENT: ['png', 'jpg', 'jpeg'],
     error: null,
     user: null,
     index: 0,
@@ -531,9 +534,9 @@ export const store = new Vuex.Store({
     },
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        console.log('upload')
         let files = window.$('#file' + data.partNo)[0].files
         let file = files[0]
+        file['typeAllow'] = state.fileTypeTPHS
         let formData = new FormData()
         if (data.partType === 3) {
           formData.append('displayName', data['displayName'])
@@ -549,19 +552,24 @@ export const store = new Vuex.Store({
         formData.append('fileTemplateNo', data.fileTemplateNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
-        axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(function (response) {
-          resolve(response.data)
-          console.log('upload file success!')
-        }).catch(function (xhr) {
-          console.log(xhr)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-          reject(xhr)
-        })
+        store.dispatch('validFileUpload', file) // check size, type tài liệu upload
+        if (file && state.validFileUpload) {
+          axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(function (response) {
+            resolve(response.data)
+            console.log('upload file success!')
+          }).catch(function (xhr) {
+            console.log(xhr)
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            reject(xhr)
+          })
+        } else {
+          reject('error')
+        }
       })
     },
     uploadSingleOtherFile ({ commit, state }, data) {
@@ -598,27 +606,27 @@ export const store = new Vuex.Store({
         console.log('data', data)
         let files = $('#' + data.selector)[0].files
         let file = files[0]
+        file['typeAllow'] = state.fileTypePAYMENT
         let formData = new FormData()
-        // formData.append('displayName', file.name)
-        // formData.append('fileType', file.type)
-        // formData.append('fileSize', file.size)
         formData.append('file', file)
-        // for (let key of formData.entries()) {
-        //   console.log(key[0] + ', ' + key[1])
-        // }
-        axios.put(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', formData, {
-          headers: {
-            'groupId': state.initData.groupId,
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(function (response) {
-          resolve(response.data)
-          console.log('Tải file lên thành công')
-        }).catch(function (xhr) {
-          console.log(xhr)
-          toastr.error('Tải file lên thất bại')
-          reject(xhr)
-        })
+        store.dispatch('validFileUpload', file) // check size, type tài liệu upload
+        if (file && state.validFileUpload) {
+          axios.put(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', formData, {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(function (response) {
+            resolve(response.data)
+            console.log('Tải file lên thành công')
+          }).catch(function (xhr) {
+            console.log(xhr)
+            toastr.error('Tải file lên thất bại')
+            reject(xhr)
+          })
+        } else {
+          reject('error')
+        }
       })
     },
     getDetailDossier ({ commit, state }, data) {
@@ -2509,6 +2517,27 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    validFileUpload ({commit, state}, file) {
+      let getFileType = file.name ? file.name.split('.') : ''
+      let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
+      let fileTypeAllow = file.typeAllow
+      let fileSizeAllow = 10
+      let fileTypeInput = fileTypeAllow.filter(function (item) {
+        return item === fileType
+      })
+      store.commit('setValidFileUpload', false)
+      if (fileTypeInput && fileTypeInput.length > 0) {
+        if (Number(file.size) <= fileSizeAllow * 1048576) {
+          store.commit('setValidFileUpload', true)
+        } else {
+          toastr.error('Tải liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          store.commit('setValidFileUpload', false)
+        }
+      } else {
+        toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + file.typeAllow.toString().replace(/\,/g,', '))
+        store.commit('setValidFileUpload', false)
+      }
     }
     // ----End---------
   },
@@ -2521,6 +2550,9 @@ export const store = new Vuex.Store({
     },
     setLoadingGov (state, payload) {
       state.loadingGov = payload
+    },
+    setValidFileUpload (state, payload) {
+      state.validFileUpload = payload
     },
     setError (state, payload) {
       state.error = payload

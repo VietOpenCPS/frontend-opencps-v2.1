@@ -1199,8 +1199,8 @@
         }
         vm.pageTotalStep = 0
         vm.$store.dispatch('getProcessStep', filter).then(function (result) {
-          vm.stepList = result
-          vm.pageTotalStep = vm.stepList.length
+          vm.stepList = result.data
+          vm.pageTotalStep = result.total
         }).catch(reject => {
           console.log(reject)
         })
@@ -1214,8 +1214,8 @@
         }
         vm.pageTotalAction = 0
         vm.$store.dispatch('getProcessAction', filter).then(function (result) {
-          vm.actionList = result
-          vm.pageTotalAction = vm.actionList.length
+          vm.actionList = result.data
+          vm.pageTotalAction = result.total
         }).catch(reject => {
           console.log(reject)
         })
