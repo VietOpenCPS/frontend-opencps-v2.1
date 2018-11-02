@@ -1361,6 +1361,29 @@ export default {
             actionId: vm.processActionCurrent
           }
           vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+            var paymentsOut = ''
+            if (vm.showThuPhi) {
+              paymentsOut = {
+                requestPayment: vm.payments['requestPayment'],
+                paymentNote: vm.payments['paymentNote'],
+                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+              }
+              resultAction['payment'] = paymentsOut
+            }
+            if (vm.showYkienCanBoThucHien) {
+              let result = vm.$refs.ykiencanbo.doExport()
+              let note = ''
+              if (result.valid) {
+                validYKien = true
+                note = result.text
+              } else {
+                validYKien = false
+              }
+              resultAction['userNote'] = note
+            }
             vm.$refs.kypheduyettailieu.kySo(resultAction)
             setTimeout(function () {
               vm.loadingAction = false

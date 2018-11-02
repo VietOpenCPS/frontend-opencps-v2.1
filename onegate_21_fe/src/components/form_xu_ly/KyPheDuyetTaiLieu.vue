@@ -111,7 +111,7 @@ export default {
       return exportData
     },
     kySo (item) {
-      console.log('run ky so', item)
+      console.log('run ky so -data payload', item)
       var vm = this
       var fileArr
       if (Array.isArray(item.createFiles)) {
@@ -154,13 +154,15 @@ export default {
           paramObj.actionCode = item.actionCode
           paramObj.actionUser = window.themeDisplay.getUserName()
           paramObj.actionNote = ''
-          paramObj.postStepCode = item.postStepCode
-          paramObj.payload = item.payload
-          paramObj.assignUsers = item.assignUsers
-          paramObj.payment = item.payment
+          paramObj.postStepCode = item.postStepCode ? item.postStepCode : ''
+          paramObj.payload = item.payload ? item.payload : ''
+          paramObj.assignUsers = item.assignUsers ? item.assignUsers : ''
+          paramObj.payment = item.payment ? item.payment : ''
+          paramObj.userNote = item.userNote ? item.userNote : ''
           var strIdArr = idArr.join(';')
           var actionName = item.actionName
-          console.log(strIdArr)
+          console.log('strIdArr', strIdArr)
+          console.log('paramObj', paramObj)
           vm.kyDuyetYCGiamDinh(strIdArr, paramObj, actionName)
         }
       }
@@ -242,6 +244,7 @@ export default {
           payload: paramObj['payload'],
           assignUsers: paramObj['assignUsers'],
           payment: paramObj['payment'],
+          userNote: paramObj['userNote'],
           sign: signs,
           signFieldName: signFieldNames,
           fileName: fileNames,
