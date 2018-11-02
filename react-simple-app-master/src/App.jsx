@@ -169,10 +169,10 @@ class App extends React.Component {
       } else if (response.data === 'ok') {
         window.location.href = window.themeDisplay.getURLHome()
       } else {
-        toast.error("Đăng nhập thất bại.", { autoClose: 2000 });
+        toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
       }
     }).catch(function (error) {
-      toast.error("Đăng nhập thất bại.", { autoClose: 2000 });
+      toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
     })
   };
 

@@ -2869,3 +2869,14 @@ body .chip .chip__content {
 .no-comments.no-data {
   font-size: 18px;
 }
+
+.v_data_table_check_all {
+    width: 32px !important;
+}
+.v_data_table_check_all > div {
+    margin: auto !important;
+}
+.v_data_table_check_all .input-group--selection-controls.checkbox .input-group--selection-controls__ripple {
+    width: 32px;
+    height: 32px;
+}
