@@ -51,15 +51,13 @@
               </v-tabs-items>
             </v-tabs> -->
             <v-checkbox
-              v-if="!kysoSuccess"
               class="ml-3"
               v-model='activeKS'
-              label='Chọn để thực hiện ký số'
-              :disabled="activeKS"
+              label='Sử dụng chữ ký số'
             ></v-checkbox>
-            <v-alert v-else outline :value="true" type="success" class="mx-2">
+            <!-- <v-alert v-else outline :value="true" type="success" class="mx-2">
               Đã thực hiện ký số
-            </v-alert>
+            </v-alert> -->
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -91,12 +89,12 @@ export default {
     }
   },
   watch: {
-    activeKS (val) {
-      var vm = this
-      if (val === true) {
-        vm.kySo(vm.dataEsign)
-      }
-    }
+    // activeKS (val) {
+    //   var vm = this
+    //   if (val === true) {
+    //     vm.kySo(vm.dataEsign)
+    //   }
+    // }
   },
   mounted () {},
   methods: {
@@ -144,13 +142,11 @@ export default {
       if (isKyOk) {
         if (!plugin().valid) {
           isKyOk = false
-          vm.activeKS = false
           alert('Plugin ký số không hoạt động')
           return
         }
         if (waitingFiles) {
           alert('Tệp điện tử chưa sẵn sàng. Xin vui lòng chờ trong giây lát')
-          vm.activeKS = false
           return
         }
         if (idArr) {
@@ -211,16 +207,13 @@ export default {
               }
               vm.completeKyDuyetManyYCGiamDinh(signs.join(','), signFieldNames.join(','), fileNames.join(','), fileEntryIds.join(','), paramObj, actionName)
             } else {
-              vm.activeKS = false
               alert('Plugin ký số không hoạt động')
             }
           } else {
-            vm.activeKS = false
             alert('Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
           }
         },
         error: function (result) {
-          vm.activeKS = false
         }
       })
     },
@@ -256,14 +249,11 @@ export default {
             toastr.success('Thực hiện ký số thành công.')
           } else if (msg === 'fileEntryId') {
             alert('Cảnh báo: Không tìm thấy file bản thảo. Tạm dừng tiến trình đóng dấu số')
-            vm.activeKS = false
           } else {
             alert(msg)
-            vm.activeKS = false
           }
         },
         error: function () {
-          vm.activeKS = false
           alert('Thực hiện ký số thất bại')
         }
       })
