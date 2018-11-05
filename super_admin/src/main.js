@@ -20,11 +20,11 @@ Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
-let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost'
+let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/socket-gate?groupId='+ groupId + '&portalURL=' + portalURL + '&Token=' + token, 
+Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?groupId='+ groupId + '&portalURL=' + portalURL + '&Token=' + token, 
   {
     store: store,
     format: 'json',
@@ -34,7 +34,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/socket-gate?group
   }
 )
 
-axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
 
 Vue.config.productionTip = true
@@ -60,6 +60,13 @@ Vue.mixin({
         return window.Liferay.authToken
       } else {
         return ''
+      }
+    },
+    getUserId: function () {
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+        return window.themeDisplay.getUserId()
+      } else {
+        return 0
       }
     }
   }
@@ -90,14 +97,15 @@ new Vue({
             type: 'api',
             cmd: 'get',
             respone: 'loginUser',
-            api: '/o/gate/v2/user/login',
+            api: '/o/gate/v2/users/login',
             headers: {
-              'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
-              'groupId': vm.getScopeGroupId()
+              'Token': vm.getAuthToken(),
+              'groupId': vm.getScopeGroupId(),
+              'USER_ID': vm.getUserId()
             }
           }
         )
-        if (vm.$router.history.current.path === '/') {
+        if (window.location.href.endsWith('#/')) {
           vm.$router.push('/table/opencps_employee')
         }
       }, 10)

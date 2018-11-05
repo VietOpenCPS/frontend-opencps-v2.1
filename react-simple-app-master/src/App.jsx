@@ -21,7 +21,7 @@ import Button from '@material-ui/core/Button';
 import { ToastContainer, toast } from 'react-toastify';
 
 const themeDisplay = window.themeDisplay;
-axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 const styles = theme => ({
   root: {
     textAlign: 'right',
@@ -85,7 +85,7 @@ class App extends React.Component {
       anchorEl: null,
       isSignedIn: false,
       userNameLogin: '',
-      forgottenURL: '/forgotten-password',
+      forgottenURL: '/register/#/cap-lai-mat-khau',
       drawer: false,
       avatarURL: '',
       notificationCount: 0,
@@ -118,9 +118,9 @@ class App extends React.Component {
       let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
       let forgottenURLStr = ''
       if (redirectURL !== '') {
-        forgottenURLStr = redirectURL + '/forgotten-password'
+        forgottenURLStr = redirectURL + '/register/#/cap-lai-mat-khau'
       } else {
-        forgottenURLStr = themeDisplay.getURLHome() + '/forgotten-password'
+        forgottenURLStr = themeDisplay.getURLHome() + '/register/#/cap-lai-mat-khau'
       }
       vm.setState({
         isSignedIn: themeDisplay.isSignedIn(),
@@ -165,7 +165,13 @@ class App extends React.Component {
     }).then(function (response) {
       console.log(response.data)
       if (response.data !== '' && response.data !== 'ok') {
-        window.location.href = response.data
+        if (response.data === 'pending') {
+          window.location.href = window.themeDisplay.getURLHome() +
+          "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+            "&redirectURL=" + window.themeDisplay.getURLHome()
+        } else {
+          window.location.href = response.data
+        }
       } else if (response.data === 'ok') {
         window.location.href = window.themeDisplay.getURLHome()
       } else {
