@@ -17,4 +17,13 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script type="text/javascript">
+      $.ajaxSetup({
+      headers: {
+        "Token": "Liferay.authToken",
+        "groupId": 0
+      },
+      global: true
+    });
+  </script>
 </html>

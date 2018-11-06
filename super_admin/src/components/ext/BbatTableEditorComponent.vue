@@ -193,19 +193,45 @@
             <v-flex xs12>
               <v-text-field
                 v-model="password"
+                type="password"
                 label="Mật khẩu mới" 
                 box 
               >
               </v-text-field>
             </v-flex>
             <v-flex xs12>
-              <v-btn block color="blue darken-3" dark>Xác nhận</v-btn>
+              <v-btn block color="blue darken-3" dark v-on:click.native="doChangePassWord()">Xác nhận</v-btn>
+            </v-flex>
+            <v-flex xs12>
+              <v-switch
+                :label="deactiveAccountFlag === 0 ? 'Đang hoạt động' : 'Không hoạt động'"
+                v-model="deactiveAccountFlag"
+              ></v-switch>
             </v-flex>
           </v-layout>
         </v-card-title>
       </v-card>
       
     </v-navigation-drawer>
+    <v-snackbar
+      v-model="snackbarsuccess"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="success"
+    >
+      Yêu cầu thực hiện thành công
+      <v-btn
+        icon
+        @click="snackbarsuccess = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-form>
 </template>
 
@@ -221,6 +247,8 @@
     },
     data() {
       return {
+        deactiveAccountFlag: 0,
+        snackbarsuccess: false,
         pickItem: {},
         layoutNameDynamic: '',
         screenLogin: '',
@@ -405,8 +433,9 @@
               respone: item.concatina['datasource_key'],
               api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
               headers: {
-                'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
-                'groupId': vm.getScopeGroupId()
+                'Token': vm.getAuthToken(),
+                'groupId': vm.getScopeGroupId(),
+                'USER_ID': vm.getUserId()
               }
             }
           )
@@ -429,18 +458,76 @@
                 respone: vm.detailForm[key]['datasource_key'],
                 api: apiURL,
                 headers: {
-                  'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
-                  'groupId': vm.getScopeGroupId()
+                  'Token': vm.getAuthToken(),
+                  'groupId': vm.getScopeGroupId(),
+                  'USER_ID': vm.getUserId()
                 }
               }
             )
           }
         }
       },
+      doDeactiveAccount () {
+        let vm = this
+        let postData = {
+          id: vm.id,
+          data: {
+            locked: vm.password
+          }
+        }
+        vm.$store.dispatch('deactiveAccount', postData).then(function (data) {
+          vm.snackbarsuccess = true
+        })
+      },
+      doChangePassWord () {
+        let vm = this
+        var result = confirm('Bạn có muốn đổi mật khẩu?');
+        if (result) {
+          let postData = {
+            id: vm.id,
+            data: {
+              password: vm.password
+            }
+          }
+          vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
+            vm.snackbarsuccess = true
+          })
+        }
+      },
       showAccount (item) {
         let vm = this
-        vm.layoutNameDynamic = item['label']
-        vm.rightAccount = !vm.rightAccount
+        if (item['mappingUserId'] === 0) {
+          if (item['email'] === '') {
+            alert('Cấp địa chỉ email trước khi tạo tài khoản.')
+          } else {
+            var result = confirm('Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?');
+            if (result) {
+              let postData = {
+                id: vm.id,
+                data: {
+                  email: vm.detailData[0]['email'],
+                  screenName: '',
+                  exist: false
+                }
+              }
+              vm.$store.dispatch('createUserAccount', postData).then(function (data) {
+                vm.screenLogin = data['screenName']
+                vm.emailLogin = data['email']
+                vm.deactiveAccountFlag = data['deactiveAccountFlag']
+                vm.layoutNameDynamic = item['label']
+                vm.rightAccount = !vm.rightAccount
+              })
+            }
+          }
+        } else {
+          vm.$store.dispatch('getUserAccount', vm.detailData[0]['mappingUserId']).then(function (data) {
+            vm.screenLogin = data['screenName']
+            vm.emailLogin = data['email']
+            vm.deactiveAccountFlag = data['deactiveAccountFlag']
+            vm.layoutNameDynamic = item['label']
+            vm.rightAccount = !vm.rightAccount
+          })
+        }
       },
       showAttached (item) {
         let vm = this

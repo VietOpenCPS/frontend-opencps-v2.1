@@ -174,6 +174,76 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    deactiveAccount ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.put('/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
+            resolve({statu: 200})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    changePassUserAccount ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.put('/user/' + postData['id'] + '/changepass', postData['data'], param).then(function () {
+            resolve({statu: 200})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    createUserAccount ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/employees/' + postData['id'] + '/account', postData['data'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    getUserAccount ({commit, state}, userId) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/gate/v2/user/' + userId, param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     downloadServiceFileTemplate ({commit, state}, item) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -850,6 +920,7 @@ export const store = new Vuex.Store({
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
       setTimeout(() => {
+        console.log('state.refreshSocket', state.refreshSocket)
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
           window.location.reload(true)
@@ -912,17 +983,18 @@ export const store = new Vuex.Store({
       state.snackbarsocket = payload
     },
     setloginUser (state, payload) {
-      console.log('payload', payload)
-      let currentLogin = payload[0]
-      if (currentLogin['role'] === 'Administrator') {
-        console.log('admin login')
-      } else if (currentLogin['role'] === 'Administrator_data') {
-        state.listTableMenu.splice(3, 1)
-      } else {
-        state.listTableMenu.splice(2, 1)
-        state.listTableMenu.splice(2, 1)
+      if (payload !== null && payload !== undefined) {
+        let currentLogin = payload[0]
+        if (currentLogin['role'] === 'Administrator') {
+          console.log('admin login')
+        } else if (currentLogin['role'] === 'Administrator_data') {
+          state.listTableMenu.splice(3, 1)
+        } else {
+          state.listTableMenu.splice(2, 1)
+          state.listTableMenu.splice(2, 1)
+        }
+        state.loginUser = payload
       }
-      state.loginUser = payload
     }
   },
   getters: {
