@@ -1003,3 +1003,12 @@
 	.taglib-text.hide-accessible {
 		display: none;
 	}
+	#wrapper > .sheet > .sheet-header {
+		margin-bottom: 3rem;
+		max-width: 1024px;
+		margin: 0 auto;
+	}
+	.v_data_table_check_all {
+		width: 32px !important;
+		padding: 0 !important;
+	}

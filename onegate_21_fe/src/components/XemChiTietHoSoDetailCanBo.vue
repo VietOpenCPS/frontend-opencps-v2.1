@@ -60,11 +60,11 @@
             THANH TOÁN
           </v-btn>
         </v-tab>
-        <!-- <v-tab :key="4" href="#tabs-4" v-if="originality !== 1" @click="loadHoSoLienThong()">
+        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1" @click="loadHoSoLienThong()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LIÊN THÔNG
           </v-btn>
-        </v-tab> -->
+        </v-tab>
         <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TIẾN TRÌNH THỤ LÝ
@@ -110,7 +110,7 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xls, xlsx</span>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
@@ -312,11 +312,16 @@
           </v-tab-item>
           <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
-              <ho-so-lien-thong :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
+              <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
+              <v-card-text v-else>
+                <v-flex xs12 class="text-xs-center">
+                  <span>Không có hồ sơ liên thông</span>
+                </v-flex>
+              </v-card-text>
             </v-card>
           </v-tab-item>
           <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <div>
+            <div v-if="viewTable">
               <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
               >
@@ -352,6 +357,15 @@
                 </template>
               </v-data-table>
             </div>
+            <div v-else>
+              Xem dạng sơ đồ
+            </div>
+            <v-flex xs12 class="text-right">
+              <v-btn color="primary" class="ml-0 mr-2" @click="viewTable = !viewTable"
+              >
+                {{viewTable ? 'Xem dạng sơ đồ' : 'Xem dạng bảng'}}
+              </v-btn>
+            </v-flex>
           </v-tab-item>
           <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
@@ -571,7 +585,8 @@ export default {
     },
     stateViewResult: true,
     stateViewDocument: true,
-    listLienThong: []
+    listLienThong: [],
+    viewTable: true
   }),
   computed: {
     loading () {
@@ -668,9 +683,11 @@ export default {
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
-        // vm.loadHoSoLienThong()
         vm.getNextActions()
         vm.runComment()
+        if (vm.originality !== 1) {
+          vm.loadHoSoLienThong()
+        }
         // console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {

@@ -418,7 +418,7 @@ export default {
       applicantName: ''
     },
     thongTinNguoiNopHoSo: {
-      sameUser: true,
+      sameUser: false,
       delegateName: '',
       delegateCityCode: '',
       delegateAddress: '',

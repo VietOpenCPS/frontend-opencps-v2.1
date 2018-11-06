@@ -161,9 +161,12 @@ import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import support from '../store/support.json'
+// import Suggestions from 'v-suggestions'
 export default {
   props: [],
-  components: {},
+  components: {
+    // 'suggestions': Suggestions
+  },
   data: () => ({
     date: null,
     dialogRules: false,
@@ -180,8 +183,7 @@ export default {
     passWord: '',
     rePassWord: '',
     agreeRules: false,
-    ruleContent: `<div id="rules" style="background-color: #ffffff; color: black" class="MT20">
-   <div style="padding: 15px;"><ol> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Tổ chức, cá nhân có nhu cầu sử dụng dịch vụ công trực tuyến có quyền đề nghị cấp, sửa đổi, bổ sung thông tin tài&nbsp;khoản, tạm dừng, hủy tài khoản tại Cổng thông tin điện tử&nbsp;cung cấp dịch vụ&nbsp;công trực tuyến của Bộ Văn hóa, Thể thao và Du lịch. </span></span></span></li> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Các Tổng cục, Cục, Vụ thực hiện TTHC trên môi trường mạng thông qua phần mềm Quản lý hồ sơ Một cửa có trách nhiệm gửi yêu cầu cấp phát, sửa đổi, bổ sung, tạm dừng, hủy tài khoản của Lãnh đạo, cán bộ thực hiện dịch vụ công trực tuyến đến Trung tâm Công nghệ thông tin.</span></span></span></li> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Tổ chức, cá nhân đề nghị cấp, sửa đổi, bổ sung thông tin, tạm dừng, hủy tài khoản hoàn toàn chịu trách nhiệm về tính chính xác của thông tin cung cấp, thực hiện thay đổi mật khẩu ngay khi được cấp phát và chịu trách nhiệm quản lý thông tin tài khoản.</span></span></span></li> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Trung tâm Công nghệ thông tin phối hợp với các cơ quan, đơn vị liên quan có trách nhiệm cấp, sửa đổi, bổ sung thông tin, tạm dừng, hủy tài khoản sử&nbsp;dụng hệ thống dịch vụ công trực tuyến. Trường hợp không đáp ứng yêu cầu phải nêu rõ lý do.</span></span></span></li> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Trường hợp tổ chức, cá nhân đăng nhập vào hệ thống dịch vụ công trực tuyến quá 05 (năm) lần mà không thành công thì&nbsp;hệ thống dịch vụ công trực tuyến sẽ&nbsp;tự động tạm dừng tài khoản. Tổ chức, cá nhân liên hệ với Trung tâm Công nghệ thông tin để kích hoạt lại thông tin tài khoản.</span></span></span></li> <li style="text-align:justify;background-image:initial;background-position:initial;background-size:initial;background-repeat:initial;background-attachment:initial;background-origin:initial;background-clip:initial;"><span style="color:black;"><span style="font-family:times new roman,serif;"><span style="font-size:12.0pt;">Trường hợp phát hiện tổ&nbsp;chức, cá nhân trong quá trình thực hiện dịch vụ công trực tuyến có hành vi gây ảnh hưởng tới sự ổn định của hệ thống dịch vụ công trực tuyến, các Tổng cục, Cục, Vụ và cơ quan, đơn vị có liên quan thông báo cho Trung tâm Công nghệ thông tin tạm dừng tài&nbsp;khoản&nbsp;của tổ chức, cá nhân đó và nêu rõ lý do.</span></span></span></li> </ol></div></div>`,
+    ruleContent: '',
     e1: true,
     e2: true,
     rules: {
@@ -267,7 +269,7 @@ export default {
     getDieuKhoan () {
       let vm = this
       vm.$store.dispatch('getDieuKhoan').then(function (result) {
-        // vm.ruleContent = result
+        vm.ruleContent = result
       })
     },
     viewRules () {

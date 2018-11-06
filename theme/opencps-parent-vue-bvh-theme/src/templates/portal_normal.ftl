@@ -18,10 +18,10 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	
-	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=12312211199123" rel="stylesheet" type="text/css">
+	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=123122111991223" rel="stylesheet" type="text/css">
 
 	<#if permissionChecker.isOmniadmin()>
-		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=12312211199123" rel="stylesheet" type="text/css">
+		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=123122111299123" rel="stylesheet" type="text/css">
 	</#if>
 
 	<script>
@@ -69,7 +69,9 @@
 	</style>
 </#if>
 
-<div class="" id="wrapper">
+<div class="" id="wrapper" style="
+    overflow: hidden;
+">
 	<header id="banner">		
 		<div class="container align-middle hide-title">
 			<div class="logo align-middle">
@@ -93,6 +95,8 @@
 
 	<@liferay_util["include"] page=content_include />
 
+</div>
+
 	<footer id="footer">
 	    <div class="container first align-middle-lg">
 	        <div>
@@ -110,11 +114,9 @@
 	    </div>
 	    <div class="text-center last">${copyright}</div>
 	</footer>
-</div>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=65722572255"></script>
-
+	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=123"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />

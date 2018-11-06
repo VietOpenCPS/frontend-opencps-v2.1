@@ -113,7 +113,7 @@
 </div>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=65722572255"></script>
+	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=123"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />
