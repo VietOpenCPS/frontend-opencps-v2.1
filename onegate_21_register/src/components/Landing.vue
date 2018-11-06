@@ -161,9 +161,12 @@ import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import support from '../store/support.json'
+// import Suggestions from 'v-suggestions'
 export default {
   props: [],
-  components: {},
+  components: {
+    // 'suggestions': Suggestions
+  },
   data: () => ({
     date: null,
     dialogRules: false,

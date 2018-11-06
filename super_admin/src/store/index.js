@@ -311,7 +311,30 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDossierTemplate ({commit, state}) {
+    getAgencyLists ({state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get(state.endPointApi +'/dictcollections/GOVERNMENT_AGENCY/dictitems', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getDossierTemplate ({state}) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
           let param = {
@@ -326,7 +349,6 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject(xhr)
-            commit('setsnackbarerror', true)
           })
         })
       })
@@ -788,19 +810,20 @@ export const store = new Vuex.Store({
           dataPostAction.append('autoEvent', data.autoEvent)
           dataPostAction.append('preCondition', data.preCondition)
           dataPostAction.append('allowAssignUser', data.allowAssignUser)
-          dataPostAction.append('assignUserId', data.assignUserId)
+          dataPostAction.append('assignUserId', data.assignUserId ? data.assignUserId : '')
           dataPostAction.append('requestPayment', data.requestPayment)
-          dataPostAction.append('paymentFee', data.paymentFee)
+          dataPostAction.append('paymentFee', data.paymentFee ? data.paymentFee : '')
           dataPostAction.append('syncActionCode', data.syncActionCode)
           dataPostAction.append('rollbackable', data.rollbackable)
-          dataPostAction.append('createDossierFiles', data.createDossierFiles)
-          dataPostAction.append('returnDossierFiles', data.returnDossierFiles)
+          dataPostAction.append('createDossierFiles', data.createDossierFiles ? data.createDossierFiles.join() : '')
+          dataPostAction.append('returnDossierFiles', data.returnDossierFiles ? data.returnDossierFiles.join() : '')
           dataPostAction.append('createDossierNo', data.createDossierNo)
           dataPostAction.append('eSignature', data.eSignature)
           dataPostAction.append('configNote', data.configNote)
           dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo)
-          dataPostAction.append('createDossiers', data.createDossier)
+          dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')
           if (data.type === 'add') {
+            console.log('dataPostAction', dataPostAction)
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions', dataPostAction, options).then(function (response) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               resolve(response.data)

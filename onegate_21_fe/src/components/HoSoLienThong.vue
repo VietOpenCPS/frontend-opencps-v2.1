@@ -6,7 +6,8 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span>Danh sách hồ sơ liên thông</span>
+          <span v-if="!detailView">Danh sách hồ sơ liên thông</span>
+          <span v-else>{{currentHoSoLienThong ? currentHoSoLienThong.dossierName : ''}}</span>
         </div>
         <v-card class="">
           <v-card-text class="px-0 py-0">
@@ -15,32 +16,83 @@
               :items="listLienThong"
               hide-actions
               class="table-landing table-bordered"
+              item-key="dossierId"
+              v-if="!detailView"
             >
               <template slot="items" slot-scope="props">
-                <tr @click="props.expanded = !props.expanded">
-                  <td class="text-xs-center">
-                    <span>{{lienthongPage * 15 - 15 + props.index + 1}}</span>
+                <tr @click="viewDetail(props.item)" style="cursor: pointer">
+                  <td class="text-xs-center" width="5%">
+                    <span>{{props.index + 1}}</span>
                   </td>
-                  <td class="text-xs-left">
+                  <td class="text-xs-left" width="30%">
                     {{ props.item.dossierName }}
                   </td>
-                  <td class="text-xs-left">
+                  <td class="text-xs-left" width="25%">
                     {{ props.item.govAgencyName }}
                   </td>
-                  <td class="text-xs-left">
+                  <td class="text-xs-left" width="15%">
                     {{ props.item.submitDate }}
                   </td>
-                  <td class="text-xs-left">
-                    {{ props.item.dossierStatusText }}
+                  <td class="text-xs-left" width="15%">
+                    {{ props.item.receiveDate }}
+                  </td>
+                  <td class="text-xs-left" width="10%">
+                    {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
                   </td>
                 </tr>
               </template>
-              <template slot="expand" slot-scope="props">
-                <v-card flat>
-                  <v-card-text></v-card-text>
+              <!-- <template slot="expand" slot-scope="props">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <v-card flat v-else>
+                  <v-expansion-panel expand  class="expansion-pl ext__form">
+                    <v-expansion-panel-content v-bind:value="true">
+                      <div slot="header">
+                        <div class="background-triangle-small"> 1.</div>
+                        Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                      </div>
+                      <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel expand  class="expansion-pl ext__form">
+                    <v-expansion-panel-content v-bind:value="true">
+                      <div slot="header">
+                        <div class="background-triangle-small"> 2.</div>
+                        Tài liệu kết quả
+                      </div>
+                      <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
                 </v-card>
-              </template>
+              </template> -->
             </v-data-table>
+            <div v-else>
+              <v-expansion-panel expand  class="expansion-pl ext__form">
+                <v-expansion-panel-content v-bind:value="true">
+                  <div slot="header">
+                    <div class="background-triangle-small"> I.</div>
+                    Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel expand  class="expansion-pl ext__form">
+                <v-expansion-panel-content v-bind:value="true">
+                  <div slot="header">
+                    <div class="background-triangle-small"> II.</div>
+                    Tài liệu kết quả
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-flex xs12 class="mt-3 mb-2 text-right">
+                <v-btn color="primary" class="my-0 mx-0" @click="detailView = false">
+                  <v-icon size="16">undo</v-icon> &nbsp;
+                  Quay lại danh sách 
+                </v-btn>
+              </v-flex>
+            </div>
           </v-card-text>
         </v-card>
         <!--  -->
@@ -106,9 +158,11 @@
 <script>
 import router from '@/router'
 import thongtinchunghoso from './form_xu_ly/ThongTinChungHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 export default {
   components: {
-    'thongtinchunghoso': thongtinchunghoso
+    'thongtinchunghoso': thongtinchunghoso,
+    'thanh-phan-ho-so': ThanhPhanHoSo
   },
   props: {
     listLienThong: {
@@ -121,8 +175,13 @@ export default {
     }
   },
   data: () => ({
+    loading: false,
+    inputTypes: [1, 3],
+    outputTypes: [2],
+    detailView: false,
     thongTinLienThong: {},
     hoSoLienThongItems: [],
+    currentHoSoLienThong: '',
     lienthongPage: 1,
     headers: [
       {
@@ -146,6 +205,11 @@ export default {
         sortable: false
       },
       {
+        text: 'Ngày tiếp nhận',
+        align: 'center',
+        sortable: false
+      },
+      {
         text: 'Trạng thái',
         align: 'center',
         sortable: false
@@ -153,9 +217,6 @@ export default {
     ]
   }),
   computed: {
-    loading () {
-      return this.$store.getters.loading
-    }
   },
   created () {
     var vm = this
@@ -163,20 +224,6 @@ export default {
     })
   },
   methods: {
-    loadHoSoLienThong (classPK) {
-      var vm = this
-      vm.$store.dispatch('loadDossierLienThong', classPK).then(result => {
-        vm.hoSoLienThongItems = result
-        if (vm.hoSoLienThongItems.length > 0) {
-          for (var key in vm.hoSoLienThongItems) {
-            let itemDossier = vm.hoSoLienThongItems[key]
-            vm.getDossierLogs(itemDossier)
-          }
-        }
-      }).catch(reject => {
-        console.log(reject)
-      })
-    },
     getDossierLogs (dossier) {
       var vm = this
       let data = {
@@ -190,6 +237,20 @@ export default {
       }).catch(reject => {
         console.log(reject)
       })
+    },
+    viewDetail (item) {
+      var vm = this
+      console.log('item', item)
+      vm.detailView = true
+      vm.currentHoSoLienThong = item
+      setTimeout(function () {
+        if (vm.$refs.thanhphanhoso1) {
+          vm.$refs.thanhphanhoso1.initData(item)
+        }
+        if (vm.$refs.thanhphanhoso2) {
+          vm.$refs.thanhphanhoso2.initData(item)
+        }
+      }, 300)
     },
     goBack () {
       window.history.back()

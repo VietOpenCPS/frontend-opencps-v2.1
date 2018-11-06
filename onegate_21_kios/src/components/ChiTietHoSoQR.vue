@@ -24,7 +24,7 @@
           >
             <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
             <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
-            <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab>
+            <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
             <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
               <v-card >
                 <v-card-text class="px-0 py-0">
@@ -142,20 +142,21 @@
           <v-flex xs12 sm12 md6>
             <v-card>
               <v-toolbar color="primary" dark>
-                <!-- <v-menu transition="slide-x-transition">
+                <v-menu transition="slide-x-transition">
                   <v-toolbar-side-icon slot="activator"></v-toolbar-side-icon>
                   <v-list>
-                    <v-list-tile>Thông tin hồ sơ</v-list-tile>
-                    <v-list-tile>Tiến trình thụ lý</v-list-tile>
+                    <v-list-tile @click="detailInfo = true">Thông tin hồ sơ</v-list-tile>
+                    <v-list-tile @click="loadDossierActions">Tiến trình thụ lý</v-list-tile>
                   </v-list>
-                </v-menu> -->
-                <v-toolbar-title class="mobile mx-2">THÔNG TIN HỒ SƠ</v-toolbar-title>
+                </v-menu>
+                <v-toolbar-title class="mobile mx-2" v-if="detailInfo">THÔNG TIN HỒ SƠ</v-toolbar-title>
+                <v-toolbar-title class="mobile mx-2" v-else>TIẾN TRÌNH THỤ LÝ</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon class="mr-2">
                   <v-icon size="20">home</v-icon>
                 </v-btn>
               </v-toolbar>
-              <v-layout wrap class="mx-2 my-3">
+              <v-layout wrap class="mx-2 my-3" v-if="detailInfo">
                 <v-flex xs4 class="mb-1">
                   <v-subheader class="pl-0 text-header">Thủ tục: </v-subheader>
                 </v-flex>
@@ -216,6 +217,48 @@
                   </div>
                 </v-flex>
               </v-layout>
+              <v-layout wrap class="mx-2 my-3" v-else>
+                <v-card>
+                  <v-card-text class="px-0 py-0">
+                    <div>
+                      <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
+                      hide-actions no-data-text="Không có dữ liệu"
+                      >
+                        <template slot="headerCell" slot-scope="props">
+                          <v-tooltip bottom>
+                            <span slot="activator">
+                              {{ props.header.text }}
+                            </span>
+                            <span>
+                              {{ props.header.text }}
+                            </span>
+                          </v-tooltip>
+                        </template>
+                        <template slot="items" slot-scope="props">
+                          <td class="text-xs-center">{{props.index + 1}}</td>
+                          <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                          <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                          <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
+                          <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                          <td class="text-xs-left">
+                            <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                              {{itemUser.userName}} <br>
+                            </div>
+                          </td>
+                          <td class="text-xs-left">
+                            <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                              {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                            </div>
+                            <div v-if="props.item.statusText">
+                              <span style="color: green">{{props.item.statusText}}</span>
+                            </div>
+                          </td>
+                        </template>
+                      </v-data-table>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-layout>
             </v-card>
           </v-flex>
         </v-layout>
@@ -242,6 +285,7 @@
       tailieuNop: [],
       tailieuKeyQua: [],
       isPermission: false,
+      detailInfo: true,
       headers: [{
         text: '#',
         align: 'center',
@@ -283,6 +327,7 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
+        vm.detailInfo = true
         vm.$store.commit('setFullScreen', true)
         let currentParams = vm.$router.history.current.params
         let currentQuery = vm.$router.history.current.query
@@ -299,6 +344,20 @@
             if (resultDossier.status && resultDossier.status.toString() === '200') {
               vm.isPermission = true
               vm.dossierDetail = resultDossier.data
+              if ((!vm.dossierDetail.originality || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+                let submissionNote = vm.dossierDetail.submissionNote
+                let resultTemp = submissionNote.data
+                for (var i = 0; i < resultTemp.length; i++) {
+                  if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                    if (!Array.isArray(resultTemp[i]['actions'])) {
+                      let arrActionsTemp = []
+                      arrActionsTemp.push(resultTemp[i]['actions'])
+                      resultTemp[i]['actions'] = arrActionsTemp
+                    }
+                  }
+                }
+                vm.dossierActions = resultTemp
+              }
             } else {
               vm.isPermission = false
             }
@@ -316,21 +375,26 @@
         let dataParams = {
           dossierId: vm.dossierDetail.dossierId
         }
-        vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          if (resultActions.data) {
-            let resultTemp = resultActions.data
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+        vm.detailInfo = false
+        if (vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') {
+          return
+        } else {
+          vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
+            if (resultActions.data) {
+              let resultTemp = resultActions.data
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
                 }
               }
+              vm.dossierActions = resultTemp
             }
-            vm.dossierActions = resultTemp
-          }
-        })
+          })
+        }
       },
       loadLogs () {
         var vm = this
