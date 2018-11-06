@@ -175,7 +175,7 @@
                   <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm6 class="pr-2">
-                        <v-checkbox label="Tạo số tiếp nhận hồ sơ" v-model="currentProcess.generateDossierNo"></v-checkbox>
+                        <v-switch label="Tạo số tiếp nhận hồ sơ" v-model="currentProcess.generateDossierNo"></v-switch>
                         <v-text-field
                           label="Cấu hình sinh mã số hồ sơ"
                           v-model="currentProcess.dossierNoPattern"
@@ -186,7 +186,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 class="pl-2">
-                        <v-checkbox label="Sinh ngày hẹn trả hồ sơ" v-model="currentProcess.generateDueDate"></v-checkbox>
+                        <v-switch label="Sinh ngày hẹn trả hồ sơ" v-model="currentProcess.generateDueDate"></v-switch>
                         <v-text-field
                           label="Cấu hình sinh ngày hẹn trả"
                           v-model="currentProcess.dueDatePattern"
@@ -202,10 +202,10 @@
                   <v-flex xs12 sm12 class="mt-2">
                     <v-layout wrap>
                       <v-flex xs12 sm6>
-                        <v-checkbox label="Sinh mật mã tra cứu hồ sơ" v-model="currentProcess.generatePassword"></v-checkbox>
+                        <v-switch label="Sinh mật mã tra cứu hồ sơ" v-model="currentProcess.generatePassword"></v-switch>
                       </v-flex>
                       <v-flex xs12 sm6>
-                        <v-checkbox label="Gửi thông báo cho chủ hồ sơ" v-model="currentProcess.directNotification"></v-checkbox>
+                        <v-switch label="Gửi thông báo cho chủ hồ sơ" v-model="currentProcess.directNotification"></v-switch>
                       </v-flex>
                     </v-layout>
                   </v-flex>
@@ -220,7 +220,7 @@
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
-                <v-flex xs12 class="text-right" style="
+                <v-flex xs12 class="text-right pr-3" style="
                   position: fixed;
                   bottom: 0;
                   width: -webkit-calc( 100% - 300px );
@@ -302,11 +302,20 @@
                 <template slot="no-data">
                 </template>
               </v-data-table>
-              <div class="text-xs-right layout wrap mt-2" style="position: relative;">
-                <v-flex xs12>
-                  <tiny-pagination :total="pageTotalStep" :page="pageStep" @tiny:change-page="paggingStepData" custom-class="custom-tiny-class"></tiny-pagination> 
-                </v-flex>
-              </div>
+              <v-flex xs12 class="text-right" style="
+                position: fixed;
+                bottom: 0;
+                width: -webkit-calc( 100% - 300px );
+                width: calc( 100% - 300px );
+                background: white;
+                z-index: 2;
+              ">
+                <div class="text-xs-right layout wrap mt-2 pr-2" style="position: relative;">
+                  <v-flex xs12>
+                    <tiny-pagination :total="pageTotalStep" :page="pageStep" @tiny:change-page="paggingStepData" custom-class="custom-tiny-class"></tiny-pagination> 
+                  </v-flex>
+                </div>
+              </v-flex>
             </v-card>
             <!-- Chi tiết step -->
             <v-card class="pt-2" v-else style="margin-bottom:40px">
@@ -477,10 +486,10 @@
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
-                    <v-checkbox label="Cho phép sửa hồ sơ" v-model="currentStep.editable"></v-checkbox>
+                    <v-switch label="Cho phép sửa hồ sơ" v-model="currentStep.editable"></v-switch>
                   </v-flex>
                 </v-layout>
-                <v-flex xs12 class="text-right" style="
+                <v-flex xs12 class="text-right pr-3" style="
                   position: fixed;
                   bottom: 0;
                   width: -webkit-calc( 100% - 300px );
@@ -566,11 +575,20 @@
                 <template slot="no-data">
                 </template>
               </v-data-table>
-              <div class="text-xs-right layout wrap mt-2" style="position: relative;">
-                <v-flex xs12>
-                  <tiny-pagination :total="pageTotalAction" :page="pageAction" @tiny:change-page="paggingActionData" custom-class="custom-tiny-class"></tiny-pagination> 
-                </v-flex>
-              </div>
+              <v-flex xs12 class="text-right" style="
+                position: fixed;
+                bottom: 0;
+                width: -webkit-calc( 100% - 300px );
+                width: calc( 100% - 300px );
+                background: white;
+                z-index: 2;
+              ">
+                <div class="text-xs-right layout wrap mt-2 pr-2" style="position: relative;">
+                  <v-flex xs12>
+                    <tiny-pagination :total="pageTotalAction" :page="pageAction" @tiny:change-page="paggingActionData" custom-class="custom-tiny-class"></tiny-pagination> 
+                  </v-flex>
+                </div>
+              </v-flex>
             </v-card>
             <!-- Chi tiết Action -->
             <v-card class="pt-2" v-else style="margin-bottom:40px">
@@ -655,7 +673,7 @@
                     ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
-                    <v-checkbox label="Cho phép rollback" v-model="currentAction.rollbackable"></v-checkbox>
+                    <v-switch label="Cho phép rollback" v-model="currentAction.rollbackable"></v-switch>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
@@ -693,9 +711,16 @@
                       v-model="currentAction.createDossierFiles"
                       item-text="partName"
                       item-value="fileTemplateNo"
-                      :hide-selected="true"
+                      multiple
                       clearable
-                    ></v-autocomplete>
+                    >
+                      <template
+                        slot="selection"
+                        slot-scope="{ item, index }"
+                      >
+                        <v-flex xs12>{{index + 1}}. {{item.partName}}</v-flex>
+                      </template>
+                    </v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-autocomplete
@@ -705,9 +730,16 @@
                       v-model="currentAction.returnDossierFiles"
                       item-text="partName"
                       item-value="fileTemplateNo"
-                      :hide-selected="true"
+                      multiple
                       clearable
-                    ></v-autocomplete>
+                    >
+                      <template
+                        slot="selection"
+                        slot-scope="{ item, index }"
+                      >
+                        <v-flex xs12>{{index + 1}}. {{item.partName}}</v-flex>
+                      </template>
+                    </v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
@@ -739,11 +771,22 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
-                    <v-text-field
+                    <v-autocomplete
+                      box
+                      label="Cấu hình cơ quan"
+                      :items="agencyLists"
+                      v-model="currentAction.createDossier"
+                      item-text="itemName"
+                      item-value="itemCode"
+                      multiple
+                      clearable
+                    >
+                    </v-autocomplete>
+                    <!-- <v-text-field
                       label="Cấu hình cơ quan"
                       v-model="currentAction.createDossier"
                       box
-                    ></v-text-field>
+                    ></v-text-field> -->
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
@@ -757,15 +800,15 @@
                   <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm3 class="pr-2">
-                        <v-checkbox label="Sinh mã số tiếp nhận" v-model="currentAction.createDossierNo"></v-checkbox>
+                        <v-switch label="Sinh mã số tiếp nhận" v-model="currentAction.createDossierNo"></v-switch>
                       </v-flex>
                       <v-flex xs12 sm3 class="pl-2">
-                        <v-checkbox label="Có ký số điện tử" v-model="currentAction.eSignature"></v-checkbox>
+                        <v-switch label="Có ký số điện tử" v-model="currentAction.eSignature"></v-switch>
                       </v-flex>
                     </v-layout>
                   </v-flex>
                 </v-layout>
-                <v-flex xs12 class="text-right" style="
+                <v-flex xs12 class="text-right pr-3" style="
                   position: fixed;
                   bottom: 0;
                   width: -webkit-calc( 100% - 300px );
@@ -982,6 +1025,7 @@
         ],
         dossierTemplateList: [],
         dossierPartList: [],
+        agencyLists: [],
         employeeList: [],
         requestPaymentList: [
           { text: 'Không thay đổi trạng thái', value: 0 },
@@ -1001,11 +1045,11 @@
           allowAssignUser: '',
           rollbackable: false,
           dossierTemplateNo: '',
-          createDossierFiles: null,
-          returnDossierFiles: null,
+          createDossierFiles: [],
+          returnDossierFiles: [],
           requestPayment: '',
           paymentFee: '',
-          createDossier: '',
+          createDossier: [],
           syncActionCode: '',
           configNote: '',
           createDossierNo: false,
@@ -1130,6 +1174,14 @@
           console.log(reject)
         })
       },
+      getAgencyLists () {
+        var vm = this
+        vm.$store.dispatch('getAgencyLists').then(function (result) {
+          vm.agencyLists = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       getEmployees () {
         var vm = this
         vm.$store.dispatch('getEmployee').then(function (result) {
@@ -1199,8 +1251,8 @@
         }
         vm.pageTotalStep = 0
         vm.$store.dispatch('getProcessStep', filter).then(function (result) {
-          vm.stepList = result
-          vm.pageTotalStep = vm.stepList.length
+          vm.stepList = result.data
+          vm.pageTotalStep = result.total
         }).catch(reject => {
           console.log(reject)
         })
@@ -1214,8 +1266,8 @@
         }
         vm.pageTotalAction = 0
         vm.$store.dispatch('getProcessAction', filter).then(function (result) {
-          vm.actionList = result
-          vm.pageTotalAction = vm.actionList.length
+          vm.actionList = result.data
+          vm.pageTotalAction = result.total
         }).catch(reject => {
           console.log(reject)
         })
@@ -1228,6 +1280,9 @@
         }
         vm.$store.dispatch('getProcessActionsDetail', filter).then(function (result) {
           vm.currentAction = result
+          vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers.split(',') : []
+          vm.currentAction['createDossierFiles'] = result.createDossierFiles ? result.createDossierFiles.split(',') : []
+          vm.currentAction['returnDossierFiles'] = result.returnDossierFiles ? result.returnDossierFiles.split(',') : []
         }).catch(reject => {
           console.log(reject)
         })
@@ -1248,6 +1303,7 @@
         var vm = this
         let currentQuery = vm.$router.history.current.query
         // let currentParams = vm.$router.history.current.params
+        vm.getAgencyLists()
         if (Number(vm.id) > 0 && !vm.activeStep && !vm.activeAction) {
           vm.getProcessDetail(vm.id)
         } else if (vm.activeStep && !vm.activeStepDetail) {
@@ -1289,13 +1345,14 @@
             allowAssignUser: '',
             rollbackable: false,
             dossierTemplateNo: '',
-            createDossierFiles: '',
-            returnDossierFiles: '',
+            createDossierFiles: [],
+            returnDossierFiles: [],
             requestPayment: '',
             syncActionCode: '',
             configNote: '',
             createDossierNo: false,
-            eSignature: false
+            eSignature: false,
+            createDossier: []
           }
           if (Number(currentQuery.actionCode) > 0) {
             vm.getProcessActionDetail(currentQuery.actionCode)
@@ -1523,6 +1580,7 @@
       },
       updateAction (type) {
         var vm = this
+        console.log('currentAction', vm.currentAction)
         let currentPath = vm.$router.history.current.path
         if (vm.$refs.formAddAction.validate()) {
           vm.currentAction['type'] = type
@@ -1538,6 +1596,9 @@
               // vm.$router.push(currentPath + '?action=true&actionCode=' + result.actionCode)
             } else {
               vm.currentAction = result
+            vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers.split(',') : []
+            vm.currentAction['createDossierFiles'] = result.createDossierFiles ? result.createDossierFiles.split(',') : []
+            vm.currentAction['returnDossierFiles'] = result.returnDossierFiles ? result.returnDossierFiles.split(',') : []
             }
           }).catch(reject => {
             console.log(reject)
@@ -1620,6 +1681,13 @@
           return 'Theo dõi'
         } else {
           return 'Thực hiện'
+        }
+      },
+      parseArray (arg) {
+        if (arg) {
+          return arg.split(',')
+        } else {
+          return []
         }
       }
     }
