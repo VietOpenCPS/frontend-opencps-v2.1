@@ -42,10 +42,10 @@
                 >
               </v-select>
             </v-flex>
-            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
+            <!-- <v-flex xs6 sm1 class="px-2">
               <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
+            </v-flex> -->
+            <v-flex xs6 sm2 class="px-2">
               <v-menu
                 ref="menufromDate"
                 :close-on-content-click="false"
@@ -58,6 +58,7 @@
                 min-width="290px"
               >
                 <v-text-field
+                  label="Từ ngày"
                   slot="activator"
                   v-model="fromDateFormatted"
                   append-icon="event"
@@ -66,10 +67,10 @@
                 <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
+            <!-- <v-flex xs6 sm1 class="px-2">
               <v-subheader class="pl-0 text-header">Đến ngày: </v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
+            </v-flex> -->
+            <v-flex xs6 sm2 class="px-2">
               <v-menu
                 ref="menutoDate"
                 :close-on-content-click="false"
@@ -82,6 +83,7 @@
                 min-width="290px"
               >
                 <v-text-field
+                  label="Đến ngày"
                   slot="activator"
                   v-model="toDateFormatted"
                   append-icon="event"
@@ -233,15 +235,22 @@ export default {
       vm.isDVC = vm.getReportCongDVC()
       vm.danhSachBaoCao = vm.loadingMenuConfigToDo
       let currentQuerys = vm.$router.history.current.query
+      vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
       if (currentQuerys.hasOwnProperty('fromDate')) {
         vm.fromDateFormatted = currentQuerys.fromDate
       } else {
-        vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
+        vm.fromDateFormatted = ''
+        if (vm.documentTYPE !== 'REPORT_01') {
+          vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
+        }
       }
       if (currentQuerys.hasOwnProperty('toDate')) {
         vm.toDateFormatted = currentQuerys.toDate
       } else {
-        vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+        vm.toDateFormatted = ''
+        if (vm.documentTYPE !== 'REPORT_01') {
+          vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+        }
       }
       if (vm.isDVC) {
         vm.$store.dispatch('getAgencyLists').then(function (result) {
@@ -268,15 +277,22 @@ export default {
         if (vm.isCallBack) {
           vm.isCallBack = false
           vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
+          console.log('documentTYPE', vm.documentTYPE)
           if (currentQuerys.hasOwnProperty('fromDate')) {
             vm.fromDateFormatted = currentQuerys.fromDate
           } else {
-            vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
+            vm.fromDateFormatted = ''
+            if (vm.documentTYPE !== 'REPORT_01') {
+              vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
+            }
           }
           if (currentQuerys.hasOwnProperty('toDate')) {
             vm.toDateFormatted = currentQuerys.toDate
           } else {
-            vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+            vm.toDateFormatted = ''
+            if (vm.documentTYPE !== 'REPORT_01') {
+              vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+            }
           }
         }
       }
@@ -286,6 +302,23 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
+      vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
+      if (currentQuery.hasOwnProperty('fromDate')) {
+        vm.fromDateFormatted = currentQuery.fromDate
+      } else {
+        vm.fromDateFormatted = ''
+        if (vm.documentTYPE !== 'REPORT_01') {
+          vm.fromDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 3).toLocaleDateString('vi-VN')
+        }
+      }
+      if (currentQuery.hasOwnProperty('toDate')) {
+        vm.toDateFormatted = currentQuery.toDate
+      } else {
+        vm.toDateFormatted = ''
+        if (vm.documentTYPE !== 'REPORT_01') {
+          vm.toDateFormatted = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).toLocaleDateString('vi-VN')
+        }
+      }
       console.log('run watch')
       vm.doPrintReport()
     },
@@ -322,6 +355,8 @@ export default {
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
             putData['month'] = vm.month
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
           } else {
             putData['fromDate'] = vm.fromDateFormatted
             putData['toDate'] = vm.toDateFormatted
@@ -366,6 +401,8 @@ export default {
           if (vm.documentTYPE === 'REPORT_01') {
             putData['year'] = vm.year
             putData['month'] = vm.month
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
           } else {
             putData['fromDate'] = vm.fromDateFormatted
             putData['toDate'] = vm.toDateFormatted
@@ -387,30 +424,56 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.fromDateFormatted = ''
+        vm.toDateFormatted = ''
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDate,
+            toDate: vm.toDate,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
     },
     changeMonth (item) {
       let vm = this
       vm.month = item
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.fromDateFormatted = ''
+        vm.toDateFormatted = ''
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDate,
+            toDate: vm.toDate,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
     },
     changeGov (item) {
       let vm = this
@@ -430,31 +493,57 @@ export default {
       let vm = this
       vm.menufromDate = false
       vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.year = ''
+        vm.month = ''
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
     },
     changeToDate () {
       let vm = this
       vm.menutoDate = false
       vm.toDateFormatted = vm.formatDate(vm.toDate)
-      router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.year = ''
+        vm.month = ''
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
     },
     formatDate (date) {
       if (!date) return null

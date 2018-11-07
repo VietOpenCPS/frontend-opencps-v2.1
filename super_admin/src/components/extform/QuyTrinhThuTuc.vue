@@ -1609,7 +1609,7 @@
         var vm = this
         let currentPath = vm.$router.history.current.path
         vm.$router.push({
-          path: currentPath + '?action=true&actionCode=' + itemAction.actionCode,
+          path: currentPath + '?action=true&actionCode=' + itemAction.processActionId,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
