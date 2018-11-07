@@ -354,6 +354,7 @@
               let current = vm.$router.history.current
               let newQuery = current.query
               let queryString = '?'
+              newQuery['page'] = 1
               newQuery['state_change'] = '0'
               newQuery['renew'] = ''
               for (let key in newQuery) {

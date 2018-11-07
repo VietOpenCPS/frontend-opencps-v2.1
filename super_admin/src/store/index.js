@@ -174,6 +174,23 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    doChangeStatusAccount ({commit, state}, postData) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.put('/o/gate/v2/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
+            resolve({statu: 200})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     deactiveAccount ({commit, state}, postData) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -182,7 +199,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
+          axios.put('/o/gate/v2/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
             resolve({statu: 200})
           }).catch(function (xhr) {
             reject(xhr)
@@ -199,7 +216,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/user/' + postData['id'] + '/changepass', postData['data'], param).then(function () {
+          axios.put('/o/gate/v2/user/' + postData['id'] + '/changepass', postData['data'], param).then(function () {
             resolve({statu: 200})
           }).catch(function (xhr) {
             reject(xhr)
@@ -310,6 +327,26 @@ export const store = new Vuex.Store({
             }
           }
           axios.get('/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    getAttachFileData ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/gate/v2/fileattach/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable)

@@ -13,7 +13,7 @@ import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
 import 'v-suggestions/dist/v-suggestions.css'
 import axios from 'axios'
 
-axios.defaults.headers.common['Token'] = window.Liferay.authToken
+axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
 Vue.config.productionTip = true

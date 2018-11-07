@@ -75,6 +75,11 @@
             NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
+        <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            THEO DÕI HỒ SƠ
+          </v-btn>
+        </v-tab>
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
@@ -375,6 +380,9 @@
               </td>
             </div>
           </v-tab-item>
+          <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
+            <div id="mermaid_dossier" class="mermaid"></div>
+          </v-tab-item>
         </v-tabs-items>
       </v-tabs>
     </div>
@@ -401,6 +409,7 @@ import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
+import mermaid from 'mermaid'
 export default {
   props: ['index', 'id'],
   components: {
@@ -753,6 +762,21 @@ export default {
             }
             vm.dossierActions = resultTemp
           }
+        })
+      }
+    },
+    loadMermaidgraph (data) {
+      var vm = this
+      document.getElementById('mermaid_dossier').innerHTML = ''
+      if (vm.thongTinChiTietHoSo.dossierId) {
+        let dataParams = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId
+        }
+        vm.$store.dispatch('loadMermaidgraph', dataParams).then(chartData => {
+          document.getElementById('mermaid_dossier').innerHTML = chartData
+          mermaid.initialize({
+            theme: 'forest'
+          })
         })
       }
     },

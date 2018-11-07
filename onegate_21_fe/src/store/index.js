@@ -1785,6 +1785,24 @@ export const store = new Vuex.Store({
           })
         })
       },
+      loadMermaidgraph ({commit, state}, data) {
+        let config = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            stepType: data.stepType
+          }
+        }
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/mermaidgraph'
+        return new Promise((resolve, reject) => {
+          axios.get(url, config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      },
       loadDossierLienThong ({commit, state}, classPK) {
         return new Promise((resolve, reject) => {
           store.dispatch('loadInitResource').then(function (result) {

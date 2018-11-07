@@ -126,7 +126,7 @@
       </v-card>
       <v-card>
         <v-card-title primary-title class="pb-0 pt-2">
-          <attached-file-template v-if="rightAttached" :pk="id" :pick-item="pickItem"></attached-file-template>
+          <attached-file-template v-if="rightAttached" :pk="id" :pick-item="pickItem" :code="tableName"></attached-file-template>
         </v-card-title>
       </v-card>
     </v-navigation-drawer>
@@ -204,8 +204,9 @@
             </v-flex>
             <v-flex xs12>
               <v-switch
-                :label="deactiveAccountFlag === 0 ? 'Đang hoạt động' : 'Không hoạt động'"
-                v-model="deactiveAccountFlag"
+                label="Kích hoạt tài khoản"
+                v-model="deactiveAccountFlagBoolean"
+                @change="doChangeStatusAccount($event)"
               ></v-switch>
             </v-flex>
           </v-layout>
@@ -248,6 +249,7 @@
     data() {
       return {
         deactiveAccountFlag: 0,
+        deactiveAccountFlagBoolean: false,
         snackbarsuccess: false,
         pickItem: {},
         layoutNameDynamic: '',
@@ -470,7 +472,7 @@
       doDeactiveAccount () {
         let vm = this
         let postData = {
-          id: vm.id,
+          id: vm.detailData[0]['mappingUserId'],
           data: {
             locked: vm.password
           }
@@ -484,7 +486,7 @@
         var result = confirm('Bạn có muốn đổi mật khẩu?');
         if (result) {
           let postData = {
-            id: vm.id,
+            id: vm.detailData[0]['mappingUserId'],
             data: {
               password: vm.password
             }
@@ -492,6 +494,27 @@
           vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
             vm.snackbarsuccess = true
           })
+        }
+      },
+      doChangeStatusAccount (dataLock) {
+        let vm = this
+        let labelStatus = 'Bạn có muốn khoá tài khoản này?'
+        if (dataLock) {
+          labelStatus = 'Bạn có muốn mở khoá tài khoản này?'
+        }
+        var result = confirm(labelStatus)
+        if (result) {
+          let postData = {
+            id: vm.detailData[0]['mappingUserId'],
+            data: {
+              locked: dataLock
+            }
+          }
+          vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
+            vm.snackbarsuccess = true
+          })
+        } else {
+          vm.deactiveAccountFlag = !dataLock
         }
       },
       showAccount (item) {
@@ -514,6 +537,11 @@
                 vm.screenLogin = data['screenName']
                 vm.emailLogin = data['email']
                 vm.deactiveAccountFlag = data['deactiveAccountFlag']
+                if (vm.deactiveAccountFlag === 0) {
+                  vm.deactiveAccountFlagBoolean = true
+                } else {
+                  vm.deactiveAccountFlagBoolean = false
+                }
                 vm.layoutNameDynamic = item['label']
                 vm.rightAccount = !vm.rightAccount
               })
@@ -524,6 +552,11 @@
             vm.screenLogin = data['screenName']
             vm.emailLogin = data['email']
             vm.deactiveAccountFlag = data['deactiveAccountFlag']
+            if (vm.deactiveAccountFlag === 0) {
+              vm.deactiveAccountFlagBoolean = true
+            } else {
+              vm.deactiveAccountFlagBoolean = false
+            }
             vm.layoutNameDynamic = item['label']
             vm.rightAccount = !vm.rightAccount
           })

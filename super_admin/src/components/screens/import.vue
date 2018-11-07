@@ -15,8 +15,18 @@
 
     <v-card class="px-2 mx-1" style="overflow: hidden;">
       <v-toolbar color="blue darken-3" dark height="48">
-        <v-toolbar-title class="ml-3">
-          Import dữ liệu
+        <v-toolbar-title class="ml-2">
+          <v-btn
+            :loading="importLoading"
+            :disabled="importLoading"
+            color="blue darken-3"
+            dark
+            class="mx-0"
+            @click.native="doImportData()"
+          >
+            Upload
+            <v-icon right dark>cloud_upload</v-icon>
+          </v-btn>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-icon dark>more_vert</v-icon>
@@ -25,18 +35,39 @@
         </v-btn>
       </v-toolbar>
       <div style="overflow: hidden;overflow-x: scroll;">
-        sdf
+        <input
+          type="file"
+          ref="importData"
+          name="importData"
+          :accept="accept"
+          @change="onFilePicked"
+          v-show="false"
+        >
+        <v-alert
+          :value="true"
+          v-if="importMessage"
+          color="success"
+          icon="check_circle"
+          outline
+        >
+          Gửi yêu cầu Import dữ liệu thành công.
+        </v-alert>
       </div>
     </v-card>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+  
   export default {
     props: ['tableName'],
     data () {
       return {
+        importMessage: false,
+        importLoading: false,
         showFilter: false,
+        accept: 'text/xml,application/zip',
         breadCrumbsitems: [
           {
             text: 'Import',
@@ -47,6 +78,39 @@
             disabled: false
           }
         ]
+      }
+    },
+    methods: {
+      doImportData () {
+        this.importLoading = true
+        this.importMessage = false
+        this.$refs.importData.click()
+      },
+      onFilePicked(event) {
+        let vm = this
+        const files = event.target.files || event.dataTransfer.files
+        if (files && files[0]) {
+          var bodyFormData = new FormData()
+          bodyFormData.append('file', files[0])
+          axios({
+            method: 'post',
+            url: '/o/rest/v2/dossiers/import/files',
+            data: bodyFormData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+          })
+          .then(function (response) {
+            //handle success
+            console.log(response)
+            vm.importLoading = false
+            vm.importMessage = true
+          })
+          .catch(function (response) {
+            //handle error
+            console.log(response)
+            vm.importLoading = false
+            vm.importMessage = false
+          })
+        }
       }
     }
   }
