@@ -778,6 +778,7 @@ export default {
     },
     loadMermaidgraph (data) {
       var vm = this
+      document.getElementById('mermaid_dossier').innerHTML = ''
       if (vm.thongTinChiTietHoSo.dossierId) {
         let dataParams = {
           dossierId: vm.thongTinChiTietHoSo.dossierId
