@@ -385,13 +385,13 @@
           </v-tab-item>
           <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
             <SvgPanZoom 
-              style="width: 500px; height: 500px; border:1px solid black;"
+              id="mermaid_dossier" class="mermaid"
+              style="width: 100%;height: 100vh;padding: 15px;"
               :zoomEnabled="true"
               :controlIconsEnabled="true"
               :fit="false"
               :center="true"
             >
-              <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
             </SvgPanZoom>
           </v-tab-item>
         </v-tabs-items>
