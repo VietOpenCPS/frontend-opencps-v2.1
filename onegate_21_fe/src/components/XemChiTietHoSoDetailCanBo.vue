@@ -384,7 +384,9 @@
             </div>
           </v-tab-item>
           <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
+            
             <div id="mermaid_dossier" class="mermaid"></div>
+
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
