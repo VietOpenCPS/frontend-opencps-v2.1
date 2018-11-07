@@ -384,9 +384,15 @@
             </div>
           </v-tab-item>
           <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
-            
-            <div id="mermaid_dossier" class="mermaid"></div>
-
+            <SvgPanZoom 
+              style="width: 500px; height: 500px; border:1px solid black;"
+              :zoomEnabled="true"
+              :controlIconsEnabled="true"
+              :fit="false"
+              :center="true"
+            >
+              <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
+            </SvgPanZoom>
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
@@ -419,9 +425,11 @@ mermaid.initialize({
   theme: 'forest',
   startOnLoad: false
 })
+import SvgPanZoom from 'vue-svg-pan-zoom'
 export default {
   props: ['index', 'id'],
   components: {
+    'SvgPanZoom': SvgPanZoom,
     'comment': Comment,
     'thong-tin-co-ban-ho-so': ThongTinCoBanHoSo,
     'phan-cong': PhanCong,
