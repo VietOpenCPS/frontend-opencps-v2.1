@@ -19,7 +19,7 @@
           <!-- <v-tab key="1" ripple class="mx-2" @click="loadDossiertemplate"> Thành phần hồ sơ </v-tab> -->
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
-          <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab>
+          <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
@@ -237,6 +237,20 @@
         var vm = this
         vm.$store.commit('setFullScreen', true)
         vm.dossierDetail = this.$store.getters.getDetailDossier
+        if ((!vm.dossierDetail.originality || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+          let submissionNote = vm.dossierDetail.submissionNote
+          let resultTemp = submissionNote.data
+          for (var i = 0; i < resultTemp.length; i++) {
+            if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+              if (!Array.isArray(resultTemp[i]['actions'])) {
+                let arrActionsTemp = []
+                arrActionsTemp.push(resultTemp[i]['actions'])
+                resultTemp[i]['actions'] = arrActionsTemp
+              }
+            }
+          }
+          vm.dossierActions = resultTemp
+        }
       })
     },
     watch: {},
@@ -246,21 +260,25 @@
         let dataParams = {
           dossierId: vm.dossierDetail.dossierId
         }
-        vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          if (resultActions.data) {
-            let resultTemp = resultActions.data
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+        if (vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') {
+          return
+        } else {
+          vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
+            if (resultActions.data) {
+              let resultTemp = resultActions.data
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
                 }
               }
+              vm.dossierActions = resultTemp
             }
-            vm.dossierActions = resultTemp
-          }
-        })
+          })
+        }
       },
       loadLogs () {
         var vm = this

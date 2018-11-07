@@ -90,11 +90,18 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/dictcollections/PRIVACY', param).then(function (response) {
-          axios.get('/o/rest/v2/dictcollections/PRIVACY', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/collectionCode/dataForm', param).then(function (response) {
+          axios.get('/o/gate/v2/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/collectionCode/dataForm', param).then(function (response) {
             if (response.data) {
               let dataReturn = response.data
-              resolve(dataReturn)
+              let dataRule
+              if (Array.isArray(dataReturn) && dataReturn.length > 0) {
+                let privacy = dataReturn.filter(function (item) {
+                  return (item.id === 'PRIVACY')
+                })
+                dataRule = privacy && privacy.length > 0 ? privacy[0].name : ''
+              }
+              resolve(dataRule)
             } else {
               resolve('')
             }
