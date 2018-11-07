@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-content>
-      <section :class="isKios ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
+      <section :class="isKios ? 'kios-content-wrapper' : ''" >
         <div class="tab-item">
           <div class="left" :class="fullScreen ? 'smallScreen' : ''">
             <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
@@ -65,7 +65,6 @@
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
         if (!newQuery.hasOwnProperty('secretKey')) {
-          vm.setInterval()
           vm.isKios = true
           // console.log('isKios')
         } else {
