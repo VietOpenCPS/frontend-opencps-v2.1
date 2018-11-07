@@ -75,6 +75,11 @@
             NHẬT KÝ SỬA ĐỔI
           </v-btn>
         </v-tab>
+        <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            THEO DÕI HỒ SƠ
+          </v-btn>
+        </v-tab>
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
@@ -321,51 +326,40 @@
             </v-card>
           </v-tab-item>
           <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <div v-if="viewTable">
-              <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
-              hide-actions no-data-text="Không có dữ liệu"
-              >
-                <template slot="headerCell" slot-scope="props">
-                  <v-tooltip bottom>
-                    <span slot="activator">
-                      {{ props.header.text }}
-                    </span>
-                    <span>
-                      {{ props.header.text }}
-                    </span>
-                  </v-tooltip>
-                </template>
-                <template slot="items" slot-scope="props">
-                  <td class="text-xs-center">{{props.index + 1}}</td>
-                  <td class="text-xs-left">{{props.item.sequenceRole}}</td>
-                  <td class="text-xs-left">{{props.item.sequenceName}}</td>
-                  <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
-                  <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                  <td class="text-xs-left">
-                    <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
-                      {{itemUser.userName}} <br>
-                    </div>
-                  </td>
-                  <td class="text-xs-left">
-                    <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                      {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
-                    </div>
-                    <div v-if="props.item.statusText">
-                      <span style="color: green">{{props.item.statusText}}</span>
-                    </div>
-                  </td>
-                </template>
-              </v-data-table>
-            </div>
-            <div v-else>
-              Xem dạng sơ đồ
-            </div>
-            <v-flex xs12 class="text-right">
-              <v-btn color="primary" class="ml-0 mr-2" @click="viewTable = !viewTable"
-              >
-                {{viewTable ? 'Xem dạng sơ đồ' : 'Xem dạng bảng'}}
-              </v-btn>
-            </v-flex>
+            <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
+            hide-actions no-data-text="Không có dữ liệu"
+            >
+              <template slot="headerCell" slot-scope="props">
+                <v-tooltip bottom>
+                  <span slot="activator">
+                    {{ props.header.text }}
+                  </span>
+                  <span>
+                    {{ props.header.text }}
+                  </span>
+                </v-tooltip>
+              </template>
+              <template slot="items" slot-scope="props">
+                <td class="text-xs-center">{{props.index + 1}}</td>
+                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
+                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                <td class="text-xs-left">
+                  <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                    {{itemUser.userName}} <br>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                  </div>
+                  <div v-if="props.item.statusText">
+                    <span style="color: green">{{props.item.statusText}}</span>
+                  </div>
+                </td>
+              </template>
+            </v-data-table>
           </v-tab-item>
           <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
@@ -388,6 +382,9 @@
                 </p>
               </td>
             </div>
+          </v-tab-item>
+          <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
+            <div id="mermaid_dossier" class="mermaid"></div>
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
@@ -415,6 +412,7 @@ import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
+import mermaid from 'mermaid'
 export default {
   props: ['index', 'id'],
   components: {
@@ -585,8 +583,7 @@ export default {
     },
     stateViewResult: true,
     stateViewDocument: true,
-    listLienThong: [],
-    viewTable: true
+    listLienThong: []
   }),
   computed: {
     loading () {
@@ -770,6 +767,21 @@ export default {
             }
             vm.dossierActions = resultTemp
           }
+        })
+      }
+    },
+    loadMermaidgraph (data) {
+      var vm = this
+      document.getElementById('mermaid_dossier').innerHTML = ''
+      if (vm.thongTinChiTietHoSo.dossierId) {
+        let dataParams = {
+          dossierId: vm.thongTinChiTietHoSo.dossierId
+        }
+        vm.$store.dispatch('loadMermaidgraph', dataParams).then(chartData => {
+          document.getElementById('mermaid_dossier').innerHTML = chartData
+          mermaid.initialize({
+            theme: 'forest'
+          })
         })
       }
     },

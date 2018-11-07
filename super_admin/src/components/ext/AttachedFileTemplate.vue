@@ -5,7 +5,7 @@
         <div class="sample_wrapper">
             <div id="dropArea">
                 <span id="drop" class="droparea"> Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
-                <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
+                <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code === 'opencps_serviceinfo'">
                   <ul class="e-upload-files">
                     <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
                       <div class='container' style="position: relative;">
@@ -68,6 +68,50 @@
                     </li>
                   </ul>
                 </div>
+                <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code !== 'opencps_serviceinfo'">
+                  <ul class="e-upload-files">
+                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
+                      <div class='container' style="position: relative;min-height: 75px;">
+                        <span class='wrapper' style="
+                          line-height: 10px;
+                        ">
+                        <span :class="['icon sf-icon-' + item['extension']]"></span>
+                        <div class='name file-name'>
+                          <span>{{item['fileName']}}</span>
+                          <p style="
+                            margin-top: 5px;
+                            font-size: 10px;
+                            margin-bottom: 0;
+                          ">
+                            ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
+                          </p>
+                        </div>
+                        <v-btn flat icon color="primary" 
+                          v-on:click.native="processDownloadFileAttach(item)"
+                          :loading="loading"
+                          :disabled="loading"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                            top: 32px;
+                          ">
+                          <v-icon size="14">link</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="red darken-3" 
+                          v-on:click.native="processDeleteFileAttach(item)"
+                          :loading="loadingRemove"
+                          :disabled="loadingRemove"
+                          style="
+                            position: absolute;
+                            right: 5px;
+                          ">
+                          <v-icon size="14">delete</v-icon>
+                        </v-btn>
+                        </span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
                 <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
@@ -97,10 +141,11 @@
         },
         extensions: '.pdf, .png, .txt',
         dropArea: "dropArea",
-        rawData: []
+        rawData: [],
+        className: ''
       }
     },
-    props: ['pickItem', 'pk'],
+    props: ['pickItem', 'pk', 'code'],
     created() {
       var vm = this
       vm.$nextTick(function() {
@@ -112,6 +157,7 @@
         saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
         removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
       }
+      this.className = this.pickItem['class_name']
       document.getElementById('browse').onclick = function() {
           document.getElementsByClassName('e-file-select-wrap')[0].querySelector('button').click();
           return false;
@@ -137,22 +183,39 @@
       },
       loadFileTemplate () {
         let vm = this
-        vm.$store.dispatch('getServiceFileTemplate', vm.pk).then(function (result) {
-          vm.fileTemplateData = result.data
-          vm.fileTemplateTotal = result.total
-          for (let key in vm.fileTemplateData) {
-            vm.rawData.push({
-              fileTemplateNo: vm.fileTemplateData[key]['fileTemplateNo'],
-              serviceInfoId: vm.fileTemplateData[key]['serviceInfoId']
-            })
+        if (vm.code === 'opencps_serviceinfo') {
+          vm.$store.dispatch('getServiceFileTemplate', vm.pk).then(function (result) {
+            vm.fileTemplateData = result.data
+            vm.fileTemplateTotal = result.total
+            for (let key in vm.fileTemplateData) {
+              vm.rawData.push({
+                fileTemplateNo: vm.fileTemplateData[key]['fileTemplateNo'],
+                serviceInfoId: vm.fileTemplateData[key]['serviceInfoId']
+              })
+            }
+            let rightAttachedCounter = document.getElementById('rightAttachedCounter')
+            if (rightAttachedCounter !== null && rightAttachedCounter !== undefined && vm.fileTemplateTotal > 0) {
+              rightAttachedCounter.innerHTML = 'Tổng số: ' + vm.fileTemplateTotal + ' '
+            }
+          }).catch(reject => {
+            console.log(reject)
+          })
+        } else {
+          let filter = {
+            className: vm.className,
+            pk: vm.pk
           }
-          let rightAttachedCounter = document.getElementById('rightAttachedCounter')
-          if (rightAttachedCounter !== null && rightAttachedCounter !== undefined && vm.fileTemplateTotal > 0) {
-            rightAttachedCounter.innerHTML = 'Tổng số: ' + vm.fileTemplateTotal + ' '
-          }
-        }).catch(reject => {
-          console.log(reject)
-        })
+          vm.$store.dispatch('getAttachFileData', filter).then(function (result) {
+            vm.fileTemplateData = result.data
+            vm.fileTemplateTotal = result.total
+            let rightAttachedCounter = document.getElementById('rightAttachedCounter')
+            if (rightAttachedCounter !== null && rightAttachedCounter !== undefined && vm.fileTemplateTotal > 0) {
+              rightAttachedCounter.innerHTML = 'Tổng số: ' + vm.fileTemplateTotal + ' '
+            }
+          }).catch(reject => {
+            console.log(reject)
+          })
+        }
       },
       onSuccess: function() {
         setTimeout(() => {

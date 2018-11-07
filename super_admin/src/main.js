@@ -30,7 +30,9 @@ Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?g
     format: 'json',
     reconnection: true,
     reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-    reconnectionDelay: 3000
+    reconnectionDelay: 3000,
+    maxHttpBufferSize: 30 * 1024 * 1024,
+    maxPayload: 30 * 1024 * 1024
   }
 )
 
