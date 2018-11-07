@@ -957,7 +957,6 @@ export const store = new Vuex.Store({
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
       setTimeout(() => {
-        console.log('state.refreshSocket', state.refreshSocket)
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
           window.location.reload(true)
