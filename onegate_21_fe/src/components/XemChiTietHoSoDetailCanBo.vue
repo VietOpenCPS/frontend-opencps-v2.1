@@ -384,15 +384,9 @@
             </div>
           </v-tab-item>
           <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
-            <SvgPanZoom 
-              id="mermaid_dossier" class="mermaid"
-              style="width: 100%;height: 100vh;padding: 15px;"
-              :zoomEnabled="true"
-              :controlIconsEnabled="true"
-              :fit="false"
-              :center="true"
-            >
-            </SvgPanZoom>
+            
+            <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
+
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
@@ -425,11 +419,9 @@ mermaid.initialize({
   theme: 'forest',
   startOnLoad: false
 })
-import SvgPanZoom from 'vue-svg-pan-zoom'
 export default {
   props: ['index', 'id'],
   components: {
-    'SvgPanZoom': SvgPanZoom,
     'comment': Comment,
     'thong-tin-co-ban-ho-so': ThongTinCoBanHoSo,
     'phan-cong': PhanCong,
@@ -794,6 +786,15 @@ export default {
           mermaid.render('theGraph', chartData, function (svgCode) {
             document.getElementById('mermaid_dossier').innerHTML = svgCode
           })
+          setTimeout(function () {
+            window.svgPanZoom('#theGraph', {
+              zoomEnabled: true,
+              controlIconsEnabled: true,
+              fit: true,
+              center: true,
+              minZoom: 0.1
+            })
+          }, 500)
         })
       }
     },

@@ -10,7 +10,6 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
-import 'vue-svg-pan-zoom/dist/vue-svg-pan-zoom.css'
 import 'v-suggestions/dist/v-suggestions.css'
 import axios from 'axios'
 
