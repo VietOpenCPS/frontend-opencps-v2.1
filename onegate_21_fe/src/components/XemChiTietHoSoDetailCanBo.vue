@@ -415,6 +415,10 @@ import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
 import mermaid from 'mermaid'
+mermaid.initialize({
+  theme: 'forest',
+  startOnLoad: false
+})
 export default {
   props: ['index', 'id'],
   components: {
@@ -774,15 +778,13 @@ export default {
     },
     loadMermaidgraph (data) {
       var vm = this
-      document.getElementById('mermaid_dossier').innerHTML = ''
       if (vm.thongTinChiTietHoSo.dossierId) {
         let dataParams = {
           dossierId: vm.thongTinChiTietHoSo.dossierId
         }
         vm.$store.dispatch('loadMermaidgraph', dataParams).then(chartData => {
-          document.getElementById('mermaid_dossier').innerHTML = chartData
-          mermaid.initialize({
-            theme: 'forest'
+          mermaid.render('theGraph', chartData, function (svgCode) {
+            document.getElementById('mermaid_dossier').innerHTML = svgCode
           })
         })
       }
