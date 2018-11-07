@@ -419,6 +419,7 @@ mermaid.initialize({
   theme: 'forest',
   startOnLoad: false
 })
+import SvgPanZoom from 'svg-pan-zoom'
 export default {
   props: ['index', 'id'],
   components: {
