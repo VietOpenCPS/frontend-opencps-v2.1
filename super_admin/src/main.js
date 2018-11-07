@@ -20,11 +20,19 @@ Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
+let companyId = window.themeDisplay !== undefined ? window.themeDisplay.getCompanyId() : 0
+let userId = window.themeDisplay !== undefined ? window.themeDisplay.getUserId() : 0
+let userName = window.themeDisplay !== undefined ? window.themeDisplay.getUserName() : ''
 let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?groupId='+ groupId + '&portalURL=' + portalURL + '&Token=' + token, 
+Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?groupId='+ groupId
+  + '&portalURL=' + portalURL
+  + '&companyId=' + companyId
+  + '&userId=' + userId
+  + '&userName=' + userName
+  + '&Token=' + token, 
   {
     store: store,
     format: 'json',

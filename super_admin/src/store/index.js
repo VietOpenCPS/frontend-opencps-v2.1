@@ -957,7 +957,6 @@ export const store = new Vuex.Store({
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
       setTimeout(() => {
-        console.log('state.refreshSocket', state.refreshSocket)
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
           window.location.reload(true)
@@ -1026,6 +1025,9 @@ export const store = new Vuex.Store({
           console.log('admin login')
         } else if (currentLogin['role'] === 'Administrator_data') {
           state.listTableMenu.splice(3, 1)
+        } else if (currentLogin['role'] === 'Administrator_data_user') {
+          state.listTableMenu.splice(2, 1)
+          state.listTableMenu.splice(2, 1)
         } else {
           state.listTableMenu.splice(2, 1)
           state.listTableMenu.splice(2, 1)

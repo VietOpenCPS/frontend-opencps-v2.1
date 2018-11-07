@@ -139,7 +139,7 @@
           saveUrl: '',
           removeUrl: ''
         },
-        extensions: '.pdf, .png, .txt',
+        extensions: '.pdf, .txt, .rtf, .doc, .docx, .xls, .xlsx, .jpg, .png',
         dropArea: "dropArea",
         rawData: [],
         className: ''

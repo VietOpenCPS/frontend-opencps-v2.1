@@ -83,6 +83,8 @@ export const store = new Vuex.Store({
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = '/o/rest/statistics'
+            param.params['fromStatisticDate'] = filter.fromDate
+            param.params['toStatisticDate'] = filter.toDate
             axios.get(requestURL, param).then(function (response) {
               let serializable = response.data
               if (serializable.data) {
@@ -98,6 +100,8 @@ export const store = new Vuex.Store({
               reject(error)
             })
           } else {
+            // test local
+            // requestURL = 'http://127.0.0.1:8081/api/dossiers'
             requestURL = '/o/rest/v2/dossiers'
             param.params['sort'] = 'domainCode'
             if (filter.document === 'REPORT_05') {
