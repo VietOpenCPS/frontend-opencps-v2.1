@@ -495,6 +495,7 @@
         }
         vm.$store.dispatch('deactiveAccount', postData).then(function (data) {
           vm.snackbarsuccess = true
+          console.log(data)
         })
       },
       doChangePassWord () {
@@ -509,6 +510,7 @@
           }
           vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
             vm.snackbarsuccess = true
+            console.log(data)
           })
         }
       },
@@ -528,6 +530,7 @@
           }
           vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
             vm.snackbarsuccess = true
+            console.log(data)
           })
         } else {
           vm.deactiveAccountFlag = !dataLock

@@ -453,13 +453,13 @@
                     </v-data-table>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm12>
+                  <!-- <v-flex xs12 sm12>
                     <v-text-field
                       label="Lock State"
                       v-model="currentStep.lockState"
                       box
                     ></v-text-field>
-                  </v-flex>
+                  </v-flex> -->
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-text-field
@@ -635,7 +635,7 @@
                     <v-autocomplete
                       label="Bước thực hiện thao tác"
                       box
-                      :items="stepList"
+                      :items="stepListAction"
                       v-model="currentAction.preStepCode"
                       item-text="stepName"
                       item-value="stepCode"
@@ -649,7 +649,7 @@
                     <v-autocomplete
                       box
                       label="Bước sau thực hiện thao tác"
-                      :items="stepList"
+                      :items="stepListAction"
                       v-model="currentAction.postStepCode"
                       item-text="stepName"
                       item-value="stepCode"
@@ -961,6 +961,7 @@
           }
         ],
         stepList: [],
+        stepListAction: [],
         listStepPage: 1,
         listActionPage: 1,
         currentStep: {
@@ -972,7 +973,6 @@
           roleId: '',
           moderator: 0,
           condition: '',
-          lockState: '',
           stepInstruction: '',
           briefNote: '',
           customProcessUrl: '',
@@ -1257,6 +1257,17 @@
           console.log(reject)
         })
       },
+      getProcessStepAction (id) {
+        var vm = this
+        let filter = {
+          processId: id
+        }
+        vm.$store.dispatch('getProcessStep', filter).then(function (result) {
+          vm.stepListAction = result.data
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       getProcessActions () {
         var vm = this
         let currentQuery = vm.$router.history.current.query
@@ -1318,7 +1329,6 @@
             roleId: '',
             moderator: 0,
             condition: '',
-            lockState: '',
             stepInstruction: '',
             briefNote: '',
             customProcessUrl: '',
@@ -1332,7 +1342,7 @@
         } else if (vm.activeAction && !vm.activeActionDetail) {
           vm.getProcessActions(vm.id)
         } else if (vm.activeAction && vm.activeActionDetail) {
-          vm.getProcessSteps(vm.id)
+          vm.getProcessStepAction(vm.id)
           vm.getDossierTemplates()
           vm.getEmployees()
           vm.currentAction = {
@@ -1459,14 +1469,19 @@
                 }
               }
               vm.$router.push({
-                path: currentPath + '?step=true&stepCode=' + result.stepCode,
+                path: currentPath + '?step=true',
                 query: {
                   renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
                 }
               })
               // vm.$router.push(currentPath + '?step=true&stepCode=' + result.stepCode)
             } else {
-              vm.currentStep = result
+              vm.$router.push({
+                path: currentPath + '?step=true',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
             }
           }).catch(reject => {
             console.log(reject)
@@ -1586,20 +1601,13 @@
           vm.currentAction['type'] = type
           vm.currentAction['currentProcess'] = vm.id
           vm.$store.dispatch('postProcessAction', vm.currentAction).then(function (result) {
-            if (type === 'add') {
-              vm.$router.push({
-                path: currentPath + '?action=true&actionCode=' + result.actionCode,
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                }
-              })
-              // vm.$router.push(currentPath + '?action=true&actionCode=' + result.actionCode)
-            } else {
-              vm.currentAction = result
-            vm.currentAction['createDossier'] = result.createDossiers ? result.createDossiers.split(',') : []
-            vm.currentAction['createDossierFiles'] = result.createDossierFiles ? result.createDossierFiles.split(',') : []
-            vm.currentAction['returnDossierFiles'] = result.returnDossierFiles ? result.returnDossierFiles.split(',') : []
-            }
+            vm.$router.push({
+              path: currentPath + '?action=true',
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+            console.log(result)
           }).catch(reject => {
             console.log(reject)
           })

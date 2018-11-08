@@ -42,7 +42,7 @@
     </v-dialog>
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
-    <div>
+    <div id="actionContent">
       <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
@@ -166,13 +166,14 @@
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
               <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
-              <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
+              <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
               <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" :dataEsign="dataEsign" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
+              <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
               <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
               <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                 <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
@@ -397,7 +398,7 @@
 
 <script>
 import router from '@/router'
-// import $ from 'jquery'
+import $ from 'jquery'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
@@ -414,6 +415,7 @@ import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
+import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
 import mermaid from 'mermaid'
 mermaid.initialize({
   theme: 'forest',
@@ -434,6 +436,7 @@ export default {
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'ngay-hen-tra': EditDate,
+    'thong-tin-buu-chinh': ThongTinBuuChinh,
     'ngay-gia-han': ExtendDateEdit,
     'chi-tiet-thanh-toan': ChiTietThanhToan,
     'ho-so-lien-thong': HoSoLienThong
@@ -467,6 +470,7 @@ export default {
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
+    returnFiles: [],
     processSteps: [],
     documents: [],
     payments: '',
@@ -485,6 +489,7 @@ export default {
     dataEsign: '',
     showTraKetQua: false,
     showThuPhi: false,
+    showPostalService: false,
     showThanhToanDienTu: false,
     showEditDate: false,
     showExtendDateEdit: false,
@@ -502,7 +507,6 @@ export default {
     paymentProfile: '',
     payment_type: 0,
     type_assign: 0,
-    returnFiles: [],
     assign_items: [],
     btnStateVisible: true,
     extendDateEdit: '',
@@ -891,6 +895,7 @@ export default {
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
       vm.showThuPhi = false
+      vm.showPostalService = false
       vm.showThanhToanDienTu = false
       vm.showEditDate = false
       vm.showExtendDateEdit = false
@@ -948,10 +953,18 @@ export default {
           vm.dataEsign = result
           // vm.$store.commit('setDataCreateFile', result)
         }
-        if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined' && result.returnFiles.length > 0) {
+        if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined') {
           isPopup = true
+          if (Array.isArray(result.returnFiles)) {
+            vm.returnFiles = result.returnFiles
+          } else {
+            vm.returnFiles = [result.returnFiles]
+          }
           vm.showTraKetQua = true
-          vm.returnFiles = result.returnFiles
+        }
+        if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendViaPostal=1') >= 0) {
+          isPopup = true
+          vm.showPostalService = true
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
@@ -1470,6 +1483,9 @@ export default {
                 }
               })
             }
+            $('html, body').animate({
+              scrollTop: $('#actionContent').offset().top
+            }, 1000, 'linear')
           }).catch(function (reject) {
             vm.loadingAction = false
             vm.loadingActionProcess = false

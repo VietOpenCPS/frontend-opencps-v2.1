@@ -17,11 +17,11 @@
                       </span>
                       <span v-if="item.partTip">{{item.partTip}}</span>
                     </v-tooltip>
-                    <v-tooltip top v-if="item.hasForm && item.daKhai">
+                    <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
                     </v-tooltip>
-                    <v-tooltip top v-if="item.hasForm && !item.daKhai">
+                    <v-tooltip top v-if="item.hasForm && !item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip>
