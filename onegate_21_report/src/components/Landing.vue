@@ -42,34 +42,38 @@
                 >
               </v-select>
             </v-flex>
-            <!-- <v-flex xs6 sm1 class="px-2">
+            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
               <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
-            </v-flex> -->
-            <v-flex xs6 sm2 class="px-2">
-              <v-menu
-                ref="menufromDate"
-                :close-on-content-click="false"
-                v-model="menufromDate"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                max-width="290px"
-                min-width="290px"
-              >
-                <v-text-field
-                  label="Từ ngày"
-                  slot="activator"
-                  v-model="fromDateFormatted"
-                  append-icon="event"
-                  @blur="fromDate = parseDate(fromDateFormatted)"
-                ></v-text-field>
-                <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
-              </v-menu>
             </v-flex>
-            <!-- <v-flex xs6 sm1 class="px-2">
-              <v-subheader class="pl-0 text-header">Đến ngày: </v-subheader>
-            </v-flex> -->
+            <v-flex xs6 sm2 class="px-2">
+              <v-layout wrap>
+                <v-flex>
+                  <v-menu
+                    ref="menufromDate"
+                    :close-on-content-click="false"
+                    v-model="menufromDate"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      placeholder="Từ ngày"
+                      slot="activator"
+                      v-model="fromDateFormatted"
+                      append-icon="event"
+                      @blur="fromDate = parseDate(fromDateFormatted)"
+                    ></v-text-field>
+                    <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
+                  </v-menu>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+            <v-flex xs6 sm1 class="px-2" v-if="documentTYPE !== 'REPORT_01'">
+              <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
+            </v-flex>
             <v-flex xs6 sm2 class="px-2">
               <v-menu
                 ref="menutoDate"
@@ -83,7 +87,7 @@
                 min-width="290px"
               >
                 <v-text-field
-                  label="Đến ngày"
+                  placeholder="Đến ngày"
                   slot="activator"
                   v-model="toDateFormatted"
                   append-icon="event"
@@ -483,8 +487,8 @@ export default {
         query: {
           year: vm.year,
           month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate,
+          fromDate: vm.fromDateFormatted,
+          toDate: vm.toDateFormatted,
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
@@ -495,7 +499,7 @@ export default {
       vm.fromDateFormatted = vm.formatDate(vm.fromDate)
       if (vm.documentTYPE === 'REPORT_01') {
         vm.year = ''
-        vm.month = ''
+        vm.month = '0'
         router.push({
           path: '/bao-cao/' + vm.index,
           query: {
@@ -523,7 +527,7 @@ export default {
       vm.toDateFormatted = vm.formatDate(vm.toDate)
       if (vm.documentTYPE === 'REPORT_01') {
         vm.year = ''
-        vm.month = ''
+        vm.month = '0'
         router.push({
           path: '/bao-cao/' + vm.index,
           query: {
