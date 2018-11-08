@@ -193,7 +193,7 @@ export default {
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       passWord: (value) => {
-        const pattern = /^(?![0-9]{6,})[0-9a-zA-Z@$!%*#?&]{6,}$/
+        const pattern = /^((?=.*\d)(?=.*[a-z])([0-9a-zA-Z@$!%*#?&]{6,}))$/
         return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
       },
       taxCode: (value) => {
