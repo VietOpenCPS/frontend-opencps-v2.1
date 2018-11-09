@@ -1270,8 +1270,8 @@ export const store = new Vuex.Store({
     loadPlugin ({commit, state}, item) {
       return new Promise((resolve, reject) => {
         item.plugin = true
-        var urlPluginFormData = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.actionId + '/formdata'
-        var urlPluginFormScript = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.actionId + '/formscript'
+        var urlPluginFormData = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/formdata'
+        var urlPluginFormScript = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/formscript'
         var config_plugins = {
           headers: {
             'groupId': state.initData.groupId
@@ -1319,7 +1319,7 @@ export const store = new Vuex.Store({
               }
               item.html = true
               item.no_html = ''
-              var url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processActionId + '/previewhtml'
+              var url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/previewhtml'
               axios.get(url, config_view).then(function (response) {
                 item.no_html = ''
                 vm.stepModel = item
@@ -1333,6 +1333,9 @@ export const store = new Vuex.Store({
                 formReport.data = formData
                 console.log('formReport_____FINAL=======', formReport)
                 window.$('#alpacajs_form_plugin').alpaca(formReport)
+                window.$('.dossierFilePartNo').val('')
+                window.$('.dossierFilePartNo').attr('id', 'dossierFileId' + partNo)
+                window.$('.dossierFilePartNo').val(dossierFileId)
               }).catch(function (error) {
                 console.log(error)
                 item.html = true
@@ -1392,6 +1395,21 @@ export const store = new Vuex.Store({
           }
         }
         let url = state.initData.dossierApi + '/' + data.dossierId + '/logs'
+        axios.get(url, config).then(function (response) {
+          resolve(response.data.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
+    loadPlugins ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let url = state.initData.dossierApi + '/' + data.dossierId + '/plugins'
         axios.get(url, config).then(function (response) {
           resolve(response.data.data)
         }).catch(function (xhr) {
