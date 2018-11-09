@@ -843,3 +843,23 @@ body .e-upload .e-file-select-wrap .e-file-select {
     body .jexcel.bossanova-ui td .results {
       margin-top: -45px !important;
     }
+
+    .file-preview .e-upload {
+        border: none !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        cursor: pointer;
+    }
+    .file-preview .e-upload .e-upload-files {
+        border-top: none !important;
+    }
+    body .file-preview .e-file-select-wrap:before,
+    body .file-preview .e-file-select-wrap:after {
+        content: "";
+    }
+
+    body .file-preview .e-file-select-wrap {
+        position: absolute;
+    }
