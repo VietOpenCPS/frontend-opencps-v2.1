@@ -909,7 +909,7 @@ export const store = new Vuex.Store({
         }
         var dataPutdossier = new URLSearchParams()
         dataPutdossier.append('applicantName', data.applicantName)
-        dataPutdossier.append('dossierNo', data.dossierNo)
+        dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
         dataPutdossier.append('applicantIdType', applicantType)
         dataPutdossier.append('applicantIdNo', data.applicantIdNo)
         dataPutdossier.append('address', data.address)
@@ -939,6 +939,7 @@ export const store = new Vuex.Store({
           dataPutdossier.append('postalServiceCode', data.postalServiceCode)
           dataPutdossier.append('postalAddress', data.postalAddress)
           dataPutdossier.append('postalCityCode', data.postalCityCode)
+          dataPutdossier.append('postalTelNo', data.postalTelNo)
           // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           // dataPutdossier.append('postalWardCode', data.postalWardCode)
         }

@@ -232,13 +232,15 @@ export default {
       // vm.dichVuChuyenPhatKetQua.postalCityCode = val.cityCode
       // vm.dichVuChuyenPhatKetQua.postalDistrictCode = val.districtCode
       // vm.dichVuChuyenPhatKetQua.postalWardCode = val.wardCode
+      /*
       vm.dichVuChuyenPhatKetQua.postalAddress = val.address
       vm.dichVuChuyenPhatKetQua.postalTelNo = val.contactTelNo
-      var filter = {
-        collectionCode: 'ADMINISTRATIVE_REGION',
-        level: 0,
-        parent: 0
-      }
+      */
+      // var filter = {
+      //   collectionCode: 'ADMINISTRATIVE_REGION',
+      //   level: 0,
+      //   parent: 0
+      // }
       // if (val.cityCode) {
       //   vm.onChangeResultCity(val.cityCode)
       // }
