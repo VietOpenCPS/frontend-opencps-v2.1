@@ -4,19 +4,19 @@
       margin-bottom: 100px;
     ">
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
-        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="data"></attached-file-avatar>
-        <datetime-picker v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
-        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + item.pk">
+        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item"></attached-file-avatar>
+        <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + item.pk">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
-        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['account'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAccount(item)">
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['account'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAccount(item)">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
-        <v-btn color="blue darken-3" dark v-if="item.type === 'button' && item['attached'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['attached'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
@@ -24,7 +24,7 @@
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-autocomplete v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
+        <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="dataSocket[item['datasource_key']]"
           :item-text="item.itemText"
@@ -35,7 +35,7 @@
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
         ></v-autocomplete>
-        <v-autocomplete v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
+        <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="item.datasource"
           :item-text="item.itemText"
@@ -46,7 +46,7 @@
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
         ></v-autocomplete>
-        <v-text-field v-if="item.type === 'text-fields'"
+        <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
@@ -55,7 +55,7 @@
           clearable
         >
         </v-text-field>
-        <v-textarea v-if="item.type === 'textarea'"
+        <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
@@ -65,10 +65,77 @@
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
         <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
-        <v-switch v-if="item.type === 'v-switch'"
+        <v-switch :class="item['class_component']" v-if="item.type === 'v-switch'"
           :label="item['label']" 
           v-model="data[item.model]"
         ></v-switch>
+        <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild">
+          <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar>
+          <datetime-picker :class="itemChild['class_component']" v-if="itemChild.type === 'date'" v-model="data[itemChild.model]" :item="itemChild" :data-value="data[itemChild.model]"></datetime-picker>
+          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['link'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" :to="itemChild.url + '?pk=' + data[itemChild.pk] + '&col=' + itemChild.pk">
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
+            {{itemChild.label}}
+          </v-btn>
+          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['account'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" v-on:click.native="showAccount(itemChild)">
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
+            {{itemChild.label}}
+          </v-btn>
+          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['attached'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" v-on:click.native="showAttached(itemChild)">
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
+            {{itemChild.label}}
+          </v-btn>
+          <content-placeholders v-if="itemChild.type === 'selects' && !pullOk && itemChild.hasOwnProperty('datasource_key')">
+            <content-placeholders-text :lines="1" />
+          </content-placeholders>
+          <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && pullOk && itemChild.hasOwnProperty('datasource_key')"
+            v-model="data[itemChild.model]"
+            :items="dataSocket[itemChild['datasource_key']]"
+            :item-text="itemChild.itemText"
+            :item-value="itemChild.itemValue"
+            box
+            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :rules="processRules(itemChild.rules)"
+            :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
+            @change="processChangeDataSource($event, itemChild)"
+          ></v-autocomplete>
+          <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
+            v-model="data[itemChild.model]"
+            :items="itemChild.datasource"
+            :item-text="itemChild.itemText"
+            :item-value="itemChild.itemValue"
+            box
+            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :rules="processRules(itemChild.rules)"
+            :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
+            @change="processChangeDataSource($event, itemChild)"
+          ></v-autocomplete>
+          <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
+            v-model="data[itemChild.model]"
+            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :rules="processRules(itemChild.rules)"
+            :placeholder="itemChild['placeholder']"
+            box 
+            clearable
+          >
+          </v-text-field>
+          <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
+            v-model="data[itemChild.model]"
+            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
+            :rules="processRules(itemChild.rules)"
+            :placeholder="itemChild['placeholder']"
+            box 
+            clearable
+          ></v-textarea>
+          <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
+          <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>
+          <v-switch :class="itemChild['class_component']" v-if="itemChild.type === 'v-switch'"
+            :label="itemChild['label']" 
+            v-model="data[itemChild.model]"
+          ></v-switch>
+        </div>
       </v-flex>
       <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
           position: fixed;
@@ -495,6 +562,7 @@
         }
         vm.$store.dispatch('deactiveAccount', postData).then(function (data) {
           vm.snackbarsuccess = true
+          console.log(data)
         })
       },
       doChangePassWord () {
@@ -509,6 +577,7 @@
           }
           vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
             vm.snackbarsuccess = true
+            console.log(data)
           })
         }
       },
@@ -528,6 +597,7 @@
           }
           vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
             vm.snackbarsuccess = true
+            console.log(data)
           })
         } else {
           vm.deactiveAccountFlag = !dataLock

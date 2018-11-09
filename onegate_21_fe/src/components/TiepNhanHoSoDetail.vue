@@ -341,31 +341,35 @@ export default {
         setTimeout(function () {
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-            var initData = vm.$store.getters.loadingInitData
-            let actionUser = initData.user.userName ? initData.user.userName : ''
-            let dataPostAction = {
-              dossierId: vm.dossierId,
-              actionCode: 1100,
-              actionNote: '',
-              actionUser: actionUser,
-              payload: '',
-              security: '',
-              assignUsers: '',
-              payment: vm.payments,
-              createDossiers: '',
-              dueDate: tempData.dueDate
-            }
-            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-              let currentQuery = vm.$router.history.current.query
-              router.push({
-                path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
-                query: {
-                  activeTab: 'tabs-1'
-                }
+            if (vm.formCode === 'UPDATE') {
+              vm.goBack()
+            } else {
+              var initData = vm.$store.getters.loadingInitData
+              let actionUser = initData.user.userName ? initData.user.userName : ''
+              let dataPostAction = {
+                dossierId: vm.dossierId,
+                actionCode: 1100,
+                actionNote: '',
+                actionUser: actionUser,
+                payload: '',
+                security: '',
+                assignUsers: '',
+                payment: vm.payments,
+                createDossiers: '',
+                dueDate: tempData.dueDate
+              }
+              vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+                // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+                let currentQuery = vm.$router.history.current.query
+                router.push({
+                  path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
+                  query: {
+                    activeTab: 'tabs-1'
+                  }
+                })
+                vm.tiepNhanState = false
               })
-              vm.tiepNhanState = false
-            })
+            }
           }).catch(function (xhr) {
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
