@@ -9,7 +9,7 @@
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Vui lòng nhập mã PIN đã được gửi về email hoặc số điện thoại của bạn</p>
+            <p>Vui lòng nhập mã PIN đã được gửi về email của bạn</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field
