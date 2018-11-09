@@ -132,6 +132,14 @@
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
+              <v-btn color="primary" class="ml-0 mr-2" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+                v-on:click.native="processPullBtnplugin(item, index)" 
+                :loading="loadingPlugin"
+                :disabled="loadingPlugin"
+              >
+                {{item.pluginName}}
+                <span slot="loader">Loading...</span>
+              </v-btn>
               <!-- Action rollBack -->
               <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
                 @click="rollBackDossier(true)"
@@ -393,6 +401,48 @@
       </v-tabs>
     </div>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+
+    <v-dialog v-model="dialogPlugin" persistent :overlay="false" :max-width="800" style="overflow: hidden;" transition="dialog-transition">
+      <v-card>
+        <v-card-title class="px-0 py-0">
+          <v-toolbar dark color="primary" height="40">
+            <div class="text-bold" v-if="modelPlugin !== null && modelPlugin !== undefined">{{modelPlugin['pluginName']}}</div>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn icon dark @click.native="dialogPlugin = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+        </v-card-title>
+        <v-card-text class="pr-0 py-0">
+          <div v-if="modelPlugin === null" style="width: 100%; height: 400px;" class="text-xs-center center-all">
+            <v-progress-circular indeterminate v-bind:size="100" color="purple"></v-progress-circular>
+          </div>
+          <div v-else-if="modelPlugin.pending">
+            Hồ sơ chờ đồng bộ ...
+          </div>
+          <div v-else-if="modelPlugin['plugin']">
+            <div v-if="modelPlugin.pdf">
+              <div class="flex xs12 sm12 text-center">
+                <object id="dossierPDFViewPlugin" data="" width="100%" height="100%" v-if="!modelPlugin.no_pdf">
+                  <iframe :src="modelPlugin.url" width="100%" style="min-height: 500px !important; padding-left: 0;"> </iframe>
+                </object>
+                <div id="dossierPDFViewNotFound" class="text-center">{{ modelPlugin.no_pdf }}</div>
+              </div>
+            </div>
+
+            <div v-if="modelPlugin['html']">
+              <input type="hidden" id="dossierFilePartNo" class="dossierFilePartNo" name="">
+              <div id="alpacajs_form_plugin" class="expansion-panel__header"></div>
+              <div id="dossierAlpacaNotFound" class="text-center">{{ modelPlugin.no_html }}</div>
+            </div> 
+          </div>
+          <div v-else>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -517,6 +567,8 @@ export default {
     rollbackable: false,
     configNote: null,
     actionSpecial: false,
+    btnPlugins: [],
+    loadingPlugin: false,
     headers: [{
       text: '#',
       align: 'center',
@@ -593,7 +645,9 @@ export default {
     },
     stateViewResult: true,
     stateViewDocument: true,
-    listLienThong: []
+    listLienThong: [],
+    modelPlugin: null,
+    dialogPlugin: false
   }),
   computed: {
     loading () {
@@ -883,6 +937,23 @@ export default {
           vm.stepModel = null
         })
       }
+    },
+    processPullBtnplugin (item, index) {
+      var vm = this
+      let param = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        processPluginId: item.processPluginId
+      }
+      vm.dialogPlugin = true
+      vm.loadingPlugin = true
+      vm.$store.dispatch('loadPlugin', param).then(result => {
+        vm.modelPlugin = result
+        vm.modelPlugin['pluginName'] = item.pluginName
+        vm.loadingPlugin = false
+      }).catch(xhr => {
+        vm.modelPlugin = null
+        vm.loadingPlugin = false
+      })
     },
     processPullBtnDetailRouter (dossierItem, item, result, index) {
       let vm = this
@@ -1627,6 +1698,13 @@ export default {
         // setTimeout(function () {
         //   vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
         // }, 300)
+      })
+      vm.$store.dispatch('loadPlugins', {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }).then(results => {
+        vm.btnPlugins = results
+      }).catch(xhr => {
+        vm.btnPlugins = []
       })
       vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
     },
