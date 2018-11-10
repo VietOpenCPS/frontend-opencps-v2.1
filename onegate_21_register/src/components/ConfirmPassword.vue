@@ -9,7 +9,7 @@
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Bạn vui lòng kiểm tra email hoặc số điện thoại để lấy mã bảo mật</p>
+            <p>Bạn vui lòng kiểm tra email để lấy mã bảo mật</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field

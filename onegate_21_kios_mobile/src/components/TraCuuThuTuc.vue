@@ -1,8 +1,8 @@
 <template>
-  <div class="px-2 py-0">
-    <h4 class="pt-2 ml-2">
+  <v-card flat class="py-0">
+    <h3 class="pt-2 ml-2">
       <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
-    </h4>
+    </h3>
     <v-layout wrap class="mt-2">
       <v-flex xs12 sm4 class="pl-2 pr-2">
         <v-select
@@ -28,79 +28,41 @@
           @change="changeDomain"
         ></v-select>
       </v-flex>
-      <!-- <v-flex xs3 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
-          :items="listMucDo"
-          v-model="levelSelected"
-          autocomplete
-          placeholder="Chọn mức độ"
-          item-text="levelName"
-          item-value="level"
-          :hide-selected="true"
-          @change="changeLevel"
-          clearable
-        >
-          <template slot="item" slot-scope="data">
-            <template>
-              <v-list-tile-content>
-                <v-list-tile-title >Mức độ {{data.item.level}}</v-list-tile-title>
-              </v-list-tile-content>
-            </template>
-          </template>
-        </v-select>
-      </v-flex> -->
       <v-flex xs12 sm4 class="pl-2 pr-2">
         <v-text-field
           label="Tên thủ tục"
           v-model="serviceNameKey"
           box
-          clearable
+          append-icon="search"
+          @keyup.enter="filterServiceinfos('keyword')"
+          @click:append="filterServiceinfos('keyword')"
         ></v-text-field>
-        <!-- <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-          <div class="input-group__input">
-            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos('keyword')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
-            <i aria-hidden="true" @click="filterServiceinfos('keyword')" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
-          </div>
-        </div> -->
       </v-flex>
     </v-layout>
-    <!-- <div class="text-center" style="width: 130px">
-      <v-btn color="primary"
-        :loading="loading"
-        :disabled="loading"
-        @click="filterServiceinfos('filter')"
-        style="height:34px;width:110px;margin-top:17px"
-      >
-        <v-icon size="18">search</v-icon>
-        &nbsp;
-        Tra Cứu
-        <span slot="loader">Loading...</span>
-      </v-btn>
-    </div> -->
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
+    <!-- danh sách cơ quan -->
     <div class="mt-4" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" >
       <v-layout class="wrap">
-        <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+        <v-flex xs12 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
           <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
-    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0">
+    <div class="mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && showListLinhVuc">
       <!-- danh sách lĩnh vực -->
-      <div class="">
+      <v-card class="">
         <v-list class="py-0">
           <template v-for="(item, index) in listLinhVuc" >
-            <v-list-tile :key="index" @click="filterDomain(item)">
+            <v-list-tile :key="index" @click="filterDomain(item)" style="border-bottom:1px solid #dedede">
               <v-list-tile-content>
                 <v-list-tile-title v-html="item.domainName"></v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
           </template>
         </v-list>
-      </div>
+      </v-card>
       <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
@@ -109,76 +71,48 @@
       </div>
     </div>
     <!-- danh sách thủ tục -->
-    <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc">
-      <div class="">
-        <v-data-table
-          :headers="headersTable"
-          :items="listThuTuc"
-          hide-actions
-          class="table-bordered ml-2"
-        >
-          <template slot="items" slot-scope="props">
-            <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
-                </div>
-              </td>
-              <td class="text-xs-left" >
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.serviceName}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.domainName}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
-                      Mức độ {{props.item.maxLevel}}
-                    </v-chip>
-                    <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </template>
-          <template slot="no-data">
-            <div class="text-xs-center mt-2">
-              Không có thủ tục nào được tìm thấy
-            </div>
-          </template>
-        </v-data-table>
-      </div>
+    <v-container fluid grid-list-sm class="px-2" v-if="!loading && !activeDetailService && showListThuTuc && !showListLinhVuc">
+      <v-layout wrap>
+        <v-flex xs12 sm6 v-for="(item, index) in listThuTuc" :key="index" class="mb-2">
+          <v-card flat color="#e9e9ff" width="100%" height="100%">
+            <v-card-title primary-title>
+              <v-flex class="xs12 sm12 pb-1">
+                <span class="pr-2 text-bold">Tên thủ tục: </span>
+                <span class="pl-0"> {{item.serviceName}}</span>
+              </v-flex>
+              <v-flex class="xs12 sm12 pb-1">
+                <span class="pr-2 text-bold">Lĩnh vực: </span>
+                <span class="pl-0"> {{item.domainName}}</span>
+              </v-flex>
+              <v-flex class="xs12 sm12 pb-1">
+                <span class="pr-2 text-bold">Mức độ: </span>
+                <span :style="'color:'+getColor(item.maxLevel)">
+                  Mức độ {{item.maxLevel}}
+                </span>
+              </v-flex>
+            </v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn small color="primary" @click="viewDetail(item)">
+                <v-icon size="18">near_me</v-icon> &nbsp;
+                Xem chi tiết
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+      </v-layout>
       <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2">
           <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
             @tiny:change-page="paggingData" ></tiny-pagination> 
         </div>
       </div>
-    </div>
+    </v-container>
     <!-- chi tiết thủ tục -->
     <div class="mt-4" v-if="!loading && activeDetailService">
       <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
     </div>
-  </div>
+  </v-card>
 </template>
 
 <script>
@@ -232,7 +166,8 @@ export default {
         sortable: false
       }
     ],
-    showListThuTuc: false
+    showListThuTuc: false,
+    showListLinhVuc: false
   }),
   computed: {
     activeDetailService () {
@@ -242,7 +177,6 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
       vm.$store.commit('setFullScreen', false)
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -267,6 +201,7 @@ export default {
               if (result.data) {
                 vm.listLinhVuc = result.data
                 vm.totalPaggingLinhVuc = Number(result.total)
+                vm.showListLinhVuc = true
               } else {
                 vm.listLinhVuc = []
                 vm.totalPaggingLinhVuc = 0
@@ -274,6 +209,8 @@ export default {
               vm.pageListLinhVuc = Number(newQuery.page) ? Number(newQuery.page) : 1
               if (vm.govAgencySelected && vm.linhVucSelected) {
                 vm.doLoadingThuTuc()
+                vm.showListLinhVuc = false
+                vm.showListThuTuc = true
               }
             }).catch(reject => {
               vm.listLinhVuc = []
@@ -310,6 +247,8 @@ export default {
           if (result.data) {
             vm.listLinhVuc = result.data
             vm.totalPaggingLinhVuc = Number(result.total)
+            vm.showListThuTuc = false
+            vm.showListLinhVuc = true
           } else {
             vm.listLinhVuc = []
             vm.totalPaggingLinhVuc = 0
@@ -323,6 +262,7 @@ export default {
       }
       if (vm.linhVucSelected || vm.serviceNameKey !== '') {
         vm.doLoadingThuTuc()
+        vm.showListLinhVuc = false
         vm.showListThuTuc = true
       }
       if (currentQuery.hasOwnProperty('detail')) {
@@ -396,6 +336,7 @@ export default {
     changeAdministration () {
       var vm = this
       vm.showListThuTuc = false
+      vm.showListLinhVuc = true
       vm.listLinhVuc = []
       vm.linhVucSelected = ''
       vm.levelSelected = ''
@@ -485,7 +426,7 @@ export default {
       if (level === 2) {
         return 'green'
       } else if (level === 3) {
-        return 'orange darken-1'
+        return 'orange'
       } else if (level === 4) {
         return 'red'
       }

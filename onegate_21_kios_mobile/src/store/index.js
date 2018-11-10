@@ -8,8 +8,8 @@ Vue.use(Vuex)
 Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
-    // endPoint: '/o/rest/v2',
-    endPoint: 'http://127.0.0.1:8081/api',
+    endPoint: '/o/rest/v2',
+    // endPoint: 'http://127.0.0.1:8081/api',
     initData: support.initData,
     totalEmployee: 0,
     filterDossierKey: {
@@ -85,8 +85,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -132,8 +132,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get(state.endPoint + '/serviceconfigs/pubish/' + filter.administrationCode + '/domains', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get(state.endPoint + '/serviceconfigs/pubish/' + filter.administrationCode + '/domains', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -275,6 +275,7 @@ export const store = new Vuex.Store({
     getDossierDetailPass ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          // test local
           let param = {
             headers: {
               groupId: state.initData.groupId,

@@ -295,8 +295,6 @@ table .action_column {
 }
 body .table-bordered {
     border: 0;
-    border-bottom: 1px solid #dddddd;
-    border-left: 1px solid #dddddd;
 }
 body .table__overflow .table > thead > tr > th {
     border-right: 1px solid lightgray;
@@ -305,8 +303,14 @@ body .table__overflow .table > thead > tr > th {
     font-weight: bold;
 }
 body .table-bordered tbody > tr > td {
-    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
     vertical-align: top;
+}
+body .table-bordered tbody > tr > td:not(:last-child) {
+    border-right: 1px solid lightgray;
+}
+body .table-bordered thead > tr > th:not(:last-child) {
+    border-right: 1px solid lightgray;
 }
 body table.table tbody td, body table.table tbody th {
     height: 38px;

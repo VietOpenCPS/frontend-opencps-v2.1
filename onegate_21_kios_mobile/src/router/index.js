@@ -13,7 +13,7 @@ import CheckPassword from '@/components/CheckPassword'
 const routes = [
   { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
-  { path: '/tra-cuu-ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
+  { path: '/thong-tin-ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
   { path: '/tra-cuu-thu-tuc', name: 'TraCuuThuTuc', component: TraCuuThuTuc, props: false },
   { path: '/tra-cuu-thu-tuc/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
   { path: '/danh-gia-cldv', name: 'DanhGiaChatLuongDichVu', component: DanhGiaChatLuongDichVu, props: false },

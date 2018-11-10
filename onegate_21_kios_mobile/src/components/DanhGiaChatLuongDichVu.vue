@@ -1,18 +1,18 @@
 <template>
-  <div class="px-2 py-0 kios-item">
+  <div class="px-2 py-0">
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <h4 class="pt-2 ml-2" v-if="!detailActive">
+    <h3 class="pt-2 ml-2" v-if="!detailActive">
       <span style="color:#065694">CHỌN ĐƠN VỊ ĐỂ ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ </span>
-    </h4>
+    </h3>
     <div class="text-xs-center" v-if="detailActive">
-      <h4 class="py-2" style="color:#065694">ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ</h4>
-      <h4 class="pb-2" style="color:green">{{govAgencyName(govAgencySelected)}}</h4>
+      <h3 class="py-2" style="color:#065694">ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ</h3>
+      <h3 class="pb-2" style="color:green">{{govAgencyName(govAgencySelected)}}</h3>
     </div>
     <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
-        <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+        <v-flex xs12 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
           <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.itemName}}</v-btn>
         </v-flex>
       </v-layout>
