@@ -58,13 +58,14 @@
 
 <script>
   import Vue from 'vue'
+  /* eslint-disable */
   import {
     UploaderPlugin
   } from '@syncfusion/ej2-vue-inputs'
   import {
     detach
   } from '@syncfusion/ej2-base'
-  
+  /* eslint-disable */
   Vue.use(UploaderPlugin)
   
   export default {

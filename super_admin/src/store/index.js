@@ -519,14 +519,15 @@ export const store = new Vuex.Store({
     getProcessStep ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
+          let paramInput = filter.page ? {
+            start: filter.page * 10 - 10,
+            end: filter.page * 10
+          } : {}
           let param = {
             headers: {
               groupId: state.initData.groupId
             },
-            params: {
-              start: filter.page * 10 - 10,
-              end: filter.page * 10
-            }
+            params: paramInput
           }
           axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/steps', param).then(function (response) {
             let seriable = response.data
@@ -761,7 +762,6 @@ export const store = new Vuex.Store({
           dataPostStep.append('customProcessUrl', data.customProcessUrl)
           dataPostStep.append('briefNote', data.briefNote)
           dataPostStep.append('stepInstruction', data.stepInstruction)
-          dataPostStep.append('lockState', data.lockState)
           dataPostStep.append('editable', data.editable)
           if (data.type === 'add') {
             axios.post(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/steps', dataPostStep, options).then(function (response) {
@@ -900,10 +900,10 @@ export const store = new Vuex.Store({
           dataPostAction.append('rollbackable', data.rollbackable)
           dataPostAction.append('createDossierFiles', data.createDossierFiles ? data.createDossierFiles.join() : '')
           dataPostAction.append('returnDossierFiles', data.returnDossierFiles ? data.returnDossierFiles.join() : '')
-          dataPostAction.append('createDossierNo', data.createDossierNo)
+          dataPostAction.append('createDossierNo', data.createDossierNo ? data.createDossierNo : '')
           dataPostAction.append('eSignature', data.eSignature)
           dataPostAction.append('configNote', data.configNote)
-          dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo)
+          dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo ? data.dossierTemplateNo : '')
           dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')
           if (data.type === 'add') {
             console.log('dataPostAction', dataPostAction)
