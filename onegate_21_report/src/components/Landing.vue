@@ -351,7 +351,7 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all' || !filter['agency']) {
+          if (filter['agency'] === 'all') {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
@@ -397,7 +397,7 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all' || !filter['agency']) {
+          if (filter['agency'] === 'all') {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
