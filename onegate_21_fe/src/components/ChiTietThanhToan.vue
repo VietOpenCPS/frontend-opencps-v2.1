@@ -251,7 +251,7 @@ export default {
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {
         let eInvoiceNo = string.split('#')[1] ? string.split('#')[1] : ''
-        return eInvoiceNo
+        return eInvoiceNo.indexOf('}') < 0 && eInvoiceNo.indexOf('"') < 0 ? eInvoiceNo : ''
       } else {
         return ''
       }

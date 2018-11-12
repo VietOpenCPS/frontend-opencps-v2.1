@@ -246,7 +246,7 @@
       vm.$nextTick(function () {
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
-        if ((!vm.dossierDetail.originality || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+        if ((vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
           if (resultTemp) {
