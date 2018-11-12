@@ -12,31 +12,31 @@
             <v-subheader class="pl-0">Dịch vụ đăng ký: </v-subheader>
           </v-flex>
           <v-flex xs12 sm4>
-            <p class="mt-1 mb-0">VNPOST</p>
+            <p class="mb-0" style="padding-top:6px">VNPOST</p>
           </v-flex>
           <v-flex xs12 sm2>
             <v-subheader class="pl-0">Bưu cục: </v-subheader>
           </v-flex>
           <v-flex xs12 sm4>
-            <p class="mt-1 mb-0">{{postName}}</p>
+            <p class="mb-0" style="padding-top:6px">{{postName}}</p>
           </v-flex>
           <v-flex xs12 sm2>
             <v-subheader class="pl-0">Tên người nhận: </v-subheader>
           </v-flex>
           <v-flex xs12 sm4>
-            <p class="mt-1 mb-0">{{postalService.applicantName}}</p>
+            <p class="mb-0" style="padding-top:6px">{{postalService.applicantName}}</p>
           </v-flex>
           <v-flex xs12 sm2>
             <v-subheader class="pl-0">Số điện thoại: </v-subheader>
           </v-flex>
           <v-flex xs12 sm4>
-            <p class="mt-1 mb-0">{{postalService.postalTelNo}}</p>
+            <p class="mb-0" style="padding-top:6px">{{postalService.postalTelNo}}</p>
           </v-flex>
           <v-flex xs12 sm2>
             <v-subheader class="pl-0">Địa chỉ: </v-subheader>
           </v-flex>
           <v-flex xs12 sm10>
-            <p class="mt-1 mb-0">{{postalService.postalAddress}}</p>
+            <p class="mb-0" style="padding-top:6px">{{postalService.postalAddress}}</p>
           </v-flex>
         </v-layout>
       </v-card>

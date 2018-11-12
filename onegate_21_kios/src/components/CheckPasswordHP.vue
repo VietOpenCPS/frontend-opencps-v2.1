@@ -40,7 +40,6 @@
     <v-dialog v-model="dialogError" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Bạn không có quyền truy cập hồ sơ 
-          <span>{{dossierDetail.dossierNo}}</span>
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -57,7 +56,9 @@
 <script>
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
+import toastr from 'toastr'
 import $ from 'jquery'
+Vue.use(toastr)
 export default {
   props: [],
   components: {},
@@ -152,19 +153,21 @@ export default {
           vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
             vm.loading = false
             vm.dialogCheckPass = false
-            vm.clearDialog()
-            if (result.status && result.status.toString() === '200') {
+            if (result.status && result.status.toString() === '203') {
+              // vm.dialogError = true
+              toastr.error('Mã tra cứu không chính xác. Vui lòng thử lại.')
+            } else if (result.status && result.status.toString() === '200') {
+              vm.clearDialog()
               vm.$store.commit('setDossierDetail', result.data)
               let queryString = '?keyword=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
               vm.$router.push({
                 path: '/tra-cuu-ho-so-homepage' + queryString
               })
-            } else {
-              vm.dialogError = true
             }
           }).catch(function (reject) {
             vm.dialogCheckPass = false
             vm.loading = false
+            toastr.error('Lỗi hệ thống')
             console.log('reject', reject)
           })
         }

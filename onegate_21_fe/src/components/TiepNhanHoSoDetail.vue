@@ -477,7 +477,10 @@ export default {
                   }
                   console.log('queryString=====', queryString)
                   vm.$router.push({
-                    path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString
+                    path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString,
+                    query: {
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                    }
                   })
                 }).catch(reject => {
                   vm.loadingAction = false

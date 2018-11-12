@@ -1644,10 +1644,17 @@ header span {
 	background-color: #0090ff;
 }
 .tab-item .left a:nth-child(4) {
-	background-color: #cdbe1c;
+    background-color: #cdbe1c;
+    margin: 0 0 8px 0;
 }
 .tab-item .left a:nth-child(4):hover {
 	background-color: #e4d538;
+}
+.tab-item .left a:nth-child(5) {
+	background-color: #c36423;
+}
+.tab-item .left a:nth-child(5):hover {
+	background-color: #da8851;
 }
 .mWrapper > header {
     display: none !important;

@@ -47,6 +47,34 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    goSignIn ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          console.log('filter login', filter)
+          axios.post('/o/gate/v2/login', {}, {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter.applicantName + ':' + filter.password)
+            }
+          }).then(function (response) {
+            if (response.data !== '' && response.data !== 'ok') {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                '/register#/xac-thuc-tai-khoan?active_user_id=' + window.themeDisplay.getUserId() +
+                  '&redirectURL=' + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              window.location.href = window.themeDisplay.getURLHome()
+            } else {
+              toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác', { autoClose: 2000 })
+            }
+          }).catch(function () {
+            toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác', { autoClose: 2000 })
+          })
+        })
+      })
+    },
     loadingDataHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
