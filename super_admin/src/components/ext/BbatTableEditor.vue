@@ -92,19 +92,7 @@
             }
           }
           if (dataObj.respone === 'listTableMenu') {
-            let listTableMenu = vm.$store.getters.getlistTableMenu
-            if (listTableMenu.length > 2) {
-              let dataMenu = vm.dataSocket['listTableMenu']
-              for (let key in dataMenu) {
-                listTableMenu[2].children.push({
-                  icon: 'arrow_right',
-                  link: '/table/' + dataMenu[key][1],
-                  code: dataMenu[key][1],
-                  text: dataMenu[key][2]
-                })
-              }
-            }
-            vm.$store.commit('setlistTableMenu', listTableMenu)
+            vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
           } else if (dataObj.respone === 'loginUser') {
             vm.$store.commit('setloginUser', dataObj['loginUser'])
           } 

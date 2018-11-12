@@ -2,7 +2,7 @@
   <v-layout row wrap>
     <v-flex xs12 class="control-section file-preview py-0">
       <div class="control_wrapper">
-        <div id="dropArea" style="height: auto;overflow: auto;position: relative;border: 1px dashed #949494;text-align: center;padding: 15px;">
+        <div id="dropArea" :style="'background-image: url(' + avatarData + ');'" style="height: 250px;overflow: auto;position: relative;border: 1px dashed #949494;text-align: center;padding: 15px;background-size: cover;">
           <span id="dropPreview" style="position: absolute;left: 0;top: 0;height: 100%;width: 100%;"> 
             <a href="javascript:;" id="browseAvata">
               <i aria-hidden="true" class="v-icon material-icons" style="font-size: 54px;opacity: .2;position: absolute;top: 0;right: 0;">camera_alt</i>
@@ -10,7 +10,7 @@
           </span>
           <ejs-uploader id='imagePreview' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
           </ejs-uploader>
-          <svg style="width: 125px;margin: 0 auto;enable-background:new 0 0 563.43 563.43;"
+          <svg v-if="noAvatar" style="width: 125px;margin: 0 auto;margin-top: 45px;enable-background:new 0 0 563.43 563.43;"
             version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
               viewBox="0 0 563.43 563.43" xml:space="preserve">
             <path d="M280.79,314.559c83.266,0,150.803-67.538,150.803-150.803S364.055,13.415,280.79,13.415S129.987,80.953,129.987,163.756
@@ -70,6 +70,8 @@
   export default {
     data() {
       return {
+        noAvatar: true,
+        avatarData: '',
         loadingRemove: false,
         loading: false,
         fileTemplateData: [],
@@ -88,7 +90,7 @@
     created() {
       var vm = this
       vm.$nextTick(function() {
-        vm.loadFileTemplate()
+        this.loadImageComponent()
       })
     },
     mounted: function() {
@@ -108,13 +110,30 @@
         args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
         args.currentRequest.setRequestHeader('groupId', vm.getScopeGroupId())
       },
-      loadFileTemplate() {
+      loadImageComponent() {
         let vm = this
+        console.log('vm.pk', vm.pk)
+        let filter = {
+          pk: vm.pk,
+          className: vm.className
+        }
+        vm.noAvatar = true
+        vm.avatarData = ''
+        vm.$store.dispatch('getImageComponent', filter).then(function (data) {
+          if (data !== '' && data !== null) {
+            vm.noAvatar = false
+            let portalURL = ''
+            if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+              portalURL = themeDisplay.getPortalURL()
+            }
+            vm.avatarData = portalURL + data
+          }
+        })
       },
       onSuccess: function() {
         setTimeout(() => {
           document.getElementById('dropArea').querySelectorAll(".e-upload-success").forEach(e => e.parentNode.removeChild(e))
-          this.loadFileTemplate()
+          this.loadImageComponent()
         }, 2000)
       },
       onFileRemove: function(args) {

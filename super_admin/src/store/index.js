@@ -77,48 +77,6 @@ export const store = new Vuex.Store({
         text: 'Dữ liệu dùng chung',
         model: false,
         children: [
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_dictcollection',
-            code: 'opencps_dictcollection',
-            text: 'Nhóm danh mục'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_dictgroup',
-            code: 'opencps_dictgroup',
-            text: 'Nhóm dữ liệu danh mục'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_dictitem',
-            code: 'opencps_dictitem',
-            text: 'Dữ liệu danh mục'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_holiday',
-            code: 'opencps_holiday',
-            text: 'Ngày nghỉ lễ'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_worktime',
-            code: 'opencps_worktime',
-            text: 'Ngày làm việc trong tuần'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_notificationtemplate',
-            code: 'opencps_notificationtemplate',
-            text: 'Mẫu thông báo'
-          },
-          {
-            icon: 'arrow_right',
-            link: '/table/opencps_workingunit',
-            code: 'opencps_workingunit',
-            text: 'Tổ chức, phòng ban'
-          }
         ]
       },
       {
@@ -252,6 +210,24 @@ export const store = new Vuex.Store({
             }
           }
           axios.get('/o/gate/v2/user/' + userId, param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    getImageComponent ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/gate/v2/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {
@@ -983,7 +959,25 @@ export const store = new Vuex.Store({
       state.socket.reconnectError = true
     },
     setlistTableMenu (state, payload) {
-      state.listTableMenu = payload
+      let listTableMenu = state.listTableMenu
+      for (let key in payload) {
+        if (payload[key][4] && listTableMenu.length > 1) {
+          listTableMenu[1].children.push({
+            icon: 'arrow_right',
+            link: '/table/' + payload[key][1],
+            code: payload[key][1],
+            text: payload[key][2]
+          })
+        } else if (!payload[key][4] && listTableMenu.length > 2) {
+          listTableMenu[2].children.push({
+            icon: 'arrow_right',
+            link: '/table/' + payload[key][1],
+            code: payload[key][1],
+            text: payload[key][2]
+          })
+        }
+      }
+      state.listTableMenu = listTableMenu
     },
     setInitData (state, payload) {
       state.initData = payload

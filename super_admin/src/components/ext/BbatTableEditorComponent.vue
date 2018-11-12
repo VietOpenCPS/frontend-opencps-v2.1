@@ -4,7 +4,7 @@
       margin-bottom: 100px;
     ">
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
-        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item"></attached-file-avatar>
+        <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar>
         <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + item.pk">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
@@ -484,13 +484,9 @@
           delete dataPOST['expandoBridge']
           delete dataPOST['modelAttributes']
           delete dataPOST['stagedModelType']
-          console.log(newQuery)
-          console.log(newQuery.hasOwnProperty('col'))
-          console.log(newQuery.hasOwnProperty('pk'))
           if (newQuery.hasOwnProperty('col') && newQuery.hasOwnProperty('pk')) {
             dataPOST[newQuery['col']] = newQuery['pk']
           }
-          console.log('dataPOST', dataPOST)
           vm.$socket.sendObj(
             {
               type: 'admin',
