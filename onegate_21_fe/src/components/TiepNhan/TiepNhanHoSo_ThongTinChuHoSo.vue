@@ -70,6 +70,8 @@
                     v-model="thongTinChuHoSo.address"
                     multi-line
                     rows="2"
+                    :rules="originality === 1 ? [v => !!v || 'Trường dữ liệu bắt buộc'] : ''"
+                    required
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm2>
@@ -152,7 +154,8 @@
                     v-else
                     v-model="thongTinChuHoSo.contactTelNo"
                     append-icon="phone"
-                    :rules="[rules.telNo]"
+                    :rules="originality === 1 ? [rules.telNo, rules.required] : [rules.telNo]"
+                    required
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm2>
@@ -168,7 +171,8 @@
                     <v-text-field
                     v-else
                     v-model="thongTinChuHoSo.contactEmail"
-                    :rules="thongTinChuHoSo.contactEmail ? [rules.email] : ''"
+                    :rules="originality === 1 ? [rules.email, rules.required] : (thongTinChuHoSo.contactEmail && originality !== 1 ? [rules.email] : '')"
+                    required
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -640,6 +644,8 @@ export default {
         level: 1,
         parent: data
       }
+      vm.thongTinChuHoSo.districtCode = ''
+      vm.thongTinChuHoSo.wardCode = ''
       vm.$store.commit('setCityVal', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.districts = result.data
@@ -657,6 +663,7 @@ export default {
         level: 1,
         parent: data
       }
+      vm.thongTinChuHoSo.wardCode = ''
       vm.$store.commit('setDistrictVal', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.wards = result.data
@@ -747,6 +754,8 @@ export default {
     },
     onChangeDelegateCity (data) {
       var vm = this
+      vm.thongTinNguoiNopHoSo.delegateDistrictCode = ''
+      vm.thongTinNguoiNopHoSo.delegateWardCode = ''
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,
@@ -765,6 +774,7 @@ export default {
     },
     onChangeDelegateDistrict (data) {
       var vm = this
+      vm.thongTinNguoiNopHoSo.delegateWardCode = ''
       let filter = {
         collectionCode: 'ADMINISTRATIVE_REGION',
         level: 1,

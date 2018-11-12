@@ -247,18 +247,20 @@
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
         if ((!vm.dossierDetail.originality || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
-          let submissionNote = vm.dossierDetail.submissionNote
-          let resultTemp = submissionNote.data
-          for (var i = 0; i < resultTemp.length; i++) {
-            if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-              if (!Array.isArray(resultTemp[i]['actions'])) {
-                let arrActionsTemp = []
-                arrActionsTemp.push(resultTemp[i]['actions'])
-                resultTemp[i]['actions'] = arrActionsTemp
+          let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
+          let resultTemp = submissionNote ? submissionNote.data : ''
+          if (resultTemp) {
+            for (var i = 0; i < resultTemp.length; i++) {
+              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                if (!Array.isArray(resultTemp[i]['actions'])) {
+                  let arrActionsTemp = []
+                  arrActionsTemp.push(resultTemp[i]['actions'])
+                  resultTemp[i]['actions'] = arrActionsTemp
+                }
               }
             }
+            vm.dossierActions = resultTemp
           }
-          vm.dossierActions = resultTemp
         }
       })
     },
@@ -270,7 +272,6 @@
           dossierId: vm.dossierDetail.dossierId
         }
         if (vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') {
-          return
         } else {
           vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
             if (resultActions.data) {

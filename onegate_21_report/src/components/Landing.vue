@@ -93,7 +93,7 @@
                   append-icon="event"
                   @blur="toDate = parseDate(toDateFormatted)"
                 ></v-text-field>
-                <v-date-picker v-model="toDate" no-title @input="changeToDate"></v-date-picker>
+                <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
               </v-menu>
             </v-flex>
             <v-flex class="px-2 text-right">
@@ -145,6 +145,7 @@ export default {
     fromDateFormatted: null,
     toDate: null,
     menutoDate: false,
+    toDateMin: null,
     toDateFormatted: null,
     danhSachBaoCaos: [],
     years: [
@@ -327,6 +328,7 @@ export default {
       vm.doPrintReport()
     },
     fromDate (val) {
+      this.toDateMin = val
       this.fromDateFormatted = this.formatDate(this.fromDate)
     },
     toDate (val) {
@@ -346,12 +348,14 @@ export default {
       }
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
       }
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all') {
+          if (filter['agency'] === 'all' || filter['agency'] === undefined) {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
@@ -390,6 +394,8 @@ export default {
       }
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
@@ -397,7 +403,7 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all') {
+          if (filter['agency'] === 'all' || filter['agency'] === undefined) {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
