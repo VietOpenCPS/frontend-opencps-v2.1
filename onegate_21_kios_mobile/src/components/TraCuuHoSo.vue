@@ -1,100 +1,81 @@
 <template>
   <div class="py-0" >
-    <div>
-      <v-card class="pb-2">
-        <h4 class="pt-2 ml-2">
-          <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
-        </h4>
-        <v-layout wrap class="mt-2 px-0 py-0">
-          <v-flex xs12 sm5 class="px-2">
-            <v-text-field
-              label="Số hồ sơ"
-              v-model="dossierNoKey"
-              box
-              :rules="[v => !!v || 'Yêu cầu nhập số hồ sơ']"
-              required
-              clearable
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm5 class="px-2">
-            <v-text-field
-              label="Số CMND"
-              v-model="applicantIdNoKey"
-              box
-              clearable
-            ></v-text-field>
-          </v-flex>
-          <v-flex xs12 sm2 class="text-right">
-            <v-btn color="primary"
-              :loading="loadingTable"
-              :disabled="loadingTable"
-              @click="filterDossier"
-            >
-              <v-icon size="18">search</v-icon>
-              &nbsp;
-              Tra Cứu
-              <span slot="loader">Loading...</span>
-            </v-btn>
+    <v-card class="pb-2">
+      <h3 class="pt-2 ml-2">
+        <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
+      </h3>
+      <v-layout wrap class="mt-2 px-0 py-0">
+        <v-flex xs12 sm5 class="px-2">
+          <v-text-field
+            label="Số hồ sơ"
+            v-model="dossierNoKey"
+            box
+            clearable
+          ></v-text-field>
+        </v-flex>
+        <v-flex xs12 sm5 class="px-2">
+          <v-text-field
+            label="Số CMND"
+            v-model="applicantIdNoKey"
+            box
+            clearable
+          ></v-text-field>
+        </v-flex>
+        <v-flex xs12 sm2 class="text-right">
+          <v-btn color="primary"
+            :loading="loadingTable"
+            :disabled="loadingTable"
+            @click="filterDossier"
+          >
+            <v-icon size="18">search</v-icon>
+            &nbsp;
+            Tra Cứu
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-flex>
+      </v-layout>
+      <v-alert class="mt-2 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
+        Nhập thông tin tra cứu
+      </v-alert>
+      <!--  -->
+      <v-container fluid grid-list-sm class="px-2" v-if="validateTracuu === true && !activeDetailDossier">
+        <v-layout wrap>
+          <v-flex xs12 sm6 v-for="(item, index) in dossierList" :key="index" class="mb-2">
+            <v-card flat color="#e9e9ff" width="100%" height="100%">
+              <v-card-title primary-title>
+                <v-flex class="xs12 sm12 pb-1">
+                  <span class="pr-2 text-bold">Mã hồ sơ: </span>
+                  <span class="pl-0"> {{item.dossierNo}}</span>
+                </v-flex>
+                <v-flex class="xs12 sm12 pb-1">
+                  <span class="pr-2 text-bold">Người nộp: </span>
+                  <span class="pl-0"> {{item.applicantName}}</span>
+                </v-flex>
+                <v-flex class="xs12 sm12 pb-1">
+                  <span class="pr-2 text-bold">Ngày nộp: </span>
+                  <span class="pl-0"> {{item.receiveDate}}</span>
+                </v-flex>
+              </v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn small color="primary" @click="viewDetail(item)">
+                  <v-icon size="18">near_me</v-icon> &nbsp;
+                  Xem chi tiết
+                </v-btn>
+              </v-card-actions>
+            </v-card>
           </v-flex>
         </v-layout>
-        <v-alert class="mt-5 mx-2" v-if="validateTracuu === false && !activeDetailDossier" :value="true" outline color="orange" icon="priority_high">
-          Nhập thông tin tra cứu
-        </v-alert>
-        <!--  -->
-        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier">
-          <v-data-table
-          :headers="headersTable"
-          :items="dossierList"
-          hide-actions
-          class="table-landing table-bordered"
-          >
-            <template slot="items" slot-scope="props">
-              <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer" @click="viewDetail(props.item)">
-                <td class="text-xs-left">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.dossierNo}}</span><br>
-                  </div>
-                </td>
-                <td class="text-xs-left" >
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.applicantName}}</span>
-                  </div>
-                </td>
-                <td class="text-xs-left">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>
-                      <span>{{props.item.receiveDate}}</span>
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            </template>
-            <template slot="no-data">
-              <div class="text-xs-center mt-2">
-                Không có hồ sơ nào được tìm thấy
-              </div>
-            </template>
-          </v-data-table>
-          <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
-            <div class="flex pagging-table px-2">
-              <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
-                @tiny:change-page="paggingData" ></tiny-pagination> 
-            </div>
+        <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table">
+            <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
           </div>
         </div>
-        <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
-          <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
-        </div>
-      </v-card>
+      </v-container>
+      <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
+        <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
+      </div>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
           <v-card-title class="headline">Bạn không có quyền truy cập hồ sơ 
@@ -106,7 +87,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </div>
+    </v-card>
   </div>
 </template>
 
@@ -301,6 +282,7 @@ export default {
           vm.dossierList = result.data
           vm.dossierItemTotal = result.total
           vm.totalPages = Number(result.total)
+          console.log('totalPages', vm.totalPages)
         } else {
           vm.dossierList = []
           vm.dossierItemTotal = 0
@@ -319,6 +301,7 @@ export default {
       vm.$router.push({
         path: '/ma-truy-cap-ho-so',
         query: {
+          id: item.dossierId,
           target: 'chitiethoso'
         }
       })

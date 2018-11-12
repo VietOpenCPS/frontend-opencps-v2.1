@@ -5,7 +5,7 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="pr-2 pb-2">
+        <v-flex class="px-2 py-2">
           <span class="text-bold">{{dossierDetail.serviceName}}</span>
         </v-flex>
       </v-layout>
@@ -16,47 +16,11 @@
           dark
           slider-color="yellow"
         >
-          <!-- <v-tab key="1" ripple class="mx-2" @click="loadDossiertemplate"> Thành phần hồ sơ </v-tab> -->
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
-          <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
-                <!-- <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> I.</div>
-                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div v-for="(item, index) in tailieuNop" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> II.</div>
-                      Kết quả xử lý
-                    </div>
-                    <div v-for="(item, index) in tailieuKeyQua" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel> -->
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
                     <div class="xs12 sm12 pb-1">
@@ -119,7 +83,7 @@
                   >
                     <template slot="headerCell" slot-scope="props">
                       <v-tooltip bottom>
-                        <span slot="activator">
+                        <span slot="activator" class="text-bold">
                           {{ props.header.text }}
                         </span>
                         <span>
@@ -128,12 +92,12 @@
                       </v-tooltip>
                     </template>
                     <template slot="items" slot-scope="props">
-                      <td class="text-xs-center">{{props.index + 1}}</td>
-                      <td class="text-xs-left">{{props.item.sequenceRole}}</td>
-                      <td class="text-xs-left">{{props.item.sequenceName}}</td>
-                      <td class="text-xs-left">{{props.item.durationCount}} ngày</td>
-                      <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                      <td class="text-xs-left">
+                      <td class="text-xs-center px-2">{{props.index + 1}}</td>
+                      <td class="text-xs-left px-2">{{props.item.sequenceRole}}</td>
+                      <td class="text-xs-left px-2">{{props.item.sequenceName}}</td>
+                      <td class="text-xs-left px-2">{{props.item.durationCount}} ngày</td>
+                      <td class="text-xs-left px-2">{{props.item.startDate|dateTimeView}}</td>
+                      <td class="text-xs-left px-2">
                         <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
                           {{itemUser.userName}} <br>
                         </div>
@@ -169,9 +133,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
         <v-icon dark>arrow_back</v-icon>
-      </v-btn>
+      </v-btn> -->
     </div>
   </div>
 </template>
@@ -237,6 +201,7 @@
         var vm = this
         vm.$store.commit('setFullScreen', true)
         vm.dossierDetail = this.$store.getters.getDetailDossier
+        console.log('dossierDetail', vm.dossierDetail)
         if ((!vm.dossierDetail.originality || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote
           let resultTemp = submissionNote.data

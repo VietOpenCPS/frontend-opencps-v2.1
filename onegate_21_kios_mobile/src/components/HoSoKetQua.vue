@@ -6,44 +6,42 @@
       </content-placeholders>
       <v-card v-else>
         <div class="table-dossier" style="background-color: #ffffff">
-          <h4 class="py-3 ml-3">
+          <h3 class="py-3 ml-3">
             <span style="color:#065694">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ (NGÀY {{fromDate()}}) </span>
-          </h4>
-          <div class="mt-3"> 
-            <v-layout class="wrap">
-              <v-flex class="px-2 py-2 th" style="width: 25%"><span class="text-bold">Mã hồ sơ</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 35%"><span class="text-bold"> Chủ hồ sơ</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 20%"><span class="text-bold">Ngày nộp</span></v-flex>
-              <v-flex class="px-2 py-2 th" style="width: 20%"><span class="text-bold">Ngày có kết quả</span></v-flex>
+          </h3>
+          <v-container fluid grid-list-sm class="px-2">
+            <v-layout wrap>
+              <v-flex xs12 sm6 v-for="(item, index) in dossierList" :key="index" class="mb-2">
+                <v-card flat color="#e9e9ff" width="100%" height="100%">
+                  <v-card-title primary-title>
+                    <v-flex class="xs12 sm12 pb-1">
+                      <span class="pr-2 text-bold">Mã hồ sơ: </span>
+                      <span class="pl-0"> {{item.dossierNo}}</span>
+                    </v-flex>
+                    <v-flex class="xs12 sm12 pb-1">
+                      <span class="pr-2 text-bold">Chủ hồ sơ: </span>
+                      <span class="pl-0"> {{item.applicantName}}</span>
+                    </v-flex>
+                    <v-flex class="xs12 sm12 pb-1">
+                      <span class="pr-2 text-bold">Ngày nộp: </span>
+                      <span class="pl-0"> {{item.receiveDate}}</span>
+                    </v-flex>
+                    <v-flex class="xs12 sm12 pb-1">
+                      <span class="pr-2 text-bold">Ngày có kết quả: </span>
+                      <span class="pl-0"> {{item.releaseDate}}</span>
+                    </v-flex>
+                  </v-card-title>
+                </v-card>
+              </v-flex>
             </v-layout>
-          </div>
-          <div class="dossierList">
-            <marquee behavior="scroll" direction="up" v-if="dossierList.length > 5">
-              <div class="wrap-list">
-                <v-layout class="wrap" v-for="(item, index) in dossierList"
-                :key="item.dossierId" :class="index%2===1 ? 'active': ''">
-                  <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
-                  <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
-                </v-layout>
+            <!-- <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+              <div class="flex pagging-table">
+                <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
               </div>
-            </marquee>
-            <div class="wrap-list" v-else>
-              <v-layout class="wrap" v-for="(item, index) in dossierList"
-              :key="item.dossierId" :class="index%2===1 ? 'active': ''">
-                <v-flex class="px-2 py-2 td" style="width: 25%"><span>{{item.dossierNo}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 35%"><span> {{item.applicantName}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.receiveDate}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 20%"><span>{{item.releaseDate}}</span></v-flex>
-              </v-layout>
-            </div>
-          </div>
+            </div> -->
+          </v-container>
         </div>
-        <v-btn class="back-btn" @click="changeScreen" fab color="primary">
-          <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
-          <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
-        </v-btn>
       </v-card>
     </div>
   </div>

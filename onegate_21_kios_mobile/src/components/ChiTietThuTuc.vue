@@ -94,9 +94,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
         <v-icon dark>arrow_back</v-icon>
-      </v-btn>
+      </v-btn> -->
     </div>
   </div>
 </template>
