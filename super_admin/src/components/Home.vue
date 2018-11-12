@@ -1,74 +1,67 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      :clipped="$vuetify.breakpoint.lgAndUp"
-      v-model="drawer"
-      fixed
-      app
-      width="240"
-      dark
-    >
+    <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app width="240" dark>
       <div class="sidebar-background" style="background-image: url(&quot;/o/vue-admin/images/bg_menu.jpg&quot;);"></div>
       <v-list dense>
         <template v-for="item in items">
-          <v-layout
-            v-if="item.heading"
-            :key="item.heading"
-            row
-            align-center
-          >
-            <v-flex xs6>
-              <v-subheader v-if="item.heading">
-                {{ item.heading }}
-              </v-subheader>
-            </v-flex>
-            <v-flex xs6 class="text-xs-center">
-              <a href="#!" class="body-2 black--text">EDIT</a>
-            </v-flex>
-          </v-layout>
-          <v-list-group
-            v-else-if="item.hasOwnProperty('children')"
-            v-model="item.model"
-            :key="item.text"
-            :append-icon="item.model ? item.icon : item['icon-alt']"
-            prepend-icon="folder_open"
-            dark
-          >
-            <v-list-tile slot="activator">
+            <v-layout
+              v-if="item.heading"
+              :key="item.heading"
+              row
+              align-center
+            >
+              <v-flex xs6>
+                <v-subheader v-if="item.heading">
+                  {{ item.heading }}
+                </v-subheader>
+              </v-flex>
+              <v-flex xs6 class="text-xs-center">
+                <a href="#!" class="body-2 black--text">EDIT</a>
+              </v-flex>
+            </v-layout>
+            <v-list-group
+              v-else-if="item.hasOwnProperty('children')"
+              v-model="item.model"
+              :key="item.text"
+              :append-icon="item.model ? item.icon : item['icon-alt']"
+              prepend-icon="folder_open"
+              dark
+            >
+              <v-list-tile slot="activator">
+                <v-list-tile-content>
+                  <v-list-tile-title>
+                    {{ item.text }}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile
+                v-if="item.hasOwnProperty('children')"
+                v-for="(child, i) in item.children"
+                :key="i"
+                :class='{"list__active": tableName === child.code}'
+                :to="child.link + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1"
+              >
+                <v-list-tile-action v-if="child.icon">
+                  <v-icon>{{ child.icon }}</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>
+                    {{ child.text }}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list-group>
+            <v-list-tile v-else :key="item.text">
+              <v-list-tile-action>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
                   {{ item.text }}
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile
-              v-if="item.hasOwnProperty('children')"
-              v-for="(child, i) in item.children"
-              :key="i"
-              :class='{"list__active": tableName === child.code}'
-              :to="child.link + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1"
-            >
-              <v-list-tile-action v-if="child.icon">
-                <v-icon>{{ child.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  {{ child.text }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list-group>
-          <v-list-tile v-else :key="item.text">
-            <v-list-tile-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>
-                {{ item.text }}
-              </v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </template>
+</template>
       </v-list>
     </v-navigation-drawer>
     <v-toolbar
@@ -102,11 +95,14 @@
         </v-avatar>
         Cấu hình trang
       </v-btn>
-      <v-btn flat class="mr-2 my-0 ml-0">
+      <v-btn flat class="my-0 mx-0">
         <v-avatar size="32px" tile>
           <v-icon dark>account_circle</v-icon>
         </v-avatar>
           {{loginUser['email']}}
+      </v-btn>
+      <v-btn icon class="mr-2 my-0 ml-0" v-on:click.native="doLogOut()">
+        <v-icon>exit_to_app</v-icon>
       </v-btn>
     </v-toolbar>
     <v-container fluid>
@@ -172,10 +168,10 @@
       tableName: String
     },
     computed: {
-      items () {
+      items() {
         return this.$store.getters.getlistTableMenu
       },
-      loginUser () {
+      loginUser() {
         return this.$store.getters.getloginUser
       },
       snackbarerror: {
@@ -200,23 +196,23 @@
       }
     },
     methods: {
-      redirectFilter (val) {
+      redirectFilter(val) {
         this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       },
-      closeError () {
+      closeError() {
         this.$store.commit('setsnackbarerror', false)
       },
-      reloadPage () {
+      reloadPage() {
         window.location.reload(true)
       },
-      redirectControlPanel () {
+      redirectControlPanel() {
         let controlPanelURL = ''
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           controlPanelURL = window.themeDisplay.getLayoutRelativeControlPanelURL()
         }
         window.location.href = controlPanelURL + '?p_p_id=com_liferay_layout_admin_web_portlet_GroupPagesPortlet'
       },
-      getItemSearch () {
+      getItemSearch() {
         let vm = this
         if (vm.items.length === 2) {
           return vm.items[1].children
@@ -225,6 +221,9 @@
         } else {
           return []
         }
+      },
+      doLogOut() {
+        window.location.href = '/o/portal/logout'
       }
     }
   }

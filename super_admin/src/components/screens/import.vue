@@ -34,7 +34,7 @@
           <v-icon>refresh</v-icon>
         </v-btn>
       </v-toolbar>
-      <div style="overflow: hidden;overflow-x: scroll;">
+      <div style="overflow: hidden;overflow-x: auto;">
         <input
           type="file"
           ref="importData"
@@ -52,6 +52,14 @@
         >
           Gửi yêu cầu Import dữ liệu thành công.
         </v-alert>
+        <v-alert
+          :value="true"
+          v-if="importMessage"
+          color="success"
+          outline
+        >
+          {{responseXMLSuccess}}
+        </v-alert>
       </div>
     </v-card>
   </div>
@@ -64,6 +72,7 @@
     props: ['tableName'],
     data () {
       return {
+        responseXMLSuccess: '',
         importMessage: false,
         importLoading: false,
         showFilter: false,
@@ -101,6 +110,7 @@
           .then(function (response) {
             //handle success
             console.log(response)
+            vm.responseXMLSuccess = response.data
             vm.importLoading = false
             vm.importMessage = true
           })
