@@ -585,6 +585,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getProcessSequence ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/serviceprocesses/' + filter.processId + '/sequences', param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable.data)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     getProcessActionsDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -733,6 +753,51 @@ export const store = new Vuex.Store({
             }
           }
           axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        })
+      })
+    },
+    postProcessSequence ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostProcessSequence = new URLSearchParams()
+          dataPostProcessSequence.append('sequenceName', data.processSequence.sequenceName)
+          dataPostProcessSequence.append('sequenceNo', data.processSequence.sequenceNo)
+          dataPostProcessSequence.append('durationCount', data.processSequence.durationCount)
+          dataPostProcessSequence.append('sequenceRole', data.processSequence.sequenceRole)
+          axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/sequences', dataPostProcessSequence, options).then(function (response) {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+            // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        })
+      })
+    },
+    deleteProcessSequence ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/serviceprocesses/' + data.processId + '/sequences/' + data.processSequence.sequenceNo, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
           }).catch(function (error) {
@@ -915,7 +980,7 @@ export const store = new Vuex.Store({
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           } else {
-            axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions/' + data.actionCode, dataPostAction, options).then(function (response) {
+            axios.put(state.endPointApi + '/serviceprocesses/' + data.currentProcess + '/actions/' + data.processActionId, dataPostAction, options).then(function (response) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
               resolve(response.data)
             }).catch(function (error) {

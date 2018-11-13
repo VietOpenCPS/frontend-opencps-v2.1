@@ -100,7 +100,7 @@
                       </v-flex>
                     </v-layout>
                   </v-flex>
-                  <!--  -->
+                  <!-- Vai trò xử lý -->
                   <v-flex xs12 sm12>
                     <v-layout wrap>
                       <v-flex xs12 sm4 class="pl-0">
@@ -162,6 +162,74 @@
                             <td class="text-xs-left" width="25%">{{ props.item.condition }}</td>
                             <td class="text-xs-center px-0" width="10%">
                               <v-icon small color="red" @click="deleteProcessRoles(props.item, props.index)">
+                                delete
+                              </v-icon>
+                            </td>
+                          </template>
+                        </v-data-table>
+                      </v-flex>
+                      <!--  -->
+                    </v-layout>
+                  </v-flex>
+                  <!--  -->
+                  <v-flex xs12 sm12>
+                    <v-layout wrap>
+                      <v-flex xs12 sm3 class="pl-0">
+                        <v-text-field
+                          label="Tên tiến trình"
+                          v-model="sequenceName"
+                          box
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm3 class="pl-2">
+                        <v-text-field
+                          label="Thứ tự thực hiện"
+                          v-model="sequenceNo"
+                          box
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm2 class="pl-2">
+                        <v-text-field
+                          label="Vai trò thực hiện"
+                          v-model="sequenceRole"
+                          box
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm2 class="pl-2">
+                        <v-text-field
+                          label="Thời hạn"
+                          v-model="sequenceDurationCount"
+                          box
+                          type="Number"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm2 class="pl-2 text-xs-right">
+                        <v-btn color="blue darken-3" dark
+                          class="mr-0"
+                          @click="createItemSequence"
+                          :disabled="sequenceName&&sequenceRole&&sequenceNo&&sequenceDurationCount?false:true"
+                        >
+                          <v-icon size="24">add</v-icon>&nbsp;
+                          Thêm
+                        </v-btn>
+                      </v-flex>
+                      <!--  -->
+                      <v-flex xs12 sm12>
+                        <v-data-table
+                          v-if="processSequenceList.length>0"
+                          :headers="headerProcessSequence"
+                          :items="processSequenceList"
+                          hide-actions
+                          class="elevation-1 table-bordered"
+                          style="border: 1px solid #dedede"
+                        >
+                          <template slot="items" slot-scope="props">
+                            <td class="text-xs-left" width="30%">{{ props.item.sequenceName }}</td>
+                            <td class="text-xs-left" width="20%">{{ props.item.sequenceNo }}</td>
+                            <td class="text-xs-left" width="20%">{{ props.item.sequenceRole }}</td>
+                            <td class="text-xs-left" width="20%">{{ props.item.durationCount }}</td>
+                            <td class="text-xs-center px-0" width="10%">
+                              <v-icon small color="red" @click="deleteProcessSequence(props.item, props.index)">
                                 delete
                               </v-icon>
                             </td>
@@ -876,6 +944,10 @@
         processRoleId: '',
         processModerator: '',
         processCondition: '',
+        sequenceName: '',
+        sequenceNo: '',
+        sequenceRole: '',
+        sequenceDurationCount: '',
         stepRoleId: '',
         stepModerator: '',
         stepCondition: '',
@@ -888,6 +960,7 @@
         loading: false,
         active: null,
         processRoleList: [],
+        processSequenceList: [],
         stepRoleList: [],
         headerProcessRoles: [
           {
@@ -902,6 +975,33 @@
           },
           {
             text: 'Điều kiện',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false
+          }
+        ],
+        headerProcessSequence: [
+          {
+            text: 'Tên tiến trình',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thứ tự thực hiện',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Vai trò',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Hạn xử lý',
             align: 'center',
             sortable: false
           },
@@ -1156,6 +1256,7 @@
           vm.currentProcess = result
           vm.currentProcessName = result.processName
           vm.getProcessRoles()
+          vm.getProcessSequence()
         }).catch(reject => {
           console.log(reject)
         })
@@ -1309,6 +1410,17 @@
           console.log(reject)
         })
       },
+      getProcessSequence () {
+        var vm = this
+        let filter = {
+          processId: vm.id
+        }
+        vm.$store.dispatch('getProcessSequence', filter).then(function (result) {
+          vm.processSequenceList = result
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       //
       doDetailContent () {
         var vm = this
@@ -1381,6 +1493,11 @@
                   vm.createProcessRoles(result.serviceProcessId, vm.processRoleList[key])
                 }
               }
+              if (vm.processSequenceList.length > 0) {
+                for (let key in vm.processSequenceList) {
+                  vm.createProcessSequence(result.serviceProcessId, vm.processSequenceList[key])
+                }
+              }
               vm.$router.push({
                 path: currentPath.replace(0, result.serviceProcessId),
                 query: {
@@ -1424,6 +1541,33 @@
           console.log(reject)
         })
       },
+      createItemSequence () {
+        let vm = this
+        let itemAdd = {
+          sequenceName: vm.sequenceName,
+          sequenceNo: vm.sequenceNo,
+          durationCount: vm.sequenceDurationCount,
+          sequenceRole: vm.sequenceRole
+        }
+        if (Number(vm.id) > 0) {
+          vm.createProcessSequence(vm.id, itemAdd)
+        } else {
+          vm.processSequenceList.unshift(itemAdd)
+        }
+      },
+      createProcessSequence (processId, processSequence) {
+        var vm = this
+        let filter = {
+          processId: processId,
+          processSequence: processSequence
+        }
+        vm.$store.dispatch('postProcessSequence', filter).then(function (result) {
+          console.log(result)
+          vm.getProcessSequence()
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       deleteProcessRoles (processRoles, index) {
         var vm = this
         if (Number(vm.id) > 0) {
@@ -1442,6 +1586,26 @@
           }
         } else {
           vm.processRoleList.splice(index, 1)
+        }
+      },
+      deleteProcessSequence (processSequence, index) {
+        var vm = this
+        if (Number(vm.id) > 0) {
+          let x = confirm('Xác nhận xóa dữ liệu')
+          if (x) {
+            let filter = {
+              processId: vm.id,
+              processSequence: processSequence
+            }
+            vm.$store.dispatch('deleteProcessSequence', filter).then(function (result) {
+              console.log(result)
+              vm.getProcessSequence()
+            }).catch(reject => {
+              console.log(reject)
+            })
+          }
+        } else {
+          vm.processSequenceList.splice(index, 1)
         }
       },
       createStep () {
