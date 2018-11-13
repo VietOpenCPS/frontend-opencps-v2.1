@@ -21,6 +21,11 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
           {{item.label}}
         </v-btn>
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['fileform'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
+          {{item.label}}
+        </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
@@ -34,6 +39,8 @@
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
+          :chips="item['chips']"
+          :multiple="item['multiple']"
         ></v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
@@ -45,6 +52,8 @@
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
+          :chips="item['chips']"
+          :multiple="item['multiple']"
         ></v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
@@ -100,6 +109,8 @@
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
+            :chips="item['chips']"
+            :multiple="item['multiple']"
           ></v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
@@ -111,6 +122,8 @@
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
+            :chips="item['chips']"
+            :multiple="item['multiple']"
           ></v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
@@ -126,7 +139,7 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
-            box 
+            box
             clearable
           ></v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
@@ -194,8 +207,20 @@
         </v-card-title>
       </v-card>
       <v-card>
-        <v-card-title primary-title class="pb-0 pt-2">
+        <v-card-title primary-title class="pb-0 pt-2" v-if="pickItem['attached']">
           <attached-file-template v-if="rightAttached" :pk="id" :pick-item="pickItem" :code="tableName"></attached-file-template>
+        </v-card-title>
+        <v-card-title primary-title class="pb-0 pt-2" v-if="pickItem['fileform']">
+          <v-layout row wrap class="my-3">
+            <v-flex xs12 class="text-center title">
+              Tải file cấu hình mẫu FORM
+            </v-flex>
+            <attached-file-form v-if="rightAttached" :pk="id" :pick-item="pickItem" :code="tableName"></attached-file-form>
+            <v-flex xs12 class="text-center title mt-3">
+              Tải file cấu hình mẫu Jasper
+            </v-flex>
+            <attached-file-jasper v-if="rightAttached" :pk="id" :pick-item="pickItem" :code="tableName"></attached-file-jasper>
+          </v-layout>
         </v-card-title>
       </v-card>
     </v-navigation-drawer>
@@ -309,13 +334,17 @@
   import DatetimePicker from './DatetimePicker.vue'
   import AttachedFileTemplate from './AttachedFileTemplate.vue'
   import AttachedFileAvatar from './AttachedFileAvatar.vue'
+  import AttachedFileForm from './AttachedFileForm.vue'
+  import AttachedFileJasper from './AttachedFileJasper.vue'
 
   export default {
     props: ['tableConfig', 'detailData', 'id', 'tableName'],
     components: {
       DatetimePicker,
       AttachedFileTemplate,
-      AttachedFileAvatar
+      AttachedFileAvatar,
+      AttachedFileForm,
+      AttachedFileJasper
     },
     data() {
       return {
@@ -362,15 +391,15 @@
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
           if (vm.tableConfig['detailColumns'] !== '') {
             vm.detailForm = eval('( ' + vm.tableConfig['detailColumns'] + ' )')
-            vm.processDataSource()
           } else {
             let videoElement = document.getElementById('editor-video-preloader')
             if (videoElement !== null && videoElement !== undefined) {
               videoElement.play()
             }
           }
-          if (vm.detailData !== null && vm.detailData !== undefined) {
+          if (vm.detailData !== null && vm.detailData !== undefined && vm.tableConfig !== null && vm.tableConfig !== undefined) {
             vm.data = vm.detailData[0]
+            vm.processDataSource()
           } else {
             vm.data = {}
           }
@@ -418,7 +447,7 @@
           } else if (dataObj.respone === 'loginUser') {
             vm.$store.commit('setloginUser', dataObj['loginUser'])
           } 
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
             vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
             vm.processDataSource()
           }
@@ -526,6 +555,9 @@
         let vm = this
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
+            if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && vm.data[vm.detailForm[key]['model']] !== '') {
+              vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
+            }
             vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
             let apiURL = vm.detailForm[key]['datasource_api']
