@@ -34,6 +34,8 @@
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
+          :chips="item['chips']"
+          :multiple="item['multiple']"
         ></v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
@@ -45,6 +47,8 @@
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
+          :chips="item['chips']"
+          :multiple="item['multiple']"
         ></v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
@@ -100,6 +104,8 @@
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
+            :chips="item['chips']"
+            :multiple="item['multiple']"
           ></v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
@@ -111,6 +117,8 @@
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
+            :chips="item['chips']"
+            :multiple="item['multiple']"
           ></v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
@@ -126,7 +134,7 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
-            box 
+            box
             clearable
           ></v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
