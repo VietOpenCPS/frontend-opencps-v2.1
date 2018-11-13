@@ -68,7 +68,7 @@
                   <v-subheader class="pl-0 text-right">Trạng thái: </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{dossierDetail.dossierSubStatusText?dossierDetail.dossierSubStatusText:dossierDetail.dossierStatusText}}</p>
+                  <p class="pt-2 mb-0">{{getPaymentStatus(payments.paymentStatus)}}</p>
                 </v-flex>
                 <v-flex xs12 sm7></v-flex>
                 <v-layout wrap v-if="Number(payments.paymentStatus) >= 3">
@@ -266,6 +266,21 @@ export default {
     },
     tracuuhoadon () {
       window.open('http://tracuu.cmcsoft.com', '_blank')
+    },
+    getPaymentStatus (code) {
+      if (code === 1 || code === '1') {
+        return 'Yêu cầu nộp tiền tạm ứng '
+      } else if (code === 2 || code === '2') {
+        return 'Yêu cầu quyết toán phí'
+      } else if (code === 3 || code === '3') {
+        return 'Báo đã nộp phí trực tuyến'
+      } else if (code === 3 || code === '4') {
+        return 'Yêu cầu nộp lại phí trực tuyến'
+      } else if (code === 5 || code === '5') {
+        return 'Xác nhận hoàn thành thu phí'
+      } else {
+        return ''
+      }
     }
   }
 }

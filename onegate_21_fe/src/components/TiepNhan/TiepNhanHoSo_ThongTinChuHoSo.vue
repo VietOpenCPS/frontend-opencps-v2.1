@@ -59,7 +59,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Địa chỉ: </v-subheader>
+                    <v-subheader v-else class="pl-0">Địa chỉ <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm10>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -144,7 +144,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Số điện thoại: </v-subheader>
+                    <v-subheader v-else class="pl-0">Số điện thoại <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm2>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -162,7 +162,7 @@
                     <content-placeholders class="mt-1" v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
-                    <v-subheader v-else class="pl-0">Địa chỉ E-mail: </v-subheader>
+                    <v-subheader v-else class="pl-0">Địa chỉ E-mail <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm6>
                     <content-placeholders class="mt-1" v-if="loading">
@@ -806,8 +806,9 @@ export default {
       if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
         vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
       }
-      vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
-      console.log('vm.thongTinChuHoSo', vm.thongTinChuHoSo)
+      setTimeout(function () {
+        vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
+      }, 300)
     },
     onSearchItemSelected1 (item) {
       var vm = this
@@ -827,8 +828,9 @@ export default {
       if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
         vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
       }
-      vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
-      console.log('vm.thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+      setTimeout(function () {
+        vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
+      }, 300)
     },
     getThongTinChuHoSo () {
       return this.thongTinChuHoSo
