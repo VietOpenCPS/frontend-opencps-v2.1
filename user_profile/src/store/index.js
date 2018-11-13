@@ -71,7 +71,33 @@ export const store = new Vuex.Store({
             resolve(response.data)
           }, error => {
             reject(error)
+            commit('setsnackbarerror', true)
           })
+        })
+      })
+    },
+    changePass ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        let userId = 0
+        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+          userId = window.themeDisplay.getUserId()
+        }
+        var url = '/o/rest/v2/users/' + userId + '/changepass/application'
+        var dataPutUser = new URLSearchParams()
+        dataPutUser.append('oldPassword', filter.oldPassword)
+        dataPutUser.append('newPassword', filter.newPassword)
+        axios.post(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+          commit('setsnackbarerror', true)
         })
       })
     },
@@ -108,6 +134,7 @@ export const store = new Vuex.Store({
           resolve(result1)
         }).catch(xhr => {
           reject(xhr)
+          commit('setsnackbarerror', true)
         })
       })
     },
