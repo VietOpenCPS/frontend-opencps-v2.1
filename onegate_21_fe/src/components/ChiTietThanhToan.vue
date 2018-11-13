@@ -249,13 +249,19 @@ export default {
       window.open(url)
     },
     getEinvoiceNo (string) {
-      if (string) {
-        return string.split('#')[1]
+      if (string && string.indexOf('#') >= 0) {
+        let eInvoiceNo = string.split('#')[1] ? string.split('#')[1] : ''
+        return eInvoiceNo
+      } else {
+        return ''
       }
     },
     getEinvoiceCode (string) {
-      if (string) {
-        return string.split('#')[3].split(',')[0].replace('"', '')
+      if (string && string.indexOf('#') >= 0) {
+        let eInvoiceCode = string.split('#')[3] ? string.split('#')[3].split(',')[0].replace('"', '') : ''
+        return eInvoiceCode
+      } else {
+        return ''
       }
     },
     tracuuhoadon () {

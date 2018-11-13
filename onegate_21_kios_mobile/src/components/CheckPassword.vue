@@ -41,6 +41,8 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import toastr from 'toastr'
+Vue.use(toastr)
 export default {
   props: [],
   components: {},
@@ -94,11 +96,13 @@ export default {
                 path: '/thong-tin-ho-so/' + filter.dossierId
               })
             } else {
-              vm.dialogError = true
+              // vm.dialogError = true
+              toastr.error('Mã tra cứu không chính xác. Vui lòng thử lại.')
             }
           }).catch(function (reject) {
             vm.loading = false
-            vm.dialogError = true
+            // vm.dialogError = true
+            toastr.error('Lỗi hệ thống.')
             console.log('reject', reject)
           })
         }

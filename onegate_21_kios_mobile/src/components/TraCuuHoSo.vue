@@ -282,7 +282,7 @@ export default {
           vm.dossierList = result.data
           vm.dossierItemTotal = result.total
           vm.totalPages = Number(result.total)
-          console.log('totalPages', vm.totalPages)
+          // console.log('totalPages', vm.totalPages)
         } else {
           vm.dossierList = []
           vm.dossierItemTotal = 0
