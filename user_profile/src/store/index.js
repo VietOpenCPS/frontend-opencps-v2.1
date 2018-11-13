@@ -43,6 +43,7 @@ export const store = new Vuex.Store({
           if (window.themeDisplay !== undefined && window.themeDisplay !== null) {
             userId = window.themeDisplay.getUserId()
           }
+          // axios.get('http://127.0.0.1:8081/api/users/' + userId, param).then(function (response) {
           axios.get('/o/gate/v2/users/' + userId, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
@@ -55,7 +56,7 @@ export const store = new Vuex.Store({
     },
     loadDictItems ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -68,7 +69,7 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
           axios.get('/o/rest/v2/dictcollections/' + data.collectionCode + '/dictitems', param).then(function (response) {
             let serializable = response.data
-            resolve(response.data)
+            resolve(serializable)
           }, error => {
             reject(error)
             commit('setsnackbarerror', true)

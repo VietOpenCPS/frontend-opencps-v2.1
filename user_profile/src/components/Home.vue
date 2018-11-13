@@ -107,9 +107,30 @@
                 <v-text-field label="Điện thoại 💥" v-model="user['employeeTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
+                <!-- <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
                   <v-text-field slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['employeeBirthDate'])" label="Ngày sinh" v-model="user['employeeBirthDate']"></v-text-field>
                   <v-date-picker v-model="ngayCap" no-title></v-date-picker>
+                </v-menu> -->
+                <v-menu
+                  ref="menuBirthDate"
+                  :close-on-content-click="true"
+                  v-model="menuBirthDate"
+                  :nudge-right="40"
+                  lazy
+                  transition="fade-transition"
+                  offset-y
+                  full-width
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    slot="activator"
+                    box append-icon="event"
+                    v-model="user['employeeBirthDate']"
+                    label="Ngày sinh"
+                    @blur="ngayCap = parseDate(user['employeeBirthDate'])"
+                  ></v-text-field>
+                  <v-date-picker v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4>
@@ -124,11 +145,11 @@
 
               <v-flex xs12 sm6>
                 <p class="mb-2 px-1">File ảnh ký số</p>
-                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item"></attached-file-avatar>
+                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsign" :type="'image'"></attached-file-avatar>
               </v-flex>
               <v-flex xs12 sm6>
                 <p class="mb-2 px-1">File chứng thư gốc</p>
-                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item"></attached-file-avatar>
+                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsignCert" :type="'document'"></attached-file-avatar>
               </v-flex>
 
               <v-flex sm12 class="text-xs-right">
@@ -144,7 +165,7 @@
         <v-flex class="xs12 sm4 px-3">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
             <v-card-text class="pt-3" style="width: 300px;padding: 0;margin: 0 auto;">
-              <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item"></attached-file-avatar>
+              <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item" :type="'image'"></attached-file-avatar>
             </v-card-text>
             <v-card-text v-if="user['className'] === 'org.opencps.usermgt.model.Employee'">
               <div class="text-bold text-xs-center mb-2">{{user['employeeFullName']}}</div>
@@ -257,6 +278,18 @@
         'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
         'remove_api': '',
         'class_name': 'org.opencps.usermgt.model.ApplicantAvatar'
+      },
+      itemEsign: {
+        "model": "classPK",
+        'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsign',
+        'remove_api': '',
+        'class_name': 'org.opencps.usermgt.model.ApplicantEsign'
+      },
+      itemEsignCert: {
+        "model": "classPK",
+        'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsignCert',
+        'remove_api': '',
+        'class_name': 'org.opencps.usermgt.model.ApplicantEsignCert'
       }
     }),
     watch: {
@@ -326,6 +359,11 @@
         if (!date) return null
         const [day, month, year] = date.split('/')
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      },
+      changeBirthDate () {
+        let vm = this
+        vm.menuBirthDate = false
+        vm.user['employeeBirthDate'] = vm.formatDate(vm.ngayCap)
       },
       onChangeCity (data) {
         var vm = this
