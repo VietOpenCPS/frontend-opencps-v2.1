@@ -8,23 +8,67 @@
         <v-flex class="xs12 sm8">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
             <v-toolbar color="blue darken-3" dark height="48">
-              <v-btn dark flat v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
-                <v-icon>verified_user</v-icon> &nbsp; Thông tin cá nhân
+              <v-btn dark flat>
+                <v-icon>verified_user</v-icon> &nbsp; 
+                <span v-if="state === 0">
+                  Thông tin tài khoản
+                </span>
+                <span v-else>
+                  Đổi mật khẩu
+                </span>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn dark flat class="mr-2">
+              <v-btn dark flat class="mr-2" v-if="state === 0">
                 <v-icon>done</v-icon> &nbsp; Cập nhật thông tin
               </v-btn>
+              <v-btn dark flat class="mr-2" v-else>
+                <v-icon>done</v-icon> &nbsp; Xác nhận đổi mật khẩu
+              </v-btn>
             </v-toolbar>
-            <v-layout v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" row wrap class="px-3 py-3">
+            <v-layout v-if="state === 1" row justify-center wrap class="py-3">
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm6>
+                <v-alert
+                  :value="true"
+                  color="error"
+                  icon="warning"
+                  outline
+                  v-if="changePassWordFail"
+                >
+                  Mật khẩu cũ không chính xác.
+                </v-alert>
+              </v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Mật khẩu cũ 💥" type="password" v-model="oldPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Mật khẩu mới 💥" type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Nhập lại mật khẩu mới 💥" type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3></v-flex>
+              <v-flex xs12 sm6>
+                <v-btn block color="blue darken-3" dark :loading="loading" :disabled="loading" v-on:click.native="doChangePassWord" class="mx-0">
+                  <v-icon>done</v-icon>&nbsp; Xác nhận đổi mật khẩu
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Applicant'" row wrap class="px-3 py-3">
               <v-flex xs12 sm4>
-                <v-text-field label="Họ và tên 💥" v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+                <v-text-field label="Tên người dùng 💥" v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field label="Điện thoại" v-model="user['applicantContactTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
                 <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box></v-text-field>
@@ -54,7 +98,46 @@
                 </v-btn>
               </v-flex>
             </v-layout>
-  
+
+            <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Employee'" row wrap class="px-3 py-3">
+              <v-flex xs12 sm4>
+                <v-text-field label="Tên người dùng 💥" v-model="user['employeeFullName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field label="Điện thoại 💥" v-model="user['employeeTelNo']" box></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
+                  <v-text-field slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['employeeBirthDate'])" label="Ngày sinh" v-model="user['employeeBirthDate']"></v-text-field>
+                  <v-date-picker v-model="ngayCap" no-title></v-date-picker>
+                </v-menu>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field label="Contact code 💥" v-model="user['employeeNo']" box></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field label="Địa điểm ký số 💥" value="Hà Nội" box></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field label="Chức danh ký số 💥" v-model="user['title']" box></v-text-field>
+              </v-flex>
+
+              <v-flex xs12 sm6>
+                <p class="mb-2 px-1">File ảnh ký số</p>
+                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item"></attached-file-avatar>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <p class="mb-2 px-1">File chứng thư gốc</p>
+                <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item"></attached-file-avatar>
+              </v-flex>
+
+              <v-flex sm12 class="text-xs-right">
+                <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitUserProfile" class="mx-0" dark>
+                  <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
+                </v-btn>
+              </v-flex>
+            </v-layout>
+
           </v-card>
         </v-flex>
         <!-- content-right -->
@@ -65,15 +148,31 @@
             </v-card-text>
             <v-card-text v-if="user['className'] === 'org.opencps.usermgt.model.Employee'">
               <div class="text-bold text-xs-center mb-2">{{user['employeeFullName']}}</div>
-              <div>
-                <span>Ngày sinh:</span>&nbsp; <span class="text-bold">{{user['employeeBirthDate']}}</span>
+              <div class="text-xs-center label__user_profile pb-2">
+                <a href="javascript:;" style="
+                      text-decoration: none;
+                      border-bottom: 1px dashed;
+                    ">{{user['employeeEmail']}}</a>
               </div>
-              <div>
-                <span>Thư điện tử:</span>&nbsp; <span class="text-bold">{{user['employeeEmail']}}</span>
-              </div>
-              <div>
-                <span>Số điện thoại:</span>&nbsp; <span class="text-bold">{{user['employeeTelNo']}}</span>
-              </div>
+              <v-layout row wrap>
+                <v-flex xs12 sm4>
+                  <v-subheader class="pr-0">Ngày sinh: </v-subheader>
+                </v-flex>
+                <v-flex xs8>
+                  <v-subheader>{{user['employeeBirthDate']}}</v-subheader>
+                </v-flex>
+                <v-flex xs12 sm4>
+                  <v-subheader class="pr-0">Số điện thoại: </v-subheader>
+                </v-flex>
+                <v-flex xs8>
+                  <v-subheader>{{user['employeeTelNo']}}</v-subheader>
+                </v-flex>
+              </v-layout>
+              <v-layout row wrap>
+                <v-flex xs12 class="mx-3">
+                  <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
+                </v-flex>
+              </v-layout>
             </v-card-text>
             <v-card-text v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
               <div class="text-bold text-xs-center label__user_profile">{{user['applicantName']}}</div>
@@ -106,7 +205,7 @@
               </v-layout>
               <v-layout row wrap>
                 <v-flex xs12 class="mx-3">
-                  <v-btn block color="blue darken-3" dark>Đổi mật khẩu</v-btn>
+                  <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
                 </v-flex>
               </v-layout>
             </v-card-text>
@@ -117,6 +216,12 @@
     <v-snackbar v-model="snackbarerror" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="2000" :top="true" :vertical="false" color="red darken-3">
       Yêu cầu thực hiện thất bại
       <v-btn icon @click="closeError()">
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarsuccess" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="2000" :top="true" :vertical="false" color="success">
+      Yêu cầu thực hiện thành công
+      <v-btn icon @click="snackbarsuccess = !snackbarsuccess">
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
@@ -131,6 +236,13 @@
       AttachedFileAvatar
     },
     data: () => ({
+      changePassWordFail: false,
+      snackbarsuccess: false,
+      oldPassWord: '',
+      newPassWord: '',
+      newPassWordConfirm: '',
+      state: 0,
+      stateLabel: 'Đổi mật khẩu',
       valid: false,
       loading: false,
       user: {},
@@ -160,8 +272,8 @@
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            item['upload_api'] = '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
-            item['class_name'] = 'rg.opencps.usermgt.model.EmployeeAvatar'
+            vm.item['upload_api'] = '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
+            vm.item['class_name'] = 'rg.opencps.usermgt.model.EmployeeAvatar'
           }
           let filterCity = {
             collectionCode: 'ADMINISTRATIVE_REGION',
@@ -240,10 +352,44 @@
       },
       submitUserProfile () {
         let vm = this
-        vm.loading = true
-        vm.$store.dispatch('putUser', vm.user).then(function () {
-          vm.loading = false
-        })
+        if (vm.$refs.form.validate()) {
+          vm.loading = true
+          vm.$store.dispatch('putUser', vm.user).then(function () {
+            vm.loading = false
+          }).catch(function () {
+            vm.loading = false
+          })
+        }
+      },
+      showChangePass () {
+        let vm = this
+        if (vm.state === 0) {
+          vm.state = 1
+          vm.stateLabel = 'Thông tin tài khoản'
+        } else {
+          vm.state = 0
+          vm.stateLabel = 'Đổi mật khẩu'
+        }
+      },
+      doChangePassWord () {
+        let vm = this
+        if (vm.$refs.form.validate()) {
+          vm.loading = true
+          let data = {
+            oldPassword : vm.oldPassWord,
+            newPassword : vm.newPassWord
+          }
+          vm.changePassWordFail = false
+          vm.$store.dispatch('changePass', data).then(function (data) {
+            vm.loading = false
+            vm.snackbarsuccess = true
+            if (String(data) === 'false') {
+              vm.changePassWordFail = true
+            }
+          }).catch(function () {
+            vm.loading = false
+          })
+        }
       }
     }
   }
