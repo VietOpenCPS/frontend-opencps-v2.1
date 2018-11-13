@@ -81,7 +81,9 @@
                     </div>
                   </div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;">
+                <v-menu bottom right offset-y class="ml-2 my-2" style="display: inline-block;position:relative !important;"
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -91,6 +93,18 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                  @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Nộp hồ sơ
+                </v-btn>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                  @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Xem hướng dẫn
+                </v-btn>
               </v-card>
             </v-tab-item>
             <v-tab-item key="2" transition="fade-transition" reverse-transition="fade-transition">
@@ -98,7 +112,9 @@
                 <v-card-text>
                   <div v-html="serviceDetail.processText"></div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -108,6 +124,18 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                  @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Nộp hồ sơ
+                </v-btn>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                  @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Xem hướng dẫn
+                </v-btn>
               </v-card>
             </v-tab-item>
             <v-tab-item key="3" transition="fade-transition" reverse-transition="fade-transition">
@@ -125,7 +153,9 @@
                     </div>
                   </div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -135,6 +165,18 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                  @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Nộp hồ sơ
+                </v-btn>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                  @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Xem hướng dẫn
+                </v-btn>
               </v-card>
             </v-tab-item>
             <v-tab-item key="4" transition="fade-transition" reverse-transition="fade-transition">
@@ -142,7 +184,9 @@
                 <v-card-text>
                   <div v-html="serviceDetail.conditionText"></div>
                 </v-card-text>
-                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;">
+                <v-menu bottom right offset-y class="ml-2 mb-2" style="display: inline-block;position:relative !important;"
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
+                >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
@@ -152,6 +196,18 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
+                  @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Nộp hồ sơ
+                </v-btn>
+                <v-btn small color="primary" class="mx-2 my-2" 
+                  v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
+                  @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
+                >
+                  Xem hướng dẫn
+                </v-btn>
               </v-card>
             </v-tab-item>
           </v-tabs>
