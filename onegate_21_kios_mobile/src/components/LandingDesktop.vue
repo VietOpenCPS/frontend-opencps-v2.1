@@ -191,6 +191,7 @@
             vm.agencyLists = result
           }
           vm.dataReport2 = true
+          vm.doProcessReport2(vm.agencyLists)
         }).catch(function () {
           vm.doProcessReport2(support.fakeReport2)
         })
