@@ -1,7 +1,7 @@
 <template>
   <div class="py-0" >
-    <v-card class="pb-2">
-      <h3 class="pt-2 ml-2">
+    <v-card class="pb-2 pt-5">
+      <h3 class="py-2 ml-2">
         <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
       </h3>
       <v-layout wrap class="mt-2 px-0 py-0">
@@ -72,6 +72,9 @@
               @tiny:change-page="paggingData" ></tiny-pagination> 
           </div>
         </div>
+        <v-alert class="mt-2 mx-2" v-if="totalPages === 0" :value="true" outline color="orange" icon="priority_high">
+          Không có hồ sơ nào được tìm thấy
+        </v-alert>
       </v-container>
       <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
         <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>

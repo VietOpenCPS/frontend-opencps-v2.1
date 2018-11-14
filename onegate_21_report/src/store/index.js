@@ -72,7 +72,7 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: filter.month,
+              month: filter.month ? filter.month : 0,
               group: filter.group,
               reporting: false,
               agency: filter['agency']
