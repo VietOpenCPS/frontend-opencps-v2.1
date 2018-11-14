@@ -188,10 +188,11 @@
           let agencyLists = []
           if (result === null || result === undefined || result === 'undefined') {
           } else {
-            vm.agencyLists = result
+            agencyLists = result
           }
           vm.dataReport2 = true
-          vm.doProcessReport2(vm.agencyLists)
+          console.log(agencyLists)
+          vm.doProcessReport2(agencyLists)
         }).catch(function () {
           vm.doProcessReport2(support.fakeReport2)
         })
