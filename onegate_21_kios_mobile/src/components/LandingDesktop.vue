@@ -154,13 +154,7 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
-        /*
-        if (isMobile) {
-          $('.mWrapper > header').css('display', 'block !important')
-          $('.mWrapper > footer').css('display', 'block !important')
-        }
-        */
-        // vm.doStaticsReport1()
+        vm.doStaticsReport1()
       })
     },
     methods: {
