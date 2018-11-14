@@ -1,6 +1,6 @@
 <template>
   <v-card flat class="py-0">
-    <h3 class="pt-2 ml-2">
+    <h3 class="pt-5 ml-2">
       <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h3>
     <v-layout wrap class="mt-2">

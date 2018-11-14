@@ -4,7 +4,7 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
-      <v-layout class="wrap">
+      <v-layout class="wrap pt-5">
         <v-flex class="px-2 py-2">
           <span class="text-bold">{{dossierDetail.serviceName}}</span>
         </v-flex>

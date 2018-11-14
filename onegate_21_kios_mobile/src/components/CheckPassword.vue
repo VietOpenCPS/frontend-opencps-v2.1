@@ -1,5 +1,5 @@
 <template>
-  <v-flex xs12 sm6 class="mt-4 px-2 text-xs-center" style="margin:0 auto">
+  <v-flex xs12 sm6 class="px-2 text-xs-center" style="margin:70px auto">
     <div>
       <v-layout wrap>
         <v-flex xs12>

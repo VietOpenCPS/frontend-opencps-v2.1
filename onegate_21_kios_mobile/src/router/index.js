@@ -1,6 +1,7 @@
 import Vue from 'vue/dist/vue.min.js'
 import Router from 'vue-router'
 import Landing from '@/components/Landing'
+import LandingDesktop from '@/components/LandingDesktop'
 import TraCuuHoSo from '@/components/TraCuuHoSo'
 import ChiTietHoSo from '@/components/ChiTietHoSo'
 import TraCuuThuTuc from '@/components/TraCuuThuTuc'
@@ -12,7 +13,8 @@ import CheckPassword from '@/components/CheckPassword'
 import DangNhap from '@/components/DangNhap'
 
 const routes = [
-  { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
+  { path: '/', name: 'LandingDesktop', component: LandingDesktop, props: false },
+  { path: '/m', name: 'Landing', component: Landing, props: false },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
   { path: '/thong-tin-ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
   { path: '/tra-cuu-thu-tuc', name: 'TraCuuThuTuc', component: TraCuuThuTuc, props: false },

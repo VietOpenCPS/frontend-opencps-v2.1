@@ -871,3 +871,6 @@ body .e-upload .e-file-select-wrap .e-file-select {
         top: 0;
         padding: 0;
     }
+    body .v-autocomplete__content .v-input--selection-controls .v-input__slot {
+        margin-bottom: 0 !important;
+    }

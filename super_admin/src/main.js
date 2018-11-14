@@ -118,7 +118,7 @@ new Vue({
         if (window.location.href.endsWith('#/')) {
           vm.$router.push('/table/opencps_employee')
         }
-      }, 10)
+      }, 100)
     })
   }
 })
