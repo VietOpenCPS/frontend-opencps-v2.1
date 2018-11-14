@@ -47,6 +47,67 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    getAgencyReportLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+              year: filter.year,
+              month: filter.month,
+              group: filter.group,
+              reporting: false,
+              agency: filter['agency']
+            }
+          }
+          if (filter['report']) {
+            param.params['domain'] = 'total'
+          }
+          if (filter['report'] === 'linemonth') {
+            param.params['domain'] = ''
+          }
+          axios.get('/o/rest/statistics', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getAgencyReportListsHomePage ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get('o/rest/statistics?reporting=false&year=2018&domain=total&agency=total&month=0', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data[0]
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     goSignIn ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

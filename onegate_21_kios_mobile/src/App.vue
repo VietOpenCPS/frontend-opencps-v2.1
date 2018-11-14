@@ -1,41 +1,47 @@
 <template>
   <v-app>
-    <v-navigation-drawer app clipped floating width="310">
+    <v-navigation-drawer app clipped floating width="310" v-model="drawer">
+      <div class="text-center">
+        <v-btn-toggle v-model="toggle_exclusive" mandatory class="mt-2" style="width: 100%">
+          <v-btn flat style="width: 50%" to="/m">
+            Mobile
+          </v-btn>
+          <v-btn flat style="width: 50%" to="/">
+            Desktop
+          </v-btn>
+        </v-btn-toggle>
+      </div>
+      <div class="mx-3 mt-3"><v-btn to="/" block color="primary" dark>Trang chủ</v-btn></div>
       <div class="tab-item">
         <div class="left">
-          <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
-            <p class="icon px-2"><img class="mt-4" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-document.png"></p>
+          <a href="javascript:;" @click="goPage('dangnhap')">
+            <p class="icon pl-1 pr-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-sign.png"></p>
             <p class="ml-2 my-0">
-              <span class="text-bold">Kết quả hồ sơ</span><br>
-              <span>Tra cứu kết quả hồ sơ</span>
+              <span class="text-bold">Đăng nhập</span>
+            </p>
+          </a>
+          <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
+            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-document.png"></p>
+            <p class="ml-2 my-0">
+              <span class="text-bold">Kết quả hồ sơ</span>
             </p>
           </a>
           <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-            <p class="icon px-2"><img class="mt-4" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-search-50.png"></p>
+            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-search-50.png"></p>
             <p class="ml-2 my-0">
-              <span class="text-bold">Tra cứu hồ sơ</span><br>
-              <span>Tra cứu thông tin hồ sơ</span>
+              <span class="text-bold">Tra cứu hồ sơ</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('tracuuthutuc')">
-            <p class="icon px-2"><img class="mt-4" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-search-dc-50.png"></p>
+            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-search-dc-50.png"></p>
             <p class="ml-2 my-0">
-              <span class="text-bold">Tra cứu thủ tục</span><br>
-              <span>Tra cứu thông tin thủ tục</span>
+              <span class="text-bold">Tra cứu thủ tục</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('danhgia')">
-            <p class="icon pl-1 pr-2"><img class="mt-4" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-evaluation.png"></p>
+            <p class="icon pl-1 pr-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-evaluation.png"></p>
             <p class="ml-2 my-0">
-              <span class="text-bold">Đánh giá</span><br>
-              <span>Đánh giá chất lượng dịch vụ</span>
-            </p>
-          </a>
-          <a href="javascript:;" @click="goPage('dangnhap')">
-            <p class="icon pl-1 pr-2"><img class="mt-4" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-sign.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Đăng nhập</span><br>
-              <span>Đăng nhập hệ thống</span>
+              <span class="text-bold">Đánh giá</span>
             </p>
           </a>
         </div>
@@ -44,6 +50,21 @@
     <v-content>
       <router-view></router-view>
     </v-content>
+    <v-fab-transition>
+    <v-btn
+      v-show="!hidden"
+      color="pink"
+      fab
+      dark
+      small
+      fixed
+      top
+      right
+      v-on:click.native="drawer = !drawer"
+    >
+      <v-icon>menu</v-icon>
+    </v-btn>
+  </v-fab-transition>
   </v-app>
 </template>
 
@@ -52,6 +73,9 @@
   import $ from 'jquery'
   export default {
     data: () => ({
+      drawer: false,
+      hidden: false,
+      toggle_exclusive: 0,
       workingUnitList: [],
       currentIndex: 0,
       loading: true
