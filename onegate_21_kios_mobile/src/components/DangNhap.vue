@@ -1,5 +1,5 @@
 <template>
-  <v-card flat class="pb-3">
+  <v-card flat class="pb-3 login_mobile">
     <v-form ref="form" v-model="valid" lazy-validation class="px-3" style="max-width:500px;margin:0 auto">
       <v-layout wrap class="text-xs-center" style="max-width:500px;">
         <v-flex xs12 class="my-4 text-xs-center">

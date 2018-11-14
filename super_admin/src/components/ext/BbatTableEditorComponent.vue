@@ -558,7 +558,9 @@
         let vm = this
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
-            if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && vm.data[vm.detailForm[key]['model']] !== '') {
+            console.log('vm.data[vm.detailForm[key]', vm.data[vm.detailForm[key]['model']])
+            console.log('vm.data[vm.detailForm[startsWith]', vm.data[vm.detailForm[key]['model']].startsWith("["))
+            if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && vm.data[vm.detailForm[key]['model']].startsWith("[")) {
               vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
             }
           }

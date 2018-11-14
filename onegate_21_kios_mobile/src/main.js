@@ -9,8 +9,13 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'babel-polyfill'
 import axios from 'axios'
+import VueApexCharts from 'vue-apexcharts'
+import { isMobile } from 'mobile-device-detect'
+import $ from 'jquery'
 
-axios.defaults.headers.common['Token'] = window.Liferay.authToken
+Vue.component('apexchart', VueApexCharts)
+
+axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)
@@ -20,5 +25,15 @@ new Vue({ // eslint-disable-line no-new
   el: '#app',
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  created () {
+    let vm = this
+    vm.$nextTick(function () {
+      if (isMobile) {
+        vm.$router.push('/m')
+        $('.mWrapper > header').css('display', 'block !important')
+        $('.mWrapper > footer').css('display', 'block !important')
+      }
+    })
+  }
 })
