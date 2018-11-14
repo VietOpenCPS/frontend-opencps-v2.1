@@ -17,7 +17,7 @@
           slider-color="yellow"
         >
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
-          <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
+          <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
@@ -202,7 +202,7 @@
         vm.$store.commit('setFullScreen', true)
         vm.dossierDetail = this.$store.getters.getDetailDossier
         console.log('dossierDetail', vm.dossierDetail)
-        if ((vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+        if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
           if (resultTemp) {
