@@ -397,12 +397,13 @@
               videoElement.play()
             }
           }
-          if (vm.detailData !== null && vm.detailData !== undefined && vm.tableConfig !== null && vm.tableConfig !== undefined) {
+          if (vm.detailData !== null && vm.detailData !== undefined) {
             vm.data = vm.detailData[0]
-            vm.processDataSource()
+            vm.processDataSourceVerify()
           } else {
             vm.data = {}
           }
+          vm.processDataSource()
         } else {
           vm.$socket.sendObj(
             {
@@ -441,14 +442,16 @@
               } else {
                 vm.data = vm.dataSocket[dataObj.respone][0]
               }
+              vm.processDataSourceVerify()
             } else {
               vm.data = {}
             }
           } else if (dataObj.respone === 'loginUser') {
             vm.$store.commit('setloginUser', dataObj['loginUser'])
           } 
-          if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+          if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
             vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+            console.log('load tableConfig')
             vm.processDataSource()
           }
           vm.loading = false
@@ -551,13 +554,20 @@
           )
         }
       },
-      processDataSource () {
+      processDataSourceVerify () {
         let vm = this
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && vm.data[vm.detailForm[key]['model']] !== '') {
               vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
             }
+          }
+        }
+      },
+      processDataSource () {
+        let vm = this
+        for (let key in vm.detailForm) {
+          if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
             let apiURL = vm.detailForm[key]['datasource_api']
