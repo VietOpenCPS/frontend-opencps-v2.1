@@ -3,8 +3,8 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <h3 class="pt-2 ml-2" v-if="!detailActive">
-      <span style="color:#065694">CHỌN ĐƠN VỊ ĐỂ ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ </span>
+    <h3 class="pt-5 ml-2" v-if="!detailActive">
+      <span style="color:#065694">CHỌN ĐƠN VỊ ĐỂ ĐÁNH GIÁ </span>
     </h3>
     <div class="text-xs-center" v-if="detailActive">
       <h3 class="py-2" style="color:#065694">ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ</h3>

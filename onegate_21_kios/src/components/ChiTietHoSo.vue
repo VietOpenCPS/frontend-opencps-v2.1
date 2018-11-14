@@ -32,7 +32,7 @@
         >
           <!-- <v-tab key="1" ripple class="mx-2" @click="loadDossiertemplate"> Thành phần hồ sơ </v-tab> -->
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
-          <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
+          <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
           <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
@@ -246,7 +246,7 @@
       vm.$nextTick(function () {
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
-        if ((vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+        if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
           let resultTemp = submissionNote ? submissionNote.data : ''
           if (resultTemp) {
