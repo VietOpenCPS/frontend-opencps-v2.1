@@ -1657,15 +1657,7 @@ header span {
 .tab-item .left a:nth-child(5):hover {
 	background-color: #da8851;
 }
-.mWrapper > header {
-    display: none !important;
-}
-.mWrapper > nav {
-    display: none !important;
-}
-.mWrapper > footer {
-    display: none !important;
-}
+
 .mWrapper > section {
     padding: 0 !important
 }
