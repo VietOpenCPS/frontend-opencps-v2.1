@@ -255,7 +255,7 @@ export default {
       let url = '/o/rest/v2/dossiers/' + vm.dossierDetail.dossierId + '/payments/' + vm.dossierDetail.referenceUid + '/confirmfile'
       window.open(url)
     },
-    printPay (dossierItem, item) {
+    printPay () {
       let vm = this
       vm.activePrintPay = true
       let filter = {

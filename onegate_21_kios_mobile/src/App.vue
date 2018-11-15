@@ -82,14 +82,6 @@
       currentIndex: 0,
       loading: true
     }),
-    created () {
-      var vm = this
-      vm.$nextTick(function () {
-        let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-      })
-    },
     computed: {
       fullScreen () {
         return this.$store.getters.getFullScreen

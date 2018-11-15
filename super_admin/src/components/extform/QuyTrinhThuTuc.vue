@@ -709,8 +709,6 @@
                       item-value="stepCode"
                       :hide-selected="true"
                       clearable
-                      :rules="[rules.required]"
-                      required
                     ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
@@ -723,8 +721,6 @@
                       item-value="stepCode"
                       :hide-selected="true"
                       clearable
-                      :rules="[rules.required]"
-                      required
                     ></v-autocomplete>
                   </v-flex>
                   <!--  -->

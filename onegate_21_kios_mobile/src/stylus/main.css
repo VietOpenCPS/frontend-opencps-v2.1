@@ -1897,3 +1897,10 @@ body .login_mobile .v-text-field--box input, .v-text-field--outline input {
     height: 260px;
     min-height: 260px !important;
 }
+body {
+    min-width: unset !important;
+}
+.forgetten-password-input header a {
+    font-size: 10px;
+    text-transform: unset;
+}
