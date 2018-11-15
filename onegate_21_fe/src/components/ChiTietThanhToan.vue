@@ -266,7 +266,7 @@ export default {
       vm.dialogPDF = true
       vm.$store.dispatch('printPay', filter).then(function (result) {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        document.getElementById('dialogPreview').src = result
       })
     },
     getEinvoiceNo (string) {
