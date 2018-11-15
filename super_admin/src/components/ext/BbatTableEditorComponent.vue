@@ -170,7 +170,7 @@
           :disabled="loading"
         >Ghi lại</v-btn>
         <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
-          <v-icon>undo</v-icon> &nbsp;
+          <v-icon>reply</v-icon> &nbsp;
           Quay lại
         </v-btn>
       </v-flex>

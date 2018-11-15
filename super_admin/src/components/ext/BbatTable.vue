@@ -27,7 +27,7 @@
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn dark flat v-on:click.native="backToCode" v-if="depen">
-          <v-icon>undo</v-icon> &nbsp;
+          <v-icon>reply</v-icon> &nbsp;
           {{backTableName}}
         </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
@@ -77,6 +77,12 @@
             <v-icon>edit</v-icon>
           </v-list-tile-action>
           <v-list-tile-title>Sửa</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile v-if="tableName === 'opencps_serviceprocess'" v-on:click.native="toBieuDoQuyTrinh()">
+          <v-list-tile-action>
+            <v-icon>merge_type</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Biểu đồ quy trình</v-list-tile-title>
         </v-list-tile>
         <v-list-tile v-on:click.native="deleteRecord()">
           <v-list-tile-action>
@@ -442,50 +448,17 @@
           )
         }
       },
-      start() {
+      toBieuDoQuyTrinh() {
         let vm = this
-        vm.$socket.sendObj(
-          {
-            type: 'admin',
-            cmd: 'add',
-            code: vm.$router.history.current.params.tableName,
-            bundle_name: 'backend.admin.config.service',
-            model_name: 'org.opencps.adminconfig.model.AdminConfig',
-            service_util_name: 'org.opencps.adminconfig.service.AdminConfigLocalServiceUtil',
-            data: {
-              id: 102,
-              code: "abc",
-              name: "Danh sách màn hình quản trị",
-              bundleName: "backend.admin.config.service",
-              modelName: "org.opencps.adminconfig.model.AdminConfig",
-              serviceUtilName: "org.opencps.adminconfig.service.AdminConfigLocalServiceUtil",
-              headersName: `["id","Mã code","Tên","Tên gói backend"]`,
-              columns: `[
-                {
-                  "column": "id",
-                  "type": "number",
-                  "width": "0",
-                  "readOnly": true
-                },
-                {
-                  "column": "code",
-                  "type": "text",
-                  "width": "30%"
-                },
-                {
-                  "column": "name",
-                  "type": "text",
-                  "width": "30%"
-                },
-                {
-                  "column": "bundleName",
-                  "type": "text",
-                  "width": "40%"
-                }
-              ]`
-            }
-          }
-        )
+        let idEditor = 0
+        let tempTableData = vm.dataSocket['tableData']
+        idEditor = tempTableData[vm.currentIndex][0]
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        vm.$router.push({
+          path: '/table/' + vm.tableName + '/flowchart/' + idEditor,
+          query: newQuery
+        })
       }
     }
   }

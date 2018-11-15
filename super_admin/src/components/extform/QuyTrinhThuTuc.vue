@@ -31,7 +31,7 @@
         </v-btn> -->
         <v-icon dark>more_vert</v-icon>
         <v-btn dark icon v-on:click.native="backToList">
-          <v-icon>undo</v-icon>
+          <v-icon>reply</v-icon>
         </v-btn>
       </v-toolbar>
       <div class="grid-list">
