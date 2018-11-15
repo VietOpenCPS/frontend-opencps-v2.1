@@ -993,7 +993,7 @@ export default {
               break
             }
           }
-          console.log('btnDynamics', vm.btnDynamics)
+          // console.log('btnDynamics', vm.btnDynamics)
         }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)
@@ -1202,14 +1202,14 @@ export default {
     },
     doLoadingDataHoSo () {
       let vm = this
-      vm.selected = []
+      // vm.selected = []
       let currentQuery = router.history.current.query
-      console.log('currentQuery======', currentQuery)
+      // console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0) {
           querySet = currentQuery.q
-          console.log('querySet------', querySet)
+          // console.log('querySet------', querySet)
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
@@ -1295,10 +1295,10 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
-      console.log('++++++++++++++++++')
-      console.log('newQuery-------', newQuery)
-      console.log('current-------', current)
-      console.log('++++++++++++++++++')
+      // console.log('++++++++++++++++++')
+      // console.log('newQuery-------', newQuery)
+      // console.log('current-------', current)
+      // console.log('++++++++++++++++++')
       let queryString = '?'
       newQuery['service_config'] = ''
       newQuery['template_no'] = ''
@@ -1327,7 +1327,7 @@ export default {
       })
     },
     changeDomain (item) {
-      console.log('change Domain')
+      // console.log('change Domain')
       let vm = this
       vm.linhVucSelected = item
       if (item) {
@@ -1368,7 +1368,7 @@ export default {
         queryString += 'step=' + newQuery['step'] + '&'
       }
       queryString += 'domain=' + vm.domainCode
-      console.log('change Domain queryString', queryString)
+      // console.log('change Domain queryString', queryString)
       vm.$router.push({
         path: current.path + queryString,
         query: {
@@ -1378,7 +1378,7 @@ export default {
     },
     changeDossierNoKey () {
       var vm = this
-      console.log('run log ...')
+      // console.log('run log ...')
       setTimeout(function () {
         if (vm.dossierNoKey) {
           if (vm.dossierNoKey.length > 3 || vm.dossierNoKey === '') {
@@ -1417,7 +1417,7 @@ export default {
       vm.buttonConfigItem = item
       //
       vm.itemAction = item
-      console.log('itemAction++++++++++++', item)
+      // console.log('itemAction++++++++++++', item)
       vm.indexAction = index
       if (String(item.form) === 'NEW') {
         let isOpenDialog = true
@@ -1503,6 +1503,7 @@ export default {
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
+      console.log('vm.selected', vm.selected)
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
@@ -1586,7 +1587,7 @@ export default {
             // vm.processAction(actionDossierItem, item, result, key, false)
           }
         } else if (vm.selected.length > 1) {
-          console.log('run doActions Landing')
+          // console.log('run doActions Landing')
           vm.$store.dispatch('loadActionActive', item).then(function () {
             vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
               let dossiersSelect = vm.selected.map(select => {
@@ -1654,7 +1655,7 @@ export default {
           let filter = {
             dossierId: 0
           }
-          console.log(vm.selected)
+          // console.log(vm.selected)
           if (vm.selected.length > 0) {
             let deleteIds = []
             for (let key in vm.selected) {
@@ -1969,7 +1970,7 @@ export default {
     },
     keywordEventChange (data) {
       let vm = this
-      console.log('keywordEventChange', data)
+      // console.log('keywordEventChange', data)
       vm.advObjectSearch = {}
       for (let key in data) {
         if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
@@ -1981,7 +1982,7 @@ export default {
           if (data[key].startsWith('keyword:')) {
             vm.advObjectSearch['keyword'] = data[key].replace('keyword:', '')
           } else {
-            console.log('vm.advSearchItems', vm.advSearchItems)
+            // console.log('vm.advSearchItems', vm.advSearchItems)
             for (let keyTool in vm.advSearchItems) {
               if (data[key].startsWith(vm.advSearchItems[keyTool].spec + ':')) {
                 vm.advObjectSearch[vm.advSearchItems[keyTool].spec] = data[key].replace(vm.advSearchItems[keyTool].spec + ':', '')
@@ -1993,7 +1994,7 @@ export default {
           vm.advObjectSearch[data[key].spec] = newText.replace(data[key].spec + ':', '')
         }
       }
-      console.log('advObjectSearch', vm.advObjectSearch)
+      // console.log('advObjectSearch', vm.advObjectSearch)
       vm.advSearchItems = []
       for (let key in vm.advObjectSearch) {
         if (!vm.advObjectSearch.hasOwnProperty(key)) continue
@@ -2143,7 +2144,7 @@ export default {
     },
     changeAdvFilterDataChips (item) {
       let vm = this
-      console.log('changeAdvFilterDataChips', vm.advSearchItems)
+      // console.log('changeAdvFilterDataChips', vm.advSearchItems)
       let indexPush = -2
       for (let key in vm.advSearchTools) {
         if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {

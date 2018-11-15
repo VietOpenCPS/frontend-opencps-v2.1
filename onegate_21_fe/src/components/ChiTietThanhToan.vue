@@ -138,10 +138,14 @@
                   <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
                 </v-flex>
                 <v-flex xs12 sm2></v-flex>
-                <v-flex xs12 sm4 class="mb-3">
+                <v-flex xs12 sm12 class="mb-3">
                   <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 
                     Tra cứu hóa đơn
+                  </v-btn>
+                  <v-btn class="ml-3" color="primary" @click="printPay()">
+                    <v-icon>print</v-icon> &nbsp;
+                    In biên lai
                   </v-btn>
                 </v-flex>
               </v-layout>
@@ -152,7 +156,8 @@
     </v-card>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
-        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-card-title class="headline" v-if="!activePrintPay">File đính kèm</v-card-title>
+        <v-card-title class="headline" v-else>In biên lai thanh toán</v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
           <v-icon>clear</v-icon>
         </v-btn>
@@ -196,7 +201,8 @@ export default {
     loadingAction: false,
     paymentFile: '',
     dialogPDF: false,
-    dialogPDFLoading: true
+    dialogPDFLoading: true,
+    activePrintPay: false
   }),
   computed: {
     paymentFileName () {
@@ -230,6 +236,7 @@ export default {
     },
     viewFile () {
       let vm = this
+      vm.activePrintPay = false
       vm.dialogPDFLoading = true
       vm.dialogPDF = true
       let filter = {
@@ -247,6 +254,20 @@ export default {
       // let url = 'http://127.0.0.1:8081/api/dossiers/' + vm.dossierId + '/payment/confirmfile'
       let url = '/o/rest/v2/dossiers/' + vm.dossierDetail.dossierId + '/payments/' + vm.dossierDetail.referenceUid + '/confirmfile'
       window.open(url)
+    },
+    printPay () {
+      let vm = this
+      vm.activePrintPay = true
+      let filter = {
+        dossierId: vm.dossierDetail.dossierId,
+        referenceUid: vm.payments.referenceUid
+      }
+      vm.dialogPDFLoading = true
+      vm.dialogPDF = true
+      vm.$store.dispatch('printPay', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        document.getElementById('dialogPDFPreview').src = result
+      })
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {

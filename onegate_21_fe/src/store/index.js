@@ -2061,6 +2061,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    printPay ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/payments/' + filter.referenceUid + '/invoicefile/preview', param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            console.log(error)
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            reject(error)
+          })
+        })
+      })
+    },
     processPullBtnDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
