@@ -88,7 +88,7 @@
             </div>
             <div class="card__text pt-2 pb-0 pl-5 pr-4">
 
-              <apexchart type="line" height="525" :options="chartOptions" :series="seriesChart"></apexchart>
+              <apexchart type="line" :options="chartOptions" :series="seriesChart"></apexchart>
 
             </div>
           </div>  
@@ -100,8 +100,35 @@
             </div>
             <div class="card__text pt-2 pb-0 pl-5 pr-4">
 
-              <apexchart type="donut" :options="donutOptions" :series="donutChart" :responsive="responsive"></apexchart>
+              <apexchart type="donut" :options="donutOptions" :series="donutChart" :width="460" class="donutChartRight" style="overflow: hidden;height: 260px;"></apexchart>
               
+              <v-layout row wrap>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #A5D6A7;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang xử lý còn hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #EF9A9A;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang xử lý quá hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #78909C;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang bổ sung điều kiện</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #90CAF9;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết sớm hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #1565C0;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết đúng hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #C62828;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết quá hạn</span>
+                </v-flex>
+              </v-layout>
+
             </div>
           </div>    
         </div> 
@@ -158,17 +185,7 @@
       }],
       donutOptions: {
         labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn'],
-        responsive: [{
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 350
-            },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }]
+        colors: ['#A5D6A7', '#EF9A9A', '#78909C', '#90CAF9', '#1565C0', '#C62828']
       },
       donutChart: [0, 0, 0, 0, 0, 0]
     }),
