@@ -82,29 +82,10 @@
       currentIndex: 0,
       loading: true
     }),
-    created () {
-      var vm = this
-      vm.$nextTick(function () {
-        let vm = this
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        $('.mWrapper > header').css('display', 'none')
-        $('.mWrapper > nav').css('display', 'none')
-        $('.mWrapper > footer').css('display', 'none')
-      })
-    },
     computed: {
       fullScreen () {
         return this.$store.getters.getFullScreen
       }
-    },
-    mounted () {
-      var vm = this
-      vm.$nextTick(function () {
-        $('.mWrapper > header').css('display', 'none')
-        $('.mWrapper > nav').css('display', 'none')
-        $('.mWrapper > footer').css('display', 'none')
-      })
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
