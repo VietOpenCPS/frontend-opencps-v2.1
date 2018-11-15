@@ -1801,8 +1801,9 @@ header span {
 }
 .row-2 .step {
 	color: white;
-	margin-right: 70px;
-	font-weight: 500;
+	margin-right: 35px;
+    font-weight: 500;
+    min-width: 175px;
 }
 .row-2 .step:last-child {
 	margin-right: 0;

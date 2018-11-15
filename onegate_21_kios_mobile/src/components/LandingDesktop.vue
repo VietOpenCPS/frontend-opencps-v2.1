@@ -56,7 +56,7 @@
     </div>
   
     <div class="row-2">
-      <div class="container"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-1.png">
+      <div class="container" style="padding: 0;"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-1.png">
         <div class="align-middle">
           <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-2.png"> <span>Đăng ký<br> tài khoản</span> </a>
           <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-3.png"> <span>Đăng nhập và<br> khai báo hồ sơ</span> </a>
