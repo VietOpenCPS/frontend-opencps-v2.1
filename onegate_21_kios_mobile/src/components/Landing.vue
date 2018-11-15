@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row-1">
-      <div class="container align-space-between">
+      <div class="container">
         <div class="left">
           <div class="about">
             <p>Giới thiệu</p>
