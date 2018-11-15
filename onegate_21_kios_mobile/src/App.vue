@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app clipped floating width="310" v-model="drawer">
+    <v-navigation-drawer app clipped floating width="310" v-model="drawer" v-if="isMobile">
       <div class="text-center">
         <v-btn-toggle v-model="toggle_exclusive" mandatory class="mt-2" style="width: 100%">
           <v-btn flat style="width: 50%" to="/m">
@@ -52,6 +52,7 @@
     </v-content>
     <v-fab-transition>
     <v-btn
+      v-if="isMobile"
       v-show="!hidden"
       color="pink"
       fab
@@ -71,6 +72,7 @@
 <script>
   import router from '@/router'
   import $ from 'jquery'
+  import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
       drawer: false,

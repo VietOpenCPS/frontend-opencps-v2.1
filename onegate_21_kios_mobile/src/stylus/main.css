@@ -1883,3 +1883,20 @@ header span {
 body .login_mobile .v-text-field--box input, .v-text-field--outline input {
     margin-top: 15px;
 }
+.align-middle {
+    display: -webkit-box;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+}
+.row-2 .step {
+    color: white;
+    margin-right: 70px;
+    font-weight: 500;
+}
+.align-space-between {
+    display: -webkit-box;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
