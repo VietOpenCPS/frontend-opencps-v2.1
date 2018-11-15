@@ -1,41 +1,37 @@
 <template>
   <div>
-    <div class="row-1">
+    <div class="row-1" style="    padding-bottom: 50px;">
       <div class="container align-space-between">
         <div class="left">
-          <div class="about">
+          <div class="about" style="margin-bottom: 25px;">
             <p>Giới thiệu</p>
             <span>Hệ thống Dịch vụ công trực tuyến Tỉnh Phú Thọ<br>
-  là hệ thống giao dịch điện tử các thủ tục hành chính<br>
-  giữa Công dân, Doanh nghiệp và các Cơ quan nhà nước.</span></div>
+    là hệ thống giao dịch điện tử các thủ tục hành chính<br>
+    giữa Công dân, Doanh nghiệp và các Cơ quan nhà nước.</span></div>
   
           <div class="search">
             <div class="search-wrapper">
-              <v-text-field
-                v-model="keyword"
-                solo
-                placeholder="Nhập mã hồ sơ"
-                append-icon="search"
-                @click:append="() => ( 
-                  this.$router.push({
-                    path: '/tra-cuu-ho-so',
-                    query: {
-                      keyword: this.keyword
-                    }
-                  }) 
-                )"
-              ></v-text-field>
-              <v-btn v-on:click.native="goToNopHoSo" class="mx-0" block color="amber darken-2" dark style="color: #fff;">Ấn vào đây để nộp hồ sơ trực tuyến <v-icon style="
-                  position: absolute;
-                  right: 5px;
-                  font-size: 18px;
-              ">assignment</v-icon></v-btn>
+              <v-text-field v-model="keyword" solo placeholder="Nhập mã hồ sơ" append-icon="search" @click:append="() => ( 
+                    this.$router.push({
+                      path: '/tra-cuu-ho-so',
+                      query: {
+                        keyword: this.keyword
+                      }
+                    }) 
+                  )"></v-text-field>
+              <v-btn v-on:click.native="goToNopHoSo" class="mx-0" block color="amber darken-2" dark style="color: #fff;">Ấn vào đây để nộp hồ sơ trực tuyến
+                <v-icon style="
+                    position: absolute;
+                    right: 5px;
+                    font-size: 18px;
+                ">assignment</v-icon>
+              </v-btn>
             </div>
           </div>
   
         </div>
   
-        <div class="right">
+        <div class="right" style="width: 300px;">
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
@@ -58,31 +54,87 @@
         </div>
       </div>
     </div>
-
-    <div class="row-3">
-      <div class="sub-text px-2">Công dân, Doanh nghiệp khai thác Dịch vụ công trực tuyến tại Cổng Dịch vụ công trực tuyến hoặc khai thác trực tiếp tại Trung tâm Phục vụ Hành chính công</div>
-    </div>
   
-    <div style="clear: both;">
-      
-      <div class="container">
-        <div class="chart-progress" v-if="showReport1">
-          <apexchart type="line" height="525"
-            :options="chartOptions" 
-            :series="seriesChart" 
-          ></apexchart>
+    <div class="row-2">
+      <div class="container" style="padding: 0;"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-1.png">
+        <div class="align-middle">
+          <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-2.png"> <span>Đăng ký<br> tài khoản</span> </a>
+          <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-3.png"> <span>Đăng nhập và<br> khai báo hồ sơ</span> </a>
+          <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-4.png"> <span>Thanh toán<br> phí, lệ phí</span> </a>
+          <a class="step align-middle" href=""> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/img-home-5.png"> <span>Nhận kết quả</span> </a>
         </div>
-  
-        <div class="chart-result" v-if="showReport2">
-          <apexchart type="donut" 
-            :options="donutOptions"
-            :series="donutChart"
-            :responsive="responsive"
-          ></apexchart>
-        </div>
-        
       </div>
     </div>
+  
+    <div class="row-3">
+      <div class="sub-text px-2">Công dân, Doanh nghiệp khai thác Dịch vụ công trực tuyến tại Cổng Dịch vụ công trực tuyến hoặc khai thác trực tiếp tại Trung tâm Phục vụ Hành chính công</div>
+      <div class="container">
+      <div class="procedure align-middle align-space-between">
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd1#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-1.png"> <span>Xem hướng dẫn<br> thủ tục hành chính</span> </a></div>
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd2#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-2.png"> <span>Nộp hồ sơ và<br> thanh toán trực tuyến<br> tại Cổng Dịch vụ công</span> </a> <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd3#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-3.png"> <span>Nộp hồ sơ trực tiếp tại<br> Trung tâm Phục vụ<br> Hành chính công</span> </a></div>
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd4#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-4.png"> <span>Theo dõi tiến trình<br> thụ lý hồ sơ</span> </a></div>
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd5#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-5.png"> <span>Nhận kết quả trực tuyến</span> </a> <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd6#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-6.png"> <span>Nhận kết quả<br> tại nhà qua dịch vụ<br> chuyển phát nhanh</span> </a>      <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd7#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-7.png"> <span>Nhận kết quả<br> tại Trung tâm Phục vụ<br> Hành chính công</span> </a></div>
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd8#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-8.png"> <span>Đánh giá cán bộ</span> </a></div>
+      </div>
+    </div>
+    </div>
+
+    <div class="row-4"> 
+      <div class="container"> 
+        <div class="chart-progress" v-if="showReport1">
+          <div class="card" style="height: auto; border-radius: 0px;">
+            <div class="card__title headline">
+              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM 2018
+            </div>
+            <div class="card__text pt-2 pb-0 pl-5 pr-4">
+
+              <apexchart type="line" :options="chartOptions" :series="seriesChart"></apexchart>
+
+            </div>
+          </div>  
+        </div> 
+        <div class="chart-result" v-if="showReport2">
+          <div class="card" style="height: auto; border-radius: 0px;">
+            <div class="card__title headline">
+              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM 2018
+            </div>
+            <div class="card__text pt-2 pb-0 pl-5 pr-4">
+
+              <apexchart type="donut" :options="donutOptions" :series="donutChart" :width="460" class="donutChartRight" style="overflow: hidden;height: 260px;"></apexchart>
+              
+              <v-layout row wrap>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #A5D6A7;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang xử lý còn hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #EF9A9A;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang xử lý quá hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #78909C;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đang bổ sung điều kiện</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #90CAF9;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết sớm hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #1565C0;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết đúng hạn</span>
+                </v-flex>
+                <v-flex style="font-size: 11px;padding: 4px 0;">
+                  <span style="width: 15px;height: 15px;background: #C62828;border-radius: 50%;display: block;position: absolute;"></span>
+                  <span style="padding-left: 22px;">Đã giải quyết quá hạn</span>
+                </v-flex>
+              </v-layout>
+
+            </div>
+          </div>    
+        </div> 
+      </div> 
+    </div>
+
   </div>
 </template>
 
@@ -90,7 +142,7 @@
   import router from '@/router'
   import Vue from 'vue/dist/vue.min.js'
   import support from '../store/support.json'
-
+  
   export default {
     props: [],
     data: () => ({
@@ -119,10 +171,6 @@
             colors: ['#f3f3f3', 'transparent'],
             opacity: 0.5
           }
-        },
-        title: {
-          text: 'TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM ' + (new Date()).getFullYear(),
-          align: 'left'
         }
       },
       toolbar: {
@@ -137,23 +185,14 @@
       }],
       donutOptions: {
         labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn'],
-        responsive: [{
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 350
-            },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }]
+        colors: ['#A5D6A7', '#EF9A9A', '#78909C', '#90CAF9', '#1565C0', '#C62828']
       },
       donutChart: [0, 0, 0, 0, 0, 0]
     }),
     created () {
       let vm = this
       vm.$nextTick(function () {
+        console.log('build chart')
         vm.doStaticsReport1()
       })
     },
@@ -169,8 +208,7 @@
         vm.showReport1 = false
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
           let dataReport1 = []
-          if (result === null || result === undefined || result === 'undefined') {
-          } else {
+          if (result === null || result === undefined || result === 'undefined') {} else {
             dataReport1 = result
           }
           vm.doProcessReport1(dataReport1)
@@ -186,8 +224,7 @@
         vm.dataReport2 = false
         vm.$store.dispatch('getAgencyReportLists', filterPie).then(function (result) {
           let agencyLists = []
-          if (result === null || result === undefined || result === 'undefined') {
-          } else {
+          if (result === null || result === undefined || result === 'undefined') {} else {
             agencyLists = result
           }
           vm.dataReport2 = true
@@ -199,6 +236,14 @@
         vm.daTiepNhan = 0
         vm.daGiaiQuyet = 0
         vm.phanTram = 0
+        vm.$store.dispatch('getAgencyReportListsHomePage').then(function (result) {
+          if (result === null || result === undefined || result === 'undefined') {
+          } else {
+            vm.daTiepNhan = result['processCount']
+            vm.daGiaiQuyet = result['releaseCount']
+            vm.phanTram = result['ontimePercentage']
+          }
+        })
       },
       doProcessReport2 (data) {
         let vm = this
@@ -217,8 +262,7 @@
         let monthData = {}
         let lineDataMonth = {}
         for (let key in data) {
-          if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
-          } else {
+          if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {} else {
             if (data[key].month > 0) {
               labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
               if (vm.gov_agency_code === '' && data[key].govAgencyName !== '') {

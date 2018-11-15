@@ -170,7 +170,7 @@
           :disabled="loading"
         >Ghi lại</v-btn>
         <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
-          <v-icon>undo</v-icon> &nbsp;
+          <v-icon>reply</v-icon> &nbsp;
           Quay lại
         </v-btn>
       </v-flex>
@@ -558,9 +558,7 @@
         let vm = this
         for (let key in vm.detailForm) {
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
-            console.log('vm.data[vm.detailForm[key]', vm.data[vm.detailForm[key]['model']])
-            console.log('vm.data[vm.detailForm[startsWith]', vm.data[vm.detailForm[key]['model']].startsWith("["))
-            if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && vm.data[vm.detailForm[key]['model']].startsWith("[")) {
+            if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && String(vm.data[vm.detailForm[key]['model']]).startsWith("[")) {
               vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
             }
           }
@@ -645,7 +643,7 @@
       },
       showAccount (item) {
         let vm = this
-        if (item['mappingUserId'] === 0) {
+        if (vm.detailData[0]['mappingUserId'] === 0) {
           if (item['email'] === '') {
             alert('Cấp địa chỉ email trước khi tạo tài khoản.')
           } else {

@@ -132,6 +132,21 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    loadMermaidgraph ({commit, state}, id) {
+      let config = {
+        headers: {
+          groupId: state.initData.groupId
+        }
+      }
+      let url = '/o/rest/v2/serviceprocesses/' + id + '/mermaidgraph'
+      return new Promise((resolve, reject) => {
+        axios.get(url, config).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     doChangeStatusAccount ({commit, state}, postData) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -188,10 +203,15 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
             }
           }
-          axios.get('/o/rest/v2/employees/' + postData['id'] + '/account', postData['data'], param).then(function (response) {
+          var dataPostProcess = new URLSearchParams()
+          dataPostProcess.append('email', postData['data']['email'])
+          dataPostProcess.append('screenName', '')
+          dataPostProcess.append('exist', false)
+          axios.post('/o/rest/v2/employees/' + postData['id'] + '/account', dataPostProcess, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {

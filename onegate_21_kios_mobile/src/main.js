@@ -31,8 +31,13 @@ new Vue({ // eslint-disable-line no-new
     vm.$nextTick(function () {
       if (isMobile) {
         vm.$router.push('/m')
-        $('.mWrapper > header').css('display', 'block !important')
-        $('.mWrapper > footer').css('display', 'block !important')
+        $('.mWrapper > header').css('display', 'none')
+        $('.mWrapper > footer').css('display', 'none')
+        $('.mWrapper > nav').css('display', 'none')
+      } else {
+        $('.mWrapper > header').css('display', 'block')
+        $('.mWrapper > footer').css('display', 'block')
+        $('.mWrapper > nav').css('display', 'block')
       }
     })
   }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row-1">
-      <div class="container align-space-between">
+      <div class="container">
         <div class="left">
           <div class="about">
             <p>Giới thiệu</p>
@@ -198,6 +198,14 @@
         vm.daTiepNhan = 0
         vm.daGiaiQuyet = 0
         vm.phanTram = 0
+        vm.$store.dispatch('getAgencyReportListsHomePage').then(function (result) {
+          if (result === null || result === undefined || result === 'undefined') {
+          } else {
+            vm.daTiepNhan = result['processCount']
+            vm.daGiaiQuyet = result['releaseCount']
+            vm.phanTram = result['ontimePercentage']
+          }
+        })
       },
       doProcessReport2 (data) {
         let vm = this
