@@ -23,7 +23,7 @@
             slider-color="yellow"
           >
             <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
-            <v-tab key="2" ripple class="mx-2" @click="loadDossierActions"> Tiến trình thụ lý </v-tab>
+            <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
             <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
             <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
               <v-card >
@@ -146,7 +146,7 @@
                   <v-toolbar-side-icon slot="activator"></v-toolbar-side-icon>
                   <v-list>
                     <v-list-tile @click="detailInfo = true">Thông tin hồ sơ</v-list-tile>
-                    <v-list-tile @click="loadDossierActions">Tiến trình thụ lý</v-list-tile>
+                    <v-list-tile >Tiến trình thụ lý</v-list-tile>
                   </v-list>
                 </v-menu>
                 <v-toolbar-title class="mobile mx-2" v-if="detailInfo">THÔNG TIN HỒ SƠ</v-toolbar-title>
@@ -344,7 +344,7 @@
             if (resultDossier.status && resultDossier.status.toString() === '200') {
               vm.isPermission = true
               vm.dossierDetail = resultDossier.data
-              if ((vm.dossierDetail.originality === 0 || vm.dossierDetail.originality === '0') && vm.dossierDetail.submissionNote) {
+              if (vm.dossierDetail.submissionNote) {
                 let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
                 let resultTemp = submissionNote ? submissionNote.data : ''
                 if (resultTemp) {

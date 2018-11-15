@@ -4,10 +4,11 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <v-card v-else>
+      <v-card v-else class="pt-5">
         <div class="table-dossier" style="background-color: #ffffff">
-          <h3 class="py-3 ml-3">
-            <span style="color:#065694">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ (NGÀY {{fromDate()}}) </span>
+          <h3 class="py-3 text-xs-center">
+            <span style="color:#065694">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ</span><br>
+            <span style="color:#065694">NGÀY {{fromDate()}} </span>
           </h3>
           <v-container fluid grid-list-sm class="px-2">
             <v-layout wrap>
@@ -34,6 +35,9 @@
                 </v-card>
               </v-flex>
             </v-layout>
+            <v-alert class="mt-2 mx-2" v-if="dossierList.length === 0" :value="true" outline color="orange" icon="priority_high">
+              Không có hồ sơ có kết quả ngày {{fromDate()}}
+            </v-alert>
             <!-- <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
               <div class="flex pagging-table">
                 <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
