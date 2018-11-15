@@ -132,6 +132,21 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    loadMermaidgraph ({commit, state}, id) {
+      let config = {
+        headers: {
+          groupId: state.initData.groupId
+        }
+      }
+      let url = '/o/rest/v2/serviceprocesses/' + id + '/mermaidgraph'
+      return new Promise((resolve, reject) => {
+        axios.get(url, config).then(function (response) {
+          resolve(response.data)
+        }).catch(function (xhr) {
+          reject(xhr)
+        })
+      })
+    },
     doChangeStatusAccount ({commit, state}, postData) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

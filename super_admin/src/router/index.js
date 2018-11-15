@@ -49,6 +49,15 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/table/:tableName/flowchart/:id',
+        name: 'FlowChartView',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/FlowChartView.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },
