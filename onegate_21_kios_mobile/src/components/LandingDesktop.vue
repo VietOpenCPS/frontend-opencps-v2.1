@@ -175,6 +175,7 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
+        console.log('build chart')
         vm.doStaticsReport1()
       })
     },
