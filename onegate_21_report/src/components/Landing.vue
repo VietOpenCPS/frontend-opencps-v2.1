@@ -238,6 +238,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       vm.isDVC = vm.getReportCongDVC()
+      vm.year = ''
       vm.danhSachBaoCao = vm.loadingMenuConfigToDo
       let currentQuerys = vm.$router.history.current.query
       vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
@@ -272,6 +273,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       if (vm.isCallBack) {
+        vm.year = ''
         vm.isCallBack = false
         vm.danhSachBaoCao = vm.loadingMenuConfigToDo
         let currentParams = vm.$router.history.current.params
@@ -300,6 +302,7 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      vm.year = ''
       let currentQuery = newRoute.query
       vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
       if (currentQuery.hasOwnProperty('fromDate')) {
@@ -332,10 +335,11 @@ export default {
       vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
       let filter = {
         document: vm.documentTYPE,
-        year: vm.year,
-        // month: vm.month,
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
+      }
+      if (vm.documentTYPE === 'REPORT_01') {
+        filter['year'] = vm.year
       }
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
@@ -378,10 +382,11 @@ export default {
       vm.documentTYPE = vm.danhSachBaoCao[vm.index].document
       let filter = {
         document: vm.documentTYPE,
-        year: vm.year,
-        // month: vm.month,
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
+      }
+      if (vm.documentTYPE === 'REPORT_01') {
+        filter['year'] = vm.year
       }
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
