@@ -1514,7 +1514,7 @@
       createItemRole () {
         let vm = this
         let itemAdd = {
-          roleId: vm.processRoleId.jobPosId,
+          roleId: vm.processRoleId.roleId,
           roleName: vm.processRoleId.title,
           roleCode: vm.processRoleId.jobPosCode,
           moderator: vm.processModerator.value,
@@ -1667,7 +1667,7 @@
         let currentQuery = vm.$router.history.current.query
         let stepCode = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
         let itemAdd = {
-          roleId: vm.stepRoleId.jobPosId,
+          roleId: vm.stepRoleId.roleId,
           roleName: vm.stepRoleId.title,
           roleCode: vm.stepRoleId.jobPosCode,
           moderatorText: vm.stepModerator.text,
