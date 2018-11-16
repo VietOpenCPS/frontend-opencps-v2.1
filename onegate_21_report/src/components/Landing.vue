@@ -436,23 +436,32 @@ export default {
         if (vm.year) {
           vm.fromDateFormatted = ''
           vm.toDateFormatted = ''
+          router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              fromDate: '',
+              toDate: '',
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          let date = new Date()
+          router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              fromDate: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN'),
+              toDate: new Date().toLocaleDateString('vi-VN'),
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
         }
-        router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            // month: vm.month,
-            fromDate: '',
-            toDate: '',
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
       } else {
         router.push({
           path: '/bao-cao/' + vm.index,
           query: {
             year: vm.year,
-            // month: vm.month,
             fromDate: vm.fromDate,
             toDate: vm.toDate,
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1

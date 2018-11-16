@@ -728,6 +728,7 @@ export const store = new Vuex.Store({
           }
           dataPostProcessRoles.append('moderator', moderator)
           dataPostProcessRoles.append('roleName', data.processRoles.roleName)
+          dataPostProcessRoles.append('roleCode', data.processRoles.roleCode)
           dataPostProcessRoles.append('condition', data.processRoles.condition)
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles', dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -928,6 +929,7 @@ export const store = new Vuex.Store({
           }
           dataPostProcessRoles.append('roleId', data.stepRoles.roleId)
           dataPostProcessRoles.append('roleName', data.stepRoles.roleName)
+          dataPostProcessRoles.append('roleCode', data.stepRoles.roleCode)
           dataPostProcessRoles.append('moderator', moderator)
           dataPostProcessRoles.append('condition', data.stepRoles.condition)
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles', dataPostProcessRoles, options).then(function (response) {
