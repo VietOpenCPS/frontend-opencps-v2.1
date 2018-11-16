@@ -174,14 +174,14 @@
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-layout wrap>
-                      <v-flex xs12 sm3 class="pl-0">
+                      <v-flex xs12 sm4 class="pl-0">
                         <v-text-field
                           label="Tên tiến trình"
                           v-model="sequenceName"
                           box
                         ></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm3 class="pl-2">
+                      <v-flex xs12 sm2 class="pl-2">
                         <v-text-field
                           label="Thứ tự thực hiện"
                           v-model="sequenceNo"
@@ -345,7 +345,7 @@
                 <template slot="items" slot-scope="props">
                   <td class="text-xs-center" width="5%">
                     <div>
-                      <span>{{listStepPage * 10 - 10 + props.index + 1}}</span>
+                      <span>{{pageStep * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
                   <td class="text-xs-left" width="50%">{{ props.item.stepName }}</td>
@@ -618,7 +618,7 @@
                 <template slot="items" slot-scope="props">
                   <td class="text-xs-center" width="5%">
                     <div>
-                      <span>{{listActionPage * 10 - 10 + props.index + 1}}</span>
+                      <span>{{pageAction * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
@@ -1346,6 +1346,7 @@
           processId: id,
           page: currentQuery.page ? currentQuery.page : 1
         }
+        vm.pageStep = currentQuery.page ? Number(currentQuery.page) : 1
         vm.pageTotalStep = 0
         vm.$store.dispatch('getProcessStep', filter).then(function (result) {
           vm.stepList = result.data
@@ -1373,6 +1374,7 @@
           page: currentQuery.page ? currentQuery.page : 1
         }
         vm.pageTotalAction = 0
+        vm.pageAction = currentQuery.page ? Number(currentQuery.page) : 1
         vm.$store.dispatch('getProcessAction', filter).then(function (result) {
           vm.actionList = result.data
           vm.pageTotalAction = result.total
@@ -1514,6 +1516,7 @@
         let itemAdd = {
           roleId: vm.processRoleId.jobPosId,
           roleName: vm.processRoleId.title,
+          roleCode: vm.processRoleId.jobPosCode,
           moderator: vm.processModerator.value,
           moderatorText: vm.processModerator.text,
           condition: vm.processCondition
@@ -1666,6 +1669,7 @@
         let itemAdd = {
           roleId: vm.stepRoleId.jobPosId,
           roleName: vm.stepRoleId.title,
+          roleCode: vm.stepRoleId.jobPosCode,
           moderatorText: vm.stepModerator.text,
           moderator: vm.stepModerator.value,
           condition: vm.stepCondition
@@ -1808,7 +1812,7 @@
         } else if (tab === 'step') {
           if (Number(vm.id) > 0) {
             vm.$router.push({
-              path: currentPath + '?step=true&page=' + vm.listStepPage,
+              path: currentPath + '?step=true&page=1',
               query: {
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
@@ -1819,7 +1823,7 @@
           }
         } else {
           vm.$router.push({
-            path: currentPath + '?action=true&page=' + vm.listActionPage,
+            path: currentPath + '?action=true&page=1',
             query: {
               renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
             }
