@@ -225,9 +225,9 @@
                         >
                           <template slot="items" slot-scope="props">
                             <td class="text-xs-left" width="30%">{{ props.item.sequenceName }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceNo }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceRole }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.durationCount }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.sequenceNo }}</td>
+                            <td class="text-xs-left" width="30%">{{ props.item.sequenceRole }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.durationCount }}</td>
                             <td class="text-xs-center px-0" width="10%">
                               <v-icon small color="red" @click="deleteProcessSequence(props.item, props.index)">
                                 delete
@@ -1514,7 +1514,7 @@
       createItemRole () {
         let vm = this
         let itemAdd = {
-          roleId: vm.processRoleId.jobPosId,
+          roleId: vm.processRoleId.roleId,
           roleName: vm.processRoleId.title,
           roleCode: vm.processRoleId.jobPosCode,
           moderator: vm.processModerator.value,
@@ -1667,7 +1667,7 @@
         let currentQuery = vm.$router.history.current.query
         let stepCode = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
         let itemAdd = {
-          roleId: vm.stepRoleId.jobPosId,
+          roleId: vm.stepRoleId.roleId,
           roleName: vm.stepRoleId.title,
           roleCode: vm.stepRoleId.jobPosCode,
           moderatorText: vm.stepModerator.text,

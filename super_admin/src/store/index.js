@@ -597,6 +597,8 @@ export const store = new Vuex.Store({
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable.data)
+            } else {
+              resolve([])
             }
           }).catch(function (xhr) {
             reject(xhr)
@@ -617,6 +619,8 @@ export const store = new Vuex.Store({
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable.data)
+            } else {
+              resolve([])
             }
           }).catch(function (xhr) {
             reject(xhr)
@@ -902,6 +906,8 @@ export const store = new Vuex.Store({
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable.data)
+            } else {
+              resolve([])
             }
           }).catch(function (xhr) {
             reject(xhr)

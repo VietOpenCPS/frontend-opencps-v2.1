@@ -334,6 +334,16 @@ export default {
     },
     initDataResource () {
       return this.$store.getters.loadingInitData
+    },
+    dossierTemplateItemsFilter () {
+      let vm = this
+      let dossierTemplate = vm.dossierTemplateItems
+      if (dossierTemplate.length > 0) {
+        let filter = dossierTemplate.filter(function (item) {
+          return vm.partTypes.includes(item.partType) && vm.checkVisibleTemp(item, 0)
+        })
+        return filter
+      }
     }
   },
   mounted () {

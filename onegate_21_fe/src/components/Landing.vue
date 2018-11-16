@@ -632,7 +632,6 @@ export default {
     'template-rendering': TemplateRendering
   },
   data: () => ({
-    // test local
     isAdminSuper: false,
     dossierCountingShow: false,
     dossierCounting: [],
@@ -1202,7 +1201,7 @@ export default {
     },
     doLoadingDataHoSo () {
       let vm = this
-      // vm.selected = []
+      vm.selected = []
       let currentQuery = router.history.current.query
       // console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
