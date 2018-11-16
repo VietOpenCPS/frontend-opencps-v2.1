@@ -225,9 +225,9 @@
                         >
                           <template slot="items" slot-scope="props">
                             <td class="text-xs-left" width="30%">{{ props.item.sequenceName }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceNo }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceRole }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.durationCount }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.sequenceNo }}</td>
+                            <td class="text-xs-left" width="30%">{{ props.item.sequenceRole }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.durationCount }}</td>
                             <td class="text-xs-center px-0" width="10%">
                               <v-icon small color="red" @click="deleteProcessSequence(props.item, props.index)">
                                 delete
