@@ -41,6 +41,7 @@
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
+          clearable
         ></v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
@@ -54,6 +55,7 @@
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
+          clearable
         ></v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
@@ -111,6 +113,7 @@
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
             :multiple="item['multiple']"
+            clearable
           ></v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
@@ -124,13 +127,14 @@
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
             :multiple="item['multiple']"
+            clearable
           ></v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
-            box 
+            box
             clearable
           >
           </v-text-field>

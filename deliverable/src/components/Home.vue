@@ -5,6 +5,7 @@
         <v-list-tile
           v-for="item in items"
           :key="item.title"
+          @click="deliverableRouter(item)"
         >
           <v-list-tile-action>
             <v-icon>description</v-icon>
@@ -16,7 +17,7 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-container fluid>
+    <v-container fluid class="px-0">
       <router-view></router-view>
     </v-container>
     <v-snackbar
@@ -135,6 +136,9 @@
       },
       doLogOut() {
         window.location.href = '/o/portal/logout'
+      },
+      deliverableRouter (item) {
+        console.log(item)
       }
     }
   }
