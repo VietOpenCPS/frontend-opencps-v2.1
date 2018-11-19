@@ -335,6 +335,7 @@
           <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
             <v-checkbox
               v-model="props.selected"
+              @change="changeSelected"
               primary
               hide-details
               color="primary"
@@ -792,6 +793,7 @@ export default {
     hosoDatas: [],
     hosoDatasTotal: 0,
     hosoDatasPage: 1,
+    hosoTotalPage: 0,
     selected: [],
     listThuTucHanhChinh: [],
     listThuTuc: [],
@@ -1049,6 +1051,11 @@ export default {
           }
         }
       }
+      console.log('selected change', vm.selected)
+    },
+    changeSelected () {
+      let vm = this
+      console.log('selected change', vm.selected)
     },
     resend () {
       var vm = this
@@ -1256,9 +1263,14 @@ export default {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
+          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / 15)
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true
           }
+          // if (vm.hosoTotalPage > 0) {
+          //   for (let key in vm.hosoTotalPage) {
+          //   }
+          // }
         }).catch(reject => {
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
