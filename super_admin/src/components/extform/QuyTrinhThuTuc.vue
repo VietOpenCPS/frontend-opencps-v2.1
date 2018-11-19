@@ -348,7 +348,8 @@
                       <span>{{pageStep * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left" width="50%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="35%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="15%">{{ props.item.processStepId }}</td>
                   <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
                   <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -622,8 +623,9 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.preStepName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.postStepName }}</td>
+                  <td class="text-xs-left" width="10%">{{ props.item.processActionId }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.preStepName }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.postStepName }}</td>
                   <td class="text-xs-center px-0" width="15%">
                     <v-icon
                       small color="blue"
@@ -1041,6 +1043,11 @@
             sortable: false
           },
           {
+            text: 'Mã bước',
+            align: 'center',
+            sortable: false
+          },
+          {
             text: 'Trạng thái',
             align: 'center',
             sortable: false
@@ -1087,6 +1094,11 @@
           },
           {
             text: 'Tên thao tác',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Mã thao tác',
             align: 'center',
             sortable: false
           },
