@@ -1,7 +1,7 @@
 <template>
   <div> 
     <v-flex xs12 sm12 class="text-xs-center">
-      <span>Kéo thả các ô vuông để cho đúng thứ tự của từ</span> <br>
+      <span>Kéo thả các ô vuông đúng thứ tự của từ</span> <br>
       <v-chip label style="background-color: #81D4FA;" text-color="white">
         {{captcha}}
       </v-chip>

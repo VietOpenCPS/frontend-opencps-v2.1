@@ -344,6 +344,7 @@
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"
+              @change="changeSelected"
               primary
               hide-details
               color="primary"
@@ -794,6 +795,8 @@ export default {
     hosoDatasTotal: 0,
     hosoDatasPage: 1,
     hosoTotalPage: 0,
+    selectedDoAction: [],
+    selectMultiplePage: [],
     selected: [],
     listThuTucHanhChinh: [],
     listThuTuc: [],
@@ -855,6 +858,7 @@ export default {
   },
   created () {
     var vm = this
+    vm.selectMultiplePage = []
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
       if (query.hasOwnProperty('page') && query['page'] !== '1') {
@@ -944,7 +948,7 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
-      // console.log('currentQuery watch router', currentQuery)
+      let currentQueryOld = oldRoute.query
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -998,8 +1002,12 @@ export default {
         }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)
+          if (currentQuery.page === currentQueryOld['page']) {
+            vm.selectMultiplePage = []
+          }
         } else {
           vm.hosoDatasPage = 1
+          vm.selectMultiplePage = []
         }
         vm.$store.commit('setLoadingDynamicBtn', false)
         if (vm.listLinhVuc === null || vm.listLinhVuc === undefined || (vm.listLinhVuc !== null && vm.listLinhVuc !== undefined && vm.listLinhVuc.length === 0)) {
@@ -1024,6 +1032,21 @@ export default {
       setTimeout(function () {
         vm.doLoadingDataHoSo()
       }, 100)
+    },
+    selectMultiplePage: {
+      handler: function (val) {
+        let vm = this
+        if (val.length > 0) {
+          vm.selectedDoAction = []
+          for (let key in val) {
+            vm.selectedDoAction = vm.selectedDoAction.concat(val[key]['selected'])
+          }
+        } else {
+          vm.selectedDoAction = []
+        }
+        console.log('selectedDoAction', vm.selectedDoAction)
+      },
+      deep: true
     }
   },
   methods: {
@@ -1051,11 +1074,13 @@ export default {
           }
         }
       }
-      console.log('selected change', vm.selected)
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
+      console.log('selected toggle all', vm.selectMultiplePage)
     },
     changeSelected () {
       let vm = this
-      console.log('selected change', vm.selected)
+      vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
+      console.log('selected item', vm.selectMultiplePage)
     },
     resend () {
       var vm = this
@@ -1064,7 +1089,7 @@ export default {
     closeDialogStatusAction () {
       var vm = this
       vm.dialog_statusAction = false
-      vm.selected = vm.selected.filter(function (item) {
+      vm.selectedDoAction = vm.selectedDoAction.filter(function (item) {
         return !item.statusAction
       })
     },
@@ -1267,10 +1292,17 @@ export default {
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true
           }
-          // if (vm.hosoTotalPage > 0) {
-          //   for (let key in vm.hosoTotalPage) {
-          //   }
-          // }
+          if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
+            for (let key = 0; key < vm.hosoTotalPage; key++) {
+              let item = {
+                selected: [],
+                page: key + 1
+              }
+              vm.selectMultiplePage.push(item)
+            }
+            console.log('selectMultiplePage', vm.selectMultiplePage)
+          }
+          vm.selected = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
         }).catch(reject => {
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
@@ -1293,6 +1325,7 @@ export default {
     },
     changeServiceConfigs (item) {
       let vm = this
+      vm.selectMultiplePage = []
       if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
         this.listDichVu = item.options
       } else {
@@ -1340,6 +1373,7 @@ export default {
     changeDomain (item) {
       // console.log('change Domain')
       let vm = this
+      vm.selectMultiplePage = []
       vm.linhVucSelected = item
       if (item) {
         setTimeout(function () {
@@ -1389,6 +1423,7 @@ export default {
     },
     changeDossierNoKey () {
       var vm = this
+      vm.selectMultiplePage = []
       // console.log('run log ...')
       setTimeout(function () {
         if (vm.dossierNoKey) {
@@ -1406,6 +1441,7 @@ export default {
     },
     changeDichVuConfigs (item) {
       let vm = this
+      vm.selectMultiplePage = []
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1514,7 +1550,7 @@ export default {
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
-      console.log('vm.selected', vm.selected)
+      console.log('vm.selectedDoAction', vm.selectedDoAction)
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
@@ -1522,7 +1558,7 @@ export default {
           document: item.document,
           'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
           'govAgencyCode': vm.thuTucHanhChinhSelected.govAgencyCode,
-          dossiers: JSON.stringify(vm.selected)
+          dossiers: JSON.stringify(vm.selectedDoAction)
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
@@ -1585,9 +1621,9 @@ export default {
       }
       if (isGroup) {
         vm.countSelected = 0
-        if (vm.selected.length === 1) {
-          for (let key in vm.selected) {
-            let actionDossierItem = vm.selected[key]
+        if (vm.selectedDoAction.length === 1) {
+          for (let key in vm.selectedDoAction) {
+            let actionDossierItem = vm.selectedDoAction[key]
             router.push({
               path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
               query: {
@@ -1597,11 +1633,11 @@ export default {
             })
             // vm.processAction(actionDossierItem, item, result, key, false)
           }
-        } else if (vm.selected.length > 1) {
+        } else if (vm.selectedDoAction.length > 1) {
           // console.log('run doActions Landing')
           vm.$store.dispatch('loadActionActive', item).then(function () {
-            vm.$store.dispatch('loadDossierSelected', vm.selected).then(function () {
-              let dossiersSelect = vm.selected.map(select => {
+            vm.$store.dispatch('loadDossierSelected', vm.selectedDoAction).then(function () {
+              let dossiersSelect = vm.selectedDoAction.map(select => {
                 return select.dossierId
               }).join(',')
               let query = vm.$router.history.current.query
@@ -1667,10 +1703,10 @@ export default {
             dossierId: 0
           }
           // console.log(vm.selected)
-          if (vm.selected.length > 0) {
+          if (vm.selectedDoAction.length > 0) {
             let deleteIds = []
-            for (let key in vm.selected) {
-              deleteIds.push(vm.selected[key]['dossierId'])
+            for (let key in vm.selectedDoAction) {
+              deleteIds.push(vm.selectedDoAction[key]['dossierId'])
             }
             filter['dossierId'] = deleteIds
             vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
@@ -1810,11 +1846,11 @@ export default {
               if (String(item.form) === 'ACTIONS') {
                 // get dossier submit fail and show on dialog
                 vm.hosoDatas.splice(index, 1)
-                vm.selected[index].statusAction = true
+                vm.selectedDoAction[index].statusAction = true
                 vm.countSelected += 1
-                if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                if (vm.countSelected === vm.selectedDoAction.length && vm.statusFailed > 0 && vm.selectedDoAction.length > 1) {
                   vm.dialog_statusAction = true
-                } else if (vm.countSelected === vm.selected.length && vm.statusFailed === 0) {
+                } else if (vm.countSelected === vm.selectedDoAction.length && vm.statusFailed === 0) {
                   router.push({
                     path: vm.$router.history.current.path,
                     query: {
@@ -1840,8 +1876,8 @@ export default {
               if (String(item.form) === 'ACTIONS') {
                 vm.countSelected += 1
                 vm.statusFailed += 1
-                vm.selected[index].statusAction = false
-                if (vm.countSelected === vm.selected.length && vm.statusFailed > 0 && vm.selected.length > 1) {
+                vm.selectedDoAction[index].statusAction = false
+                if (vm.countSelected === vm.selectedDoAction.length && vm.statusFailed > 0 && vm.selectedDoAction.length > 1) {
                   vm.dialog_statusAction = true
                 }
               } else {}
@@ -1981,6 +2017,7 @@ export default {
     },
     keywordEventChange (data) {
       let vm = this
+      vm.selectMultiplePage = []
       // console.log('keywordEventChange', data)
       vm.advObjectSearch = {}
       for (let key in data) {
@@ -2127,6 +2164,7 @@ export default {
     },
     doRedirectFilter () {
       let vm = this
+      vm.selectMultiplePage = []
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
