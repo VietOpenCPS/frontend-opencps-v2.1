@@ -995,6 +995,7 @@ export const store = new Vuex.Store({
           dataPostAction.append('returnDossierFiles', data.returnDossierFiles ? data.returnDossierFiles.join() : '')
           dataPostAction.append('createDossierNo', data.createDossierNo ? data.createDossierNo : '')
           dataPostAction.append('eSignature', data.eSignature)
+          dataPostAction.append('signatureType', data.eSignature ? data.signatureType : '')
           dataPostAction.append('configNote', data.configNote)
           dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo ? data.dossierTemplateNo : '')
           dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')

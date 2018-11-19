@@ -868,9 +868,18 @@
                       <v-flex xs12 sm3 class="pr-2">
                         <v-switch label="Sinh mã số tiếp nhận" v-model="currentAction.createDossierNo"></v-switch>
                       </v-flex>
-                      <v-flex xs12 sm3 class="pl-2">
+                      <v-flex xs12 sm2 class="pl-2">
                         <v-switch label="Có ký số điện tử" v-model="currentAction.eSignature"></v-switch>
                       </v-flex>
+                      <v-select xs12 sm3 class="pl-2"
+                        v-if="currentAction.eSignature"
+                        box
+                        label="Hình thức xác nhận"
+                        :items="esignatureTypeList"
+                        v-model="currentAction.signatureType"
+                        item-text="text"
+                        item-value="value"
+                      ></v-select>
                     </v-layout>
                   </v-flex>
                 </v-layout>
@@ -1161,8 +1170,15 @@
           syncActionCode: '',
           configNote: '',
           createDossierNo: false,
-          eSignature: false
+          eSignature: false,
+          signatureType: 'digital'
         },
+        esignatureTypeList: [
+          { text: 'Sử dụng chữ kí số', value: 'digital' },
+          { text: 'Sử dụng captcha', value: 'captcha' },
+          { text: 'Nhập mật khẩu người dùng', value: 'password' },
+          { text: 'Nhập mã pin', value: 'pin' }          
+        ],
         validAddAction: false,
         //
         rules: {
@@ -1484,6 +1500,7 @@
             configNote: '',
             createDossierNo: false,
             eSignature: false,
+            signatureType: 'digital',
             createDossier: []
           }
           if (Number(currentQuery.actionCode) > 0) {
