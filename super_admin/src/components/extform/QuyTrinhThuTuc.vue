@@ -225,9 +225,9 @@
                         >
                           <template slot="items" slot-scope="props">
                             <td class="text-xs-left" width="30%">{{ props.item.sequenceName }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceNo }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.sequenceRole }}</td>
-                            <td class="text-xs-left" width="20%">{{ props.item.durationCount }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.sequenceNo }}</td>
+                            <td class="text-xs-left" width="30%">{{ props.item.sequenceRole }}</td>
+                            <td class="text-xs-left" width="15%">{{ props.item.durationCount }}</td>
                             <td class="text-xs-center px-0" width="10%">
                               <v-icon small color="red" @click="deleteProcessSequence(props.item, props.index)">
                                 delete
@@ -348,7 +348,8 @@
                       <span>{{pageStep * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left" width="50%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="35%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="15%">{{ props.item.processStepId }}</td>
                   <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
                   <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -622,8 +623,9 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.preStepName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.postStepName }}</td>
+                  <td class="text-xs-left" width="10%">{{ props.item.processActionId }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.preStepName }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.postStepName }}</td>
                   <td class="text-xs-center px-0" width="15%">
                     <v-icon
                       small color="blue"
@@ -1041,6 +1043,11 @@
             sortable: false
           },
           {
+            text: 'Mã bước',
+            align: 'center',
+            sortable: false
+          },
+          {
             text: 'Trạng thái',
             align: 'center',
             sortable: false
@@ -1087,6 +1094,11 @@
           },
           {
             text: 'Tên thao tác',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Mã thao tác',
             align: 'center',
             sortable: false
           },
@@ -1514,7 +1526,7 @@
       createItemRole () {
         let vm = this
         let itemAdd = {
-          roleId: vm.processRoleId.jobPosId,
+          roleId: vm.processRoleId.roleId,
           roleName: vm.processRoleId.title,
           roleCode: vm.processRoleId.jobPosCode,
           moderator: vm.processModerator.value,
@@ -1667,7 +1679,7 @@
         let currentQuery = vm.$router.history.current.query
         let stepCode = currentQuery.hasOwnProperty('stepCode') ? currentQuery.stepCode : 0
         let itemAdd = {
-          roleId: vm.stepRoleId.jobPosId,
+          roleId: vm.stepRoleId.roleId,
           roleName: vm.stepRoleId.title,
           roleCode: vm.stepRoleId.jobPosCode,
           moderatorText: vm.stepModerator.text,

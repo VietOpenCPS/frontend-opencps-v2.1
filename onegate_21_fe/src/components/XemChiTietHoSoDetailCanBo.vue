@@ -537,6 +537,7 @@ export default {
     showTaoTaiLieuKetQua: false,
     showKyPheDuyetTaiLieu: false,
     dataEsign: '',
+    typeEsign: 'captcha',
     showTraKetQua: false,
     showThuPhi: false,
     showPostalService: false,
@@ -1414,16 +1415,11 @@ export default {
       }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
-        // console.log('resultTmp', result)
-        if (resultTmp.useKS) {
+        if (resultTmp.required) {
           useKySo = true
-          // if (vm.kysoSuccess) {
-          //   validKySo = true
-          // } else {
-          //   validKySo = false
-          // }
         } else {
           useKySo = false
+          alert('Yêu cầu xác thực ký duyệt')
         }
       }
       if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
@@ -1482,44 +1478,46 @@ export default {
           }
         }
         vm.loadingActionProcess = true
-        if (useKySo) {
-          let filter = {
-            dossierId: vm.thongTinChiTietHoSo.dossierId,
-            actionId: vm.processActionCurrent
-          }
-          vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
-            var paymentsOut = ''
-            if (vm.showThuPhi) {
-              paymentsOut = {
-                requestPayment: vm.payments['requestPayment'],
-                paymentNote: vm.payments['paymentNote'],
-                advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-              }
-              resultAction['payment'] = paymentsOut
+        if (vm.showKyPheDuyetTaiLieu) {
+          if (useKySo) {
+            let filter = {
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              actionId: vm.processActionCurrent
             }
-            if (vm.showYkienCanBoThucHien) {
-              let result = vm.$refs.ykiencanbo.doExport()
-              let note = ''
-              if (result.valid) {
-                validYKien = true
-                note = result.text
-              } else {
-                validYKien = false
+            vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+              var paymentsOut = ''
+              if (vm.showThuPhi) {
+                paymentsOut = {
+                  requestPayment: vm.payments['requestPayment'],
+                  paymentNote: vm.payments['paymentNote'],
+                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
+                resultAction['payment'] = paymentsOut
               }
-              resultAction['userNote'] = note
-            }
-            vm.$refs.kypheduyettailieu.kySo(resultAction)
-            setTimeout(function () {
+              if (vm.showYkienCanBoThucHien) {
+                let result = vm.$refs.ykiencanbo.doExport()
+                let note = ''
+                if (result.valid) {
+                  validYKien = true
+                  note = result.text
+                } else {
+                  validYKien = false
+                }
+                resultAction['userNote'] = note
+              }
+              vm.$refs.kypheduyettailieu.kySo(resultAction)
+              setTimeout(function () {
+                vm.loadingAction = false
+                vm.loadingActionProcess = false
+              }, 200)
+            }).catch(function (reject) {
               vm.loadingAction = false
               vm.loadingActionProcess = false
-            }, 200)
-          }).catch(function (reject) {
-            vm.loadingAction = false
-            vm.loadingActionProcess = false
-          })
+            })
+          }
         } else {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             // console.log('result======', result)
