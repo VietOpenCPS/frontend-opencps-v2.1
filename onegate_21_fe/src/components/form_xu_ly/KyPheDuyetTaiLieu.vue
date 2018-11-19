@@ -9,55 +9,29 @@
         </div>
         <v-card >
           <v-card-text class='px-0 py-0'>
-            <!-- <v-tabs icons-and-text class='mb-4' v-model='tabActive'>
-              <v-tabs-slider color='primary'></v-tabs-slider>
-              <v-tab :key='1' href='#tabs-1' @click='changeActive'>
-                <v-btn flat class='px-0 py-0 mx-0 my-0'>Ký kết quả hồ sơ</v-btn>
-              </v-tab>
-              <v-tab :key='2' href='#tabs-3' @click='changeActive'>
-                <v-btn flat class='px-0 py-0 mx-0 my-0'>Không ký duyệt</v-btn>
-              </v-tab>
-              <v-tab :key='3' href='#tabs-4' @click='changeActive'>
-                <v-btn flat class='px-0 py-0 mx-0 my-0'>Yêu cầu trình lại</v-btn>
-              </v-tab>
-              <v-tabs-items class='px-3 py-3'>
-                <v-tab-item id='tabs-1' :key='1' reverse-transition='fade-transition' transition='fade-transition'>
-                  <v-checkbox 
-                    v-model='activeKS'
-                    label='Sử dụng chữ ký số'
-                  ></v-checkbox>
-                </v-tab-item>
-                <v-tab-item id='tabs-3' :key='2' reverse-transition='fade-transition' transition='fade-transition'>
-                  Lý do:
-                  <v-text-field
-                    placeholder='Lý do không ký hồ sơ'
-                    v-model='noteReason'
-                    textarea
-                    :rows='2'
-                    class='pt-2'
-                  ></v-text-field>
-                </v-tab-item>
-                <v-tab-item id='tabs-4' :key='3' reverse-transition='fade-transition' transition='fade-transition'>
-                  <p class='mb-2'>Trình lại: <span class='text-bold'>{{detailDossier['govAgencyName']}}</span></p>
-                  Lý do:
-                  <v-text-field
-                    placeholder='Lý do trình lại hồ sơ'
-                    v-model='noteReason'
-                    textarea
-                    :rows='2'
-                    class='pt-2'
-                  ></v-text-field>
-                </v-tab-item>
-              </v-tabs-items>
-            </v-tabs> -->
-            <v-checkbox
+            <v-checkbox v-if="esignType === 'digital'"
               class="ml-3"
               v-model='activeKS'
               label='Sử dụng chữ ký số'
             ></v-checkbox>
-            <!-- <v-alert v-else outline :value="true" type="success" class="mx-2">
-              Đã thực hiện ký số
-            </v-alert> -->
+            <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
+              <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
+              <v-captcha ref="captcha"></v-captcha>
+            </v-flex>
+            <v-flex xs12 sm4 class="my-3 pl-3" v-if="esignType === 'password'">
+              <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
+              <v-text-field
+                box
+                label="Nhập mật khẩu xác thực"
+                :append-icon="e1 ? 'visibility' : 'visibility_off'"
+                :append-icon-cb="() => (e1 = !e1)"
+                :rules="[v => !!v || 'Yêu cầu nhập mật khẩu']"
+                :type="e1 ? 'password' : 'text'"
+                name="input-10-2"
+                v-model="passWord"
+                required
+              ></v-text-field>
+            </v-flex>
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -67,6 +41,7 @@
 <script>
 import $ from 'jquery'
 import toastr from 'toastr'
+import VueCaptcha from './Captcha.vue'
 function plugin0 () {
   return document.getElementById('plugin0')
 }
@@ -76,25 +51,28 @@ export default {
     detailDossier: {},
     dataEsign: {}
   },
+  components: {
+    'v-captcha': VueCaptcha
+  },
   data: () => ({
     tabActive: 'tabs-1',
     activeKS: false,
     noteReason: '',
-    thongTinHoSo: {}
+    thongTinHoSo: {},
+    passWord: '',
+    e1: true
   }),
-  created () {},
+  created () {
+  },
   computed: {
     kysoSuccess () {
       return this.$store.getters.kysoSuccess
+    },
+    esignType () {
+      return this.dataEsign.signatureType
     }
   },
   watch: {
-    // activeKS (val) {
-    //   var vm = this
-    //   if (val === true) {
-    //     vm.kySo(vm.dataEsign)
-    //   }
-    // }
   },
   mounted () {},
   methods: {
@@ -106,12 +84,13 @@ export default {
       let vm = this
       let exportData = {
         textValue: vm.noteReason,
-        useKS: vm.activeKS
+        required: (vm.esignType === 'password') ? vm.passWord : (vm.esignType === 'digital' ? vm.activeKS : vm.$refs.captcha.checkValidCatcha())
       }
+      console.log('exportData', exportData)
       return exportData
     },
     kySo (item) {
-      console.log('run ky so -data payload', item)
+      console.log('run ky so data payload', item)
       var vm = this
       var fileArr
       if (Array.isArray(item.createFiles)) {
@@ -140,11 +119,6 @@ export default {
       console.log('idArr', idArr)
       var isKyOk = item.eSignature
       if (isKyOk) {
-        if (!plugin().valid) {
-          isKyOk = false
-          alert('Plugin ký số không hoạt động')
-          return
-        }
         if (waitingFiles) {
           alert('Tệp điện tử chưa sẵn sàng. Xin vui lòng chờ trong giây lát')
           return
@@ -163,7 +137,16 @@ export default {
           var actionName = item.actionName
           console.log('strIdArr', strIdArr)
           console.log('paramObj', paramObj)
-          vm.kyDuyetYCGiamDinh(strIdArr, paramObj, actionName)
+          if (vm.esignType === 'digital') {
+            if (!plugin().valid) {
+              isKyOk = false
+              alert('Plugin ký số không hoạt động')
+              return
+            }
+            vm.kyDuyetYCGiamDinh(strIdArr, paramObj, actionName)
+          } else if (vm.esignType === 'captcha') {
+            vm.completeKyDuyetCaptchaSignature(strIdArr, paramObj, actionName)
+          }
         }
       }
     },
@@ -261,6 +244,38 @@ export default {
           } else {
             alert(msg)
           }
+        },
+        error: function () {
+          alert('Thực hiện ký số thất bại')
+        }
+      })
+    },
+    completeKyDuyetCaptchaSignature (strIdArr, paramObj, actionName) {
+      var vm = this
+      var url = '/o/rest/v2/captchaSignature/' + vm.detailDossier.dossierId + '/dossierFiles'
+      $.ajax({
+        type: 'PUT',
+        url: url,
+        async: false,
+        dataType: 'json',
+        headers: {
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': window.Liferay.authToken
+        },
+        data: {
+          actionCode: paramObj['actionCode'],
+          actionUser: paramObj['actionUser'],
+          actionNote: paramObj['actionNote'],
+          assignUserId: paramObj['assignUserId'],
+          postStepCode: paramObj['postStepCode'],
+          subUsers: paramObj['subUsers'],
+          payload: paramObj['payload'] ? JSON.stringify(paramObj['payload']) : '',
+          assignUsers: paramObj['assignUsers'],
+          payment: paramObj['payment'] ? JSON.stringify(paramObj['payment']) : '',
+          userNote: paramObj['userNote'],
+          fileEntryId: strIdArr
+        },
+        success: function (result) {
         },
         error: function () {
           alert('Thực hiện ký số thất bại')
