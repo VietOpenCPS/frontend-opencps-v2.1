@@ -1838,7 +1838,7 @@ export const store = new Vuex.Store({
                 groupId: state.initData.groupId
               },
               params: {
-                origin: classPK
+                originDossierId: classPK
               }
             }
             axios.get(state.initData.dossierApi, param).then(function (response) {
@@ -2020,7 +2020,13 @@ export const store = new Vuex.Store({
             params: {
               serviceCode: filter.serviceCode ? filter.serviceCode : '',
               serviceName: filter.serviceName ? filter.serviceName : '',
-              typeCode: filter.typeCode ? filter.typeCode : ''
+              typeCode: filter.typeCode ? filter.typeCode : '',
+              templateNo: filter.templateNo ? filter.templateNo : '',
+              applicantName: filter.applicantName ? filter.applicantName : '',
+              applicantAddress: filter.applicantAddress ? filter.applicantAddress : '',
+              applicantEmail: filter.applicantEmail ? filter.applicantEmail : '',
+              applicantTelNo: filter.applicantTelNo ? filter.applicantTelNo : '',
+              employeeName: filter.employeeName ? filter.employeeName : ''
             }
           }
           axios.get(state.initData.getServiceConfigs + '/' + filter.serviceConfigId + '/guide', param).then(function (response) {
