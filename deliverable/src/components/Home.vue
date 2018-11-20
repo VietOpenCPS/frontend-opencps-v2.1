@@ -4,7 +4,7 @@
       <v-list dense>
         <v-list-tile
           v-for="item in items"
-          :key="item.title"
+          :key="item.typeCode"
           @click="deliverableRouter(item)"
         >
           <v-list-tile-action>
@@ -12,7 +12,7 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+            <v-list-tile-title>{{ item.typeName }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -80,11 +80,8 @@
       tableName: String
     },
     computed: {
-      items() {
-        return this.$store.getters.getlistTableMenu
-      },
-      loginUser() {
-        return this.$store.getters.getloginUser
+      items () {
+        return this.$store.getters.getDeliverableTypes
       },
       snackbarerror: {
         // getter
@@ -116,26 +113,6 @@
       },
       reloadPage() {
         window.location.reload(true)
-      },
-      redirectControlPanel() {
-        let controlPanelURL = ''
-        if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
-          controlPanelURL = window.themeDisplay.getLayoutRelativeControlPanelURL()
-        }
-        window.location.href = controlPanelURL + '?p_p_id=com_liferay_layout_admin_web_portlet_GroupPagesPortlet'
-      },
-      getItemSearch() {
-        let vm = this
-        if (vm.items.length === 2) {
-          return vm.items[1].children
-        } else if (vm.items.length > 2) {
-          return vm.items[2].children
-        } else {
-          return []
-        }
-      },
-      doLogOut() {
-        window.location.href = '/o/portal/logout'
       },
       deliverableRouter (item) {
         console.log(item)

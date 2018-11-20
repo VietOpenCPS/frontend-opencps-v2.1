@@ -76,8 +76,8 @@
 			<#include "${full_templates_path}/navigation.ftl" />
 		</#if>
 		<div class="group-actions">
-			<a href="/login" class="btn-login">Đăng nhập</a>
-			<a href="/register" class="btn-dregister">Đăng ký</a>
+			<a href="/web/kiem-thu-duong-bo/registe" class="btn-login">Đăng nhập</a>
+			<a href="/web/kiem-thu-duong-bo/registe" class="btn-dregister">Đăng ký</a>
 		</div>
 	</header>
 
