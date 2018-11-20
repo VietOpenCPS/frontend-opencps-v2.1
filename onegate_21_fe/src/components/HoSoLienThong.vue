@@ -20,7 +20,8 @@
               v-if="!detailView"
             >
               <template slot="items" slot-scope="props">
-                <tr @click="viewDetail(props.item)" style="cursor: pointer">
+                <!-- <tr @click="viewDetail(props.item)" style="cursor: pointer"> -->
+                <tr>
                   <td class="text-xs-center" width="5%">
                     <span>{{props.index + 1}}</span>
                   </td>

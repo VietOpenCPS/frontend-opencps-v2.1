@@ -399,16 +399,13 @@
                   <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile v-for="(item, i) in btnStepsDynamics" :key="i + '_' + props.item.dossierId + '_' + props.item.dossierId"
-                  v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo) && String(item.form) !== 'NEW' && menuType !== 3"
+                  v-if="String(props.item['permission']).indexOf('write') !== -1 && String(item.form) !== 'NEW' && menuType !== 3"
                   @click="btnActionEvent(props.item, item, index, false)"
                 >
                   <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile @click="viewDetail(props.item, props.index)" :disabled="!props.item['permission']">
                   Xem chi tiết
-                    <!-- <g-recaptcha data-sitekey="6Le9NG4UAAAAAAckfnDTZiaBB8pS95DMU77OWuw8" :data-validate="validate" :data-callback="callback" data-language="vi" style="width: 100%">
-                      <span>Xem chi tiết</span>
-                    </g-recaptcha> -->
                 </v-list-tile>
               </v-list>
             </v-menu>
@@ -621,7 +618,7 @@
                 <v-select
                   class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
-                  v-model="thuTucHanhChinhSelected"
+                  v-model="thuTucHanhChinhSelectedGuide"
                   autocomplete
                   placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
@@ -637,8 +634,8 @@
                 <div class="my-2">Dịch vụ:</div>
                 <v-select
                   class="input-group--text-field-box"
-                  :items="listDichVu"
-                  v-model="dichVuSelected"
+                  :items="listDichVuGuide"
+                  v-model="dichVuSelectedGuide"
                   placeholder="Chọn dịch vụ"
                   autocomplete
                   item-text="optionName"
@@ -679,7 +676,6 @@
                 <div class="my-2">Số điện thoại:</div>
                 <v-text-field
                   box
-                  label="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
                 ></v-text-field>
               </v-flex>
@@ -900,8 +896,12 @@ export default {
     listThuTucHanhChinh: [],
     listThuTuc: [],
     thuTucHanhChinhSelected: null,
+    thuTucHanhChinhSelectedGuide: null,
     listLinhVuc: [],
     linhVucSelected: null,
+    listDichVuGuide: [],
+    dichVuSelectedGuide: null,
+    templateNoGuide: '',
     domainCode: '',
     govAgencyCode: '',
     serviceCode: '',
@@ -1471,17 +1471,16 @@ export default {
     },
     changeServiceConfigsGuide (item) {
       let vm = this
-      vm.selectMultiplePage = []
       if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
-        this.listDichVu = item.options
+        this.listDichVuGuide = item.options
       } else {
-        this.listDichVu = []
+        this.listDichVuGuide = []
       }
-      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
-        this.dichVuSelected = this.listDichVu[0]
-        this.templateNo = this.dichVuSelected.templateNo
+      if (this.listDichVuGuide !== null && this.listDichVuGuide !== undefined && this.listDichVuGuide !== 'undefined' && this.listDichVuGuide.length > 0) {
+        this.dichVuSelectedGuide = this.listDichVuGuide[0]
+        this.templateNoGuide = this.dichVuSelectedGuide.templateNo
       } else {
-        this.dichVuSelected = null
+        this.dichVuSelectedGuide = null
       }
     },
     changeDomain (item) {
@@ -1701,10 +1700,10 @@ export default {
       if (vm.$refs.formGuide.validate()) {
         vm.loadingAction = true
         let filter = {
-          serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId,
-          serviceCode: vm.thuTucHanhChinhSelected.serviceCode,
-          serviceName: vm.thuTucHanhChinhSelected.serviceName,
-          templateNo: vm.templateNo,
+          serviceConfigId: vm.thuTucHanhChinhSelectedGuide.serviceConfigId,
+          serviceCode: vm.thuTucHanhChinhSelectedGuide.serviceCode,
+          serviceName: vm.thuTucHanhChinhSelectedGuide.serviceName,
+          templateNo: vm.templateNoGuide,
           applicantName: vm.applicantNameGuide,
           applicantAddress: vm.applicantAddressGuide,
           applicantEmail: vm.applicantEmailGuide,
