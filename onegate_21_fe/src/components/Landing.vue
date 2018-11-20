@@ -6,7 +6,7 @@
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-select
             v-model="advSearchItems"
-            placeholder="Tìm kiếm theo từ khoá ..."
+            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục ..."
             solo
             chips
             tags
@@ -605,6 +605,91 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog_printGuide" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline">
+          Thông tin phiếu hướng dẫn hoàn thiện hồ sơ
+        </v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_printGuide = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text>
+          <v-form ref="formGuide" v-model="validGuide" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12 class="px-2 pb-3">
+                <v-select
+                  :items="listThuTucHanhChinh"
+                  v-model="thuTucHanhChinhSelected"
+                  autocomplete
+                  label="Thủ tục hành chính"
+                  item-text="serviceName"
+                  item-value="serviceConfigId"
+                  return-object
+                  :hide-selected="true"
+                  @change = "changeServiceConfigsGuide"
+                  :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
+                  required
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <v-select
+                  :items="listDichVu"
+                  v-model="dichVuSelected"
+                  label="Dịch vụ"
+                  autocomplete
+                  item-text="optionName"
+                  item-value="processOptionId"
+                  return-object
+                  :hide-selected="true"
+                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  required
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <v-text-field
+                  label="Tên người làm thủ tục"
+                  box
+                  v-model="applicantNameGuide"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <v-text-field
+                  label="Địa chỉ"
+                  box
+                  v-model="applicantAddressGuide"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <v-text-field
+                  box
+                  label="Thư điện tử"
+                  v-model="applicantEmailGuide"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <v-text-field
+                  box
+                  label="Số điện thoại"
+                  v-model="applicantTelNoGuide"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doGuiding()"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>print</v-icon> &nbsp;
+            In phiếu hướng dẫn
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -766,6 +851,12 @@ export default {
     countSelected: 0,
     statusFailed: 0,
     dialog_statusAction: false,
+    dialog_printGuide: false,
+    validGuide: false,
+    applicantNameGuide: '',
+    applicantEmailGuide: '',
+    applicantTelNoGuide: '',
+    applicantAddressGuide: '',
     dossierSelected: [
       {
         dossierNo: '18ACE289',
@@ -1370,6 +1461,21 @@ export default {
         path: current.path + queryString
       })
     },
+    changeServiceConfigsGuide (item) {
+      let vm = this
+      vm.selectMultiplePage = []
+      if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
+        this.listDichVu = item.options
+      } else {
+        this.listDichVu = []
+      }
+      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+        this.dichVuSelected = this.listDichVu[0]
+        this.templateNo = this.dichVuSelected.templateNo
+      } else {
+        this.dichVuSelected = null
+      }
+    },
     changeDomain (item) {
       // console.log('change Domain')
       let vm = this
@@ -1502,7 +1608,8 @@ export default {
         // In văn bản mới nhất đã phê duyệt
         vm.doPrint03(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'GUIDING') {
-        vm.doGuiding(dossierItem, item, index, isGroup)
+        vm.dialog_printGuide = true
+        // vm.doGuiding(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'PREVIEW') {
         vm.doPreview(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'ACTIONS') {
@@ -1581,22 +1688,30 @@ export default {
         document.getElementById('dialogPDFPreview').src = result
       })
     },
-    doGuiding (dossierItem, item, index, isGroup) {
+    doGuiding () {
       let vm = this
-      if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
-        alert('Loại thủ tục bắt buộc phải chọn')
-      } else {
+      if (vm.$refs.formGuide.validate()) {
+        vm.loadingAction = true
         let filter = {
           serviceConfigId: vm.thuTucHanhChinhSelected.serviceConfigId,
           serviceCode: vm.thuTucHanhChinhSelected.serviceCode,
           serviceName: vm.thuTucHanhChinhSelected.serviceName,
+          templateNo: vm.templateNo,
+          applicantName: vm.applicantNameGuide,
+          applicantAddress: vm.applicantAddressGuide,
+          applicantEmail: vm.applicantEmailGuide,
+          applicantTelNo: vm.applicantTelNoGuide,
+          employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
           typeCode: 'DOC_03'
         }
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
         vm.$store.dispatch('doGuiding', filter).then(function (result) {
+          vm.dialog_printGuide = false
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreview').src = result
+        }).catch(function () {
+          vm.loadingAction = false
         })
       }
     },
