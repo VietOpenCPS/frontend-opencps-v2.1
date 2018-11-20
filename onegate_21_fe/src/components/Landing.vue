@@ -617,11 +617,13 @@
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12 class="px-2 pb-3">
+                <div class="my-2">Thủ tục hành chính:</div>
                 <v-select
+                  class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
                   autocomplete
-                  label="Thủ tục hành chính"
+                  placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
@@ -632,10 +634,12 @@
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
+                <div class="my-2">Dịch vụ:</div>
                 <v-select
+                  class="input-group--text-field-box"
                   :items="listDichVu"
                   v-model="dichVuSelected"
-                  label="Dịch vụ"
+                  placeholder="Chọn dịch vụ"
                   autocomplete
                   item-text="optionName"
                   item-value="processOptionId"
@@ -646,8 +650,9 @@
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
+                <div class="my-2">Tên người làm thủ tục:</div>
                 <v-text-field
-                  label="Tên người làm thủ tục"
+                  placeholder="Nhập tên người làm thủ tục"
                   box
                   v-model="applicantNameGuide"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
@@ -655,23 +660,26 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
+                <div class="my-2">Địa chỉ:</div>
                 <v-text-field
-                  label="Địa chỉ"
+                  placeholder="Nhập địa chỉ"
                   box
                   v-model="applicantAddressGuide"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
+                <div class="my-2">Thư điện tử:</div>
                 <v-text-field
                   box
-                  label="Thư điện tử"
+                  placeholder="Nhập thư điện tử"
                   v-model="applicantEmailGuide"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
+                <div class="my-2">Số điện thoại:</div>
                 <v-text-field
                   box
-                  label="Số điện thoại"
+                  label="Nhập số điện thoại"
                   v-model="applicantTelNoGuide"
                 ></v-text-field>
               </v-flex>
