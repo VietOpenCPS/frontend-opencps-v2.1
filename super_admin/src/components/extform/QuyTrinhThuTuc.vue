@@ -348,7 +348,8 @@
                       <span>{{pageStep * 10 - 10 + props.index + 1}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left" width="50%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="35%">{{ props.item.stepName }}</td>
+                  <td class="text-xs-left" width="15%">{{ props.item.processStepId }}</td>
                   <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
                   <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -622,8 +623,9 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.preStepName }}</td>
-                  <td class="text-xs-left" width="30%">{{ props.item.postStepName }}</td>
+                  <td class="text-xs-left" width="10%">{{ props.item.processActionId }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.preStepName }}</td>
+                  <td class="text-xs-left" width="25%">{{ props.item.postStepName }}</td>
                   <td class="text-xs-center px-0" width="15%">
                     <v-icon
                       small color="blue"
@@ -866,9 +868,18 @@
                       <v-flex xs12 sm3 class="pr-2">
                         <v-switch label="Sinh mã số tiếp nhận" v-model="currentAction.createDossierNo"></v-switch>
                       </v-flex>
-                      <v-flex xs12 sm3 class="pl-2">
+                      <v-flex xs12 sm2 class="pl-2">
                         <v-switch label="Có ký số điện tử" v-model="currentAction.eSignature"></v-switch>
                       </v-flex>
+                      <v-select xs12 sm3 class="pl-2"
+                        v-if="currentAction.eSignature"
+                        box
+                        label="Hình thức xác nhận"
+                        :items="esignatureTypeList"
+                        v-model="currentAction.signatureType"
+                        item-text="text"
+                        item-value="value"
+                      ></v-select>
                     </v-layout>
                   </v-flex>
                 </v-layout>
@@ -1041,6 +1052,11 @@
             sortable: false
           },
           {
+            text: 'Mã bước',
+            align: 'center',
+            sortable: false
+          },
+          {
             text: 'Trạng thái',
             align: 'center',
             sortable: false
@@ -1087,6 +1103,11 @@
           },
           {
             text: 'Tên thao tác',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Mã thao tác',
             align: 'center',
             sortable: false
           },
@@ -1149,8 +1170,15 @@
           syncActionCode: '',
           configNote: '',
           createDossierNo: false,
-          eSignature: false
+          eSignature: false,
+          signatureType: 'digital'
         },
+        esignatureTypeList: [
+          { text: 'Sử dụng chữ kí số', value: 'digital' },
+          { text: 'Sử dụng captcha', value: 'captcha' },
+          { text: 'Nhập mật khẩu người dùng', value: 'password' },
+          { text: 'Nhập mã pin', value: 'pin' }          
+        ],
         validAddAction: false,
         //
         rules: {
@@ -1472,6 +1500,7 @@
             configNote: '',
             createDossierNo: false,
             eSignature: false,
+            signatureType: 'digital',
             createDossier: []
           }
           if (Number(currentQuery.actionCode) > 0) {
