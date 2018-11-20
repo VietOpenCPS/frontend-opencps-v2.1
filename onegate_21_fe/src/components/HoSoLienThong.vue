@@ -27,13 +27,16 @@
                   <td class="text-xs-left" width="30%">
                     {{ props.item.dossierName }}
                   </td>
+                  <td class="text-xs-left" width="10%">
+                    {{ props.item.dossierNo }}
+                  </td>
                   <td class="text-xs-left" width="25%">
                     {{ props.item.govAgencyName }}
                   </td>
-                  <td class="text-xs-left" width="15%">
+                  <td class="text-xs-left" width="10%">
                     {{ props.item.submitDate }}
                   </td>
-                  <td class="text-xs-left" width="15%">
+                  <td class="text-xs-left" width="10%">
                     {{ props.item.receiveDate }}
                   </td>
                   <td class="text-xs-left" width="10%">
@@ -191,6 +194,11 @@ export default {
       },
       {
         text: 'Tên hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
         align: 'center',
         sortable: false
       },

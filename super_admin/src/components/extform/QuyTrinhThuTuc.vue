@@ -349,7 +349,7 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="35%">{{ props.item.stepName }}</td>
-                  <td class="text-xs-left" width="15%">{{ props.item.processStepId }}</td>
+                  <td class="text-xs-left" width="15%">{{ props.item.stepCode }}</td>
                   <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
                   <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -623,7 +623,7 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left" width="10%">{{ props.item.processActionId }}</td>
+                  <td class="text-xs-left" width="10%">{{ props.item.actionCode }}</td>
                   <td class="text-xs-left" width="25%">{{ props.item.preStepName }}</td>
                   <td class="text-xs-left" width="25%">{{ props.item.postStepName }}</td>
                   <td class="text-xs-center px-0" width="15%">
