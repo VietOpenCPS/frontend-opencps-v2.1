@@ -82,7 +82,7 @@ export const store = new Vuex.Store({
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
           state.getContentFile = response.data
         }).catch(function () {
-          rstate.getContentFile = ''
+          state.getContentFile = ''
         })
       })
     }

@@ -205,7 +205,13 @@
     },
     computed: {
       detailForm () {
-        return eval('( ' + this.$store.getters.getContentFile + ' )')
+        let detailDynamic = this.$store.getters.getContentFile
+        console.log('detailDynamic', detailDynamic)
+        if (detailDynamic === '') {
+          return []
+        } else {
+          return eval('( ' + detailDynamic + ' )')
+        }
       }
     },
     methods: {
