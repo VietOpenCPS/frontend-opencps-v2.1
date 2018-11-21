@@ -387,6 +387,7 @@
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDynamics" :key="i + '_menu_' + props.item.dossierId" 
                   @click="btnActionEvent(props.item, item, props.index, false)"
+                  :disabled="String(props.item['permission']).indexOf('write') === -1"
                   v-if="menuType === 3"
                   >
                   <v-list-tile-title>{{item.title}}{{item.tiltle}}</v-list-tile-title>
@@ -1572,81 +1573,83 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
-      // set info buttonConfig
-      vm.buttonConfigItem = {}
-      vm.buttonConfigItem = item
-      //
-      vm.itemAction = item
-      // console.log('itemAction++++++++++++', item)
-      vm.indexAction = index
-      if (String(item.form) === 'NEW') {
-        let isOpenDialog = true
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
-          isOpenDialog = false
+      if (String(dossierItem['permission']).indexOf('write') !== -1) {
+        // set info buttonConfig
+        vm.buttonConfigItem = {}
+        vm.buttonConfigItem = item
+        //
+        vm.itemAction = item
+        // console.log('itemAction++++++++++++', item)
+        vm.indexAction = index
+        if (String(item.form) === 'NEW') {
+          let isOpenDialog = true
+          if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+            isOpenDialog = false
+          }
+          if (isOpenDialog) {
+            // vm.thuTucHanhChinhSelected = null
+            vm.dialogAction = true
+          } else {
+            vm.doCreateDossier()
+          }
+          // console.log('isOpenDialog++++++++', isOpenDialog)
+        } else if (String(item.form) === 'UPDATE') {
+          router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
+            query: vm.$router.history.current.query
+          })
+        } else if (String(item.form) === 'ADD') {
+          router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
+            query: vm.$router.history.current.query
+          })
+        } else if (String(item.form) === 'COPY') {
+          vm.doCopy(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'CANCEL') {
+          vm.doCancel(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_01') {
+          // Xem trước phiếu của một hồ sơ
+          vm.doPrint01(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_02') {
+          // Xem trước phiếu gộp của nhiều hồ sơ
+          vm.doPrint02(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PRINT_03') {
+          // In văn bản mới nhất đã phê duyệt
+          vm.doPrint03(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'GUIDING') {
+          vm.dialog_printGuide = true
+          // vm.doGuiding(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'PREVIEW') {
+          vm.doPreview(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ACTIONS') {
+          vm.doActions(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'DELETE') {
+          vm.doDeleteDossier(dossierItem, item, index, isGroup)
+        } else if (String(item.form) === 'ROLLBACK_01') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'ROLLBACK_02') {
+          let result = {
+            actionCode: 9000
+          }
+          vm.processAction(dossierItem, item, result, index, true)
+        } else if (String(item.form) === 'OVERDUE') {
+          let result = {
+            actionCode: 8500,
+            dossierId: dossierItem.dossierId,
+            overdue: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 111)
+        } else if (String(item.form) === 'BETIMES') {
+          let result = {
+            actionCode: 8400,
+            dossierId: dossierItem.dossierId,
+            betimes: dossierItem['extendDate']
+          }
+          vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
         }
-        if (isOpenDialog) {
-          // vm.thuTucHanhChinhSelected = null
-          vm.dialogAction = true
-        } else {
-          vm.doCreateDossier()
-        }
-        // console.log('isOpenDialog++++++++', isOpenDialog)
-      } else if (String(item.form) === 'UPDATE') {
-        router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
-        })
-      } else if (String(item.form) === 'ADD') {
-        router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
-          query: vm.$router.history.current.query
-        })
-      } else if (String(item.form) === 'COPY') {
-        vm.doCopy(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'CANCEL') {
-        vm.doCancel(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_01') {
-        // Xem trước phiếu của một hồ sơ
-        vm.doPrint01(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_02') {
-        // Xem trước phiếu gộp của nhiều hồ sơ
-        vm.doPrint02(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PRINT_03') {
-        // In văn bản mới nhất đã phê duyệt
-        vm.doPrint03(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'GUIDING') {
-        vm.dialog_printGuide = true
-        // vm.doGuiding(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'PREVIEW') {
-        vm.doPreview(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ACTIONS') {
-        vm.doActions(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'DELETE') {
-        vm.doDeleteDossier(dossierItem, item, index, isGroup)
-      } else if (String(item.form) === 'ROLLBACK_01') {
-        let result = {
-          actionCode: 9000
-        }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'ROLLBACK_02') {
-        let result = {
-          actionCode: 9000
-        }
-        vm.processAction(dossierItem, item, result, index, true)
-      } else if (String(item.form) === 'OVERDUE') {
-        let result = {
-          actionCode: 8500,
-          dossierId: dossierItem.dossierId,
-          overdue: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 111)
-      } else if (String(item.form) === 'BETIMES') {
-        let result = {
-          actionCode: 8400,
-          dossierId: dossierItem.dossierId,
-          betimes: dossierItem['extendDate']
-        }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
