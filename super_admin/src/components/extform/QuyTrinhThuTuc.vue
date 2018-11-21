@@ -349,7 +349,7 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="35%">{{ props.item.stepName }}</td>
-                  <td class="text-xs-left" width="15%">{{ props.item.processStepId }}</td>
+                  <td class="text-xs-left" width="15%">{{ props.item.stepCode }}</td>
                   <td class="text-xs-left" width="20%">{{ props.item.dossierStatusText }}</td>
                   <td class="text-xs-center" width="10%">{{ props.item.durationCount }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -623,7 +623,7 @@
                     </div>
                   </td>
                   <td class="text-xs-left" width="20%">{{ props.item.actionName }}</td>
-                  <td class="text-xs-left" width="10%">{{ props.item.processActionId }}</td>
+                  <td class="text-xs-left" width="10%">{{ props.item.actionCode }}</td>
                   <td class="text-xs-left" width="25%">{{ props.item.preStepName }}</td>
                   <td class="text-xs-left" width="25%">{{ props.item.postStepName }}</td>
                   <td class="text-xs-center px-0" width="15%">
@@ -765,7 +765,6 @@
                       item-value="dossierTemplateId"
                       :hide-selected="true"
                       clearable
-                      @change="getDossierParts"
                     ></v-autocomplete>
                   </v-flex>
                   <!--  -->
@@ -1218,6 +1217,9 @@
       },
       dossierSubStatusList () {
         return this.$store.getters.getDossierSubStatusList
+      },
+      templateNoAction () {
+        return this.currentAction.dossierTemplateNo
       }
     },
     watch: {
@@ -1238,6 +1240,14 @@
           vm.active = 'tab-1'
         }
         vm.doDetailContent()
+      },
+      templateNoAction (val) {
+        if (val) {
+          this.getDossierParts()
+        } else {
+          this.currentAction.createDossierFiles = ''
+          this.currentAction.returnDossierFiles = ''
+        }
       }
     },
     methods: {
@@ -1325,6 +1335,7 @@
       },
       getDossierParts () {
         var vm = this
+        console.log('vm.currentAction.dossierTemplateNo', vm.currentAction.dossierTemplateNo)
         if (vm.currentAction.dossierTemplateNo) {
           vm.$store.dispatch('getDossierPart', vm.currentAction.dossierTemplateNo).then(function (result) {
             vm.dossierPartList = result

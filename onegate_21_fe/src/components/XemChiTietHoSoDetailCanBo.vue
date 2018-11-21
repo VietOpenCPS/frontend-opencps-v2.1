@@ -93,15 +93,22 @@
                     <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                   </span>
                 </p>
-                <p class="mb-0" v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                <p class="mb-0">
                   <span>Người thực hiện: &nbsp;</span>
-                  <span v-for="(item, index) in usersNextAction" :key="item.userId">
-                    &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                  <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                    <span v-for="(item, index) in usersNextAction" :key="item.userId">
+                      &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                    </span>
+                    <span v-if="stepOverdueNextAction"> - </span>
+                    <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                      {{stepOverdueNextAction}}
+                    </span>
                   </span>
-                  <span v-if="stepOverdueNextAction"> - </span>
-                  <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
-                    {{stepOverdueNextAction}}
-                  </span>
+                  <!-- <span v-if="checkPemissionPhanCongLai(currentUser)">
+                    <v-btn @click="reAsign"  small color="primary" style="height:26px">
+                      Phân công lại
+                    </v-btn>
+                  </span> -->
                 </p>
               </div>
               <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
@@ -127,7 +134,7 @@
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
-                v-if="item.enable > 0 || (item['autoEvent'] === 'special')"
+                v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
               >
                 {{item.actionName}}
                 <span slot="loader">Loading...</span>
@@ -150,10 +157,10 @@
                 <span slot="loader">Loading...</span>
               </v-btn> -->
               <!-- Action special -->
-              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && checkActionSpecial(btnStepsDynamics)">
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
-                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" v-if="checkPemissionSpecialAction(item.form, currentUser, thongTinChiTietHoSo)" @click="btnActionEvent(item, index)">
+                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                   </v-list-tile>
                   <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
@@ -401,7 +408,33 @@
       </v-tabs>
     </div>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
-
+    <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline">
+          Chọn người thực hiện
+        </v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_reAsign = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text>
+          <phan-cong-lai ref="phanconglai" v-model="reAsignUsers" :type="1"></phan-cong-lai>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doReAsign()"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>how_to_reg</v-icon> &nbsp;
+            Phân công
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click.native="dialog_reAsign = false">
+            <v-icon>reply</v-icon> &nbsp;
+            Hủy
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="dialogPlugin" persistent :overlay="false" :max-width="800" style="overflow: hidden;" transition="dialog-transition">
       <v-card>
         <v-card-title class="px-0 py-0">
@@ -465,6 +498,7 @@ import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
+import PhanCongLai from './form_xu_ly/PhanCongLai.vue'
 import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
 import mermaid from 'mermaid'
 mermaid.initialize({
@@ -489,7 +523,8 @@ export default {
     'thong-tin-buu-chinh': ThongTinBuuChinh,
     'ngay-gia-han': ExtendDateEdit,
     'chi-tiet-thanh-toan': ChiTietThanhToan,
-    'ho-so-lien-thong': HoSoLienThong
+    'ho-so-lien-thong': HoSoLienThong,
+    'phan-cong-lai': PhanCongLai
   },
   data: () => ({
     inputTypes: [1, 3],
@@ -525,6 +560,7 @@ export default {
     documents: [],
     payments: '',
     dossierActions: [],
+    reAsignUsers: [],
     itemselect: '',
     dossierSyncs: [],
     stepModel: null,
@@ -537,7 +573,7 @@ export default {
     showTaoTaiLieuKetQua: false,
     showKyPheDuyetTaiLieu: false,
     dataEsign: '',
-    typeEsign: 'captcha',
+    typeEsign: '',
     showTraKetQua: false,
     showThuPhi: false,
     showPostalService: false,
@@ -648,7 +684,8 @@ export default {
     stateViewDocument: true,
     listLienThong: [],
     modelPlugin: null,
-    dialogPlugin: false
+    dialogPlugin: false,
+    dialog_reAsign: false
   }),
   computed: {
     loading () {
@@ -1419,7 +1456,9 @@ export default {
           useKySo = true
         } else {
           useKySo = false
-          alert('Yêu cầu xác thực ký duyệt')
+          if (vm.dataEsign.signatureType !== 'digital') {
+            alert('Yêu cầu xác thực ký duyệt')
+          }
         }
       }
       if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
@@ -1517,6 +1556,47 @@ export default {
               vm.loadingAction = false
               vm.loadingActionProcess = false
             })
+          } else if (!useKySo && vm.dataEsign.signatureType === 'digital') {
+            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+              // console.log('result======', result)
+              vm.loadingAction = false
+              vm.dialogActionProcess = false
+              vm.loadingActionProcess = false
+              vm.alertObj = {
+                icon: 'check_circle',
+                color: 'success',
+                message: 'Thực hiện thành công!'
+              }
+              vm.btnStateVisible = false
+              if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                vm.rollbackable = result.rollbackable
+              }
+              if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                vm.printDocument = true
+              }
+              if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+              }
+              vm.checkInput = 0
+              vm.$store.commit('setCheckInput', 0)
+              if (String(item.form) === 'ACTIONS') {
+              } else {
+                router.push({
+                  path: vm.$router.history.current.path,
+                  query: {
+                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                    q: currentQuery['q']
+                  }
+                })
+              }
+              $('html, body').animate({
+                scrollTop: $('#actionContent').offset().top
+              }, 500, 'linear')
+            }).catch(function (reject) {
+              vm.loadingAction = false
+              vm.loadingActionProcess = false
+            })
           }
         } else {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
@@ -1554,7 +1634,7 @@ export default {
             }
             $('html, body').animate({
               scrollTop: $('#actionContent').offset().top
-            }, 1000, 'linear')
+            }, 500, 'linear')
           }).catch(function (reject) {
             vm.loadingAction = false
             vm.loadingActionProcess = false
@@ -1913,6 +1993,57 @@ export default {
         // }
       }
       return checkValue
+    },
+    checkPemissionPhanCongLai (currentUser) {
+      let vm = this
+      let checkValue = true
+      // check theo người thực hiện và chuyển đến bởi
+      let userArr = vm.$store.getters.getUsersNextAction
+      let userLastAction = [{'userId': vm.thongTinChiTietHoSo.lastActionUserId ? vm.thongTinChiTietHoSo.lastActionUserId : ''}]
+      let userCheckPermission = userArr.concat(userLastAction)
+      if (userCheckPermission.length > 0) {
+        let check = userCheckPermission.filter(function (item) {
+          return item['userId'].toString() === currentUser['userId'].toString()
+        })
+        if (check.length > 0) {
+          checkValue = true
+        } else {
+          checkValue = false
+        }
+      } else {
+        checkValue = false
+      }
+      return checkValue
+    },
+    reAsign () {
+      let vm = this
+      vm.$store.dispatch('getDossierUserAsign', vm.thongTinChiTietHoSo.dossierId).then(function(result) {
+        vm.reAsignUsers = result
+        vm.dialog_reAsign = true
+      })
+    },
+    doReAsign () {
+      let vm = this
+      let filter = {
+        'dossierId': vm.thongTinChiTietHoSo.dossierId,
+        'users': vm.reAsignUsers
+      }
+      let result = vm.$refs.phanconglai.doExport()
+      if (result) {
+        vm.loadingAction = true
+        vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
+          setTimeout(function() {
+            vm.getNextActions()
+          }, 300)
+          vm.dialog_reAsign = false
+          vm.loadingAction = false
+        }).catch(function (error) {
+          vm.loadingAction = false
+          console.log(error)
+        })
+      } else {
+        return
+      }
     },
     changeStateViewResult (data) {
       console.log('state view result', data)
