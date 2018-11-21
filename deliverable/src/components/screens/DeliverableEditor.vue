@@ -30,7 +30,8 @@
     },
     data () {
       return {
-        dataSocket: {}
+        dataSocket: {},
+        tempCounter: 0
       }
     },
     created () {
@@ -41,10 +42,15 @@
           console.log('formId', formId)
           vm.$store.dispatch('getContentFile', formId)
           vm.$store.dispatch('getContentFileSimple')
+          vm.tempCounter = vm.pullCounter
           vm.$socket.onmessage = function (data) {
             let dataObj = eval('( ' + data.data + ' )')
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            console.log('onmessage dataSocket no home', vm.dataSocket)
+            vm.$store.commit('setdataSocket', vm.dataSocket)
+            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+              vm.tempCounter = vm.tempCounter - 1
+              vm.$store.commit('setpullCounter', vm.tempCounter)
+            }
           }
         }, 100)
       })
@@ -56,6 +62,16 @@
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
+      },
+      pullCounter: {
+        // getter
+        get: function() {
+          return this.$store.getters.pullCounter
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setpullCounter', newValue)
+        }
       }
     },
     methods: {
