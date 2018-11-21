@@ -129,10 +129,6 @@ export const store = new Vuex.Store({
       console.error(state, event)
     },
     SOCKET_ONMESSAGE (state, message) {
-      console.log('SOCKET_ONMESSAGE', message)
-      let dataObj = eval('( ' + message.data + ' )')
-      state.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-      console.log('SOCKET_ONMESSAGE state.dataSocket', state.dataSocket)
       state.message = message
     },
     [WebSocket.WS_RECONNECT](state, count) {
