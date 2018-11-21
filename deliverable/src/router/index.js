@@ -6,7 +6,7 @@ import DeliverableList from '@/components/screens/DeliverableList'
 
 const routes = [
   {
-    path: '/',
+    path: '/danh-sach-giay-to/:index',
     name: 'Home',
     component: Home,
     props: true,
@@ -14,15 +14,6 @@ const routes = [
       requiresAuth: true
     },
     children: [
-      {
-        path: '/danh-sach-giay-to/:index',
-        name: 'DeliverableList',
-        component: DeliverableList,
-        props: true,
-        meta: {
-          requiresAuth: true
-        }
-      },
       {
         path: '/table/:tableName/flowchart/:id',
         name: 'FlowChartView',

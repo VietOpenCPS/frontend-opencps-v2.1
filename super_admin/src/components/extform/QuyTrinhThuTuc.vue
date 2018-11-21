@@ -765,7 +765,6 @@
                       item-value="dossierTemplateId"
                       :hide-selected="true"
                       clearable
-                      @change="getDossierParts"
                     ></v-autocomplete>
                   </v-flex>
                   <!--  -->
@@ -1218,6 +1217,9 @@
       },
       dossierSubStatusList () {
         return this.$store.getters.getDossierSubStatusList
+      },
+      templateNoAction () {
+        return this.currentAction.dossierTemplateNo
       }
     },
     watch: {
@@ -1238,6 +1240,14 @@
           vm.active = 'tab-1'
         }
         vm.doDetailContent()
+      },
+      templateNoAction (val) {
+        if (val) {
+          this.getDossierParts()
+        } else {
+          this.currentAction.createDossierFiles = ''
+          this.currentAction.returnDossierFiles = ''
+        }
       }
     },
     methods: {
@@ -1325,6 +1335,7 @@
       },
       getDossierParts () {
         var vm = this
+        console.log('vm.currentAction.dossierTemplateNo', vm.currentAction.dossierTemplateNo)
         if (vm.currentAction.dossierTemplateNo) {
           vm.$store.dispatch('getDossierPart', vm.currentAction.dossierTemplateNo).then(function (result) {
             vm.dossierPartList = result

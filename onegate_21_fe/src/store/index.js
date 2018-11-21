@@ -1843,16 +1843,54 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.dossierApi, param).then(function (response) {
               let serializable = response.data
-              // if (serializable.length > 0) {
-              //   for (var key in serializable) {
-              //     serializable[key].dossierLog = []
-              //   }
-              // }
               if (serializable.data) {
                 resolve(serializable.data)
               } else {
                 resolve([])
               }
+            }).catch(function (error) {
+              reject(error)
+            })
+          })
+        })
+      },
+      getDossierUserAsign ({commit, state}, classPK) {
+        return new Promise((resolve, reject) => {
+          store.dispatch('loadInitResource').then(function (result) {
+            let param = {
+              headers: {
+                groupId: state.initData.groupId
+              }
+            }
+            axios.get(state.initData.dossierApi + '/' + classPK + '/users', param).then(function (response) {
+              let serializable = response.data
+              if (serializable['data']) {
+                if (Array.isArray(serializable['data'])) {
+                  resolve(serializable.data)
+                } else {
+                  resolve([serializable['data']])
+                }
+              } else {
+                resolve([])
+              }
+            }).catch(function (error) {
+              reject(error)
+            })
+          })
+        })
+      },
+      postDossierUserAsign ({commit, state}, filter) {
+        return new Promise((resolve, reject) => {
+          store.dispatch('loadInitResource').then(function (result) {
+            let param = {
+              headers: {
+                groupId: state.initData.groupId
+              }
+            }
+            let dataPost = new URLSearchParams()
+            dataPost.append('assignUsers', filter.users?JSON.stringify(filter.users):'')
+            axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/users', dataPost, param).then(function (response) {
+              resolve(response)
             }).catch(function (error) {
               reject(error)
             })
@@ -2665,7 +2703,7 @@ export const store = new Vuex.Store({
       state.checkInput = payload
     },
     setUserNextAction (state, payload) {
-      state.usersNextAction = payload
+      state.usersNextAction = payload ? payload : []
     },
     setStepOverdueNextAction (state, payload) {
       state.stepOverdueNextAction = payload
