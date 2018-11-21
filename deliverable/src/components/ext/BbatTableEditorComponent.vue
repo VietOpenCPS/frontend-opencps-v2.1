@@ -210,7 +210,7 @@
         if (detailDynamic === '') {
           return []
         } else {
-          return eval('( ' + detailDynamic + ' )')
+          return detailDynamic
         }
       }
     },
