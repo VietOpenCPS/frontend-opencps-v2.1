@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation>
+  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3">
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
     ">
