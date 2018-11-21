@@ -13,14 +13,14 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.typeName }} - {{indexItem}} - {{index}} - {{String(indexItem) === String(index)}}</v-list-tile-title>
+            <v-list-tile-title>{{ item.typeName }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-container fluid class="px-0">
+    <v-content>
       <router-view></router-view>
-    </v-container>
+    </v-content>
     <v-snackbar
       v-model="snackbarerror"
       :bottom="false"

@@ -15,8 +15,8 @@ const routes = [
     },
     children: [
       {
-        path: '/table/:tableName/flowchart/:id',
-        name: 'FlowChartView',
+        path: '/danh-sach-giay-to/:index',
+        name: 'DeliverableList',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
         props: true,
         meta: {
