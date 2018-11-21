@@ -104,11 +104,11 @@
                       {{stepOverdueNextAction}}
                     </span>
                   </span>
-                  <!-- <span v-if="checkPemissionPhanCongLai(currentUser)">
-                    <v-btn @click="reAsign"  small color="primary" style="height:26px">
+                  <span>
+                    <v-btn :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
                       Phân công lại
                     </v-btn>
-                  </span> -->
+                  </span>
                 </p>
               </div>
               <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
@@ -2029,7 +2029,7 @@ export default {
         'users': vm.reAsignUsers
       }
       let result = vm.$refs.phanconglai.doExport()
-      if (result) {
+      if (result && vm.checkPemissionPhanCongLai(currentUser)) {
         vm.loadingAction = true
         vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
           setTimeout(function() {

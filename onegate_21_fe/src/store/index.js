@@ -1864,11 +1864,11 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.dossierApi + '/' + classPK + '/users', param).then(function (response) {
               let serializable = response.data
-              if (serializable['users']) {
-                if (Array.isArray(serializable['users'])) {
-                  resolve(serializable.users)
+              if (serializable['data']) {
+                if (Array.isArray(serializable['data'])) {
+                  resolve(serializable.data)
                 } else {
-                  resolve([serializable['users']])
+                  resolve([serializable['data']])
                 }
               } else {
                 resolve([])
@@ -1888,7 +1888,7 @@ export const store = new Vuex.Store({
               }
             }
             let dataPost = new URLSearchParams()
-            dataPost.append('users', filter.users?JSON.stringify(filter.users):'')
+            dataPost.append('assignUsers', filter.users?JSON.stringify(filter.users):'')
             axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/users', dataPost, param).then(function (response) {
               resolve(response)
             }).catch(function (error) {
