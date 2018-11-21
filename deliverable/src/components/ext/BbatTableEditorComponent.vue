@@ -176,14 +176,13 @@
     },
     data() {
       return {
+        pullCounter: 0,
         isCallBack: true,
         config: {},
         pullOk: true,
-        pullCounter: 0,
         valid: true,
         loading: false,
         data: {},
-        dataSocket: {},
         cmOptions: {
           tabSize: 4,
           mode: 'text/javascript',
@@ -213,6 +212,19 @@
         } else {
           return detailDynamic
         }
+      },
+      dataSocket: {
+        // getter
+        get: function() {
+          return this.$store.getters.dataSocket
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setdataSocket', newValue)
+        }
+      },
+      pullCounterOrg () {
+        return this.$store.getters.pullCounter
       }
     },
     updated() {
@@ -223,22 +235,11 @@
           vm.processDataSource()
           setTimeout(() => {
             vm.processDataSourceVerify()
-          }, 500)
-        }
-      })
-    },
-    created() {
-      var vm = this
-      vm.$nextTick(function() {
-        vm.$socket.onmessage = function (data) {
-          let dataObj = eval('( ' + data.data + ' )')
-          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-            vm.pullCounter = vm.pullCounter - 1
-            if (vm.pullCounter === 0) {
+            console.log('vm.pullCounterOrg 1: ', vm.pullCounterOrg)
+            if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
             }
-          }
+          }, 500)
         }
       })
     },
@@ -254,6 +255,7 @@
         if (item.hasOwnProperty('concatina')) {
           vm.pullOk = false
           vm.pullCounter = vm.pullCounter + 1
+          vm.$store.commit('setpullCounter', vm.pullCounter)
           vm.$socket.sendObj(
             {
               type: 'api',
@@ -285,6 +287,7 @@
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
+            vm.$store.commit('setpullCounter', vm.pullCounter)
             let apiURL = vm.detailForm[key]['datasource_api']
             if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
               apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']

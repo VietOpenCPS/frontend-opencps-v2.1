@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
     refreshSocket: 0,
     initData: {},
     dataSocket: {},
+    pullCounter: 0,
     tocken: '',
     loginUser: [
       {
@@ -146,6 +147,12 @@ export const store = new Vuex.Store({
     },
     setsnackbarsocket (state, payload) {
       state.snackbarsocket = payload
+    },
+    setpullCounter (state, payload) {
+      state.pullCounter = payload
+    },
+    setdataSocket (state, payload) {
+      state.setdataSocket = payload
     }
   },
   getters: {
@@ -163,6 +170,12 @@ export const store = new Vuex.Store({
     },
     getContentFileSimple (state) {
       return state.getContentFileSimple
+    },
+    pullCounter (state) {
+      return state.pullCounter
+    },
+    dataSocket (state) {
+      return state.dataSocket
     }
   }
 })
