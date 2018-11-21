@@ -15,6 +15,7 @@
     </div>
     <div style="text-align: right;">
       <v-btn color="blue darken-3" dark
+        :to="'/danh-sach-giay-to/' + index + '/editor'"
       >
         Thêm giấy phép
       </v-btn>
