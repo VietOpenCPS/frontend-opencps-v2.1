@@ -1,72 +1,135 @@
 <template>
-  <v-expansion-panel class="expansion-pl ext__form">
-    <v-expansion-panel-content hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
-      <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-      {{item.fieldLabel}}
-      </div>
-      <v-card>
-        <v-card-text class="py-2 px-2">
-          <v-layout wrap>
-            <v-flex xs12>
-                <!-- <span :for="item.fieldName" style="
-                    font-size: 13px;
-                ">{{item.fieldLabel}}</span> -->
-                <v-text-field v-if="item.fieldType === 'textarea'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    multi-line
-                    @input="inputChangeValue(item)"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'string'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    @input="inputChangeValue(item)"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'number'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-				            :rules="[rulesValid.number]"
-                    @input="inputChangeValue(item)"
-                ></v-text-field>
-                <v-text-field v-if="item.fieldType === 'date'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    readonly
-                    append-icon="event"
-                    v-on:click.native="openDialogCustom(item, item.fieldName)"
-                ></v-text-field>
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <v-dialog
-            v-model="dialog"
-            width="500"
-        >
-            <v-date-picker
-                v-model="date"
-                full-width
-                landscape
-            ></v-date-picker>
-            <v-card-actions style="
-                background: #fff;
-            ">
-            <v-spacer></v-spacer>
-            <v-btn
-                color="primary"
-                flat
-                @click="pickDateCustom"
-            >
-                Xác nhận
-            </v-btn>
-            </v-card-actions>
-        </v-dialog>
-      </v-card>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+  <div>
+    <v-expansion-panel v-if="type !== 'dieuchinhdulieu'" class="expansion-pl ext__form">
+      <v-expansion-panel-content hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
+        <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+        {{item.fieldLabel}}
+        </div>
+        <v-card>
+          <v-card-text class="py-2 px-2">
+            <v-layout wrap>
+              <v-flex xs12>
+                  <!-- <span :for="item.fieldName" style="
+                      font-size: 13px;
+                  ">{{item.fieldLabel}}</span> -->
+                  <v-text-field v-if="item.fieldType === 'textarea'"
+                      :id="item.fieldName"
+                      :value="item.value"
+                      :placeholder="item.placeholder"
+                      multi-line
+                      @input="inputChangeValue(item)"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'string'"
+                      :id="item.fieldName"
+                      :value="item.value"
+                      :placeholder="item.placeholder"
+                      @input="inputChangeValue(item)"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'number'"
+                      :id="item.fieldName"
+                      :value="item.value"
+                      :placeholder="item.placeholder"
+                      :rules="[rulesValid.number]"
+                      @input="inputChangeValue(item)"
+                  ></v-text-field>
+                  <v-text-field v-if="item.fieldType === 'date'"
+                      :id="item.fieldName"
+                      :value="item.value"
+                      :placeholder="item.placeholder"
+                      readonly
+                      append-icon="event"
+                      v-on:click.native="openDialogCustom(item, item.fieldName)"
+                  ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-dialog
+              v-model="dialog"
+              width="500"
+          >
+              <v-date-picker
+                  v-model="date"
+                  full-width
+                  landscape
+              ></v-date-picker>
+              <v-card-actions style="
+                  background: #fff;
+              ">
+              <v-spacer></v-spacer>
+              <v-btn
+                  color="primary"
+                  flat
+                  @click="pickDateCustom"
+              >
+                  Xác nhận
+              </v-btn>
+              </v-card-actions>
+          </v-dialog>
+        </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+    <v-card v-else>
+      <v-card-text class="py-2 px-2">
+        <v-layout wrap>
+          <v-flex xs12>
+              <!-- <span :for="item.fieldName" style="
+                  font-size: 13px;
+              ">{{item.fieldLabel}}</span> -->
+              <v-text-field v-if="item.fieldType === 'textarea'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  multi-line
+                  @input="inputChangeValue(item)"
+              ></v-text-field>
+              <v-text-field v-if="item.fieldType === 'string'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  @input="inputChangeValue(item)"
+              ></v-text-field>
+              <v-text-field v-if="item.fieldType === 'number'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  :rules="[rulesValid.number]"
+                  @input="inputChangeValue(item)"
+              ></v-text-field>
+              <v-text-field v-if="item.fieldType === 'date'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  readonly
+                  append-icon="event"
+                  v-on:click.native="openDialogCustom(item, item.fieldName)"
+              ></v-text-field>
+          </v-flex>
+        </v-layout>
+      </v-card-text>
+      <v-dialog
+          v-model="dialog"
+          width="500"
+      >
+        <v-date-picker
+            v-model="date"
+            full-width
+            landscape
+        ></v-date-picker>
+        <v-card-actions style="
+            background: #fff;
+        ">
+          <v-spacer></v-spacer>
+          <v-btn
+              color="primary"
+              flat
+              @click="pickDateCustom"
+          >
+              Xác nhận
+          </v-btn>
+        </v-card-actions>
+      </v-dialog>
+    </v-card>
+  </div>
 </template>
 <script>
   export default {
@@ -76,6 +139,10 @@
       },
       action_id: {
         type: Number
+      },
+      type: {
+        type: String,
+        default: () => ''
       }
     },
     data: () => ({
@@ -91,9 +158,9 @@
         }
       }
     }),
-    created () {
-      var vm = this
-      vm.$nextTick(function () {
+    watch: {
+      dossier_id () {
+        let vm = this
         let filter = {
           dossierId: vm.dossier_id,
           actionId: vm.action_id
@@ -101,6 +168,20 @@
         vm.$store.dispatch('getExtraForm', filter).then(function (result) {
           vm.formBuilder = result
         })
+      }
+    },
+    created () {
+      var vm = this
+      vm.$nextTick(function () {
+        let filter = {
+          dossierId: vm.dossier_id,
+          actionId: vm.action_id
+        }
+        if (filter['dossierId'] && filter['actionId']) {
+          vm.$store.dispatch('getExtraForm', filter).then(function (result) {
+            vm.formBuilder = result
+          })
+        }
       })
     },
     methods: {

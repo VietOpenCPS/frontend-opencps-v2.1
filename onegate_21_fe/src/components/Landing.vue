@@ -394,6 +394,7 @@
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
                 <v-list-tile v-for="(item, i) in btnDynamics" :key="i + '_menu_' + props.item.dossierId" 
                   @click="btnActionEvent(props.item, item, props.index, false)"
+                  :disabled="String(props.item['permission']).indexOf('write') === -1"
                   v-if="menuType === 3"
                   >
                   <v-list-tile-title>{{item.title}}{{item.tiltle}}</v-list-tile-title>
@@ -701,6 +702,26 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog_extraForm" scrollable persistent max-width="700px">
+      <v-card>
+        <v-card-title class="headline">
+          Điều chỉnh dữ liệu
+        </v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_extraForm = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <v-card-text>
+          <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" :dossier_id="dossierIdSelected" :action_id="actionId" :type="'dieuchinhdulieu'"></form-bo-sung-thong-tin>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doChangeDossierExtraForm()">
+            <v-icon>save</v-icon> &nbsp;
+            Xác nhận
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -716,6 +737,7 @@ import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
 import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
+import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 
 export default {
   props: ['index'],
@@ -727,10 +749,13 @@ export default {
     'xac-nhan-thu-phi': XacNhanThuPhi,
     'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
-    'template-rendering': TemplateRendering
+    'template-rendering': TemplateRendering,
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan
   },
   data: () => ({
     isAdminSuper: false,
+    actionId: '',
+    dossierIdSelected: '',
     dossierCountingShow: false,
     dossierCounting: [],
     advSearchToolsSelected: [],
@@ -863,6 +888,7 @@ export default {
     statusFailed: 0,
     dialog_statusAction: false,
     dialog_printGuide: false,
+    dialog_extraForm: false,
     validGuide: false,
     applicantNameGuide: '',
     applicantEmailGuide: '',
@@ -1153,7 +1179,7 @@ export default {
         } else {
           vm.selectedDoAction = []
         }
-        console.log('selectedDoAction', vm.selectedDoAction)
+        // console.log('selectedDoAction', vm.selectedDoAction)
       },
       deep: true
     }
@@ -1186,12 +1212,12 @@ export default {
         }
       }
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
-      console.log('selected toggle all', vm.selectMultiplePage)
+      // console.log('selected toggle all', vm.selectMultiplePage)
     },
     changeSelected () {
       let vm = this
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
-      console.log('selected item', vm.selectMultiplePage)
+      // console.log('selected item', vm.selectMultiplePage)
     },
     resend () {
       var vm = this
@@ -1833,24 +1859,29 @@ export default {
     doChangeDossier (dossierItem, item, index, isGroup) {
       let vm = this
       let currentQuery = vm.$router.history.current.query
-      //
       if (isGroup) {
-        let filter = {
-          dossierId: 0
-        }
-        // console.log(vm.selected)
-        
         if (vm.selectedDoAction.length > 0) {
-          let deleteIds = []
-          for (let key in vm.selectedDoAction) {
-            deleteIds.push(vm.selectedDoAction[key]['dossierId'])
-          }
-          filter['dossierId'] = deleteIds
-          // TODO show dialog
-          
+          vm.actionId = 9100
+          vm.dossierIdSelected = vm.selectedDoAction[0].dossierId
+          console.log('selectExtraForm', vm.dossierIdSelected, vm.actionId)
+          vm.dialog_extraForm = true
         } else {
-          alert('no item selected')
+          alert('Chọn hồ sơ để thực hiện')
         }
+      }
+    },
+    doChangeDossierExtraForm () {
+      let vm = this
+      vm.dialog_extraForm = false
+      let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+      for (let key in vm.selectedDoAction) {
+        let fiter = {
+          dossierId: vm.selectedDoAction[key].dossierId,
+          actionCode: vm.actionId,
+          payload: payloadExtraForm
+        }
+        vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
+        })
       }
     },
     doDeleteDossier (dossierItem, item, index, isGroup) {
