@@ -198,6 +198,7 @@
     computed: {
       detailForm () {
         let detailDynamic = this.$store.getters.getContentFileSimple
+        console.log('detailDynamicSimple', detailDynamic)
         if (detailDynamic === '') {
           return []
         } else {
