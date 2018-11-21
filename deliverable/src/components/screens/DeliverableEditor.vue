@@ -49,6 +49,9 @@
             vm.$store.commit('setdataSocket', vm.dataSocket)
             if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
               vm.tempCounter = vm.tempCounter - 1
+              if (vm.tempCounter < 0) {
+                vm.tempCounter = 0
+              }
               vm.$store.commit('setpullCounter', vm.tempCounter)
             }
           }
