@@ -2029,7 +2029,7 @@ export default {
         'users': vm.reAsignUsers
       }
       let result = vm.$refs.phanconglai.doExport()
-      if (result && vm.checkPemissionPhanCongLai(currentUser)) {
+      if (result && vm.checkPemissionPhanCongLai(vm.currentUser)) {
         vm.loadingAction = true
         vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
           setTimeout(function() {
