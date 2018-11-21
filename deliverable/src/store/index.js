@@ -78,7 +78,7 @@ export const store = new Vuex.Store({
             'Accept': 'text/plain'
           }
         }
-        axios.get('/fileattach/' + fileEntryId + '/text', options).then(function (response) {
+        axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
           resolve(response.data)
         }).catch(function () {
           commit('setsnackbarerror', true)
