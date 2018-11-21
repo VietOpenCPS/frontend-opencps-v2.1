@@ -214,6 +214,18 @@
         }
       }
     },
+    created() {
+      var vm = this
+      vm.$nextTick(function() {
+        setTimeout(() => {
+          vm.processDataSource()
+        }, 100)
+        vm.$socket.onmessage = function (data) {
+          let dataObj = eval('( ' + data.data + ' )')
+          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+        }
+      })
+    },
     methods: {
       clearLoading () {
         this.loading = false
