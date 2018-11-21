@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import NotFound from '@/components/NotFound'
 import DeliverableList from '@/components/screens/DeliverableList'
+import DeliverableEditor from '@/components/screens/DeliverableEditor'
 
 const routes = [
   {
@@ -18,6 +19,16 @@ const routes = [
         path: '/danh-sach-giay-to/:index',
         name: 'DeliverableList',
         component: DeliverableList,
+        // component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/danh-sach-giay-to/:index/editor',
+        name: 'DeliverableEditor',
+        component: DeliverableEditor,
         // component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
         props: true,
         meta: {
