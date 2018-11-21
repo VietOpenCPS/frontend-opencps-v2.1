@@ -98,7 +98,8 @@ export const store = new Vuex.Store({
         }
         let body = AdminConfig.getAdminConfig
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
-          state.getContentFileSimple = response.data['getAdminConfig']['detailColumns']
+          state.getContentFileSimple = eval('( ' + response.data['getAdminConfig']['detailColumns'] + ' )')
+          console.log('state.getContentFileSimple', state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
           commit('setsnackbarerror', true)
