@@ -15,7 +15,7 @@
     </div>
     <div style="text-align: right;">
       <v-btn color="blue darken-3" dark
-        :to="'/danh-sach-giay-to/' + index + '/editor'"
+        :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
         Thêm giấy phép
       </v-btn>
@@ -74,8 +74,13 @@
 </template>
 
 <script>
+  import { TinyPagination } from '@/components'
+
   export default {
     props: ['index'],
+    components: {
+      TinyPagination
+    },
     data () {
       return {
         headers: [],
@@ -90,7 +95,6 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
-        console.log(vm.index)
         setTimeout(() => {
           console.log(vm.items)
           vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']

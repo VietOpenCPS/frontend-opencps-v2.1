@@ -28,7 +28,8 @@ export const store = new Vuex.Store({
     },
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
-    getDeliverableTypes: []
+    getDeliverableTypes: [],
+    getContentFile: ''
   },
   actions: {
     loadInitResource ({state}) {
@@ -71,7 +72,7 @@ export const store = new Vuex.Store({
       })
     },
     getContentFile ({ commit, state }, fileEntryId) {
-      return new Promise((resolve, reject) => {
+      return new Promise(() => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -79,9 +80,9 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
-          resolve(response.data)
-        }).catch(function (xhr) {
-          reject(xhr)
+          state.getContentFile = response.data
+        }).catch(function () {
+          rstate.getContentFile = ''
         })
       })
     }
@@ -135,6 +136,9 @@ export const store = new Vuex.Store({
     },
     getDeliverableTypes (state) {
       return state.getDeliverableTypes
+    },
+    getContentFile (state) {
+      return state.getContentFile
     }
   }
 })

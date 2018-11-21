@@ -14,15 +14,18 @@
         </div>
       </div> 
     </div>
-    <div>
-
-    </div>
+    <bbat-table-editor-component ref="bbatForm" :id="id"></bbat-table-editor-component>
   </div>
 </template>
 
 <script>
+  import { BbatTableEditorComponent } from '@/components'
+
   export default {
-    props: ['index'],
+    props: ['index', 'id'],
+    components: {
+      BbatTableEditorComponent
+    },
     data () {
       return {
         dataSocket: {}
