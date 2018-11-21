@@ -32,7 +32,7 @@
       var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
-          let formId = vm.items[vm.index]
+          let formId = vm.items[vm.index]['formScriptFileId']
           console.log('formId', formId)
           vm.$store.dispatch('getContentFile', formId).then(function (data) {
             console.log(data)
