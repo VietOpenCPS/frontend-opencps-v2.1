@@ -228,6 +228,7 @@
       var vm = this
       vm.$nextTick(function() {
         vm.$socket.onmessage = function (data) {
+          console.log('onmessage', data)
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
           if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
