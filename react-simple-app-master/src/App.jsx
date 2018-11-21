@@ -134,7 +134,7 @@ class App extends React.Component {
           },
           data: {}
         }
-        axios.get('/o/gate/v2/users/' + themeDisplay.getUserId(), param).then(function (response) {
+        axios.get('/o/v1/opencps/users/' + themeDisplay.getUserId(), param).then(function (response) {
           vm.setState({ userData: response.data })
         }).catch(function (error) {
           console.log(error)
@@ -158,7 +158,7 @@ class App extends React.Component {
   };
 
   goToDangNhap() {
-    axios.post('/o/gate/v2/login', {}, {
+    axios.post('/o/v1/opencps/login', {}, {
       headers: {
         'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
       }

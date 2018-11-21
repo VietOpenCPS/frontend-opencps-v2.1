@@ -20,7 +20,9 @@ export const store = new Vuex.Store({
     fileTypeTPHS: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf'],
     fileTypePAYMENT: ['png', 'jpg', 'jpeg'],
     error: null,
-    user: null,
+    user: {
+      'role': ''
+    },
     index: 0,
     kysoSuccess: false,
     activeGetCounter: false,
@@ -137,11 +139,17 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
+        if (state['user'].role === '') {
+          store.dispatch('getRoleUser').then(function (result) {
+            state['user'].role = result
+            console.log('state.user', state['user'].role)
+          })
+        }
         resolve(state.initData)
       })
     },
     // loadInitResource ({commit, state}) {
-    //   if (state.initData == null) {
+    //   if (state.initData === null) {
     //     return new Promise((resolve, reject) => {
     //       let param = {}
     //       let orginURL = window.location.href
@@ -166,6 +174,28 @@ export const store = new Vuex.Store({
     //     })
     //   }
     // },
+    getRoleUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/users/login', param).then(function (response) {
+        axios.get('/o/v1/opencps/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable.role) {
+            let dataReturn = serializable.role
+            resolve(dataReturn)
+          } else {
+            resolve('')
+          }
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
     loadMenuConfigToDo ({commit, state}) {
       commit('setLoadingDynamicBtn', true)
       if (state.trangThaiHoSoList === null) {
@@ -883,7 +913,6 @@ export const store = new Vuex.Store({
     putDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', false)
-        console.log('put dossier')
         let options = {
           headers: {
             groupId: state.initData.groupId,
@@ -946,7 +975,6 @@ export const store = new Vuex.Store({
         dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 0)
         axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
           resolve(response.data)
-          console.log('put dossier success')
           commit('setLoading', false)
           commit('setDossier', response.data)
           commit('setThongTinChuHoSo', response.data)
@@ -954,7 +982,6 @@ export const store = new Vuex.Store({
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
         }).catch(rejectXhr => {
-          console.log('put dossier catch')
           reject(rejectXhr)
         })
       })
@@ -3044,6 +3071,9 @@ export const store = new Vuex.Store({
     },
     getPaymentFileName (state) {
       return state.paymentFileName
+    },
+    getUser (state) {
+      return state.user
     }
   }
 })

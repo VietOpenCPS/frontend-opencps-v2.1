@@ -33,3 +33,9 @@ body .no__hidden_class.row-header .background-triangle-big {
 .row-header .background-triangle-big {
     white-space: nowrap;
 }
+body .v-list__tile--active {
+    background: #e1e2e1;
+}
+body .theme--light .v-navigation-drawer >.v-list .v-list__tile--active .v-list__tile__title {
+    color: #212121!important;
+}

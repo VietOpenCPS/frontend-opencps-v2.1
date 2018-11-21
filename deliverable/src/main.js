@@ -23,7 +23,7 @@ let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPor
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?groupId='+ groupId
+Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalURL
   + '&companyId=' + companyId
   + '&userId=' + userId
@@ -79,35 +79,7 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
-      setTimeout(() => {
-        vm.$socket.sendObj(
-          {
-            type: 'admin',
-            cmd: 'get',
-            responeType: 'menu',
-            code: 'opencps_adminconfig',
-            respone: 'listTableMenu',
-            start: -1,
-            end: -1
-          }
-        )
-        vm.$socket.sendObj(
-          {
-            type: 'api',
-            cmd: 'get',
-            respone: 'loginUser',
-            api: '/o/gate/v2/users/login',
-            headers: {
-              'Token': vm.getAuthToken(),
-              'groupId': vm.getScopeGroupId(),
-              'USER_ID': vm.getUserId()
-            }
-          }
-        )
-        if (window.location.href.endsWith('#/')) {
-          vm.$router.push('/table/opencps_employee')
-        }
-      }, 100)
+      vm.$store.dispatch('getDeliverableTypes')
     })
   }
 })

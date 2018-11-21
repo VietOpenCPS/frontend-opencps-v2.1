@@ -44,7 +44,7 @@ export const store = new Vuex.Store({
             userId = window.themeDisplay.getUserId()
           }
           // axios.get('http://127.0.0.1:8081/api/users/' + userId, param).then(function (response) {
-          axios.get('/o/gate/v2/users/' + userId, param).then(function (response) {
+          axios.get('/o/v1/opencps/users/' + userId, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {
@@ -147,7 +147,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
+          axios.get('/o/v1/opencps/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {

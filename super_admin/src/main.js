@@ -27,7 +27,7 @@ let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPor
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/gate/socket/web?groupId='+ groupId
+Vue.use(VueNativeSock, 'ws://' + portalURLSock + ':8080' + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalURL
   + '&companyId=' + companyId
   + '&userId=' + userId
@@ -107,7 +107,7 @@ new Vue({
             type: 'api',
             cmd: 'get',
             respone: 'loginUser',
-            api: '/o/gate/v2/users/login',
+            api: '/o/v1/opencps/users/login',
             headers: {
               'Token': vm.getAuthToken(),
               'groupId': vm.getScopeGroupId(),

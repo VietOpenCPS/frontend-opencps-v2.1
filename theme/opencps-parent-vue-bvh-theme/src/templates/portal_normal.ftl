@@ -31,7 +31,7 @@
         window.require = undefined;
     </script>
     
-	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery.min.js"></script>
+	<script src="${themeDisplay.getPathThemeRoot()}/js/jquery.min.js?t=123"></script>
 	<script src="${themeDisplay.getPathThemeRoot()}/js/bootstrap.min.js"></script>
 	<script src="${themeDisplay.getPathThemeRoot()}/js/handlebars.min.js"></script>
 	<script src="${themeDisplay.getPathThemeRoot()}/js/alpaca.min.js"></script>
@@ -116,7 +116,7 @@
 	</footer>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=123"></script>
+	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=1231231"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />
