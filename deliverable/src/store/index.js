@@ -80,8 +80,8 @@ export const store = new Vuex.Store({
         }
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
           resolve(response.data)
-        }).catch(function () {
-          commit('setsnackbarerror', true)
+        }).catch(function (xhr) {
+          reject(xhr)
         })
       })
     }
