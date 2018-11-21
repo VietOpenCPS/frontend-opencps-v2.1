@@ -26,7 +26,7 @@ const routes = [
         }
       },
       {
-        path: '/danh-sach-giay-to/:index/editor',
+        path: '/danh-sach-giay-to/:index/editor/:id',
         name: 'DeliverableEditor',
         component: DeliverableEditor,
         // component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
