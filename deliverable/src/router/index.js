@@ -17,7 +17,8 @@ const routes = [
       {
         path: '/danh-sach-giay-to/:index',
         name: 'DeliverableList',
-        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
+        component: DeliverableList,
+        // component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/DeliverableList.vue'),
         props: true,
         meta: {
           requiresAuth: true
