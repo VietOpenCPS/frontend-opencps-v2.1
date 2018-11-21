@@ -267,8 +267,15 @@
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       
       <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
+        v-if="getUser['role'] === 'Administrator_data'"
+      >
+        Điều chỉnh dữ liệu
+      </v-btn>
+
+      <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="isAdminSuper"
+        v-if="getUser['role'] === 'Administrator'"
       >
         DELETE
       </v-btn>
@@ -290,7 +297,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
@@ -298,14 +305,14 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
+          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
               primary
               hide-details
               @click.native="toggleAll"
-              v-if="isAdminSuper"
+              v-if="getUser['role'] === 'Administrator'"
             ></v-checkbox>
             <v-checkbox v-else
               :input-value="props.all"
@@ -332,14 +339,14 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || isAdminSuper">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
               primary
               hide-details
               color="primary"
-              v-if="isAdminSuper"
+              v-if="getUser['role'] === 'Administrator'"
             ></v-checkbox>
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
@@ -938,6 +945,9 @@ export default {
     titleLanding: ''
   }),
   computed: {
+    getUser () {
+      return this.$store.getters.getUser
+    },
     loadingDynamicBtn () {
       return this.$store.getters.loadingDynamicBtn
     },
@@ -1151,10 +1161,12 @@ export default {
   methods: {
     toggleAll () {
       var vm = this
+      /*
       if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
         vm.isAdminSuper = true
       }
-      if (vm.isAdminSuper) {
+      */
+      if (vm.getUser['role'] === 'Administrator') {
         if (vm.selected.length) {
           vm.selected = []
         } else {
@@ -1388,9 +1400,11 @@ export default {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
           vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / 15)
+          /*
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true
           }
+          */
           if (vm.hosoTotalPage > 0 && vm.selectMultiplePage.length === 0) {
             for (let key = 0; key < vm.hosoTotalPage; key++) {
               let item = {
@@ -1647,6 +1661,8 @@ export default {
           betimes: dossierItem['extendDate']
         }
         vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
+      } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
+        vm.doChangeDossier(dossierItem, item, index, isGroup)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -1812,6 +1828,29 @@ export default {
         }).catch(reject => {
           vm.loadingAction = false
         })
+      }
+    },
+    doChangeDossier (dossierItem, item, index, isGroup) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      //
+      if (isGroup) {
+        let filter = {
+          dossierId: 0
+        }
+        // console.log(vm.selected)
+        
+        if (vm.selectedDoAction.length > 0) {
+          let deleteIds = []
+          for (let key in vm.selectedDoAction) {
+            deleteIds.push(vm.selectedDoAction[key]['dossierId'])
+          }
+          filter['dossierId'] = deleteIds
+          // TODO show dialog
+          
+        } else {
+          alert('no item selected')
+        }
       }
     },
     doDeleteDossier (dossierItem, item, index, isGroup) {

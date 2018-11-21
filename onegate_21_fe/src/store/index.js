@@ -3044,6 +3044,9 @@ export const store = new Vuex.Store({
     },
     getPaymentFileName (state) {
       return state.paymentFileName
+    },
+    getUser (state) {
+      return state.user
     }
   }
 })
