@@ -71,7 +71,7 @@ export const store = new Vuex.Store({
       })
     },
     getContentFile ({ commit, state }, fileEntryId) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
