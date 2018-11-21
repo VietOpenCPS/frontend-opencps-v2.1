@@ -62,11 +62,25 @@ export const store = new Vuex.Store({
           }
         }
         let body = DeliverableTypes.getDeliverableTypes
-        console.log(body)
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           state.getDeliverableTypes = response.data['getDeliverableTypes']
         }).catch(function () {
           state.getDeliverableTypes = []
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
+    getContentFile ({ commit, state }, fileEntryId) {
+      return new Promise(() => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Accept': 'text/plain'
+          }
+        }
+        axios.get('/fileattach/' + fileEntryId + '/text', options).then(function (response) {
+          resolve(response.data)
+        }).catch(function () {
           commit('setsnackbarerror', true)
         })
       })
