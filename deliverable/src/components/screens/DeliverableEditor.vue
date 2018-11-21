@@ -38,6 +38,9 @@
       }
     },
     computed: {
+      items () {
+        return this.$store.getters.getDeliverableTypes
+      }
     },
     methods: {
       goBack () {
