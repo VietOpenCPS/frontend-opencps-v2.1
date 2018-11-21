@@ -176,6 +176,7 @@
     },
     data() {
       return {
+        isCallBack: true,
         config: {},
         pullOk: true,
         pullCounter: 0,
@@ -214,15 +215,30 @@
         }
       }
     },
+    updated() {
+      var vm = this
+      vm.$nextTick(function () {
+        if (vm.isCallBack) {
+          vm.isCallBack = false
+          vm.processDataSource()
+          setTimeout(() => {
+            vm.processDataSourceVerify()
+          }, 500)
+        }
+      })
+    },
     created() {
       var vm = this
       vm.$nextTick(function() {
-        setTimeout(() => {
-          vm.processDataSource()
-        }, 100)
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+          if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+            vm.pullCounter = vm.pullCounter - 1
+            if (vm.pullCounter === 0) {
+              vm.pullOk = true
+            }
+          }
         }
       })
     },
