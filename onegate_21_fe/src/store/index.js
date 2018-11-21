@@ -136,13 +136,12 @@ export const store = new Vuex.Store({
           state.initData['user'] = {
             'userName': '',
             'userEmail': '',
-            'userId': 20103
+            'userId': 20164
           }
         }
         if (state['user'].role === '') {
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
-            console.log('state.user', state['user'].role)
           })
         }
         resolve(state.initData)
@@ -185,11 +184,11 @@ export const store = new Vuex.Store({
         // axios.get('http://127.0.0.1:8081/api/users/login', param).then(function (response) {
         axios.get('/o/v1/opencps/users/login', param).then(function (response) {
           let serializable = response.data
-          if (serializable.role) {
-            let dataReturn = serializable.role
+          if (serializable && serializable[0]['role']) {
+            let dataReturn = serializable[0]['role']
             resolve(dataReturn)
           } else {
-            resolve('')
+            resolve('default')
           }
         }).catch(function (error) {
           reject(error)
