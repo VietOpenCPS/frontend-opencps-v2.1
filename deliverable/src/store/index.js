@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import DeliverableTypes from './DeliverableTypes'
+import AdminConfig from './AdminConfig'
 // import saveAs from 'file-saver'
 
 Vue.use(Vuex)
@@ -29,7 +30,8 @@ export const store = new Vuex.Store({
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
     getDeliverableTypes: [],
-    getContentFile: ''
+    getContentFile: '',
+    getContentFileSimple: []
   },
   actions: {
     loadInitResource ({state}) {
@@ -56,7 +58,6 @@ export const store = new Vuex.Store({
       return new Promise(() => {
         let options = {
           headers: {
-            'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
             'groupId': state.groupId,
             'Content-Type': 'text/plain',
             'Accept': 'application/json'
@@ -83,6 +84,24 @@ export const store = new Vuex.Store({
           state.getContentFile = response.data
         }).catch(function () {
           state.getContentFile = ''
+        })
+      })
+    },
+    getContentFileSimple ({ commit, state }, fileEntryId) {
+      return new Promise(() => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let body = AdminConfig.getAdminConfig
+        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+          state.getContentFileSimple = response.data['getAdminConfig']['detailColumns']
+        }).catch(function () {
+          state.getContentFileSimple = []
+          commit('setsnackbarerror', true)
         })
       })
     }
@@ -139,6 +158,9 @@ export const store = new Vuex.Store({
     },
     getContentFile (state) {
       return state.getContentFile
+    },
+    getContentFileSimple (state) {
+      return state.getContentFileSimple
     }
   }
 })

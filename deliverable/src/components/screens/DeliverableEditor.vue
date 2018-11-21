@@ -12,18 +12,20 @@
             <v-icon size="16">undo</v-icon>
           </v-btn>
         </div>
-      </div> 
+      </div>
     </div>
+    <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
     <bbat-table-editor-component ref="bbatForm" :id="id"></bbat-table-editor-component>
   </div>
 </template>
 
 <script>
-  import { BbatTableEditorComponent } from '@/components'
+  import { BbatTableEditorComponent, BbatTableEditorComponentSimple } from '@/components'
 
   export default {
     props: ['index', 'id'],
     components: {
+      BbatTableEditorComponentSimple,
       BbatTableEditorComponent
     },
     data () {
