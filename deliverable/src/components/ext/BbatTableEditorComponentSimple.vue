@@ -32,6 +32,7 @@
           :items="dataSocket[item['datasource_key']]"
           :item-text="item.itemText"
           :item-value="item.itemValue"
+          box
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
@@ -45,6 +46,7 @@
           :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"
+          box
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
@@ -58,6 +60,7 @@
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
+          box 
           clearable
         >
         </v-text-field>
@@ -66,6 +69,7 @@
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
+          box 
           clearable
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
@@ -100,6 +104,7 @@
             :items="dataSocket[itemChild['datasource_key']]"
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
+            box
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
@@ -113,6 +118,7 @@
             :items="itemChild.datasource"
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
+            box
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
@@ -126,6 +132,7 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
+            box
             clearable
           >
           </v-text-field>
@@ -134,6 +141,7 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
+            box
             clearable
           ></v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
@@ -152,7 +160,6 @@
         </div>
       </v-flex>
     </v-layout>
-
   </v-form>
 </template>
 
