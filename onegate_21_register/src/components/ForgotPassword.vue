@@ -9,12 +9,12 @@
       <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
           <v-flex xs12>
-            <p>Vui lòng nhập Email hoặc số điện thoại để được cấp lại mật khẩu</p>
+            <p>Vui lòng nhập Email để được cấp lại mật khẩu</p>
           </v-flex>
           <v-flex xs12>
             <v-text-field
               box
-              placeholder="Email hoặc số CMND/ Hộ chiếu/ Mã số thuế"
+              placeholder="địa chỉ Email"
               v-model="confirmCode"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required

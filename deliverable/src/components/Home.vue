@@ -1,18 +1,19 @@
 <template>
-  <v-app>
+  <div>
     <v-navigation-drawer v-model="drawer" fixed app width="240">
       <v-list dense>
         <v-list-tile
-          v-for="item in items"
-          :key="item.typeCode"
-          @click="deliverableRouter(item)"
+          v-for="(item, indexItem) in items"
+          :key="indexItem"
+          :to="'/danh-sach-giay-to/' + indexItem"
         >
           <v-list-tile-action>
-            <v-icon>description</v-icon>
+            <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">play_arrow</v-icon>
+            <v-icon v-else>description</v-icon>
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.typeName }}</v-list-tile-title>
+            <v-list-tile-title>{{ item.typeName }} - {{indexItem}} - {{index}} - {{String(indexItem) === String(index)}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -66,19 +67,17 @@
         <v-icon>replay</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-app>
+  </div>
 </template>
 
 <script>
   export default {
+    props: ['index'],
     data: () => ({
       dialog: false,
       drawer: null,
       dataSocket: {}
     }),
-    props: {
-      tableName: String
-    },
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes

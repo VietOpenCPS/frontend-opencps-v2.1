@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import DeliverableTypes from './DeliverableTypes'
 // import saveAs from 'file-saver'
 
 Vue.use(Vuex)
@@ -56,19 +57,14 @@ export const store = new Vuex.Store({
           headers: {
             'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTp0ZXN0',
             'groupId': state.groupId,
+            'Content-Type': 'text/plain',
             'Accept': 'application/json'
           }
         }
-        let body = `
-          {
-            getDeliverableTypes(start: 1, end: -1) {
-              typeCode
-              typeName
-            }
-          }
-        `
-        axios.post('http://localhost:8080/o/v1/opencps/deliverable', body, options).then(function (response) {
-          state.getDeliverableTypes = response.data.getDeliverableTypes
+        let body = DeliverableTypes.getDeliverableTypes
+        console.log(body)
+        axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
+          state.getDeliverableTypes = response.data['getDeliverableTypes']
         }).catch(function () {
           state.getDeliverableTypes = []
           commit('setsnackbarerror', true)

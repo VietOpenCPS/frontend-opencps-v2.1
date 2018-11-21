@@ -130,5 +130,8 @@
 				right: 15px;
 				top: 25px;
 		}
+		#navigation ul.child-menu {
+			display: none;
+		}
 	</style>
 </html>

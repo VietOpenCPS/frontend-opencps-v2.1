@@ -155,7 +155,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/o/gate/v2/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
+          axios.put('/o/v1/opencps/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
             resolve({statu: 200})
           }).catch(function (xhr) {
             reject(xhr)
@@ -172,7 +172,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/o/gate/v2/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
+          axios.put('/o/v1/opencps/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
             resolve({statu: 200})
           }).catch(function (xhr) {
             reject(xhr)
@@ -189,7 +189,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/o/gate/v2/user/' + postData['id'] + '/changepass', postData['data'], param).then(function () {
+          axios.put('/o/v1/opencps/user/' + postData['id'] + '/changepass', postData['data'], param).then(function () {
             resolve({statu: 200})
           }).catch(function (xhr) {
             reject(xhr)
@@ -229,7 +229,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/user/' + userId, param).then(function (response) {
+          axios.get('/o/v1/opencps/user/' + userId, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {
@@ -247,7 +247,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
+          axios.get('/o/v1/opencps/users/avatar/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (xhr) {
@@ -267,7 +267,7 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob'
           }
-          axios.get('/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function (data) {
+          axios.get('/o/v1/opencps/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function (data) {
             saveAs(data.data, item['uuid'] + '.' + item['extension'])
             resolve({status: true})
           }).catch(function (xhr) {
@@ -285,7 +285,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.put('/o/gate/v2/filetemplate/' + data['item']['serviceInfoId'] + '/' + data['item']['fileTemplateNo'], {
+          axios.put('/o/v1/opencps/filetemplate/' + data['item']['serviceInfoId'] + '/' + data['item']['fileTemplateNo'], {
             fileTemplateNo: data['fileTemplateNo'],
             templateName: data['templateName']
           }, param).then(function () {
@@ -305,7 +305,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.delete('/o/gate/v2/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function () {
+          axios.delete('/o/v1/opencps/filetemplate/' + item['serviceInfoId'] + '/' + item['fileTemplateNo'], param).then(function () {
             resolve({status: true})
           }).catch(function (xhr) {
             reject(xhr)
@@ -322,7 +322,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/filetemplate/' + pk, param).then(function (response) {
+          axios.get('/o/v1/opencps/filetemplate/' + pk, param).then(function (response) {
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable)
@@ -342,7 +342,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/gate/v2/fileattach/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
+          axios.get('/o/v1/opencps/fileattach/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
             let seriable = response.data
             if (seriable.data) {
               resolve(seriable)
