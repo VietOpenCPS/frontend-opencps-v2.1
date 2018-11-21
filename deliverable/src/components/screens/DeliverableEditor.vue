@@ -42,11 +42,9 @@
           vm.$store.dispatch('getContentFile', formId)
           vm.$store.dispatch('getContentFileSimple')
           vm.$socket.onmessage = function (data) {
-            console.log('onmessage', data)
             let dataObj = eval('( ' + data.data + ' )')
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            console.log('onmessage dataSocket', vm.dataSocket)
-
+            console.log('onmessage dataSocket no home', vm.dataSocket)
           }
         }, 100)
       })
