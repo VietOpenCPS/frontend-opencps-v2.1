@@ -1,8 +1,6 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3">
-    <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
-      margin-bottom: 100px;
-    ">
+  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-2 grid-list">
+    <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap>
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
         <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar>
         <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
@@ -205,6 +203,18 @@
           return detailDynamic
         }
       }
+    },
+    created() {
+      var vm = this
+      vm.$nextTick(function() {
+        setTimeout(() => {
+          vm.processDataSource()
+        }, 100)
+        vm.$socket.onmessage = function (data) {
+          let dataObj = eval('( ' + data.data + ' )')
+          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+        }
+      })
     },
     methods: {
       clearLoading () {
