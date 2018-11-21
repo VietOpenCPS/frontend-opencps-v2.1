@@ -87,7 +87,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getContentFileSimple ({ commit, state }, fileEntryId) {
+    getContentFileSimple ({ commit, state }) {
       return new Promise(() => {
         let options = {
           headers: {

@@ -39,9 +39,8 @@
         setTimeout(() => {
           let formId = vm.items[vm.index]['formScriptFileId']
           console.log('formId', formId)
-          vm.$store.dispatch('getContentFile', formId).then(function (data) {
-            console.log(data)
-          })
+          vm.$store.dispatch('getContentFile', formId)
+          vm.$store.dispatch('getContentFileSimple')
         }, 100)
       })
     },
