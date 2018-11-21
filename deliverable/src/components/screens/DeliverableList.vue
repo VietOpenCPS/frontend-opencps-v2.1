@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row-header no__hidden_class">
-      <div class="background-triangle-big"> <span>{{items[index]['typeName']}}</span> </div>
+      <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           
@@ -13,6 +13,62 @@
         </div>
       </div> 
     </div>
+    <div style="text-align: right;">
+      <v-btn color="blue darken-3" dark
+      >
+        Thêm giấy phép
+      </v-btn>
+    </div>
+    <v-data-table
+        :headers="headers"
+        :items="hosoDatas"
+        :total-items="hosoDatasTotal"
+        v-model="selected"
+        item-key="deliverableId"
+        class="table-landing table-bordered"
+        no-data-text="Không có giấy phép nào"
+        hide-actions
+      >
+      <template slot="items" slot-scope="props">
+        <tr>
+          <td class="text-xs-center px-0 py-0">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;">
+              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
+            </span>
+          </td>
+
+          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.deliverableId"
+            :class="itemHeader['class_column']"
+            v-if="itemHeader.hasOwnProperty('value')"
+          >
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+              <span v-else>
+                {{ props.item[itemHeader.value] }}
+              </span>
+            </div>
+          </td>
+          <td class="text-xs-center px-0 py-0" v-if="!hideAction">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            pdf
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
+    <div class="text-xs-right layout wrap" style="position: relative;">
+      <div class="flex pagging-table px-2"> 
+        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
+          @tiny:change-page="paggingData" ></tiny-pagination>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,20 +77,59 @@
     props: ['index'],
     data () {
       return {
+        headers: [],
+        hideAction: false,
+        hosoDatas: [],
+        hosoDatasTotal: 0,
+        hosoDatasPage: 1,
+        hosoTotalPage: 0,
         dataSocket: {}
       }
     },
     created () {
       var vm = this
       vm.$nextTick(function () {
+        console.log(vm.index)
+        setTimeout(() => {
+          console.log(vm.items)
+          vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+        }, 100)
       })
+    },
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+      },
+      index (val) {
+        var vm = this
+        vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+      }
     },
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
+      },
+      loadingTable () {
+        return this.$store.getters.loadingTable
       }
     },
     methods: {
+      paggingData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        // console.log('queryString=====', queryString)
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
+      }
     }
   }
 </script>
