@@ -232,6 +232,8 @@
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
           if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
             vm.pullCounter = vm.pullCounter - 1
+            console.log('pullCounter', vm.pullCounter)
+            console.log('vm.pullCounter === 0', vm.pullCounter === 0)
             if (vm.pullCounter === 0) {
               vm.pullOk = true
             }
@@ -278,9 +280,7 @@
       },
       processDataSource () {
         let vm = this
-        console.log('processDataSource', vm.detailForm)
         for (let key in vm.detailForm) {
-          console.log('vm.detailForm[key]', vm.detailForm[key])
           if (vm.detailForm[key].hasOwnProperty('datasource_api') && vm.detailForm[key].hasOwnProperty('datasource_key')) {
             vm.pullOk = false
             vm.pullCounter = vm.pullCounter + 1
@@ -288,7 +288,6 @@
             if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
               apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']
             }
-            console.log('apiURL', vm.apiURL)
             vm.$socket.sendObj(
               {
                 type: 'api',
@@ -304,6 +303,7 @@
             )
           }
         }
+        console.log('vm.pullCounter', vm.pullCounter)
       }
     }
   }
