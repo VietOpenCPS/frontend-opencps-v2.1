@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3">
+  <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3 vuejx__form">
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
     ">
@@ -35,7 +35,6 @@
           :items="dataSocket[item['datasource_key']]"
           :item-text="item.itemText"
           :item-value="item.itemValue"
-          box
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
@@ -45,10 +44,10 @@
           clearable
         >
           <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_prepend']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
           </template>
           <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_append']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
           </template>
         </v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
@@ -56,7 +55,6 @@
           :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"
-          box
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
@@ -66,10 +64,10 @@
           clearable
         >
           <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_prepend']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
           </template>
           <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_append']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
           </template>
         </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
@@ -77,14 +75,13 @@
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
-          box 
           clearable
         >
           <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_prepend']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
           </template>
           <template slot="append-outer" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_append']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
           </template>
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
@@ -92,7 +89,6 @@
           :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
-          box 
           clearable
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
@@ -102,10 +98,10 @@
           v-model="data[item.model]"
         >
           <template slot="prepend" v-if="item['label_prepend'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_prepend']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_prepend']"></v-subheader>
           </template>
           <template slot="append" v-if="item['label_append'] !== ''">
-            <v-subheader style="height: 24px;" v-html="item['label_append']"></v-subheader>
+            <v-subheader style="height: 24px; padding: 0;" v-html="item['label_append']"></v-subheader>
           </template>
         </v-switch>
         <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild">
@@ -135,7 +131,6 @@
             :items="dataSocket[itemChild['datasource_key']]"
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
-            box
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
@@ -145,10 +140,10 @@
             clearable
           >
             <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_prepend']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
             </template>
             <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_append']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
             </template>
           </v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
@@ -156,7 +151,6 @@
             :items="itemChild.datasource"
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
-            box
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
@@ -166,10 +160,10 @@
             clearable
           >
             <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_prepend']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
             </template>
             <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_append']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
             </template>
           </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
@@ -177,14 +171,13 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
-            box
             clearable
           >
             <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_prepend']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
             </template>
             <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_append']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
             </template>
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
@@ -192,7 +185,6 @@
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
-            box
             clearable
           ></v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
@@ -202,10 +194,10 @@
             v-model="data[itemChild.model]"
           >
             <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_prepend']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_prepend']"></v-subheader>
             </template>
             <template slot="append" v-if="itemChild['label_append'] !== ''">
-              <v-subheader style="height: 24px;" v-html="itemChild['label_append']"></v-subheader>
+              <v-subheader style="height: 24px; padding: 0;" v-html="itemChild['label_append']"></v-subheader>
             </template>
           </v-switch>
         </div>
