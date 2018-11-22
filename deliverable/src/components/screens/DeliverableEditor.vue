@@ -16,8 +16,6 @@
     </div>
     <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
     <v-tabs
-      dark
-      color="cyan"
       icons-and-text centered
     >
       <v-tabs-slider color="yellow"></v-tabs-slider>
@@ -25,6 +23,7 @@
       <v-tab
         href="#tab-1"
         :key="1"
+        v-if="String(id) !== '0'"
       >
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           XEM GIẤY PHÉP
@@ -49,6 +48,7 @@
           id="tab-1"
           :key="1"
           reverse-transition="fade-transition" transition="fade-transition"
+          v-if="String(id) !== '0'"
         >
           view giay phep
         </v-tab-item>
