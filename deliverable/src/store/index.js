@@ -152,7 +152,7 @@ export const store = new Vuex.Store({
       state.pullCounter = payload
     },
     setdataSocket (state, payload) {
-      state.setdataSocket = payload
+      state.dataSocket = payload
     }
   },
   getters: {
