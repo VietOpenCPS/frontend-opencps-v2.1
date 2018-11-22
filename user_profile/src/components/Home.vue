@@ -275,19 +275,19 @@
       wardItems: [],
       item: {
         "model": "classPK",
-        'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
+        'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
         'remove_api': '',
         'class_name': 'org.opencps.usermgt.model.ApplicantAvatar'
       },
       itemEsign: {
         "model": "classPK",
-        'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsign',
+        'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsign',
         'remove_api': '',
         'class_name': 'org.opencps.usermgt.model.ApplicantEsign'
       },
       itemEsignCert: {
         "model": "classPK",
-        'upload_api': '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsignCert',
+        'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsignCert',
         'remove_api': '',
         'class_name': 'org.opencps.usermgt.model.ApplicantEsignCert'
       }
@@ -305,7 +305,7 @@
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            vm.item['upload_api'] = '/o/gate/v2/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
+            vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
             vm.item['class_name'] = 'rg.opencps.usermgt.model.EmployeeAvatar'
           }
           let filterCity = {
