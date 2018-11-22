@@ -194,6 +194,7 @@
         console.log('submitDataObject', submitDataObject)
         if (cmd === -1) {
         } else {
+          vm.$store.dispatch('createDeliverable', submitDataObject)
         }
       }
     }

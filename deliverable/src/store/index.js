@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import DeliverableTypes from './DeliverableTypes'
 import AdminConfig from './AdminConfig'
+import Deliverable from './Deliverable'
 // import saveAs from 'file-saver'
 
 Vue.use(Vuex)
@@ -104,6 +105,23 @@ export const store = new Vuex.Store({
           console.log('state.getContentFileSimple', state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
+    createDeliverable ({ commit, state }, input) {
+      return new Promise(() => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let body = Deliverable.createDeliverable.replace('INPUTBODY', input)
+        axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
+          console.log(response)
+        }).catch(function () {
           commit('setsnackbarerror', true)
         })
       })
