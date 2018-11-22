@@ -345,7 +345,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
