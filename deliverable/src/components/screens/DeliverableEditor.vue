@@ -46,7 +46,7 @@
 
       <v-tabs-items reverse-transition="fade-transition" transition="fade-transition">
         <v-tab-item
-          id="tab-1"
+          value="tab-1"
           :key="1"
           reverse-transition="fade-transition" transition="fade-transition"
           v-if="String(id) !== '0'"
@@ -54,14 +54,14 @@
           view giay phep
         </v-tab-item>
         <v-tab-item
-          id="tab-2"
+          value="tab-2"
           :key="2"
           reverse-transition="fade-transition" transition="fade-transition"
         >
           <bbat-table-editor-component ref="bbatForm" :id="id"></bbat-table-editor-component>
         </v-tab-item>
         <v-tab-item
-          id="tab-3"
+          value="tab-3"
           :key="3"
           reverse-transition="fade-transition" transition="fade-transition"
         >
@@ -178,12 +178,16 @@
         let vm = this
         let bbatFormSimple = vm.$refs.bbatFormSimple
         let bbatForm = vm.$refs.bbatForm
+        let submitDataObject = {}
         if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
           console.log('bbatFormSimple', bbatFormSimple.data)
+          submitDataObject = bbatFormSimple.data
         }
         if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
           console.log('bbatForm', bbatForm.data)
+          submitDataObject['formData'] = bbatFormSimple.data
         }
+        console.log('submitDataObject', submitDataObject)
         if (cmd === -1) {
         } else {
         }
