@@ -49,6 +49,9 @@ body .vuejx__form .no_margin > div {
     padding: 0;
     margin: 0;
 }
+body .vuejx__form .v-text-field { 
+    padding: 0;
+}
 
 body .sm_10 .v-input__control,
 body .smx_10 > div {

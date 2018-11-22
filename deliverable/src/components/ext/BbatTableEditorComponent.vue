@@ -2,6 +2,8 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-3 py-3 vuejx__form">
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
+      max-width: 800px;
+      margin: 0 auto;
     ">
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
         <span v-if="item.type === 'label'" v-html="item['label']"></span>
@@ -90,6 +92,7 @@
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           clearable
+          :rows="2"
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
         <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
