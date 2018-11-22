@@ -94,7 +94,7 @@
                   </span>
                 </p>
                 <v-layout wrap xs12 class="mb-0">
-                  <v-flex style="width:calc(100%-150px)">
+                  <v-flex style="width:calc(100%-100px)">
                     <span>Người thực hiện: &nbsp;</span>
                     <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                       <span v-for="(item, index) in usersNextAction" :key="item.userId">
@@ -106,7 +106,7 @@
                       </span>
                     </span>
                   </v-flex>
-                  <v-flex class="text-xs-right" style="width:150px">
+                  <v-flex class="text-xs-right" style="width:100px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
                       <span v-if="currentUser['userId'].toString() === thongTinChiTietHoSo.lastActionUserId.toString() || checkPemissionPhanCongLai(currentUser) === false">Phân công lại</span>
                       <span v-if="currentUser['userId'].toString() !== thongTinChiTietHoSo.lastActionUserId.toString() && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>

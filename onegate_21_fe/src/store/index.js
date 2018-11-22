@@ -142,6 +142,9 @@ export const store = new Vuex.Store({
         if (state['user'].role === '') {
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
+          }).catch(function (error) {
+            state['user'].role = 'default'
+            console.log(error)
           })
         }
         resolve(state.initData)
@@ -191,7 +194,8 @@ export const store = new Vuex.Store({
             resolve('default')
           }
         }).catch(function (error) {
-          reject(error)
+          console.log(error)
+          reject('default')
         })
       })
     },
@@ -1951,7 +1955,7 @@ export const store = new Vuex.Store({
             }
           }
           let formData = new URLSearchParams()
-          formData.append('actionCode', filter.actionCode)
+          formData.append('actionCode', filter.actionCode ? filter.actionCode : '')
           formData.append('payment', filter.payment?JSON.stringify(filter.payment):null)
           formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):null)
           formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):null)
@@ -2578,7 +2582,11 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/nextactions/' + filter.actionId +  '/payload', param).then(function (response) {
             let serializable = response.data
-            resolve(serializable.data)
+            if (serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
           }).catch(function (error) {
             console.log(error)
             reject(error)

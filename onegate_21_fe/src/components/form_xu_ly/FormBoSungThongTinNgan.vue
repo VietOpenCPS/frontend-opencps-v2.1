@@ -114,7 +114,15 @@
                 v-on:click.native="openDialogCustom(item, item.fieldName)"
               ></v-text-field>
             </v-flex>
-          
+            <v-flex xs12 class="px-3">
+              <v-text-field v-if="item.fieldType === 'status'"
+                box
+                :id="item.fieldName"
+                :value="item.value"
+                :placeholder="item.placeholder"
+                @input="inputChangeValue(item)"
+              ></v-text-field>
+            </v-flex>
           </v-layout>
         </v-form>
         <v-dialog v-model="dialog" width="500">
@@ -171,7 +179,6 @@
         }
         vm.$store.dispatch('getExtraForm', filter).then(function (result) {
           vm.formBuilder = result
-          console.log(vm.$refs.formExtra.validate())
         })
       }
     },
@@ -214,6 +221,15 @@
           return ''
         }
       },
+      parseCurrentDate (date) {
+        if (!date) {
+          return null
+        }
+        // let [day1, time] = date.split(' ')
+        let [day2, month, year] = date.split('/')
+        // let [hh, mm, ss] = `${time}`.split(':')
+        return `${year}-${month.padStart(2, '0')}-${day2.padStart(2, '0')}`
+      },
       checkValid () {
         let vm = this
         return vm.$refs.formExtra.validate()
@@ -221,9 +237,15 @@
       formSubmitData () {
         let vm = this
         let objectReturn = {}
+        // console.log('formBuilder', vm.formBuilder)
         for (let key in vm.formBuilder) {
-          objectReturn[vm.formBuilder[key].fieldName] = vm.formBuilder[key].value
+          let valueEdit = vm.formBuilder[key].value
+          if (vm.formBuilder[key].fieldType === 'date') {
+            valueEdit = (new Date(vm.parseCurrentDate(vm.formBuilder[key].value))).getTime() ? (new Date(vm.parseCurrentDate(vm.formBuilder[key].value))).getTime() : ''
+          }
+          objectReturn[vm.formBuilder[key].fieldName] = valueEdit
         }
+        // console.log('objectReturn', objectReturn)
         return objectReturn
       }
     }
