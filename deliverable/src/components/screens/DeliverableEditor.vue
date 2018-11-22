@@ -7,8 +7,10 @@
           
         </div>
         <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-          <v-icon>more_vert</v-icon>
-          <v-btn flat class="my-0 mx-0 btn-border-left" @click="backToList" active-class="temp_active">
+          <v-btn icon class="my-0 mx-0 btn-border-left">
+            <v-icon size="16">more_vert</v-icon>
+          </v-btn>
+          <v-btn icon class="ml-0 mx-0 btn-border-left mr-3" @click="backToList" active-class="temp_active">
             <v-icon size="16">reply</v-icon>
           </v-btn>
         </div>
@@ -38,7 +40,8 @@
           FORM NHẬP GIẤY PHÉP
         </v-btn>
       </v-tab>
-      <v-tab :key="3" href="#tab-3"> 
+      <v-tab :key="3" href="#tab-3" 
+        v-if="String(id) !== '0'"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           LỊCH SỬ CẬP NHẬT GIẤY PHÉP
         </v-btn>
@@ -64,6 +67,7 @@
           value="tab-3"
           :key="3"
           reverse-transition="fade-transition" transition="fade-transition"
+          v-if="String(id) !== '0'"
         >
           view logs
         </v-tab-item>
@@ -185,7 +189,7 @@
         }
         if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
           console.log('bbatForm', bbatForm.data)
-          submitDataObject['formData'] = bbatFormSimple.data
+          submitDataObject['formData'] = bbatForm.data
         }
         console.log('submitDataObject', submitDataObject)
         if (cmd === -1) {
