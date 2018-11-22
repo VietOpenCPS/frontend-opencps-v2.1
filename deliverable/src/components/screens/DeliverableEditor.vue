@@ -17,6 +17,7 @@
     <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
     <v-tabs
       icons-and-text centered
+      v-model="active"
     >
       <v-tabs-slider></v-tabs-slider>
   
@@ -107,6 +108,7 @@
     },
     data () {
       return {
+        active: 0,
         loading: false,
         dataSocket: {},
         tempCounter: 0
