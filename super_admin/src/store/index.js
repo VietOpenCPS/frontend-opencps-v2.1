@@ -683,9 +683,9 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostProcess = new URLSearchParams()
-          dataPostProcess.append('processNo', data.processNo)
-          dataPostProcess.append('processName', data.processName)
-          dataPostProcess.append('description', data.description)
+          dataPostProcess.append('processNo', data.processNo ? data.processNo : '')
+          dataPostProcess.append('processName', data.processName ? data.processName : '')
+          dataPostProcess.append('description', data.description ? data.description : '')
           dataPostProcess.append('durationCount', data.durationCount)
           dataPostProcess.append('durationUnit', data.durationUnit)
           dataPostProcess.append('generateDossierNo', data.generateDossierNo)
@@ -735,9 +735,9 @@ export const store = new Vuex.Store({
             moderator = 1
           }
           dataPostProcessRoles.append('moderator', moderator)
-          dataPostProcessRoles.append('roleName', data.processRoles.roleName)
-          dataPostProcessRoles.append('roleCode', data.processRoles.roleCode)
-          dataPostProcessRoles.append('condition', data.processRoles.condition)
+          dataPostProcessRoles.append('roleName', data.processRoles.roleName ? data.processRoles.roleName : '')
+          dataPostProcessRoles.append('roleCode', data.processRoles.roleCode ? data.processRoles.roleCode : '')
+          dataPostProcessRoles.append('condition', data.processRoles.condition ? data.processRoles.condition : '')
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles', dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
@@ -760,7 +760,7 @@ export const store = new Vuex.Store({
           }
           var dataPostProcessRoles = new URLSearchParams()
           dataPostProcessRoles.append('moderator', data.processRoles.moderator)
-          dataPostProcessRoles.append('condition', data.processRoles.condition)
+          dataPostProcessRoles.append('condition', data.processRoles.condition ? data.processRoles.condition : '')
           axios.put(state.endPointApi + '/serviceprocesses/' + data.processId + '/roles/' + data.processRoles.roleId, dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
@@ -802,10 +802,10 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostProcessSequence = new URLSearchParams()
-          dataPostProcessSequence.append('sequenceName', data.processSequence.sequenceName)
-          dataPostProcessSequence.append('sequenceNo', data.processSequence.sequenceNo)
+          dataPostProcessSequence.append('sequenceName', data.processSequence.sequenceName ? data.processSequence.sequenceName : '')
+          dataPostProcessSequence.append('sequenceNo', data.processSequence.sequenceNo ? data.processSequence.sequenceNo : '')
           dataPostProcessSequence.append('durationCount', data.processSequence.durationCount)
-          dataPostProcessSequence.append('sequenceRole', data.processSequence.sequenceRole)
+          dataPostProcessSequence.append('sequenceRole', data.processSequence.sequenceRole ? data.processSequence.sequenceRole : '')
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/sequences', dataPostProcessSequence, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
@@ -850,8 +850,8 @@ export const store = new Vuex.Store({
           dataPostStep.append('stepCode', data.stepCode)
           dataPostStep.append('stepName', data.stepName)
           dataPostStep.append('sequenceNo', data.sequenceNo)
-          dataPostStep.append('dossierStatus', data.dossierStatus)
-          dataPostStep.append('dossierSubStatus', data.dossierSubStatus)
+          dataPostStep.append('dossierStatus', data.dossierStatus ? data.dossierStatus : '')
+          dataPostStep.append('dossierSubStatus', data.dossierSubStatus ? data.dossierSubStatus : '')
           dataPostStep.append('durationCount', data.durationCount)
           dataPostStep.append('customProcessUrl', data.customProcessUrl)
           dataPostStep.append('briefNote', data.briefNote)
@@ -937,11 +937,11 @@ export const store = new Vuex.Store({
           if (data.stepRoles.moderator === true || data.stepRoles.moderator === 'true') {
             moderator = 1
           }
-          dataPostProcessRoles.append('roleId', data.stepRoles.roleId)
-          dataPostProcessRoles.append('roleName', data.stepRoles.roleName)
-          dataPostProcessRoles.append('roleCode', data.stepRoles.roleCode)
+          dataPostProcessRoles.append('roleId', data.stepRoles.roleId ? data.stepRoles.roleId : '')
+          dataPostProcessRoles.append('roleName', data.stepRoles.roleName ? data.stepRoles.roleName : '')
+          dataPostProcessRoles.append('roleCode', data.stepRoles.roleCode ? data.stepRoles.roleCode : '')
           dataPostProcessRoles.append('moderator', moderator)
-          dataPostProcessRoles.append('condition', data.stepRoles.condition)
+          dataPostProcessRoles.append('condition', data.stepRoles.condition ? data.stepRoles.condition : '')
           axios.post(state.endPointApi + '/serviceprocesses/' + data.processId + '/steps/' + data.stepId + '/roles', dataPostProcessRoles, options).then(function (response) {
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             resolve(response.data)
@@ -983,24 +983,24 @@ export const store = new Vuex.Store({
             }
           }
           var dataPostAction = new URLSearchParams()
-          dataPostAction.append('actionCode', data.actionCode)
-          dataPostAction.append('actionName', data.actionName)
-          dataPostAction.append('preStepCode', data.preStepCode)
-          dataPostAction.append('postStepCode', data.postStepCode)
-          dataPostAction.append('autoEvent', data.autoEvent)
-          dataPostAction.append('preCondition', data.preCondition)
+          dataPostAction.append('actionCode', data.actionCode ? data.actionCode : '')
+          dataPostAction.append('actionName', data.actionName ? data.actionName : '')
+          dataPostAction.append('preStepCode', data.preStepCode ? data.preStepCode : '')
+          dataPostAction.append('postStepCode', data.postStepCode ? data.postStepCode : '')
+          dataPostAction.append('autoEvent', data.autoEvent ? data.autoEvent : '')
+          dataPostAction.append('preCondition', data.preCondition ? data.preCondition : '')
           dataPostAction.append('allowAssignUser', data.allowAssignUser)
           dataPostAction.append('assignUserId', data.assignUserId ? data.assignUserId : '')
-          dataPostAction.append('requestPayment', data.requestPayment)
+          dataPostAction.append('requestPayment', data.requestPayment ? data.requestPayment : '')
           dataPostAction.append('paymentFee', data.paymentFee ? data.paymentFee : '')
-          dataPostAction.append('syncActionCode', data.syncActionCode)
+          dataPostAction.append('syncActionCode', data.syncActionCode ? data.syncActionCode : '')
           dataPostAction.append('rollbackable', data.rollbackable)
           dataPostAction.append('createDossierFiles', data.createDossierFiles ? data.createDossierFiles.join() : '')
           dataPostAction.append('returnDossierFiles', data.returnDossierFiles ? data.returnDossierFiles.join() : '')
           dataPostAction.append('createDossierNo', data.createDossierNo ? data.createDossierNo : '')
           dataPostAction.append('eSignature', data.eSignature)
           dataPostAction.append('signatureType', data.eSignature ? data.signatureType : '')
-          dataPostAction.append('configNote', data.configNote)
+          dataPostAction.append('configNote', data.configNote ? data.configNote : data.configNote)
           dataPostAction.append('dossierTemplateNo', data.dossierTemplateNo ? data.dossierTemplateNo : '')
           dataPostAction.append('createDossiers', data.createDossier ? data.createDossier.join() : '')
           if (data.type === 'add') {
