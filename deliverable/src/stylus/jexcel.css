@@ -42,3 +42,33 @@ body .theme--light .v-navigation-drawer >.v-list .v-list__tile--active .v-list__
 body .vuejx__form .v-input__slot {
     padding: 0;
 }
+body .sm_10 .v-input__control {
+    width: 10% !important;
+}
+body .sm_20 .v-input__control {
+    width: 20% !important;
+}
+body .sm_30 .v-input__control {
+    width: 30% !important;
+}
+body .sm_40 .v-input__control {
+    width: 40% !important;
+}
+body .sm_50 .v-input__control {
+    width: 50% !important;
+}
+body .sm_60 .v-input__control {
+    width: 60% !important;
+}
+body .sm_70 .v-input__control {
+    width: 70% !important;
+}
+body .sm_80 .v-input__control {
+    width: 80% !important;
+}
+body .sm_90 .v-input__control {
+    width: 90% !important;
+}
+body .sm_100 .v-input__control {
+    width: 100% !important;
+}
