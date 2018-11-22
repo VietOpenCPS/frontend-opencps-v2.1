@@ -710,7 +710,7 @@
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_extraForm = false">
           <v-icon>clear</v-icon>
         </v-btn>
-        <v-card-text>
+        <v-card-text flat class="px-0">
           <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" :dossier_id="dossierIdSelected" :action_id="actionId" :type="'dieuchinhdulieu'"></form-bo-sung-thong-tin>
         </v-card-text>
         <v-card-actions>
@@ -718,6 +718,10 @@
           <v-btn class="mr-3" color="primary" @click="doChangeDossierExtraForm()">
             <v-icon>save</v-icon> &nbsp;
             Xác nhận
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click="dialog_extraForm = false">
+            <v-icon>clear</v-icon> &nbsp;
+            Hủy
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -1872,8 +1876,8 @@ export default {
     },
     doChangeDossierExtraForm () {
       let vm = this
-      vm.dialog_extraForm = false
       let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+      let counterProcess = 0
       for (let key in vm.selectedDoAction) {
         let fiter = {
           dossierId: vm.selectedDoAction[key].dossierId,
@@ -1881,6 +1885,17 @@ export default {
           payload: payloadExtraForm
         }
         vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
+          counterProcess += 1
+          if (counterProcess === vm.selectedDoAction.length) {
+            vm.doLoadingDataHoSo()
+            vm.dialog_extraForm = false
+          }
+        }).catch(function () {
+          counterProcess += 1
+          if (counterProcess === vm.selectedDoAction.length) {
+            vm.doLoadingDataHoSo()
+            vm.dialog_extraForm = false
+          }
         })
       }
     },
