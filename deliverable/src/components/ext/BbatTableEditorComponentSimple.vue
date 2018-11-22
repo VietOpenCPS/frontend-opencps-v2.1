@@ -233,6 +233,7 @@
           setTimeout(() => {
             vm.processDataSourceVerify()
             console.log('vm.pullCounterOrg 2: ', vm.pullCounterOrg)
+            console.log('dataSocket', vm.dataSocket)
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
             }
