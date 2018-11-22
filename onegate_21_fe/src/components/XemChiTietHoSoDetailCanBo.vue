@@ -93,23 +93,26 @@
                     <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
                   </span>
                 </p>
-                <p class="mb-0">
-                  <span>Người thực hiện: &nbsp;</span>
-                  <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
-                    <span v-for="(item, index) in usersNextAction" :key="item.userId">
-                      &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                <v-layout wrap xs12 class="mb-0">
+                  <v-flex style="width:calc(100%-150px)">
+                    <span>Người thực hiện: &nbsp;</span>
+                    <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
+                      <span v-for="(item, index) in usersNextAction" :key="item.userId">
+                        &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
+                      </span>
+                      <span v-if="stepOverdueNextAction"> - </span>
+                      <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
+                        {{stepOverdueNextAction}}
+                      </span>
                     </span>
-                    <span v-if="stepOverdueNextAction"> - </span>
-                    <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
-                      {{stepOverdueNextAction}}
-                    </span>
-                  </span>
-                  <span>
-                    <v-btn :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
-                      Phân công lại
+                  </v-flex>
+                  <v-flex class="text-xs-right" style="width:150px">
+                    <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
+                      <span v-if="currentUser['userId'].toString() === thongTinChiTietHoSo.lastActionUserId.toString() || checkPemissionPhanCongLai(currentUser) === false">Phân công lại</span>
+                      <span v-if="currentUser['userId'].toString() !== thongTinChiTietHoSo.lastActionUserId.toString() && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
-                  </span>
-                </p>
+                  </v-flex>
+                </v-layout>
               </div>
               <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
                 <p class="mb-2">
