@@ -50,33 +50,53 @@ body .vuejx__form .no_margin > div {
     margin: 0;
 }
 
-body .sm_10 .v-input__control {
+body .sm_10 .v-input__control,
+body .smx_10 > div {
     width: 10% !important;
+    margin: 0 auto;
 }
-body .sm_20 .v-input__control {
+body .sm_20 .v-input__control,
+body .smx_20 > div {
     width: 20% !important;
+    margin: 0 auto;
 }
-body .sm_30 .v-input__control {
+body .sm_30 .v-input__control,
+body .smx_30 > div {
     width: 30% !important;
+    margin: 0 auto;
 }
-body .sm_40 .v-input__control {
+body .sm_40 .v-input__control,
+body .smx_40 > div {
     width: 40% !important;
+    margin: 0 auto;
 }
-body .sm_50 .v-input__control {
+body .sm_50 .v-input__control,
+body .smx_50 > div {
     width: 50% !important;
+    margin: 0 auto;
 }
-body .sm_60 .v-input__control {
+body .sm_60 .v-input__control,
+body .smx_60 > div {
     width: 60% !important;
+    margin: 0 auto;
 }
-body .sm_70 .v-input__control {
+body .sm_70 .v-input__control,
+body .smx_70 > div {
     width: 70% !important;
+    margin: 0 auto;
 }
-body .sm_80 .v-input__control {
+body .sm_80 .v-input__control,
+body .smx_80 > div {
     width: 80% !important;
+    margin: 0 auto;
 }
-body .sm_90 .v-input__control {
+body .sm_90 .v-input__control,
+body .smx_90 > div {
     width: 90% !important;
+    margin: 0 auto;
 }
-body .sm_100 .v-input__control {
+body .sm_100 .v-input__control,
+body .smx_100 > div {
     width: 100% !important;
+    margin: 0 auto;
 }
