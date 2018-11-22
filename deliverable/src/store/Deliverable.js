@@ -1,7 +1,7 @@
 const createDeliverable = `
-    mutation OpenCPSDeliverable {
+    {
         createDeliverable(
-            body: INPUTBODY
+            body: "INPUTBODY"
         ) {
             deliverableId
         }

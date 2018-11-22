@@ -118,7 +118,7 @@ export const store = new Vuex.Store({
             'Accept': 'application/json'
           }
         }
-        let body = Deliverable.createDeliverable.replace('INPUTBODY', JSON.stringify(input))
+        let body = Deliverable.createDeliverable.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\\"'))
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           console.log(response)
         }).catch(function () {
