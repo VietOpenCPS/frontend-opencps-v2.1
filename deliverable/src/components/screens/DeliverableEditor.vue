@@ -74,11 +74,11 @@
           border-top: 1px solid #dcdcdc;
       ">
         <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
-        <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark
+        <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
           :loading="loading"
           :disabled="loading"
         >Ghi lại và thêm mới</v-btn>
-        <v-btn color="blue darken-3" class="mr-0" dark
+        <v-btn color="blue darken-3" class="mr-0" dark  v-on:click.native="saveToData(0)"
           :loading="loading"
           :disabled="loading"
         >Ghi lại</v-btn>
@@ -171,8 +171,22 @@
         }
         queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
         vm.$router.push({
-          path: currentPath.substring(0, currentPath.indexOf('/danh-sach-giay-to/')) + vm.index + queryString
+          path: '/danh-sach-giay-to/' + vm.index + queryString
         })
+      },
+      saveToData (cmd) {
+        let vm = this
+        let bbatFormSimple = vm.$refs.bbatFormSimple
+        let bbatForm = vm.$refs.bbatForm
+        if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
+          console.log('bbatFormSimple', bbatFormSimple.data)
+        }
+        if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
+          console.log('bbatForm', bbatForm.data)
+        }
+        if (cmd === -1) {
+        } else {
+        }
       }
     }
   }
