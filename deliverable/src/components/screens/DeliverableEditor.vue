@@ -46,6 +46,7 @@
           vm.$socket.onmessage = function (data) {
             let dataObj = eval('( ' + data.data + ' )')
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            console.log('vm.dataSocket', vm.dataSocket)
             vm.$store.commit('setdataSocket', vm.dataSocket)
             if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
               vm.tempCounter = vm.tempCounter - 1
