@@ -265,7 +265,13 @@
       </v-flex>
     </v-layout>
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
-      
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'UNDO_DOSSIER'}, 0, true)" 
+        v-if="getUser['role'] === 'Administrator_data'"
+      >
+       &nbsp; &nbsp; Undo&nbsp; &nbsp;
+      </v-btn>
+
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
         v-if="getUser['role'] === 'Administrator_data'"
@@ -297,7 +303,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
@@ -305,7 +311,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'">
+          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -339,7 +345,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator'">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
@@ -1693,6 +1699,8 @@ export default {
         vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
       } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
         vm.doChangeDossier(dossierItem, item, index, isGroup)
+      } else if (String(item.form) === 'UNDO_DOSSIER') {
+        vm.doUndoDossier(dossierItem, item, index, isGroup)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -1867,36 +1875,75 @@ export default {
         if (vm.selectedDoAction.length > 0) {
           vm.actionId = 9100
           vm.dossierIdSelected = vm.selectedDoAction[0].dossierId
-          console.log('selectExtraForm', vm.dossierIdSelected, vm.actionId)
+          // console.log('selectExtraForm', vm.dossierIdSelected, vm.actionId)
           vm.dialog_extraForm = true
         } else {
           alert('Chọn hồ sơ để thực hiện')
         }
       }
     },
+    doUndoDossier (dossierItem, item, index, isGroup) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let counterProcess = 0
+      if (vm.selectedDoAction.length > 0) {
+        let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+        if (x) {
+          for (let key in vm.selectedDoAction) {
+            let fiter = {
+              dossierId: vm.selectedDoAction[key].dossierId
+            }
+            vm.$store.dispatch('rollBack', fiter).then(function (result) {
+              counterProcess += 1
+              if (counterProcess === vm.selectedDoAction.length) {
+                setTimeout(function () {
+                  vm.doLoadingDataHoSo()
+                }, 300)
+              }
+            }).catch(function () {
+              counterProcess += 1
+              if (counterProcess === vm.selectedDoAction.length) {
+                setTimeout(function () {
+                  vm.doLoadingDataHoSo()
+                }, 300)
+              }
+            })
+          }
+        }
+      } else {
+        alert('Chọn hồ sơ để thực hiện')
+      }
+    },
     doChangeDossierExtraForm () {
       let vm = this
       let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
       let counterProcess = 0
-      for (let key in vm.selectedDoAction) {
-        let fiter = {
-          dossierId: vm.selectedDoAction[key].dossierId,
-          actionCode: vm.actionId,
-          payload: payloadExtraForm
+      let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+      if (x) {
+        for (let key in vm.selectedDoAction) {
+          let fiter = {
+            dossierId: vm.selectedDoAction[key].dossierId,
+            actionCode: vm.actionId,
+            payload: payloadExtraForm
+          }
+          vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
+            counterProcess += 1
+            if (counterProcess === vm.selectedDoAction.length) {
+              setTimeout(function () {
+                vm.doLoadingDataHoSo()
+              }, 300)
+              vm.dialog_extraForm = false
+            }
+          }).catch(function () {
+            counterProcess += 1
+            if (counterProcess === vm.selectedDoAction.length) {
+              setTimeout(function () {
+                vm.doLoadingDataHoSo()
+              }, 300)
+              vm.dialog_extraForm = false
+            }
+          })
         }
-        vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
-          counterProcess += 1
-          if (counterProcess === vm.selectedDoAction.length) {
-            vm.doLoadingDataHoSo()
-            vm.dialog_extraForm = false
-          }
-        }).catch(function () {
-          counterProcess += 1
-          if (counterProcess === vm.selectedDoAction.length) {
-            vm.doLoadingDataHoSo()
-            vm.dialog_extraForm = false
-          }
-        })
       }
     },
     doDeleteDossier (dossierItem, item, index, isGroup) {
