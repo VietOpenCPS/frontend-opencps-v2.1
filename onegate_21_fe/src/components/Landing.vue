@@ -267,14 +267,14 @@
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'UNDO_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'Administrator_data'"
+        v-if="getUser['role'] === 'default'"
       >
        &nbsp; &nbsp; Undo&nbsp; &nbsp;
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'Administrator_data'"
+        v-if="getUser['role'] === 'default'"
       >
         Điều chỉnh dữ liệu
       </v-btn>
@@ -303,7 +303,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
@@ -311,7 +311,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
+          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -345,7 +345,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
