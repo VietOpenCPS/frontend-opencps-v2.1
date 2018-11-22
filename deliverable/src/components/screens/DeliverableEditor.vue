@@ -7,9 +7,9 @@
           
         </div>
         <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-          <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-            Quay lại &nbsp;
-            <v-icon size="16">undo</v-icon>
+          <v-icon>more_vert</v-icon>
+          <v-btn flat class="my-0 mx-0 btn-border-left" @click="backToList" active-class="temp_active">
+            <v-icon size="16">reply</v-icon>
           </v-btn>
         </div>
       </div>
@@ -18,7 +18,7 @@
     <v-tabs
       icons-and-text centered
     >
-      <v-tabs-slider color="yellow"></v-tabs-slider>
+      <v-tabs-slider></v-tabs-slider>
   
       <v-tab
         href="#tab-1"
@@ -68,6 +68,31 @@
         </v-tab-item>
       </v-tabs-items>
     </v-tabs>
+    <v-layout row wrap>
+      <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
+          position: fixed;
+          bottom: 0;
+          width: -webkit-calc( 100% - 308px );
+          width: calc( 100% - 308px );
+          background: white;
+          z-index: 4;
+          border-top: 1px solid #dcdcdc;
+      ">
+        <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
+        <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark
+          :loading="loading"
+          :disabled="loading"
+        >Ghi lại và thêm mới</v-btn>
+        <v-btn color="blue darken-3" class="mr-0" dark
+          :loading="loading"
+          :disabled="loading"
+        >Ghi lại</v-btn>
+        <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
+          <v-icon>reply</v-icon> &nbsp;
+          Quay lại
+        </v-btn>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
@@ -82,6 +107,7 @@
     },
     data () {
       return {
+        loading: false,
         dataSocket: {},
         tempCounter: 0
       }
@@ -133,6 +159,24 @@
     methods: {
       goBack () {
         window.history.back()
+      },
+      backToList () {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let currentPath = current.path
+        let queryString = '?'
+        newQuery['state_change'] = '0'
+        newQuery['renew'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        vm.$router.push({
+          path: currentPath.substring(0, currentPath.indexOf('/danh-sach-giay-to/')) + vm.index + queryString
+        })
       }
     }
   }
