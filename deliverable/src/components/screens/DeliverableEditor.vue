@@ -71,12 +71,6 @@
     </v-tabs>
     <v-layout row wrap>
       <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
-          position: fixed;
-          bottom: 0;
-          width: -webkit-calc( 100% - 308px );
-          width: calc( 100% - 308px );
-          background: white;
-          z-index: 4;
           border-top: 1px solid #dcdcdc;
       ">
         <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
