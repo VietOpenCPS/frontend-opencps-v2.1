@@ -39,9 +39,12 @@ body .v-list__tile--active {
 body .theme--light .v-navigation-drawer >.v-list .v-list__tile--active .v-list__tile__title {
     color: #212121!important;
 }
-body .vuejx__form .v-input__slot {
+body .vuejx__form .v-input__slot,
+body .vuejx__form p {
     padding: 0;
+    margin: 0;
 }
+
 body .sm_10 .v-input__control {
     width: 10% !important;
 }
