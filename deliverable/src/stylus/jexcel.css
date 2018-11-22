@@ -61,6 +61,9 @@ body .vuejx__form p {
     font-family: inherit !important;
     font-size: inherit !important;
 }
+body .vuejx__form .v-textarea.v-text-field--enclosed textarea {
+    margin-top: 0 !important;
+}
 body .sm_10 .v-input__control,
 body .smx_10 > div {
     width: 10% !important;
