@@ -41,6 +41,7 @@ body .theme--light .v-navigation-drawer >.v-list .v-list__tile--active .v-list__
 }
 body .vuejx__form .v-subheader {
     color: inherit;
+    font-weight: 400 !important;
 }
 body .vuejx__form .v-input__slot,
 body .vuejx__form p,
@@ -50,9 +51,15 @@ body .vuejx__form .no_margin > div {
     margin: 0;
 }
 body .vuejx__form .v-text-field { 
-    padding: 0;
+    padding: 0 !important;
 }
-
+body .vuejx__form input::placeholder {
+    font-size: 12px;
+}
+body .vuejx__form span {
+    font-family: inherit !important;
+    font-size: inherit !important;
+}
 body .sm_10 .v-input__control,
 body .smx_10 > div {
     width: 10% !important;
