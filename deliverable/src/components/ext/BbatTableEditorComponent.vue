@@ -4,6 +4,9 @@
       margin-bottom: 100px;
     ">
       <v-flex v-for="(item, index) in detailForm" v-bind:key="index" :class="item['class']">
+        <v-subheader style="height: 24px;" v-if="item.type === 'label'">
+          {{item['label']}}
+        </v-subheader>
         <attached-file-avatar v-if="item.type === 'avatar'" :pk="data[item.model]" :pick-item="item" :current-data="data"></attached-file-avatar>
         <datetime-picker :class="item['class_component']" v-if="item.type === 'date'" v-model="data[item.model]" :item="item" :data-value="data[item.model]"></datetime-picker>
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['link'] && ((item.dependency && String(id) !== '0') || !item.dependency)" :to="item.url + '?pk=' + data[item.pk] + '&col=' + item.pk">
@@ -42,7 +45,18 @@
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
-        ></v-autocomplete>
+        >
+          <template slot="prepend" v-if="item['label_prepend'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_prepend']}}
+            </v-subheader>
+          </template>
+          <template slot="append-outer" v-if="item['label_append'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_append']}}
+            </v-subheader>
+          </template>
+        </v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="item.datasource"
@@ -56,7 +70,18 @@
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
-        ></v-autocomplete>
+        >
+          <template slot="prepend" v-if="item['label_prepend'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_prepend']}}
+            </v-subheader>
+          </template>
+          <template slot="append-outer" v-if="item['label_append'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_append']}}
+            </v-subheader>
+          </template>
+        </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
           :label="item.required ? item['label'] + ' 💥': item['label']" 
@@ -65,6 +90,16 @@
           box 
           clearable
         >
+          <template slot="prepend" v-if="item['label_prepend'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_prepend']}}
+            </v-subheader>
+          </template>
+          <template slot="append-outer" v-if="item['label_append'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_append']}}
+            </v-subheader>
+          </template>
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
@@ -79,8 +114,22 @@
         <v-switch :class="item['class_component']" v-if="item.type === 'v-switch'"
           :label="item['label']" 
           v-model="data[item.model]"
-        ></v-switch>
+        >
+          <template slot="prepend" v-if="item['label_prepend'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_prepend']}}
+            </v-subheader>
+          </template>
+          <template slot="append" v-if="item['label_append'] !== ''">
+            <v-subheader style="height: 24px;">
+              {{item['label_append']}}
+            </v-subheader>
+          </template>
+        </v-switch>
         <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild">
+          <v-subheader style="height: 24px;" v-if="itemChild.type === 'label'">
+            {{itemChild['label']}}
+          </v-subheader>
           <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar>
           <datetime-picker :class="itemChild['class_component']" v-if="itemChild.type === 'date'" v-model="data[itemChild.model]" :item="itemChild" :data-value="data[itemChild.model]"></datetime-picker>
           <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['link'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" :to="itemChild.url + '?pk=' + data[itemChild.pk] + '&col=' + itemChild.pk">
@@ -114,7 +163,18 @@
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
-          ></v-autocomplete>
+          >
+            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_prepend']}}
+              </v-subheader>
+            </template>
+            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_append']}}
+              </v-subheader>
+            </template>
+          </v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
             :items="itemChild.datasource"
@@ -128,7 +188,18 @@
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
-          ></v-autocomplete>
+          >
+            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_prepend']}}
+              </v-subheader>
+            </template>
+            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_append']}}
+              </v-subheader>
+            </template>
+          </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
             :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
@@ -137,6 +208,16 @@
             box
             clearable
           >
+            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_prepend']}}
+              </v-subheader>
+            </template>
+            <template slot="append-outer" v-if="itemChild['label_append'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_append']}}
+              </v-subheader>
+            </template>
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
@@ -151,7 +232,18 @@
           <v-switch :class="itemChild['class_component']" v-if="itemChild.type === 'v-switch'"
             :label="itemChild['label']" 
             v-model="data[itemChild.model]"
-          ></v-switch>
+          >
+            <template slot="prepend" v-if="itemChild['label_prepend'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_prepend']}}
+              </v-subheader>
+            </template>
+            <template slot="append" v-if="itemChild['label_append'] !== ''">
+              <v-subheader style="height: 24px;">
+                {{itemChild['label_append']}}
+              </v-subheader>
+            </template>
+          </v-switch>
         </div>
       </v-flex>
     </v-layout>
