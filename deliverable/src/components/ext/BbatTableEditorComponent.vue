@@ -93,6 +93,7 @@
           :placeholder="item['placeholder']"
           clearable
           :rows="2"
+          box
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
         <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
@@ -189,6 +190,7 @@
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             clearable
+            box
           ></v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
           <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>

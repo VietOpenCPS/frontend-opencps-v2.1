@@ -56,7 +56,8 @@ body .vuejx__form .v-text-field {
 body .vuejx__form input::placeholder {
     font-size: 12px;
 }
-body .vuejx__form span {
+body .vuejx__form span,
+body .vuejx__form p {
     font-family: inherit !important;
     font-size: inherit !important;
 }
