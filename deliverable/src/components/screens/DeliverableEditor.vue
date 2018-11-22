@@ -16,34 +16,54 @@
     </div>
     <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
     <v-tabs
-      color="blue darken-3"
       dark
+      color="cyan"
       icons-and-text centered
     >
-      <v-tabs-slider color="primary"></v-tabs-slider>
-      <v-tab :key="1" href="#tabs-1"> 
+      <v-tabs-slider color="yellow"></v-tabs-slider>
+  
+      <v-tab
+        href="#tab-1"
+        :key="1"
+      >
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           XEM GIẤY PHÉP
         </v-btn>
       </v-tab>
-      <v-tab :key="2" href="#tabs-1"> 
+        <v-tab
+        href="#tab-2"
+        :key="2"
+      >
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           FORM NHẬP GIẤY PHÉP
         </v-btn>
       </v-tab>
-      <v-tab :key="3" href="#tabs-1"> 
+      <v-tab :key="3" href="#tab-3"> 
         <v-btn flat class="px-0 py-0 mx-0 my-0">
           LỊCH SỬ CẬP NHẬT GIẤY PHÉP
         </v-btn>
       </v-tab>
+
       <v-tabs-items reverse-transition="fade-transition" transition="fade-transition">
-        <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+        <v-tab-item
+          id="tab-1"
+          :key="1"
+          reverse-transition="fade-transition" transition="fade-transition"
+        >
           view giay phep
         </v-tab-item>
-        <v-tab-item id="tabs-2" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+        <v-tab-item
+          id="tab-2"
+          :key="2"
+          reverse-transition="fade-transition" transition="fade-transition"
+        >
           <bbat-table-editor-component ref="bbatForm" :id="id"></bbat-table-editor-component>
         </v-tab-item>
-        <v-tab-item id="tabs-3" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+        <v-tab-item
+          id="tab-3"
+          :key="3"
+          reverse-transition="fade-transition" transition="fade-transition"
+        >
           view logs
         </v-tab-item>
       </v-tabs-items>
