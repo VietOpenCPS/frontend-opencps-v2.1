@@ -18,7 +18,7 @@
                 </span>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn dark flat class="mr-2" v-if="state === 0">
+              <v-btn dark flat class="mr-2" v-if="state === 0" v-on:click="submitUserProfile">
                 <v-icon>done</v-icon> &nbsp; Cập nhật thông tin
               </v-btn>
               <v-btn dark flat class="mr-2" v-else>
@@ -93,7 +93,7 @@
                 <v-autocomplete label="Xã/phường" :items="wardItems" v-model="user['applicantWardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box></v-autocomplete>
               </v-flex>
               <v-flex sm12 class="text-xs-right">
-                <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click.native="submitUserProfile" class="mx-0" dark>
+                <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click="submitUserProfile" class="mx-0" dark>
                   <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
                 </v-btn>
               </v-flex>
@@ -267,6 +267,7 @@
       valid: false,
       loading: false,
       user: {},
+      menuBirthDate: false,
       toDateFormatted: null,
       ngayCap: null,
       toggle_exclusive: 0,
