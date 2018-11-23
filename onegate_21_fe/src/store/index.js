@@ -185,7 +185,7 @@ export const store = new Vuex.Store({
         }
         // test local
         // axios.get('http://127.0.0.1:8081/api/users/login', param).then(function (response) {
-        axios.get('/o/v2/opencps/users/login', param).then(function (response) {
+        axios.get('/o/rest/v2/users/login', param).then(function (response) {
           let serializable = response.data
           if (serializable && serializable[0]['role']) {
             let dataReturn = serializable[0]['role']

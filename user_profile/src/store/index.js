@@ -43,6 +43,7 @@ export const store = new Vuex.Store({
           if (window.themeDisplay !== undefined && window.themeDisplay !== null) {
             userId = window.themeDisplay.getUserId()
           }
+          // test local
           // axios.get('http://127.0.0.1:8081/api/users/' + userId, param).then(function (response) {
           axios.get('/o/v1/opencps/users/' + userId, param).then(function (response) {
             let seriable = response.data
@@ -113,10 +114,13 @@ export const store = new Vuex.Store({
         var url = ''
         if (filter['className'] === 'org.opencps.usermgt.model.Employee') {
           url = '/o/rest/v2/employees/' + filter['classPK']
-          dataPutUser.append('fullName', filter.fullName)
-          dataPutUser.append('telNo', Number(filter.telNo))
-          dataPutUser.append('address', filter.address)
-          dataPutUser.append('email', filter.email)
+          dataPutUser.append('fullName', filter.employeeFullName)
+          dataPutUser.append('telNo', Number(filter.employeeTelNo))
+          dataPutUser.append('employeeNo', filter.employeeNo)
+          dataPutUser.append('title', Number(filter.title))
+          let [dayInput, monthInput, yearInput] = filter['employeeBirthDate'].split('/')
+          let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
+          dataPutUser.append('birthDate', new Date(newDate).getTime() ? new Date(newDate).getTime() : '')
         } else if (filter['className'] === 'org.opencps.usermgt.model.Applicant') {
           url = '/o/rest/v2/applicants/' + filter['classPK']
           dataPutUser.append('applicantName', filter['applicantName'])
