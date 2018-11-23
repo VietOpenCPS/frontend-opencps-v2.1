@@ -267,21 +267,21 @@
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'UNDO_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'Administrator_data'"
+        v-if="getUser('Administrator_data')"
       >
        &nbsp; &nbsp; Undo&nbsp; &nbsp;
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'Administrator_data'"
+        v-if="getUser('Administrator_data')"
       >
         Điều chỉnh dữ liệu
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="getUser['role'] === 'Administrator'"
+        v-if="getUser('Administrator')"
       >
         DELETE
       </v-btn>
@@ -303,7 +303,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
@@ -311,14 +311,14 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
+          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
               primary
               hide-details
               @click.native="toggleAll"
-              v-if="getUser['role'] === 'Administrator'"
+              v-if="getUser('Administrator')"
             ></v-checkbox>
             <v-checkbox v-else
               :input-value="props.all"
@@ -345,14 +345,14 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
               primary
               hide-details
               color="primary"
-              v-if="getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
+              v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
@@ -981,9 +981,6 @@ export default {
     titleLanding: ''
   }),
   computed: {
-    getUser () {
-      return this.$store.getters.getUser
-    },
     loadingDynamicBtn () {
       return this.$store.getters.loadingDynamicBtn
     },
@@ -1202,7 +1199,7 @@ export default {
         vm.isAdminSuper = true
       }
       */
-      if (vm.getUser['role'] === 'Administrator') {
+      if (vm.getUser('Administrator')) {
         if (vm.selected.length) {
           vm.selected = []
         } else {
@@ -1223,6 +1220,18 @@ export default {
       }
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
       // console.log('selected toggle all', vm.selectMultiplePage)
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      let currentRole = roles.filter(function (item) {
+        return item === roleItem
+      })
+      if (currentRole && currentRole.length > 0) {
+        return true
+      } else {
+        return false
+      }
     },
     changeSelected () {
       let vm = this
