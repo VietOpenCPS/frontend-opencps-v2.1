@@ -143,7 +143,7 @@ export const store = new Vuex.Store({
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
           }).catch(function (error) {
-            state['user'].role = 'default'
+            state['user'].role = ['default']
             console.log(error)
           })
         }
@@ -187,11 +187,17 @@ export const store = new Vuex.Store({
         // axios.get('http://127.0.0.1:8081/api/users/login', param).then(function (response) {
         axios.get('/o/rest/v2/users/login', param).then(function (response) {
           let serializable = response.data
-          if (serializable && serializable[0]['role']) {
-            let dataReturn = serializable[0]['role']
-            resolve(dataReturn)
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            console.log('roles', roles)
+            resolve(roles)
           } else {
-            resolve('default')
+            resolve(['default'])
           }
         }).catch(function (error) {
           console.log(error)
