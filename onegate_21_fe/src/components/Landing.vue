@@ -267,14 +267,14 @@
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'UNDO_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'default'"
+        v-if="getUser['role'] === 'Administrator_data'"
       >
        &nbsp; &nbsp; Undo&nbsp; &nbsp;
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
-        v-if="getUser['role'] === 'default'"
+        v-if="getUser['role'] === 'Administrator_data'"
       >
         Điều chỉnh dữ liệu
       </v-btn>
@@ -303,7 +303,7 @@
         :total-items="hosoDatasTotal"
         v-model="selected"
         item-key="dossierId"
-        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'"
+        :select-all="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
         class="table-landing table-bordered"
         no-data-text="Không có hồ sơ nào"
         hide-actions
@@ -311,7 +311,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'">
+          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -345,14 +345,14 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'default'">
+          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
               primary
               hide-details
               color="primary"
-              v-if="getUser['role'] === 'Administrator'"
+              v-if="getUser['role'] === 'Administrator' || getUser['role'] === 'Administrator_data'"
             ></v-checkbox>
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
@@ -711,7 +711,7 @@
     <v-dialog v-model="dialog_extraForm" scrollable persistent max-width="700px">
       <v-card>
         <v-card-title class="headline">
-          Điều chỉnh dữ liệu
+          Điều chỉnh dữ liệu mã hồ sơ: {{selectedDoAction.length > 0 ? selectedDoAction[selectedDoAction.length - 1]['dossierNo'] : ''}}
         </v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_extraForm = false">
           <v-icon>clear</v-icon>
@@ -1873,8 +1873,9 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (isGroup) {
         if (vm.selectedDoAction.length > 0) {
+          let countSelectedDoAction = vm.selectedDoAction.length
           vm.actionId = 9100
-          vm.dossierIdSelected = vm.selectedDoAction[0].dossierId
+          vm.dossierIdSelected = vm.selectedDoAction[countSelectedDoAction - 1].dossierId
           // console.log('selectExtraForm', vm.dossierIdSelected, vm.actionId)
           vm.dialog_extraForm = true
         } else {
@@ -1885,30 +1886,22 @@ export default {
     doUndoDossier (dossierItem, item, index, isGroup) {
       let vm = this
       let currentQuery = vm.$router.history.current.query
-      let counterProcess = 0
       if (vm.selectedDoAction.length > 0) {
-        let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+        let countSelectedDoAction = vm.selectedDoAction.length
+        let x = confirm('Xác thực thao tác với mã hồ sơ: ' + vm.selectedDoAction[countSelectedDoAction - 1].dossierNo)
         if (x) {
-          for (let key in vm.selectedDoAction) {
-            let fiter = {
-              dossierId: vm.selectedDoAction[key].dossierId
-            }
-            vm.$store.dispatch('rollBack', fiter).then(function (result) {
-              counterProcess += 1
-              if (counterProcess === vm.selectedDoAction.length) {
-                setTimeout(function () {
-                  vm.doLoadingDataHoSo()
-                }, 300)
-              }
-            }).catch(function () {
-              counterProcess += 1
-              if (counterProcess === vm.selectedDoAction.length) {
-                setTimeout(function () {
-                  vm.doLoadingDataHoSo()
-                }, 300)
-              }
-            })
+          let fiter = {
+            dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId
           }
+          vm.$store.dispatch('rollBack', fiter).then(function (result) {
+            setTimeout(function () {
+              vm.doLoadingDataHoSo()
+            }, 300)
+          }).catch(function () {
+            setTimeout(function () {
+              vm.doLoadingDataHoSo()
+            }, 300)
+          })
         }
       } else {
         alert('Chọn hồ sơ để thực hiện')
@@ -1917,33 +1910,21 @@ export default {
     doChangeDossierExtraForm () {
       let vm = this
       let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
-      let counterProcess = 0
       let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
       if (x) {
-        for (let key in vm.selectedDoAction) {
-          let fiter = {
-            dossierId: vm.selectedDoAction[key].dossierId,
-            actionCode: vm.actionId,
-            payload: payloadExtraForm
-          }
-          vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
-            counterProcess += 1
-            if (counterProcess === vm.selectedDoAction.length) {
-              setTimeout(function () {
-                vm.doLoadingDataHoSo()
-              }, 300)
-              vm.dialog_extraForm = false
-            }
-          }).catch(function () {
-            counterProcess += 1
-            if (counterProcess === vm.selectedDoAction.length) {
-              setTimeout(function () {
-                vm.doLoadingDataHoSo()
-              }, 300)
-              vm.dialog_extraForm = false
-            }
-          })
+        let countSelectedDoAction = vm.selectedDoAction.length
+        let fiter = {
+          dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId,
+          actionCode: vm.actionId,
+          payload: payloadExtraForm
         }
+        vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
+          vm.doLoadingDataHoSo()
+          vm.dialog_extraForm = false
+        }).catch(function () {
+          vm.dialog_extraForm = false
+          vm.doLoadingDataHoSo()
+        })
       }
     },
     doDeleteDossier (dossierItem, item, index, isGroup) {
