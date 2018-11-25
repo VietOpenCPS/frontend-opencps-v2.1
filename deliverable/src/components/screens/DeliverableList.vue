@@ -24,8 +24,6 @@
         :headers="headers"
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
-        v-model="selected"
-        item-key="deliverableId"
         class="table-landing table-bordered"
         no-data-text="Không có giấy phép nào"
         hide-actions
@@ -88,16 +86,16 @@
         hosoDatas: [],
         hosoDatasTotal: 0,
         hosoDatasPage: 1,
-        hosoTotalPage: 0,
-        dataSocket: {}
+        dataSocket: {},
+        loadingTable: false
       }
     },
     created () {
       var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
-          console.log(vm.items)
           vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+          vm.pullData(vm.items[vm.index]['typeCode'])
         }, 100)
       })
     },
@@ -112,12 +110,22 @@
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
-      },
-      loadingTable () {
-        return this.$store.getters.loadingTable
       }
     },
     methods: {
+      pullData (type) {
+        let vm = this
+        let filter = {
+          type: type,
+          page: hosoDatasPage
+        }
+        vm.$store.dispatch('getDeliverables', filter).then(function (result) {
+          vm.hosoDatasTotal = result['hits']['total']
+          vm.hosoDatas = result['hits']['hits']
+        })
+      },
+      viewDetail (item, index) {
+      },
       paggingData (config) {
         let vm = this
         let current = vm.$router.history.current
