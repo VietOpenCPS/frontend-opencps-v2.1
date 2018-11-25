@@ -1,5 +1,5 @@
 const createDeliverable = `
-    {
+    mutation {
         createDeliverable(
             body: "INPUTBODY"
         ) {
