@@ -32,14 +32,14 @@
     props: ['value', 'item', 'dataValue'],
     watch: {
         toDate (val) {
-            this.toDateFormatted = this.formatDate(val)
+            this.toDateFormatted = this.formatDate(parseInt(val))
             this.$emit('input', new Date(val).getTime())
         }
     },
     methods: {
         formatDate (date) {
             if (!date) return null
-            let dateObj = new Date(date)
+            let dateObj = new Date(parseInt(date))
             return dateObj.getDate() + '/' + (dateObj.getMonth() + 1) + '/' + dateObj.getFullYear()
         },
         parseDate (date) {
