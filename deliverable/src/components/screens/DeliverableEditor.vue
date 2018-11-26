@@ -10,7 +10,7 @@
           <v-btn icon class="my-0 mx-0 btn-border-left">
             <v-icon size="16">more_vert</v-icon>
           </v-btn>
-          <v-btn icon class="ml-0 mx-0 btn-border-left mr-3" @click="backToList" active-class="temp_active">
+          <v-btn icon class="ml-0 btn-border-left mr-3 my-0" @click="backToList" active-class="temp_active">
             <v-icon size="16">reply</v-icon>
           </v-btn>
         </div>
@@ -123,7 +123,7 @@
           vm.$store.dispatch('getContentFile', formId)
           vm.showComponent = false
           vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
-            vm.detail = detail
+            vm.detail = result
             vm.showComponent = true
           })
           vm.$store.dispatch('getContentFileSimple')
