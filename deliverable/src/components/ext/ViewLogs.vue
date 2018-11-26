@@ -10,11 +10,12 @@
 </template>
 
 <script>
-  import support from '../../store/support.json'
+  import support from '../../store/support'
   export default {
     props: ['id', 'datainput'],
     data() {
       return {
+        support: support,
         data: {},
         dialogPDFLoading: true,
         isCallBack: true,
