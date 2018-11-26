@@ -103,6 +103,14 @@
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('page')) {
+          vm.hosoDatasPage = parseInt(currentQuery.page)
+        } else {
+          vm.hosoDatasPage = 1
+        }
+        vm.pullData(vm.items[vm.index]['typeCode'])
       },
       index (val) {
         var vm = this
