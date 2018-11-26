@@ -289,7 +289,7 @@
           setTimeout(() => {
             vm.processDataSourceVerify()
             if (String(vm.id) !== '0') {
-              vm.data = vm.datainput
+              vm.data = JSON.parse(vm.datainput)
             }
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
