@@ -35,11 +35,11 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
-              {{ hosoDatasPage * 15 - 15 + props.index + 1 }} / {{props.item['_source']['applicantIdNo']}} / {{props.item['source']['applicantIdNo']}}
+              {{ hosoDatasPage * 15 - 15 + props.index + 1 }} / {{props.item['_source']}} / {{props.item['source']}}
             </span>
           </td>
 
-          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
+          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item"
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
