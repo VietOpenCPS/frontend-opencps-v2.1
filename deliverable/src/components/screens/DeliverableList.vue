@@ -122,7 +122,7 @@
       var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
-          if (vm.items[val]['tableConfig'] !== '') {
+          if (vm.items[vm.index]['tableConfig'] !== '') {
             vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
           } else {
             vm.headers = []
