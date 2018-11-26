@@ -117,7 +117,7 @@
         let vm = this
         let filter = {
           type: type,
-          page: hosoDatasPage
+          page: vm.hosoDatasPage
         }
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
           vm.hosoDatasTotal = result['hits']['total']
