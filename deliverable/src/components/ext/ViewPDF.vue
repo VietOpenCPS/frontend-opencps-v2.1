@@ -1,18 +1,25 @@
 <template>
   <div>
+    <vue-pdf-viewer width="100%" height="100%" style="overflow: auto;min-height: 600px;" :url="url"></vue-pdf-viewer>
     <iframe v-show="!dialogPDFLoading" id="pdfViewer" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0"></iframe>
   </div>
 </template>
 
 <script>
 
+  import VuePDFViewer from 'vue-pdf-viewer'
+
   export default {
     props: ['id', 'datainput'],
+    components: {
+      'vue-pdf-viewer': VuePDFViewer
+    },
     data() {
       return {
         data: {},
         dialogPDFLoading: true,
-        isCallBack: true
+        isCallBack: true,
+        url: 'blob:http://localhost:8080/0a3f225d-dd33-4e7d-80c1-fca34e02ac74'
       }
     },
     created() {
