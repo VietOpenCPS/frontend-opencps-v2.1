@@ -164,7 +164,7 @@ export const store = new Vuex.Store({
       })
     },
     createDeliverable ({ commit, state }, input) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -175,8 +175,10 @@ export const store = new Vuex.Store({
         let body = Deliverable.createDeliverable.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\\"'))
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           console.log(response)
-        }).catch(function () {
+          resolve(response.data)
+        }).catch(function (error) {
           commit('setsnackbarerror', true)
+          reject(error)
         })
       })
     }

@@ -173,6 +173,7 @@
       },
       backToList () {
         let vm = this
+        console.log('backToList')
         let current = vm.$router.history.current
         let newQuery = current.query
         let currentPath = current.path
@@ -210,6 +211,7 @@
             vm.detail = {}
           } else {
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
+              vm.loading = false
               vm.backToList()
             })
           }
