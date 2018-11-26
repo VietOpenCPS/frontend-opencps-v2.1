@@ -198,6 +198,7 @@
           console.log('bbatForm', bbatForm.data)
           submitDataObject['formData'] = bbatForm.data
         }
+        submitDataObject['deliverableType'] = vm.items[vm.index]['deliverableType']
         console.log('submitDataObject', submitDataObject)
         if (cmd === -1) {
         } else {
