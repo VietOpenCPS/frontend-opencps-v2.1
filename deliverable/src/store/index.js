@@ -138,7 +138,7 @@ export const store = new Vuex.Store({
             end: filter.page * 15,
           }
         }
-        axios.get('/o/v1/opencps/deliverable/' + id, options).then(function (response) {
+        axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
