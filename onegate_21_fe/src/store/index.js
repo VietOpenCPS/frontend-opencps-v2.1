@@ -1324,7 +1324,7 @@ export const store = new Vuex.Store({
             item.plugin = true
             if(responseScript.indexOf('#preview@pdf') !== -1){
               console.log('view pdf')
-              var url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processActionId + '/preview' 
+              var url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/preview' 
               var config_blob =  {
                 headers: {
                   'groupId': state.initData.groupId

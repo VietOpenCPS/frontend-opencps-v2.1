@@ -47,94 +47,94 @@
                     </v-btn>
                   </div>
                 </div>
+                </div>
               </div>
+              <v-card v-if="item.eForm">
+                <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
+                  <v-layout wrap>
+                    <v-flex xs12 class="text-xs-right">
+                      <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
+                      v-if="item.eForm">Lưu lại</v-btn>
+                      <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
+                      <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
+                      <div :id="'formAlpaca' + item.partNo + id">
+                      </div>
+                    </v-flex>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <div class="absolute__btn group__thanh_phan pr-3 mr-1">
+              <content-placeholders class="mt-1" v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <v-layout row wrap v-else>
+                <v-flex style="width: 50px;">
+                  <input
+                  type="file"
+                  style="display: none"
+                  :id="'file' + item.partNo"
+                  @change="onUploadSingleFile($event,item)"
+                  >
+                  <v-progress-circular
+                  :width="2"
+                  :size="25"
+                  color="green"
+                  indeterminate
+                  v-if="progressUploadPart + id === item.partNo + id"
+                  ></v-progress-circular>
+                  <v-tooltip top v-else-if="progressUploadPart + id !== item.partNo + id">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                      <v-badge>
+                        <v-icon size="16" color="primary">cloud_upload</v-icon>
+                      </v-badge>
+                    </v-btn>
+                    <span>Tải file lên</span>
+                  </v-tooltip>
+                  <!-- <v-tooltip top>
+                    <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
+                      {{item.count}}
+                    </v-btn>
+                    <span>Xem</span>
+                  </v-tooltip> -->
+                </v-flex>
+              </v-layout>
             </div>
-            <v-card v-if="item.eForm">
-              <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
-                <v-layout wrap>
-                  <v-flex xs12 class="text-xs-right">
-                    <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
-                    v-if="item.eForm">Lưu lại</v-btn>
-                    <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
-                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
-                    <div :id="'formAlpaca' + item.partNo + id">
-                    </div>
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <div class="absolute__btn group__thanh_phan pr-3 mr-1">
-          <content-placeholders class="mt-1" v-if="loading">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-layout row wrap v-else>
-            <v-flex style="width: 50px;">
-              <input
-              type="file"
-              style="display: none"
-              :id="'file' + item.partNo"
-              @change="onUploadSingleFile($event,item)"
-              >
+          </div>
+        </v-card>
+        <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
+          <span>Không chọn</span>
+          <span>Bản chính</span>
+          <span>Bản chụp</span>
+          <span>Công chứng</span>
+        </div> -->
+        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+          <v-card>
+            <v-card-title class="headline">File đính kèm</v-card-title>
+            <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+              <v-icon>clear</v-icon>
+            </v-btn>
+            <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+            ">
               <v-progress-circular
-              :width="2"
-              :size="25"
-              color="green"
+              :size="100"
+              :width="1"
+              color="primary"
               indeterminate
-              v-if="progressUploadPart + id === item.partNo + id"
               ></v-progress-circular>
-              <v-tooltip top v-else-if="progressUploadPart + id !== item.partNo + id">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
-                  <v-badge>
-                    <v-icon size="16" color="primary">cloud_upload</v-icon>
-                  </v-badge>
-                </v-btn>
-                <span>Tải file lên</span>
-              </v-tooltip>
-              <!-- <v-tooltip top>
-                <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
-                  {{item.count}}
-                </v-btn>
-                <span>Xem</span>
-              </v-tooltip> -->
-            </v-flex>
-          </v-layout>
-        </div>
-      </div>
-    </v-card>
-    <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
-      <span>Không chọn</span>
-      <span>Bản chính</span>
-      <span>Bản chụp</span>
-      <span>Công chứng</span>
-    </div> -->
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
-      <v-card>
-        <v-card-title class="headline">File đính kèm</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
-        <div v-if="dialogPDFLoading" style="
-        min-height: 600px;
-        text-align: center;
-        margin: auto;
-        padding: 25%;
-        ">
-        <v-progress-circular
-        :size="100"
-        :width="1"
-        color="primary"
-        indeterminate
-        ></v-progress-circular>
-      </div>
-      <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
-      </iframe>
-    </v-card>
-  </v-dialog>
-</v-expansion-panel-content>
-</v-expansion-panel>
-</div>
+            </div>
+            <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+            </iframe>
+          </v-card>
+        </v-dialog>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </div>
 </template>
 
 <script>
@@ -194,13 +194,13 @@
       var vm = this
       vm.page = 1
       vm.$nextTick(function () {
-        console.log('vm.detailDossier------------', vm.detailDossier)
+        // console.log('vm.detailDossier------------', vm.detailDossier)
         if (vm.detailDossier['dossierId']) {
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
             vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
-            console.log('vm.createFiles------------', vm.createFiles)
-            console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
+            // console.log('vm.createFiles------------', vm.createFiles)
+            // console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
           }).catch(reject => {
           })
         }
@@ -211,8 +211,8 @@
       vm.$nextTick(function () {
         if (vm.createFiles.length > 0) {
           setTimeout(function () {
-            console.log('vm.createFiles------------', vm.createFiles)
-            console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
+            // console.log('vm.createFiles------------', vm.createFiles)
+            // console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
             vm.genAllAlpacaForm(vm.dossierFilesItems, vm.createFiles)
           }, 300)
         }
@@ -563,6 +563,21 @@
       }).catch(reject => {
         console.log('error')
       })
+    },
+    validCreateFileTemplate () {
+      var vm = this
+      if (vm.createFiles.length > 0) {
+        for (var i = 0; i < vm.createFiles.length; i++) {
+          if (vm.createFiles[i]['required'] && !vm.createFiles[i]['daKhai']) {
+            let message = 'Chú ý :' + vm.createFiles[i].partName + ' là thành phần bắt buộc!'
+            toastr.error(message)
+            return false
+          }
+        }
+        return true
+      } else {
+        return true
+      }
     }
   }
 }

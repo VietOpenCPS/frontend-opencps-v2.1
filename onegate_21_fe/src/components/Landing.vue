@@ -1224,14 +1224,8 @@ export default {
     getUser (roleItem) {
       let vm = this
       let roles = vm.$store.getters.getUser.role
-      let currentRole = roles.filter(function (item) {
-        return item === roleItem
-      })
-      if (currentRole && currentRole.length > 0) {
-        return true
-      } else {
-        return false
-      }
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     },
     changeSelected () {
       let vm = this
