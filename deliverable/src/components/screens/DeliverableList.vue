@@ -35,21 +35,21 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
-              {{ hosoDatasPage * 15 - 15 + props.index + 1 }} / {{props.item['_source']}} / {{props.item['source']}}
+              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
           </td>
 
-          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item"
+          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
+            <div v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
-                {{ props.item[itemHeader.value] }}
+                {{ props.item['_source'][itemHeader.value] }}
               </span>
             </div>
           </td>
