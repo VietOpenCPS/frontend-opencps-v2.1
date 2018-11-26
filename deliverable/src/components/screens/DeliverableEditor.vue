@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
+    <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
     <v-tabs
       icons-and-text centered
       v-model="active"
@@ -61,7 +61,7 @@
           :key="2"
           reverse-transition="fade-transition" transition="fade-transition"
         >
-          <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id"></bbat-table-editor-component>
+          <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail"></bbat-table-editor-component>
         </v-tab-item>
         <v-tab-item
           value="tab-3"
