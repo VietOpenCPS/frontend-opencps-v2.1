@@ -135,7 +135,7 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
-          resolve(response.data)
+          resolve(response.data['hits']['hits'][0]['_source'])
         }).catch(function (error) {
           reject(error)
         })
