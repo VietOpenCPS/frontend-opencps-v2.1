@@ -70,14 +70,12 @@
             reverse-transition="fade-transition" transition="fade-transition"
             v-if="String(id) !== '0'"
           >
-            view logs
+            <view-logs v-if="showComponent" :id="id" :datainput="detail"></view-logs>
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
       <v-layout row wrap>
-        <v-flex xs12 class="text-right pt-0 ml-1 px-0" style="
-            border-top: 1px solid #dcdcdc;
-        ">
+        <v-flex xs12 class="text-right pt-0 ml-1 px-0">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
             :loading="loading"
@@ -98,14 +96,15 @@
 </template>
 
 <script>
-  import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf } from '@/components'
+  import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf, ViewLogs } from '@/components'
 
   export default {
     props: ['index', 'id'],
     components: {
       BbatTableEditorComponentSimple,
       BbatTableEditorComponent,
-      ViewPdf
+      ViewPdf,
+      ViewLogs
     },
     data () {
       return {

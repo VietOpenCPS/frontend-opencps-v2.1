@@ -3,5 +3,6 @@ import BbatTableEditorComponentSimple from './ext/BbatTableEditorComponentSimple
 import TinyPagination from './ext/TinyPagination.vue'
 import DatetimePicker from './ext/DatetimePicker.vue'
 import ViewPdf from './ext/ViewPdf.vue'
+import ViewLogs from './ext/ViewLogs.vue'
 
-export { BbatTableEditorComponent, BbatTableEditorComponentSimple, TinyPagination, DatetimePicker, ViewPdf }
+export { BbatTableEditorComponent, BbatTableEditorComponentSimple, TinyPagination, DatetimePicker, ViewPdf, ViewLogs }
