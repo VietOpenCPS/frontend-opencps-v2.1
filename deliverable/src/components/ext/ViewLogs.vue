@@ -16,7 +16,6 @@
     data() {
       return {
         support: support,
-        data: {},
         dialogPDFLoading: true,
         isCallBack: true,
         pdfBlob: null,
@@ -27,7 +26,7 @@
       var vm = this
       vm.$nextTick(function() {
         setTimeout(() => {
-          vm.data = vm.datainput
+          console.log(vm.support)
           vm.pullLogs()
         }, 100)
       })
