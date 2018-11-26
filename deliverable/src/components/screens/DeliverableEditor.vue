@@ -54,7 +54,7 @@
           reverse-transition="fade-transition" transition="fade-transition"
           v-if="String(id) !== '0'"
         >
-          <view-pdf :id="id" :datainput="detail"></view-pdf>
+          <view-pdf v-if="showComponent" :id="id" :datainput="detail"></view-pdf>
         </v-tab-item>
         <v-tab-item
           value="tab-2"
