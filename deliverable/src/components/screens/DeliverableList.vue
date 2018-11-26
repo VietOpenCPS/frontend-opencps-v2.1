@@ -139,7 +139,7 @@
       },
       index (val) {
         var vm = this
-        if (vm.items[val].hasOwnProperty('tableConfig')) {
+        if (vm.items[val]['tableConfig'] !== '') {
           vm.hosoDatasPage = 1
           vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
         } else {
