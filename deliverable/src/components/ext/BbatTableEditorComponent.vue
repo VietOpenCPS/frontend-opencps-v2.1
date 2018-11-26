@@ -223,7 +223,7 @@
   import DatetimePicker from './DatetimePicker.vue'
 
   export default {
-    props: ['id'],
+    props: ['id', 'datainput'],
     components: {
       DatetimePicker
     },
@@ -288,7 +288,7 @@
           vm.processDataSource()
           setTimeout(() => {
             vm.processDataSourceVerify()
-            console.log('vm.pullCounterOrg 1: ', vm.pullCounterOrg)
+            vm.data = vm.datainput
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
             }

@@ -120,7 +120,25 @@ export const store = new Vuex.Store({
             end: filter.page * 15,
           }
         }
-        axios.get('/o/v1/opencps//deliverable/' + filter['type'], options).then(function (response) {
+        axios.get('/o/v1/opencps/deliverable/' + filter['type'], options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    getDeliverableById ({ commit, state }, id) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+          }
+        }
+        axios.get('/o/v1/opencps/deliverable/' + id, options).then(function (response) {
           resolve(response.data)
         }).catch(function (error) {
           reject(error)

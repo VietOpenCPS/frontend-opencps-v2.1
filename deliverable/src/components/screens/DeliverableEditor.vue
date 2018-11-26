@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
+    <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id"></bbat-table-editor-component-simple>
     <v-tabs
       icons-and-text centered
       v-model="active"
@@ -61,7 +61,7 @@
           :key="2"
           reverse-transition="fade-transition" transition="fade-transition"
         >
-          <bbat-table-editor-component ref="bbatForm" :id="id"></bbat-table-editor-component>
+          <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id"></bbat-table-editor-component>
         </v-tab-item>
         <v-tab-item
           value="tab-3"
@@ -109,7 +109,9 @@
         active: 0,
         loading: false,
         dataSocket: {},
-        tempCounter: 0
+        tempCounter: 0,
+        detail: {},
+        showComponent: false
       }
     },
     created () {
@@ -119,6 +121,11 @@
           let formId = vm.items[vm.index]['formScriptFileId']
           console.log('formId', formId)
           vm.$store.dispatch('getContentFile', formId)
+          vm.showComponent = false
+          vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+            vm.detail = detail
+            vm.showComponent = true
+          })
           vm.$store.dispatch('getContentFileSimple')
           vm.tempCounter = vm.pullCounter
           vm.$socket.onmessage = function (data) {
