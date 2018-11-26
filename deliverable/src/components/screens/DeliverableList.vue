@@ -73,7 +73,7 @@
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
       <v-card>
         <v-card-title class="headline">Giấy phép</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" v-on:click.native="dialogPDF = false">
           <v-icon>clear</v-icon>
         </v-btn>
         <div v-if="dialogPDFLoading" style="
