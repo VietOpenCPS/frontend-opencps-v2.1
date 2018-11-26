@@ -61,7 +61,7 @@
           :key="2"
           reverse-transition="fade-transition" transition="fade-transition"
         >
-          <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail"></bbat-table-editor-component>
+          <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
         </v-tab-item>
         <v-tab-item
           value="tab-3"
@@ -191,12 +191,10 @@
         let bbatForm = vm.$refs.bbatForm
         let submitDataObject = {}
         if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
-          delete bbatFormSimple.data['formData']
-          console.log('bbatFormSimple', bbatFormSimple.data)
           submitDataObject = bbatFormSimple.data
         }
         if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
-          delete bbatForm.data['formData']
+          submitDataObject['formData'] = {}
           console.log('bbatForm', bbatForm.data)
           submitDataObject['formData'] = bbatForm.data
         }
