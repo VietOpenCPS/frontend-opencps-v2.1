@@ -1,18 +1,14 @@
 <template>
   <div>
-    <vue-friendly-iframe v-if="!dialogPDFLoading" :src="pdfBlob"></vue-friendly-iframe>
+    <iframe v-show="!dialogPDFLoading" id="pdfViewerComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
   </div>
 </template>
 
 <script>
 
-  import VueFriendlyIframe from 'vue-friendly-iframe'
-
   export default {
     props: ['id', 'datainput'],
-    components: {
-      'vue-friendly-iframe': VueFriendlyIframe
-    },
     data() {
       return {
         data: {},
@@ -37,7 +33,7 @@
         console.log('pullPDF', vm.data['fileEntryId'])
         vm.$store.dispatch('viewPDF', vm.data['fileEntryId']).then(function (result) {
           vm.dialogPDFLoading = false
-          vm.pdfBlob = result
+          document.getElementById('pdfViewerComponent').src = result
         })
       }
     }
