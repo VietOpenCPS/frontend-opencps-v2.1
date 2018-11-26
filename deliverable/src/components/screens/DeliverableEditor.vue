@@ -54,7 +54,7 @@
           reverse-transition="fade-transition" transition="fade-transition"
           v-if="String(id) !== '0'"
         >
-          view giay phep
+          <view-pdf :id="id" :datainput="detail"></view-pdf>
         </v-tab-item>
         <v-tab-item
           value="tab-2"
@@ -96,13 +96,14 @@
 </template>
 
 <script>
-  import { BbatTableEditorComponent, BbatTableEditorComponentSimple } from '@/components'
+  import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf } from '@/components'
 
   export default {
     props: ['index', 'id'],
     components: {
       BbatTableEditorComponentSimple,
-      BbatTableEditorComponent
+      BbatTableEditorComponent,
+      ViewPdf
     },
     data () {
       return {

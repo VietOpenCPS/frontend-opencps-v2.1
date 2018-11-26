@@ -57,6 +57,26 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    viewPDF ({commit, state}, id) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/v1/opencps/deliverable/file/' + id, param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getDeliverableTypes ({ commit, state }) {
       return new Promise(() => {
         let options = {
