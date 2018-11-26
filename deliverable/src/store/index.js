@@ -132,10 +132,6 @@ export const store = new Vuex.Store({
         let options = {
           headers: {
             'groupId': state.groupId
-          },
-          params: {
-            start: filter.page * 15 - 15,
-            end: filter.page * 15,
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
