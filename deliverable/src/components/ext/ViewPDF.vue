@@ -18,11 +18,11 @@
     created() {
       var vm = this
       vm.$nextTick(function () {
-        console.log('isCallBack', vm.isCallBack)
         if (vm.isCallBack) {
           vm.isCallBack = false
-          console.log('isCallBack', vm.isCallBack)
           vm.data = vm.datainput
+          console.log('vm.datainput', vm.datainput)
+          console.log('vm.data', vm.data)
           vm.pullPDF()
         }
       })
