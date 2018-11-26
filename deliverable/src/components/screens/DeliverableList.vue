@@ -64,7 +64,7 @@
         </tr>
       </template>
     </v-data-table>
-    <div class="text-xs-right layout wrap" style="position: relative;">
+    <div class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
       <div class="flex pagging-table px-2"> 
         <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
           @tiny:change-page="paggingData" ></tiny-pagination>
