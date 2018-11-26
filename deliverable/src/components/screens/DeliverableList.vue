@@ -27,6 +27,7 @@
         class="table-landing table-bordered"
         no-data-text="Không có giấy phép nào"
         hide-actions
+        v-if="!loadingTable"
       >
       <template slot="items" slot-scope="props">
         <tr>
@@ -64,7 +65,7 @@
         </tr>
       </template>
     </v-data-table>
-    <div class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
+    <div v-if="!loadingTable" class="text-xs-right layout wrap" style="position: relative;border-top: 1px solid lightgrey;">
       <div class="flex pagging-table px-2"> 
         <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
           @tiny:change-page="paggingData" ></tiny-pagination>
@@ -106,6 +107,7 @@
     },
     data () {
       return {
+        loadingTable: false,
         dialogPDFLoading: false,
         dialogPDF: false,
         headers: [],
@@ -148,6 +150,7 @@
           vm.hosoDatasTotal = 0
           vm.hosoDatasPage = 1
         }
+        vm.pullData(vm.items[val]['typeCode'])
       }
     },
     computed: {
@@ -162,9 +165,14 @@
           type: type,
           page: vm.hosoDatasPage
         }
+        vm.loadingTable = true
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
           vm.hosoDatasTotal = result['hits']['total']
           vm.hosoDatas = result['hits']['hits']
+          vm.loadingTable = false
+        }).catch(function (reject) {
+          vm.loadingTable = false
+          console.log(reject)
         })
       },
       viewDetail (item, index) {
