@@ -115,8 +115,7 @@
         hosoDatas: [],
         hosoDatasTotal: 0,
         hosoDatasPage: 1,
-        dataSocket: {},
-        loadingTable: false
+        dataSocket: {}
       }
     },
     created () {
@@ -149,8 +148,11 @@
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
           vm.hosoDatasPage = 1
+          vm.loadingTable = true
+          setTimeout(() => {
+            vm.loadingTable = false
+          }, 100)
         }
-        vm.pullData(vm.items[val]['typeCode'])
       }
     },
     computed: {
