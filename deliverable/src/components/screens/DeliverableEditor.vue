@@ -191,10 +191,12 @@
         let bbatForm = vm.$refs.bbatForm
         let submitDataObject = {}
         if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
+          delete bbatFormSimple.data['formData']
           console.log('bbatFormSimple', bbatFormSimple.data)
           submitDataObject = bbatFormSimple.data
         }
         if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
+          delete bbatForm.data['formData']
           console.log('bbatForm', bbatForm.data)
           submitDataObject['formData'] = bbatForm.data
         }
