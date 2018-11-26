@@ -125,3 +125,6 @@ table.v-table tbody td {
 table.v-table {
     border-right: 1px solid #d3d3d3;
 }
+body table.v-table tbody td, body table.v-table tbody th {
+    height: auto;
+}

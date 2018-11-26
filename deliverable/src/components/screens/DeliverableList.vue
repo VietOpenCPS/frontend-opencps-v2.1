@@ -114,7 +114,15 @@
       },
       index (val) {
         var vm = this
-        vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+        if (vm.items[val].hasOwnProperty('tableConfig')) {
+          vm.hosoDatasPage = 1
+          vm.headers = eval('( ' + vm.items[val]['tableConfig'] + ' )')['headers']
+        } else {
+          vm.headers = []
+          vm.hosoDatas = []
+          vm.hosoDatasTotal = 0
+          vm.hosoDatasPage = 1
+        }
       }
     },
     computed: {
