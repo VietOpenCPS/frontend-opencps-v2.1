@@ -118,3 +118,10 @@ body .smx_100 > div {
     width: 100% !important;
     margin: 0 auto !important;
 }
+table.v-table tbody td {
+    border-right: 1px solid #d3d3d3;
+    vertical-align: top;
+}
+table.v-table {
+    border-right: 1px solid #d3d3d3;
+}

@@ -57,7 +57,9 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            pdf
+            <v-btn flat icon v-else>
+              <v-icon>picture_as_pdf</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -125,6 +127,21 @@
         })
       },
       viewDetail (item, index) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        // console.log('queryString=====', queryString)
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
+        })
       },
       paggingData (config) {
         let vm = this
