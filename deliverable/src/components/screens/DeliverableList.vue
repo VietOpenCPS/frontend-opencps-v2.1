@@ -57,7 +57,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-btn flat icon class="mx-0 my-0" v-else>
+            <v-btn flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
               <v-icon>picture_as_pdf</v-icon>
             </v-btn>
           </td>
@@ -70,6 +70,29 @@
           @tiny:change-page="paggingData" ></tiny-pagination>
       </div>
     </div>
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+      <v-card>
+        <v-card-title class="headline">Giấy phép</v-card-title>
+        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -83,6 +106,8 @@
     },
     data () {
       return {
+        dialogPDFLoading: false,
+        dialogPDF: false,
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -154,6 +179,15 @@
         }
         vm.$router.push({
           path: '/danh-sach-giay-to/' + vm.index + '/editor/' + item['entryClassPK'] + queryString
+        })
+      },
+      showPDFG (item) {
+        let vm = this
+        vm.dialogPDF = true
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', item['fileEntryId']).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('pdfViewerListComponent').src = result
         })
       },
       paggingData (config) {
