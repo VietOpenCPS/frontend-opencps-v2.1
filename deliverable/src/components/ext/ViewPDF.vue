@@ -15,7 +15,7 @@
         isCallBack: true
       }
     },
-    updated() {
+    created() {
       var vm = this
       vm.$nextTick(function () {
         console.log('isCallBack', vm.isCallBack)
