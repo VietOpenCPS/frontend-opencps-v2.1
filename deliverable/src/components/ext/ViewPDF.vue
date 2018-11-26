@@ -7,7 +7,7 @@
 
 <script>
 
-  import VuePDFViewer from 'vue-pdf-viewer'
+  import VuePDFViewer from 'vue-instant-pdf-viewer'
 
   export default {
     props: ['id', 'datainput'],
