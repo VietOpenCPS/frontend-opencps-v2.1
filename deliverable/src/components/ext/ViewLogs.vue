@@ -15,7 +15,7 @@
     props: ['id', 'datainput'],
     data() {
       return {
-        support: support,
+        support: support.deliverableState,
         dialogPDFLoading: true,
         isCallBack: true,
         pdfBlob: null,
@@ -26,7 +26,7 @@
       var vm = this
       vm.$nextTick(function() {
         setTimeout(() => {
-          console.log(vm.support)
+          console.log(vm.support.deliverableState)
           vm.pullLogs()
         }, 100)
       })
