@@ -276,6 +276,8 @@ export default {
           fileEntryId: strIdArr
         },
         success: function (result) {
+          vm.$store.commit('setKysoSuccess', true)
+          toastr.success('Thực hiện ký số thành công.')
         },
         error: function () {
           alert('Thực hiện ký số thất bại')
