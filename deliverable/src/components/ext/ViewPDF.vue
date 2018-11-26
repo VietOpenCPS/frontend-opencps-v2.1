@@ -11,7 +11,8 @@
     data() {
       return {
         data: {},
-        dialogPDFLoading: true
+        dialogPDFLoading: true,
+        isCallBack: true
       }
     },
     updated() {
