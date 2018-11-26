@@ -18,8 +18,10 @@
     updated() {
       var vm = this
       vm.$nextTick(function () {
+        console.log('isCallBack', vm.isCallBack)
         if (vm.isCallBack) {
           vm.isCallBack = false
+          console.log('isCallBack', vm.isCallBack)
           vm.data = vm.datainput
           vm.pullPDF()
         }
@@ -29,6 +31,7 @@
       pullPDF () {
         let vm = this
         vm.dialogPDFLoading = true
+        console.log('pullPDF', vm.data['fileEntryId'])
         vm.$store.dispatch('viewPDF', vm.data['fileEntryId']).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('pdfViewer').src = result
