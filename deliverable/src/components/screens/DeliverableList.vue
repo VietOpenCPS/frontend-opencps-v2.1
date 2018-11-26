@@ -122,7 +122,18 @@
       var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
-          vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+          if (vm.items[val]['tableConfig'] !== '') {
+            vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+          } else {
+            vm.headers = []
+            vm.hosoDatas = []
+            vm.hosoDatasTotal = 0
+            vm.hosoDatasPage = 1
+            vm.loadingTable = true
+            setTimeout(() => {
+              vm.loadingTable = false
+            }, 100)
+          }
           vm.pullData(vm.items[vm.index]['typeCode'])
         }, 100)
       })
