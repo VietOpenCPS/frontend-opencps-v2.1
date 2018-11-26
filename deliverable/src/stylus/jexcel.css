@@ -128,6 +128,9 @@ table.v-table {
 body table.v-table tbody td, body table.v-table tbody th {
     height: auto;
 }
+body .absolute__btn_panel:hover {
+    position: absolute !important;
+}
 body .v-card__title.headline {
     line-height: 32px!important;
     padding: 5px 16px;
