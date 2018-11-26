@@ -232,7 +232,9 @@
           vm.processDataSource()
           setTimeout(() => {
             vm.processDataSourceVerify()
-            vm.data = vm.datainput
+            if (String(vm.id) !== '0') {
+              vm.data = vm.datainput
+            }
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
             }
