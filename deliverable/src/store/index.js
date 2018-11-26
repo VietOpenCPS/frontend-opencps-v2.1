@@ -4,6 +4,7 @@ import axios from 'axios'
 import DeliverableTypes from './DeliverableTypes'
 import AdminConfig from './AdminConfig'
 import Deliverable from './Deliverable'
+import DeliverableLogs from './DeliverableLogs'
 // import saveAs from 'file-saver'
 
 Vue.use(Vuex)
@@ -71,6 +72,26 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             console.log(error)
             reject(error)
+          })
+        })
+      })
+    },
+    viewLogs ({commit, state}, id) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let options = {
+            headers: {
+              'groupId': state.groupId,
+              'Content-Type': 'text/plain',
+              'Accept': 'application/json'
+            }
+          }
+          let body = DeliverableLogs.getDeliverableLogs.replace('INPUTBODY', id)
+          axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
+            resolve(response.data['getDeliverableLogs'])
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
           })
         })
       })
