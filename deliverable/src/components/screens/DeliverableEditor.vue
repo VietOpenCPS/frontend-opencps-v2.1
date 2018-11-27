@@ -70,7 +70,7 @@
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            fileUpload
+            <attached-file-template :pk="id"></attached-file-template>
           </v-tab-item>
           <v-tab-item
             value="tab-3"
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-  import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf, ViewLogs } from '@/components'
+  import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf, ViewLogs, AttachedFileTemplate } from '@/components'
 
   export default {
     props: ['index', 'id'],
@@ -119,7 +119,8 @@
       BbatTableEditorComponentSimple,
       BbatTableEditorComponent,
       ViewPdf,
-      ViewLogs
+      ViewLogs,
+      AttachedFileTemplate
     },
     data () {
       return {
