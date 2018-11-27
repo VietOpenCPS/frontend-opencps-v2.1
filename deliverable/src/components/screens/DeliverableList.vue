@@ -4,7 +4,19 @@
       <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          
+          <v-select
+            v-model="advSearchItems"
+            placeholder="Tìm kiếm ..."
+            solo
+            chips
+            tags
+            deletable-chips
+            item-value="value"
+            item-text="text"
+            @input="keywordEventChange"
+            content-class="adv__search__select"
+            return-object
+          ></v-select>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
           <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
@@ -15,7 +27,7 @@
       <v-fade-transition>
         <div v-if="menusss" class="adv__search_container">
           <v-layout wrap v-for="(item, indexTool) in filters" v-bind:key="indexTool" v-if="item.display">
-              <v-flex xs12 sm5>
+              <v-flex xs12 sm4>
                 <v-select
                   :items="filters"
                   v-model="item.fieldName"
@@ -30,6 +42,14 @@
                 <v-btn icon class="mb-0 mx-0 mt-1">
                   <v-icon size="16">drag_handle</v-icon>
                 </v-btn>
+              </v-flex>
+              <v-flex xs12 sm7>
+                <v-text-field v-if="item.fieldType === 'string'"
+                  v-model="filterData[item.fieldName]"
+                  :label="item['fieldLabel']"
+                  single-line
+                  clearable
+                ></v-text-field>
               </v-flex>
           </v-layout>
           <v-layout wrap>
@@ -149,6 +169,7 @@
     },
     data () {
       return {
+        filterData: {},
         menusss: false,
         loadingTable: false,
         dialogPDFLoading: false,
@@ -159,7 +180,8 @@
         hosoDatasTotal: 0,
         hosoDatasPage: 1,
         dataSocket: {},
-        filters: []
+        filters: [],
+        advSearchItems: []
       }
     },
     created () {
@@ -282,8 +304,6 @@
       },
       selectedAdvFilter (item) {
         let vm = this
-        console.log('item', item)
-        console.log('vm.filters', vm.filters)
         vm.filters[item.index].display = true
         vm.filters[item.index].disabled = true
         let hasKey = false
@@ -294,15 +314,16 @@
           }
         }
         if (!hasKey) {
-          /*
-          vm.filters.push({
-            spec: vm.filters[item.index].spec,
-            value: vm.filters[item.index].spec + ':' + '__',
-            text: vm.filters[item.index].spec + ':' + '__',
+          vm.advSearchItems.push({
+            spec: vm.filters[item.index].fieldName,
+            value: vm.filters[item.index].fieldName + ':' + '__',
+            text: vm.filters[item.index].fieldName + ':' + '__',
             index: item.index
           })
-          */
         }
+      },
+      keywordEventChange (data) {
+        console.log('data', data)
       }
     }
   }
