@@ -281,7 +281,7 @@
         let filter = {
           type: type,
           page: vm.hosoDatasPage,
-          q: vm.$router.history.current.query
+          q: JSON.stringify(vm.$router.history.current.query)
         }
         vm.loadingTable = true
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
