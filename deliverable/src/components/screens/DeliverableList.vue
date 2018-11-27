@@ -278,6 +278,8 @@
     methods: {
       pullData (type) {
         let vm = this
+        let currentQuery = vm.$router.history.current.query
+        console.log('currentQuery', currentQuery)
         let filter = {
           type: type,
           page: vm.hosoDatasPage,
