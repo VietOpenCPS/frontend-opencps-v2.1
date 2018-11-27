@@ -281,6 +281,8 @@
       },
       selectedAdvFilter (item) {
         let vm = this
+        console.log('item', item)
+        console.log('vm.filters', vm.filters)
         vm.filters[item.index].display = true
         vm.filters[item.index].disabled = true
         let hasKey = false
