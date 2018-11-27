@@ -68,7 +68,7 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob'
           }
-          axios.get('/users/upload/download/opencps_deliverable/' + item['className'] + '/' + item['fileAttachId'], param).then(function (data) {
+          axios.get('/o/v1/opencps/users/upload/download/opencps_deliverable/' + item['className'] + '/' + item['fileAttachId'], param).then(function (data) {
             saveAs(data.data, item['uuid'] + '.' + item['extension'])
             resolve({status: true})
           }).catch(function (xhr) {
@@ -86,7 +86,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.delete('/users/upload/delete/opencps_deliverable/' + item['className'] + '/' + item['classPK'], param).then(function () {
+          axios.delete('/o/v1/opencps/users/upload/delete/opencps_deliverable/' + item['className'] + '/' + item['classPK'], param).then(function () {
             resolve({status: true})
           }).catch(function (xhr) {
             reject(xhr)
