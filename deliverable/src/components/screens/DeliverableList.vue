@@ -4,11 +4,12 @@
       <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-select
+          <v-combobox
             v-model="advSearchItems"
             placeholder="Tìm kiếm ..."
             solo
             chips
+            small
             tags
             deletable-chips
             item-value="value"
@@ -16,7 +17,8 @@
             @input="keywordEventChange"
             content-class="adv__search__select"
             return-object
-          ></v-select>
+            multiple
+          ></v-combobox>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
           <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
