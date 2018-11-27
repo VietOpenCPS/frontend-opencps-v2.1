@@ -1,58 +1,60 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12 class="control-section uploader customdroparea">
-      <div class="control_wrapper">
+    <v-flex xs12 sm5 class="control-section uploader customdroparea">
+      <div class="control_wrapper px-3 mx-1 py-3">
         <div class="sample_wrapper">
             <div id="dropArea">
-                <span id="drop" class="droparea"> Tải giấy tờ <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
-                <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
-                  <ul class="e-upload-files">
-                    <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
-                      <div class='container' style="position: relative;min-height: 75px;">
-                        <span class='wrapper' style="
-                          line-height: 10px;
-                        ">
-                        <span :class="['icon sf-icon-' + item['extension']]"></span>
-                        <div class='name file-name'>
-                          <span>{{item['fileName']}}</span>
-                          <p style="
-                            margin-top: 5px;
-                            font-size: 10px;
-                            margin-bottom: 0;
-                          ">
-                            ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
-                          </p>
-                        </div>
-                        <v-btn flat icon color="primary" 
-                          v-on:click.native="processDownloadFileAttach(item)"
-                          :loading="loading"
-                          :disabled="loading"
-                          style="
-                            position: absolute;
-                            right: 5px;
-                            top: 32px;
-                          ">
-                          <v-icon size="14">link</v-icon>
-                        </v-btn>
-                        <v-btn flat icon color="red darken-3" 
-                          v-on:click.native="processDeleteFileAttach(item)"
-                          :loading="loadingRemove"
-                          :disabled="loadingRemove"
-                          style="
-                            position: absolute;
-                            right: 5px;
-                          ">
-                          <v-icon size="14">delete</v-icon>
-                        </v-btn>
-                        </span>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                <span id="drop" class="droparea"> Tải giấy tờ, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
+                <ejs-uploader style="margin-top: 10px;border-style: dashed;" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
         </div>
+      </div>
+    </v-flex>
+    <v-flex xs12 sm7>
+      <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
+        <ul class="e-upload-files">
+          <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
+            <div class='container' style="position: relative;min-height: 75px;">
+              <span class='wrapper' style="
+                line-height: 10px;
+              ">
+              <span :class="['icon sf-icon-' + item['extension']]"></span>
+              <div class='name file-name'>
+                <span>{{item['fileName']}}</span>
+                <p style="
+                  margin-top: 5px;
+                  font-size: 10px;
+                  margin-bottom: 0;
+                ">
+                  ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
+                </p>
+              </div>
+              <v-btn flat icon color="primary" 
+                v-on:click.native="processDownloadFileAttach(item)"
+                :loading="loading"
+                :disabled="loading"
+                style="
+                  position: absolute;
+                  right: 5px;
+                  top: 32px;
+                ">
+                <v-icon size="14">link</v-icon>
+              </v-btn>
+              <v-btn flat icon color="red darken-3" 
+                v-on:click.native="processDeleteFileAttach(item)"
+                :loading="loadingRemove"
+                :disabled="loadingRemove"
+                style="
+                  position: absolute;
+                  right: 5px;
+                ">
+                <v-icon size="14">delete</v-icon>
+              </v-btn>
+              </span>
+            </div>
+          </li>
+        </ul>
       </div>
     </v-flex>
   </v-layout>

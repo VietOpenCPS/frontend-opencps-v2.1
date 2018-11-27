@@ -58,6 +58,26 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    getAttachFileData ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/v1/opencps/fileattach/' + filter['className'] + '/' + filter['pk'], param).then(function (response) {
+            let seriable = response.data
+            if (seriable.data) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     viewPDF ({commit, state}, id) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
