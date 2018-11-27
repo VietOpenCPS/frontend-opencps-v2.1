@@ -249,10 +249,8 @@
           let currentPath = current.path
           let queryString = '?'
           newQuery['renew'] = ''
-          for (let key in val) {
-            if (!val[key]['text'].endsWith(':__')) {
-              newQuery[val[key]['spec']] = ''
-            }
+          for (let key in vm.filters) {
+            newQuery[vm.filters[key]['fieldName']] = ''
           }
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
@@ -356,7 +354,18 @@
         console.log('vm.advSearchItems', vm.advSearchItems)
       },
       keywordEventChange (data) {
-        console.log('data', data)
+        for (let keyTool in vm.filters) {
+          vm.filters[keyTool].display = false
+          vm.filters[keyTool].disabled = false
+          for (let key in data) {
+            if (data[key]['index'] === vm.filters[keyTool]['index']) {
+              vm.filters[keyTool].display = true
+              vm.filters[keyTool].disabled = true
+              break
+            }
+          }
+        }
+
       },
       changeAdvFilterData (data, item) {
         let vm = this
