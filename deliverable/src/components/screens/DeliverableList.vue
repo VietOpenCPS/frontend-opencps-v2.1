@@ -27,7 +27,7 @@
                 ></v-select>
               </v-flex>
               <v-flex xs12 sm1 class="text-center">
-                <v-btn icon class="my-0 mx-0">
+                <v-btn icon class="mb-0 mx-0 mt-1">
                   <v-icon size="16">drag_handle</v-icon>
                 </v-btn>
               </v-flex>

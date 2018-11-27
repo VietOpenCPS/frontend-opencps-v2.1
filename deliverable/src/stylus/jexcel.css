@@ -131,6 +131,10 @@ body table.v-table tbody td, body table.v-table tbody th {
 body .absolute__btn_panel:hover {
     position: absolute !important;
 }
+body .absolute__btn_panel {
+    position: absolute;
+    top:6px !important;
+}
 body .v-card__title.headline {
     line-height: 32px!important;
     padding: 5px 16px;
@@ -138,4 +142,12 @@ body .v-card__title.headline {
     font-weight: 700;
     color: #fff;
     background-color: #00204a;
+}
+body .adv__search_container {
+    margin-top: 96px !important;
+}
+
+body .adv__search_container .layout > .flex > div {
+    padding: 0;
+    margin: 0;
 }
