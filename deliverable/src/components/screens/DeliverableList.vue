@@ -42,6 +42,7 @@
                 item-text="fieldLabel"
                 @change="selectedAdvFilter"
                 hide-selected
+                return-object
               ></v-select>
             </v-flex>
             <v-flex xs12 sm2 class="text-right">
