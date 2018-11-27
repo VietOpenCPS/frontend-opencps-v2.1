@@ -40,6 +40,7 @@
                 single-line
                 item-value="fieldName"
                 item-text="fieldLabel"
+                @change="selectedAdvFilter"
                 hide-selected
               ></v-select>
             </v-flex>
@@ -277,6 +278,28 @@
         vm.$router.push({
           path: current.path + queryString
         })
+      },
+      selectedAdvFilter (item) {
+        let vm = this
+        vm.filters[item.index].display = true
+        vm.filters[item.index].disabled = true
+        let hasKey = false
+        for (let key in vm.filters) {
+          if (vm.filters[key].index === item.index) {
+            hasKey = true
+            break
+          }
+        }
+        if (!hasKey) {
+          /*
+          vm.filters.push({
+            spec: vm.filters[item.index].spec,
+            value: vm.filters[item.index].spec + ':' + '__',
+            text: vm.filters[item.index].spec + ':' + '__',
+            index: item.index
+          })
+          */
+        }
       }
     }
   }
