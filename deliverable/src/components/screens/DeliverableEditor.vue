@@ -5,7 +5,7 @@
         <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-            
+            {{deName}}
           </div>
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn icon class="my-0 mx-0 btn-border-left">
@@ -108,6 +108,7 @@
     },
     data () {
       return {
+        deName: '',
         valid: false,
         active: 0,
         loading: false,
@@ -122,11 +123,12 @@
       vm.$nextTick(function () {
         setTimeout(() => {
           let formId = vm.items[vm.index]['formScriptFileId']
-          console.log('formId', formId)
+          vm.deName = ''
           vm.$store.dispatch('getContentFile', formId)
           vm.showComponent = false
           vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
             vm.detail = result
+            vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
           })
           vm.$store.dispatch('getContentFileSimple')
