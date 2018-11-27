@@ -149,7 +149,7 @@ body .adv__search_container {
 }
 
 body .header_tools .v-input__slot {
-    background: transparent;
+    background: transparent !important;
     margin: 0;
     height: 35px;
     font-weight: normal;
