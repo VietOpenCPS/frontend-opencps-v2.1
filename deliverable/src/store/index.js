@@ -5,7 +5,7 @@ import DeliverableTypes from './DeliverableTypes'
 import AdminConfig from './AdminConfig'
 import Deliverable from './Deliverable'
 import DeliverableLogs from './DeliverableLogs'
-// import saveAs from 'file-saver'
+import saveAs from 'file-saver'
 
 Vue.use(Vuex)
 
