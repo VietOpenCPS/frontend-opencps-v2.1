@@ -90,7 +90,7 @@
         </v-tabs-items>
       </v-tabs>
       <v-layout row wrap>
-        <v-flex xs12 class="text-right pt-0 ml-1 px-0">
+        <v-flex xs12 class="text-right pt-0 ml-1 px-0 pr-1">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
             :loading="loading"

@@ -58,6 +58,43 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    downloadServiceFileTemplate ({commit, state}, item) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/octet-stream'
+            },
+            responseType: 'blob'
+          }
+          axios.get('/users/upload/download/opencps_deliverable/' + item['className'] + '/' + item['fileAttachId'], param).then(function (data) {
+            saveAs(data.data, item['uuid'] + '.' + item['extension'])
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    removeServiceFileTemplate ({commit, state}, item) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.delete('/users/upload/delete/opencps_deliverable/' + item['className'] + '/' + item['classPK'], param).then(function () {
+            resolve({status: true})
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     getAttachFileData ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
