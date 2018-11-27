@@ -240,6 +240,13 @@
             vm.loadingTable = false
           }, 100)
         }
+      },
+      advSearchItems: {
+        handler: function (val, oldVal) {
+          console.log('advSearchItems watch: ', val)
+          console.log('advSearchItems watch: ', oldVal)
+        },
+        deep: true
       }
     },
     computed: {
