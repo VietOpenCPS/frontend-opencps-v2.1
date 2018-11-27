@@ -148,7 +148,20 @@ body .adv__search_container {
     top: 40px;
 }
 
+body .header_tools .v-input__slot {
+    background: transparent;
+    margin: 0;
+    height: 35px;
+    font-weight: normal;
+}
+
 body .adv__search_container .layout > .flex > div {
     padding: 0;
     margin: 0;
+}
+body .header_tools .v-input__append-inner {
+    display: none;
+}
+body .v-navigation-drawer .v-list.v-list--dense{
+    padding: 0;
 }
