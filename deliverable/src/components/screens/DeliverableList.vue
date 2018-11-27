@@ -309,7 +309,7 @@
                 vm.advSearchItems.push({
                   spec: vm.filters[key].fieldName,
                   value: currentQuery[vm.filters[key]['fieldName']],
-                  text: vm.filters[key].fieldName + ':' + '__',
+                  text: vm.filters[key].fieldName + ':' + currentQuery[vm.filters[key]['fieldName']],
                   index: vm.filters[key].index
                 })
               }
