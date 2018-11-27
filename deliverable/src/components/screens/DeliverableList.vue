@@ -280,7 +280,8 @@
         let vm = this
         let filter = {
           type: type,
-          page: vm.hosoDatasPage
+          page: vm.hosoDatasPage,
+          q: vm.$router.history.current.query
         }
         vm.loadingTable = true
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
@@ -354,6 +355,7 @@
         console.log('vm.advSearchItems', vm.advSearchItems)
       },
       keywordEventChange (data) {
+        let vm = this
         for (let keyTool in vm.filters) {
           vm.filters[keyTool].display = false
           vm.filters[keyTool].disabled = false
@@ -365,7 +367,6 @@
             }
           }
         }
-
       },
       changeAdvFilterData (data, item) {
         let vm = this
