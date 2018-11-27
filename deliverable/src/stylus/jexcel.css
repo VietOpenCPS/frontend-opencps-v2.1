@@ -176,7 +176,7 @@ body .tai_giay_to .e-upload {
     margin-top: 10px;border-style: dashed;
 }
 body .tai_giay_to .e-upload .e-file-select-wrap {
-    padding: 0 15px 8px 15px;
+    padding: 8px 15px 8px 15px;
 }
 body .tai_giay_to .e-upload .e-upload-files {
     border: none;
