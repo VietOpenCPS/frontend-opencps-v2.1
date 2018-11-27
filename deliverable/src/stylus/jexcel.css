@@ -144,7 +144,8 @@ body .v-card__title.headline {
     background-color: #00204a;
 }
 body .adv__search_container {
-    margin-top: 55px !important;
+    margin-top: unset !important;
+    top: 40px;
 }
 
 body .adv__search_container .layout > .flex > div {
