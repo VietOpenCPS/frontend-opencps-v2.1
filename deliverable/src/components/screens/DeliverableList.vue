@@ -307,8 +307,8 @@
         vm.filters[item.index].display = true
         vm.filters[item.index].disabled = true
         let hasKey = false
-        for (let key in vm.filters) {
-          if (vm.filters[key].index === item.index) {
+        for (let key in vm.advSearchItems) {
+          if (vm.advSearchItems[key].index === item.index) {
             hasKey = true
             break
           }
@@ -321,6 +321,7 @@
             index: item.index
           })
         }
+        console.log('vm.advSearchItems', vm.advSearchItems)
       },
       keywordEventChange (data) {
         console.log('data', data)
