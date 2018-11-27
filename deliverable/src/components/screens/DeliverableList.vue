@@ -279,11 +279,17 @@
       pullData (type) {
         let vm = this
         let currentQuery = vm.$router.history.current.query
-        console.log('currentQuery', currentQuery)
+        let queryString = ''
+        for (let key in currentQuery) {
+          if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+            queryString += key + '=' + currentQuery[key] + '&'
+          }
+        }
+        queryString += '1=1'
         let filter = {
           type: type,
           page: vm.hosoDatasPage,
-          q: JSON.stringify(vm.$router.history.current.query)
+          q: queryString
         }
         vm.loadingTable = true
         vm.$store.dispatch('getDeliverables', filter).then(function (result) {
