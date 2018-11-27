@@ -15,7 +15,6 @@
             item-value="value"
             item-text="text"
             @input="keywordEventChange"
-            content-class="adv__search__select"
             return-object
             multiple
           ></v-combobox>
@@ -51,6 +50,7 @@
                   :label="item['fieldLabel']"
                   single-line
                   clearable
+                  @change="changeAdvFilterData($event, item)"
                 ></v-text-field>
               </v-flex>
           </v-layout>
@@ -327,6 +327,17 @@
       },
       keywordEventChange (data) {
         console.log('data', data)
+      },
+      changeAdvFilterData (data, item) {
+        let vm = this
+        let valueFilter = data
+        for (let key in vm.advSearchItems) {
+          if (vm.advSearchItems[key].index === item.index) {
+            vm.advSearchItems[key].value = item.fieldName + ':' + valueFilter
+            vm.advSearchItems[key].text = item.fieldName + ':' + valueFilter
+            break
+          }
+        }
       }
     }
   }
