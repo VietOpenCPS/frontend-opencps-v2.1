@@ -300,6 +300,22 @@
           vm.loadingTable = false
           console.log(reject)
         })
+        setTimeout(() => {
+          if (vm.advSearchItems !== null && vm.advSearchItems.length === 0) {
+            for (let key in vm.filters) {
+              if (currentQuery.hasOwnProperty(vm.filters[key]['fieldName'])) {
+                vm.filters[key].display = true
+                vm.filters[key].disabled = true
+                vm.advSearchItems.push({
+                  spec: vm.filters[key].fieldName,
+                  value: currentQuery[vm.filters[key]['fieldName']],
+                  text: vm.filters[key].fieldName + ':' + '__',
+                  index: vm.filters[key].index
+                })
+              }
+            }
+          }
+        }, 200)
       },
       viewDetail (item, index) {
         let vm = this
