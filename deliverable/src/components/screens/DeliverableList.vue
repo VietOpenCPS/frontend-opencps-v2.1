@@ -243,8 +243,31 @@
       },
       advSearchItems: {
         handler: function (val, oldVal) {
-          console.log('advSearchItems watch: ', val)
-          console.log('advSearchItems watch: ', oldVal)
+          let vm = this
+          let current = vm.$router.history.current
+          let newQuery = current.query
+          let currentPath = current.path
+          let queryString = '?'
+          newQuery['renew'] = ''
+          for (let key in val) {
+            if (!val[key]['text'].endsWith(':__')) {
+              newQuery[val[key]['spec']] = ''
+            }
+          }
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          for (let key in val) {
+            if (!val[key]['text'].endsWith(':__')) {
+              queryString += val[key]['spec'] + '=' + val[key]['value'] + '&'
+            }
+          }
+          queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          vm.$router.push({
+            path: '/danh-sach-giay-to/' + vm.index + queryString
+          })
         },
         deep: true
       }
@@ -325,7 +348,7 @@
         if (!hasKey) {
           vm.advSearchItems.push({
             spec: vm.filters[item.index].fieldName,
-            value: vm.filters[item.index].fieldName + ':' + '__',
+            value: '__',
             text: vm.filters[item.index].fieldName + ':' + '__',
             index: item.index
           })
@@ -340,7 +363,8 @@
         let valueFilter = data
         for (let key in vm.advSearchItems) {
           if (vm.advSearchItems[key].index === item.index) {
-            vm.advSearchItems[key].value = item.fieldName + ':' + valueFilter
+            vm.advSearchItems[key].spec = item.fieldName
+            vm.advSearchItems[key].value = valueFilter
             vm.advSearchItems[key].text = item.fieldName + ':' + valueFilter
             break
           }
