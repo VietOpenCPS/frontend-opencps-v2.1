@@ -1,17 +1,18 @@
 <template>
-  <v-layout row wrap>
+  <v-layout row wrap class="mb-5">
     <v-flex xs12 sm5 class="control-section uploader customdroparea">
       <div class="control_wrapper px-3 mx-1 py-3">
-        <div class="sample_wrapper">
+        <div class="sample_wrapper tai_giay_to">
             <div id="dropArea">
-                <span id="drop" class="droparea"> Tải giấy tờ, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
-                <ejs-uploader style="margin-top: 10px;border-style: dashed;" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                <span id="drop" class="droparea"> Tải giấy phép, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
         </div>
       </div>
     </v-flex>
     <v-flex xs12 sm7>
+      <div class="my-3 mx-3 text-center">Giấy tờ đã tải lên</div>
       <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
         <ul class="e-upload-files">
           <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
@@ -23,7 +24,7 @@
               <div class='name file-name'>
                 <span>{{item['fileName']}}</span>
                 <p style="
-                  margin-top: 5px;
+                  margin-top: 10px;
                   font-size: 10px;
                   margin-bottom: 0;
                 ">
@@ -37,7 +38,7 @@
                 style="
                   position: absolute;
                   right: 5px;
-                  top: 32px;
+                  top: 0;
                 ">
                 <v-icon size="14">link</v-icon>
               </v-btn>
@@ -48,6 +49,7 @@
                 style="
                   position: absolute;
                   right: 5px;
+                  margin-top: -10px;
                 ">
                 <v-icon size="14">delete</v-icon>
               </v-btn>
@@ -148,6 +150,7 @@
       },
       processDeleteFileAttach (item) {
         let vm = this
+        item['className'] = vm.className
         if (confirm('Bạn có chắc muốn xoá bản ghi này?')) {
           vm.loadingRemove = true
           vm.$store.dispatch('removeServiceFileTemplate', item).then(function () {
@@ -163,6 +166,7 @@
       processDownloadFileAttach (item) {
         let vm = this
         vm.loading = true
+        item['className'] = vm.className
         vm.$store.dispatch('downloadServiceFileTemplate', item).then(function () {
           vm.loading = false
         }).catch(reject => {

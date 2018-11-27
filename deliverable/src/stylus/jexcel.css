@@ -172,3 +172,16 @@ body .header_tools .v-chip--select-multi .v-chip__content {
     background: #0064c7;
     color: #fff;
 }
+body .tai_giay_to .e-upload {
+    margin-top: 10px;border-style: dashed;
+}
+body .tai_giay_to .e-upload .e-file-select-wrap {
+    padding: 0 15px 8px 15px;
+}
+body .tai_giay_to .e-upload .e-upload-files {
+    border: none;
+}
+body .tai_giay_to .e-upload-file-list {
+    border: 1px dashed #e0e0e0;
+    margin-top: -6px;
+}
