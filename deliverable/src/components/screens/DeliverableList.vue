@@ -6,52 +6,52 @@
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           
         </div>
-        <v-fade-transition>
-          <div v-if="menusss" class="adv__search_container">
-            <v-layout wrap v-for="(item, indexTool) in filters" v-bind:key="indexTool" v-if="item.display">
-                <v-flex xs12 sm5>
-                  <v-select
-                    :items="filters"
-                    v-model="item.fieldName"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="fieldName"
-                    item-text="fieldLabel"
-                    disabled
-                  ></v-select>
-                </v-flex>
-                <v-flex xs12 sm1 class="text-center">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">drag_handle</v-icon>
-                  </v-btn>
-                </v-flex>
-            </v-layout>
-            <v-layout wrap>
-              <v-flex xs12 sm10 class="no__selected__items">
-                <v-select
-                  :items="filters"
-                  label="Chọn điều kiện lọc"
-                  single-line
-                  item-value="fieldName"
-                  item-text="fieldLabel"
-                  hide-selected
-                ></v-select>
-              </v-flex>
-              <v-flex xs12 sm2 class="text-right">
-                <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
-                  <v-icon class="mr-2">clear</v-icon>
-                  Quay lại
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </div>
-        </v-fade-transition>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
           <v-btn icon class="my-0 mx-2" v-on:click.native="menusss = !menusss">
             <v-icon size="16">filter_list</v-icon>
           </v-btn>
         </div>
-      </div> 
+      </div>
+      <v-fade-transition>
+        <div v-if="menusss" class="adv__search_container">
+          <v-layout wrap v-for="(item, indexTool) in filters" v-bind:key="indexTool" v-if="item.display">
+              <v-flex xs12 sm5>
+                <v-select
+                  :items="filters"
+                  v-model="item.fieldName"
+                  label="Chọn điều kiện lọc"
+                  single-line
+                  item-value="fieldName"
+                  item-text="fieldLabel"
+                  disabled
+                ></v-select>
+              </v-flex>
+              <v-flex xs12 sm1 class="text-center">
+                <v-btn icon class="my-0 mx-0">
+                  <v-icon size="16">drag_handle</v-icon>
+                </v-btn>
+              </v-flex>
+          </v-layout>
+          <v-layout wrap>
+            <v-flex xs12 sm10 class="no__selected__items">
+              <v-select
+                :items="filters"
+                label="Chọn điều kiện lọc"
+                single-line
+                item-value="fieldName"
+                item-text="fieldLabel"
+                hide-selected
+              ></v-select>
+            </v-flex>
+            <v-flex xs12 sm2 class="text-right">
+              <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
+                <v-icon class="mr-2">clear</v-icon>
+                Quay lại
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </div>
+      </v-fade-transition>
     </div>
     <div style="text-align: right;">
       <v-btn color="blue darken-3" dark
