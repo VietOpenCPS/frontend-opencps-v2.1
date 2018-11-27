@@ -165,3 +165,10 @@ body .header_tools .v-input__append-inner {
 body .v-navigation-drawer .v-list.v-list--dense{
     padding: 0;
 }
+body .header_tools .v-chip--select-multi .v-chip__content {
+    padding: 0 4px 0 12px;
+    height: 24px;
+    border: 1px solid #0064c7;
+    background: #0064c7;
+    color: #fff;
+}
