@@ -33,15 +33,23 @@
             XEM GIẤY PHÉP
           </v-btn>
         </v-tab>
-          <v-tab
+        <v-tab
           href="#tab-2"
           :key="2"
+        >
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            TẢI GIẤY PHÉP TỪ MÁY TÍNH
+          </v-btn>
+        </v-tab>
+        <v-tab
+          href="#tab-3"
+          :key="3"
         >
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             FORM NHẬP GIẤY PHÉP
           </v-btn>
         </v-tab>
-        <v-tab :key="3" href="#tab-3" 
+        <v-tab :key="4" href="#tab-4" 
           v-if="String(id) !== '0'"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LỊCH SỬ CẬP NHẬT GIẤY PHÉP
@@ -62,11 +70,18 @@
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
+            fileUpload
           </v-tab-item>
           <v-tab-item
             value="tab-3"
             :key="3"
+            reverse-transition="fade-transition" transition="fade-transition"
+          >
+            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
+          </v-tab-item>
+          <v-tab-item
+            value="tab-4"
+            :key="4"
             reverse-transition="fade-transition" transition="fade-transition"
             v-if="String(id) !== '0'"
           >
