@@ -11,7 +11,7 @@
         </div>
       </div>
     </v-flex>
-    <v-flex xs12 sm7>
+    <v-flex xs12 sm7 class="tai_giay_to">
       <div class="my-3 mx-3 text-center">Giấy tờ đã tải lên</div>
       <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
         <ul class="e-upload-files">
