@@ -7,6 +7,8 @@
                 <span id="drop" class="droparea"> Tải giấy phép, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
                 <ejs-uploader :autoUpload="auto" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
+                <ejs-uploader v-if="tempShow" v-show="false" id='templateuploadHidden' name="UploadFilesHidden" :allowedExtensions= 'extensions' :asyncSettings= "pathHidden" ref="uploadObjHidden" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                </ejs-uploader>
             </div>
         </div>
       </div>
@@ -72,10 +74,15 @@
   export default {
     data () {
       return {
+        tempShow: false,
         loadingRemove: false,
         loading: false,
         fileTemplateData: [],
         fileTemplateTotal: 0,
+        pathHidden:  {
+          saveUrl: '',
+          removeUrl: ''
+        },
         path:  {
           saveUrl: '',
           removeUrl: ''
@@ -120,13 +127,17 @@
       doUploadLate (pkInput) {
         let vm = this
         if (vm.$refs.uploadObj.getFilesData().length > 0) {
-          vm.path = {
+          vm.pathHidden = {
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
           }
-          vm.$refs.uploadObj.asyncSettings = vm.path
-          console.log('vm.$refs.uploadObj.asyncSettings', vm.$refs.uploadObj.asyncSettings)
-          vm.$refs.uploadObj.upload(vm.$refs.uploadObj.getFilesData(), true)
+          vm.tempShow = false
+          vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
+          console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
+          vm.tempShow = true
+          setTimeout(() => {
+            vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
+          }, 200)
         }
       },
       addHeaders (args) {
