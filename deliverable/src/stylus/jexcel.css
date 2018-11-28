@@ -189,3 +189,9 @@ body .e-upload .e-upload-files .e-upload-file-list {
     border: none;
     border-top: 1px dashed rgba(0,0,0,.12);
 }
+body .fix_tool_bottom {
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 240px);
+    width: -webkit-calc(100% - 240px);
+}
