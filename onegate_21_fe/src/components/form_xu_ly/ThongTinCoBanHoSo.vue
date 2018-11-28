@@ -41,17 +41,22 @@
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Địa chỉ:</span>
-                      <span class="pl-0 text-bold "> 
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}
+                      </span>
+                      <span class="pl-0 text-bold" v-else> 
                         {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}
                       </span>
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Thư điện tử:</span>
-                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateEmail}} </span>
+                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactEmail}} </span>
+                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateEmail}} </span>
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Số điện thoại:</span>
-                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateTelNo}} </span>
+                      <span class="pl-0 text-bold " v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.contactTelNo}} </span>
+                      <span class="pl-0 text-bold " v-else> {{thongTinChiTietHoSo.delegateTelNo}} </span>
                     </div>
                   </v-list>
                 </v-menu>
