@@ -74,7 +74,7 @@
   export default {
     data () {
       return {
-        tempShow: false,
+        tempShow: true,
         loadingRemove: false,
         loading: false,
         fileTemplateData: [],
@@ -132,11 +132,14 @@
             removeUrl: '/' + pkInput,
           }
           vm.tempShow = true
-          vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
-          console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
-          vm.tempShow = false
           setTimeout(() => {
-            vm.tempShow = true
+            vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
+            console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
+            setTimeout(() => {
+              vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
+              console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
+              vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
+            }, 200)
             vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
           }, 200)
         }
