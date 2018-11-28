@@ -96,7 +96,7 @@ export const store = new Vuex.Store({
         dataPutUser.append('oldPassword', filter.oldPassword)
         dataPutUser.append('newPassword', filter.newPassword)
         axios.post(url, dataPutUser, param).then(result1 => {
-          resolve(result1)
+          resolve(result1.data)
         }).catch(xhr => {
           reject(xhr)
           commit('setsnackbarerror', true)
