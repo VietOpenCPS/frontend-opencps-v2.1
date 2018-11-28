@@ -8,8 +8,8 @@
                 <ejs-uploader :autoUpload="auto" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
-            <div style="display: none;">
-              <ejs-uploader v-if="tempShow" id='templateuploadHidden' name="UploadFilesHidden" :allowedExtensions= 'extensions' :asyncSettings= "pathHidden" ref="uploadObjHidden" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+            <div>
+              <ejs-uploader id='templateuploadHidden' name="UploadFilesHidden" :allowedExtensions= 'extensions' :asyncSettings= "pathHidden" ref="uploadObjHidden" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
               </ejs-uploader>
             </div>
         </div>
@@ -135,13 +135,9 @@
           }
           vm.tempShow = true
           setTimeout(() => {
+            console.log('vm.$refs.uploadObjHidden', vm.$refs.uploadObjHidden)
             vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
             console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
-            setTimeout(() => {
-              vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
-              console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
-              vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
-            }, 200)
             vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
           }, 200)
         }
