@@ -124,7 +124,9 @@
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
           }
-          vm.$refs.uploadObj.upload(vm.$refs.uploadObj.getFilesData(), true);
+          vm.$refs.uploadObj.asyncSettings = vm.path
+          console.log('vm.$refs.uploadObj.asyncSettings', vm.$refs.uploadObj.asyncSettings)
+          vm.$refs.uploadObj.upload(vm.$refs.uploadObj.getFilesData(), true)
         }
       },
       addHeaders (args) {
