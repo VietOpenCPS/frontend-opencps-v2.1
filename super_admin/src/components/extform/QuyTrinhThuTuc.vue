@@ -878,6 +878,7 @@
                         v-model="currentAction.signatureType"
                         item-text="text"
                         item-value="value"
+                        clearable
                       ></v-select>
                     </v-layout>
                   </v-flex>
@@ -1748,7 +1749,7 @@
             }
             vm.$store.dispatch('deleteStepRoles', filter).then(function (result) {
               console.log(result)
-              vm.getStepRoles()
+              vm.getStepRoles(stepId)
             }).catch(reject => {
               console.log(reject)
             })
