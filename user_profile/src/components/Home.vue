@@ -71,11 +71,11 @@
                 <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box></v-text-field>
+                <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
                 <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
-                  <v-text-field slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['applicantIdDate'])" label="Ngày cấp" v-model="user['applicantIdDate']"></v-text-field>
+                  <v-text-field disabled slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['applicantIdDate'])" label="Ngày cấp" v-model="user['applicantIdDate']"></v-text-field>
                   <v-date-picker v-model="ngayCap" no-title></v-date-picker>
                 </v-menu>
               </v-flex>
