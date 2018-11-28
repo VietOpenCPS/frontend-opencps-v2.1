@@ -117,6 +117,16 @@
       }
     },
     methods: {
+      doUploadLate (pkInput) {
+        let vm = this
+        if (vm.$refs.uploadObj.getFilesData().length > 0) {
+          vm.path = {
+            saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
+            removeUrl: '/' + pkInput,
+          }
+          vm.$refs.uploadObj.upload(vm.$refs.uploadObj.getFilesData(), true);
+        }
+      },
       addHeaders (args) {
         let vm = this
         args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
