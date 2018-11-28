@@ -14,6 +14,11 @@
               v-model='activeKS'
               label='Sử dụng chữ ký số'
             ></v-checkbox>
+            <v-checkbox v-if="esignType === ''"
+              class="ml-3"
+              v-model='activeKS'
+              label='Xác nhận ký số'
+            ></v-checkbox>
             <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
               <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
               <v-captcha ref="captcha"></v-captcha>
@@ -84,7 +89,7 @@ export default {
       let vm = this
       let exportData = {
         textValue: vm.noteReason,
-        required: (vm.esignType === 'password') ? vm.passWord : (vm.esignType === 'digital' ? vm.activeKS : vm.$refs.captcha.checkValidCatcha())
+        required: (vm.esignType === 'password') ? vm.passWord : (vm.esignType === 'digital' || vm.esignType === '' ? vm.activeKS : vm.$refs.captcha.checkValidCatcha())
       }
       console.log('exportData', exportData)
       return exportData
@@ -144,7 +149,7 @@ export default {
               return
             }
             vm.kyDuyetYCGiamDinh(strIdArr, paramObj, actionName)
-          } else if (vm.esignType === 'captcha') {
+          } else if (vm.esignType === 'captcha' || vm.esignType === 'password' || vm.esignType === '') {
             vm.completeKyDuyetCaptchaSignature(strIdArr, paramObj, actionName)
           }
         }
@@ -252,7 +257,7 @@ export default {
     },
     completeKyDuyetCaptchaSignature (strIdArr, paramObj, actionName) {
       var vm = this
-      var url = '/o/rest/v2/captchaSignature/' + vm.detailDossier.dossierId + '/dossierFiles'
+      var url = '/o/rest/v2/signature/' + vm.detailDossier.dossierId + '/dossierFiles'
       $.ajax({
         type: 'PUT',
         url: url,
@@ -276,9 +281,11 @@ export default {
           fileEntryId: strIdArr
         },
         success: function (result) {
+          vm.$store.commit('setKysoSuccess', true)
+          toastr.success('Thực hiện ký số thành công.')
         },
         error: function () {
-          alert('Thực hiện ký số thất bại')
+          toastr.error('Thực hiện ký số thất bại')
         }
       })
     },
