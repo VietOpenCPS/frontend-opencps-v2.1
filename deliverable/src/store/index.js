@@ -244,8 +244,10 @@ export const store = new Vuex.Store({
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let file = data['files'][0]
+        console.log(file.getAsBinary())
+        console.log(file['rawFile'].getAsBinary())
         let formData = new FormData()
-        formData.append('UploadFiles', file)
+        formData.append('UploadFiles', file['rawFile'].getAsBinary())
         axios.post('/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId/' + data['id'], formData, {
           headers: {
             'groupId': state.initData.groupId,
