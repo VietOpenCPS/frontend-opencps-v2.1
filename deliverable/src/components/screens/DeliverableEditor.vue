@@ -70,7 +70,7 @@
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <attached-file-template :pk="id"></attached-file-template>
+            <attached-file-template :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
           </v-tab-item>
           <v-tab-item
             value="tab-3"
