@@ -27,6 +27,20 @@
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
+        <v-combobox :class="item['class_component']" v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
+          v-model="data[item.model]"
+          :items="dataSocket[item['datasource_key']]"
+          :item-text="item.itemText"
+          :item-value="item.itemValue"
+          box
+          :label="item.required ? item['label'] + ' 💥': item['label']" 
+          :rules="processRules(item.rules)"
+          :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
+          @change="processChangeDataSource($event, item)"
+          :chips="item['chips']"
+          :multiple="item['multiple']"
+          clearable
+        ></v-combobox>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && pullOk && item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="dataSocket[item['datasource_key']]"

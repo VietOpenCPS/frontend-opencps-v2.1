@@ -5,7 +5,7 @@
         <div class="sample_wrapper tai_giay_to">
             <div id="dropArea">
                 <span id="drop" class="droparea"> Tải giấy phép, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
-                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                <ejs-uploader :autoUpload="false" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
             </div>
         </div>

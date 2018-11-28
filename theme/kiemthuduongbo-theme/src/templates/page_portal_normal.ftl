@@ -5,7 +5,7 @@
 <html class="${root_css_class}" dir="<@liferay.language key="lang.dir" />" lang="${w3c_language_id}">
 
 <head>
-	<title>${the_title} - ${company_name}</title>
+	<title>Hệ thống dịch vụ công trực tuyến</title>
 
 	<meta content="initial-scale=1.0, width=device-width" name="viewport" />
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -18,6 +18,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;subset=vietnamese" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=889122122" rel="stylesheet" type="text/css">
 
