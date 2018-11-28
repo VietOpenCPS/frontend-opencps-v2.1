@@ -129,9 +129,7 @@
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
           }
-          console.log('uploadFileTemp', uploadFileTemp)
           let uploadData = {
-            files: uploadFileTemp,
             id: pkInput
           }
           vm.$store.dispatch('uploadSingleFile', uploadData)
