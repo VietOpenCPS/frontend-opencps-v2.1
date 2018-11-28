@@ -7,8 +7,10 @@
                 <span id="drop" class="droparea"> Tải giấy phép, <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
                 <ejs-uploader :autoUpload="auto" id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
-                <ejs-uploader v-if="tempShow" v-show="false" id='templateuploadHidden' name="UploadFilesHidden" :allowedExtensions= 'extensions' :asyncSettings= "pathHidden" ref="uploadObjHidden" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
-                </ejs-uploader>
+            </div>
+            <div style="display: none;">
+              <ejs-uploader v-if="tempShow" id='templateuploadHidden' name="UploadFilesHidden" :allowedExtensions= 'extensions' :asyncSettings= "pathHidden" ref="uploadObjHidden" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+              </ejs-uploader>
             </div>
         </div>
       </div>
