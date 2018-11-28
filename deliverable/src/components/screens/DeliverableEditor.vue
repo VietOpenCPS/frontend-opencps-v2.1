@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-scroll="onScroll">
     <v-form ref="form" v-model="valid" lazy-validation>
       <div class="row-header no__hidden_class">
         <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
