@@ -1091,6 +1091,13 @@ export default {
       let vm = this
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
+      // console.log('params', currentQuery)
+      // for (let key in currentQuery) {
+      //   if (vm.itemFilterSupport.hasOwnProperty(key)) {
+      //     vm.itemFilterSupport[key] = currentQuery[key]
+      //   }
+      // }
+      // console.log('advFilter', vm.itemFilterSupport)
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -2268,7 +2275,6 @@ export default {
           if (data[key].startsWith('keyword:')) {
             vm.advObjectSearch['keyword'] = data[key].replace('keyword:', '')
           } else {
-            // console.log('vm.advSearchItems', vm.advSearchItems)
             for (let keyTool in vm.advSearchItems) {
               if (data[key].startsWith(vm.advSearchItems[keyTool].spec + ':')) {
                 vm.advObjectSearch[vm.advSearchItems[keyTool].spec] = data[key].replace(vm.advSearchItems[keyTool].spec + ':', '')
@@ -2280,7 +2286,7 @@ export default {
           vm.advObjectSearch[data[key].spec] = newText.replace(data[key].spec + ':', '')
         }
       }
-      // console.log('advObjectSearch', vm.advObjectSearch)
+      console.log('advObjectSearch', vm.advObjectSearch)
       vm.advSearchItems = []
       for (let key in vm.advObjectSearch) {
         if (!vm.advObjectSearch.hasOwnProperty(key)) continue
@@ -2326,6 +2332,7 @@ export default {
           vm.advSearchTools[keyTool].disabled = true
         }
       }
+      console.log('vm.advSearchItems', vm.advSearchItems)
       vm.doRedirectFilter()
     },
     selectedAdvFilter (item) {

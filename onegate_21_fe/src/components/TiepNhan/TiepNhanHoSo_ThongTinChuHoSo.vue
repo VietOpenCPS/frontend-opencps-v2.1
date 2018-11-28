@@ -799,16 +799,36 @@ export default {
       vm.thongTinChuHoSo['contactTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
       vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
+      function changeCity (data) {
+        return new Promise((resolve, reject) => {
+          setTimeout(
+            () => {
+              vm.onChangeCity(data)
+              resolve()
+            }, Math.floor(Math.random() * 100) + 1
+          )
+        })
+      }
+      function changeDistrict (data) {
+        return new Promise((resolve, reject) => {
+          setTimeout(
+            () => {
+              vm.onChangeDistrict(data)
+              resolve()
+            }, Math.floor(Math.random() * 100) + 1
+          )
+        })
+      }
       if (vm.thongTinChuHoSo['cityCode'] !== '' && vm.thongTinChuHoSo['cityCode'] !== null && vm.thongTinChuHoSo['cityCode'] !== undefined && vm.thongTinChuHoSo['cityCode'] !== 0 && vm.thongTinChuHoSo['cityCode'] !== '0') {
-        vm.onChangeCity(vm.thongTinChuHoSo['cityCode'])
+        changeCity(vm.thongTinChuHoSo['cityCode']).then(function () {
+          vm.thongTinChuHoSo.districtCode = item['districtCode'] ? item['districtCode'] : ''
+          if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
+            changeDistrict(vm.thongTinChuHoSo['districtCode']).then(function () {
+              vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
+            })
+          }
+        })
       }
-      vm.thongTinChuHoSo.districtCode = item['districtCode'] ? item['districtCode'] : ''
-      if (vm.thongTinChuHoSo['districtCode'] !== '' && vm.thongTinChuHoSo['districtCode'] !== null && vm.thongTinChuHoSo['districtCode'] !== undefined && vm.thongTinChuHoSo['districtCode'] !== 0 && vm.thongTinChuHoSo['districtCode'] !== '0') {
-        vm.onChangeDistrict(vm.thongTinChuHoSo['districtCode'])
-      }
-      setTimeout(function () {
-        vm.thongTinChuHoSo.wardCode = item['wardCode'] ? item['wardCode'] : ''
-      }, 300)
     },
     onSearchItemSelected1 (item) {
       var vm = this
@@ -821,16 +841,36 @@ export default {
       vm.thongTinNguoiNopHoSo['delegateTelNo'] = item['contactTelNo'] ? item['contactTelNo'] : ''
       vm.thongTinNguoiNopHoSo['delegateEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinNguoiNopHoSo['delegateCityCode'] = item['cityCode'] ? item['cityCode'] : ''
+      function changeCity (data) {
+        return new Promise((resolve, reject) => {
+          setTimeout(
+            () => {
+              vm.onChangeCity(data)
+              resolve()
+            }, Math.floor(Math.random() * 100) + 1
+          )
+        })
+      }
+      function changeDistrict (data) {
+        return new Promise((resolve, reject) => {
+          setTimeout(
+            () => {
+              vm.onChangeDistrict(data)
+              resolve()
+            }, Math.floor(Math.random() * 100) + 1
+          )
+        })
+      }
       if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
-        vm.onChangeDelegateCity(vm.thongTinNguoiNopHoSo['delegateCityCode'])
+        changeCity(vm.thongTinNguoiNopHoSo['delegateCityCode']).then(function () {
+          vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
+          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+            changeDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode']).then(function () {
+              vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
+            })
+          }
+        })
       }
-      vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
-      if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
-        vm.onChangeDelegateDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode'])
-      }
-      setTimeout(function () {
-        vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
-      }, 300)
     },
     getThongTinChuHoSo () {
       return this.thongTinChuHoSo
