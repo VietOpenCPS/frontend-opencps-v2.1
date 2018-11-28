@@ -241,6 +241,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    uploadSingleFile ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let file = data['files'][0]
+        let formData = new FormData()
+        formData.append('UploadFiles', file)
+        axios.post('/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId/' + data['id'], formData, {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(function (response) {
+          resolve(response.data)
+          console.log('upload file success!')
+        }).catch(function (xhr) {
+          console.log(xhr)
+          toastr.error('Tải file thất bại.')
+          reject(xhr)
+        })
+      })
+    },
     createDeliverable ({ commit, state }, input) {
       return new Promise((resolve, reject) => {
         let options = {

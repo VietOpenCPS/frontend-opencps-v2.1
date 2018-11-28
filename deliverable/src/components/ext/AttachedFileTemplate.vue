@@ -131,6 +131,11 @@
             removeUrl: '/' + pkInput,
           }
           console.log('uploadFileTemp', uploadFileTemp)
+          let uploadData = {
+            files: uploadFileTemp,
+            id: pkInput
+          }
+          vm.$store.dispatch('uploadSingleFile', uploadData)
         }
       },
       addHeaders (args) {
