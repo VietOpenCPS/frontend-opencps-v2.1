@@ -18,6 +18,7 @@
         </div>
       </div>
       <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
+      {{offsetTop}}
       <v-tabs
         icons-and-text centered
         v-model="active"
@@ -124,6 +125,7 @@
     },
     data () {
       return {
+        offsetTop: 0,
         deName: '',
         valid: false,
         active: 0,
@@ -185,6 +187,9 @@
       }
     },
     methods: {
+      onScroll (e) {
+        this.offsetTop = window.pageYOffset || document.documentElement.scrollTop
+      },
       goBack () {
         window.history.back()
       },
