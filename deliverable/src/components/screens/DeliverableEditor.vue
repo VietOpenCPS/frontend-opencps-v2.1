@@ -89,7 +89,7 @@
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
-      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 700}'>
+      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>
         <v-flex xs12 class="text-right pt-0 ml-1 px-0 pr-1">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
@@ -125,7 +125,7 @@
     data () {
       return {
         offsetTop: 0,
-        offsetCheck: 800,
+        offsetCheck: 400,
         deName: '',
         valid: false,
         active: 0,
