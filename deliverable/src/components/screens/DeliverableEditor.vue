@@ -18,7 +18,6 @@
         </div>
       </div>
       <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
-      {{offsetTop}}
       <v-tabs
         icons-and-text centered
         v-model="active"
