@@ -125,7 +125,6 @@
       doUploadLate (pkInput) {
         let vm = this
         if (vm.$refs.uploadObj.getFilesData().length > 0) {
-          let uploadFileTemp = vm.$refs.uploadObj.getFilesData()
           vm.path = {
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
