@@ -816,7 +816,6 @@
                       item-text="text"
                       item-value="value"
                       :hide-selected="true"
-                      clearable
                     ></v-select>
                   </v-flex>
                   <v-flex xs12 sm12 v-if="Number(currentAction.requestPayment) > 0">
@@ -1164,7 +1163,7 @@
           dossierTemplateNo: '',
           createDossierFiles: [],
           returnDossierFiles: [],
-          requestPayment: '',
+          requestPayment: 0,
           paymentFee: '',
           createDossier: [],
           syncActionCode: '',
@@ -1507,7 +1506,7 @@
             dossierTemplateNo: '',
             createDossierFiles: [],
             returnDossierFiles: [],
-            requestPayment: '',
+            requestPayment: 0,
             syncActionCode: '',
             configNote: '',
             createDossierNo: false,
