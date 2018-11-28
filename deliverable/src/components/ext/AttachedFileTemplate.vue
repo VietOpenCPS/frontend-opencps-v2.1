@@ -130,16 +130,7 @@
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
           }
-          console.log('vm.$refs.uploadObj', vm.$refs.uploadObj)
-          vm.$refs.uploadObj.asyncSettings = vm.pathHidden
-          console.log('vm.$refs.uploadObj', vm.$refs.uploadObj.asyncSettings)
-          vm.tempShow = false
-          setTimeout(() => {
-            vm.tempShow = true
-          }, 200)
-          setTimeout(() => {
-            vm.$refs.uploadObj.upload(uploadFileTemp, true)
-          }, 400)
+          console.log('uploadFileTemp', uploadFileTemp)
         }
       },
       addHeaders (args) {
