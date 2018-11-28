@@ -163,11 +163,13 @@
 
 <script>
   import { TinyPagination } from '@/components'
+  import TemplateRendering from './template_rendering.vue'
 
   export default {
     props: ['index'],
     components: {
-      TinyPagination
+      TinyPagination,
+      TemplateRendering
     },
     data () {
       return {
