@@ -131,11 +131,12 @@
             saveUrl: '/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId' + '/' + pkInput,
             removeUrl: '/' + pkInput,
           }
-          vm.tempShow = false
+          vm.tempShow = true
           vm.$refs.uploadObjHidden.asyncSettings = vm.pathHidden
           console.log('vm.$refs.uploadObjHidden.asyncSettings', vm.$refs.uploadObjHidden.asyncSettings)
-          vm.tempShow = true
+          vm.tempShow = false
           setTimeout(() => {
+            vm.tempShow = true
             vm.$refs.uploadObjHidden.upload(vm.$refs.uploadObj.getFilesData(), true)
           }, 200)
         }
