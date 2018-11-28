@@ -230,6 +230,7 @@
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
               vm.loading = false
               if (String(vm.id) === '0') {
+                console.log('data', data)
                 vm.$refs.attachedObj.doUploadLate(data['createDeliverable']['deliverableId'])
               }
               vm.backToList()
