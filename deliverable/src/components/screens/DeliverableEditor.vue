@@ -90,7 +90,7 @@
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
-      <v-layout row wrap>
+      <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 700}'>
         <v-flex xs12 class="text-right pt-0 ml-1 px-0 pr-1">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
           <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
@@ -126,6 +126,7 @@
     data () {
       return {
         offsetTop: 0,
+        offsetCheck: 800,
         deName: '',
         valid: false,
         active: 0,
@@ -189,6 +190,7 @@
     methods: {
       onScroll (e) {
         this.offsetTop = window.pageYOffset || document.documentElement.scrollTop
+        this.offsetCheck = document.getElementById('wrapper').offsetHeight - this.offsetTop
       },
       goBack () {
         window.history.back()
