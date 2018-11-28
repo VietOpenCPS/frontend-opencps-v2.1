@@ -70,7 +70,7 @@
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <attached-file-template :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
+            <attached-file-template ref="attachedObj" :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
           </v-tab-item>
           <v-tab-item
             value="tab-3"
@@ -229,6 +229,9 @@
           } else {
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
               vm.loading = false
+              if (String(vm.id) === '0') {
+                vm.$refs.attachedObj.doUploadLate(data['createDeliverable']['deliverableId'])
+              }
               vm.backToList()
             })
           }

@@ -185,3 +185,7 @@ body .tai_giay_to .e-upload-file-list {
     border: 1px dashed #e0e0e0;
     margin-top: -6px;
 }
+body .e-upload .e-upload-files .e-upload-file-list {
+    border: none;
+    border-top: 1px dashed rgba(0,0,0,.12);
+}
