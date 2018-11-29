@@ -79,7 +79,11 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
-      vm.$store.dispatch('getDeliverableTypes')
+      if (window.location.href.endsWith('#/')) {
+        vm.$router.push('/danh-sach-giay-to/0')
+      } else {
+        vm.$store.dispatch('getDeliverableTypes')
+      }
     })
   }
 })
