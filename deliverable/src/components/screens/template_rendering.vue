@@ -26,9 +26,7 @@ export default {
       console.log('1AAAAAAAA')
       Vue.component('my-dynamic-view', {
         template: vm.layout_view['template'],
-        data: {
-          item: vm.item
-        },
+        data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
         beforeCreate: eval(' ( ' + vm.layout_view['beforeCreate'] + ' ) '),
         created: eval(' ( ' + vm.layout_view['created'] + ' ) '),
         updated: eval(' ( ' + vm.layout_view['updated'] + ' ) '),
