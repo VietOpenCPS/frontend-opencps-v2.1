@@ -79,7 +79,11 @@ export default {
   },
   watch: {
   },
-  mounted () {},
+  mounted () {
+    if (this.esignType === '') {
+      this.activeKS = true
+    }
+  },
   methods: {
     changeActive () {
       var vm = this
@@ -157,7 +161,7 @@ export default {
     },
     kyDuyetYCGiamDinh (strIdArr, paramObj, actionName) {
       var vm = this
-      var url = '/o/rest/v2/digitalSignature/' + vm.detailDossier.dossierId + '/hashComputed'
+      var url = '/o/rest/v2/defaultsignature/digitalSignature/' + vm.detailDossier.dossierId + '/hashComputed'
       console.log(vm.detailDossier.dossierId)
       $.ajax({
         type: 'POST',
@@ -212,7 +216,7 @@ export default {
     },
     completeKyDuyetManyYCGiamDinh (signs, signFieldNames, fileNames, fileEntryIds, paramObj, actionName) {
       var vm = this
-      var url = '/o/rest/v2/digitalSignature/' + vm.detailDossier.dossierId + '/dossierFiles'
+      var url = '/o/rest/v2/defaultsignature/digitalSignature/' + vm.detailDossier.dossierId + '/dossierFiles'
       $.ajax({
         type: 'PUT',
         url: url,
@@ -257,7 +261,7 @@ export default {
     },
     completeKyDuyetCaptchaSignature (strIdArr, paramObj, actionName) {
       var vm = this
-      var url = '/o/rest/v2/signature/' + vm.detailDossier.dossierId + '/dossierFiles'
+      var url = '/o/rest/v2/defaultsignature/' + vm.detailDossier.dossierId + '/dossierFiles'
       $.ajax({
         type: 'PUT',
         url: url,
@@ -291,7 +295,7 @@ export default {
     },
     completeKyDuyetYCGiamDinh (sign, signFieldName, fileName, fileEntryId, paramObj, actionName) {
       var vm = this
-      var url = '/o/rest/v2/digitalSignature/' + vm.detailDossier.dossierId + '/dossierFile'
+      var url = '/o/rest/v2/defaultsignature/digitalSignature/' + vm.detailDossier.dossierId + '/dossierFile'
       $.ajax({
         type: 'PUT',
         url: url,
