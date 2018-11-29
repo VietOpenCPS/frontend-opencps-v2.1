@@ -21,15 +21,13 @@ export default {
   created () {
     let vm = this
     console.log('vm.layout_view', vm.layout_view)
-    if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined' && vm.layout_view !== '') {
-      let layoutObject = eval('( ' + vm.layout_view + ' )')
-      console.log('vm.layoutObject', layoutObject)
+    if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       Vue.component('my-dynamic-view', {
-        template: layoutObject['template'],
-        data: eval(' ( ' + layoutObject['data'] + ' ) '),
-        created: eval(' ( ' + layoutObject['created'] + ' ) '),
-        updated: eval(' ( ' + layoutObject['updated'] + ' ) '),
-        methods: layoutObject['methods']
+        template: vm.layout_view['template'],
+        data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
+        created: eval(' ( ' + vm.layout_view['created'] + ' ) '),
+        updated: eval(' ( ' + vm.layout_view['updated'] + ' ) '),
+        methods: vm.layout_view['methods']
       })
     }
   }
