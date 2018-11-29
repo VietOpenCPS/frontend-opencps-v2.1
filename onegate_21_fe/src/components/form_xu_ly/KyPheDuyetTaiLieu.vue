@@ -119,9 +119,12 @@ export default {
           }
           var dossierFileId = fileDetail.dossierFileId
           var dossierPartId = fileDetail.dossierPartId
-          if (dossierFileId && dossierPartId) {
-            var strId = dossierFileId + ',' + dossierPartId
+          if (dossierFileId && dossierPartId && vm.esignType === 'digital') {
+            let strId = dossierFileId + ',' + dossierPartId
             idArr.push(strId)
+          } else if (dossierFileId && vm.esignType !== 'digital') {
+            let strId1 = dossierFileId
+            idArr.push(strId1)
           }
         }
       }
