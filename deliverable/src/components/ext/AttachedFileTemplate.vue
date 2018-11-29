@@ -63,7 +63,7 @@
 </template>
 
 <script>
-  import Vue from 'vue/dist/vue.min.js'
+  import Vue from 'vue'
   import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
   import { detach } from '@syncfusion/ej2-base'
 

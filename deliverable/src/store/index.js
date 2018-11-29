@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import DeliverableTypes from './DeliverableTypes'
