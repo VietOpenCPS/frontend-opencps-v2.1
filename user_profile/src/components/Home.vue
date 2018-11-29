@@ -51,7 +51,7 @@
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Nhập lại mật khẩu mới 💥" type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc'], v => v===newPassWord || 'Mật khẩu nhập lại không chính xác'" required></v-text-field>
+                <v-text-field label="Nhập lại mật khẩu mới 💥" type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v===newPassWord || 'Mật khẩu nhập lại không chính xác']" required></v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
