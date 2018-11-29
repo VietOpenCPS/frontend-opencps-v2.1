@@ -81,9 +81,8 @@ new Vue({
     vm.$nextTick(function() {
       if (window.location.href.endsWith('#/')) {
         vm.$router.push('/danh-sach-giay-to/0')
-      } else {
-        vm.$store.dispatch('getDeliverableTypes')
       }
+      vm.$store.dispatch('getDeliverableTypes')
     })
   }
 })
