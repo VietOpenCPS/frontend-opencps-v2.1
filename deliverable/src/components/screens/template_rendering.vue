@@ -20,7 +20,7 @@ export default {
   },
   created () {
     let vm = this
-    console.log('vm.layout_view', vm.layout_view)
+    console.log('vm.item', vm.item)
     console.log((vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined'))
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       console.log('1AAAAAAAA')
