@@ -20,6 +20,7 @@ export default {
   },
   created () {
     let vm = this
+    console.log('vm.layout_view', vm.layout_view)
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       Vue.component('my-dynamic-view', {
         template: vm.layout_view['template'],
