@@ -1,5 +1,4 @@
 import Vue from 'vue/dist/vue.min.js'
-import './plugins/vuetify'
 import './stylus/app.styl'
 import './stylus/jexcel.css'
 import './stylus/ej2base.css'
@@ -11,6 +10,19 @@ import VueNativeSock from 'vue-native-websocket'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 import axios from 'axios'
+import Vuetify from 'vuetify'
+
+Vue.use(Vuetify, {
+  theme: {
+    primary: '#212121',
+    secondary: '#424242',
+    accent: '#459fed',
+    error: '#ff8e8e',
+    info: '#2196F3',
+    success: '#4CAF50',
+    warning: '#FFC107'
+  }
+})
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
