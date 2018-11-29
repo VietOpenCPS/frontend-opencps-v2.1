@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.min.js'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import NotFound from '@/components/NotFound'

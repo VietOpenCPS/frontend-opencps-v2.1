@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.min.js'
 import './plugins/vuetify'
 import './stylus/app.styl'
 import './stylus/jexcel.css'
