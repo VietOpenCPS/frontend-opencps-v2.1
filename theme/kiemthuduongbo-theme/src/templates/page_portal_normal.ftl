@@ -85,12 +85,12 @@
     font-weight: bold;
     line-height: 27px;
     margin-bottom: 0;
-">${site_name}
+">BỘ GIAO THÔNG VẬN TẢI
 	<br/>
 	<span style="
 		font-weight: normal;
 		font-size: 16px;
-	">Hệ thống dịch vụ công trực tuyến</span>
+	">HỆ THỐNG DỊCH VỤ CÔNG TRỰC TUYẾN</span>
  </p>
 				</div> 
 			</a> 
