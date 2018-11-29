@@ -112,7 +112,7 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <div v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
-              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="eval('( ' + itemHeader.layout_view + ' )')"></template-rendering>
+              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
                 {{ props.item['_source'][itemHeader.value] }}
               </span>
