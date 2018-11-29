@@ -789,3 +789,7 @@ border: none !important; }
   .input-group--suffix .input-group--text-field__suffix {
       font-size: 13px;
   }
+
+  body .bootstrap-datetimepicker-widget .datepicker > div:first-child {
+    display: block !important;
+}
