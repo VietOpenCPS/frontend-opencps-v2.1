@@ -3,7 +3,7 @@
     <v-card>
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
         <v-expansion-panel class="expaned__list__data">
-          <v-expansion-panel-content hide-actions :value="false">
+          <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
@@ -74,13 +74,13 @@
               <v-card-text style="background-color: rgba(244, 247, 213, 0.19)">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
-                    <div :id="'wrapForm' + item.partNo + id" :class="classFixed">
+                    <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px' : ''">
                       <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                       v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
                       <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
                       <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
                     </div>
-                    <div style="height:500px;border:1px solid #dedede" :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
+                    <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>
                 </v-layout>
@@ -324,7 +324,10 @@ export default {
     }],
     fileTemplateItems: [],
     stateViewResult: true,
-    classFixed: ''
+    currentFormView: '',
+    pstFixed: 0,
+    pstEl: 0,
+    endEl: 0
   }),
   computed: {
     loading () {
@@ -700,18 +703,17 @@ export default {
     loadAlpcaForm (data) {
       var vm = this
       //
-      if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
-        $(window).scroll(function () {
-          let height = $(window).scrollTop()
-          let offsetTopBTNs = $('#wrapForm' + data.partNo + vm.id).offset().top
-          let heightForm = $('#formAlpaca' + data.partNo + vm.id).height()
-          if (height > offsetTopBTNs && height < offsetTopBTNs + heightForm) {
-            vm.classFixed = 'fix-position'
-          } else {
-            vm.classFixed = ''
-          }
-        })
-      }
+      vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+      vm.pstEl = vm.endEl = 0
+      setTimeout(function () {
+        if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
+          vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
+          vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
+          $(window).scroll(function () {
+            vm.pstFixed = $(window).scrollTop()
+          })
+        }
+      }, 500)
       //
       var fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
