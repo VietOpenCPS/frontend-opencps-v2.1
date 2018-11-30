@@ -71,14 +71,16 @@
               </div>
             </div>
             <v-card v-if="item.hasForm">
-              <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
+              <v-card-text style="background-color: rgba(244, 247, 213, 0.19)">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
-                    <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
-                    v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
-                    <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
-                    <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
-                    <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
+                    <div :id="'wrapForm' + item.partNo + id" :class="classFixed">
+                      <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
+                      v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
+                      <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
+                      <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
+                    </div>
+                    <div style="height:500px;border:1px solid #dedede" :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
                   </v-flex>
                 </v-layout>
@@ -254,8 +256,7 @@
 </template>
 
 <script>
-// import $ from 'jquery'
-// import * as utils from '../store/onegate_utils'
+import $ from 'jquery'
 import toastr from 'toastr'
 export default {
   props: {
@@ -322,7 +323,8 @@ export default {
       value: 2
     }],
     fileTemplateItems: [],
-    stateViewResult: true
+    stateViewResult: true,
+    classFixed: ''
   }),
   computed: {
     loading () {
@@ -697,6 +699,20 @@ export default {
     },
     loadAlpcaForm (data) {
       var vm = this
+      //
+      if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
+        $(window).scroll(function () {
+          let height = $(window).scrollTop()
+          let offsetTopBTNs = $('#wrapForm' + data.partNo + vm.id).offset().top
+          let heightForm = $('#formAlpaca' + data.partNo + vm.id).height()
+          if (height > offsetTopBTNs && height < offsetTopBTNs + heightForm) {
+            vm.classFixed = 'fix-position'
+          } else {
+            vm.classFixed = ''
+          }
+        })
+      }
+      //
       var fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })

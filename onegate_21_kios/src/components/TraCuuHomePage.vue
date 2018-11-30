@@ -44,7 +44,7 @@
           Nhập thông tin tra cứu
         </v-alert>
         <!--  -->
-        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
+        <div class="mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" style="position:relative">
           <v-data-table
           :headers="headersTable"
           :items="dossierList"

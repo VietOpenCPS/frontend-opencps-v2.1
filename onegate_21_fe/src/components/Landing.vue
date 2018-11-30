@@ -1365,71 +1365,7 @@ export default {
       let vm = this
       vm.selected = []
       let currentQuery = router.history.current.query
-      // console.log('currentQuery======', currentQuery)
-      // <---------
-      // console.log('params', currentQuery)
-      // if (currentQuery.hasOwnProperty('adv_renew')) {
-      //   vm.advSearchItems = []
-      //   for (let key1 in vm.itemFilterKey) {
-      //     for (let key in currentQuery) {
-      //       if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
-      //         vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
-      //         break
-      //       } else {
-      //         vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
-      //       }
-      //     }
-      //   }
-      //   console.log('itemFilterSupport', vm.itemFilterSupport)
-      //   for (let key in vm.itemFilterKey) {
-      //     let spec = vm.itemFilterKey[key]
-      //     if (vm.itemFilterSupport[spec]) {
-      //       if (spec === 'keyword') {
-      //         vm.advSearchItems.push({
-      //           spec: spec,
-      //           value: spec + ':' + vm.itemFilterSupport[spec],
-      //           text: spec + ':' + vm.itemFilterSupport[spec],
-      //           index: -1
-      //         })
-      //       } else if (spec === 'year') {
-      //         let specExits = vm.advSearchItems.findIndex(item => item['spec'] === 'year_month')
-      //         console.log('vm.advSearchItems1', vm.advSearchItems)
-      //         console.log('vm.advSearchItems2', vm.advSearchItems.filter(item => item['spec'] === 'year_month'))
-      //         if (specExits >= 0) {
-      //           vm.advSearchItems.push({
-      //             spec: 'year_month',
-      //             value: spec + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-      //             text: spec + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-      //             index: vm.advSearchTools['year_month']['index']
-      //           })
-      //         } else {
-      //           vm.advSearchItems.push({
-      //             spec: 'year_month',
-      //             value: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-      //             text: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-      //             index: vm.advSearchTools[key]['index']
-      //           })
-      //         }
-      //       } else if (spec === 'month') {
-      //         vm.advSearchItems.push({
-      //           spec: 'year_month',
-      //           value: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-      //           text: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-      //           index: vm.advSearchTools[key]['index']
-      //         })
-      //       } else {
-      //         vm.advSearchItems.push({
-      //           spec: spec,
-      //           value: spec + ':' + vm.itemFilterSupport[spec],
-      //           text: spec + ':' + vm.itemFilterSupport[spec],
-      //           index: vm.advSearchTools[key]['index']
-      //         })
-      //       }
-      //     }
-      //   }
-      //   console.log('vm.advSearchItems', vm.advSearchItems)
-      // }
-      // ------->
+      console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0) {
@@ -1441,9 +1377,9 @@ export default {
         var filter = null
         if (vm.menuType !== 3) {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1460,9 +1396,9 @@ export default {
           }
         } else {
           filter = {
-            queryParams: querySet,
+            // queryParams: querySet,
             /*  test local */
-            // queryParams: 'http://127.0.0.1:8081' + querySet,
+            queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1503,6 +1439,54 @@ export default {
           vm.hosoDatas = []
           vm.hosoDatasTotal = 0
         })
+        // <---------
+        // console.log('params', currentQuery)
+        // if (currentQuery.hasOwnProperty('adv_renew')) {
+        //   vm.advSearchItems = []
+        //   for (let key1 in vm.itemFilterKey) {
+        //     for (let key in currentQuery) {
+        //       if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
+        //         vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
+        //         break
+        //       } else {
+        //         vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
+        //       }
+        //     }
+        //   }
+        //   console.log('itemFilterSupport', vm.itemFilterSupport)
+        //   for (let key in vm.itemFilterKey) {
+        //     let spec = vm.itemFilterKey[key]
+        //     if (vm.itemFilterSupport[spec]) {
+        //       if (spec === 'keyword') {
+        //         vm.advSearchItems.push({
+        //           spec: spec,
+        //           value: spec + ':' + vm.itemFilterSupport[spec],
+        //           text: spec + ':' + vm.itemFilterSupport[spec],
+        //           index: -1
+        //         })
+        //       } else if (spec === 'year') {
+        //         // vm.advSearchItems[0]['value'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
+        //         // vm.advSearchItems[0]['text'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
+        //         // vm.advSearchItems[0]['index'] = vm.advSearchTools[key]['index']
+        //       } else if (spec === 'month') {
+        //         // vm.advSearchItems[0]['value'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
+        //         // vm.advSearchItems[0]['text'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
+        //         // vm.advSearchItems[0]['index'] = vm.advSearchTools[key]['index']
+        //       } else {
+        //         vm.advSearchItems.push({
+        //           spec: spec,
+        //           value: spec + ':' + vm.itemFilterSupport[spec],
+        //           text: spec + ':' + vm.itemFilterSupport[spec],
+        //           index: vm.advSearchTools[key]['index']
+        //         })
+        //       }
+        //     }
+        //   }
+        //   console.log('vm.advSearchItems', vm.advSearchItems)
+        // } else {
+        //   vm.advSearchItems = []
+        // }
+        // ------->
       }
       if (vm.menuType === 3 || String(vm.menuType) === '3') {
         setTimeout(() => {

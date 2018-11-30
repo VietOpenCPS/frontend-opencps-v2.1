@@ -117,10 +117,14 @@ export const store = new Vuex.Store({
           dataPutUser.append('fullName', filter.employeeFullName)
           dataPutUser.append('telNo', Number(filter.employeeTelNo))
           dataPutUser.append('employeeNo', filter.employeeNo)
-          dataPutUser.append('title', Number(filter.title))
-          let [dayInput, monthInput, yearInput] = filter['employeeBirthDate'].split('/')
-          let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
-          dataPutUser.append('birthDate', new Date(newDate).getTime() ? new Date(newDate).getTime() : '')
+          dataPutUser.append('title', filter.title)
+          let date = ''
+          if (filter['employeeBirthDate']) {
+            let [dayInput, monthInput, yearInput] = filter['employeeBirthDate'].split('/')
+            let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
+            date = new Date(newDate).getTime() ? new Date(newDate).getTime() : ''
+          }
+          dataPutUser.append('birthDate', date ? date : '')
         } else if (filter['className'] === 'org.opencps.usermgt.model.Applicant') {
           url = '/o/rest/v2/applicants/' + filter['classPK']
           dataPutUser.append('applicantName', filter['applicantName'])
@@ -131,9 +135,13 @@ export const store = new Vuex.Store({
           dataPutUser.append('districtCode', filter['applicantDistrictCode'])
           dataPutUser.append('wardCode', filter['applicantWardCode'])
           dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
-          let [dayInput, monthInput, yearInput] = filter['applicantIdDate'].split('/')
-          let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
-          dataPutUser.append('applicantIdDate', new Date(newDate).getTime())
+          let date = ''
+          if (filter['applicantIdDate']) {
+            let [dayInput, monthInput, yearInput] = filter['applicantIdDate'].split('/')
+            let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
+            date = new Date(newDate).getTime() ? new Date(newDate).getTime() : ''
+          }
+          dataPutUser.append('applicantIdDate', date ? date : '')
         }
         axios.put(url, dataPutUser, param).then(result1 => {
           resolve(result1)
