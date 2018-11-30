@@ -61,10 +61,11 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('current', current)
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
-        if (!newQuery.hasOwnProperty('secretKey')) {
+        if (!newQuery.hasOwnProperty('secretKey') && current['path'] !== '/tra-cuu-ho-so-homepage') {
           vm.isKios = true
           // console.log('isKios')
         } else {
@@ -91,7 +92,7 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
-        // console.log('currentParams', currentParams)
+        console.log('newRoute', newRoute)
       }
     },
     methods: {

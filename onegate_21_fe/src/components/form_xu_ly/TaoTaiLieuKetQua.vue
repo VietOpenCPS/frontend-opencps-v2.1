@@ -10,7 +10,7 @@
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
             <v-expansion-panel class="expaned__list__data">
-              <v-expansion-panel-content hide-actions :value="false">
+              <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                     <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
@@ -26,43 +26,44 @@
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                           <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                         </v-tooltip>
-                    <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
-                      <v-badge v-on:click.stop="downloadFileTemplate(item, index)">
-                        <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
-                      </v-badge>
-                      <span>Download file giấy tờ</span>
-                    </v-tooltip> -->
-                  </div>
-                </div>
-                <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
-                  <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
-                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
-                      <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                      <v-icon v-else>attach_file</v-icon>
-                      {{itemFileView.displayName}} - 
-                      <i>{{itemFileView.modifiedDate}}</i>
-                    </span>
-                    <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
-                      <v-icon style="color: red">delete_outline</v-icon>
-                    </v-btn>
-                  </div>
-                </div>
-                </div>
-              </div>
-              <v-card v-if="item.eForm">
-                <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
-                  <v-layout wrap>
-                    <v-flex xs12 class="text-xs-right">
-                      <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
-                      v-if="item.eForm">Lưu lại</v-btn>
-                      <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
-                      <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
-                      <div :id="'formAlpaca' + item.partNo + id">
+                        <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
+                          <v-badge v-on:click.stop="downloadFileTemplate(item, index)">
+                            <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                          </v-badge>
+                          <span>Download file giấy tờ</span>
+                        </v-tooltip> -->
                       </div>
-                    </v-flex>
-                  </v-layout>
-                </v-card-text>
-              </v-card>
+                    </div>
+                    <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
+                      <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
+                        <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                          <v-icon v-if="itemFileView.eForm">border_color</v-icon>
+                          <v-icon v-else>attach_file</v-icon>
+                          {{itemFileView.displayName}} - 
+                          <i>{{itemFileView.modifiedDate}}</i>
+                        </span>
+                        <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
+                          <v-icon style="color: red">delete_outline</v-icon>
+                        </v-btn>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <v-card v-if="item.eForm">
+                  <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
+                    <v-layout wrap>
+                      <v-flex xs12 class="text-xs-right">
+                        <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px' : ''">
+                          <v-btn color="primary" @click="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
+                          v-if="item.eForm">Lưu lại</v-btn>
+                          <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
+                          <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
+                        </div>
+                        <div :id="'formAlpaca' + item.partNo + id"></div>
+                      </v-flex>
+                    </v-layout>
+                  </v-card-text>
+                </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
             <div class="absolute__btn group__thanh_phan pr-3 mr-1">
@@ -176,7 +177,11 @@
       dossierTemplatesItemSelect: {},
       fileViews: [],
       sampleCount: 0,
-      fileTemplateItems: []
+      fileTemplateItems: [],
+      currentFormView: '',
+      pstFixed: 0,
+      pstEl: 0,
+      endEl: 0
     }),
     computed: {
       loading () {
@@ -322,37 +327,37 @@
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
             })
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-        }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-        })
-      } else {
-        item['dossierId'] = vm.detailDossier.dossierId
-        item['id'] = vm.id
-        vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          vm.createFiles[index].daKhai = true
-          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-            vm.dossierFilesItems = resFiles
-            // var changeCreateFile = {
-            //   createFiles: []
-            // }
-            // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
-            //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
-            //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
-            //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
-            //     }
-            //   }
-            // }
-            // vm.$store.commit('setDataCreateFile', changeCreateFile)
+          }).catch(reject => {
+            console.log('run saveForm')
+            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          })
+        } else {
+          item['dossierId'] = vm.detailDossier.dossierId
+          item['id'] = vm.id
+          vm.$store.dispatch('postEform', item).then(resPostEform => {
+            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+            vm.createFiles[index].daKhai = true
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+              // var changeCreateFile = {
+              //   createFiles: []
+              // }
+              // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
+              //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
+              //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
+              //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
+              //     }
+              //   }
+              // }
+              // vm.$store.commit('setDataCreateFile', changeCreateFile)
+            }).catch(reject => {
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
           }).catch(reject => {
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
-        }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-        })
-      }
-    },
+        }
+      },
     onDeleteAttackFiles (item) {
       var vm = this
       console.log('delete')
@@ -391,6 +396,19 @@
     },
     loadAlpcaForm (data) {
       var vm = this
+      //
+      vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+      vm.pstEl = vm.endEl = 0
+      setTimeout(function () {
+        if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
+          vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
+          vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
+          $(window).scroll(function () {
+            vm.pstFixed = $(window).scrollTop()
+          })
+        }
+      }, 500)
+      //
       var fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === data.partNo && itemFile.eForm
       })

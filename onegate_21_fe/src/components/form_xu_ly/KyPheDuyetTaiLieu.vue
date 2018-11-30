@@ -98,6 +98,29 @@ export default {
       console.log('exportData', exportData)
       return exportData
     },
+    checkCreateFile (item) {
+      var vm = this
+      var fileArr
+      if (Array.isArray(item.createFiles)) {
+        fileArr = item.createFiles
+      } else {
+        fileArr = [item.createFiles]
+      }
+      var idArr = []
+      var waitingFiles = false
+      if (fileArr.length > 0) {
+        var length = fileArr.length
+        for (var i = 0; i < length; i++) {
+          var fileDetail = fileArr[i]
+          if (fileDetail.counter === 0) {
+            waitingFiles = true
+          }
+        }
+      } else {
+        waitingFiles = true
+      }
+      return waitingFiles
+    },
     kySo (item) {
       console.log('run ky so data payload', item)
       var vm = this

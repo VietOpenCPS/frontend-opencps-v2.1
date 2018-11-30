@@ -21,7 +21,7 @@
               <v-btn dark flat class="mr-2" v-if="state === 0" v-on:click="submitUserProfile">
                 <v-icon>done</v-icon> &nbsp; Cập nhật thông tin
               </v-btn>
-              <v-btn dark flat class="mr-2" v-else>
+              <v-btn dark flat class="mr-2" v-else v-on:click.native="doChangePassWord">
                 <v-icon>done</v-icon> &nbsp; Xác nhận đổi mật khẩu
               </v-btn>
             </v-toolbar>
@@ -394,6 +394,7 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           vm.$store.dispatch('putUser', vm.user).then(function () {
+            vm.snackbarsuccess = true
             vm.loading = false
           }).catch(function () {
             vm.loading = false
@@ -421,9 +422,10 @@
           vm.changePassWordFail = false
           vm.$store.dispatch('changePass', data).then(function (data) {
             vm.loading = false
-            vm.snackbarsuccess = true
             if (String(data) === 'false') {
               vm.changePassWordFail = true
+            } else {
+              vm.snackbarsuccess = true
             }
           }).catch(function () {
             vm.loading = false
