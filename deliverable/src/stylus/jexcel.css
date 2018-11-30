@@ -118,3 +118,80 @@ body .smx_100 > div {
     width: 100% !important;
     margin: 0 auto !important;
 }
+table.v-table tbody td {
+    border-right: 1px solid #d3d3d3;
+    vertical-align: top;
+}
+table.v-table {
+    border-right: 1px solid #d3d3d3;
+}
+body table.v-table tbody td, body table.v-table tbody th {
+    height: auto;
+}
+body .absolute__btn_panel:hover {
+    position: absolute !important;
+}
+body .absolute__btn_panel {
+    position: absolute;
+    top:6px !important;
+}
+body .v-card__title.headline {
+    line-height: 32px!important;
+    padding: 5px 16px;
+    font-size: 16px !important;
+    font-weight: 700;
+    color: #fff;
+    background-color: #00204a;
+}
+body .adv__search_container {
+    margin-top: unset !important;
+    top: 40px;
+}
+
+body .header_tools .v-input__slot {
+    background: transparent !important;
+    margin: 0;
+    height: 35px;
+    font-weight: normal;
+}
+
+body .adv__search_container .layout > .flex > div {
+    padding: 0;
+    margin: 0;
+}
+body .header_tools .v-input__append-inner {
+    display: none;
+}
+body .v-navigation-drawer .v-list.v-list--dense{
+    padding: 0;
+}
+body .header_tools .v-chip--select-multi .v-chip__content {
+    padding: 0 4px 0 12px;
+    height: 24px;
+    border: 1px solid #0064c7;
+    background: #0064c7;
+    color: #fff;
+}
+body .tai_giay_to .e-upload {
+    margin-top: 10px;border-style: dashed;
+}
+body .tai_giay_to .e-upload .e-file-select-wrap {
+    padding: 8px 15px 8px 15px;
+}
+body .tai_giay_to .e-upload .e-upload-files {
+    border: none;
+}
+body .tai_giay_to .e-upload-file-list {
+    border: 1px dashed #e0e0e0;
+    margin-top: -6px;
+}
+body .e-upload .e-upload-files .e-upload-file-list {
+    border: none;
+    border-top: 1px dashed rgba(0,0,0,.12);
+}
+body .fix_tool_bottom {
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 240px);
+    width: -webkit-calc(100% - 240px);
+}

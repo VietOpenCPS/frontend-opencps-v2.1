@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
 // Main Variable
 $main-color: #071d30;
 $main-color-dark: #0d2434;
@@ -783,3 +789,7 @@ border: none !important; }
   .input-group--suffix .input-group--text-field__suffix {
       font-size: 13px;
   }
+
+  body .bootstrap-datetimepicker-widget .datepicker > div:first-child {
+    display: block !important;
+}
