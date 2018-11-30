@@ -1526,43 +1526,104 @@ export default {
         vm.loadingActionProcess = true
         if (vm.showKyPheDuyetTaiLieu) {
           if (useKySo) {
-            let filter = {
-              dossierId: vm.thongTinChiTietHoSo.dossierId,
-              actionId: vm.processActionCurrent
-            }
-            vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
-              var paymentsOut = ''
-              if (vm.showThuPhi) {
-                paymentsOut = {
-                  requestPayment: vm.payments['requestPayment'],
-                  paymentNote: vm.payments['paymentNote'],
-                  advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                  feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                  serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                  shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-                }
-                resultAction['payment'] = paymentsOut
-              }
-              if (vm.showYkienCanBoThucHien) {
-                let result = vm.$refs.ykiencanbo.doExport()
-                let note = ''
-                if (result.valid) {
-                  validYKien = true
-                  note = result.text
+            let resultCreateFile = vm.$refs.kypheduyettailieu.checkCreateFile(vm.dataEsign)
+            if (resultCreateFile) {
+              if (vm.dataEsign.createFiles) {
+                var fileArr
+                if (Array.isArray(vm.dataEsign.createFiles)) {
+                  fileArr = vm.dataEsign.createFiles
                 } else {
-                  validYKien = false
+                  fileArr = [vm.dataEsign.createFiles]
                 }
-                resultAction['userNote'] = note
+                if (fileArr.length > 0) {
+                  let length = fileArr.length
+                  let counterSave = 0
+                  for (let i = 0; i < length; i++) {
+                    let fileDetail = fileArr[i]
+                    if (fileDetail.eForm === true) {
+                      $('#saveBtn' + fileDetail.partNo + fileDetail.templateFileNo).trigger('click')
+                      setTimeout(function () {
+                        let filter = {
+                          dossierId: vm.thongTinChiTietHoSo.dossierId,
+                          actionId: vm.processActionCurrent
+                        }
+                        vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+                          var paymentsOut = ''
+                          if (vm.showThuPhi) {
+                            paymentsOut = {
+                              requestPayment: vm.payments['requestPayment'],
+                              paymentNote: vm.payments['paymentNote'],
+                              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                            }
+                            resultAction['payment'] = paymentsOut
+                          }
+                          if (vm.showYkienCanBoThucHien) {
+                            let result = vm.$refs.ykiencanbo.doExport()
+                            let note = ''
+                            if (result.valid) {
+                              validYKien = true
+                              note = result.text
+                            } else {
+                              validYKien = false
+                            }
+                            resultAction['userNote'] = note
+                          }
+                          vm.$refs.kypheduyettailieu.kySo(resultAction)
+                          setTimeout(function () {
+                            vm.loadingAction = false
+                            vm.loadingActionProcess = false
+                          }, 200)
+                        }).catch(function (reject) {
+                          vm.loadingAction = false
+                          vm.loadingActionProcess = false
+                        })
+                      }, 3000)
+                    }
+                  }
+                }
               }
-              vm.$refs.kypheduyettailieu.kySo(resultAction)
-              setTimeout(function () {
+            } else {
+              let filter = {
+                dossierId: vm.thongTinChiTietHoSo.dossierId,
+                actionId: vm.processActionCurrent
+              }
+              vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+                var paymentsOut = ''
+                if (vm.showThuPhi) {
+                  paymentsOut = {
+                    requestPayment: vm.payments['requestPayment'],
+                    paymentNote: vm.payments['paymentNote'],
+                    advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+                    feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+                    serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+                    shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                  }
+                  resultAction['payment'] = paymentsOut
+                }
+                if (vm.showYkienCanBoThucHien) {
+                  let result = vm.$refs.ykiencanbo.doExport()
+                  let note = ''
+                  if (result.valid) {
+                    validYKien = true
+                    note = result.text
+                  } else {
+                    validYKien = false
+                  }
+                  resultAction['userNote'] = note
+                }
+                vm.$refs.kypheduyettailieu.kySo(resultAction)
+                setTimeout(function () {
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
+                }, 200)
+              }).catch(function (reject) {
                 vm.loadingAction = false
                 vm.loadingActionProcess = false
-              }, 200)
-            }).catch(function (reject) {
-              vm.loadingAction = false
-              vm.loadingActionProcess = false
-            })
+              })
+            }
           } else if (!useKySo && vm.dataEsign.signatureType === 'digital') {
             vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
               // console.log('result======', result)

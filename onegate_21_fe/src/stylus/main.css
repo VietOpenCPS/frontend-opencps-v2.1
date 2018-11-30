@@ -2892,3 +2892,7 @@ ul#captcha li:focus {
 ul#captcha li:hover {
   box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
+.fix-position {
+    position: fixed;
+    top: 0
+}

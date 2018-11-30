@@ -110,9 +110,12 @@ export const store = new Vuex.Store({
             } else if (filter.document === 'REPORT_09') {
               param.params['fromReleaseDate'] = filter.fromDate
               param.params['toReleaseDate'] = filter.toDate
-            } else {
+            } else if (filter.document === 'REPORT_10') {
               param.params['fromReceiveNotDoneDate'] = filter.fromDate
               param.params['toReceiveNotDoneDate'] = filter.toDate
+            } else {
+              param.params['fromReceiveDate'] = filter.fromDate
+              param.params['toReceiveDate'] = filter.toDate
             }
             axios.get(requestURL, param).then(function (response) {
               let serializable = response.data
