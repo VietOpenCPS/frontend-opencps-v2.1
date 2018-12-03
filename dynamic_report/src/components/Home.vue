@@ -1,0 +1,167 @@
+<template>
+  <div>
+    <v-navigation-drawer v-model="drawer" fixed app width="240">
+      <div class="drawer__filter px-2">
+        <v-select
+          v-model="reportType"
+          :items="itemsReports"
+          placeholder="Chọn báo cáo"
+          item-text="title"
+          item-value="document"
+        ></v-select>
+        <v-select
+          v-model="groupType"
+          :items="itemsGroups"
+          placeholder="GroupBy"
+          item-text="text"
+          item-value="value"
+          v-if="reportType !== 'REPORT_01'"
+        ></v-select>
+        <v-checkbox v-if="reportType !== 'REPORT_01'" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      </div>
+    </v-navigation-drawer>
+    <v-content>
+      <router-view></router-view>
+    </v-content>
+    <v-snackbar
+      v-model="snackbarerror"
+      :bottom="false"
+      :left="false"
+      :multi-line="false"
+      :right="true"
+      :timeout="2000"
+      :top="true"
+      :vertical="false"
+      color="red darken-3"
+    >
+      Yêu cầu thực hiện thất bại
+      <v-btn
+        icon
+        @click="closeError()"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbarsocket"
+      :bottom="true"
+      :left="false"
+      :multi-line="true"
+      :right="false"
+      :timeout="0"
+      :top="true"
+      :vertical="false"
+      color="red darken-3"
+    >
+      <v-progress-circular
+        :size="20"
+        :width="1"
+        color="white"
+        indeterminate
+      ></v-progress-circular>
+      &nbsp;
+      Mất kết nối, tự động kết nối lại trong giây lát ... 
+      
+      <v-btn
+        icon
+        @click="reloadPage()"
+      >
+        <v-icon>replay</v-icon>
+      </v-btn>
+    </v-snackbar>
+  </div>
+</template>
+
+<script>
+  import support from '../store/support.json'
+  export default {
+    props: ['index'],
+    data: () => ({
+      dialog: false,
+      drawer: null,
+      dataSocket: {},
+      support: support,
+      itemsReports: support['trangThaiHoSoList'],
+      itemsReportsConfig: support['report1Conf'],
+      itemsGroups: [
+        {
+          value: 'domain',
+          text: 'lĩnh vực'
+        },
+        {
+          value: 'gov',
+          text: 'đơn vị'
+        }
+      ]
+    }),
+    computed: {
+      items () {
+        return this.$store.getters.getDeliverableTypes
+      },
+      groupType: {
+        // getter
+        get: function() {
+          return this.$store.getters.groupType
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setgroupType', newValue)
+        }
+      },
+      reportType: {
+        // getter
+        get: function() {
+          return this.$store.getters.reportType
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setreportType', newValue)
+        }
+      },
+      selected: {
+        // getter
+        get: function() {
+          return this.$store.getters.selected
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setselected', newValue)
+        }
+      },
+      snackbarerror: {
+        // getter
+        get: function() {
+          return this.$store.getters.getsnackbarerror
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setsnackbarerror', newValue)
+        }
+      },
+      snackbarsocket: {
+        // getter
+        get: function() {
+          return this.$store.getters.getsnackbarsocket
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setsnackbarsocket', newValue)
+        }
+      }
+    },
+    methods: {
+      redirectFilter(val) {
+        this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
+      },
+      closeError() {
+        this.$store.commit('setsnackbarerror', false)
+      },
+      reloadPage() {
+        window.location.reload(true)
+      },
+      deliverableRouter (item) {
+        console.log(item)
+      }
+    }
+  }
+</script>
