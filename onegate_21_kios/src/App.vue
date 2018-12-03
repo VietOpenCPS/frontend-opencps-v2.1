@@ -11,7 +11,7 @@
         </a>
       </header>
       <section :class="isKios ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
-        <div class="tab-item">
+        <div :class="isKios ? 'tab-item' : ''">
           <div class="left" :class="fullScreen ? 'smallScreen' : ''">
             <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
               <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
@@ -73,7 +73,8 @@
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
-        if (!newQuery.hasOwnProperty('secretKey') && current['path'] !== '/tra-cuu-ho-so-homepage') {
+        if (!newQuery.hasOwnProperty('secretKey') && current['path'] !== '/tra-cuu-ho-so-homepage'
+         && current['path'] !== '/ma-truy-cap-ho-so' && current['name'] !== 'ChiTietHoSoHomePage') {
           vm.setInterval()
           vm.isKios = true
           // console.log('isKios')

@@ -1199,6 +1199,7 @@ export const store = new Vuex.Store({
         }
         try {
           let id = data['id'] ? data['id'] : 'nm'
+          // test local
           var dataPostEform = new FormData()
           var control = window.$('#formAlpaca' + data.partNo + id).alpaca('get')
           var formData = control.getValue()
@@ -2000,6 +2001,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getListDossierFiles ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.initData.dossierApi + '/' + data + '/files', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     deleteDossierPatch ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -2646,9 +2666,14 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/statistics/dossiers/counting', param).then(function (response) {
           axios.get('/o/rest/v2/statistics/dossiers/counting', param).then(function (response) {
             let serializable = response.data
             if (serializable.hasOwnProperty('data')) {
+              // add search dossierDeleted
+              // let dossierDelete = {key: "deleted", title: "Hồ sơ đã xóa", count: 0}
+              // serializable.data.push(dossierDelete)
               resolve(serializable.data)
             } else {
               resolve(null)
