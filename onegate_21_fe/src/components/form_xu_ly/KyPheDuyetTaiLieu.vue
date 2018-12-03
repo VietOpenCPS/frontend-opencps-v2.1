@@ -150,6 +150,8 @@ export default {
             idArr.push(strId1)
           }
         }
+      } else {
+        alert('Không tồn tại tệp điện tử. Vui lòng kiểm tra lại')
       }
       console.log('idArr', idArr)
       var isKyOk = item.eSignature
@@ -161,7 +163,7 @@ export default {
         if (idArr) {
           var paramObj = {}
           paramObj.actionCode = item.actionCode
-          paramObj.actionUser = window.themeDisplay.getUserName()
+          paramObj.actionUser = window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : ''
           paramObj.actionNote = ''
           paramObj.postStepCode = item.postStepCode ? item.postStepCode : ''
           paramObj.payload = item.payload ? item.payload : ''
@@ -294,8 +296,8 @@ export default {
         async: false,
         dataType: 'json',
         headers: {
-          'groupId': window.themeDisplay.getScopeGroupId(),
-          'Token': window.Liferay.authToken
+          'groupId': window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : '',
+          'Token': window.Liferay.authToken ? window.Liferay.authToken : ''
         },
         data: {
           actionCode: paramObj['actionCode'],

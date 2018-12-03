@@ -53,7 +53,7 @@
                   <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
-                        <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px' : ''">
+                        <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px;z-index:101' : ''">
                           <v-btn color="primary" @click="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
                           v-if="item.eForm">Lưu lại</v-btn>
                           <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
@@ -335,21 +335,9 @@
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
-            // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
             vm.createFiles[index].daKhai = true
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
-              // var changeCreateFile = {
-              //   createFiles: []
-              // }
-              // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
-              //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
-              //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
-              //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
-              //     }
-              //   }
-              // }
-              // vm.$store.commit('setDataCreateFile', changeCreateFile)
             }).catch(reject => {
               toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })

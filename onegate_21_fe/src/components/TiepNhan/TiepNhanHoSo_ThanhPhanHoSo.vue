@@ -74,7 +74,7 @@
               <v-card-text style="background-color: rgba(244, 247, 213, 0.19)">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
-                    <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px' : ''">
+                    <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
                       <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
                       v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
                       <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
