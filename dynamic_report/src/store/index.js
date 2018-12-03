@@ -32,7 +32,7 @@ export const store = new Vuex.Store({
     getDeliverableTypes: [],
     getContentFile: '',
     getContentFileSimple: [],
-    selected: ['dossierNo', 'applicantName', 'address', 'contactTelNo', 'receiveDate', 'dueDate'],
+    selected: ['dossierNo', 'delegateName', 'delegateAddress', 'delegateTelNo', 'receiveDate', 'dueDate'],
     reportType: 'REPORT_01',
     groupType: 'domain'
   },
