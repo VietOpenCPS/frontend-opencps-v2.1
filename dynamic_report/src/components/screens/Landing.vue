@@ -1,0 +1,638 @@
+<template>
+  <div class="form-chitiet">
+    <div class="row-header">
+      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex xs12 pl-3 text-ellipsis text-bold">
+          <v-layout wrap class="chart__report">
+            <v-flex xs6 sm2 class="px-2">
+              <v-select
+                :items="years"
+                v-model="year"
+                autocomplete
+                item-text="name"
+                item-value="value"
+                :hide-selected="true"
+                @change="changeYear"
+                >
+              </v-select>
+            </v-flex>
+            <v-flex xs6 sm1 class="px-2">
+              <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
+            </v-flex>
+            <v-flex xs6 sm2 class="px-2">
+              <v-layout wrap>
+                <v-flex>
+                  <v-menu
+                    ref="menufromDate"
+                    :close-on-content-click="false"
+                    v-model="menufromDate"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      placeholder="Chọn ngày"
+                      slot="activator"
+                      v-model="fromDateFormatted"
+                      append-icon="event"
+                      @blur="fromDate = parseDate(fromDateFormatted)"
+                    ></v-text-field>
+                    <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
+                  </v-menu>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+            <v-flex xs6 sm1 class="px-2">
+              <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
+            </v-flex>
+            <v-flex xs6 sm2 class="px-2">
+              <v-menu
+                ref="menutoDate"
+                :close-on-content-click="false"
+                v-model="menutoDate"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                max-width="290px"
+                min-width="290px"
+              >
+                <v-text-field
+                  placeholder="Chọn ngày"
+                  slot="activator"
+                  v-model="toDateFormatted"
+                  append-icon="event"
+                  @blur="toDate = parseDate(toDateFormatted)"
+                ></v-text-field>
+                <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex class="px-2 text-right">
+              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+                Xuất Excel
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </div>
+      </div>
+    </div>
+    <div>
+      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
+      <div v-else-if="!isShowLoading">
+        <v-alert :value="true" outline color="info" icon="info">
+          Không có dữ liệu báo cáo.
+        </v-alert>
+      </div>
+      <v-layout row wrap v-if="isShowLoading">
+        <v-flex xs12 class="text-xs-center" mt-5>
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </v-flex>
+      </v-layout>
+      
+    </div>
+  </div>
+</template>
+
+<script>
+import support from '../../store/support.json'
+import VueFriendlyIframe from 'vue-friendly-iframe'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+pdfMake.vfs = pdfFonts.pdfMake.vfs
+
+export default {
+  props: ['index', 'id'],
+  components: {
+    'vue-friendly-iframe': VueFriendlyIframe
+  },
+  data: () => ({
+    report1Def: support['report1Def'],
+    docDefinition: {
+      pageOrientation: 'landscape',
+      content: [
+        {
+          columns: [
+            {
+              width: '*',
+              style: 'borderHeader',
+              text: [
+                  'CỤC NGHỆ THUẬT BIỂU DIỄN\n',
+                  '-------------------------------------------'
+              ]
+            },
+            {
+              width: 250,
+              style: 'title',
+              text: [
+                  {text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n'},
+                  {text: 'Độc lập - Tự do - Hạnh phúc\n'},
+                  {text: '-------------------------------------------\n'},
+                  {text: 'Hà Nội, ngày 30 tháng 11 năm 2018', style: 'ngayThangNam'}
+                ]
+            }
+          ]
+        },
+        {
+            text: [
+                {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
+                {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
+                {text: 'Từ ngày: 1/11/2018 đến ngày 30/11/2018\n', fontSize: 11},
+              ], 
+            margin: [0, 20],
+            style: 'headerTitle'
+        },
+        {
+          style: 'tableExample',
+          table: {
+            widths: [],
+            body: []
+          },
+          margin: [0, 0, 0, 20]
+        },
+        {
+          columns: [
+            {
+              width: '*',
+              text: ''
+            },
+            {
+              width: 150,
+              style: 'title',
+              text: 'NGƯỜI TIẾP NHẬN HỒ SƠ'
+            }
+          ]
+        },
+        {
+          columns: [
+            {
+              width: '*',
+              text: ''
+            },
+            {
+              width: 150,
+              style: 'titleSub',
+              text: '(Ký và ghi rõ họ tên)'
+            }
+          ]
+        }
+      ],
+      styles: {
+        ngayThangNam: {
+          fontSize: 9,
+          italics: true,
+          bold: false,
+          alignment: 'right'
+        },
+        headerTitle: {
+            alignment: 'center',
+            bold: true,
+            fontSize: 13
+        },
+        borderHeader: {
+            alignment: 'left'
+        },
+        title: {
+          bold: true,
+          alignment: 'center'
+        },
+        titleSub: {
+            fontSize: 10,
+            italics: true,
+            alignment: 'center'
+        },
+        tdStyle: {
+          fontSize: 10
+        }
+      },
+      defaultStyle: {
+        columnGap: 20,
+        fontSize: 11
+      }
+    },
+    isDVC: false,
+    isCallBack: true,
+    fromDate: null,
+    menufromDate: false,
+    fromDateFormatted: null,
+    toDate: null,
+    menutoDate: false,
+    toDateMin: null,
+    toDateFormatted: null,
+    danhSachBaoCaos: [],
+    years: [
+      {
+        'value': '',
+        'name': 'Lọc theo năm'
+      },
+      {
+        'value': '2017',
+        'name': 'năm 2017'
+      },
+      {
+        'value': '2018',
+        'name': 'năm 2018'
+      },
+      {
+        'value': '2019',
+        'name': 'năm 2019'
+      }
+    ],
+    year: (new Date()).getFullYear() + '',
+    months: [
+      {
+        'value': '0',
+        'name': 'Cả năm'
+      },
+      {
+        'value': '1',
+        'name': 'tháng 1'
+      },
+      {
+        'value': '2',
+        'name': 'tháng 2'
+      },
+      {
+        'value': '3',
+        'name': 'tháng 3'
+      },
+      {
+        'value': '4',
+        'name': 'tháng 4'
+      },
+      {
+        'value': '5',
+        'name': 'tháng 5'
+      },
+      {
+        'value': '6',
+        'name': 'tháng 6'
+      },
+      {
+        'value': '7',
+        'name': 'tháng 7'
+      },
+      {
+        'value': '8',
+        'name': 'tháng 8'
+      },
+      {
+        'value': '9',
+        'name': 'tháng 9'
+      },
+      {
+        'value': '10',
+        'name': 'tháng 10'
+      },
+      {
+        'value': '11',
+        'name': 'tháng 11'
+      },
+      {
+        'value': '12',
+        'name': 'tháng 12'
+      }
+    ],
+    month: 0,
+    agencyLists: [],
+    govAgency: null,
+    danhSachBaoCao: [],
+    pdfBlob: null,
+    isShowLoading: false,
+    documentTYPE: 'REPORT_01'
+  }),
+  computed: {
+    selected () {
+      return this.$store.getters.selected
+    },
+    groupType: {
+      // getter
+      get: function() {
+        return this.$store.getters.groupType
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setgroupType', newValue)
+      }
+    }
+  },
+  created () {
+    var vm = this
+    vm.$nextTick(function () {
+      vm.doCreatePDF(vm.selected)
+    })
+  },
+  watch: {
+    /*
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+    },
+    */
+    groupType (val) {
+      console.debug(val)
+      this.doCreatePDF(this.selected)
+    },
+    selected (val) {
+      this.doCreatePDF(val)
+    },
+    fromDate (val) {
+      this.toDateMin = val
+      this.fromDateFormatted = this.formatDate(this.fromDate)
+    },
+    toDate (val) {
+      this.toDateFormatted = this.formatDate(val)
+    }
+  },
+  methods: {
+    changeYear (item) {
+      let vm = this
+      vm.year = item
+      if (vm.documentTYPE === 'REPORT_01') {
+        if (vm.year) {
+          vm.fromDateFormatted = ''
+          vm.toDateFormatted = ''
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              fromDate: '',
+              toDate: '',
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          let date = new Date()
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              fromDate: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN'),
+              toDate: new Date().toLocaleDateString('vi-VN'),
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
+      } else {
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            fromDate: vm.fromDate,
+            toDate: vm.toDate,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
+    },
+    changeMonth (item) {
+      let vm = this
+      vm.month = item
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.fromDateFormatted = ''
+        vm.toDateFormatted = ''
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      } else {
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDate,
+            toDate: vm.toDate,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }
+    },
+    changeFromDate () {
+      let vm = this
+      vm.menufromDate = false
+      vm.fromDateFormatted = vm.formatDate(vm.fromDate)
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.year = ''
+        // vm.month = '0'
+        if (vm.fromDateFormatted && vm.toDateFormatted) {
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              fromDate: vm.fromDateFormatted,
+              toDate: vm.toDateFormatted,
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
+      } else {
+        if (vm.fromDateFormatted && vm.toDateFormatted) {
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              month: vm.month,
+              fromDate: vm.fromDateFormatted,
+              toDate: vm.toDateFormatted,
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
+      }
+    },
+    changeToDate () {
+      let vm = this
+      vm.menutoDate = false
+      vm.toDateFormatted = vm.formatDate(vm.toDate)
+      if (vm.documentTYPE === 'REPORT_01') {
+        vm.year = ''
+        // vm.month = '0'
+        if (vm.fromDateFormatted && vm.toDateFormatted) {
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              fromDate: vm.fromDateFormatted,
+              toDate: vm.toDateFormatted,
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
+      } else {
+        if (vm.fromDateFormatted && vm.toDateFormatted) {
+          vm.$router.push({
+            path: '/bao-cao/' + vm.index,
+            query: {
+              year: vm.year,
+              // month: vm.month,
+              fromDate: vm.fromDateFormatted,
+              toDate: vm.toDateFormatted,
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }
+      }
+    },
+    formatDate (date) {
+      if (!date) return null
+      console.log('formatDate', date)
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    parseDate (date) {
+      if (!date) return null
+      console.log('parseDate', date)
+      const [day, month, year] = date.split('/')
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    },
+    doCreatePDF (val) {
+      let vm = this
+      vm.docDefinition['content'][2]['table']['widths'] = []
+      vm.docDefinition['content'][2]['table']['widths'].push(30)
+      let headerTableReport = []
+      let header2TableReport = []
+      headerTableReport.push({
+        text: 'STT',
+        alignment: 'center',
+        bold: true
+      })
+      header2TableReport.push({
+        text: '(1)',
+        alignment: 'center',
+        italics: true
+      })
+      let ine = 2
+      for (let key in val) {
+        vm.docDefinition['content'][2]['table']['widths'].push('*')
+        headerTableReport.push({
+          text: vm.report1Def[val[key]],
+          alignment: 'center',
+          bold: true
+        })
+        header2TableReport.push({
+          text: '(' + ine + ')',
+          alignment: 'center',
+          italics: true
+        })
+        ine = ine + 1
+      }
+      vm.docDefinition['content'][2]['table']['body'] = []
+      vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
+      vm.docDefinition['content'][2]['table']['body'].push(header2TableReport)
+      // bild data
+      let dataReport = support['report1']
+      let domainRaw = {}
+      let dossierRaw = {}
+      let dataReportCurrent = {}
+      for (let key in dataReport) {
+        dataReportCurrent = dataReport[key]
+        let domainRawItem = {}
+        if (vm.groupType === 'domain') {
+          domainRawItem['domainName'] = dataReportCurrent['domainName']
+        } else {
+          domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
+        }
+        domainRawItem['services'] = []
+        if (vm.groupType === 'domain') {
+          if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
+            domainRaw[dataReportCurrent['domainName']] = domainRawItem
+          }
+        } else {
+          if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
+            domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
+          }
+        }
+        if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
+          if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
+            dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+          }
+        } else {
+          let dossierRawItem = {}
+          dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
+          dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+          if (vm.groupType === 'domain') {
+            dossierRawItem['domainName'] = dataReportCurrent['domainName']
+          } else {
+            dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
+          }
+          dossierRawItem['dossiers'] = []
+          dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
+          dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+        }
+      }
+      console.log('domainRaw', domainRaw)
+      for (let key in dossierRaw) {
+        let keyObject = dossierRaw[key]
+        if (key !== '' && keyObject !== undefined) {
+          if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
+            domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
+            domainRaw[keyObject['domainName']]['services'].push(keyObject)
+          }
+        }
+      }
+      let domains = []
+      for (let key in domainRaw) {
+        let keyObject = domainRaw[key]
+        if (key !== '') {
+          let domainRawItem = {}
+          domainRawItem['domainName'] = key
+          domainRawItem['services'] = keyObject['services']
+          domains.push(domainRawItem)
+        }
+      }
+      if (domains.length > 0) {
+        vm.docDefinition['content'][2]['table']['body'].push([{
+          colSpan: val.length + 1,
+          text: domains[0]['domainName'],
+          bold: true,
+          style: 'tdStyle'
+        }])
+        for (let key in domains[0]['services']) {
+          vm.docDefinition['content'][2]['table']['body'].push([{
+            colSpan: val.length + 1,
+            text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+            bold: true,
+            style: 'tdStyle'
+          }])
+          let dossiersArray = domains[0]['services'][key]['dossiers']
+          let indexStt = 1
+          let dataRow = []
+          for (let keyDossier in dossiersArray) {
+            dataRow = []
+            let dossierObj = dossiersArray[keyDossier]
+            dataRow.push({
+              text: indexStt, 
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+            for (let keyVal in val) {
+              dataRow.push({
+                text: dossierObj[val[keyVal]], 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+            vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+            indexStt = indexStt + 1
+          }
+        }
+      }
+      console.log(vm.docDefinition)
+      const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+      pdfDocGenerator.getBlob((blob) => {
+        vm.pdfBlob = window.URL.createObjectURL(blob)
+      })
+    }
+  }
+}
+</script>
