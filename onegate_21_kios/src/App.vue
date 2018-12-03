@@ -73,8 +73,7 @@
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
-        if (!newQuery.hasOwnProperty('secretKey') && current['path'] !== '/tra-cuu-ho-so-homepage'
-         && current['path'] !== '/ma-truy-cap-ho-so' && current['name'] !== 'ChiTietHoSoHomePage') {
+        if (!newQuery.hasOwnProperty('secretKey')) {
           vm.setInterval()
           vm.isKios = true
           // console.log('isKios')
