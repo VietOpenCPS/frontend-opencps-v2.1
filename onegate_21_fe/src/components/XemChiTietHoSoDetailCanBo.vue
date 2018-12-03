@@ -609,6 +609,7 @@ export default {
     actionSpecial: false,
     btnPlugins: [],
     loadingPlugin: false,
+    listDossierFiles: [],
     headers: [{
       text: '#',
       align: 'center',
@@ -797,6 +798,10 @@ export default {
           } else {
             vm.documents.push(resultDocuments)
           }
+        })
+        vm.$store.dispatch('getListDossierFiles', data).then(result => {
+          vm.listDossierFiles = result
+          console.log('listDossierFiles', vm.listDossierFiles)
         })
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.initData(resultDossier)
@@ -1535,52 +1540,36 @@ export default {
                 } else {
                   fileArr = [vm.dataEsign.createFiles]
                 }
+                fileArr = fileArr.filter(item => {
+                  return item.eForm === true
+                })
                 if (fileArr.length > 0) {
-                  let length = fileArr.length
+                  let lengthFiles = fileArr.length
                   let counterSave = 0
-                  for (let i = 0; i < length; i++) {
+                  for (let i = 0; i < lengthFiles; i++) {
                     let fileDetail = fileArr[i]
-                    if (fileDetail.eForm === true) {
-                      $('#saveBtn' + fileDetail.partNo + fileDetail.templateFileNo).trigger('click')
-                      setTimeout(function () {
-                        let filter = {
-                          dossierId: vm.thongTinChiTietHoSo.dossierId,
-                          actionId: vm.processActionCurrent
+                    // <---------
+                    var fileFind = vm.listDossierFiles.find(itemFile => {
+                      return itemFile.dossierPartNo === fileDetail.partNo
+                    })
+                    if (fileFind) {
+                      fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                      vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+                        counterSave += 1
+                        if (counterSave === lengthFiles) {
+                          vm.doAction()
                         }
-                        vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
-                          var paymentsOut = ''
-                          if (vm.showThuPhi) {
-                            paymentsOut = {
-                              requestPayment: vm.payments['requestPayment'],
-                              paymentNote: vm.payments['paymentNote'],
-                              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-                              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-                              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-                              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-                            }
-                            resultAction['payment'] = paymentsOut
-                          }
-                          if (vm.showYkienCanBoThucHien) {
-                            let result = vm.$refs.ykiencanbo.doExport()
-                            let note = ''
-                            if (result.valid) {
-                              validYKien = true
-                              note = result.text
-                            } else {
-                              validYKien = false
-                            }
-                            resultAction['userNote'] = note
-                          }
-                          vm.$refs.kypheduyettailieu.kySo(resultAction)
-                          setTimeout(function () {
-                            vm.loadingAction = false
-                            vm.loadingActionProcess = false
-                          }, 200)
-                        }).catch(function (reject) {
-                          vm.loadingAction = false
-                          vm.loadingActionProcess = false
-                        })
-                      }, 3000)
+                      }).catch(reject => {
+                      })
+                    } else {
+                      fileDetail['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                      vm.$store.dispatch('postEform', fileDetail).then(resPostEform => {
+                        counterSave += 1
+                        if (counterSave === lengthFiles) {
+                          vm.doAction()
+                        }
+                      }).catch(reject => {
+                      })
                     }
                   }
                 }
@@ -2007,6 +1996,40 @@ export default {
         vm.listLienThong = result
       }).catch(reject => {
         console.log(reject)
+      })
+    },
+    doAction () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        actionId: vm.processActionCurrent
+      }
+      vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+        var paymentsOut = ''
+        if (vm.showThuPhi) {
+          paymentsOut = {
+            requestPayment: vm.payments['requestPayment'],
+            paymentNote: vm.payments['paymentNote'],
+            advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+            feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+            serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+            shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          }
+          resultAction['payment'] = paymentsOut
+        }
+        if (vm.showYkienCanBoThucHien) {
+          let result = vm.$refs.ykiencanbo.doExport()
+          resultAction['userNote'] = result.text
+        }
+        console.log('run doAction', resultAction)
+        vm.$refs.kypheduyettailieu.kySo(resultAction)
+        setTimeout(function () {
+          vm.loadingAction = false
+          vm.loadingActionProcess = false
+        }, 200)
+      }).catch(function (reject) {
+        vm.loadingAction = false
+        vm.loadingActionProcess = false
       })
     },
     printViewDocument () {

@@ -240,7 +240,8 @@
       <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
         v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
-          <v-avatar style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
+          <v-avatar v-if="item.key === 'deleted'" style="background-color: #da0e0e;border-color: #da0e0e;color: #fff;"><v-icon size="16">delete</v-icon></v-avatar>
+          <v-avatar v-else style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
           {{item.title}}
         </v-chip>
       </div>
@@ -2377,7 +2378,6 @@ export default {
     },
     showAdvFilter () {
       let vm = this
-
       vm.menusss = !vm.menusss
       vm.$store.dispatch('getStatusLists').then(function (result) {
         vm.itemFilterSupport.statusLists = result
