@@ -57,9 +57,9 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    getAgencyReportLists ({commit, state}, filter) {
+    getAgencyReportLists ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
               groupId: state.initData.groupId,
@@ -128,9 +128,9 @@ export const store = new Vuex.Store({
         })
       })
     },
-    doStatisticReportPrint ({commit, state}, filter) {
+    doStatisticReportPrint ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
+        store.dispatch('loadInitResource').then(function () {
           axios({
             method: 'PUT',
             url: '/o/rest/v2_1/statistics/report/' + filter.document,
