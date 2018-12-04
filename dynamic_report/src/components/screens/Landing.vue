@@ -5,6 +5,19 @@
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
+            <v-flex xs6 sm2 class="px-2" v-if="isDVC">
+              <v-select
+                :items="agencyLists"
+                v-model="govAgency"
+                autocomplete
+                item-text="itemName"
+                item-value="itemCode"
+                return-object
+                :hide-selected="true"
+                @change="changeGov"
+                >
+              </v-select>
+            </v-flex>
             <v-flex xs6 sm2 class="px-2">
               <v-select
                 :items="years"
@@ -389,6 +402,20 @@ export default {
     }
   },
   methods: {
+    changeGov (item) {
+      let vm = this
+      vm.govAgency = item
+      router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          // month: vm.month,
+          fromDate: vm.fromDateFormatted,
+          toDate: vm.toDateFormatted,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     changeYear (item) {
       let vm = this
       vm.year = item
