@@ -6,6 +6,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div> Kết quả xử lý
+          <span style="position: absolute; right: 15px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xls, xlsx, txt, rtf (Tối đa 10MB)</span>
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">

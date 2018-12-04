@@ -568,6 +568,17 @@
                       box
                     ></v-text-field>
                   </v-flex>
+                  <v-flex xs12 sm6>
+                    <v-autocomplete
+                      box
+                      label="Hiển thị thành phần đầu vào"
+                      :items="[{text:'Kiểm tra hồ sơ đầu vào', value: 1}, {text:'Bổ sung, hoàn thiện hồ sơ đầu vào', value: 2}]"
+                      v-model="currentStep.checkInput"
+                      item-text="text"
+                      item-value="value"
+                      clearable
+                    ></v-autocomplete>
+                  </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-switch label="Cho phép sửa hồ sơ" v-model="currentStep.editable"></v-switch>
                   </v-flex>
@@ -1102,7 +1113,8 @@
           briefNote: '',
           customProcessUrl: '',
           sequenceNo: '',
-          editable: false
+          editable: false,
+          checkInput: ''
         },
         validAddStep: false,
         // PROCESS ACTION DATA
@@ -1496,7 +1508,8 @@
             briefNote: '',
             customProcessUrl: '',
             sequenceNo: '',
-            editable: false
+            editable: false,
+            checkInput: ''
           }
           vm.stepRoleList = []
           if (Number(currentQuery.stepCode) > 0) {
