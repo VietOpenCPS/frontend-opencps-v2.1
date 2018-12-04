@@ -506,6 +506,8 @@ export default {
     },
     doCreatePDF (val) {
       let vm = this
+      console.log('vm.reportType', vm.reportType)
+      console.log('vm.reportType 01 ', vm.reportType === 'REPORT_01')
       if (vm.reportType === 'REPORT_01') {
         vm.doPrintReport()
       } else {
@@ -652,6 +654,7 @@ export default {
     },
     doPrintReport () {
       let vm = this
+      console.log('doPrintReport')
       let filter = {
         document: vm.reportType,
         fromDate: vm.fromDateFormatted,
