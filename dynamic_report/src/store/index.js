@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import saveAs from 'file-saver'
-
+import support from './support.json'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -35,7 +35,8 @@ export const store = new Vuex.Store({
     selected: ['dossierNo', 'delegateName', 'delegateAddress', 'delegateTelNo', 'receiveDate', 'dueDate'],
     reportType: 'REPORT_01',
     groupType: 'domain',
-    siteName: ''
+    siteName: '',
+    itemsReports: support['trangThaiHoSoList']
   },
   actions: {
     loadInitResource ({state}) {
@@ -55,7 +56,6 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        resolve(state.initData)
         let param = {
           headers: {
             groupId: state.initData['groupId']
@@ -64,6 +64,7 @@ export const store = new Vuex.Store({
         axios.get('/o/v1/opencps/site/name', param).then(function (response) {
           let serializable = response.data
           state.siteName = serializable
+          resolve(state.initData)
         }).catch(function (error) {
           console.log(error)
         })
@@ -193,7 +194,10 @@ export const store = new Vuex.Store({
       state.groupType = payload
     },
     setsiteName (state, payload) {
-      state.setsiteName = payload
+      state.siteName = payload
+    },
+    setitemsReports (state, payload) {
+      state.itemsReports = payload
     }
   },
   getters: {
@@ -229,6 +233,9 @@ export const store = new Vuex.Store({
     },
     siteName (state) {
       return state.siteName
+    },
+    itemsReports (state) {
+      return state.itemsReports
     }
   }
 })

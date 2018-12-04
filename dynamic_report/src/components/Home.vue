@@ -82,7 +82,6 @@
       drawer: null,
       dataSocket: {},
       support: support,
-      itemsReports: support['trangThaiHoSoList'],
       itemsReportsConfig: support['report1Conf'],
       itemsGroups: [
         {
@@ -96,6 +95,9 @@
       ]
     }),
     computed: {
+      itemsReports () {
+        return this.$store.getters.itemsReports
+      },
       items () {
         return this.$store.getters.getDeliverableTypes
       },
