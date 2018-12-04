@@ -156,12 +156,14 @@
         if (String(vm.index) !== '0') {
           for (let key in vm.itemsReports) {
             if (vm.itemsReports[key]['code'] === String(vm.index)) {
-              reportType = vm.itemsReports[key]['document']
+              vm.reportType = vm.itemsReports[key]['document']
+              console.log(vm.reportType)
+              // vm.$store.commit('setreportType', newValue)
               break
             }
           }
         } else {
-          reportType = 'REPORT_01'
+          vm.reportType = 'REPORT_01'
         }
       })
     },
