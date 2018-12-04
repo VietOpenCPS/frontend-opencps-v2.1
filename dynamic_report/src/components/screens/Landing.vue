@@ -313,9 +313,6 @@ export default {
     itemsReports () {
       return this.$store.getters.itemsReports
     },
-    siteName () {
-      return this.$store.getters.siteName
-    },
     selected () {
       return this.$store.getters.selected
     },
@@ -343,7 +340,9 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.doCreatePDF(vm.selected)
+      setTimeout(() => {
+        vm.doCreatePDF(vm.selected)
+      }, 200)
     })
   },
   watch: {
@@ -558,7 +557,7 @@ export default {
         }
       }
       vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
-      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.siteName + '\n'
+      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
       let headerTableReport = []
