@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-// import saveAs from 'file-saver'
+import saveAs from 'file-saver'
 
 Vue.use(Vuex)
 
@@ -142,8 +142,12 @@ export const store = new Vuex.Store({
           }).then(function (response) {
             console.log('serializable', response)
             let serializable = response.data
-            let file = window.URL.createObjectURL(serializable)
-            resolve(file)
+            if (filter['download']) {
+              saveAs(serializable, new Date().getTime() + '.xlsx')
+            } else {
+              let file = window.URL.createObjectURL(serializable)
+              resolve(file)
+            }
           }).catch(function (error) {
             reject(error)
           })
