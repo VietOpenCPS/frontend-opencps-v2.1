@@ -137,7 +137,7 @@ export default {
                   {text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n'},
                   {text: 'Độc lập - Tự do - Hạnh phúc\n'},
                   {text: '-------------------------------------------\n'},
-                  {text: 'Hà Nội, ngày ' + (new Date().getDate() < 10) ? ('0' + new Date().getDate()) : new Date().getDate() + ' tháng ' + (new Date().getMonth() + 1) +' năm ' + new Date().getFullYear(), style: 'ngayThangNam'}
+                  {text: 'Hà Nội, ngày ' + new Date().getDate() + ' tháng ' + (new Date().getMonth() + 1) +' năm ' + new Date().getFullYear(), style: 'ngayThangNam'}
                 ]
             }
           ]
@@ -542,11 +542,8 @@ export default {
     },
     doDynamicReport (val) {
       let vm = this
-      console.log(vm.docDefinition['content'][1])
-      console.log(vm.docDefinition['content'][1]['text'])
-      console.log(vm.docDefinition['content'][1]['text'][2])
-      if (vm.formatDate !== '' && vm.toDate !== '') {
-        vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.formatDate + ' đến ngày ' + vm.toDate
+      if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
+        vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
