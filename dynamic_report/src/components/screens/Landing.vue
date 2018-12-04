@@ -72,7 +72,7 @@
               </v-menu>
             </v-flex>
             <v-flex class="px-2 text-right">
-              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+              <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
                 Xuất Excel
               </v-btn>
             </v-flex>
@@ -137,7 +137,7 @@ export default {
                   {text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n'},
                   {text: 'Độc lập - Tự do - Hạnh phúc\n'},
                   {text: '-------------------------------------------\n'},
-                  {text: 'Hà Nội, ngày 30 tháng 11 năm 2018', style: 'ngayThangNam'}
+                  {text: 'Hà Nội, ngày ' + new Date().getDate() + ' tháng ' + (new Date().getMonth() + 1) +' năm ' + new Date().getFullYear(), style: 'ngayThangNam'}
                 ]
             }
           ]
@@ -146,7 +146,7 @@ export default {
             text: [
                 {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
                 {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
-                {text: 'Từ ngày: 1/11/2018 đến ngày 30/11/2018\n', fontSize: 11},
+                {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
               ], 
             margin: [0, 20],
             style: 'headerTitle'
@@ -592,7 +592,6 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
           let dataReport = result['data']
-          console.log('dataReport', dataReport)
           let domainRaw = {}
           let dossierRaw = {}
           let dataReportCurrent = {}
