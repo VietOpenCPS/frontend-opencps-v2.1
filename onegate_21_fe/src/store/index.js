@@ -342,6 +342,41 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingCounterNotStep ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+            agency: filter.agency ? filter.agency : '',
+            service: filter.service ? filter.service : '',
+            template: filter.template ? filter.template : '',
+            status: filter.status ? filter.status : '',
+            register: filter.register ? filter.register : '',
+            keyword: filter.keyword ? filter.keyword : '',
+            domain: filter.domain ? filter.domain : '',
+            substatus: filter.substatus ? filter.substatus : '',
+            year: filter.year ? filter.year : 0,
+            month: filter.month ? filter.month : 0,
+            top: filter.top ? filter.top : '',
+            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+          }
+          if (filter['originality']) {
+            paramSearch['originality'] = filter.originality
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramSearch
+          }
+          axios.get(filter.queryParams, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     loadingCounterHoSo ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -2072,7 +2107,7 @@ export const store = new Vuex.Store({
               'Accept': 'application/json'
             }
           }
-          var activeFinish = 1
+          var activeFinish = 0
           let selectedLength = filter['dossierId'].length
           for (let keydk in filter.dossierId) {
             axios.delete(state.initData.getNextAction + '/' + filter.dossierId[keydk] , param).then(function (response) {
