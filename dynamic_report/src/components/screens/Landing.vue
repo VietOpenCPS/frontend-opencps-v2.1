@@ -361,6 +361,8 @@ export default {
       }
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
         vm.doCreatePDF(vm.selected)
+      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate == '' && currentQuery.year !== '') {
+        vm.doCreatePDF(vm.selected)
       }
     },
     reportType (val) {
