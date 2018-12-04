@@ -340,11 +340,29 @@ export default {
     })
   },
   watch: {
-    /*
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      console.debug(oldRoute)
+      let currentQuery = newRoute.query
+      if (currentQuery.hasOwnProperty('fromDate')) {
+        vm.year = currentQuery.fromDate ? '' : vm.year
+        vm.fromDateFormatted = currentQuery.fromDate
+      } else {
+        vm.fromDateFormatted = ''
+        let date = new Date()
+        vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+      }
+      if (currentQuery.hasOwnProperty('toDate')) {
+        vm.year = currentQuery.toDate ? '' : vm.year
+        vm.toDateFormatted = currentQuery.toDate
+      } else {
+        vm.toDateFormatted = ''
+        vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+      }
+      if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+        vm.doCreatePDF(vm.selected)
+      }
     },
-    */
     reportType (val) {
       console.debug(val)
       this.doCreatePDF(this.selected)
