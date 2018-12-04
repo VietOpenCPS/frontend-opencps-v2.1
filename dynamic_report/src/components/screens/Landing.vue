@@ -707,6 +707,7 @@ export default {
           const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
+            vm.isShowLoading = false
           })
         } else {
           // vm.agencyLists = []
