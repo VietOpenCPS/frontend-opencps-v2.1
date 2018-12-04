@@ -422,8 +422,8 @@ export default {
           path: '/bao-cao/' + vm.index,
           query: {
             year: vm.year,
-            fromDate: vm.fromDate,
-            toDate: vm.toDate,
+            fromDate: '',
+            toDate: '',
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })
