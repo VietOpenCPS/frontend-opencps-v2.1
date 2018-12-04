@@ -8,32 +8,81 @@
            "title":"TÌNH HÌNH GIẢI QUYẾT TTHC"
         },
         {  
-            "code":"2",
+            "code":"1",
             "document": "REPORT_03",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT TIẾP NHẬN HỒ SƠ"
         },
         {  
-            "code":"4",
+            "code":"2",
             "document": "REPORT_05",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT TRẢ KẾT QUẢ"
         },
         {  
-            "code":"8",
+            "code":"3",
             "document": "REPORT_09",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT HỒ SƠ ĐÃ GIẢI QUYẾT"
         },
         {  
-            "code":"9",
+            "code":"4",
             "document": "REPORT_10",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT HỒ SƠ ĐANG XỬ LÝ"
+        },
+        {  
+            "code":"5",
+            "document": "DYNAMIC_REPORT_01",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ XỬ LÝ SỚM HẠN"
+        },
+        {  
+            "code":"6",
+            "document": "DYNAMIC_REPORT_02",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ XỬ LÝ TRỄ HẠN"
+        },
+        {  
+            "code":"7",
+            "document": "DYNAMIC_REPORT_03",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ XỬ LÝ ĐÚNG HẠN"
+        },
+        {  
+            "code":"8",
+            "document": "DYNAMIC_REPORT_04",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ THEO ĐƠN VỊ"
+        },
+        {  
+            "code":"9",
+            "document": "DYNAMIC_REPORT_05",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ THEO THỦ TỤC"
+        },
+        {  
+            "code":"10",
+            "document": "DYNAMIC_REPORT_06",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ THEO TRẠNG THÁI XỬ LÝ"
+        },
+        {
+            "code":"11",
+            "document": "DYNAMIC_REPORT_07",
+            "active": false,
+            "type": "dossier",
+            "title":"THỐNG KÊ HỒ SƠ THEO THỜI GIAN"
         }
     ],
     "report1Conf": [

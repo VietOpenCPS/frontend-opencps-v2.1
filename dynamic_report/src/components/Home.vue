@@ -8,6 +8,7 @@
           placeholder="Chọn báo cáo"
           item-text="title"
           item-value="document"
+          @change="changeReportType($event)"
         ></v-select>
         <v-select
           v-model="groupType"
@@ -81,7 +82,6 @@
       drawer: null,
       dataSocket: {},
       support: support,
-      itemsReports: support['trangThaiHoSoList'],
       itemsReportsConfig: support['report1Conf'],
       itemsGroups: [
         {
@@ -95,6 +95,9 @@
       ]
     }),
     computed: {
+      itemsReports () {
+        return this.$store.getters.itemsReports
+      },
       items () {
         return this.$store.getters.getDeliverableTypes
       },
@@ -149,6 +152,23 @@
         }
       }
     },
+    created () {
+    var vm = this
+      vm.$nextTick(function () {
+        if (String(vm.index) !== '0') {
+          for (let key in vm.itemsReports) {
+            if (vm.itemsReports[key]['code'] === String(vm.index)) {
+              vm.reportType = vm.itemsReports[key]['document']
+              console.log(vm.reportType)
+              // vm.$store.commit('setreportType', newValue)
+              break
+            }
+          }
+        } else {
+          vm.reportType = 'REPORT_01'
+        }
+      })
+    },
     methods: {
       redirectFilter(val) {
         this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
@@ -161,6 +181,15 @@
       },
       deliverableRouter (item) {
         console.log(item)
+      },
+      changeReportType (data) {
+        let vm = this
+        for (let key in vm.itemsReports) {
+          if (vm.itemsReports[key]['document'] === data) {
+            vm.$router.push('/bao-cao/' + vm.itemsReports[key]['code'])
+            break
+          }
+        }
       }
     }
   }

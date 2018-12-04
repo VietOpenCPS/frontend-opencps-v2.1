@@ -157,7 +157,7 @@ export default {
         },
         {
           text: [
-            {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
+            {text: '\n'},
             {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
             {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
           ], 
@@ -323,8 +323,8 @@ export default {
     isShowLoading: false
   }),
   computed: {
-    siteName () {
-      return this.$store.getters.siteName
+    itemsReports () {
+      return this.$store.getters.itemsReports
     },
     selected () {
       return this.$store.getters.selected
@@ -353,7 +353,9 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.doCreatePDF(vm.selected)
+      setTimeout(() => {
+        vm.doCreatePDF(vm.selected)
+      }, 200)
     })
   },
   watch: {
@@ -574,7 +576,15 @@ export default {
       } else {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
-      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.siteName + '\n'
+      let reportName = ''
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['code'] === String(vm.index)) {
+          reportName = vm.itemsReports[key]['title']
+          break
+        }
+      }
+      vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
+      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
       let headerTableReport = []
@@ -724,6 +734,7 @@ export default {
           const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
+            vm.isShowLoading = false
           })
         } else {
           // vm.agencyLists = []
