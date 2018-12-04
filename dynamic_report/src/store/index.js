@@ -34,7 +34,8 @@ export const store = new Vuex.Store({
     getContentFileSimple: [],
     selected: ['dossierNo', 'delegateName', 'delegateAddress', 'delegateTelNo', 'receiveDate', 'dueDate'],
     reportType: 'REPORT_01',
-    groupType: 'domain'
+    groupType: 'domain',
+    siteName: ''
   },
   actions: {
     loadInitResource ({state}) {
@@ -55,6 +56,17 @@ export const store = new Vuex.Store({
           }
         }
         resolve(state.initData)
+        let param = {
+          headers: {
+            groupId: state.initData['groupId']
+          }
+        }
+        axios.get('/o/v1/opencps/site/name', param).then(function (response) {
+          let serializable = response.data
+          state.siteName = serializable
+        }).catch(function (error) {
+          console.log(error)
+        })
       })
     },
     getAgencyReportLists ({state}, filter) {
@@ -179,6 +191,9 @@ export const store = new Vuex.Store({
     },
     setgroupType (state, payload) {
       state.groupType = payload
+    },
+    setsiteName (state, payload) {
+      state.setsiteName = payload
     }
   },
   getters: {
@@ -211,6 +226,9 @@ export const store = new Vuex.Store({
     },
     groupType (state) {
       return state.groupType
+    },
+    siteName (state) {
+      return state.siteName
     }
   }
 })
