@@ -574,112 +574,132 @@ export default {
       vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
       vm.docDefinition['content'][2]['table']['body'].push(header2TableReport)
       // bild data
-      let dataReport = support['report1']
-      let domainRaw = {}
-      let dossierRaw = {}
-      let dataReportCurrent = {}
-      for (let key in dataReport) {
-        dataReportCurrent = dataReport[key]
-        let domainRawItem = {}
-        if (vm.groupType === 'domain') {
-          domainRawItem['domainName'] = dataReportCurrent['domainName']
-        } else {
-          domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
-        }
-        domainRawItem['services'] = []
-        if (vm.groupType === 'domain') {
-          if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
-            domainRaw[dataReportCurrent['domainName']] = domainRawItem
-          }
-        } else {
-          if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
-            domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
-          }
-        }
-        if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
-          if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
-            dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
-          }
-        } else {
-          let dossierRawItem = {}
-          dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
-          dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
-          if (vm.groupType === 'domain') {
-            dossierRawItem['domainName'] = dataReportCurrent['domainName']
-          } else {
-            dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
-          }
-          dossierRawItem['dossiers'] = []
-          dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
-          dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
-        }
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
       }
-      console.log('domainRaw', domainRaw)
-      for (let key in dossierRaw) {
-        let keyObject = dossierRaw[key]
-        if (key !== '' && keyObject !== undefined) {
-          if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
-            domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
-            domainRaw[keyObject['domainName']]['services'].push(keyObject)
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null && result !== undefined) {
+          let dataReport = result['data']
+          console.log('dataReport', dataReport)
+          let domainRaw = {}
+          let dossierRaw = {}
+          let dataReportCurrent = {}
+          for (let key in dataReport) {
+            dataReportCurrent = dataReport[key]
+            let domainRawItem = {}
+            if (vm.groupType === 'domain') {
+              domainRawItem['domainName'] = dataReportCurrent['domainName']
+            } else {
+              domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
+            }
+              domainRawItem['services'] = []
+            if (vm.groupType === 'domain') {
+              if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
+                domainRaw[dataReportCurrent['domainName']] = domainRawItem
+              }
+            } else {
+              if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
+                domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
+              }
+            }
+            if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
+              if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
+                dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+              }
+            } else {
+              let dossierRawItem = {}
+              dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
+              dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+              if (vm.groupType === 'domain') {
+                dossierRawItem['domainName'] = dataReportCurrent['domainName']
+              } else {
+                dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
+              }
+              dossierRawItem['dossiers'] = []
+              dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
+              dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+            }
           }
-        }
-      }
-      let domains = []
-      for (let key in domainRaw) {
-        let keyObject = domainRaw[key]
-        if (key !== '') {
-          let domainRawItem = {}
-          domainRawItem['domainName'] = key
-          domainRawItem['services'] = keyObject['services']
-          domains.push(domainRawItem)
-        }
-      }
-      if (domains.length > 0) {
-        vm.docDefinition['content'][2]['table']['body'].push([{
-          colSpan: val.length + 1,
-          text: domains[0]['domainName'],
-          bold: true,
-          style: 'tdStyle'
-        }])
-        for (let key in domains[0]['services']) {
-          vm.docDefinition['content'][2]['table']['body'].push([{
-            colSpan: val.length + 1,
-            text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
-            bold: true,
-            style: 'tdStyle'
-          }])
-          let dossiersArray = domains[0]['services'][key]['dossiers']
-          let indexStt = 1
-          let dataRow = []
-          for (let keyDossier in dossiersArray) {
-            dataRow = []
-            let dossierObj = dossiersArray[keyDossier]
-            dataRow.push({
-              text: indexStt, 
-              alignment: 'center',
+          for (let key in dossierRaw) {
+            let keyObject = dossierRaw[key]
+            if (key !== '' && keyObject !== undefined) {
+              if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
+                domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
+                domainRaw[keyObject['domainName']]['services'].push(keyObject)
+              }
+            }
+          }
+          let domains = []
+          for (let key in domainRaw) {
+            let keyObject = domainRaw[key]
+            if (key !== '') {
+              let domainRawItem = {}
+              domainRawItem['domainName'] = key
+              domainRawItem['services'] = keyObject['services']
+              domains.push(domainRawItem)
+            }
+          }
+          if (domains.length > 0) {
+            vm.docDefinition['content'][2]['table']['body'].push([{
+              colSpan: val.length + 1,
+              text: domains[0]['domainName'],
+              bold: true,
               style: 'tdStyle'
-            })
-            for (let keyVal in val) {
-              dataRow.push({
-                text: dossierObj[val[keyVal]], 
+            }])
+            for (let key in domains[0]['services']) {
+              vm.docDefinition['content'][2]['table']['body'].push([{
+                colSpan: val.length + 1,
+                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+                bold: true,
+                style: 'tdStyle'
+              }])
+              let dossiersArray = domains[0]['services'][key]['dossiers']
+              let indexStt = 1
+              let dataRow = []
+              for (let keyDossier in dossiersArray) {
+                dataRow = []
+                let dossierObj = dossiersArray[keyDossier]
+                dataRow.push({
+                text: indexStt, 
                 alignment: 'center',
                 style: 'tdStyle'
-              })
+                })
+                for (let keyVal in val) {
+                  dataRow.push({
+                    text: dossierObj[val[keyVal]], 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                }
+                vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                indexStt = indexStt + 1
+              }
             }
-            vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-            indexStt = indexStt + 1
           }
+          const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          pdfDocGenerator.getBlob((blob) => {
+            vm.pdfBlob = window.URL.createObjectURL(blob)
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
         }
-      }
-      console.log(vm.docDefinition)
-      const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-      pdfDocGenerator.getBlob((blob) => {
-        vm.pdfBlob = window.URL.createObjectURL(blob)
       })
     },
     doPrintReport () {
       let vm = this
-      console.log('doPrintReport')
       let filter = {
         document: vm.reportType,
         fromDate: vm.fromDateFormatted,

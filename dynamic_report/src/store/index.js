@@ -143,7 +143,7 @@ export const store = new Vuex.Store({
             console.log('serializable', response)
             let serializable = response.data
             if (filter['download']) {
-              saveAs(serializable, new Date().getTime() + '.xlsx')
+              saveAs(serializable, new Date().getTime() + '.xls')
             } else {
               let file = window.URL.createObjectURL(serializable)
               resolve(file)
