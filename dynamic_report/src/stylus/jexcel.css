@@ -1,0 +1,227 @@
+.row-header {
+    background-color: #e1e2e1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.background-triangle-big, .background-triangle-small {
+    background-color: #00204A;
+    display: inline-block;
+    text-align: left;
+    color: #fff;
+    position: relative;
+    margin-right: 20px;
+    text-transform: uppercase;
+	padding: 9px 15px;
+    width: auto;
+    cursor: pointer;
+}
+body .no__hidden_class.row-header .background-triangle-big {
+    height: 37px;
+}
+.background-triangle-big:before {
+    content: "";
+    position: absolute;
+    transform: rotate(45deg);
+    right: -4px;
+    top: 2px;
+    border-top: 26px solid #00204A;
+    border-left: 26px solid transparent;
+    border-bottom: 25px solid transparent;
+}
+.row-header .background-triangle-big {
+    white-space: nowrap;
+}
+body .v-list__tile--active {
+    background: #e1e2e1;
+}
+.v-menu__content {
+    -webkit-box-shadow: 0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12);
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12);
+}
+body .theme--light .v-navigation-drawer >.v-list .v-list__tile--active .v-list__tile__title {
+    color: #212121!important;
+}
+body .vuejx__form .v-subheader {
+    color: inherit;
+    font-weight: 400 !important;
+}
+body .vuejx__form .v-input__slot,
+body .vuejx__form p,
+body .vuejx__form .no_padding > div,
+body .vuejx__form .no_margin > div {
+    padding: 0;
+    margin: 0;
+}
+body .vuejx__form .v-text-field { 
+    padding: 0 !important;
+}
+body .vuejx__form input::placeholder {
+    font-size: 12px;
+}
+body .vuejx__form span,
+body .vuejx__form p {
+    font-family: inherit !important;
+    font-size: inherit !important;
+}
+body .vuejx__form .v-textarea.v-text-field--enclosed textarea {
+    margin-top: 0 !important;
+}
+body .sm_10 .v-input__control,
+body .smx_10 > div {
+    width: 10% !important;
+    margin: 0 auto !important;
+}
+body .sm_20 .v-input__control,
+body .smx_20 > div {
+    width: 20% !important;
+    margin: 0 auto !important;
+}
+body .sm_30 .v-input__control,
+body .smx_30 > div {
+    width: 30% !important;
+    margin: 0 auto !important;
+}
+body .sm_40 .v-input__control,
+body .smx_40 > div {
+    width: 40% !important;
+    margin: 0 auto !important;
+}
+body .sm_50 .v-input__control,
+body .smx_50 > div {
+    width: 50% !important;
+    margin: 0 auto !important;
+}
+body .sm_60 .v-input__control,
+body .smx_60 > div {
+    width: 60% !important;
+    margin: 0 auto !important;
+}
+body .sm_70 .v-input__control,
+body .smx_70 > div {
+    width: 70% !important;
+    margin: 0 auto !important;
+}
+body .sm_80 .v-input__control,
+body .smx_80 > div {
+    width: 80% !important;
+    margin: 0 auto !important;
+}
+body .sm_90 .v-input__control,
+body .smx_90 > div {
+    width: 90% !important;
+    margin: 0 auto !important;
+}
+body .sm_100 .v-input__control,
+body .smx_100 > div {
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+table.v-table tbody td {
+    border-right: 1px solid #d3d3d3;
+    vertical-align: top;
+}
+table.v-table {
+    border-right: 1px solid #d3d3d3;
+}
+body table.v-table tbody td, body table.v-table tbody th {
+    height: auto;
+}
+body .absolute__btn_panel:hover {
+    position: absolute !important;
+}
+body .absolute__btn_panel {
+    position: absolute;
+    top:6px !important;
+}
+body .v-card__title.headline {
+    line-height: 32px!important;
+    padding: 5px 16px;
+    font-size: 16px !important;
+    font-weight: 700;
+    color: #fff;
+    background-color: #00204a;
+}
+body .adv__search_container {
+    margin-top: unset !important;
+    top: 40px;
+}
+
+body .header_tools .v-input__slot {
+    background: transparent !important;
+    margin: 0;
+    height: 35px;
+    font-weight: normal;
+}
+
+body .adv__search_container .layout > .flex > div {
+    padding: 0;
+    margin: 0;
+}
+body .header_tools .v-input__append-inner {
+    display: none;
+}
+body .v-navigation-drawer .v-list.v-list--dense{
+    padding: 0;
+}
+body .header_tools .v-chip--select-multi .v-chip__content {
+    padding: 0 4px 0 12px;
+    height: 24px;
+    border: 1px solid #0064c7;
+    background: #0064c7;
+    color: #fff;
+}
+body .tai_giay_to .e-upload {
+    margin-top: 10px;border-style: dashed;
+}
+body .tai_giay_to .e-upload .e-file-select-wrap {
+    padding: 8px 15px 8px 15px;
+}
+body .tai_giay_to .e-upload .e-upload-files {
+    border: none;
+}
+body .tai_giay_to .e-upload-file-list {
+    border: 1px dashed #e0e0e0;
+    margin-top: -6px;
+}
+body .e-upload .e-upload-files .e-upload-file-list {
+    border: none;
+    border-top: 1px dashed rgba(0,0,0,.12);
+}
+body .fix_tool_bottom {
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 240px);
+    width: -webkit-calc(100% - 240px);
+}
+
+body .chart__report .v-text-field {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+body .vue-friendly-iframe > iframe {
+    width: 100%;
+    height: 100vh;
+    border: none;
+}
+body .drawer__filter .v-select,
+body .drawer__filter .v-input--checkbox {
+    padding: 0;
+}
+body .drawer__filter .v-input--checkbox {
+    margin: 0;
+}
+body .drawer__filter .v-input--selection-controls .v-input__slot {
+    margin-bottom: 5px;
+}
+body .drawer__filter .v-input--selection-controls__input {
+    position: absolute;
+    top: 0;
+}
+body .drawer__filter .v-input--selection-controls.v-input .v-label {
+    left: 32px !important;
+    width: -webkit-calc(100% - 32px);
+    width: calc(100% - 32px);
+    padding-top: 2px;
+}
