@@ -143,13 +143,13 @@ export default {
           ]
         },
         {
-            text: [
-                {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
-                {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
-                {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
-              ], 
-            margin: [0, 20],
-            style: 'headerTitle'
+          text: [
+            {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
+            {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
+            {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
+          ], 
+          margin: [0, 20],
+          style: 'headerTitle'
         },
         {
           style: 'tableExample',
@@ -542,10 +542,13 @@ export default {
     },
     doDynamicReport (val) {
       let vm = this
+      console.log(vm.docDefinition['content'][1])
+      console.log(vm.docDefinition['content'][1]['text'])
+      console.log(vm.docDefinition['content'][1]['text'][2])
       if (vm.formatDate !== '' && vm.toDate !== '') {
-        vm.docDefinition['content'][1]['text'][0][2]['text'] = 'Từ ngày ' + vm.formatDate + ' đến ngày ' + vm.toDate
+        vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.formatDate + ' đến ngày ' + vm.toDate
       } else {
-        vm.docDefinition['content'][1]['text'][0][2]['text'] = 'Năm: ' + vm.year
+        vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
       vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
