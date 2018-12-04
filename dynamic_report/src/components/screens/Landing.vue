@@ -557,7 +557,7 @@ export default {
           break
         }
       }
-      vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName
+      vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
       vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
