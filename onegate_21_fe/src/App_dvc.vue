@@ -214,6 +214,27 @@
                 }
               }
               vm.trangThaiHoSoList[key]['counter'] = parentCount
+            } else {
+              if (vm.trangThaiHoSoList[key].queryParams.indexOf('step') >= 0) {
+                let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
+                let countParent = 0
+                for (let countKey in vm.counterData) {
+                  if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
+                    let countParent = vm.counterData[countKey].totalCount
+                    break
+                  }
+                }
+                vm.trangThaiHoSoList[key]['counter'] = countParent
+              } else {
+                let filter = {
+                  queryParams: vm.trangThaiHoSoList[key].queryParams
+                }
+                vm.$store.dispatch('loadingCounterNotStep', filter).then(function (result) {
+                  vm.trangThaiHoSoList[key]['counter'] = result.total
+                }).catch(function () {
+                  vm.trangThaiHoSoList[key]['counter'] = 0
+                })
+              }
             }
           }
           vm.loading = false

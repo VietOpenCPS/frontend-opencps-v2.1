@@ -268,21 +268,21 @@
     <div v-if="!loadingDynamicBtn" class="btn_wrap_actions">
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'UNDO_DOSSIER'}, 0, true)" 
-        v-if="getUser('Administrator_data')"
+        v-if="getUser('Administrator_data') && currentQueryState['status'] !== 'deleted'"
       >
        &nbsp; &nbsp; Undo&nbsp; &nbsp;
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
-        v-if="getUser('Administrator_data')"
+        v-if="getUser('Administrator_data') && currentQueryState['status'] !== 'deleted'"
       >
         Điều chỉnh dữ liệu
       </v-btn>
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="getUser('Administrator')"
+        v-if="getUser('Administrator') && currentQueryState['status'] !== 'deleted'"
       >
         DELETE
       </v-btn>
@@ -1989,7 +1989,7 @@ export default {
               dossierId: vm.selectedDoAction[key]['dossierId']
             }
             console.log('filter Restore', filter)
-            if (vm.selectedDoAction[key]['originality'] && Number(vm.selectedDoAction[key]['originality']) < 0) {
+            if (vm.selectedDoAction[key]['originality'] && Number(vm.selectedDoAction[key]['originality']) > 3) {
               vm.$store.dispatch('restoreDossier', filter).then(function (result) {
                 restoreCounter += 1
                 if (restoreCounter === lengthDossier) {
