@@ -103,6 +103,7 @@
 </template>
 
 <script>
+import saveAs from 'file-saver'
 import support from '../../store/support.json'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
@@ -762,12 +763,10 @@ export default {
           putData['reportType'] = 'excel'
           let filterPostData = {
             document: vm.reportType,
-            data: putData
+            data: putData,
+            download: true
           }
-          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
-            console.log(result)
-            window.open(result, '_blank')
-          })
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData)
         }
       })
     }
