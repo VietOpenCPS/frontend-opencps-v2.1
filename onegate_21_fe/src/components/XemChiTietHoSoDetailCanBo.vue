@@ -1531,55 +1531,57 @@ export default {
         vm.loadingActionProcess = true
         if (vm.showKyPheDuyetTaiLieu) {
           if (useKySo) {
-            let resultCreateFile = vm.$refs.kypheduyettailieu.checkCreateFile(vm.dataEsign)
-            if (resultCreateFile) {
-              if (vm.dataEsign.createFiles) {
-                var fileArr
-                if (Array.isArray(vm.dataEsign.createFiles)) {
-                  fileArr = vm.dataEsign.createFiles
-                } else {
-                  fileArr = [vm.dataEsign.createFiles]
-                }
-                fileArr = fileArr.filter(item => {
-                  return item.eForm === true
-                })
-                if (fileArr.length > 0) {
-                  let lengthFiles = fileArr.length
-                  let counterSave = 0
-                  for (let i = 0; i < lengthFiles; i++) {
-                    let fileDetail = fileArr[i]
-                    // <---------
-                    var fileFind = vm.listDossierFiles.find(itemFile => {
-                      return itemFile.dossierPartNo === fileDetail.partNo
-                    })
-                    if (fileFind) {
-                      fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
-                      vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
-                        counterSave += 1
-                        if (counterSave === lengthFiles) {
-                          vm.doAction()
-                        }
-                      }).catch(reject => {
+            let filter = {
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              actionId: vm.processActionCurrent
+            }
+            vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+              vm.dataEsign = resultAction
+              let resultCreateFile = vm.$refs.kypheduyettailieu.checkCreateFile(vm.dataEsign)
+              if (resultCreateFile) {
+                if (vm.dataEsign.createFiles) {
+                  var fileArr
+                  if (Array.isArray(vm.dataEsign.createFiles)) {
+                    fileArr = vm.dataEsign.createFiles
+                  } else {
+                    fileArr = [vm.dataEsign.createFiles]
+                  }
+                  fileArr = fileArr.filter(item => {
+                    return item.eForm === true
+                  })
+                  if (fileArr.length > 0) {
+                    let lengthFiles = fileArr.length
+                    let counterSave = 0
+                    for (let i = 0; i < lengthFiles; i++) {
+                      let fileDetail = fileArr[i]
+                      // <---------
+                      var fileFind = vm.listDossierFiles.find(itemFile => {
+                        return itemFile.dossierPartNo === fileDetail.partNo
                       })
-                    } else {
-                      fileDetail['dossierId'] = vm.thongTinChiTietHoSo.dossierId
-                      vm.$store.dispatch('postEform', fileDetail).then(resPostEform => {
-                        counterSave += 1
-                        if (counterSave === lengthFiles) {
-                          vm.doAction()
-                        }
-                      }).catch(reject => {
-                      })
+                      if (fileFind) {
+                        fileFind['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                        vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+                          counterSave += 1
+                          if (counterSave === lengthFiles) {
+                            vm.doAction()
+                          }
+                        }).catch(reject => {
+                        })
+                      } else {
+                        console.log('fileDetail', fileDetail)
+                        fileDetail['dossierId'] = vm.thongTinChiTietHoSo.dossierId
+                        vm.$store.dispatch('postEformEsignature', fileDetail).then(resPostEform => {
+                          counterSave += 1
+                          if (counterSave === lengthFiles) {
+                            vm.doAction()
+                          }
+                        }).catch(reject => {
+                        })
+                      }
                     }
                   }
                 }
-              }
-            } else {
-              let filter = {
-                dossierId: vm.thongTinChiTietHoSo.dossierId,
-                actionId: vm.processActionCurrent
-              }
-              vm.$store.dispatch('processPullBtnDetail', filter).then(function (resultAction) {
+              } else {
                 var paymentsOut = ''
                 if (vm.showThuPhi) {
                   paymentsOut = {
@@ -1608,11 +1610,11 @@ export default {
                   vm.loadingAction = false
                   vm.loadingActionProcess = false
                 }, 200)
-              }).catch(function (reject) {
-                vm.loadingAction = false
-                vm.loadingActionProcess = false
-              })
-            }
+              }
+            }).catch(function (reject) {
+              vm.loadingAction = false
+              vm.loadingActionProcess = false
+            })
           } else if (!useKySo && vm.dataEsign.signatureType === 'digital') {
             vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
               // console.log('result======', result)

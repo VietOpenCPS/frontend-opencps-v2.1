@@ -1199,11 +1199,34 @@ export const store = new Vuex.Store({
         }
         try {
           let id = data['id'] ? data['id'] : 'nm'
-          // test local
           var dataPostEform = new FormData()
           var control = window.$('#formAlpaca' + data.partNo + id).alpaca('get')
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
+          dataPostEform.append('file', '')
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
+          axios.post(url, dataPostEform, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    postEformEsignature ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        try {
+          var dataPostEform = new FormData()
+          dataPostEform.append('formData', JSON.stringify(JSON.parse(data.formData)))
           dataPostEform.append('file', '')
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
@@ -2001,6 +2024,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    restoreDossier ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.post('/o/rest/v2/dossiers/' + filter.dossierId + '/restore' , param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        })
+      })
+    },
     getListDossierFiles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -2415,6 +2458,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
+          // test local
+          // axios.get('http://127.0.0.1:8081/api/dictcollections/DOSSIER_STATUS/dictitems?parent=0', param).then(function (response) {
           axios.get('/o/rest/v2/dictcollections/DOSSIER_STATUS/dictitems?parent=0', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -2671,9 +2716,6 @@ export const store = new Vuex.Store({
           axios.get('/o/rest/v2/statistics/dossiers/counting', param).then(function (response) {
             let serializable = response.data
             if (serializable.hasOwnProperty('data')) {
-              // add search dossierDeleted
-              // let dossierDelete = {key: "deleted", title: "Hồ sơ đã xóa", count: 0}
-              // serializable.data.push(dossierDelete)
               resolve(serializable.data)
             } else {
               resolve(null)
@@ -2698,7 +2740,7 @@ export const store = new Vuex.Store({
         if (Number(file.size) <= fileSizeAllow * 1048576) {
           store.commit('setValidFileUpload', true)
         } else {
-          toastr.error('Tải liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
           store.commit('setValidFileUpload', false)
         }
       } else {
