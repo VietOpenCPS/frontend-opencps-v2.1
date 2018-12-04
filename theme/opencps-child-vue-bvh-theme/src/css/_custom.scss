@@ -783,3 +783,13 @@ border: none !important; }
   .input-group--suffix .input-group--text-field__suffix {
       font-size: 13px;
   }
+
+  body .v-suggestions {
+    padding-top: 3px;
+}
+body .v-suggestions > input{
+    padding: 0;
+    border-bottom: 1px solid #949494;
+    height: 28px;
+    width: 100%;
+}

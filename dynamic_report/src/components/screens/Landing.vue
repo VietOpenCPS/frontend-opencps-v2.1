@@ -312,6 +312,16 @@ export default {
     selected () {
       return this.$store.getters.selected
     },
+    reportType: {
+      // getter
+      get: function() {
+        return this.$store.getters.reportType
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setreportType', newValue)
+      }
+    },
     groupType: {
       // getter
       get: function() {
@@ -335,15 +345,9 @@ export default {
       let vm = this
     },
     */
-   reportType: {
-      // getter
-      get: function() {
-        return this.$store.getters.reportType
-      },
-      // setter
-      set: function(newValue) {
-        this.$store.commit('setreportType', newValue)
-      }
+    reportType (val) {
+      console.debug(val)
+      this.doCreatePDF(this.selected)
     },
     groupType (val) {
       console.debug(val)
