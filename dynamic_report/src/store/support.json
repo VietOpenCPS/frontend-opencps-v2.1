@@ -8,28 +8,28 @@
            "title":"TÌNH HÌNH GIẢI QUYẾT TTHC"
         },
         {  
-            "code":"2",
+            "code":"1",
             "document": "REPORT_03",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT TIẾP NHẬN HỒ SƠ"
         },
         {  
-            "code":"4",
+            "code":"2",
             "document": "REPORT_05",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT TRẢ KẾT QUẢ"
         },
         {  
-            "code":"8",
+            "code":"3",
             "document": "REPORT_09",
             "active": false,
             "type": "dossier",
             "title":"CHI TIẾT HỒ SƠ ĐÃ GIẢI QUYẾT"
         },
         {  
-            "code":"9",
+            "code":"4",
             "document": "REPORT_10",
             "active": false,
             "type": "dossier",
