@@ -39,7 +39,7 @@ export const store = new Vuex.Store({
     itemsReports: support['trangThaiHoSoList']
   },
   actions: {
-    loadInitResource ({state}) {
+    loadInitResource ({commit, state}) {
       return new Promise((resolve) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
@@ -64,6 +64,8 @@ export const store = new Vuex.Store({
         axios.get('/o/v1/opencps/site/name', param).then(function (response) {
           let serializable = response.data
           state.siteName = serializable
+          console.log(state.siteName)
+          commit('setsiteName', serializable)
           resolve(state.initData)
         }).catch(function (error) {
           console.log(error)
