@@ -306,8 +306,7 @@ export default {
     govAgency: null,
     danhSachBaoCao: [],
     pdfBlob: null,
-    isShowLoading: false,
-    documentTYPE: 'REPORT_01'
+    isShowLoading: false
   }),
   computed: {
     selected () {
@@ -336,6 +335,16 @@ export default {
       let vm = this
     },
     */
+   reportType: {
+      // getter
+      get: function() {
+        return this.$store.getters.reportType
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setreportType', newValue)
+      }
+    },
     groupType (val) {
       console.debug(val)
       this.doCreatePDF(this.selected)
@@ -355,7 +364,7 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         if (vm.year) {
           vm.fromDateFormatted = ''
           vm.toDateFormatted = ''
@@ -395,7 +404,7 @@ export default {
     changeMonth (item) {
       let vm = this
       vm.month = item
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.fromDateFormatted = ''
         vm.toDateFormatted = ''
         vm.$router.push({
@@ -423,7 +432,7 @@ export default {
       let vm = this
       vm.menufromDate = false
       vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.year = ''
         // vm.month = '0'
         if (vm.fromDateFormatted && vm.toDateFormatted) {
@@ -455,7 +464,7 @@ export default {
       let vm = this
       vm.menutoDate = false
       vm.toDateFormatted = vm.formatDate(vm.toDate)
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.year = ''
         // vm.month = '0'
         if (vm.fromDateFormatted && vm.toDateFormatted) {
@@ -496,6 +505,14 @@ export default {
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     },
     doCreatePDF (val) {
+      let vm = this
+      if (vm.reportType === 'REPORT_01') {
+        vm.doPrintReport()
+      } else {
+        vm.doDynamicReport(val)
+      }
+    },
+    doDynamicReport (val) {
       let vm = this
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
@@ -631,6 +648,55 @@ export default {
       const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
       pdfDocGenerator.getBlob((blob) => {
         vm.pdfBlob = window.URL.createObjectURL(blob)
+      })
+    },
+    doPrintReport () {
+      let vm = this
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        let putData = {}
+        if (result !== null && result !== undefined) {
+          putData = result
+          if (filter['agency'] === 'all') {
+            putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
+          }
+          if (vm.reportType === 'REPORT_01') {
+            putData['year'] = vm.year
+            // putData['month'] = vm.month
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          let filterPostData = {
+            document: vm.reportType,
+            data: putData
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
+            vm.pdfBlob = result
+            vm.isShowLoading = false
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
+        }
       })
     }
   }
