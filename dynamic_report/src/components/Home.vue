@@ -8,6 +8,7 @@
           placeholder="Chọn báo cáo"
           item-text="title"
           item-value="document"
+          @change="changeReportType($event)"
         ></v-select>
         <v-select
           v-model="groupType"
@@ -149,6 +150,21 @@
         }
       }
     },
+    created () {
+    var vm = this
+      vm.$nextTick(function () {
+        if (String(vm.index) !== '0') {
+          for (let key in vm.itemsReports) {
+            if (vm.itemsReports[key]['code'] === String(vm.index)) {
+              reportType = vm.itemsReports[key]['document']
+              break
+            }
+          }
+        } else {
+          reportType = 'REPORT_01'
+        }
+      })
+    },
     methods: {
       redirectFilter(val) {
         this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
@@ -161,6 +177,15 @@
       },
       deliverableRouter (item) {
         console.log(item)
+      },
+      changeReportType (data) {
+        let vm = this
+        for (let key in vm.itemsReports) {
+          if (vm.itemsReports[key]['document'] === data) {
+            vm.$router.push('/bao-cao/' + vm.itemsReports[key]['code'])
+            break
+          }
+        }
       }
     }
   }
