@@ -35,7 +35,7 @@
                     min-width="290px"
                   >
                     <v-text-field
-                      placeholder="Chọn ngày"
+                      placeholder="dd/mm/yyyy"
                       slot="activator"
                       v-model="fromDateFormatted"
                       append-icon="event"
@@ -62,7 +62,7 @@
                 min-width="290px"
               >
                 <v-text-field
-                  placeholder="Chọn ngày"
+                  placeholder="dd/mm/yyyy"
                   slot="activator"
                   v-model="toDateFormatted"
                   append-icon="event"
@@ -723,6 +723,51 @@ export default {
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
+        }
+      })
+    },
+    doExcelFunc () {
+      let vm = this
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        let putData = {}
+        if (result !== null && result !== undefined) {
+          putData = result
+          if (filter['agency'] === 'all') {
+            putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
+          }
+          if (vm.reportType === 'REPORT_01') {
+            putData['year'] = vm.year
+            putData['month'] = '0'
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          putData['reportType'] = 'excel'
+          let filterPostData = {
+            document: vm.reportType,
+            data: putData
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
+            console.log(result)
+            window.open(result, '_blank')
+          })
         }
       })
     }
