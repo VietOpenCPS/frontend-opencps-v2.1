@@ -35,7 +35,7 @@
                     min-width="290px"
                   >
                     <v-text-field
-                      placeholder="Chọn ngày"
+                      placeholder="dd/mm/yyyy"
                       slot="activator"
                       v-model="fromDateFormatted"
                       append-icon="event"
@@ -62,7 +62,7 @@
                 min-width="290px"
               >
                 <v-text-field
-                  placeholder="Chọn ngày"
+                  placeholder="dd/mm/yyyy"
                   slot="activator"
                   v-model="toDateFormatted"
                   append-icon="event"
@@ -72,7 +72,7 @@
               </v-menu>
             </v-flex>
             <v-flex class="px-2 text-right">
-              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+              <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
                 Xuất Excel
               </v-btn>
             </v-flex>
@@ -103,6 +103,7 @@
 </template>
 
 <script>
+import saveAs from 'file-saver'
 import support from '../../store/support.json'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
@@ -125,7 +126,7 @@ export default {
               width: '*',
               style: 'borderHeader',
               text: [
-                  'CỤC NGHỆ THUẬT BIỂU DIỄN\n',
+                  '\n',
                   '-------------------------------------------'
               ]
             },
@@ -136,19 +137,19 @@ export default {
                   {text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n'},
                   {text: 'Độc lập - Tự do - Hạnh phúc\n'},
                   {text: '-------------------------------------------\n'},
-                  {text: 'Hà Nội, ngày 30 tháng 11 năm 2018', style: 'ngayThangNam'}
+                  {text: 'Hà Nội, ngày ' + new Date().getDate() + ' tháng ' + (new Date().getMonth() + 1) +' năm ' + new Date().getFullYear(), style: 'ngayThangNam'}
                 ]
             }
           ]
         },
         {
-            text: [
-                {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
-                {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
-                {text: 'Từ ngày: 1/11/2018 đến ngày 30/11/2018\n', fontSize: 11},
-              ], 
-            margin: [0, 20],
-            style: 'headerTitle'
+          text: [
+            {text: 'BÁO CÁO CHI TIẾT TIẾP NHẬN HỒ SƠ\n'},
+            {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
+            {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
+          ], 
+          margin: [0, 20],
+          style: 'headerTitle'
         },
         {
           style: 'tableExample',
@@ -306,12 +307,24 @@ export default {
     govAgency: null,
     danhSachBaoCao: [],
     pdfBlob: null,
-    isShowLoading: false,
-    documentTYPE: 'REPORT_01'
+    isShowLoading: false
   }),
   computed: {
+    siteName () {
+      return this.$store.getters.siteName
+    },
     selected () {
       return this.$store.getters.selected
+    },
+    reportType: {
+      // getter
+      get: function() {
+        return this.$store.getters.reportType
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setreportType', newValue)
+      }
     },
     groupType: {
       // getter
@@ -331,11 +344,35 @@ export default {
     })
   },
   watch: {
-    /*
     '$route': function (newRoute, oldRoute) {
       let vm = this
+      console.debug(oldRoute)
+      let currentQuery = newRoute.query
+      if (currentQuery.hasOwnProperty('fromDate')) {
+        vm.year = currentQuery.fromDate ? '' : vm.year
+        vm.fromDateFormatted = currentQuery.fromDate
+      } else {
+        vm.fromDateFormatted = ''
+        let date = new Date()
+        vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+      }
+      if (currentQuery.hasOwnProperty('toDate')) {
+        vm.year = currentQuery.toDate ? '' : vm.year
+        vm.toDateFormatted = currentQuery.toDate
+      } else {
+        vm.toDateFormatted = ''
+        vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+      }
+      if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+        vm.doCreatePDF(vm.selected)
+      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate == '' && currentQuery.year !== '') {
+        vm.doCreatePDF(vm.selected)
+      }
     },
-    */
+    reportType (val) {
+      console.debug(val)
+      this.doCreatePDF(this.selected)
+    },
     groupType (val) {
       console.debug(val)
       this.doCreatePDF(this.selected)
@@ -355,7 +392,7 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         if (vm.year) {
           vm.fromDateFormatted = ''
           vm.toDateFormatted = ''
@@ -385,8 +422,8 @@ export default {
           path: '/bao-cao/' + vm.index,
           query: {
             year: vm.year,
-            fromDate: vm.fromDate,
-            toDate: vm.toDate,
+            fromDate: '',
+            toDate: '',
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })
@@ -395,7 +432,7 @@ export default {
     changeMonth (item) {
       let vm = this
       vm.month = item
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.fromDateFormatted = ''
         vm.toDateFormatted = ''
         vm.$router.push({
@@ -423,7 +460,7 @@ export default {
       let vm = this
       vm.menufromDate = false
       vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.year = ''
         // vm.month = '0'
         if (vm.fromDateFormatted && vm.toDateFormatted) {
@@ -455,7 +492,7 @@ export default {
       let vm = this
       vm.menutoDate = false
       vm.toDateFormatted = vm.formatDate(vm.toDate)
-      if (vm.documentTYPE === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01') {
         vm.year = ''
         // vm.month = '0'
         if (vm.fromDateFormatted && vm.toDateFormatted) {
@@ -497,6 +534,20 @@ export default {
     },
     doCreatePDF (val) {
       let vm = this
+      if (vm.reportType === 'REPORT_01') {
+        vm.doPrintReport()
+      } else {
+        vm.doDynamicReport(val)
+      }
+    },
+    doDynamicReport (val) {
+      let vm = this
+      if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
+        vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
+      } else {
+        vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
+      }
+      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
       let headerTableReport = []
@@ -530,107 +581,219 @@ export default {
       vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
       vm.docDefinition['content'][2]['table']['body'].push(header2TableReport)
       // bild data
-      let dataReport = support['report1']
-      let domainRaw = {}
-      let dossierRaw = {}
-      let dataReportCurrent = {}
-      for (let key in dataReport) {
-        dataReportCurrent = dataReport[key]
-        let domainRawItem = {}
-        if (vm.groupType === 'domain') {
-          domainRawItem['domainName'] = dataReportCurrent['domainName']
-        } else {
-          domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
-        }
-        domainRawItem['services'] = []
-        if (vm.groupType === 'domain') {
-          if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
-            domainRaw[dataReportCurrent['domainName']] = domainRawItem
-          }
-        } else {
-          if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
-            domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
-          }
-        }
-        if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
-          if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
-            dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
-          }
-        } else {
-          let dossierRawItem = {}
-          dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
-          dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
-          if (vm.groupType === 'domain') {
-            dossierRawItem['domainName'] = dataReportCurrent['domainName']
-          } else {
-            dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
-          }
-          dossierRawItem['dossiers'] = []
-          dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
-          dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
-        }
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
       }
-      console.log('domainRaw', domainRaw)
-      for (let key in dossierRaw) {
-        let keyObject = dossierRaw[key]
-        if (key !== '' && keyObject !== undefined) {
-          if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
-            domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
-            domainRaw[keyObject['domainName']]['services'].push(keyObject)
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null && result !== undefined) {
+          let dataReport = result['data']
+          let domainRaw = {}
+          let dossierRaw = {}
+          let dataReportCurrent = {}
+          for (let key in dataReport) {
+            dataReportCurrent = dataReport[key]
+            let domainRawItem = {}
+            if (vm.groupType === 'domain') {
+              domainRawItem['domainName'] = dataReportCurrent['domainName']
+            } else {
+              domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
+            }
+              domainRawItem['services'] = []
+            if (vm.groupType === 'domain') {
+              if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
+                domainRaw[dataReportCurrent['domainName']] = domainRawItem
+              }
+            } else {
+              if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
+                domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
+              }
+            }
+            if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
+              if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
+                dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+              }
+            } else {
+              let dossierRawItem = {}
+              dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
+              dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+              if (vm.groupType === 'domain') {
+                dossierRawItem['domainName'] = dataReportCurrent['domainName']
+              } else {
+                dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
+              }
+              dossierRawItem['dossiers'] = []
+              dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
+              dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+            }
           }
-        }
-      }
-      let domains = []
-      for (let key in domainRaw) {
-        let keyObject = domainRaw[key]
-        if (key !== '') {
-          let domainRawItem = {}
-          domainRawItem['domainName'] = key
-          domainRawItem['services'] = keyObject['services']
-          domains.push(domainRawItem)
-        }
-      }
-      if (domains.length > 0) {
-        vm.docDefinition['content'][2]['table']['body'].push([{
-          colSpan: val.length + 1,
-          text: domains[0]['domainName'],
-          bold: true,
-          style: 'tdStyle'
-        }])
-        for (let key in domains[0]['services']) {
-          vm.docDefinition['content'][2]['table']['body'].push([{
-            colSpan: val.length + 1,
-            text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
-            bold: true,
-            style: 'tdStyle'
-          }])
-          let dossiersArray = domains[0]['services'][key]['dossiers']
-          let indexStt = 1
-          let dataRow = []
-          for (let keyDossier in dossiersArray) {
-            dataRow = []
-            let dossierObj = dossiersArray[keyDossier]
-            dataRow.push({
-              text: indexStt, 
-              alignment: 'center',
+          for (let key in dossierRaw) {
+            let keyObject = dossierRaw[key]
+            if (key !== '' && keyObject !== undefined) {
+              if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
+                domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
+                domainRaw[keyObject['domainName']]['services'].push(keyObject)
+              }
+            }
+          }
+          let domains = []
+          for (let key in domainRaw) {
+            let keyObject = domainRaw[key]
+            if (key !== '') {
+              let domainRawItem = {}
+              domainRawItem['domainName'] = key
+              domainRawItem['services'] = keyObject['services']
+              domains.push(domainRawItem)
+            }
+          }
+          if (domains.length > 0) {
+            vm.docDefinition['content'][2]['table']['body'].push([{
+              colSpan: val.length + 1,
+              text: domains[0]['domainName'],
+              bold: true,
               style: 'tdStyle'
-            })
-            for (let keyVal in val) {
-              dataRow.push({
-                text: dossierObj[val[keyVal]], 
+            }])
+            for (let key in domains[0]['services']) {
+              vm.docDefinition['content'][2]['table']['body'].push([{
+                colSpan: val.length + 1,
+                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+                bold: true,
+                style: 'tdStyle'
+              }])
+              let dossiersArray = domains[0]['services'][key]['dossiers']
+              let indexStt = 1
+              let dataRow = []
+              for (let keyDossier in dossiersArray) {
+                dataRow = []
+                let dossierObj = dossiersArray[keyDossier]
+                dataRow.push({
+                text: indexStt, 
                 alignment: 'center',
                 style: 'tdStyle'
-              })
+                })
+                for (let keyVal in val) {
+                  dataRow.push({
+                    text: dossierObj[val[keyVal]], 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                }
+                vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                indexStt = indexStt + 1
+              }
             }
-            vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-            indexStt = indexStt + 1
           }
+          const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          pdfDocGenerator.getBlob((blob) => {
+            vm.pdfBlob = window.URL.createObjectURL(blob)
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
         }
+      })
+    },
+    doPrintReport () {
+      let vm = this
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
       }
-      console.log(vm.docDefinition)
-      const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
-      pdfDocGenerator.getBlob((blob) => {
-        vm.pdfBlob = window.URL.createObjectURL(blob)
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        let putData = {}
+        if (result !== null && result !== undefined) {
+          putData = result
+          if (filter['agency'] === 'all') {
+            putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
+          }
+          if (vm.reportType === 'REPORT_01') {
+            putData['year'] = vm.year
+            // putData['month'] = vm.month
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          let filterPostData = {
+            document: vm.reportType,
+            data: putData
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
+            vm.pdfBlob = result
+            vm.isShowLoading = false
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
+        }
+      })
+    },
+    doExcelFunc () {
+      let vm = this
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        let putData = {}
+        if (result !== null && result !== undefined) {
+          putData = result
+          if (filter['agency'] === 'all') {
+            putData['flagAgency'] = 1
+          } else {
+            putData['flagAgency'] = 0
+          }
+          if (vm.reportType === 'REPORT_01') {
+            putData['year'] = vm.year
+            putData['month'] = '0'
+            putData['fromStatisticDate'] = vm.fromDateFormatted
+            putData['toStatisticDate'] = vm.toDateFormatted
+          } else {
+            putData['fromDate'] = vm.fromDateFormatted
+            putData['toDate'] = vm.toDateFormatted
+          }
+          putData['reportType'] = 'excel'
+          let filterPostData = {
+            document: vm.reportType,
+            data: putData,
+            download: true
+          }
+          vm.$store.dispatch('doStatisticReportPrint', filterPostData)
+        }
       })
     }
   }
