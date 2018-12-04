@@ -286,7 +286,13 @@
       >
         DELETE
       </v-btn>
-
+      
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'RESTORE_DOSSIER'}, 0, true)" 
+        v-if="getUser('Administrator_data') && currentQueryState.hasOwnProperty('status') && currentQueryState['status'] === 'deleted'"
+      >
+        Khôi phục hồ sơ
+      </v-btn>
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -980,7 +986,8 @@ export default {
     dialogPDFLoading: true,
     filterForm: null,
     checkSelectAll: (this.menuType !== 3 && this.originality !== 1),
-    titleLanding: ''
+    titleLanding: '',
+    currentQueryState: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1005,6 +1012,7 @@ export default {
     vm.selectMultiplePage = []
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
+      vm.currentQueryState = query
       if (query.hasOwnProperty('page') && query['page'] !== '1') {
         vm.hosoDatasPage = parseInt(query['page'])
       } else {
@@ -1017,6 +1025,7 @@ export default {
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
+      vm.currentQueryState = currentQuery
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1080,6 +1089,7 @@ export default {
       let vm = this
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
+      vm.currentQueryState = currentQuery
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1396,6 +1406,7 @@ export default {
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         } else {
+          let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
           filter = {
             queryParams: querySet,
             /*  test local */
@@ -1405,14 +1416,14 @@ export default {
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
             template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
             domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.domainCode,
-            status: currentQuery.hasOwnProperty('status') ? currentQuery.status : '',
+            status: currentQuery.hasOwnProperty('status') && currentQuery['status'] && currentQuery['status'] !== 'deleted' ? currentQuery.status : '',
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
-            originality: currentQuery.hasOwnProperty('originality') ? currentQuery.originality : '',
+            originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         }
@@ -1494,6 +1505,11 @@ export default {
           vm.$store.dispatch('loadingDossierCounting').then(function (result) {
             if (result !== null && result !== undefined) {
               vm.dossierCounting = result
+              // add search dossierDeleted
+              if (vm.getUser('Administrator_data')) {
+                let dossierDelete = {key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}
+                vm.dossierCounting.push(dossierDelete)
+              }
             } else {
               vm.dossierCounting = []
             }
@@ -1733,6 +1749,8 @@ export default {
         vm.doChangeDossier(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'UNDO_DOSSIER') {
         vm.doUndoDossier(dossierItem, item, index, isGroup)
+      } else if (String(item.form) === 'RESTORE_DOSSIER') {
+        vm.doRestoreDossier(dossierItem, item, index, isGroup)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -1920,7 +1938,7 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (vm.selectedDoAction.length > 0) {
         let countSelectedDoAction = vm.selectedDoAction.length
-        let x = confirm('Xác thực thao tác với mã hồ sơ: ' + vm.selectedDoAction[countSelectedDoAction - 1].dossierNo)
+        let x = confirm('Xác thực Undo hồ sơ với mã: ' + vm.selectedDoAction[countSelectedDoAction - 1].dossierNo)
         if (x) {
           let fiter = {
             dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId
@@ -1942,7 +1960,7 @@ export default {
     doChangeDossierExtraForm () {
       let vm = this
       let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
-      let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+      let x = confirm('Bạn có chắc chắn thực hiện hành động điều chỉnh dữ liệu?')
       if (x) {
         let countSelectedDoAction = vm.selectedDoAction.length
         let fiter = {
@@ -1959,9 +1977,40 @@ export default {
         })
       }
     },
+    doRestoreDossier () {
+      let vm = this
+      let x = confirm('Bạn có chắc chắn thực hiện hành động khôi phục hồ sơ?')
+      if (x) {
+        if (vm.selectedDoAction.length > 0) {
+          let restoreCounter = 0
+          let lengthDossier = vm.selectedDoAction.length
+          for (let key in vm.selectedDoAction) {
+            let filter = {
+              dossierId: vm.selectedDoAction[key]['dossierId']
+            }
+            console.log('filter Restore', filter)
+            if (vm.selectedDoAction[key]['originality'] && Number(vm.selectedDoAction[key]['originality']) < 0) {
+              vm.$store.dispatch('restoreDossier', filter).then(function (result) {
+                restoreCounter += 1
+                if (restoreCounter === lengthDossier) {
+                  vm.doLoadingDataHoSo()
+                }
+              }).catch(function () {
+                restoreCounter += 1
+                if (restoreCounter === lengthDossier) {
+                  vm.doLoadingDataHoSo()
+                }
+              })
+            }
+          }
+        } else {
+          alert('Chọn hồ sơ để thực hiện')
+        }
+      }
+    },
     doDeleteDossier (dossierItem, item, index, isGroup) {
       let vm = this
-      let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+      let x = confirm('Bạn có chắc chắn thực hiện hành động xóa hồ sơ?')
       if (x) {
         let currentQuery = vm.$router.history.current.query
         //
@@ -1979,7 +2028,7 @@ export default {
             vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
             })
           } else {
-            alert('no item selected')
+            alert('Chọn hồ sơ để thực hiện')
           }
         } else {
           let filter = {
@@ -2381,6 +2430,13 @@ export default {
       vm.menusss = !vm.menusss
       vm.$store.dispatch('getStatusLists').then(function (result) {
         vm.itemFilterSupport.statusLists = result
+        let statusDeleted = {
+          itemCode: 'deleted',
+          itemName: 'Đã xóa'
+        }
+        if (vm.getUser('Administrator_data')) {
+          vm.itemFilterSupport.statusLists.push(statusDeleted)
+        }
       })
       let filter = {
         itemCode: ''
