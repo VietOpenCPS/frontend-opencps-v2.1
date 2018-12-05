@@ -733,7 +733,6 @@ export default {
       }
       vm.seriesChartBar = vm.seriesChartBar.reverse()
       console.log('vm.chartOptionsBar.colors', vm.chartOptionsBar.colors)
-      console.log('seriesChartBar', vm.seriesChartBar)
       vm.$refs.barchart2.updateOptions({ colors: vm.chartOptionsBar.colors })
       vm.reloadBar = false
       setTimeout(() => {
