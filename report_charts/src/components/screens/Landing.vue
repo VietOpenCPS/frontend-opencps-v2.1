@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap>
+    <v-layout row wrap style="margin: 0;">
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="1===1">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
@@ -367,22 +367,6 @@ export default {
     }
   },
   created () {
-    let vm = this
-    vm.$nextTick(function () {
-      vm.$store.dispatch('getAgencyGroups').then(function (result) {
-        if (result !== null && result !== undefined && result !== 'undefined') {
-          vm.agencyGroups = result
-          vm.agencyGroups.unshift({
-            'groupCode': '',
-            'groupName': 'Lọc theo nhóm'
-          })
-        } else {
-          vm.agencyGroups = []
-        }
-      })
-    })
-  },
-  updated () {
     var vm = this
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
