@@ -258,6 +258,7 @@ export default {
           colors: ['#fff']
         },
         formatter: function(val, opt) {
+          console.log('opt.w.globals.labels', opt.w.globals.labels)
           return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
         },
         offsetX: 0,
@@ -706,6 +707,8 @@ export default {
       let labelOfLine = []
       for (let key in labelsCustomMonth) {
         labelOfLine.push(key)
+        console.log('label', key)
+        console.log('borderColor', vm.intToRGB(vm.hashCode(key)))
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -715,10 +718,14 @@ export default {
         lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
-      vm.chartOptionsBar.xaxis.categories = labelOfLine
+      vm.chartOptionsBar.xaxis.categories = labelOfLine.reverse()
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
+      console.log('datasetsCustom', datasetsCustom)
       for (let key in datasetsCustom) {
+        console.log('datasetsCustom key', datasetsCustom)
+        console.log('datasetsCustom', datasetsCustom[key])
+        console.log('datasetsCustom val', datasetsCustom[key]['borderColor'])
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
           data: datasetsCustom[key]['data'].reverse()
