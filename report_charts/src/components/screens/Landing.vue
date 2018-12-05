@@ -62,7 +62,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar"
+            <apexchart type="bar" height="350"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -80,7 +80,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar"
+            <apexchart type="bar" height="350"
               :options="chartOptionsBar" 
               :series="seriesChartBar" 
             ></apexchart>
@@ -97,7 +97,7 @@
             Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="line"
+            <apexchart type="line" height="450"
               :options="chartOptions" 
               :series="seriesChart" 
             ></apexchart>
@@ -623,11 +623,12 @@ export default {
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      console.log('seriesChartBarData', seriesChartBarData)
+      vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
       }]
       vm.reloadBar = false
+      vm.chartOptionsBar = {}
       vm.chartOptionsBar = {
         plotOptions: {
           bar: {
@@ -692,7 +693,7 @@ export default {
         }
       }
       // report 3
-
+      vm.seriesChartBarTotal = []
       vm.seriesChartBarTotal = [{
         name: 'Đang xử lý còn hạn',
         data: undueCountData
@@ -712,6 +713,7 @@ export default {
         name: 'Đã giải quyết quá hạn',
         data: overtimeCountData
       }]
+      vm.chartOptionsBarTotal = {}
       vm.chartOptionsBarTotal = {
         plotOptions: {
           bar: {
