@@ -291,6 +291,15 @@ export default {
       }
     },
     seriesChartBar: [{
+      name: 'Series B',
+      data: [30, 40, 45, 50, 49, 60, 70, 91]
+    },
+    {
+      name: 'Series Bddd',
+      data: [30, 40, 45, 50, 49, 60, 70, 91]
+    },
+    {
+      name: 'Series Bddddd',
       data: [30, 40, 45, 50, 49, 60, 70, 91]
     }],
     chartOptionsBarTotal: {
