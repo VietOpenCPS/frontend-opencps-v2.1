@@ -243,6 +243,46 @@ export default {
       data: [0]
     }],
     chartOptionsBarTotal: {
+      chart: {
+        stacked: true,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+        }
+      },
+      stroke: {
+        width: 1,
+        colors: ['#fff']
+      },
+      title: {
+        text: 'Fiction Books Sales'
+      },
+      xaxis: {
+        categories: [2008, 2009, 2010, 2011, 2012, 2013],
+        labels: {
+          formatter: function (val) {
+            return val + "K"
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: undefined
+        },
+
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val + "K"
+          }
+        }
+      },
+      fill: {
+        opacity: 1
+
+      }
     },
     seriesChartBarTotal: [],
     labelOfLine: []
@@ -712,6 +752,7 @@ export default {
         name: 'Đã giải quyết quá hạn',
         data: overtimeCountData
       }]
+      /*
       vm.chartOptionsBarTotal = {
         plotOptions: {
           bar: {
@@ -755,6 +796,7 @@ export default {
           }
         }
       }
+      */
     },
     hashCode (str) {
       var hash = 0
