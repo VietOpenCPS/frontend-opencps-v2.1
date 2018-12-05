@@ -290,10 +290,7 @@ export default {
         }
       }
     },
-    seriesChartBar: [{
-      name: 'series-1',
-      data: [30, 40, 45, 50, 49, 60, 70, 91]
-    }],
+    seriesChartBar: [],
     chartOptionsBarTotal: {
       plotOptions: {
         bar: {
@@ -727,6 +724,7 @@ export default {
       vm.seriesChartBar = vm.seriesChartBar
       */
      let colorDK = []
+     vm.seriesChartBar = []
      for (let key in datasetsCustom) {
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
