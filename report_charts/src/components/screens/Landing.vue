@@ -257,7 +257,11 @@ export default {
           colors: ['#fff']
         },
         formatter: function(val, opt) {
-          return opt.w.globals.labels[opt.seriesIndex] + ":  " + val
+          if (val > 0) {
+            return ''
+          } else {
+            return opt.w.globals.labels[opt.seriesIndex] + ":  " + val
+          }
         },
         offsetX: 0,
         dropShadow: {
@@ -292,15 +296,15 @@ export default {
     },
     seriesChartBar: [{
       name: 'Series B',
-      data: [30]
+      data: [30,0,0]
     },
     {
       name: 'Series Bddd',
-      data: [40]
+      data: [0,40,0]
     },
     {
       name: 'Series Bddddd',
-      data: [50]
+      data: [0,0,50]
     }],
     chartOptionsBarTotal: {
       plotOptions: {
