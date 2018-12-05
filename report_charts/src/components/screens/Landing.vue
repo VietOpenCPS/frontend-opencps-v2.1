@@ -714,7 +714,6 @@ export default {
         lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
-      vm.chartOptionsBar.xaxis.categories = vm.labelOfLine
       /*
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
@@ -727,11 +726,13 @@ export default {
       }
       vm.seriesChartBar = vm.seriesChartBar
       */
+     let colorDK = []
      for (let key in datasetsCustom) {
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
           data: datasetsCustom[key]['data']
         })
+        colorDK.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadBar = false
       vm.chartOptionsBar = {
@@ -745,7 +746,7 @@ export default {
             }
           }
         },
-        colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024'],
+        colors: colorDK,
         dataLabels: {
           enabled: true,
           textAnchor: 'start',
@@ -765,7 +766,7 @@ export default {
           colors: ['#fff']
         },
         xaxis: {
-          categories: vm.chartOptionsBar.xaxis.categories,
+          categories: vm.labelOfLine,
         },
         yaxis: {
           labels: {
