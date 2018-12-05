@@ -6,7 +6,7 @@
           <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;">
@@ -70,7 +70,7 @@
                 </div>
               </div>
             </div>
-            <v-card v-if="item.hasForm">
+            <v-card v-if="item.hasForm && !onlyView">
               <v-card-text style="background-color: rgba(244, 247, 213, 0.19)">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
@@ -231,7 +231,10 @@
     </div> -->
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
-        <v-card-title class="headline">File đính kèm</v-card-title>
+        <v-card-title class="headline">
+          <span v-if="pdfEform">Biểu mẫu khai trực tuyến</span>
+          <span v-else>File đính kèm</span>
+        </v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
           <v-icon>clear</v-icon>
         </v-btn>
@@ -297,6 +300,7 @@ export default {
     stateAddFileOther: false,
     dossierTemplatesItemSelect: {},
     fileViews: [],
+    pdfEform: false,
     sampleCount: 0,
     serviceInfoId: 0,
     fileMarkItems: [{
@@ -442,7 +446,7 @@ export default {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
         }, 500)
-        // console.log('dossierTemplateItems', vm.dossierTemplateItems)
+        console.log('dossierTemplateItems', vm.dossierTemplateItems)
       }).catch(reject => {
       })
     },
@@ -512,6 +516,8 @@ export default {
           })
           if (itemFind) {
             template['daKhai'] = true
+            template['hasForm'] = true
+            template['referenceUid'] = itemFind['referenceUid']
           } else if (!itemFind && template.hasForm) {
             template['daKhai'] = false
           }
@@ -841,6 +847,11 @@ export default {
       var vm = this
       if (data.fileSize === 0) {
         return
+      }
+      if (data['hasForm']) {
+        vm.pdfEform = true
+      } else {
+        vm.pdfEform = false
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
         var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid

@@ -742,7 +742,6 @@ export default {
         vm.$store.dispatch('loadInitResource').then(result => {
           let param = {
             headers: {
-              groupId: result.groupId
             }
           }
           axios.get(url, param).then(response => {
@@ -768,7 +767,6 @@ export default {
         vm.$store.dispatch('loadInitResource').then(result => {
           let param = {
             headers: {
-              groupId: result.groupId
             }
           }
           axios.get(url, param).then(response => {
