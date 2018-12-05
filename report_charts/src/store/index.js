@@ -71,9 +71,9 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getAgencyReportLists ({state}, filter) {
+    getAgencyReportLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function () {
+        store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId,
@@ -81,64 +81,30 @@ export const store = new Vuex.Store({
             },
             params: {
               year: filter.year,
-              month: filter.month ? filter.month : 0,
+              month: filter.month,
               group: filter.group,
               reporting: false,
               agency: filter['agency']
             }
           }
-          let requestURL = ''
-          if (filter.document === 'REPORT_01') {
-            // test local
-            // requestURL = 'http://127.0.0.1:8081/api/statistics'
-            requestURL = '/o/rest/statistics'
-            param.params['fromStatisticDate'] = filter.fromDate
-            param.params['toStatisticDate'] = filter.toDate
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = {
-                  data: serializable.data
-                }
-                resolve(dataReturn)
-              } else {
-                resolve(null)
-              }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
-          } else {
-            // test local
-            // requestURL = 'http://127.0.0.1:8081/api/dossiers'
-            requestURL = '/o/rest/v2/dossiers'
-            param.params['sort'] = 'domainCode'
-            if (filter.document === 'REPORT_05') {
-              param.params['fromFinishDate'] = filter.fromDate
-              param.params['toFinishDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_09') {
-              param.params['fromReleaseDate'] = filter.fromDate
-              param.params['toReleaseDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_10') {
-              param.params['fromReceiveNotDoneDate'] = filter.fromDate
-              param.params['toReceiveNotDoneDate'] = filter.toDate
-            } else {
-              param.params['fromReceiveDate'] = filter.fromDate
-              param.params['toReceiveDate'] = filter.toDate
-            }
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = serializable
-                resolve(dataReturn)
-              } else {
-                resolve(null)
-              }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
+          if (filter['report']) {
+            param.params['domain'] = 'total'
           }
+          if (filter['report'] === 'linemonth') {
+            param.params['domain'] = ''
+          }
+          axios.get('/o/rest/statistics', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
         })
       })
     },
