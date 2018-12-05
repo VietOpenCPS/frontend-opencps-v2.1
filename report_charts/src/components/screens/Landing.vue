@@ -714,20 +714,69 @@ export default {
         lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
-      vm.chartOptionsBar.xaxis.categories = vm.labelOfLine.reverse()
+      vm.chartOptionsBar.xaxis.categories = vm.labelOfLine
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
       for (let key in datasetsCustom) {
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
-          data: datasetsCustom[key]['data'].reverse()
+          data: datasetsCustom[key]['data']
         })
         vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
       }
-      vm.seriesChartBar = vm.seriesChartBar.reverse()
+      vm.seriesChartBar = vm.seriesChartBar
       vm.reloadBar = false
       vm.chartOptionsBar = {
-        colors: vm.chartOptionsBar.colors
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            distributed: true,
+            horizontal: true,
+            dataLabels: {
+              position: 'bottom'
+            }
+          }
+        },
+        colors: vm.chartOptionsBar.colors,
+        dataLabels: {
+          enabled: true,
+          textAnchor: 'start',
+          style: {
+            colors: ['#fff']
+          },
+          formatter: function(val, opt) {
+            return opt.w.globals.labels[opt.seriesIndex] + ":  " + val
+          },
+          offsetX: 0,
+          dropShadow: {
+            enabled: true
+          }
+        },
+        stroke: {
+          width: 1,
+          colors: ['#fff']
+        },
+        xaxis: {
+          categories: vm.chartOptionsBar.xaxis.categories,
+        },
+        yaxis: {
+          labels: {
+            show: false
+          }
+        },
+        tooltip: {
+          theme: 'dark',
+          x: {
+            show: false
+          },
+          y: {
+            title: {
+              formatter: function() {
+                return ''
+              }
+            }
+          }
+        }
       }
     },
     hashCode (str) {
