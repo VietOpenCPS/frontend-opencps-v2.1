@@ -724,6 +724,7 @@ export default {
         vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = vm.seriesChartBar.reverse()
+      console.log('vm.chartOptionsBar.colors', vm.chartOptionsBar.colors)
       console.log('seriesChartBar', vm.seriesChartBar)
       vm.reloadBar = false
     },
