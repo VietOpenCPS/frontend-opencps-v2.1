@@ -268,13 +268,6 @@ export default {
         width: 1,
         colors: ['#fff']
       },
-      grid: {
-        borderColor: '#e7e7e7',
-        row: {
-          colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024', '#69d2e7'],
-          opacity: 0.5
-        }
-      },
       xaxis: {
         categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'India'],
       },
@@ -733,13 +726,9 @@ export default {
       }
       vm.seriesChartBar = vm.seriesChartBar.reverse()
       vm.reloadBar = false
-      setTimeout(() => {
-        vm.$refs.barchart2.updateOptions({
-          chartOptionsBar: {
-            colors: vm.chartOptionsBar.colors
-          }
-        })
-      }, 500)
+      vm.chartOptionsBar = {
+        colors: vm.chartOptionsBar.colors
+      }
     },
     hashCode (str) {
       var hash = 0
