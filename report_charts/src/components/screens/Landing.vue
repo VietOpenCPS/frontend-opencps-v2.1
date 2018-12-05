@@ -636,6 +636,7 @@ export default {
     },
     doProcessReport1 (data) {
       let vm = this
+      console.log('data', data)
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let monthData = {}
@@ -662,6 +663,7 @@ export default {
           }
         }
       }
+      console.log('monthData', monthData)
       let dataOfLine = {}
       for (let key in monthData) {
         let lineProcessData = {
@@ -678,6 +680,7 @@ export default {
       vm.chartOptions.xaxis.categories = Object.values(labelsCustomMonth)
       vm.chartOptions.colors = []
       vm.seriesChart = []
+      console.log('datasetsCustom', datasetsCustom)
       for (let key in datasetsCustom) {
         vm.seriesChart.push({
           name: datasetsCustom[key]['label'],
