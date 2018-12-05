@@ -647,6 +647,7 @@ export default {
           if (data[key].month > 0) {
             labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
             if (data[key].govAgencyName !== '') {
+              console.log('X monthData', monthData)
               if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
