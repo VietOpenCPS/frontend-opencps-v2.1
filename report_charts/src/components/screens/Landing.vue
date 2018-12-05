@@ -256,11 +256,7 @@ export default {
           colors: ['#fff']
         },
         formatter: function(val, opt) {
-          console.log('formatter val', val)
-          console.log('formatter opt', opt)
-          console.log('formatter dataPointIndex', opt.dataPointIndex)
-          console.log('formatter dataPointIndex', opt.w.globals.labels)
-          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+          return opt.w.globals.labels[opt.seriesIndex] + ":  " + val
         },
         offsetX: 0,
         dropShadow: {
@@ -728,6 +724,7 @@ export default {
         vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = vm.seriesChartBar.reverse()
+      console.log('vm.chartOptionsBar.colors', vm.chartOptionsBar.colors)
       console.log('seriesChartBar', vm.seriesChartBar)
       vm.reloadBar = false
     },
