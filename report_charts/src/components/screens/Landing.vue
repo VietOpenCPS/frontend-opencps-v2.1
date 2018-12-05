@@ -125,8 +125,8 @@ export default {
     agencyGroups: [],
     noReportData: false,
     isCallBack: true,
-    reloadPie: false,
-    reloadLine: false,
+    reloadPie: true,
+    reloadLine: true,
     showTable: false,
     agencyLists: [],
     agencyListsMonth: [],
@@ -581,7 +581,7 @@ export default {
             filter.report = true
           }
         }
-        vm.reloadLine = false
+        vm.reloadLine = true
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
           let dataReport1 = []
           if (result === null || result === undefined || result === 'undefined') {
@@ -685,7 +685,7 @@ export default {
         })
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
-      vm.reloadLine = true
+      vm.reloadLine = false
     },
     hashCode (str) {
       var hash = 0
