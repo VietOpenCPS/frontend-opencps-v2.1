@@ -59,7 +59,7 @@
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="1===1">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
-            Tình hình giải quyết hồ sơ năm {{year}}
+            Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="bar" height="350"
@@ -77,13 +77,12 @@
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
-            Tình hình giải quyết hồ sơ năm {{year}}
+            Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="bar" height="350"
               :options="chartOptionsBar" 
               :series="seriesChartBar" 
-              ref="barchart2"
             ></apexchart>
           </v-card-text>
         </v-card>
@@ -295,16 +294,7 @@ export default {
       }
     },
     seriesChartBar: [{
-      name: 'Series B',
-      data: [30,0,0]
-    },
-    {
-      name: 'Series Bddd',
-      data: [0,40,0]
-    },
-    {
-      name: 'Series Bddddd',
-      data: [0,0,50]
+      data: [0,0,0]
     }],
     chartOptionsBarTotal: {
       plotOptions: {
@@ -729,13 +719,12 @@ export default {
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
-        seriesChartBarData.push({
-          name: datasetsCustom[key]['label'],
-          data: datasetsCustom[key]['data']
-        })
+        seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      // vm.seriesChartBar = seriesChartBarData
+      vm.seriesChartBar = [{
+        data: seriesChartBarData
+      }]
       vm.reloadBar = false
       vm.chartOptionsBar = {
         plotOptions: {
