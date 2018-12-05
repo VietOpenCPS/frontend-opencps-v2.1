@@ -83,6 +83,7 @@
             <apexchart type="bar" height="350"
               :options="chartOptionsBar" 
               :series="seriesChartBar" 
+              ref="barchart2"
             ></apexchart>
           </v-card-text>
         </v-card>
@@ -245,7 +246,7 @@ export default {
           horizontal: true,
           dataLabels: {
             position: 'bottom'
-          },
+          }
         }
       },
       colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024', '#69d2e7'],
@@ -266,6 +267,13 @@ export default {
       stroke: {
         width: 1,
         colors: ['#fff']
+      },
+      grid: {
+        borderColor: '#e7e7e7',
+        row: {
+          colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024', '#69d2e7'],
+          opacity: 0.5
+        }
       },
       xaxis: {
         categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'India'],
@@ -726,7 +734,11 @@ export default {
       vm.seriesChartBar = vm.seriesChartBar.reverse()
       console.log('vm.chartOptionsBar.colors', vm.chartOptionsBar.colors)
       console.log('seriesChartBar', vm.seriesChartBar)
+      vm.$refs.barchart2.updateOptions({ colors: vm.chartOptionsBar.colors })
       vm.reloadBar = false
+      setTimeout(() => {
+        vm.$refs.barchart2.updateOptions({ colors: vm.chartOptionsBar.colors })
+      }, 500)
     },
     hashCode (str) {
       var hash = 0
