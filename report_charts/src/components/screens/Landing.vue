@@ -62,7 +62,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar" height="550"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -248,40 +248,38 @@ export default {
       },
       plotOptions: {
         bar: {
-          horizontal: true,
+          barHeight: '100%',
+          horizontal: true
         }
       },
       stroke: {
         width: 1,
         colors: ['#fff']
       },
-      title: {
-        text: 'Fiction Books Sales'
-      },
       xaxis: {
         categories: [2008, 2009, 2010, 2011, 2012, 2013],
         labels: {
           formatter: function (val) {
-            return val + "K"
+            return val
           }
         }
       },
       yaxis: {
         title: {
           text: undefined
-        },
-
+        }
       },
       tooltip: {
         y: {
-          formatter: function (val) {
-            return val + "K"
+          title: {
+            formatter: function() {
+              return ''
+            }
           }
         }
       },
       fill: {
         opacity: 1
-
       }
     },
     seriesChartBarTotal: [],
@@ -752,7 +750,6 @@ export default {
         name: 'Đã giải quyết quá hạn',
         data: overtimeCountData
       }]
-      /*
       vm.chartOptionsBarTotal = {
         plotOptions: {
           bar: {
@@ -770,7 +767,7 @@ export default {
           colors: ['#fff']
         },
         xaxis: {
-          categories: labelOfLine,
+          categories: vm.labelOfLine,
           labels: {
             formatter: function(val) {
               return val
@@ -796,7 +793,6 @@ export default {
           }
         }
       }
-      */
     },
     hashCode (str) {
       var hash = 0
