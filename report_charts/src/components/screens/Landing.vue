@@ -646,7 +646,7 @@ export default {
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
-            if (vm.gov_agency_code === '' && data[key].govAgencyName !== '') {
+            if (data[key].govAgencyName !== '') {
               if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
