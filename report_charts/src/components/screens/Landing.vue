@@ -62,7 +62,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -80,7 +80,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar"
               :options="chartOptionsBar" 
               :series="seriesChartBar" 
             ></apexchart>
@@ -97,7 +97,7 @@
             Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="line" height="525"
+            <apexchart type="line"
               :options="chartOptions" 
               :series="seriesChart" 
             ></apexchart>
