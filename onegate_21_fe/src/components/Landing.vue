@@ -1989,7 +1989,7 @@ export default {
               dossierId: vm.selectedDoAction[key]['dossierId']
             }
             console.log('filter Restore', filter)
-            if (vm.selectedDoAction[key]['originality'] && Number(vm.selectedDoAction[key]['originality']) > 3) {
+            if (vm.selectedDoAction[key]['originality']) {
               vm.$store.dispatch('restoreDossier', filter).then(function (result) {
                 restoreCounter += 1
                 if (restoreCounter === lengthDossier) {
