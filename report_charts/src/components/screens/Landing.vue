@@ -756,10 +756,10 @@ export default {
             colors: ['#fff']
           },
           formatter: function(val, opt) {
-            if (val > 0) {
-              return ''
-            } else {
+            if (String(val) > 0) {
               return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+            } else {
+              return ''
             }
           },
           offsetX: 0,
