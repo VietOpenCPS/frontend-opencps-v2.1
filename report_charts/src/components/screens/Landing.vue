@@ -93,7 +93,7 @@
         <content-placeholders-heading />
         <content-placeholders-img />
       </content-placeholders>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="1===1">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadLine">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ năm {{year}}
@@ -599,12 +599,12 @@ export default {
         }
         vm.reloadLine = false
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+          let dataReport1 = []
           if (result === null || result === undefined || result === 'undefined') {
-            vm.agencyListsMonth = []
           } else {
-            vm.agencyListsMonth = result
+            dataReport1 = result
           }
-          vm.reloadLine = true
+          vm.doProcessReport1(dataReport1)
         })
       }, 200)
     },
@@ -649,6 +649,70 @@ export default {
           govAgencyCode: vm.govAgencyCode
         }
       })
+    },
+    doProcessReport1 (data) {
+      let vm = this
+      let datasetsCustom = []
+      let labelsCustomMonth = {}
+      let monthData = {}
+      let lineDataMonth = {}
+      for (let key in data) {
+        if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
+        } else {
+          if (data[key].month > 0) {
+            labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
+            if (vm.gov_agency_code === '' && data[key].govAgencyName !== '') {
+              if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
+                monthData[data[key].govAgencyName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              } else {
+                monthData[data[key].govAgencyName] = []
+                monthData[data[key].govAgencyName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              }
+            }
+          }
+        }
+      }
+      let dataOfLine = {}
+      for (let key in monthData) {
+        let lineProcessData = {
+          label: key,
+          borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
+          backgroundColor: 'transparent',
+          data: []
+        }
+        for (let keyArray in monthData[key]) {
+          lineProcessData.data.push(monthData[key][keyArray].total)
+        }
+        datasetsCustom.push(lineProcessData)
+      }
+      vm.chartOptions.xaxis.categories = Object.values(labelsCustomMonth)
+      vm.chartOptions.colors = []
+      vm.seriesChart = []
+      for (let key in datasetsCustom) {
+        vm.seriesChart.push({
+          name: datasetsCustom[key]['label'],
+          data: datasetsCustom[key]['data'].reverse()
+        })
+        vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
+      }
+      vm.reloadLine = true
+    },
+    hashCode (str) {
+      var hash = 0
+      for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      return hash
+    },
+    intToRGB (i) {
+      var c = (i & 0x00FFFFFF).toString(16).toUpperCase()
+      return '00000'.substring(0, 6 - c.length) + c
     }
   }
 }
