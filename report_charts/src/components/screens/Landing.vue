@@ -665,7 +665,6 @@ export default {
           }
         }
       }
-      let dataOfLine = {}
       for (let key in monthData) {
         let lineProcessData = {
           label: key,
@@ -694,44 +693,28 @@ export default {
       let vm = this
       let datasetsCustom = []
       let labelsCustomMonth = {}
-      let monthData = {}
       let lineDataMonth = {}
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
-            labelsCustomMonth[data[key].govAgencyName] = data[key].govAgencyName
-            if (data[key].govAgencyName !== '') {
-              if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
-                monthData[data[key].govAgencyName].push({
-                  month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
-                })
-              } else {
-                monthData[data[key].govAgencyName] = []
-                monthData[data[key].govAgencyName].push({
-                  month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
-                })
-              }
-            }
+            labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
           }
         }
       }
-      let dataOfLine = {}
-      for (let key in monthData) {
+      let labelOfLine = []
+      for (let key in labelsCustomMonth) {
+        labelOfLine.push(key)
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
           backgroundColor: 'transparent',
           data: []
         }
-        for (let keyArray in monthData[key]) {
-          lineProcessData.data.push(monthData[key][keyArray].total)
-        }
+        lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
-      vm.chartOptionsBar.xaxis.categories = Object.values(labelsCustomMonth)
+      vm.chartOptionsBar.xaxis.categories = labelOfLine
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
       for (let key in datasetsCustom) {
