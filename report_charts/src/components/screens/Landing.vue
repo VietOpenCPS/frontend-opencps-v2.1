@@ -711,9 +711,8 @@ export default {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
           backgroundColor: 'transparent',
-          data: []
+          data: labelsCustomMonth[key]
         }
-        lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
      let colorDK = []
@@ -722,6 +721,7 @@ export default {
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
+      console.log('seriesChartBarData', seriesChartBarData)
       vm.seriesChartBar = [{
         data: seriesChartBarData
       }]
