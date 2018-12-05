@@ -290,7 +290,10 @@ export default {
         }
       }
     },
-    seriesChartBar: [],
+    seriesChartBar: [{
+      name: 'series-1',
+      data: [30]
+    }],
     chartOptionsBarTotal: {
       plotOptions: {
         bar: {
@@ -720,7 +723,7 @@ export default {
         })
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      vm.seriesChartBar = seriesChartBarData
+      // vm.seriesChartBar = seriesChartBarData
       vm.reloadBar = false
       vm.chartOptionsBar = {
         plotOptions: {
