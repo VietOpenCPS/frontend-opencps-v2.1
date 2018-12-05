@@ -305,7 +305,7 @@ export default {
       chart: {
         stacked: true
       },
-      colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024', '#69d2e7'],
+      colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024'],
       stroke: {
         width: 1,
         colors: ['#fff']
@@ -715,6 +715,7 @@ export default {
         datasetsCustom.push(lineProcessData)
       }
       vm.chartOptionsBar.xaxis.categories = vm.labelOfLine
+      /*
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
       for (let key in datasetsCustom) {
@@ -725,6 +726,7 @@ export default {
         vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = vm.seriesChartBar
+      */
       vm.reloadBar = false
       vm.chartOptionsBar = {
         plotOptions: {
