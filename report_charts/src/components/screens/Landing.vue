@@ -756,7 +756,11 @@ export default {
             colors: ['#fff']
           },
           formatter: function(val, opt) {
-            return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+            if (val > 0) {
+              return ''
+            } else {
+              return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+            }
           },
           offsetX: 0,
           dropShadow: {
