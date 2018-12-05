@@ -732,10 +732,13 @@ export default {
         vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = vm.seriesChartBar.reverse()
-      console.log('vm.chartOptionsBar.colors', vm.chartOptionsBar.colors)
       vm.reloadBar = false
       setTimeout(() => {
-        vm.$refs.barchart2.updateOptions({ colors: vm.chartOptionsBar.colors })
+        vm.$refs.barchart2.updateOptions({
+          chartOptionsBar: {
+            colors: vm.chartOptionsBar.colors
+          }
+        })
       }, 500)
     },
     hashCode (str) {
