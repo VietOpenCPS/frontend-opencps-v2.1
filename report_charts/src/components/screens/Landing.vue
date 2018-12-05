@@ -62,7 +62,7 @@
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="550"
+            <apexchart type="bar" height="350"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -243,44 +243,6 @@ export default {
       data: [0]
     }],
     chartOptionsBarTotal: {
-      chart: {
-        stacked: true,
-      },
-      plotOptions: {
-        bar: {
-          barHeight: '100%',
-          horizontal: true
-        }
-      },
-      stroke: {
-        width: 1,
-        colors: ['#fff']
-      },
-      xaxis: {
-        categories: [2008, 2009, 2010, 2011, 2012, 2013],
-        labels: {
-          formatter: function (val) {
-            return val
-          }
-        }
-      },
-      yaxis: {
-        title: {
-          text: undefined
-        }
-      },
-      tooltip: {
-        y: {
-          title: {
-            formatter: function() {
-              return ''
-            }
-          }
-        }
-      },
-      fill: {
-        opacity: 1
-      }
     },
     seriesChartBarTotal: [],
     labelOfLine: []
