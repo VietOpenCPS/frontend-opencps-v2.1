@@ -44,7 +44,7 @@ export const store = new Vuex.Store({
             userId = window.themeDisplay.getUserId()
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/users/' + userId, param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/users/113', param).then(function (response) {
           axios.get('/o/v1/opencps/users/' + userId, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
@@ -114,34 +114,27 @@ export const store = new Vuex.Store({
         var url = ''
         if (filter['className'] === 'org.opencps.usermgt.model.Employee') {
           url = '/o/rest/v2/employees/' + filter['classPK']
-          dataPutUser.append('fullName', filter.employeeFullName)
-          dataPutUser.append('telNo', Number(filter.employeeTelNo))
-          dataPutUser.append('employeeNo', filter.employeeNo)
-          dataPutUser.append('title', filter.title)
+          dataPutUser.append('fullName', filter.employeeFullName ? filter.employeeFullName : '')
+          dataPutUser.append('telNo', filter.employeeTelNo ? filter.employeeTelNo : '')
+          dataPutUser.append('employeeNo', filter.employeeNo ? filter.employeeNo : '')
+          dataPutUser.append('title', filter.title ? filter.title : '')
           let date = ''
           if (filter['employeeBirthDate']) {
             let [dayInput, monthInput, yearInput] = filter['employeeBirthDate'].split('/')
             let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
             date = new Date(newDate).getTime() ? new Date(newDate).getTime() : ''
           }
-          dataPutUser.append('birthDate', date ? date : '')
+          dataPutUser.append('birthdate', date ? date : '')
         } else if (filter['className'] === 'org.opencps.usermgt.model.Applicant') {
           url = '/o/rest/v2/applicants/' + filter['classPK']
           dataPutUser.append('applicantName', filter['applicantName'])
-          dataPutUser.append('contactTelNo', Number(filter['applicantContactTelNo']))
+          dataPutUser.append('contactTelNo', filter['applicantContactTelNo'])
           dataPutUser.append('address', filter['applicantAddress'])
           dataPutUser.append('contactEmail', filter['applicantContactTelNo'])
           dataPutUser.append('cityCode', filter['applicantCityCode'])
           dataPutUser.append('districtCode', filter['applicantDistrictCode'])
           dataPutUser.append('wardCode', filter['applicantWardCode'])
           dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
-          let date = ''
-          if (filter['applicantIdDate']) {
-            let [dayInput, monthInput, yearInput] = filter['applicantIdDate'].split('/')
-            let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
-            date = new Date(newDate).getTime() ? new Date(newDate).getTime() : ''
-          }
-          dataPutUser.append('applicantIdDate', date ? date : '')
         }
         axios.put(url, dataPutUser, param).then(result1 => {
           resolve(result1)

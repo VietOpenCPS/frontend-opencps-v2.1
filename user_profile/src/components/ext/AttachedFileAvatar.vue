@@ -51,6 +51,7 @@
             <g>
             </g>
           </svg>
+          <img v-if="!noAvatar && type === 'document'" src="https://img.icons8.com/color/100/000000/new-resume-template.png" style="width: 100px;margin: 0 auto;margin-top: 45px;enable-background:new 0 0 563.43 563.43;">
           <img v-if="noAvatar && type === 'document'" src="https://img.icons8.com/ios/100/000000/new-resume-template.png" style="width: 100px;margin: 0 auto;margin-top: 45px;enable-background:new 0 0 563.43 563.43;">
         </div>
       </div>

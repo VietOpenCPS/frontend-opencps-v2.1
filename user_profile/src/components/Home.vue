@@ -74,10 +74,7 @@
                 <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
-                  <v-text-field disabled slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['applicantIdDate'])" label="Ngày cấp" v-model="user['applicantIdDate']"></v-text-field>
-                  <v-date-picker v-model="ngayCap" no-title></v-date-picker>
-                </v-menu>
+                <v-text-field label="Ngày cấp" v-model="user['applicantIdDate']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
                 <v-textarea label="Địa chỉ" v-model="user['applicantAddress']" box clearable></v-textarea>
@@ -107,10 +104,6 @@
                 <v-text-field label="Điện thoại 💥" v-model="user['employeeTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <!-- <v-menu :close-on-content-click="true" lazy transition="fade-transition" offset-y full-width max-width="290px" min-width="290px">
-                  <v-text-field slot="activator" box append-icon="event" @blur="ngayCap = parseDate(user['employeeBirthDate'])" label="Ngày sinh" v-model="user['employeeBirthDate']"></v-text-field>
-                  <v-date-picker v-model="ngayCap" no-title></v-date-picker>
-                </v-menu> -->
                 <v-menu
                   ref="menuBirthDate"
                   :close-on-content-click="true"
@@ -335,6 +328,12 @@
               vm.wardItems = resultWards.data
             })
           }
+          if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
+            vm.user['applicantIdDate'] = vm.parseDateInput(vm.user['applicantIdDate'])
+          }
+          if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
+            vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
+          }
         })
       })
     },
@@ -430,6 +429,12 @@
           }).catch(function () {
             vm.loading = false
           })
+        }
+      },
+      parseDateInput (dateInput) {
+        if (dateInput) {
+          let date = new Date(dateInput)
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
         }
       }
     }
