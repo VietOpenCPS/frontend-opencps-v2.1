@@ -56,7 +56,7 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;">
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="1===1">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
@@ -238,123 +238,13 @@ export default {
       data: [23, 43, 54, 12, 44, 52, 32, 11]
     }],
     chartOptionsBar: {
-      plotOptions: {
-        bar: {
-          barHeight: '100%',
-          distributed: true,
-          horizontal: true,
-          dataLabels: {
-            position: 'bottom'
-          }
-        }
-      },
-      colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024', '#69d2e7'],
-      dataLabels: {
-        enabled: true,
-        textAnchor: 'start',
-        style: {
-          colors: ['#fff']
-        },
-        formatter: function(val, opt) {
-          if (val > 0) {
-            return ''
-          } else {
-            return opt.w.globals.labels[opt.seriesIndex] + ":  " + val
-          }
-        },
-        offsetX: 0,
-        dropShadow: {
-          enabled: true
-        }
-      },
-      stroke: {
-        width: 1,
-        colors: ['#fff']
-      },
-      xaxis: {
-        categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'India'],
-      },
-      yaxis: {
-        labels: {
-          show: false
-        }
-      },
-      tooltip: {
-        theme: 'dark',
-        x: {
-          show: false
-        },
-        y: {
-          title: {
-            formatter: function() {
-              return ''
-            }
-          }
-        }
-      }
     },
     seriesChartBar: [{
-      data: [0,0,0]
+      data: [0]
     }],
     chartOptionsBarTotal: {
-      plotOptions: {
-        bar: {
-          barHeight: '100%',
-          horizontal: true,
-          type: 'bar'
-        },
-      },
-      chart: {
-        stacked: true
-      },
-      colors: ['#33b2df', '#546E7A', '#d4526e', '#13d8aa', '#A5978B', '#2b908f', '#f9a3a4', '#90ee7e', '#f48024'],
-      stroke: {
-        width: 1,
-        colors: ['#fff']
-      },
-      xaxis: {
-        categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
-        labels: {
-          formatter: function(val) {
-            return val + "K"
-          }
-        }
-      },
-      yaxis: {
-        title: {
-          text: undefined
-        }
-      },
-      tooltip: {
-        theme: 'dark',
-        x: {
-          show: false
-        },
-        y: {
-          title: {
-            formatter: function() {
-              return ''
-            }
-          }
-        }
-      }
     },
-    seriesChartBarTotal: [{
-      name: 'Marine Sprite',
-      data: [44, 55, 41, 37, 22, 43, 21]
-    },{
-      name: 'Striking Calf',
-      data: [53, 32, 33, 52, 13, 43, 32]
-    },{
-      name: 'Tank Picture',
-      data: [12, 17, 11, 9, 15, 11, 20]
-    },{
-      name: 'Bucket Slope',
-      data: [9, 7, 5, 8, 6, 9, 4]
-    },{
-      name: 'Reborn Kid',
-      data: [25, 12, 19, 32, 25, 24, 10]
-    }],
+    seriesChartBarTotal: [],
     labelOfLine: []
   }),
   computed: {
@@ -696,11 +586,23 @@ export default {
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let lineDataMonth = {}
+      let undueCountData = []
+      let overdueCountData = []
+      let waitingCountData = []
+      let betimesCountData = []
+      let ontimeCountData = []
+      let overtimeCountData = []
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+            undueCountData.push(data[key].undueCount)
+            overdueCountData.push(data[key].overdueCount)
+            waitingCountData.push(data[key].waitingCount)
+            betimesCountData.push(data[key].betimesCount)
+            ontimeCountData.push(data[key].ontimeCount)
+            overtimeCountData.push(data[key].overtimeCount)
           }
         }
       }
@@ -760,12 +662,83 @@ export default {
           width: 1,
           colors: ['#fff']
         },
+        grid: {
+          borderColor: '#e7e7e7',
+          row: {
+            colors: ['#f3f3f3', 'transparent'],
+            opacity: 0.5
+          }
+        },
         xaxis: {
           categories: vm.labelOfLine,
         },
         yaxis: {
           labels: {
             show: false
+          }
+        },
+        tooltip: {
+          theme: 'dark',
+          x: {
+            show: false
+          },
+          y: {
+            title: {
+              formatter: function() {
+                return ''
+              }
+            }
+          }
+        }
+      }
+      // report 3
+
+      vm.seriesChartBarTotal = [{
+        name: 'Đang xử lý còn hạn',
+        data: undueCountData
+      },{
+        name: 'Đang xử lý quá hạn',
+        data: overdueCountData
+      },{
+        name: 'Đang bổ sung điều kiện',
+        data: waitingCountData
+      },{
+        name: 'Đã giải quyết sớm hạn',
+        data: betimesCountData
+      },{
+        name: 'Đã giải quyết đúng hạn',
+        data: ontimeCountData
+      },{
+        name: 'Đã giải quyết quá hạn',
+        data: overtimeCountData
+      }]
+      vm.chartOptionsBarTotal = {
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            horizontal: true,
+            type: 'bar'
+          },
+        },
+        chart: {
+          stacked: true
+        },
+        colors: ['#A5D6A7', '#EF9A9A', '#78909C', '#90CAF9', '#1565C0', '#C62828'],
+        stroke: {
+          width: 1,
+          colors: ['#fff']
+        },
+        xaxis: {
+          categories: labelOfLine,
+          labels: {
+            formatter: function(val) {
+              return val
+            }
+          }
+        },
+        yaxis: {
+          title: {
+            text: undefined
           }
         },
         tooltip: {
