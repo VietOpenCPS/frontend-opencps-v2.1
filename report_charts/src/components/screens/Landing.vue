@@ -702,6 +702,7 @@ export default {
           }
         }
       }
+      console.log('labelsCustomMonth', labelsCustomMonth)
       let labelOfLine = []
       for (let key in labelsCustomMonth) {
         labelOfLine.push(key)
