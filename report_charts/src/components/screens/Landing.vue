@@ -76,7 +76,7 @@
         <content-placeholders-heading />
         <content-placeholders-img />
       </content-placeholders>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="1===1">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ năm {{year}}
@@ -126,6 +126,7 @@ export default {
     noReportData: false,
     isCallBack: true,
     reloadPie: true,
+    reloadBar: true,
     reloadLine: true,
     showTable: false,
     agencyLists: [],
@@ -522,6 +523,7 @@ export default {
       }
       vm.reloadPie = false
       vm.showTable = false
+      vm.reloadBar = false
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
@@ -530,6 +532,7 @@ export default {
           vm.noReportData = false
           vm.agencyLists = result
         }
+        vm.doProcessReport2(vm.agencyLists)
         vm.reloadPie = true
         for (let key in vm.agencyLists) {
           let currentData = vm.agencyLists[key]
@@ -636,7 +639,6 @@ export default {
     },
     doProcessReport1 (data) {
       let vm = this
-      console.log('data', data)
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let monthData = {}
@@ -647,7 +649,6 @@ export default {
           if (data[key].month > 0) {
             labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
             if (data[key].govAgencyName !== '') {
-              console.log('X monthData', monthData)
               if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
@@ -664,7 +665,6 @@ export default {
           }
         }
       }
-      console.log('monthData', monthData)
       let dataOfLine = {}
       for (let key in monthData) {
         let lineProcessData = {
@@ -681,7 +681,6 @@ export default {
       vm.chartOptions.xaxis.categories = Object.values(labelsCustomMonth)
       vm.chartOptions.colors = []
       vm.seriesChart = []
-      console.log('datasetsCustom', datasetsCustom)
       for (let key in datasetsCustom) {
         vm.seriesChart.push({
           name: datasetsCustom[key]['label'],
@@ -690,6 +689,59 @@ export default {
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
+    },
+    doProcessReport2 (data) {
+      let vm = this
+      let datasetsCustom = []
+      let labelsCustomMonth = {}
+      let monthData = {}
+      let lineDataMonth = {}
+      for (let key in data) {
+        if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
+        } else {
+          if (data[key].month > 0) {
+            labelsCustomMonth[data[key].govAgencyName] = data[key].govAgencyName
+            if (data[key].govAgencyName !== '') {
+              if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
+                monthData[data[key].govAgencyName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              } else {
+                monthData[data[key].govAgencyName] = []
+                monthData[data[key].govAgencyName].push({
+                  month: data[key].month,
+                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                })
+              }
+            }
+          }
+        }
+      }
+      let dataOfLine = {}
+      for (let key in monthData) {
+        let lineProcessData = {
+          label: key,
+          borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
+          backgroundColor: 'transparent',
+          data: []
+        }
+        for (let keyArray in monthData[key]) {
+          lineProcessData.data.push(monthData[key][keyArray].total)
+        }
+        datasetsCustom.push(lineProcessData)
+      }
+      vm.chartOptionsBar.xaxis.categories = Object.values(labelsCustomMonth)
+      vm.chartOptionsBar.colors = []
+      vm.seriesChartBar = []
+      for (let key in datasetsCustom) {
+        vm.seriesChartBar.push({
+          name: datasetsCustom[key]['label'],
+          data: datasetsCustom[key]['data'].reverse()
+        })
+        vm.chartOptionsBar.colors.push(datasetsCustom[key]['borderColor'])
+      }
+      vm.reloadBar = false
     },
     hashCode (str) {
       var hash = 0
