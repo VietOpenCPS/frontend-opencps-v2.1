@@ -255,6 +255,9 @@ export default {
         style: {
           colors: ['#fff']
         },
+        formatter: function(val, opt) {
+          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+        },
         offsetX: 0,
         dropShadow: {
           enabled: true
@@ -519,7 +522,7 @@ export default {
       }
       vm.reloadPie = false
       vm.showTable = false
-      vm.reloadBar = false
+      vm.reloadBar = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
@@ -699,7 +702,6 @@ export default {
         }
       }
       labelsCustomMonth = labelsCustomMonth
-      console.log('labelsCustomMonth.reverse()', labelsCustomMonth)
       for (let key in labelsCustomMonth) {
         vm.labelOfLine.push(key)
         let lineProcessData = {
@@ -711,6 +713,7 @@ export default {
         lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
+      console.log('vm.labelOfLine.reverse()', vm.labelOfLine.reverse())
       vm.chartOptionsBar.xaxis.categories = vm.labelOfLine.reverse()
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
