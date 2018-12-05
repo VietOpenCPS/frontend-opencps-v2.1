@@ -256,8 +256,8 @@ export default {
           colors: ['#fff']
         },
         formatter: function(val, opt) {
-          console.log('opt.w.globals.labels', this.labelOfLine)
-          return this.labelOfLine[opt.dataPointIndex] + ":  " + val
+          console.log('opt.w.globals.labels', opt)
+          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
         },
         offsetX: 0,
         dropShadow: {
@@ -720,6 +720,9 @@ export default {
       vm.seriesChartBar = []
       console.log('datasetsCustom', datasetsCustom)
       for (let key in datasetsCustom) {
+        console.log('datasetsCustom key', datasetsCustom)
+        console.log('datasetsCustom', datasetsCustom[key])
+        console.log('datasetsCustom val', datasetsCustom[key]['borderColor'])
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
           data: datasetsCustom[key]['data'].reverse()
