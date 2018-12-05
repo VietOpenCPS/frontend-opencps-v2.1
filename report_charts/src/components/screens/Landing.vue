@@ -6,28 +6,26 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex xs6 sm2 class="px-2">
-              <v-select
+              <v-autocomplete
                 :items="years"
                 v-model="year"
-                autocomplete
                 item-text="name"
                 item-value="value"
                 :hide-selected="true"
                 @change="changeYear"
                 >
-              </v-select>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs6 sm2 class="px-2">
-              <v-select
+              <v-autocomplete
                 :items="months"
                 v-model="month"
-                autocomplete
                 item-text="name"
                 item-value="value"
                 :hide-selected="true"
                 @change="changeYear"
                 >
-              </v-select>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
               <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
@@ -258,8 +256,8 @@ export default {
           colors: ['#fff']
         },
         formatter: function(val, opt) {
-          console.log('opt.w.globals.labels', opt.w.globals.labels)
-          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+          console.log('opt.w.globals.labels', this.labelOfLine)
+          return this.labelOfLine[opt.dataPointIndex] + ":  " + val
         },
         offsetX: 0,
         dropShadow: {
@@ -354,7 +352,8 @@ export default {
     },{
       name: 'Reborn Kid',
       data: [25, 12, 19, 32, 25, 24, 10]
-    }]
+    }],
+    labelOfLine: []
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -703,12 +702,10 @@ export default {
           }
         }
       }
-      console.log('labelsCustomMonth', labelsCustomMonth)
-      let labelOfLine = []
+      labelsCustomMonth = labelsCustomMonth.reverse()
+      console.log('labelsCustomMonth.reverse()', labelsCustomMonth)
       for (let key in labelsCustomMonth) {
-        labelOfLine.push(key)
-        console.log('label', key)
-        console.log('borderColor', vm.intToRGB(vm.hashCode(key)))
+        vm.labelOfLine.push(key)
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -718,14 +715,11 @@ export default {
         lineProcessData.data.push(labelsCustomMonth[key])
         datasetsCustom.push(lineProcessData)
       }
-      vm.chartOptionsBar.xaxis.categories = labelOfLine.reverse()
+      vm.chartOptionsBar.xaxis.categories = vm.labelOfLine
       vm.chartOptionsBar.colors = []
       vm.seriesChartBar = []
       console.log('datasetsCustom', datasetsCustom)
       for (let key in datasetsCustom) {
-        console.log('datasetsCustom key', datasetsCustom)
-        console.log('datasetsCustom', datasetsCustom[key])
-        console.log('datasetsCustom val', datasetsCustom[key]['borderColor'])
         vm.seriesChartBar.push({
           name: datasetsCustom[key]['label'],
           data: datasetsCustom[key]['data'].reverse()
