@@ -727,6 +727,12 @@ export default {
       }
       vm.seriesChartBar = vm.seriesChartBar
       */
+     for (let key in datasetsCustom) {
+        vm.seriesChartBar.push({
+          name: datasetsCustom[key]['label'],
+          data: datasetsCustom[key]['data']
+        })
+      }
       vm.reloadBar = false
       vm.chartOptionsBar = {
         plotOptions: {
