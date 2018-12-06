@@ -249,3 +249,6 @@ body .wrap_report .v-card__title.headline > a {
     font-size: 13px;
     text-decoration: underline;
 }
+body .wrap_report .v-card__title.headline {
+    font-size: 14px!important;
+}
