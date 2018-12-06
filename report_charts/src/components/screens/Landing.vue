@@ -853,6 +853,11 @@ export default {
       }
       vm.labelOfLine = []
       for (let key in labelsCustomMonth) {
+        if (key === '') {
+          vm.labelOfLine.push('Toàn bộ lĩnh vực')
+        } else {
+          vm.labelOfLine.push(key)
+        }
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -868,10 +873,10 @@ export default {
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
        console.log('datasetsCustom[key]', datasetsCustom[key])
-        vm.labelOfLine.push(datasetsCustom[key]['label'])
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
+      console.log('seriesChartBarData', seriesChartBarData)
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
