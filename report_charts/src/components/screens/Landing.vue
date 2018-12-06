@@ -860,7 +860,6 @@ export default {
       }
       vm.labelOfLine = []
       for (let key in labelsCustomMonth) {
-        vm.labelOfLine.push(key)
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -870,19 +869,19 @@ export default {
         datasetsCustom.push(lineProcessData)
       }
       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
-        if (vm.labelOfLine.length > 1) {
-          delete vm.labelOfLine[0]
+        if (datasetsCustom.length > 1) {
           delete datasetsCustom[0]
         }
       }
-      console.log('labelOfLine: ', vm.labelOfLine)
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
+       vm.labelOfLine.push(datasetsCustom[key]['label'])
        console.log('custom: ', datasetsCustom[key])
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
+      console.log('labelOfLine: ', vm.labelOfLine)
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
