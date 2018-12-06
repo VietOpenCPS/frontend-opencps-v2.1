@@ -862,8 +862,10 @@ export default {
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
        console.log('datasetsCustom', datasetsCustom)
-        seriesChartBarData.push(datasetsCustom[key]['data'])
-        colorDK.push(datasetsCustom[key]['borderColor'])
+       if (datasetsCustom[key]['label'] !== '' && datasetsCustom[key]['label'] !== undefined) {
+          seriesChartBarData.push(datasetsCustom[key]['data'])
+          colorDK.push(datasetsCustom[key]['borderColor'])
+       }
       }
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
