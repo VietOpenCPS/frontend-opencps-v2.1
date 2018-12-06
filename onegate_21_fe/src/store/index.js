@@ -2021,10 +2021,10 @@ export const store = new Vuex.Store({
           }
           let formData = new URLSearchParams()
           formData.append('actionCode', filter.actionCode ? filter.actionCode : '')
-          formData.append('payment', filter.payment?JSON.stringify(filter.payment):null)
-          formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):null)
-          formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):null)
-          formData.append('payload', filter.payload?JSON.stringify(filter.payload):null)
+          formData.append('payment', filter.payment?JSON.stringify(filter.payment):'')
+          formData.append('assignUsers', filter.toUsers?JSON.stringify(filter.toUsers):'')
+          formData.append('actionNote', filter.userNote?JSON.stringify(filter.userNote):'')
+          formData.append('payload', filter.payload?JSON.stringify(filter.payload):'')
           axios.post(state.initData.getNextAction + '/' + filter.dossierId + '/actions', formData, param).then(function (response) {
             store.dispatch('getActiveGetCounter', !state.activeGetCounter)
             let serializable = response.data

@@ -94,6 +94,7 @@ export default {
       var vm = this
       let query = vm.$router.history.current.query
       let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
+      let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
       if (dossierId) {
         vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
@@ -109,6 +110,15 @@ export default {
           }
           vm.$store.dispatch('putPayments', filter).then(result => {
             vm.dossierDetail['paymentFee'] = result.paymentFee
+            if (actionCode) {
+              let fiter2 = {
+                dossierId: dossierId,
+                actionCode: actionCode
+              }
+              vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
+              }).catch(function () {
+              })
+            }
           }).catch(reject => {
           })
         })
