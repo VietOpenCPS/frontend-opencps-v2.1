@@ -451,6 +451,7 @@ export default {
       let currentQuerys = newRoute.query
       vm.reportGovName = ''
       vm.govAgencyCode = ''
+      console.log('currentQuerys', currentQuerys)
       if (currentQuerys.hasOwnProperty('year')) {
         vm.year = currentQuerys.year + ''
       } else {
@@ -671,6 +672,7 @@ export default {
     changeMonth (item) {
       let vm = this
       vm.month = item
+      console.log('changeMonth', vm.year)
       vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {
