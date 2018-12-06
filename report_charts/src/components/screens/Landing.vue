@@ -76,7 +76,7 @@
         </v-card>
       </v-flex>
       <v-flex xs12 sm4 class="mt-4 ml-2 mr-2">
-        <v-card class="wrap_report" style="border-radius: 0;">
+        <v-card class="wrap_report mx-2" style="border-radius: 0;">
           <v-card-title class="headline">
             Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
@@ -85,19 +85,15 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-layout row wrap>
-        <v-card class="wrap_report layout row wrap" style="border-radius: 0;">
-          <v-card-title class="headline">
-            Chi tiết tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
-          </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0">
-            <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '') || (!chartView && item.domainName !== '')) && reloadPie">
-              <pie-chart-report :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report>
-            </v-flex>
-          </v-card-text>
-        </v-card>
-      </v-layout>
-      
+      <v-card class="wrap_report" style="border-radius: 0;">
+        <v-card-text class="py-2 px-1 layout row wrap" style="
+            background: #fafafa;
+        ">
+          <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '') || (!chartView && item.domainName !== '')) && reloadPie">
+            <pie-chart-report :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report>
+          </v-flex>
+        </v-card-text>
+      </v-card>
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
