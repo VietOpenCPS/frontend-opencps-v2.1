@@ -89,21 +89,6 @@ export default {
     })
   },
   methods: {
-    toDetailReport () {
-      let vm = this
-      let currentParams = vm.$router.history.current.params
-      let currentQuerys = vm.$router.history.current.query
-      vm.$router.push({
-        path: '/bao-cao/' + currentParams.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          group: vm.group,
-          reportGovName: vm.item.govAgencyName,
-          govAgencyCode: vm.item.govAgencyCode
-        }
-      })
-    }
   }
 }
 </script>
