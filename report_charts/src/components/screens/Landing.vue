@@ -861,6 +861,7 @@ export default {
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
+       console.log('datasetsCustom', datasetsCustom)
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
