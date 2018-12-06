@@ -872,21 +872,16 @@ export default {
       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
         if (vm.labelOfLine.length > 1) {
           delete vm.labelOfLine[0]
+          delete datasetsCustom[0]
         }
       }
+      console.log('labelOfLine: ', vm.labelOfLine)
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
        console.log('custom: ', datasetsCustom[key])
-       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
-          if (vm.labelOfLine.includes(datasetsCustom[key]['label'])) {
-            seriesChartBarData.push(datasetsCustom[key]['data'])
-            colorDK.push(datasetsCustom[key]['borderColor'])
-          }
-        } else {
-          seriesChartBarData.push(datasetsCustom[key]['data'])
-          colorDK.push(datasetsCustom[key]['borderColor'])
-        }
+        seriesChartBarData.push(datasetsCustom[key]['data'])
+        colorDK.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
