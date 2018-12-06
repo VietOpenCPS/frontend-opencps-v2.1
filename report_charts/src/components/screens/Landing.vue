@@ -837,7 +837,11 @@ export default {
         if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
-            labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+            if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
+              labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+            } else {
+              labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+            }
             undueCountData.push(data[key].undueCount)
             overdueCountData.push(data[key].overdueCount)
             waitingCountData.push(data[key].waitingCount)
@@ -857,9 +861,13 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
+       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '') {
+          delete datasetsCustom[0]
+        }
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
+       console.log('datasetsCustom[key]', datasetsCustom[key])
         vm.labelOfLine.push(datasetsCustom[key]['label'])
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
