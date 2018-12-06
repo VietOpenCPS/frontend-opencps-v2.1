@@ -130,7 +130,7 @@
         <content-placeholders-heading />
         <content-placeholders-img />
       </content-placeholders>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadLine">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadLine" id="lineChartID">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ năm {{year}}
