@@ -80,7 +80,7 @@
           <v-card-title class="headline">
             Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0" v-if="showTable">
+          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
             <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
           </v-card-text>
         </v-card>
@@ -319,7 +319,6 @@ export default {
     reloadLine: true,
     showTable: false,
     agencyLists: [],
-    agencyListsTotal: [],
     agencyListsMonth: [],
     group: '',
     years: [
@@ -437,7 +436,8 @@ export default {
     chartOptionsBarTotal: {
     },
     seriesChartBarTotal: [],
-    labelOfLine: []
+    labelOfLine: [],
+    showTableTotal: false
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -482,71 +482,26 @@ export default {
         vm.$store.dispatch('getLevelList').then(function (result) {
           vm.levelList = result
         })
-        vm.showTable = false
+        vm.showTableTotal = false
         vm.$store.dispatch('getReportTotal').then(function (result) {
-          vm.totalCounter['total_3'] = 0
-          vm.totalCounter['total_4'] = 0
-          vm.totalCounter['total_5'] = 0
-          vm.totalCounter['total_6'] = 0
-          vm.totalCounter['total_7'] = 0
-          vm.totalCounter['total_8'] = 0
-          vm.totalCounter['total_9'] = 0
-          vm.totalCounter['total_10'] = 0
-          vm.totalCounter['total_11'] = 0
-          vm.totalCounter['total_12'] = 0
-          vm.totalCounter['total_13'] = 0
-          vm.totalCounter['total_14'] = 0
-          vm.totalCounter['total_15'] = 0
-          vm.totalCounter['total_16'] = 0
-          vm.totalCounter['total_17'] = 0
-          vm.totalCounter['total_18'] = 0
-          vm.totalCounter['total_19'] = 0
-          vm.totalCounter['total_20'] = 0
-          vm.totalCounter['total_21'] = 0
-          vm.totalCounter['total_22'] = 0
-          vm.totalCounter['total_23'] = 0
-          vm.totalCounter['total_24'] = 0
-          vm.totalCounter['total_25'] = 0
           let agencyListsTotal = result
-          for (let key in vm.agencyLists) {
+          for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
             if (currentData.domainName === '' && currentData.domainName === '') {
-              vm.totalCounter['total_3'] = currentData.totalCount
-              vm.totalCounter['total_4'] = currentData.deniedCount
-              vm.totalCounter['total_5'] = currentData.cancelledCount
-              vm.totalCounter['total_6'] = currentData.processCount
-              vm.totalCounter['total_7'] = currentData.remainingCount
-              vm.totalCounter['total_8'] = currentData.receivedCount
-              vm.totalCounter['total_9'] = currentData.onegateCount
-              vm.totalCounter['total_10'] = currentData.onlineCount
-              vm.totalCounter['total_11'] = currentData.releaseCount
-              vm.totalCounter['total_12'] = currentData.betimesCount
-              vm.totalCounter['total_13'] = currentData.ontimeCount
-              vm.totalCounter['total_14'] = currentData.overtimeCount
-              vm.totalCounter['total_15'] = currentData.overtimeInside
-              vm.totalCounter['total_16'] = currentData.overtimeOutside
-              vm.totalCounter['total_17'] = currentData.doneCount
-              vm.totalCounter['total_18'] = currentData.releasingCount
-              vm.totalCounter['total_19'] = currentData.unresolvedCount
-              vm.totalCounter['total_20'] = currentData.processingCount
-              vm.totalCounter['total_21'] = currentData.undueCount
-              vm.totalCounter['total_22'] = currentData.overdueCount
-              vm.totalCounter['total_23'] = currentData.outsideCount
-              vm.totalCounter['total_24'] = currentData.waitingCount
-              vm.totalCounter['total_25'] = currentData.ontimePercentage
-              vm.showTable = true
+              vm.itemTotal = {
+                undueCount: currentData.undueCount,
+                overdueCount: vm.totalCounter['total_22'],
+                waitingCount: vm.totalCounter['total_24'],
+                betimesCount: vm.totalCounter['total_12'],
+                ontimeCount: vm.totalCounter['total_13'],
+                overtimeCount: vm.totalCounter['total_14'],
+                ontimePercentage: vm.totalCounter['total_25']
+              }
+              vm.showTableTotal = true
               break
             }
           }
-          vm.itemTotal = {
-            undueCount: vm.totalCounter['total_21'],
-            overdueCount: vm.totalCounter['total_22'],
-            waitingCount: vm.totalCounter['total_24'],
-            betimesCount: vm.totalCounter['total_12'],
-            ontimeCount: vm.totalCounter['total_13'],
-            overtimeCount: vm.totalCounter['total_14'],
-            ontimePercentage: vm.totalCounter['total_25']
-          }
+          
         })
       }
     })
@@ -667,6 +622,31 @@ export default {
       }
       vm.reloadPie = false
       vm.reloadBar = true
+
+      vm.totalCounter['total_3'] = 0
+      vm.totalCounter['total_4'] = 0
+      vm.totalCounter['total_5'] = 0
+      vm.totalCounter['total_6'] = 0
+      vm.totalCounter['total_7'] = 0
+      vm.totalCounter['total_8'] = 0
+      vm.totalCounter['total_9'] = 0
+      vm.totalCounter['total_10'] = 0
+      vm.totalCounter['total_11'] = 0
+      vm.totalCounter['total_12'] = 0
+      vm.totalCounter['total_13'] = 0
+      vm.totalCounter['total_14'] = 0
+      vm.totalCounter['total_15'] = 0
+      vm.totalCounter['total_16'] = 0
+      vm.totalCounter['total_17'] = 0
+      vm.totalCounter['total_18'] = 0
+      vm.totalCounter['total_19'] = 0
+      vm.totalCounter['total_20'] = 0
+      vm.totalCounter['total_21'] = 0
+      vm.totalCounter['total_22'] = 0
+      vm.totalCounter['total_23'] = 0
+      vm.totalCounter['total_24'] = 0
+      vm.totalCounter['total_25'] = 0
+      vm.showTable = false
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result === null || result === undefined || result === 'undefined') {
           vm.noReportData = true
@@ -676,6 +656,36 @@ export default {
           vm.agencyLists = result
         }
         vm.doProcessReport2(vm.agencyLists)
+        for (let key in vm.agencyLists) {
+          let currentData = vm.agencyLists[key]
+          if (currentData.domainName === '' && currentData.domainName === '') {
+            vm.totalCounter['total_3'] = currentData.totalCount
+            vm.totalCounter['total_4'] = currentData.deniedCount
+            vm.totalCounter['total_5'] = currentData.cancelledCount
+            vm.totalCounter['total_6'] = currentData.processCount
+            vm.totalCounter['total_7'] = currentData.remainingCount
+            vm.totalCounter['total_8'] = currentData.receivedCount
+            vm.totalCounter['total_9'] = currentData.onegateCount
+            vm.totalCounter['total_10'] = currentData.onlineCount
+            vm.totalCounter['total_11'] = currentData.releaseCount
+            vm.totalCounter['total_12'] = currentData.betimesCount
+            vm.totalCounter['total_13'] = currentData.ontimeCount
+            vm.totalCounter['total_14'] = currentData.overtimeCount
+            vm.totalCounter['total_15'] = currentData.overtimeInside
+            vm.totalCounter['total_16'] = currentData.overtimeOutside
+            vm.totalCounter['total_17'] = currentData.doneCount
+            vm.totalCounter['total_18'] = currentData.releasingCount
+            vm.totalCounter['total_19'] = currentData.unresolvedCount
+            vm.totalCounter['total_20'] = currentData.processingCount
+            vm.totalCounter['total_21'] = currentData.undueCount
+            vm.totalCounter['total_22'] = currentData.overdueCount
+            vm.totalCounter['total_23'] = currentData.outsideCount
+            vm.totalCounter['total_24'] = currentData.waitingCount
+            vm.totalCounter['total_25'] = currentData.ontimePercentage
+            vm.showTable = true
+            break
+          }
+        }
         vm.reloadPie = true
       })
       setTimeout(() => {
