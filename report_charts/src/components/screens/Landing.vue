@@ -88,6 +88,7 @@
       <v-card class="wrap_report" style="border-radius: 0;">
         <v-card-text class="py-2 px-1 layout row wrap" style="
             background: #fafafa;
+            margin: 0;
         ">
           <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '') || (!chartView && item.domainName !== '')) && reloadPie">
             <pie-chart-report :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report>
