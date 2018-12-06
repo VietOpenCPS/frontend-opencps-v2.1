@@ -877,8 +877,16 @@ export default {
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
-        seriesChartBarData.push(datasetsCustom[key]['data'])
-        colorDK.push(datasetsCustom[key]['borderColor'])
+       console.log('custom: ', datasetsCustom[key])
+       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
+          if (vm.labelOfLine.includes(datasetsCustom[key]['label'])) {
+            seriesChartBarData.push(datasetsCustom[key]['data'])
+            colorDK.push(datasetsCustom[key]['borderColor'])
+          }
+        } else {
+          seriesChartBarData.push(datasetsCustom[key]['data'])
+          colorDK.push(datasetsCustom[key]['borderColor'])
+        }
       }
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
