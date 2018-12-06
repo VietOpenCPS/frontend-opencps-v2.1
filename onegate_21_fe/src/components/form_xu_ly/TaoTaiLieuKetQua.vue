@@ -347,245 +347,245 @@
           })
         }
       },
-    onDeleteAttackFiles (item) {
-      var vm = this
-      console.log('delete')
-      let x = confirm('Bạn có muốn xóa toàn bộ file trong thành phần hồ sơ này?')
-      if (x) {
-        vm.dossierFilesItems.forEach(val => {
-          if (val.dossierPartNo === item.partNo) {
-            val['dossierId'] = vm.detailDossier.dossierId
-            vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
-              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId)
-            }).catch(function (xhr) {
-            })
-          }
-        })
-      }
-    },
-    pickFile (item) {
-      var vm = this
-      vm.stateAddFileOther = false
-      document.getElementById('file' + item.partNo).click()
-    },
-    onUploadSingleFile (e, data) {
-      var vm = this
-      vm.dossierTemplatesItemSelect = data
-      vm.progressUploadPart = data.partNo
-      data['dossierId'] = vm.detailDossier.dossierId
-      data['dossierTemplateNo'] = vm.detailDossier.dossierTemplateNo
-      vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-        vm.progressUploadPart = ''
-        vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
-          vm.dossierFilesItems = result
-        })
-      }).catch(function (xhr) {
-        vm.progressUploadPart = ''
-      })
-    },
-    loadAlpcaForm (data) {
-      var vm = this
-      //
-      vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
-      vm.pstEl = vm.endEl = 0
-      setTimeout(function () {
-        if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
-          vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
-          vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
-          $(window).scroll(function () {
-            vm.pstFixed = $(window).scrollTop()
+      onDeleteAttackFiles (item) {
+        var vm = this
+        console.log('delete')
+        let x = confirm('Bạn có muốn xóa toàn bộ file trong thành phần hồ sơ này?')
+        if (x) {
+          vm.dossierFilesItems.forEach(val => {
+            if (val.dossierPartNo === item.partNo) {
+              val['dossierId'] = vm.detailDossier.dossierId
+              vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
+                vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId)
+              }).catch(function (xhr) {
+              })
+            }
           })
         }
-      }, 500)
-      //
-      var fileFind = vm.dossierFilesItems.find(itemFile => {
-        return itemFile.dossierPartNo === data.partNo && itemFile.eForm
-      })
-      if (fileFind) {
-        fileFind['id'] = vm.id
-        vm.$store.dispatch('loadAlpcaForm', fileFind)
-      } else {
-        vm.createFiles.forEach(val => {
-          if (val.eForm && data.partNo === val.partNo) {
-            val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
-            vm.showAlpacaJSFORM(val)
-          }
+      },
+      pickFile (item) {
+        var vm = this
+        vm.stateAddFileOther = false
+        document.getElementById('file' + item.partNo).click()
+      },
+      onUploadSingleFile (e, data) {
+        var vm = this
+        vm.dossierTemplatesItemSelect = data
+        vm.progressUploadPart = data.partNo
+        data['dossierId'] = vm.detailDossier.dossierId
+        data['dossierTemplateNo'] = vm.detailDossier.dossierTemplateNo
+        vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
+          vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+            vm.dossierFilesItems = result
+          })
+        }).catch(function (xhr) {
+          vm.progressUploadPart = ''
         })
-      }
-    },
-    deleteSingleFileEform (item, index) {
-      var vm = this
-      let x = confirm('Bạn có muốn xóa?')
-      if (x) {
+      },
+      loadAlpcaForm (data) {
+        var vm = this
+        //
+        vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+        vm.pstEl = vm.endEl = 0
+        setTimeout(function () {
+          if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
+            vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
+            vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
+            $(window).scroll(function () {
+              vm.pstFixed = $(window).scrollTop()
+            })
+          }
+        }, 500)
+        //
+        var fileFind = vm.dossierFilesItems.find(itemFile => {
+          return itemFile.dossierPartNo === data.partNo && itemFile.eForm
+        })
+        if (fileFind) {
+          fileFind['id'] = vm.id
+          vm.$store.dispatch('loadAlpcaForm', fileFind)
+        } else {
+          vm.createFiles.forEach(val => {
+            if (val.eForm && data.partNo === val.partNo) {
+              val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
+              vm.showAlpacaJSFORM(val)
+            }
+          })
+        }
+      },
+      deleteSingleFileEform (item, index) {
+        var vm = this
+        let x = confirm('Bạn có muốn xóa?')
+        if (x) {
+          vm.dossierFilesItems.forEach(file => {
+            if (file.dossierPartNo === item.partNo && file.eForm) {
+              file['dossierId'] = vm.detailDossier.dossierId
+              vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
+                console.log('success!')
+                vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+                  vm.dossierFilesItems = result
+                  var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+                    return file.dossierPartNo === item.partNo && !file.eForm
+                  })
+                  if (fileViewsTemp) {
+                    vm.fileViews = fileViewsTemp
+                  }
+                  // var changeCreateFile = {
+                  //   createFiles: []
+                  // }
+                  // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
+                  //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
+                  //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
+                  //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
+                  //     }
+                  //   }
+                  // }
+                  // vm.$store.commit('setDataCreateFile', changeCreateFile)
+                })
+              })
+            }
+          })
+          vm.createFiles[index].daKhai = false
+        }
+      },
+      previewFileEfom (item, index) {
+        var vm = this
         vm.dossierFilesItems.forEach(file => {
           if (file.dossierPartNo === item.partNo && file.eForm) {
             file['dossierId'] = vm.detailDossier.dossierId
-            vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
-              console.log('success!')
-              vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
-                vm.dossierFilesItems = result
-                var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-                  return file.dossierPartNo === item.partNo && !file.eForm
+            vm.dialogPDFLoading = true
+            vm.dialogPDF = true
+            file['id'] = vm.id
+            vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+              setTimeout(function () {
+                vm.$store.dispatch('viewFile', file).then(result => {
+                  vm.dialogPDFLoading = false
+                  document.getElementById('dialogPDFPreview' + vm.id).src = result
                 })
-                if (fileViewsTemp) {
-                  vm.fileViews = fileViewsTemp
-                }
-                // var changeCreateFile = {
-                //   createFiles: []
-                // }
-                // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
-                //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
-                //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
-                //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
-                //     }
-                //   }
-                // }
-                // vm.$store.commit('setDataCreateFile', changeCreateFile)
-              })
+              }, 1000)
+            }).catch(reject => {
+              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
             })
           }
         })
-        vm.createFiles[index].daKhai = false
-      }
-    },
-    previewFileEfom (item, index) {
-      var vm = this
-      vm.dossierFilesItems.forEach(file => {
-        if (file.dossierPartNo === item.partNo && file.eForm) {
-          file['dossierId'] = vm.detailDossier.dossierId
-          vm.dialogPDFLoading = true
-          vm.dialogPDF = true
-          file['id'] = vm.id
-          vm.$store.dispatch('putAlpacaForm', file).then(resData => {
-            setTimeout(function () {
-              vm.$store.dispatch('viewFile', file).then(result => {
-                vm.dialogPDFLoading = false
-                document.getElementById('dialogPDFPreview' + vm.id).src = result
-              })
-            }, 1000)
+      },
+      deleteSingleFile (item, index) {
+        var vm = this
+        let x = confirm('Bạn có muốn xóa?')
+        if (x) {
+          item['dossierId'] = vm.detailDossier.dossierId
+          vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
+            vm.fileViews.splice(index, 1)
+            vm.partView = item.dossierPartNo
+            vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
+              vm.dossierFilesItems = result
+            })
           }).catch(reject => {
             toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
           })
         }
-      })
-    },
-    deleteSingleFile (item, index) {
-      var vm = this
-      let x = confirm('Bạn có muốn xóa?')
-      if (x) {
-        item['dossierId'] = vm.detailDossier.dossierId
-        vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
-          vm.fileViews.splice(index, 1)
-          vm.partView = item.dossierPartNo
-          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
-            vm.dossierFilesItems = result
-          })
-        }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
-        })
-      }
-    },
-    viewFile (data) {
-      var vm = this
-      vm.dossierFilesItems.forEach(val => {
-        val['dossierId'] = vm.detailDossier.dossierId
-        if (val.dossierPartNo === data.partNo) {
-          this.$store.dispatch('viewFile', val)
-        }
-      })
-    },
-    viewFile2 (data) {
-      var vm = this
-      if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
-        window.open(url)
-      } else {
-        vm.dialogPDFLoading = true
-        vm.dialogPDF = true
-        data['dossierId'] = vm.detailDossier.dossierId
-        vm.$store.dispatch('viewFile', data).then(result => {
-          vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview' + vm.id).src = result
-        })
-      }
-    },
-    viewFileWithPartNo (item) {
-      var vm = this
-      if (vm.dossierFilesItems) {
-        var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-          return file.dossierPartNo === item.partNo && !file.eForm
-        })
-        if (fileViewsTemp) {
-          vm.fileViews = fileViewsTemp
-          if (vm.partView !== item.partNo) {
-            vm.stateView = true
-            vm.partView = item.partNo
-          } else {
-            vm.stateView = !vm.stateView
-            vm.partView = item.partNo
+      },
+      viewFile (data) {
+        var vm = this
+        vm.dossierFilesItems.forEach(val => {
+          val['dossierId'] = vm.detailDossier.dossierId
+          if (val.dossierPartNo === data.partNo) {
+            this.$store.dispatch('viewFile', val)
           }
-        } else {
-          return
-        }
-      }
-      return
-    },
-    checkStyle (item) {
-      return 'calc(100% - ' + 50 + 'px)'
-    },
-    downloadFileTemplate (item, index) {
-      var vm = this
-      if (vm.fileTemplateItems.length > 0) {
-        let fileFind = vm.fileTemplateItems.find(file => {
-          return item.fileTemplateNo === file.fileTemplateNo
         })
-        if (fileFind) {
-          let url = vm.initDataResource.serviceInfoApi + '/' + fileFind.serviceCode + '/filetemplates/' + fileFind.fileTemplateNo
+      },
+      viewFile2 (data) {
+        var vm = this
+        if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
+          var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
           window.open(url)
         } else {
-          console.log('ko thay file')
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+          data['dossierId'] = vm.detailDossier.dossierId
+          vm.$store.dispatch('viewFile', data).then(result => {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPDFPreview' + vm.id).src = result
+          })
         }
-      }
-    },
-    cancelDialog () {
-      var vm = this
-      vm.dialogAddOtherTemp = false
-      vm.progressUploadPart = ''
-    },
-    addFileOther (item) {
-      var vm = this
-      vm.dialogAddOtherTemp = true
-      vm.stateAddFileOther = true
-      vm.dossierTemplatesItemSelect = item
-    },
-    changeDisplayName (item, index) {
-      var vm = this
-      let params = {
-        dossierId: vm.detailDossier.dossierId,
-        value: value
-      }
-      vm.$store.dispatch('changeDisplayNameFile', params).then(result => {
-        vm.fileViews[index].displayName = result.displayName
-        vm.stateEdit = false
-      }).catch(reject => {
-        console.log('error')
-      })
-    },
-    validCreateFileTemplate () {
-      var vm = this
-      if (vm.createFiles.length > 0) {
-        for (var i = 0; i < vm.createFiles.length; i++) {
-          if (vm.createFiles[i]['required'] && !vm.createFiles[i]['daKhai']) {
-            let message = 'Chú ý :' + vm.createFiles[i].partName + ' là thành phần bắt buộc!'
-            toastr.error(message)
-            return false
+      },
+      viewFileWithPartNo (item) {
+        var vm = this
+        if (vm.dossierFilesItems) {
+          var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+            return file.dossierPartNo === item.partNo && !file.eForm
+          })
+          if (fileViewsTemp) {
+            vm.fileViews = fileViewsTemp
+            if (vm.partView !== item.partNo) {
+              vm.stateView = true
+              vm.partView = item.partNo
+            } else {
+              vm.stateView = !vm.stateView
+              vm.partView = item.partNo
+            }
+          } else {
+            return
           }
         }
-        return true
-      } else {
-        return true
+        return
+      },
+      checkStyle (item) {
+        return 'calc(100% - ' + 50 + 'px)'
+      },
+      downloadFileTemplate (item, index) {
+        var vm = this
+        if (vm.fileTemplateItems.length > 0) {
+          let fileFind = vm.fileTemplateItems.find(file => {
+            return item.fileTemplateNo === file.fileTemplateNo
+          })
+          if (fileFind) {
+            let url = vm.initDataResource.serviceInfoApi + '/' + fileFind.serviceCode + '/filetemplates/' + fileFind.fileTemplateNo
+            window.open(url)
+          } else {
+            console.log('ko thay file')
+          }
+        }
+      },
+      cancelDialog () {
+        var vm = this
+        vm.dialogAddOtherTemp = false
+        vm.progressUploadPart = ''
+      },
+      addFileOther (item) {
+        var vm = this
+        vm.dialogAddOtherTemp = true
+        vm.stateAddFileOther = true
+        vm.dossierTemplatesItemSelect = item
+      },
+      changeDisplayName (item, index) {
+        var vm = this
+        let params = {
+          dossierId: vm.detailDossier.dossierId,
+          value: value
+        }
+        vm.$store.dispatch('changeDisplayNameFile', params).then(result => {
+          vm.fileViews[index].displayName = result.displayName
+          vm.stateEdit = false
+        }).catch(reject => {
+          console.log('error')
+        })
+      },
+      validCreateFileTemplate () {
+        var vm = this
+        if (vm.createFiles.length > 0) {
+          for (var i = 0; i < vm.createFiles.length; i++) {
+            if (vm.createFiles[i]['required'] && !vm.createFiles[i]['daKhai']) {
+              let message = 'Chú ý :' + vm.createFiles[i].partName + ' là thành phần bắt buộc!'
+              toastr.error(message)
+              return false
+            }
+          }
+          return true
+        } else {
+          return true
+        }
       }
     }
   }
-}
 </script>
