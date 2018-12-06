@@ -81,7 +81,7 @@
             Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="item.govAgencyName === '' && item.domainName === ''">
+            <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyListsTotal" v-bind:key="index" v-if="item.govAgencyName === '' && item.domainName === ''">
               <pie-chart-report-public :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
             </v-flex>
           </v-card-text>
@@ -320,6 +320,7 @@ export default {
     reloadLine: true,
     showTable: false,
     agencyLists: [],
+    agencyListsTotal: [],
     agencyListsMonth: [],
     group: '',
     years: [
@@ -689,8 +690,10 @@ export default {
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
           let dataReport1 = []
           if (result === null || result === undefined || result === 'undefined') {
+            vm.agencyListsTotal = []
           } else {
             dataReport1 = result
+            vm.agencyListsTotal = result
           }
           vm.doProcessReport1(dataReport1)
         })

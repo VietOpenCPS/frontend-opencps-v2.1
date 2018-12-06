@@ -1,5 +1,14 @@
 <template>
-  <pie-chart :width="200" :height="200"></pie-chart>
+  <div>
+    <pie-chart :width="200" :height="200"></pie-chart>
+    <div style="line-height: 30px;position: absolute;margin-top: -36px;border-radius: 4px;border: 1px solid #0d71bb94;padding: 0 5px;margin-left: 10px;color: #0d71bb;font-size: 12px;"> 
+        &nbsp;Tỷ lệ đúng hạn: 
+        <span class="text-bold" style="line-height: 30px;font-size: 12px;">&nbsp;&nbsp;{{item.ontimePercentage}} %</span></div>
+
+      <div style="line-height: 30px;position: absolute;margin-top: -65px;padding: 0 5px;margin-left: 5px;font-size: 12px;"> 
+        &nbsp;Tổng số hồ sơ:
+        <span class="text-bold" style="line-height: 30px;font-size: 12px;">&nbsp;&nbsp;{{item.undueCount + item.overdueCount + item.waitingCount + item.betimesCount + item.ontimeCount + item.overtimeCount}}</span></div>
+  </div>
 </template>
 
 <script>
@@ -64,7 +73,10 @@ export default {
           responsive: true,
           maintainAspectRatio: false,
           legend: {
-            position: 'top'
+            position: 'left',
+            labels: {
+              padding: 10
+            }
           },
           pieceLabel: {
             render: 'value',
