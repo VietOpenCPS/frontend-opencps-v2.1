@@ -834,18 +834,7 @@ export default {
       let overtimeCountData = []
       let currentQuerys = vm.$router.history.current.query
       for (let key in data) {
-        console.log('String(data[key].domainName)', String(data[key].domainName) !== '')
-        console.log((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined))
         if ((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) && String(data[key].domainName) !== '') {
-          if (data[key].month > 0) {
-            labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
-            undueCountData.push(data[key].undueCount)
-            overdueCountData.push(data[key].overdueCount)
-            waitingCountData.push(data[key].waitingCount)
-            betimesCountData.push(data[key].betimesCount)
-            ontimeCountData.push(data[key].ontimeCount)
-            overtimeCountData.push(data[key].overtimeCount)
-          }
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
@@ -860,6 +849,7 @@ export default {
       }
       vm.labelOfLine = []
       for (let key in labelsCustomMonth) {
+        vm.labelOfLine.push(key)
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -868,20 +858,12 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
-      if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
-        if (datasetsCustom.length > 1) {
-          delete datasetsCustom[0]
-        }
-      }
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
-       vm.labelOfLine.push(datasetsCustom[key]['label'])
-       console.log('custom: ', datasetsCustom[key])
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      console.log('labelOfLine: ', vm.labelOfLine)
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
