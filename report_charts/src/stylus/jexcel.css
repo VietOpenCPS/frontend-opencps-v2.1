@@ -222,3 +222,16 @@ body .drawer__filter .v-input--selection-controls.v-input .v-label {
     width: calc(100% - 32px);
     padding-top: 2px;
 }
+
+.report__table {
+    margin: 0 auto;
+}
+
+.report__table th, 
+.report__table td {
+    border: 1px solid;
+    padding: 2px;
+}
+.report__table th {
+    padding: 6px 2px;
+}

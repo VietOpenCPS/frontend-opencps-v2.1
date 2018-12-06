@@ -124,7 +124,7 @@
             <v-flex xs6 class="text-center text-bold">
             </v-flex>
             <v-flex xs6 class="text-center mt-2">
-              Ngày {{currentDay}} tháng {{currentMonth}} năm {{year}} 
+              Ngày {{currentDay}} tháng {{currentMonth}} năm {{(new Date()).getFullYear()}} 
             </v-flex>
             <v-flex xs12 class="text-center text-bold mt-3 fs14">
               BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
