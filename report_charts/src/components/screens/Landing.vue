@@ -834,6 +834,8 @@ export default {
       let overtimeCountData = []
       let currentQuerys = vm.$router.history.current.query
       for (let key in data) {
+        console.log('String(data[key].domainName)', String(data[key].domainName) !== '')
+        console.log((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined))
         if ((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) && String(data[key].domainName) !== '') {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
