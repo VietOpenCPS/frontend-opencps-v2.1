@@ -23,7 +23,7 @@
                 item-text="name"
                 item-value="value"
                 :hide-selected="true"
-                @change="changeYear"
+                @change="changeMonth"
                 >
               </v-autocomplete>
             </v-flex>
