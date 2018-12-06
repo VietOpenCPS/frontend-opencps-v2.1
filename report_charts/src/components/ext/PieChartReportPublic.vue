@@ -44,6 +44,7 @@ export default {
     if (currentQuerys.hasOwnProperty('govAgencyCode')) {
       vm.govAgencyCode = currentQuerys.govAgencyCode
     }
+    console.log('vm.item', vm.item)
     Vue.component('pie-chart', {
       extends: VueChartJs.Pie,
       mounted () {

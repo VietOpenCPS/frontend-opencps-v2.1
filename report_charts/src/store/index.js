@@ -94,6 +94,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getReportTotal ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            }
+          }
+          axios.get('/o/rest/statistics?reporting=false&year=2018&domain=total&agency=total&month=0', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getAgencyReportLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
