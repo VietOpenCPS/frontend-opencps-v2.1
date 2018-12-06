@@ -870,7 +870,9 @@ export default {
       console.log(currentQuerys['govAgencyCode'])
       console.log('vm.labelOfLine', vm.labelOfLine)
       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
-        vm.labelOfLine = vm.labelOfLine.shift()
+        if (vm.labelOfLine.length > 1) {
+          delete vm.labelOfLine[0]
+        }
       }
       console.log('vm.labelOfLine2', vm.labelOfLine)
      let colorDK = []
