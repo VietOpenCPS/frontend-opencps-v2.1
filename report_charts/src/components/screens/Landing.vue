@@ -56,6 +56,35 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
+      <v-flex xs12 sm4 class="mt-4 ml-2 mr-2">
+        <v-card class="wrap_report" style="border-radius: 0;">
+          <v-card-title class="headline">
+            Thống kê thủ tục hành chính
+          </v-card-title>
+          <v-card-text class="pt-2 pb-0 px-0">
+            <v-list class="pt-0">
+              <v-list-tile v-for="item in levelList" :key="item.level">
+                <v-list-tile-content>
+                  <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
+                  <span class="status__counter" style="color:#0b72ba">
+                    {{item.count}}
+                  </span>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <v-flex xs12 sm4 class="mt-4 ml-2 mr-2">
+        <v-card class="wrap_report" style="border-radius: 0;">
+          <v-card-title class="headline">
+            Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
+          </v-card-title>
+          <v-card-text class="pt-2 pb-0 px-0">
+            123123
+          </v-card-text>
+        </v-card>
+      </v-flex>
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
@@ -271,6 +300,7 @@
 export default {
   props: ['index', 'id'],
   data: () => ({
+    levelList: [],
     chartView: true,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
@@ -441,6 +471,9 @@ export default {
           vm.chartView = (currentQuerys.chartView === 'true')
         }
         vm.doStaticsReport()
+        vm.$store.dispatch('getLevelList').then(function (result) {
+          vm.levelList = result
+        })
       }
     })
   },
