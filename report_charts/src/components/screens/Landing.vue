@@ -81,7 +81,9 @@
             Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            123123
+            <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="item.govAgencyName === '' && item.domainName === ''">
+              <pie-chart-report-public :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
+            </v-flex>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -297,8 +299,14 @@
 
 <script>
 
+import { PieChartReport, PieChartReportPublic } from '@/components'
+
 export default {
   props: ['index', 'id'],
+  components: {
+    PieChartReport,
+    PieChartReportPublic
+  },
   data: () => ({
     levelList: [],
     chartView: true,
