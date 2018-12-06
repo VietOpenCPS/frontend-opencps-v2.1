@@ -85,7 +85,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-card class="wrap_report" style="border-radius: 0;">
+      <v-card class="wrap_report xs12 flex" style="border-radius: 0;">
         <v-card-text class="py-2 px-1 layout row wrap" style="
             background: #fafafa;
             margin: 0;
@@ -833,7 +833,16 @@ export default {
       let ontimeCountData = []
       let overtimeCountData = []
       for (let key in data) {
-        if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
+        if (vm.govAgencyCode !== '' && String(data[key].domainName) !== '') {
+          if (data[key].month > 0) {
+            labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+            undueCountData.push(data[key].undueCount)
+            overdueCountData.push(data[key].overdueCount)
+            waitingCountData.push(data[key].waitingCount)
+            betimesCountData.push(data[key].betimesCount)
+            ontimeCountData.push(data[key].ontimeCount)
+            overtimeCountData.push(data[key].overtimeCount)
+          }
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
