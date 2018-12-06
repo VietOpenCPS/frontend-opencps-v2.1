@@ -832,8 +832,9 @@ export default {
       let betimesCountData = []
       let ontimeCountData = []
       let overtimeCountData = []
+      let currentQuerys = vm.$router.history.current.query
       for (let key in data) {
-        if (vm.govAgencyCode !== '' && String(data[key].domainName) !== '') {
+        if ((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) && String(data[key].domainName) !== '') {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
             undueCountData.push(data[key].undueCount)
@@ -866,15 +867,11 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
-      let currentQuerys = vm.$router.history.current.query
-      console.log(currentQuerys['govAgencyCode'])
-      console.log('vm.labelOfLine', vm.labelOfLine)
       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
         if (vm.labelOfLine.length > 1) {
           delete vm.labelOfLine[0]
         }
       }
-      console.log('vm.labelOfLine2', vm.labelOfLine)
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
