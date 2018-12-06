@@ -512,7 +512,7 @@ export default {
         dossierTemplates.forEach(template => {
           template['daKhai'] = false
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed
           })
           if (itemFind) {
             template['daKhai'] = true
@@ -764,7 +764,7 @@ export default {
     previewFileEfom (item, index) {
       var vm = this
       vm.dossierFilesItems.forEach(file => {
-        if (file.dossierPartNo === item.partNo && file.eForm) {
+        if (file.dossierPartNo === item.partNo && file.eForm && !file.removed) {
           file['dossierId'] = vm.thongTinHoSo.dossierId
           vm.dialogPDFLoading = true
           vm.dialogPDF = true

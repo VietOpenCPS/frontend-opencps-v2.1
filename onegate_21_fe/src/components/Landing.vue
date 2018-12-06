@@ -1019,87 +1019,9 @@ export default {
       } else {
         vm.hosoDatasPage = 1
       }
-      // <--------- set State advSearch
-      // console.log('params', currentQuery)
-      if (currentQuery.hasOwnProperty('adv_renew')) {
-        vm.advSearchItems = []
-        for (let key1 in vm.itemFilterKey) {
-          for (let key in currentQuery) {
-            if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
-              break
-            } else {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
-            }
-          }
-        }
-        for (let key in vm.itemFilterKey) {
-          let spec = vm.itemFilterKey[key]
-          let current = vm.advSearchTools.find(function (item) {
-            return item.spec === spec
-          })
-          if (vm.itemFilterSupport[spec]) {
-            if (spec === 'keyword') {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: -1
-              })
-            } else if (spec === 'year') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
-                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month',
-                  value: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-                  text: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-                  index: 0
-                })
-              }
-            } else if (spec === 'month') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month',
-                  value: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-                  text: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-                  index: 0
-                })
-              }
-            } else {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: current['index']
-              })
-            }
-          }
-        }
-        // console.log('vm.advSearchItems new', vm.advSearchItems)
-      } else {
-        vm.advSearchItems = []
-      }
-      for (let keyTool in vm.advSearchTools) {
-        vm.advSearchTools[keyTool].display = false
-        vm.advSearchTools[keyTool].disabled = false
-        let current = vm.advSearchItems.find(function (item) {
-          return item.spec === vm.advSearchTools[keyTool].spec
-        })
-        if (current) {
-          vm.advSearchTools[keyTool].display = true
-          vm.advSearchTools[keyTool].disabled = true
-        }
-      }
-      // ------->
+      // <--- set State advSearch
+      vm.setStateAdvSearch(currentQuery)
+      // ---->
     })
   },
   updated () {
@@ -1240,85 +1162,9 @@ export default {
         } else {
           vm.doLoadingDataHoSo()
         }
-        // <--------- set State advSearch
-        if (currentQuery.hasOwnProperty('adv_renew')) {
-          vm.advSearchItems = []
-          for (let key1 in vm.itemFilterKey) {
-            for (let key in currentQuery) {
-              if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
-                vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
-                break
-              } else {
-                vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
-              }
-            }
-          }
-          for (let key in vm.itemFilterKey) {
-            let spec = vm.itemFilterKey[key]
-            let current = vm.advSearchTools.find(function (item) {
-              return item.spec === spec
-            })
-            if (vm.itemFilterSupport[spec]) {
-              if (spec === 'keyword') {
-                vm.advSearchItems.push({
-                  spec: spec,
-                  value: spec + ':' + vm.itemFilterSupport[spec],
-                  text: spec + ':' + vm.itemFilterSupport[spec],
-                  index: -1
-                })
-              } else if (spec === 'year') {
-                let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
-                if (searchDate) {
-                  searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
-                  searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
-                  searchDate['index'] = 0
-                } else {
-                  vm.advSearchItems.push({
-                    spec: 'year_month',
-                    value: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-                    text: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-                    index: 0
-                  })
-                }
-              } else if (spec === 'month') {
-                let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
-                if (searchDate) {
-                  searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
-                  searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
-                  searchDate['index'] = 0
-                } else {
-                  vm.advSearchItems.push({
-                    spec: 'year_month',
-                    value: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-                    text: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-                    index: 0
-                  })
-                }
-              } else {
-                vm.advSearchItems.push({
-                  spec: spec,
-                  value: spec + ':' + vm.itemFilterSupport[spec],
-                  text: spec + ':' + vm.itemFilterSupport[spec],
-                  index: current['index']
-                })
-              }
-            }
-          }
-        } else {
-          vm.advSearchItems = []
-        }
-        for (let keyTool in vm.advSearchTools) {
-          vm.advSearchTools[keyTool].display = false
-          vm.advSearchTools[keyTool].disabled = false
-          let current = vm.advSearchItems.find(function (item) {
-            return item.spec === vm.advSearchTools[keyTool].spec
-          })
-          if (current) {
-            vm.advSearchTools[keyTool].display = true
-            vm.advSearchTools[keyTool].disabled = true
-          }
-        }
-        // ------->
+        // <--- set State advSearch
+        vm.setStateAdvSearch(currentQuery)
+        // ---->
       }
     },
     activeLoadingDataHoSo (val) {
@@ -1383,6 +1229,88 @@ export default {
       let vm = this
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
       // console.log('selected item', vm.selectMultiplePage)
+    },
+    setStateAdvSearch (currentQuery) {
+      // <--------- set State advSearch
+      let vm = this
+      if (currentQuery.hasOwnProperty('adv_renew')) {
+        vm.advSearchItems = []
+        for (let key1 in vm.itemFilterKey) {
+          for (let key in currentQuery) {
+            if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
+              vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
+              break
+            } else {
+              vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
+            }
+          }
+        }
+        for (let key in vm.itemFilterKey) {
+          let spec = vm.itemFilterKey[key]
+          let current = vm.advSearchTools.find(function (item) {
+            return item.spec === spec
+          })
+          if (vm.itemFilterSupport[spec]) {
+            if (spec === 'keyword') {
+              vm.advSearchItems.push({
+                spec: spec,
+                value: spec + ':' + vm.itemFilterSupport[spec],
+                text: spec + ':' + vm.itemFilterSupport[spec],
+                index: -1
+              })
+            } else if (spec === 'year') {
+              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
+              if (searchDate) {
+                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
+                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
+                searchDate['index'] = 0
+              } else {
+                vm.advSearchItems.push({
+                  spec: 'year_month',
+                  value: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
+                  text: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
+                  index: 0
+                })
+              }
+            } else if (spec === 'month') {
+              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
+              if (searchDate) {
+                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
+                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
+                searchDate['index'] = 0
+              } else {
+                vm.advSearchItems.push({
+                  spec: 'year_month',
+                  value: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
+                  text: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
+                  index: 0
+                })
+              }
+            } else {
+              vm.advSearchItems.push({
+                spec: spec,
+                value: spec + ':' + vm.itemFilterSupport[spec],
+                text: spec + ':' + vm.itemFilterSupport[spec],
+                index: current['index']
+              })
+            }
+          }
+        }
+      } else {
+        vm.advSearchItems = []
+      }
+      for (let keyTool in vm.advSearchTools) {
+        vm.advSearchTools[keyTool].display = false
+        vm.advSearchTools[keyTool].disabled = false
+        let current = vm.advSearchItems.find(function (item) {
+          return item.spec === vm.advSearchTools[keyTool].spec
+        })
+        if (current) {
+          vm.advSearchTools[keyTool].display = true
+          vm.advSearchTools[keyTool].disabled = true
+        }
+      }
+      // ------->
     },
     resend () {
       var vm = this
