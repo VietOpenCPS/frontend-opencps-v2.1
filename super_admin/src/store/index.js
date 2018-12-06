@@ -132,7 +132,7 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    loadMermaidgraph ({commit, state}, id) {
+    loadMermaidgraph ({state}, id) {
       let config = {
         headers: {
           groupId: state.initData.groupId

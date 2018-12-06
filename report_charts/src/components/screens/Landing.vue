@@ -55,7 +55,7 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap style="margin: 0;">
+    <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
       <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
@@ -109,6 +109,160 @@
         <content-placeholders-img />
       </content-placeholders>
     </v-layout>
+    <div v-if="String(index) === '1'">
+      <v-card class="py-4" style="border-radius: 0;box-shadow: none;
+        border-bottom: 1px solid #ddd;">
+        <v-card-text>
+          <v-layout wrap id="contentToPDF">
+            <v-flex xs6 class="text-center text-bold">
+            </v-flex>
+            <v-flex xs6 class="text-center text-bold">
+              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM <br/>
+              Độc lập - Tự do - Hạnh phúc 
+              <hr align="center" width="120px" style="margin: auto;">
+            </v-flex>
+            <v-flex xs6 class="text-center text-bold">
+            </v-flex>
+            <v-flex xs6 class="text-center mt-2">
+              Ngày {{currentDay}} tháng {{currentMonth}} năm {{year}} 
+            </v-flex>
+            <v-flex xs12 class="text-center text-bold mt-3 fs14">
+              BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
+              <span v-if="String(month) !== '0'">Tháng {{month}}</span> Năm {{year}}
+            </v-flex>
+            <div class="mt-3 report__table">
+              <table>
+                <thead>
+                  <tr>
+                    <th rowspan="5" colspan="1" width="40"> <span v-if="govAgencyCode !== '' || String(chartView) === 'false'">Lĩnh vực</span> <span v-else>Đơn vị</span></th>
+                    <th rowspan="5" colspan="1" width="40">Tổng số</th>
+                    <th rowspan="5" colspan="1" width="40">Từ chối tiếp nhận trong kỳ</th>
+                    <th rowspan="5" colspan="1" width="40">Hồ sơ rút không giải quyết</th>
+                    <th rowspan="1" colspan="5">Nhận giải quyết</th>
+                    <th rowspan="1" colspan="15">Kết quả giải quyết</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="4" colspan="1" width="40">Tổng số</th>
+                    <th rowspan="4" colspan="1" width="40">Tồn trước</th>
+                    <th rowspan="1" colspan="3">Nhận trong kỳ</th>
+                    <th rowspan="1" colspan="9">Hồ sơ đã có kết quả</th>
+                    <th rowspan="1" colspan="4">Đang giải quyết</th>
+                    <th rowspan="4" colspan="1" width="40">Tạm dừng bổ sung điều kiện</th>
+                    <th rowspan="4" colspan="1" width="40">% trước và đúng hạn</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th rowspan="3" width="40">Một cửa</th>
+                    <th rowspan="3" width="40">Trực tuyến</th>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th colspan="5">Tình trạng thực hiện</th>
+                    <th colspan="2">Trả kết quả</th>
+                    <th rowspan="3" width="40">Từ chối giải quyết</th>
+                    <th rowspan="3" width="40">Tổng số</th>
+                    <th rowspan="3" width="40">Còn hạn giải quyết</th>
+                    <th rowspan="3" width="40">Quá hạn giải quyết</th>
+                    <th rowspan="3" width="40">Đang xử lý ngoài đơn vị</th>
+                  </tr>
+                  <tr>
+                    <th rowspan="2" width="40">Trước hạn</th>
+                    <th rowspan="2" width="40">Đúng hạn</th>
+                    <th colspan="3">Quá hạn</th>
+                    <th rowspan="2" width="40">Đã trả</th>
+                    <th rowspan="2" width="40">Chưa trả</th>
+                  </tr>
+                  <tr>
+                    <th width="40">Tổng số</th>
+                    <th width="40">Trong đơn vị</th>
+                    <th width="40">Ngoài đơn vị</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="note__column">
+                    <td align="center">1</td>
+                    <td align="center">2</td>
+                    <td align="center">3</td>
+                    <td align="center">4</td>
+                    <td align="center">5</td>
+                    <td align="center">6</td>
+                    <td align="center">7</td>
+                    <td align="center">8</td>
+                    <td align="center">9</td>
+                    <td align="center">10</td>
+                    <td align="center">11</td>
+                    <td align="center">12</td>
+                    <td align="center">13</td>
+                    <td align="center">14</td>
+                    <td align="center">15</td>
+                    <td align="center">16</td>
+                    <td align="center">17</td>
+                    <td align="center">18</td>
+                    <td align="center">19</td>
+                    <td align="center">20</td>
+                    <td align="center">21</td>
+                    <td align="center">22</td>
+                    <td align="center">23</td>
+                    <td align="center">24</td>
+                  </tr>
+                  <tr v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' || String(chartView) === 'true') && item.govAgencyName !== '') || ((govAgencyCode !== ''  || String(chartView) === 'false') && item.domainName !== '')">
+                    <td v-if="govAgencyCode !== '' || String(chartView) === 'false'" align="center">{{item.domainName}}</td>
+                    <td v-else align="center">{{item.govAgencyName}}</td>
+                    <td align="center">{{item.totalCount}}</td>
+                    <td align="center">{{item.deniedCount}}</td>
+                    <td align="center">{{item.cancelledCount}}</td>
+                    <td align="center">{{item.processCount}}</td>
+                    <td align="center">{{item.remainingCount}}</td>
+                    <td align="center">{{item.receivedCount}}</td>
+                    <td align="center">{{item.onegateCount}}</td>
+                    <td align="center">{{item.onlineCount}}</td>
+                    <td align="center">{{item.releaseCount}}</td>
+                    <td align="center">{{item.betimesCount}}</td>
+                    <td align="center">{{item.ontimeCount}}</td>
+                    <td align="center">{{item.overtimeCount}}</td>
+                    <td align="center">{{item.overtimeInside}}</td>
+                    <td align="center">{{item.overtimeOutside}}</td>
+                    <td align="center">{{item.doneCount}}</td>
+                    <td align="center">{{item.releasingCount}}</td>
+                    <td align="center">{{item.unresolvedCount}}</td>
+                    <td align="center">{{item.processingCount}}</td>
+                    <td align="center">{{item.undueCount}}</td>
+                    <td align="center">{{item.overdueCount}}</td>
+                    <td align="center">{{item.outsideCount}}</td>
+                    <td align="center">{{item.waitingCount}}</td>
+                    <td align="center">{{item.ontimePercentage}}</td>
+                  </tr>
+                  <tr class="sum__column" style="font-weight: bold;" v-if="showTable">
+                    <td align="center">Tổng số <br> <span v-if="agencyLists !== null && agencyLists.length > 0"> {{agencyLists.length - 1}} </span></td>
+                    <td align="center ">{{totalCounter['total_3']}}</td>
+                    <td align="center">{{totalCounter['total_4']}}</td>
+                    <td align="center">{{totalCounter['total_5']}}</td>
+                    <td align="center">{{totalCounter['total_6']}}</td>
+                    <td align="center">{{totalCounter['total_7']}}</td>
+                    <td align="center">{{totalCounter['total_8']}}</td>
+                    <td align="center">{{totalCounter['total_9']}}</td>
+                    <td align="center">{{totalCounter['total_10']}}</td>
+                    <td align="center">{{totalCounter['total_11']}}</td>
+                    <td align="center">{{totalCounter['total_12']}}</td>
+                    <td align="center">{{totalCounter['total_13']}}</td>
+                    <td align="center">{{totalCounter['total_14']}}</td>
+                    <td align="center">{{totalCounter['total_15']}}</td>
+                    <td align="center">{{totalCounter['total_16']}}</td>
+                    <td align="center">{{totalCounter['total_17']}}</td>
+                    <td align="center">{{totalCounter['total_18']}}</td>
+                    <td align="center">{{totalCounter['total_19']}}</td>
+                    <td align="center">{{totalCounter['total_20']}}</td>
+                    <td align="center">{{totalCounter['total_21']}}</td>
+                    <td align="center">{{totalCounter['total_22']}}</td>
+                    <td align="center">{{totalCounter['total_23']}}</td>
+                    <td align="center">{{totalCounter['total_24']}}</td>
+                    <td align="center">{{totalCounter['total_25']}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -297,6 +451,19 @@ export default {
       let currentQuerys = newRoute.query
       vm.reportGovName = ''
       vm.govAgencyCode = ''
+      if (currentQuerys.hasOwnProperty('year')) {
+        vm.year = currentQuerys.year + ''
+      } else {
+        vm.year = (new Date()).getFullYear() + ''
+      }
+      if (currentQuerys.hasOwnProperty('month')) {
+        vm.month = currentQuerys.month + ''
+      } else {
+        vm.month = ((new Date()).getMonth() + 1) + ''
+      }
+      if (currentQuerys.hasOwnProperty('reportGovName')) {
+        vm.reportGovName = currentQuerys.reportGovName
+      }
       if (currentQuerys.hasOwnProperty('reportGovName')) {
         vm.reportGovName = currentQuerys.reportGovName
       }
@@ -534,7 +701,6 @@ export default {
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let monthData = {}
-      let lineDataMonth = {}
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
         } else {
@@ -585,7 +751,6 @@ export default {
       let vm = this
       let datasetsCustom = []
       let labelsCustomMonth = {}
-      let lineDataMonth = {}
       let undueCountData = []
       let overdueCountData = []
       let waitingCountData = []
@@ -606,7 +771,7 @@ export default {
           }
         }
       }
-      labelsCustomMonth = labelsCustomMonth
+      vm.labelOfLine = []
       for (let key in labelsCustomMonth) {
         vm.labelOfLine.push(key)
         let lineProcessData = {
