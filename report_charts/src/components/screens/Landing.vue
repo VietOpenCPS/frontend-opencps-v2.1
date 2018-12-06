@@ -849,7 +849,6 @@ export default {
       }
       vm.labelOfLine = []
       for (let key in labelsCustomMonth) {
-        vm.labelOfLine.push(key)
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
@@ -861,8 +860,10 @@ export default {
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
-       console.log('datasetsCustom', datasetsCustom)
+       console.log('datasetsCustom', datasetsCustom[key]['label'])
+       console.log('datasetsCustom chk: ', (datasetsCustom[key]['label'] !== '' && datasetsCustom[key]['label'] !== undefined))
        if (datasetsCustom[key]['label'] !== '' && datasetsCustom[key]['label'] !== undefined) {
+          vm.labelOfLine.push(key)
           seriesChartBarData.push(datasetsCustom[key]['data'])
           colorDK.push(datasetsCustom[key]['borderColor'])
        }
