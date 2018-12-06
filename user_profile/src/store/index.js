@@ -130,7 +130,7 @@ export const store = new Vuex.Store({
           dataPutUser.append('applicantName', filter['applicantName'])
           dataPutUser.append('contactTelNo', filter['applicantContactTelNo'])
           dataPutUser.append('address', filter['applicantAddress'])
-          dataPutUser.append('contactEmail', filter['applicantContactTelNo'])
+          dataPutUser.append('contactEmail', filter['applicantContactEmail'])
           dataPutUser.append('cityCode', filter['applicantCityCode'])
           dataPutUser.append('districtCode', filter['applicantDistrictCode'])
           dataPutUser.append('wardCode', filter['applicantWardCode'])

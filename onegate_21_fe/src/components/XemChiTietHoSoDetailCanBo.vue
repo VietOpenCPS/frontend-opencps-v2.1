@@ -85,7 +85,7 @@
             <!-- Một cửa -->
             <div class="px-4 pt-2">
               <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
-                <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
+                <p class="mb-2">
                   <span>Chuyển đến bởi: </span>
                   <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
                   <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
@@ -125,7 +125,9 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx</span>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
+                    <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                    <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx (Tối đa 10MB)</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
@@ -788,11 +790,11 @@ export default {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
         vm.getNextActions()
+        console.log('run initdata')
         vm.runComment()
-        if (vm.originality !== 1) {
+        if (vm.getOriginality() !== 1) {
           vm.loadHoSoLienThong()
         }
-        // console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -1365,6 +1367,7 @@ export default {
       var validCreateFiles = true
       var validThanhToanDienTu = true
       var validKySo = true
+      var validFormBoSung = true
       var useKySo = false
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1448,6 +1451,12 @@ export default {
       }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+        let validation = vm.$refs.formBoSungThongTinNgan.checkValid()
+        if (validation) {
+          validFormBoSung = true
+        } else {
+          validFormBoSung = false
+        }
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
@@ -1474,7 +1483,7 @@ export default {
           }
         }
       }
-      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1995,6 +2004,7 @@ export default {
     loadHoSoLienThong () {
       var vm = this
       let dossierId = vm.thongTinChiTietHoSo.dossierId
+      console.log('run load lien thong')
       vm.$store.dispatch('loadDossierLienThong', dossierId).then(result => {
         vm.listLienThong = result
       }).catch(reject => {
@@ -2194,6 +2204,12 @@ export default {
       } else {
         return ''
       }
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     }
   }
 }

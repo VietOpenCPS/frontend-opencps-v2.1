@@ -860,10 +860,14 @@ export default {
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
         data['dossierId'] = vm.thongTinHoSo.dossierId
-        vm.$store.dispatch('viewFile', data).then(result => {
-          vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview' + vm.id).src = result
-        })
+        if (data.referenceUid) {
+          vm.$store.dispatch('viewFile', data).then(result => {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPDFPreview' + vm.id).src = result
+          })
+        } else {
+          toastr.error('File dữ liệu không tồn tại')
+        }
       }
     },
     viewFileWithPartNo (item) {
