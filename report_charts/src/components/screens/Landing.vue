@@ -869,9 +869,10 @@ export default {
       let currentQuerys = vm.$router.history.current.query
       console.log(currentQuerys['govAgencyCode'])
       console.log('vm.labelOfLine', vm.labelOfLine)
-      if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '') {
+      if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) {
         vm.labelOfLine = vm.labelOfLine.shift()
       }
+      console.log('vm.labelOfLine2', vm.labelOfLine)
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
