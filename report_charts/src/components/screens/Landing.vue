@@ -866,7 +866,10 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
-      if (vm.govAgencyCode !== '') {
+      let currentQuerys = vm.$router.history.current.query
+      console.log(currentQuerys['govAgencyCode'])
+      console.log('vm.labelOfLine', vm.labelOfLine)
+      if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '') {
         vm.labelOfLine = vm.labelOfLine.shift()
       }
      let colorDK = []
