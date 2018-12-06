@@ -81,9 +81,7 @@
             Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyListsTotal" v-bind:key="index" v-if="item.govAgencyName === '' && item.domainName === ''">
-              <pie-chart-report-public :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
-            </v-flex>
+            <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -308,6 +306,7 @@ export default {
     PieChartReportPublic
   },
   data: () => ({
+    itemTotal: {},
     levelList: [],
     chartView: true,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
@@ -666,6 +665,15 @@ export default {
             break
           }
         }
+        vm.itemTotal = {
+          undueCount: vm.totalCounter['total_21'],
+          overdueCount: vm.totalCounter['total_22'],
+          waitingCount: vm.totalCounter['total_24'],
+          betimesCount: vm.totalCounter['total_12'],
+          ontimeCount: vm.totalCounter['total_13'],
+          overtimeCount: vm.totalCounter['total_14'],
+          ontimePercentage: vm.totalCounter['total_25']
+        }
       })
       setTimeout(() => {
         filter = {
@@ -690,10 +698,8 @@ export default {
         vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
           let dataReport1 = []
           if (result === null || result === undefined || result === 'undefined') {
-            vm.agencyListsTotal = []
           } else {
             dataReport1 = result
-            vm.agencyListsTotal = result
           }
           vm.doProcessReport1(dataReport1)
         })
