@@ -834,7 +834,7 @@ export default {
       let overtimeCountData = []
       let currentQuerys = vm.$router.history.current.query
       for (let key in data) {
-        if ((currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== '' && currentQuerys['govAgencyCode'] !== undefined) && String(data[key].domainName) !== '') {
+        if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
             labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
@@ -862,11 +862,9 @@ export default {
      for (let key in datasetsCustom) {
        console.log('datasetsCustom', datasetsCustom[key]['label'])
        console.log('datasetsCustom chk: ', (datasetsCustom[key]['label'] !== '' && datasetsCustom[key]['label'] !== undefined))
-       if (datasetsCustom[key]['label'] !== '' && datasetsCustom[key]['label'] !== undefined) {
-          vm.labelOfLine.push(key)
-          seriesChartBarData.push(datasetsCustom[key]['data'])
-          colorDK.push(datasetsCustom[key]['borderColor'])
-       }
+        vm.labelOfLine.push(key)
+        seriesChartBarData.push(datasetsCustom[key]['data'])
+        colorDK.push(datasetsCustom[key]['borderColor'])
       }
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
