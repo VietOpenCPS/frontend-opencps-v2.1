@@ -866,6 +866,9 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
+      if (vm.govAgencyCode !== '') {
+        vm.labelOfLine = vm.labelOfLine.shift()
+      }
      let colorDK = []
      let seriesChartBarData = []
      for (let key in datasetsCustom) {
