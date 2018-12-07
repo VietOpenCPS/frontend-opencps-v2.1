@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="width:100%">
     <v-expansion-panel v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
       <v-expansion-panel-content hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
-        {{item.fieldLabel}}
+        {{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
@@ -18,19 +18,24 @@
                       :placeholder="item.placeholder"
                       multi-line
                       @input="inputChangeValue(item)"
+                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                      :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'string'"
                       :id="item.fieldName"
                       :value="item.value"
                       :placeholder="item.placeholder"
                       @input="inputChangeValue(item)"
+                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                      :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'number'"
                       :id="item.fieldName"
                       :value="item.value"
                       :placeholder="item.placeholder"
-                      :rules="[rulesValid.number]"
                       @input="inputChangeValue(item)"
+                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                      :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'date'"
                       :id="item.fieldName"
@@ -39,6 +44,8 @@
                       readonly
                       append-icon="event"
                       v-on:click.native="openDialogCustom(item, item.fieldName)"
+                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                      :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
               </v-flex>
             </v-layout>
@@ -70,9 +77,9 @@
       <div class="mb-2" hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
         <div class="px-2 py-1" style="border-bottom:1px solid #8a8989">
           <!-- <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> -->
-          <span class="text-bold">{{index + 1}}. </span>{{item.fieldLabel}}
+          <span class="text-bold">{{index + 1}}. </span>{{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>
         </div>
-        <v-form ref="formExtra" v-model="valid" lazy-validation>
+        <v-form ref="form" v-model="valid2" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 class="px-3">
               <v-text-field v-if="item.fieldType === 'textarea'"
@@ -82,6 +89,8 @@
                 :placeholder="item.placeholder"
                 multi-line
                 @input="inputChangeValue(item)"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -91,6 +100,8 @@
                 :value="item.value"
                 :placeholder="item.placeholder"
                 @input="inputChangeValue(item)"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -99,8 +110,9 @@
                 :id="item.fieldName"
                 :value="item.value"
                 :placeholder="item.placeholder"
-                :rules="[rulesValid.number]"
                 @input="inputChangeValue(item)"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -112,6 +124,8 @@
                 readonly
                 append-icon="event"
                 v-on:click.native="openDialogCustom(item, item.fieldName)"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
@@ -121,6 +135,8 @@
                 :value="item.value"
                 :placeholder="item.placeholder"
                 @input="inputChangeValue(item)"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
             </v-flex>
           </v-layout>
@@ -163,9 +179,17 @@
       dialog: false,
       formBuilder: [],
       valid: false,
+      valid2: false,
       rulesValid: {
         number: function (value) {
           var pattern = /^\d+$/
+          return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
+        }
+      },
+      rules: {
+        required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+        number: function (value) {
+          const pattern = /^\d+$/
           return pattern.test(value) || 'Kiểu dữ liệu sai định dạng.'
         }
       }
@@ -232,7 +256,17 @@
       },
       checkValid () {
         let vm = this
-        return vm.$refs.formExtra.validate()
+        let valid = true
+        if (vm.formBuilder.length > 0) {
+          for (let key in vm.formBuilder) {
+            if ((vm.formBuilder[key]['required'] === true || vm.formBuilder[key]['required'] === 'true') && !vm.formBuilder[key]['value']) {
+              valid = false
+              alert(vm.formBuilder[key]['fieldLabel'] + ' là bắt buộc!')
+              return valid
+            }
+          }
+        }
+        return valid
       },
       formSubmitData () {
         let vm = this

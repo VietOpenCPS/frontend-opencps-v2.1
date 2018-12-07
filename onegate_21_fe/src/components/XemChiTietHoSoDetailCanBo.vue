@@ -60,7 +60,7 @@
             THANH TOÁN
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1" @click="loadHoSoLienThong()">
+        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1 && listLienThong.length>0" @click="loadHoSoLienThong()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LIÊN THÔNG
           </v-btn>
@@ -85,7 +85,7 @@
             <!-- Một cửa -->
             <div class="px-4 pt-2">
               <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
-                <p class="mb-2" v-if="filterNextActionEnable(btnDossierDynamics)">
+                <p class="mb-2">
                   <span>Chuyển đến bởi: </span>
                   <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
                   <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
@@ -108,7 +108,7 @@
                   </v-flex>
                   <v-flex class="text-xs-right" style="width:100px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false">Phân công lại</span>
+                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
                       <span v-if="String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>
@@ -125,7 +125,9 @@
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: red; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx</span>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
+                    <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                    <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx (Tối đa 10MB)</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
@@ -334,7 +336,7 @@
               <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
             </v-card>
           </v-tab-item>
-          <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
               <v-card-text v-else>
@@ -788,11 +790,10 @@ export default {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
         vm.getNextActions()
-        vm.runComment()
-        if (vm.originality !== 1) {
+        if (vm.getOriginality() !== 1) {
           vm.loadHoSoLienThong()
         }
-        // console.log('thongtinchitiet', vm.thongTinChiTietHoSo)
+        vm.runComment()
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -802,7 +803,7 @@ export default {
         })
         vm.$store.dispatch('getListDossierFiles', data).then(result => {
           vm.listDossierFiles = result
-          console.log('listDossierFiles', vm.listDossierFiles)
+          // console.log('listDossierFiles', vm.listDossierFiles)
         })
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.initData(resultDossier)
@@ -1032,7 +1033,6 @@ export default {
         } catch (e) {
         }
       }
-      console.log('isPopup========11111', isPopup)
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -1127,7 +1127,6 @@ export default {
           vm.typeExtendDate = 'betimes'
         }
       }
-      // console.log('isPopup========222222', isPopup)
       if (isPopup) {
         vm.loadingAction = false
         vm.dialogActionProcess = true
@@ -1365,6 +1364,7 @@ export default {
       var validCreateFiles = true
       var validThanhToanDienTu = true
       var validKySo = true
+      var validFormBoSung = true
       var useKySo = false
       var initData = vm.$store.getters.loadingInitData
       let actionUser = initData.user.userName ? initData.user.userName : ''
@@ -1414,7 +1414,6 @@ export default {
         } else {
           validThanhToanDienTu = false
         }
-        // console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
@@ -1429,7 +1428,6 @@ export default {
       }
       if (vm.showExtendDateEdit) {
         let data = vm.$refs.ngaygiahan.doExport()
-        // console.log('extendDateEdit', data.extendDate)
         if (data.valid) {
           validTreHan = true
         } else {
@@ -1448,6 +1446,12 @@ export default {
       }
       if (vm.showFormBoSungThongTinNgan) {
         filter['payload'] = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+        let validation = vm.$refs.formBoSungThongTinNgan.checkValid()
+        if (validation) {
+          validFormBoSung = true
+        } else {
+          validFormBoSung = false
+        }
       }
       if (vm.showYkienCanBoThucHien) {
         let result = vm.$refs.ykiencanbo.doExport()
@@ -1474,7 +1478,7 @@ export default {
           }
         }
       }
-      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1487,7 +1491,6 @@ export default {
         if (x && vm.validateAction) {
           vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            // console.log('result======', result)
             vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -1503,8 +1506,6 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
-            // console.log('vm.rollbackable======', vm.rollbackable)
-            // console.log('vm.printDocument======', vm.printDocument)
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1569,7 +1570,6 @@ export default {
                         }).catch(reject => {
                         })
                       } else {
-                        console.log('fileDetail', fileDetail)
                         fileDetail['dossierId'] = vm.thongTinChiTietHoSo.dossierId
                         vm.$store.dispatch('postEformEsignature', fileDetail).then(resPostEform => {
                           counterSave += 1
@@ -1606,11 +1606,11 @@ export default {
                   }
                   resultAction['userNote'] = note
                 }
-                vm.$refs.kypheduyettailieu.kySo(resultAction)
                 setTimeout(function () {
                   vm.loadingAction = false
                   vm.loadingActionProcess = false
                 }, 200)
+                vm.$refs.kypheduyettailieu.kySo(resultAction)
               }
             }).catch(function (reject) {
               vm.loadingAction = false
@@ -1904,7 +1904,6 @@ export default {
             createDossiers: ''
           }
           vm.$store.dispatch('postAction', params).then(resPostAction => {
-            console.log(resPostAction)
           })
         })
       } else {
@@ -1920,7 +1919,6 @@ export default {
           createDossiers: ''
         }
         vm.$store.dispatch('postAction', params).then(resPostAction => {
-          console.log(resPostAction)
         })
       }
     },
@@ -1988,7 +1986,7 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
-        console.log('paymentProfile', vm.paymentProfile)
+        // console.log('paymentProfile', vm.paymentProfile)
       }).catch(reject => {
       })
     },
@@ -2024,7 +2022,6 @@ export default {
           let result = vm.$refs.ykiencanbo.doExport()
           resultAction['userNote'] = result.text
         }
-        console.log('run doAction', resultAction)
         vm.$refs.kypheduyettailieu.kySo(resultAction)
         setTimeout(function () {
           vm.loadingAction = false
@@ -2140,9 +2137,15 @@ export default {
       }
     },
     changeStateViewResult (data) {
-      console.log('state view result', data)
+      // console.log('state view result', data)
       var vm = this
       vm.stateViewResult = data
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     },
     checkActionSpecial (btnAction) {
       var vm = this
