@@ -232,7 +232,7 @@
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-card-title class="headline">
-          <span v-if="pdfEform">Biểu mẫu khai trực tuyến</span>
+          <span v-if="pdfEform">Bản khai trực tuyến</span>
           <span v-else>File đính kèm</span>
         </v-card-title>
         <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
@@ -860,10 +860,14 @@ export default {
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
         data['dossierId'] = vm.thongTinHoSo.dossierId
-        vm.$store.dispatch('viewFile', data).then(result => {
-          vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview' + vm.id).src = result
-        })
+        if (data.referenceUid) {
+          vm.$store.dispatch('viewFile', data).then(result => {
+            vm.dialogPDFLoading = false
+            document.getElementById('dialogPDFPreview' + vm.id).src = result
+          })
+        } else {
+          toastr.error('File dữ liệu không tồn tại')
+        }
       }
     },
     viewFileWithPartNo (item) {

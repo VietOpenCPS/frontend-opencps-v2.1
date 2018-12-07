@@ -1996,22 +1996,25 @@ export default {
     },
     doChangeDossierExtraForm () {
       let vm = this
-      let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
-      let x = confirm('Bạn có chắc chắn thực hiện hành động điều chỉnh dữ liệu?')
-      if (x) {
-        let countSelectedDoAction = vm.selectedDoAction.length
-        let fiter = {
-          dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId,
-          actionCode: vm.actionId,
-          payload: payloadExtraForm
+      let validation = vm.$refs.formBoSungThongTinNgan.checkValid()
+      if (validation) {
+        let payloadExtraForm = vm.$refs.formBoSungThongTinNgan.formSubmitData()
+        let x = confirm('Bạn có chắc chắn thực hiện hành động điều chỉnh dữ liệu?')
+        if (x) {
+          let countSelectedDoAction = vm.selectedDoAction.length
+          let fiter = {
+            dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId,
+            actionCode: vm.actionId,
+            payload: payloadExtraForm
+          }
+          vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
+            vm.doLoadingDataHoSo()
+            vm.dialog_extraForm = false
+          }).catch(function () {
+            vm.dialog_extraForm = false
+            vm.doLoadingDataHoSo()
+          })
         }
-        vm.$store.dispatch('processDossierRouter', fiter).then(function (result) {
-          vm.doLoadingDataHoSo()
-          vm.dialog_extraForm = false
-        }).catch(function () {
-          vm.dialog_extraForm = false
-          vm.doLoadingDataHoSo()
-        })
       }
     },
     doRestoreDossier () {
