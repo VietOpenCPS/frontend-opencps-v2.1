@@ -56,7 +56,7 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
-      <v-flex xs12 sm4 class="mt-4 ml-2 mr-2">
+      <v-flex xs12 sm4 class="mt-4" style="    padding-left: 15px;">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Thống kê thủ tục hành chính
@@ -75,17 +75,54 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-flex xs12 sm4 class="mt-4 ml-2 mr-2">
+      <v-flex xs12 sm4 class="mt-4">
         <v-card class="wrap_report mx-2" style="border-radius: 0;">
           <v-card-title class="headline">
-            Tổng hợp tình hình giải quyết hồ sơ năm {{year}}
+            <span>Tổng hợp tình hình giải quyết hồ sơ năm {{year}}</span>
+            <a class="detail__pie" href="javascript:;" @click="showDetailReport = !showDetailReport">
+              <span v-if="!showDetailReport">Chi tiết</span>
+              <span v-else>Đóng lại</span>
+            </a>
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
             <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-card class="wrap_report xs12 flex" style="border-radius: 0;">
+      <v-flex xs12 sm4 class="mt-4">
+        <v-card class="wrap_report mx-2" style="border-radius: 0;">
+          <v-card-title class="headline">
+            TÌNH HÌNH XỬ LÝ HỒ SƠ NĂM {{year}}
+          </v-card-title>
+          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
+            <div>
+              <div class="numbers align-space-between" style="margin: 20px 0;overflow: hidden;">
+                <div class="tiepnhan" style="
+                  width: 50%;
+                  text-align: center;
+                  float: left;
+                ">
+                  <p style="text-transform: uppercase;margin-bottom: 5px;">Đã tiếp nhận</p>
+                  <span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span>
+                  <label style="text-transform: uppercase;font-weight: 400;margin-top: 5px;display: block;">Hồ sơ</label>
+                </div>
+                <div class="giaiquyet" style="width: 50%;text-align: center;float: left;">
+                  <p style="text-transform: uppercase;margin-bottom: 5px;">Đã giải quyết</p>
+                  <span id="da_giai_quyet" style="font-size: 24px;font-weight: 700;">{{itemTotal['releaseCount']}}</span>
+                  <label style="text-transform: uppercase;font-weight: 400;margin-top: 5px;display: block;">Hồ sơ</label>
+                </div>
+              </div>
+              <div class="result" style="text-align: center;padding-bottom: 15px;">
+                <p id="phan_tram" style="font-size: 36px;color: #fdb44b;font-weight: 500;margin: 0;">
+                  {{itemTotal['ontimePercentage']}}
+                </p> 
+                <span style="text-transform: uppercase;">Trong hạn</span>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <v-card v-if="showDetailReport" class="wrap_report xs12 flex" style="border-radius: 0;">
         <v-card-text class="py-2 px-1 layout row wrap" style="
             background: #fafafa;
             margin: 0;
@@ -316,6 +353,7 @@ export default {
     PieChartReportPublic
   },
   data: () => ({
+    showDetailReport: false,
     itemTotal: {},
     levelList: [],
     chartView: true,
@@ -506,6 +544,8 @@ export default {
                 ontimeCount: currentData.ontimeCount,
                 overtimeCount: currentData.overtimeCount,
                 ontimePercentage: currentData.ontimePercentage,
+                processCount: currentData.processCount,
+                releaseCount: currentData.releaseCount,
               }
               vm.showTableTotal = true
               break
