@@ -180,7 +180,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId()
+            groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
         // test local
