@@ -540,7 +540,7 @@ export default {
           vm.levelList = result
           let totalXXX = 0
           for (let key in vm.levelList) {
-            totalXXX = totalXXX + vm.levelList[key]['count']
+            totalXXX = totalXXX + parseInt(vm.levelList[key]['count'])
           }
           vm.totalTTHC = totalXXX
         })
