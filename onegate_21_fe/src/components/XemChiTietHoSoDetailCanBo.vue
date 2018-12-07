@@ -60,7 +60,7 @@
             THANH TOÁN
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1" @click="loadHoSoLienThong()">
+        <v-tab :key="4" href="#tabs-4" v-if="originality !== 1 && listLienThong.length>0" @click="loadHoSoLienThong()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LIÊN THÔNG
           </v-btn>
@@ -108,7 +108,7 @@
                   </v-flex>
                   <v-flex class="text-xs-right" style="width:100px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false">Phân công lại</span>
+                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
                       <span v-if="String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>
@@ -336,7 +336,7 @@
               <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
             </v-card>
           </v-tab-item>
-          <v-tab-item id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
               <v-card-text v-else>
@@ -790,11 +790,10 @@ export default {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
         vm.getNextActions()
-        console.log('run initdata')
-        vm.runComment()
         if (vm.getOriginality() !== 1) {
           vm.loadHoSoLienThong()
         }
+        vm.runComment()
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
           if (Array.isArray(resultDocuments)) {
             vm.documents = resultDocuments
@@ -804,7 +803,7 @@ export default {
         })
         vm.$store.dispatch('getListDossierFiles', data).then(result => {
           vm.listDossierFiles = result
-          console.log('listDossierFiles', vm.listDossierFiles)
+          // console.log('listDossierFiles', vm.listDossierFiles)
         })
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.initData(resultDossier)
@@ -1034,7 +1033,6 @@ export default {
         } catch (e) {
         }
       }
-      console.log('isPopup========11111', isPopup)
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
@@ -1129,7 +1127,6 @@ export default {
           vm.typeExtendDate = 'betimes'
         }
       }
-      // console.log('isPopup========222222', isPopup)
       if (isPopup) {
         vm.loadingAction = false
         vm.dialogActionProcess = true
@@ -1417,7 +1414,6 @@ export default {
         } else {
           validThanhToanDienTu = false
         }
-        // console.log('paymentProfile1', paymentProfile, validThanhToanDienTu)
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
@@ -1432,7 +1428,6 @@ export default {
       }
       if (vm.showExtendDateEdit) {
         let data = vm.$refs.ngaygiahan.doExport()
-        // console.log('extendDateEdit', data.extendDate)
         if (data.valid) {
           validTreHan = true
         } else {
@@ -1496,7 +1491,6 @@ export default {
         if (x && vm.validateAction) {
           vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            // console.log('result======', result)
             vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
@@ -1512,8 +1506,6 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
-            // console.log('vm.rollbackable======', vm.rollbackable)
-            // console.log('vm.printDocument======', vm.printDocument)
             router.push({
               path: vm.$router.history.current.path,
               query: {
@@ -1578,7 +1570,6 @@ export default {
                         }).catch(reject => {
                         })
                       } else {
-                        console.log('fileDetail', fileDetail)
                         fileDetail['dossierId'] = vm.thongTinChiTietHoSo.dossierId
                         vm.$store.dispatch('postEformEsignature', fileDetail).then(resPostEform => {
                           counterSave += 1
@@ -1615,11 +1606,11 @@ export default {
                   }
                   resultAction['userNote'] = note
                 }
-                vm.$refs.kypheduyettailieu.kySo(resultAction)
                 setTimeout(function () {
                   vm.loadingAction = false
                   vm.loadingActionProcess = false
                 }, 200)
+                vm.$refs.kypheduyettailieu.kySo(resultAction)
               }
             }).catch(function (reject) {
               vm.loadingAction = false
@@ -1913,7 +1904,6 @@ export default {
             createDossiers: ''
           }
           vm.$store.dispatch('postAction', params).then(resPostAction => {
-            console.log(resPostAction)
           })
         })
       } else {
@@ -1929,7 +1919,6 @@ export default {
           createDossiers: ''
         }
         vm.$store.dispatch('postAction', params).then(resPostAction => {
-          console.log(resPostAction)
         })
       }
     },
@@ -1997,14 +1986,13 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
-        console.log('paymentProfile', vm.paymentProfile)
+        // console.log('paymentProfile', vm.paymentProfile)
       }).catch(reject => {
       })
     },
     loadHoSoLienThong () {
       var vm = this
       let dossierId = vm.thongTinChiTietHoSo.dossierId
-      console.log('run load lien thong')
       vm.$store.dispatch('loadDossierLienThong', dossierId).then(result => {
         vm.listLienThong = result
       }).catch(reject => {
@@ -2034,7 +2022,6 @@ export default {
           let result = vm.$refs.ykiencanbo.doExport()
           resultAction['userNote'] = result.text
         }
-        console.log('run doAction', resultAction)
         vm.$refs.kypheduyettailieu.kySo(resultAction)
         setTimeout(function () {
           vm.loadingAction = false
@@ -2150,9 +2137,15 @@ export default {
       }
     },
     changeStateViewResult (data) {
-      console.log('state view result', data)
+      // console.log('state view result', data)
       var vm = this
       vm.stateViewResult = data
+    },
+    getUser (roleItem) {
+      let vm = this
+      let roles = vm.$store.getters.getUser.role
+      let roleExits = roles.findIndex(item => item === roleItem)
+      return (roleExits >= 0)
     },
     checkActionSpecial (btnAction) {
       var vm = this
@@ -2204,12 +2197,6 @@ export default {
       } else {
         return ''
       }
-    },
-    getUser (roleItem) {
-      let vm = this
-      let roles = vm.$store.getters.getUser.role
-      let roleExits = roles.findIndex(item => item === roleItem)
-      return (roleExits >= 0)
     }
   }
 }
