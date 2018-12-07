@@ -61,13 +61,21 @@
           <v-card-title class="headline">
             Thống kê thủ tục hành chính
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0">
+          <v-card-text class="pt-2 py-0 px-0">
             <v-list class="pt-0">
               <v-list-tile v-for="item in levelList" :key="item.level">
                 <v-list-tile-content>
                   <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
                   <span class="status__counter" style="color:#0b72ba">
                     {{item.count}}
+                  </span>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>
+                  <v-list-tile-title>Tổng số thủ tục hành chính</v-list-tile-title>
+                  <span class="status__counter" style="color:#0b72ba">
+                    {{totalTTHC}}
                   </span>
                 </v-list-tile-content>
               </v-list-tile>
@@ -114,7 +122,7 @@
               </div>
               <div class="result" style="text-align: center;padding-bottom: 15px;">
                 <p id="phan_tram" style="font-size: 36px;color: #fdb44b;font-weight: 500;margin: 0;">
-                  {{itemTotal['ontimePercentage']}}
+                  {{itemTotal['ontimePercentage']}} %
                 </p> 
                 <span style="text-transform: uppercase;">Trong hạn</span>
               </div>
@@ -356,6 +364,7 @@ export default {
     showDetailReport: false,
     itemTotal: {},
     levelList: [],
+    totalTTHC: 0,
     chartView: true,
     currentMonth: ((new Date()).getMonth() + 1) < 10 ? '0' + ((new Date()).getMonth() + 1) : ((new Date()).getMonth() + 1),
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
@@ -529,6 +538,11 @@ export default {
         vm.doStaticsReport()
         vm.$store.dispatch('getLevelList').then(function (result) {
           vm.levelList = result
+          let totalXXX = 0
+          for (let key in vm.levelList) {
+            totalXXX = totalXXX + vm.levelList[key]['count']
+          }
+          vm.totalTTHC = totalXXX
         })
         vm.showTableTotal = false
         vm.$store.dispatch('getReportTotal').then(function (result) {
