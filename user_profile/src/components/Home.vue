@@ -48,7 +48,7 @@
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                <v-text-field type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v!==oldPassWord || 'Mật khẩu mới trùng mật khẩu cũ']" required>
                   <template slot="label">Mật khẩu mới <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
