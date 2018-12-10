@@ -72,6 +72,8 @@ export const store = new Vuex.Store({
       dossierTemplates: support.dossierTemplates
     },
     dossierTemplates: support.dossierTemplates,
+    applicantId: '',
+    applicantBussinessExit: false,
     thongTinChuHoSo: {
       userType: true,
       cityCode: '',
@@ -1027,6 +1029,66 @@ export const store = new Vuex.Store({
           commit('setDichVuChuyenPhatKetQua', response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)
+        })
+      })
+    },
+    getApplicantInfos ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/applicants/ngsp/' + filter.applicantIdNo, param).then(function (response) {
+        axios.get('/o/rest/v2/applicants/ngsp/' + filter.applicantIdNo, param).then(function (response) {
+          if (response.data && response.data['Data']) {
+            resolve(response.data['Data'])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
+    checkApplicantInfos ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        // test local
+        var url = '/o/rest/v2/applicants/ngsp/verify'
+        // var url = 'http://127.0.0.1:8081/api/applicants/ngsp/verify'
+        var dataCheck = new URLSearchParams()
+        dataCheck.append('applicantIdNo', filter.applicantIdNo ? filter.applicantIdNo : '')
+        dataCheck.append('applicantName', filter.applicantName ? filter.applicantName : '')
+        axios.post(url, dataCheck, param).then(result1 => {
+          resolve(result1.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    getDossierFilesApplicants ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        axios.get(state.initData.dossierApi + '/' + filter.dossierId + '/applicant/' + filter.applicantIdNo + '/files/' + filter.fileTemplateNo + '/search', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
         })
       })
     },
@@ -3021,6 +3083,12 @@ export const store = new Vuex.Store({
     },
     setPaymentFileName (state, payload) {
       state.paymentFileName = payload
+    },
+    setApplicantBussinessExit (state, payload) {
+      state.applicantBussinessExit = payload
+    },
+    setApplicantId (state, payload) {
+      state.applicantId = payload
     }
   },
   getters: {
@@ -3189,6 +3257,12 @@ export const store = new Vuex.Store({
     },
     getUser (state) {
       return state.user
+    },
+    getApplicantIdNo (state) {
+      return state.applicantId
+    },
+    getApplicantBussinessExit (state) {
+      return state.applicantBussinessExit
     }
   }
 })
