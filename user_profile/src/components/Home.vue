@@ -314,6 +314,15 @@
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
             vm.item['class_name'] = 'rg.opencps.usermgt.model.EmployeeAvatar'
           }
+          if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
+            vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])
+          }
+          if (vm.user['applicantDistrictCode'] && vm.user['applicantDistrictCode'].indexOf('0') !== 0) {
+            vm.user['applicantDistrictCode'] = Number(vm.user['applicantDistrictCode'])
+          }
+          if (vm.user['applicantWardCode'] && vm.user['applicantWardCode'].indexOf('0') !== 0) {
+            vm.user['applicantWardCode'] = Number(vm.user['applicantWardCode'])
+          }
           let filterCity = {
             collectionCode: 'ADMINISTRATIVE_REGION',
             level: 0,
@@ -447,6 +456,13 @@
         if (dateInput) {
           let date = new Date(dateInput)
           return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        }
+      },
+      itemCodeNumber (code) {
+        if (code && code.indexOf('0') !== 0) {
+          return Number(code)
+        } else {
+          return ''
         }
       }
     }
