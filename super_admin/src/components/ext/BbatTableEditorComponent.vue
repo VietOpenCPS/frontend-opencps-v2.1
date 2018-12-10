@@ -37,45 +37,48 @@
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
-        ></v-autocomplete>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-autocomplete>
         <v-autocomplete :class="item['class_component']" v-if="item.type === 'selects' && !item.hasOwnProperty('datasource_key')"
           v-model="data[item.model]"
           :items="item.datasource"
           :item-text="item.itemText"
           :item-value="item.itemValue"
           box
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :no-data-text="'Không tìm thấy dữ liệu ' + item['label']"
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
-        ></v-autocomplete>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-autocomplete>
         <v-text-field :class="item['class_component']" v-if="item.type === 'text-fields'"
           v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           box 
           clearable
         >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
         <v-textarea :class="item['class_component']" v-if="item.type === 'textarea'"
           v-model="data[item.model]"
-          :label="item.required ? item['label'] + ' 💥': item['label']" 
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           box 
           clearable
-        ></v-textarea>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
         <codemirror v-if="item.type === 'codemirror'" v-model="data[item.model]" :options="cmOptions"></codemirror>
         <v-switch :class="item['class_component']" v-if="item.type === 'v-switch'"
@@ -111,45 +114,48 @@
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
-          ></v-autocomplete>
+          >
+            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+          </v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
             :items="itemChild.datasource"
             :item-text="itemChild.itemText"
             :item-value="itemChild.itemValue"
             box
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :no-data-text="'Không tìm thấy dữ liệu ' + itemChild['label']"
             @change="processChangeDataSource($event, itemChild)"
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
-          ></v-autocomplete>
+          >
+            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+          </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
             clearable
           >
+            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
-            :label="itemChild.required ? itemChild['label'] + ' 💥': itemChild['label']" 
             :rules="processRules(itemChild.rules)"
             :placeholder="itemChild['placeholder']"
             box
             clearable
-          ></v-textarea>
+          >
+            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+          </v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
           <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>
           <v-switch :class="itemChild['class_component']" v-if="itemChild.type === 'v-switch'"
