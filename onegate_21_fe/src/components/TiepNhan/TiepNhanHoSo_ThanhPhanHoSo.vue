@@ -68,6 +68,17 @@
                     </v-btn>
                   </div>
                 </div>
+                <div class="mr-2 mb-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #ef6c00">
+                  <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="item.partNo === itemFileView.dossierPartNo  && !itemFileView.eForm" >
+                    <div :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                      <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                        <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
+                        {{itemFileView.displayName}} - 
+                        <i>{{itemFileView.modifiedDate}}</i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <v-card v-if="item.hasForm && !onlyView">
@@ -153,6 +164,14 @@
                   </v-badge>
                 </v-btn>
                 <span>Tải file lên</span>
+              </v-tooltip>
+              <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
+                  <v-badge>
+                    <v-icon size="16" color="orange darken-3">warning</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span>Giấy tờ đã nộp</span>
               </v-tooltip>
               <!-- <v-tooltip top>
                 <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
@@ -327,6 +346,8 @@ export default {
       value: 2
     }],
     fileTemplateItems: [],
+    fileTemplateNoString: '',
+    dossierFilesApplicant: [],
     stateViewResult: true,
     currentFormView: '',
     pstFixed: 0,
@@ -353,6 +374,12 @@ export default {
         })
         return filter
       }
+    },
+    applicantBussinessExit () {
+      return this.$store.getters.getApplicantBussinessExit
+    },
+    applicantId () {
+      return this.$store.getters.getApplicantIdNo
     }
   },
   mounted () {
@@ -361,7 +388,20 @@ export default {
     vm.$nextTick(function () {
     })
   },
-  watch: {},
+  watch: {
+    applicantBussinessExit (val) {
+      let vm = this
+      if (val && vm.fileTemplateNoString) {
+        vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+    },
+    applicantId (val) {
+      let vm = this
+      if (val && vm.fileTemplateNoString) {
+        vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
+      }
+    }
+  },
   methods: {
     resetCounterTemplate ({commit, state}, data) {
       var vm = this
@@ -447,6 +487,14 @@ export default {
           vm.recountFileTemplates()
         }, 500)
         console.log('dossierTemplateItems', vm.dossierTemplateItems)
+        let fileTemplateNoArr = []
+        for (let key in vm.dossierTemplateItems) {
+          fileTemplateNoArr.push(vm.dossierTemplateItems[key]['fileTemplateNo'])
+        }
+        if (fileTemplateNoArr.length > 0) {
+          vm.fileTemplateNoString = fileTemplateNoArr.toString()
+          console.log('fileTemplateNoString', vm.fileTemplateNoString)
+        }
       }).catch(reject => {
       })
     },
@@ -1117,6 +1165,28 @@ export default {
         console.log('error')
       })
     },
+    getDossierFileApplicants (applicantIdNo, fileTemplateNo) {
+      var vm = this
+      let filter = {
+        dossierId: vm.thongTinHoSo.dossierId,
+        applicantIdNo: applicantIdNo,
+        fileTemplateNo: fileTemplateNo
+      }
+      vm.$store.dispatch('getDossierFilesApplicants', filter).then(result => {
+        vm.dossierFilesApplicant = result
+      }).catch(reject => {
+        console.log('error')
+      })
+    },
+    showFilesApplicant (partNo) {
+      let vm = this
+      console.log($('#fileApplicant-' + partNo).is(':visible'))
+      if ($('#fileApplicant-' + partNo).is(':visible')) {
+        $('#fileApplicant-' + partNo).hide()
+      } else {
+        $('#fileApplicant-' + partNo).show()
+      }
+    },
     checkKQhasFile (item) {
       var vm = this
       if (vm.partTypes.includes(2)) {
@@ -1130,6 +1200,17 @@ export default {
         }
       } else {
         return true
+      }
+    },
+    partNoApplicantHasFile (partNo) {
+      let vm = this
+      let hasFile = vm.dossierFilesApplicant.find(file => {
+        return file.dossierPartNo === partNo
+      })
+      if (hasFile) {
+        return true
+      } else {
+        return false
       }
     }
   }
