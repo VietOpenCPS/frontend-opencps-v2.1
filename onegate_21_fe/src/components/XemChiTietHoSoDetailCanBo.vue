@@ -1565,6 +1565,8 @@ export default {
                         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
                           counterSave += 1
                           if (counterSave === lengthFiles) {
+                            vm.loadingAction = false
+                            vm.loadingActionProcess = false
                             vm.doAction()
                           }
                         }).catch(reject => {
@@ -1574,6 +1576,8 @@ export default {
                         vm.$store.dispatch('postEformEsignature', fileDetail).then(resPostEform => {
                           counterSave += 1
                           if (counterSave === lengthFiles) {
+                            vm.loadingAction = false
+                            vm.loadingActionProcess = false
                             vm.doAction()
                           }
                         }).catch(reject => {
@@ -1606,10 +1610,8 @@ export default {
                   }
                   resultAction['userNote'] = note
                 }
-                setTimeout(function () {
-                  vm.loadingAction = false
-                  vm.loadingActionProcess = false
-                }, 200)
+                vm.loadingAction = false
+                vm.loadingActionProcess = false
                 vm.$refs.kypheduyettailieu.kySo(resultAction)
               }
             }).catch(function (reject) {
@@ -2023,10 +2025,6 @@ export default {
           resultAction['userNote'] = result.text
         }
         vm.$refs.kypheduyettailieu.kySo(resultAction)
-        setTimeout(function () {
-          vm.loadingAction = false
-          vm.loadingActionProcess = false
-        }, 200)
       }).catch(function (reject) {
         vm.loadingAction = false
         vm.loadingActionProcess = false
