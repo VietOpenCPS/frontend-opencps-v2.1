@@ -34,6 +34,8 @@ new Vue({ // eslint-disable-line no-new
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
+        $('.mWrapper > footer > .container > .left').css('width', '100%')
+        $('.mWrapper > footer > .container > .right').css('width', '100%')
       } else {
         $('.mWrapper > header').css('display', 'block')
         $('.mWrapper > footer').css('display', 'block')
