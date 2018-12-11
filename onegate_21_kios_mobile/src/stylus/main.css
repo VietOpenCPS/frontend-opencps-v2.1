@@ -1667,7 +1667,7 @@ header span {
 
 
 .row-1 {
-	background: url('http://119.17.200.7/o/parent-opencps-vue/images/bg-home.jpg') center center no-repeat;
+	background: url('/o/parent-opencps-vue/images/bg-home.jpg') center center no-repeat;
     background-size: 100% auto;
     margin-top: -10px;
     padding-top: 22px;
@@ -1737,7 +1737,7 @@ header span {
     text-align: center;
 }
 .row-1 .right .body {
-	background: url(http://119.17.200.7/o/parent-opencps-vue/images/img-home-6.png) center center no-repeat;
+	background: url(/o/parent-opencps-vue/images/img-home-6.png) center center no-repeat;
     background-size: cover;
 	padding: 15px 0;
 }
@@ -1782,7 +1782,7 @@ header span {
 }
 
 .row-2 {
-	background: url('http://119.17.200.7/o/parent-opencps-vue/images/bg-home-3.jpg') center center repeat-x;
+	background: url('/o/parent-opencps-vue/images/bg-home-3.jpg') center center repeat-x;
 	background-size: auto 100%;
 	padding: 15px 0;
 }
@@ -1805,7 +1805,7 @@ header span {
 }
 
 .row-3 {
-	background: url('http://119.17.200.7/o/parent-opencps-vue/images/bg-home-2.jpg') center center no-repeat;
+	background: url('/o/parent-opencps-vue/images/bg-home-2.jpg') center center no-repeat;
 	background-size: cover;
 }
 .row-3 .sub-text {
