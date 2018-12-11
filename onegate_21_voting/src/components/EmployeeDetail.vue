@@ -29,7 +29,7 @@
           </div>
           <div style="clear: both; margin-top: 15px;"></div>
         </div>
-        <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;">
+        <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
           <div style="font-weight: bold;">{{index + 1}}. {{ item.subject }}</div>
           <div class="ml-4">
             <v-radio-group v-model="item.selected" height="10" row>
@@ -76,7 +76,7 @@
         <v-layout row wrap>
           <v-flex xs12 sm12>
             <v-text-field
-            label="Chứng minh thư nhân dân"
+            placeholder="Nhập số chứng minh thư nhân dân"
             v-model="applicantIdNo"
             :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
             required
@@ -84,7 +84,7 @@
           </v-flex>
           <v-flex xs12 sm12>
             <v-text-field
-            label="Mã hồ sơ"
+            placeholder="Nhập mã hồ sơ"
             v-model="dossierNo"
             :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
             required

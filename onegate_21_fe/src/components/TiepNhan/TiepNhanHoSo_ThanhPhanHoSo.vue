@@ -68,7 +68,7 @@
                     </v-btn>
                   </div>
                 </div>
-                <div class="mr-2 mb-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #ef6c00">
+                <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
                   <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="item.partNo === itemFileView.dossierPartNo  && !itemFileView.eForm" >
                     <div :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                       <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -137,7 +137,7 @@
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '90px' : 'auto'}" :class="{'text-xs-center' : !onlyView, 'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? '90px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input
               type="file"
               style="display: none"
@@ -494,6 +494,9 @@ export default {
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
           console.log('fileTemplateNoString', vm.fileTemplateNoString)
+          if (vm.applicantId && !vm.onlyView) {
+            vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
+          }
         }
       }).catch(reject => {
       })
@@ -905,10 +908,10 @@ export default {
         var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
         window.open(url)
       } else {
-        vm.dialogPDFLoading = true
-        vm.dialogPDF = true
         data['dossierId'] = vm.thongTinHoSo.dossierId
         if (data.referenceUid) {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
           vm.$store.dispatch('viewFile', data).then(result => {
             vm.dialogPDFLoading = false
             document.getElementById('dialogPDFPreview' + vm.id).src = result
