@@ -41,17 +41,23 @@
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Mật khẩu cũ 💥" type="password" v-model="oldPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+                <v-text-field type="password" v-model="oldPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                  <template slot="label">Mật khẩu cũ <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Mật khẩu mới 💥" type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+                <v-text-field type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v!==oldPassWord || 'Mật khẩu mới trùng mật khẩu cũ']" required>
+                  <template slot="label">Mật khẩu mới <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Nhập lại mật khẩu mới 💥" type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v===newPassWord || 'Mật khẩu nhập lại không chính xác']" required></v-text-field>
+                <v-text-field type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v===newPassWord || 'Mật khẩu nhập lại không chính xác']" required>
+                  <template slot="label">Nhập lại mật khẩu mới <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
@@ -62,7 +68,9 @@
             </v-layout>
             <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Applicant'" row wrap class="px-3 py-3">
               <v-flex xs12 sm4>
-                <v-text-field label="Tên người dùng 💥" v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+                <v-text-field v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                  <template slot="label">Tên người dùng <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-text-field label="Điện thoại" v-model="user['applicantContactTelNo']" box></v-text-field>
@@ -98,15 +106,17 @@
 
             <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Employee'" row wrap class="px-3 py-3">
               <v-flex xs12 sm4>
-                <v-text-field label="Tên người dùng 💥" v-model="user['employeeFullName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required></v-text-field>
+                <v-text-field v-model="user['employeeFullName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                  <template slot="label">Tên người dùng <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field label="Điện thoại 💥" v-model="user['employeeTelNo']" box></v-text-field>
+                <v-text-field label="Điện thoại" v-model="user['employeeTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
                 <v-menu
                   ref="menuBirthDate"
-                  :close-on-content-click="true"
+                  :close-on-content-click="false"
                   v-model="menuBirthDate"
                   :nudge-right="40"
                   lazy
@@ -127,13 +137,15 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field label="Contact code 💥" v-model="user['employeeNo']" box></v-text-field>
+                <v-text-field v-model="user['employeeNo']" box>
+                  <template slot="label">Contact code <span class="red--text darken-3">*</span></template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field label="Địa điểm ký số 💥" value="Hà Nội" box></v-text-field>
+                <v-text-field label="Địa điểm ký số" value="Hà Nội" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm4>
-                <v-text-field label="Chức danh ký số 💥" v-model="user['title']" box></v-text-field>
+                <v-text-field label="Chức danh ký số" v-model="user['title']" box></v-text-field>
               </v-flex>
 
               <v-flex xs12 sm6>
@@ -302,6 +314,15 @@
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
             vm.item['class_name'] = 'rg.opencps.usermgt.model.EmployeeAvatar'
           }
+          if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
+            vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])
+          }
+          if (vm.user['applicantDistrictCode'] && vm.user['applicantDistrictCode'].indexOf('0') !== 0) {
+            vm.user['applicantDistrictCode'] = Number(vm.user['applicantDistrictCode'])
+          }
+          if (vm.user['applicantWardCode'] && vm.user['applicantWardCode'].indexOf('0') !== 0) {
+            vm.user['applicantWardCode'] = Number(vm.user['applicantWardCode'])
+          }
           let filterCity = {
             collectionCode: 'ADMINISTRATIVE_REGION',
             level: 0,
@@ -435,6 +456,13 @@
         if (dateInput) {
           let date = new Date(dateInput)
           return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        }
+      },
+      itemCodeNumber (code) {
+        if (code && code.indexOf('0') !== 0) {
+          return Number(code)
+        } else {
+          return ''
         }
       }
     }

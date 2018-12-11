@@ -52,22 +52,24 @@
                 <v-layout wrap>
                   <v-flex xs12 sm12>
                     <v-text-field
-                      label="Số hiệu quy trình"
                       v-model="currentProcess.processNo"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Số hiệu quy trình <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-text-field
-                      label="Tên quy trình"
                       v-model="currentProcess.processName"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Tên quy trình <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm12>
@@ -82,12 +84,13 @@
                     <v-layout wrap>
                       <v-flex xs12 sm7 class="pl-0">
                         <v-text-field
-                          label="Thời gian xử lý"
                           v-model="currentProcess.durationCount"
                           box
                           :rules="[rules.required]"
                           required
-                        ></v-text-field>
+                        >
+                        <template slot="label">Thời gian xử lý <span class="red--text darken-3">*</span></template>
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs12 sm5 class="pl-2 pr-0">
                         <v-select
@@ -245,24 +248,26 @@
                       <v-flex xs12 sm6 class="pr-2">
                         <v-switch label="Tạo số tiếp nhận hồ sơ" v-model="currentProcess.generateDossierNo"></v-switch>
                         <v-text-field
-                          label="Cấu hình sinh mã số hồ sơ"
                           v-model="currentProcess.dossierNoPattern"
                           box
                           :rules="currentProcess.generateDossierNo ? [rules.required] : []"
                           :required="currentProcess.generateDossierNo"
                           :disabled="currentProcess.generateDossierNo?false:true"
-                        ></v-text-field>
+                        >
+                          <template slot="label">Cấu hình sinh mã số hồ sơ <span v-if="currentProcess.generateDossierNo" class="red--text darken-3">*</span></template>
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 class="pl-2">
                         <v-switch label="Sinh ngày hẹn trả hồ sơ" v-model="currentProcess.generateDueDate"></v-switch>
                         <v-text-field
-                          label="Cấu hình sinh ngày hẹn trả"
                           v-model="currentProcess.dueDatePattern"
                           box
                           :rules="currentProcess.generateDueDate ? [rules.required] : []"
                           :required="currentProcess.generateDueDate"
                           :disabled="currentProcess.generateDueDate?false:true"
-                        ></v-text-field>
+                        >
+                          <template slot="label">Cấu hình sinh ngày hẹn trả <span v-if="currentProcess.generateDueDate" class="red--text darken-3">*</span></template>
+                        </v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-flex>
@@ -280,12 +285,13 @@
                   <!--  -->
                   <v-flex xs12 sm12>
                     <v-text-field
-                      label="Server đồng bộ "
                       v-model="currentProcess.serverNo"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Server đồng bộ  <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-right pr-3" style="
@@ -392,12 +398,13 @@
                 <v-layout wrap>
                   <v-flex xs12 sm6 class="pr-2">
                     <v-text-field
-                      label="Tên bước"
                       v-model="currentStep.stepName"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Tên bước  <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-text-field
@@ -410,7 +417,6 @@
                   <v-flex xs12 sm6 class="pr-2">
                     <v-autocomplete
                       box
-                      label="Trạng thái chính "
                       :items="dossierStatusList"
                       v-model="currentStep.dossierStatus"
                       item-text="itemName"
@@ -421,22 +427,24 @@
                       required
                       @change="changeDossierStatus"
                     >
-                    <template
-                      slot="item"
-                      slot-scope="data"
-                    >
-                      <v-flex xs12>{{data.item.itemCode}} - {{data.item.itemName}}</v-flex>
-                    </template>
+                      <template
+                        slot="item"
+                        slot-scope="data"
+                      >
+                        <v-flex xs12>{{data.item.itemCode}} - {{data.item.itemName}}</v-flex>
+                      </template>
+                      <template slot="label">Trạng thái chính  <span class="red--text darken-3">*</span></template>
                     </v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-text-field
-                      label="Mã bước quy trình "
                       v-model="currentStep.stepCode"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Mã bước quy trình <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
@@ -691,19 +699,21 @@
                 <v-layout wrap>
                   <v-flex xs12 sm6 class="pr-2">
                     <v-text-field
-                      label="Tên thao tác"
                       v-model="currentAction.actionName"
                       box
                       :rules="[rules.required]"
                       required
-                    ></v-text-field>
+                    >
+                      <template slot="label">Tên thao tác <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-text-field
-                      label="Mã thao tác"
                       v-model="currentAction.actionCode"
                       box
-                    ></v-text-field>
+                    >
+                      <template slot="label">Mã thao tác <span class="red--text darken-3">*</span></template>
+                    </v-text-field>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
