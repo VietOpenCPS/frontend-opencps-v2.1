@@ -745,7 +745,20 @@ export default {
       })
     },
     doPrintReportFix () {
-
+      let vm = this
+      let docDefinition = {}
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['document'] === vm.reportType) {
+          docDefinition = eval('( ' + vm.itemsReports[key]['tableConfig'] + ' )')['docDefinition']
+          break
+        }
+      }
+      vm.isShowLoading = true
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+      pdfDocGenerator.getBlob((blob) => {
+        vm.pdfBlob = window.URL.createObjectURL(blob)
+        vm.isShowLoading = false
+      })
     },
     doPrintReport () {
       let vm = this
