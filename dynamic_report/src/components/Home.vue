@@ -155,16 +155,19 @@
     created () {
     var vm = this
       vm.$nextTick(function () {
-        if (String(vm.index) !== '0') {
-          for (let key in vm.itemsReports) {
-            if (vm.itemsReports[key]['code'] === String(vm.index)) {
-              vm.reportType = vm.itemsReports[key]['document']
-              break
+        setTimeout(() => {
+          console.log('itemsReports', vm.itemsReports)
+          if (String(vm.index) !== '0') {
+            for (let key in vm.itemsReports) {
+              if (vm.itemsReports[key]['code'] === String(vm.index)) {
+                vm.reportType = vm.itemsReports[key]['document']
+                break
+              }
             }
+          } else {
+            vm.reportType = vm.itemsReports[0]['document']
           }
-        } else {
-          vm.reportType = vm.itemsReports[0]['document']
-        }
+        }, 200)
       })
     },
     methods: {
