@@ -25,22 +25,23 @@
                       <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading || loadingVerify">
-                        <content-placeholders-text :lines="1" />
-                      </content-placeholders>
                       <v-text-field
                         v-if="originality === 1 || originality === '1'"
                         v-model="thongTinChuHoSo.applicantIdNo"
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
                         @input="changeApplicantInfos"
+                        :disabled="loadingVerify"
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
                         v-model="thongTinChuHoSo.applicantIdNo"
                         :options="searchOptions"
                         :onItemSelected="onSearchItemSelected"
-                        :onInputChange="onInputChange">
+                        :onInputChange="onInputChange"
+                        :class="loadingVerify ? 'input-group--disabled' : ''"
+                        :style="loadingVerify ? 'color:#00000061' : ''"
+                        >
                         <div slot="item" slot-scope="props" class="single-item">
                           <v-list-tile-content>
                             <v-list-tile-title v-html="props.item.applicantName"></v-list-tile-title>
@@ -50,7 +51,7 @@
                       </suggestions>
                     </v-flex>
                     <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading || loadingVerify">
+                      <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
@@ -65,6 +66,7 @@
                         @input="changeApplicantInfos"
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
+                        :disabled="loadingVerify"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -466,7 +468,6 @@ export default {
       cityCode: '',
       districtCode: '',
       wardCode: '',
-      applicantNote: '',
       applicantIdNo: '',
       applicantIdType: '',
       contactEmail: '',
@@ -641,7 +642,6 @@ export default {
         cityCode: data.cityCode,
         districtCode: data.districtCode,
         wardCode: data.wardCode,
-        applicantNote: data.applicantNote,
         applicantIdNo: data.applicantIdNo,
         applicantIdType: data.applicantIdType,
         contactEmail: data.contactEmail,
@@ -978,7 +978,7 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
-      if (!vm.thongTinChuHoSo.userType || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
           applicantName: vm.thongTinChuHoSo.applicantName

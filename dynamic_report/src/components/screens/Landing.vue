@@ -784,6 +784,7 @@ export default {
           console.log('groupType: ', vm.groupType)
           let index = 1
           for (let key in result) {
+            console.log('domainName: ', (result[key]['domainName'] !== ''))
             let flag = false
             if (vm.groupType !== 'domain') {
               if (result[key]['govAgencyName'] !== '') {
@@ -819,8 +820,6 @@ export default {
                 })
               }
               for (let keyMapping in mappingData) {
-                console.log('mappingData', mappingData[keyMapping])
-                console.log('mappingData value: ', result[key][mappingData[keyMapping]])
                 dataRow.push({
                   text: result[key][mappingData[keyMapping]], 
                   alignment: 'center',
