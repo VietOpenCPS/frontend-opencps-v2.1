@@ -1855,6 +1855,7 @@ export default {
         vm.dialogPDFLoading = true
         vm.dialogPDF = true
         vm.$store.dispatch('doGuiding', filter).then(function (result) {
+          vm.loadingAction = false
           vm.dialog_printGuide = false
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreview').src = result
