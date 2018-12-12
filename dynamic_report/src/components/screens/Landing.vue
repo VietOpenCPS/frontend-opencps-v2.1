@@ -825,7 +825,9 @@ export default {
                 })
               }
               index = index + 1
-              docDefinition['content'][2]['table']['body'].push(dataRow)
+              console.log('dataRow', dataRow)
+              console.log('body', docDefinition['content'][2]['table']['body'])
+              // docDefinition['content'][2]['table']['body'].push(dataRow)
             }
           }
           const pdfDocGenerator = pdfMake.createPdf(docDefinition)
