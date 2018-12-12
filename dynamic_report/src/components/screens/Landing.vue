@@ -781,8 +781,10 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
+          console.log('result: ', result)
           let index = 1
           for (let key in result) {
+            console.log('result: ', result[key])
             let flag = false
             if (vm.groupType !== 'domain') {
               if (result[key]['domainName'] !== '') {
