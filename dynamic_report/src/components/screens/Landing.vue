@@ -818,6 +818,8 @@ export default {
                 })
               }
               for (let keyMapping in mappingData) {
+                console.log('mappingData', mappingData[keyMapping])
+                console.log('mappingData value: ', result[key][mappingData[keyMapping]])
                 dataRow.push({
                   text: result[key][mappingData[keyMapping]], 
                   alignment: 'center',
@@ -825,9 +827,7 @@ export default {
                 })
               }
               index = index + 1
-              console.log('dataRow', dataRow)
-              console.log('body', docDefinition['content'][2]['table']['body'])
-              // docDefinition['content'][2]['table']['body'].push(dataRow)
+              docDefinition['content'][2]['table']['body'].push(dataRow)
             }
           }
           const pdfDocGenerator = pdfMake.createPdf(docDefinition)
