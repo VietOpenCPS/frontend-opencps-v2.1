@@ -12,8 +12,8 @@
         </div>
         <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
           <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-            Quay lại &nbsp;
-            <v-icon size="16">undo</v-icon>
+            <v-icon size="18">reply</v-icon> &nbsp;
+            Quay lại
           </v-btn>
         </div>
       </div> 
@@ -120,8 +120,8 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>  &nbsp;
-          <v-icon size="20">save</v-icon>
+          <v-icon size="20">save</v-icon>  &nbsp;
+          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
@@ -130,8 +130,8 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          <span>Tiếp nhận và thêm mới</span>  &nbsp;
-          <v-icon size="20">note_add</v-icon>
+          <v-icon size="20">note_add</v-icon>  &nbsp;
+          <span>Tiếp nhận và thêm mới</span>
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
@@ -140,8 +140,8 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          Lưu &nbsp;
-          <v-icon size="20">save</v-icon>
+          <v-icon size="20">save</v-icon> &nbsp;
+          Lưu
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
@@ -162,8 +162,8 @@
           :loading="loadingAction"
           :disabled="loadingAction"
         >
-          Quay lại &nbsp;
-          <v-icon>undo</v-icon>
+          <v-icon size="18">reply</v-icon> &nbsp;
+          Quay lại
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
@@ -174,7 +174,6 @@
 <script>
 import router from '@/router'
 import toastr from 'toastr'
-// import * as utils from '../store/onegate_utils'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'

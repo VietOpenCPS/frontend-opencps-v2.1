@@ -8,7 +8,7 @@
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
                 <v-flex xs12 class="text-right pr-2">
-                  <v-tooltip left v-if="!thongTinChuHoSo.userType && bussinessExits">
+                  <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits">
                     <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
                     >
                       <v-icon dark>account_balance</v-icon>
@@ -25,7 +25,7 @@
                       <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
+                      <content-placeholders class="mt-1" v-if="loading || loadingVerify">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-text-field
@@ -33,6 +33,7 @@
                         v-model="thongTinChuHoSo.applicantIdNo"
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
+                        @input="changeApplicantInfos"
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
@@ -49,7 +50,7 @@
                       </suggestions>
                     </v-flex>
                     <v-flex xs12 sm2>
-                      <content-placeholders class="mt-1" v-if="loading">
+                      <content-placeholders class="mt-1" v-if="loading || loadingVerify">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
                       <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
@@ -441,6 +442,7 @@ export default {
   },
   data: () => ({
     valid_thongtinchuhoso: false,
+    loadingVerify: false,
     citys: [],
     delegateDistricts: [],
     districts: [],
@@ -466,6 +468,7 @@ export default {
       wardCode: '',
       applicantNote: '',
       applicantIdNo: '',
+      applicantIdType: '',
       contactEmail: '',
       contactTelNo: '',
       contactName: '',
@@ -640,6 +643,7 @@ export default {
         wardCode: data.wardCode,
         applicantNote: data.applicantNote,
         applicantIdNo: data.applicantIdNo,
+        applicantIdType: data.applicantIdType,
         contactEmail: data.contactEmail,
         contactName: data.contactName,
         contactTelNo: data.contactTelNo,
@@ -651,6 +655,7 @@ export default {
       }
       let thongTinChuHoSoTemp = Object.assign(vm.thongTinChuHoSo, tempDataChuHs)
       vm.thongTinChuHoSo = thongTinChuHoSoTemp
+      vm.checkApplicantInfos()
       vm.$nextTick(function () {
         var filter = {
           collectionCode: 'ADMINISTRATIVE_REGION',
@@ -777,7 +782,7 @@ export default {
     },
     showValid () {
       var vm = this
-      if (!vm.thongTinChuHoSo.userType) {
+      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo['applicantIdType'] === 'business')) {
         if (vm.validBussinessInfos && vm.$refs.formChuHoSo.validate()) {
           return true
         } else {
@@ -962,7 +967,7 @@ export default {
     },
     changeApplicantInfos () {
       let vm = this
-      if (!vm.thongTinChuHoSo.userType) {
+      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
         if (vm.functionTimeOut) {
           clearTimeout(vm.functionTimeOut)
         }
@@ -973,27 +978,31 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
-      if (!vm.thongTinChuHoSo.userType) {
+      if (!vm.thongTinChuHoSo.userType || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
           applicantName: vm.thongTinChuHoSo.applicantName
         }
+        vm.loadingVerify = true
         vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
+          vm.loadingVerify = false
           if (result && result.hasOwnProperty('error') && result.error === true) {
             vm.bussinessExits = false
             vm.validBussinessInfos = false
             vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + '. Vui lòng kiểm tra lại mã số thuế')
+            toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
           } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
             vm.bussinessExits = true
             vm.validBussinessInfos = false
             vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + '. Vui lòng đối chiếu thông tin doanh nghiệp')
+            toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
           } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
             vm.bussinessExits = true
             vm.validBussinessInfos = true
             vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
           }
+        }).catch(function () {
+          vm.loadingVerify = false
         })
       }
     },

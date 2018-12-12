@@ -9,51 +9,45 @@
           <v-card-text class="py-2 px-2">
             <v-layout wrap>
               <v-flex xs12>
-                  <!-- <span :for="item.fieldName" style="
-                      font-size: 13px;
-                  ">{{item.fieldLabel}}</span> -->
                   <v-text-field v-if="item.fieldType === 'textarea'"
-                      :id="item.fieldName"
-                      :value="item.value"
-                      :placeholder="item.placeholder"
-                      multi-line
-                      @input="inputChangeValue(item)"
-                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                      :required="(item.required === true || item.required === 'true') ? true : false"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    multi-line
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'string'"
-                      :id="item.fieldName"
-                      :value="item.value"
-                      :placeholder="item.placeholder"
-                      @input="inputChangeValue(item)"
-                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                      :required="(item.required === true || item.required === 'true') ? true : false"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'number'"
-                      :id="item.fieldName"
-                      :value="item.value"
-                      :placeholder="item.placeholder"
-                      @input="inputChangeValue(item)"
-                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
-                      :required="(item.required === true || item.required === 'true') ? true : false"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    @input="inputChangeValue(item)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
                   <v-text-field v-if="item.fieldType === 'date'"
-                      :id="item.fieldName"
-                      :value="item.value"
-                      :placeholder="item.placeholder"
-                      readonly
-                      append-icon="event"
-                      v-on:click.native="openDialogCustom(item, item.fieldName)"
-                      :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                      :required="(item.required === true || item.required === 'true') ? true : false"
+                    :id="item.fieldName"
+                    :value="item.value"
+                    :placeholder="item.placeholder"
+                    readonly
+                    append-icon="event"
+                    v-on:click.native="openDialogCustom(item, item.fieldName)"
+                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                    :required="(item.required === true || item.required === 'true') ? true : false"
                   ></v-text-field>
               </v-flex>
             </v-layout>
           </v-card-text>
-          <v-dialog
-            v-model="dialog"
-            width="500"
-          >
+          <v-dialog v-model="dialog" width="500">
             <v-date-picker
               v-model="date"
               full-width
@@ -61,11 +55,7 @@
             ></v-date-picker>
             <v-card-actions style="background: #fff">
               <v-spacer></v-spacer>
-              <v-btn
-                color="primary"
-                flat
-                @click="pickDateCustom"
-              >
+              <v-btn color="primary" flat @click="pickDateCustom">
                 Xác nhận
               </v-btn>
             </v-card-actions>
