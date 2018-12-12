@@ -74,12 +74,15 @@ export const store = new Vuex.Store({
     dossierTemplates: support.dossierTemplates,
     applicantId: '',
     applicantBussinessExit: false,
+    applicantNote: {
+      value: '',
+      edit: false
+    },
     thongTinChuHoSo: {
       userType: true,
       cityCode: '',
       districtCode: '',
       wardCode: '',
-      applicantNote: '',
       applicantIdNo: '',
       contactEmail: '',
       contactName: '',
@@ -458,7 +461,6 @@ export const store = new Vuex.Store({
         cityCode: 25,
         districtCode: '',
         wardCode: '',
-        applicantNote: '',
         applicantIdNo: '',
         contactEmail: '',
         contactName: '',
@@ -888,10 +890,6 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded',
             'cps_auth': state.initData.cps_auth
           }
-          // test local
-          // headers: {
-          //   'groupId': state.initData.groupId
-          // }
         }
         var dataPostdossier = new URLSearchParams()
         dataPostdossier.append('serviceCode', data.serviceCode)
@@ -966,10 +964,6 @@ export const store = new Vuex.Store({
             'Content-Type': 'application/x-www-form-urlencoded',
             'cps_auth': state.initData.cps_auth
           }
-          // test local
-          // headers: {
-          //   groupId: state.initData.groupId
-          // }
         }
         var applicantType = ''
         if (!data.userType) {
@@ -1001,7 +995,9 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateCityCode', data.delegateCityCode)
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
-        dataPutdossier.append('applicantNote', data.applicantNote)
+        if (state.applicantNote['edit']) {
+          dataPutdossier.append('applicantNote', state.applicantNote['value'])
+        }
         if (data.originality !== 1) {
           dataPutdossier.append('dossierName', data.dossierName)
         }
@@ -2927,8 +2923,7 @@ export const store = new Vuex.Store({
         wardCode: payload.wardCode,
         contactEmail: payload.contactEmail,
         contactTelNo: payload.contactTelNo,
-        userType: userTypeCondition,
-        applicantNote: payload.applicantNote
+        userType: userTypeCondition
       }
       state.thongTinChuHoSo = thongTinChuHoSoPayLoad
     },
@@ -3086,6 +3081,9 @@ export const store = new Vuex.Store({
     },
     setApplicantBussinessExit (state, payload) {
       state.applicantBussinessExit = payload
+    },
+    setApplicantNote (state, payload) {
+      state.applicantNote = payload
     },
     setApplicantId (state, payload) {
       state.applicantId = payload
@@ -3260,6 +3258,9 @@ export const store = new Vuex.Store({
     },
     getApplicantIdNo (state) {
       return state.applicantId
+    },
+    getApplicantNote (state) {
+      return state.applicantNote
     },
     getApplicantBussinessExit (state) {
       return state.applicantBussinessExit

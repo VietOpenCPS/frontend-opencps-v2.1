@@ -1,6 +1,6 @@
 <template>  
   <div style="background-color: white;width:100%">
-    <v-expansion-panel v-if="type === 'overdue'" class="expansion-pl">
+    <v-expansion-panel v-if="type === 'overdue' || type === 'preoverdue'" class="expansion-pl">
       <v-expansion-panel-content hide-actions value="1">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
           <span>Lý do chậm hạn trả</span><span style="color:red"> *</span>
@@ -9,11 +9,11 @@
           <v-card-text class="py-2 px-2">
             <v-layout wrap>
               <v-flex xs12>
-                <v-form v-if="type === 'overdue'" v-model="valid" ref="delayNoteForm">
+                <v-form v-model="valid" ref="delayNoteForm">
                   <v-text-field
                     v-model="delayNote"
                     multi-line
-                    :rows="4"
+                    :rows="3"
                     :rules="() => delayNote !== '' || 'Trường dữ liệu bắt buộc'"
                   ></v-text-field>
                 </v-form>
@@ -22,14 +22,14 @@
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
-      </v-expansion-panel>
+    </v-expansion-panel>
     <v-expansion-panel class="expansion-pl">
       <v-expansion-panel-content hide-actions value="1">
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span v-if="type === 'overdue'">Ngày hẹn lại</span>
+          <span v-if="type === 'overdue' || type === 'preoverdue'">Ngày hẹn lại</span>
           <span v-if="type === 'betimes'">Ngày hẹn trả sớm</span>
         </div>
         <v-card >
@@ -86,7 +86,7 @@ export default {
       let vm = this
       let date = vm.extendDateInput ? (new Date(vm.extendDateInput)).getTime() : ''
       var exportData
-      if (vm.type === 'overdue') {
+      if (vm.type === 'overdue' || vm.type === 'preoverdue') {
         exportData = {
           text: vm.delayNote,
           extendDate: date,
