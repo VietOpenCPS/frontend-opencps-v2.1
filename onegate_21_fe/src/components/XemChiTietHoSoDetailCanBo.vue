@@ -201,7 +201,6 @@
                   :disabled="loadingActionProcess"
                   >
                   <v-icon>save</v-icon>&nbsp;
-                  <!-- <span v-if="configNote && configNote.labelButton">{{configNote.labelButton}}</span> <span v-else>Xác nhận</span> -->
                   Xác nhận
                   <span slot="loader">Loading...</span>
                 </v-btn>
@@ -790,6 +789,11 @@ export default {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
         vm.getNextActions()
+        if (resultDossier['dossierSubStatus']) {
+          vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
+            vm.btnStepsDynamics = result
+          })
+        }
         if (vm.getOriginality() !== 1) {
           vm.loadHoSoLienThong()
         }
@@ -813,11 +817,6 @@ export default {
         }
         if (vm.$refs.thanhphanhoso2) {
           vm.$refs.thanhphanhoso2.initData(resultDossier)
-        }
-        if (resultDossier['dossierSubStatus']) {
-          vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
-            vm.btnStepsDynamics = result
-          })
         }
       })
     },
@@ -1120,6 +1119,12 @@ export default {
           vm.extendDateEdit = result.overdue
           vm.typeExtendDate = 'overdue'
         }
+        if (result.hasOwnProperty('preoverdue')) {
+          isPopup = true
+          vm.showExtendDateEdit = true
+          vm.extendDateEdit = result.preoverdue
+          vm.typeExtendDate = 'preoverdue'
+        }
         if (result.hasOwnProperty('betimes')) {
           isPopup = true
           vm.showExtendDateEdit = true
@@ -1206,7 +1211,7 @@ export default {
         }
         vm.doActionSpecial(result)
       } else if (String(item.form) === 'OVERDUE') {
-        vm.btnIndex = 111
+        vm.btnIndex = 8500
         let result = {
           actionCode: 8500,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
@@ -1214,8 +1219,17 @@ export default {
         }
         // vm.doActionSpecial(result)
         vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+      } else if (String(item.form) === 'PREOVERDUE') {
+        vm.btnIndex = 8501
+        let result = {
+          actionCode: 8501,
+          dossierId: vm.thongTinChiTietHoSo.dossierId,
+          preoverdue: vm.thongTinChiTietHoSo['extendDate'] ? vm.thongTinChiTietHoSo['extendDate'] : ''
+        }
+        // vm.doActionSpecial(result)
+        vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
       } else if (String(item.form) === 'BETIMES') {
-        vm.btnIndex = 333
+        vm.btnIndex = 8400
         let result = {
           actionCode: 8400,
           dossierId: vm.thongTinChiTietHoSo.dossierId,
@@ -1439,7 +1453,14 @@ export default {
         if (vm.typeExtendDate === 'overdue') {
           payload = {
             'extendDate': data.extendDate,
-            'delayNote': data.text
+            'delayNote': data.text,
+            'lockState': ''
+          }
+        } else if (vm.typeExtendDate === 'preoverdue') {
+          payload = {
+            'extendDate': data.extendDate,
+            'delayNote': data.text,
+            'lockState': 'CONFIRM'
           }
         }
         filter['payload'] = payload
@@ -1804,14 +1825,21 @@ export default {
         if (currentQuery.hasOwnProperty('btnIndex') && currentQuery.btnIndex !== null && currentQuery.btnIndex !== '') {
           vm.btnStateVisible = true
           vm.dialogActionProcess = true
-          if (currentQuery.btnIndex.toString() === '111') {
+          if (currentQuery.btnIndex.toString() === '8500') {
             let result = {
               actionCode: 8500,
               dossierId: vm.thongTinChiTietHoSo.dossierId,
               overdue: vm.thongTinChiTietHoSo['extendDate']
             }
             vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
-          } else if (currentQuery.btnIndex.toString() === '333') {
+          } else if (currentQuery.btnIndex.toString() === '8501') {
+            let result = {
+              actionCode: 8501,
+              dossierId: vm.thongTinChiTietHoSo.dossierId,
+              preoverdue: vm.thongTinChiTietHoSo['extendDate']
+            }
+            vm.processPullBtnDetailRouter(vm.thongTinChiTietHoSo, null, result, null)
+          } else if (currentQuery.btnIndex.toString() === '8400') {
             let result = {
               actionCode: 8400,
               dossierId: vm.thongTinChiTietHoSo.dossierId,
