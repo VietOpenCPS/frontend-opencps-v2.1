@@ -781,20 +781,17 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
-          console.log('groupType: ', vm.groupType)
           let index = 1
           for (let key in result) {
-            console.log('domainName v: ', result[key]['domainName'])
-            console.log('domainName: ', (result[key]['domainName'] !== ''))
             let flag = false
             if (vm.groupType !== 'domain') {
-              if (result[key]['govAgencyName'] !== '') {
+              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && result[key]['domainName'] === undefined) {
                 flag = true
               } else {
                 flag = false
               }
             } else {
-              if (result[key]['domainName'] !== '') {
+              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && result[key]['govAgencyName'] === undefined) {
                 flag = true
               } else {
                 flag = false
