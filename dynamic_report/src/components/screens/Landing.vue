@@ -760,14 +760,7 @@ export default {
         labelGroup = 'Sở Ban ngành'
       }
       if (vm.reportType === 'REPORT_FIX_01') {
-        console.log(docDefinition)
-        console.log(docDefinition['content'])
-        console.log(docDefinition['content'][2])
-        console.log(docDefinition['content'][2]['table'])
-        console.log(docDefinition['content'][2]['table']['body'])
-        console.log(docDefinition['content'][2]['table']['body'][0])
-        console.log(docDefinition['content'][2]['table']['body'][0][0])
-        docDefinition['content'][2]['table']['body'][0][0][1]['text'] = '\n\n\n' + labelGroup
+        docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
       }
 
       const pdfDocGenerator = pdfMake.createPdf(docDefinition)
