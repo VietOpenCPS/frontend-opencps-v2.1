@@ -784,6 +784,7 @@ export default {
           console.log('groupType: ', vm.groupType)
           let index = 1
           for (let key in result) {
+            console.log('domainName v: ', result[key]['domainName'])
             console.log('domainName: ', (result[key]['domainName'] !== ''))
             let flag = false
             if (vm.groupType !== 'domain') {
