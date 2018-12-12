@@ -747,9 +747,11 @@ export default {
     doPrintReportFix () {
       let vm = this
       let docDefinition = {}
+      let mappingData = []
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           docDefinition = eval('( ' + vm.itemsReports[key]['tableConfig'] + ' )')['docDefinition']
+          mappingData = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['mappingData']
           break
         }
       }
@@ -762,11 +764,79 @@ export default {
       if (vm.reportType === 'REPORT_FIX_01') {
         docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
       }
-
-      const pdfDocGenerator = pdfMake.createPdf(docDefinition)
-      pdfDocGenerator.getBlob((blob) => {
-        vm.pdfBlob = window.URL.createObjectURL(blob)
-        vm.isShowLoading = false
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency) {
+        filter['agency'] = vm.govAgency['itemCode']
+      } else if (vm.isDVC && !vm.govAgency) {
+        filter['agency'] = 'all'
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null && result !== undefined) {
+          let index = 1
+          for (let key in result) {
+            let flag = false
+            if (vm.groupType !== 'domain') {
+              if (result[key]['domainName'] !== '') {
+                flag = true
+              } else {
+                flag = false
+              }
+            } else {
+              if (result[key]['govAgencyName'] !== '') {
+                flag = true
+              } else {
+                flag = false
+              }
+            }
+            if (flag) {
+              let dataRow = []
+              dataRow.push({
+                text: index, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+              if (vm.groupType !== 'domain') {
+                dataRow.push({
+                  text: result[key]['domainName'], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              } else {
+                dataRow.push({
+                  text: result[key]['govAgencyName'], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              for (let keyMapping in mappingData) {
+                dataRow.push({
+                  text: result[key][mappingData[keyMapping]], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              index = index + 1
+              docDefinition['content'][2]['table']['body'].push(dataRow)
+            }
+          }
+          const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+          pdfDocGenerator.getBlob((blob) => {
+            vm.pdfBlob = window.URL.createObjectURL(blob)
+            vm.isShowLoading = false
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
+        }
       })
     },
     doPrintReport () {
