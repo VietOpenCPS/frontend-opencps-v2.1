@@ -407,7 +407,7 @@ export default {
     changeGov (item) {
       let vm = this
       vm.govAgency = item
-      router.push({
+      vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {
           year: vm.year,
@@ -565,6 +565,8 @@ export default {
       let vm = this
       if (vm.reportType === 'REPORT_01') {
         vm.doPrintReport()
+      } else if (vm.reportType.startsWith('REPORT_FIX')) {
+        vm.doPrintReportFix()
       } else {
         vm.doDynamicReport(val)
       }
@@ -741,6 +743,9 @@ export default {
           vm.isShowLoading = false
         }
       })
+    },
+    doPrintReportFix () {
+
     },
     doPrintReport () {
       let vm = this
