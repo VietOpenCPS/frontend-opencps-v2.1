@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import saveAs from 'file-saver'
 import support from './support.json'
+import AdminConfig from './AdminConfig'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -36,7 +37,7 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: support['trangThaiHoSoList']
+    itemsReports: []
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -72,6 +73,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDynamicReports ({state}) {
+      return new Promise(() => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let body = AdminConfig.getAdminConfig
+        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+          let serializable = response.data
+          let itemsReportsData = []
+          let indexKey = 0
+          for (let key in serializable['getDynamicReports']) {
+            let current = serializable['getDynamicReports'][key]
+            let typeCurrent = 'dossier'
+            if (current['reportCode'].startsWith('REPORT_FIX')) {
+              typeCurrent = 'thong_ke'
+            }
+            itemsReportsData.push({
+              'code' : String(indexKey),
+              'document' : current['reportCode'],
+              'active' : false,
+              'type' : typeCurrent,
+              'title' : current['reportName']
+            })
+            indexKey = indexKey + 1
+          }
+          state.itemsReports = itemsReportsData
+        }).catch(function () {
+          state.itemsReports = []
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
     getAgencyReportLists ({state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -89,7 +126,7 @@ export const store = new Vuex.Store({
             }
           }
           let requestURL = ''
-          if (filter.document === 'REPORT_01') {
+          if (filter.document === 'REPORT_01' || filter.document.startsWith('REPORT_FIX')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = '/o/rest/statistics'
@@ -191,6 +228,7 @@ export const store = new Vuex.Store({
     },
     setreportType (state, payload) {
       state.reportType = payload
+
     },
     setgroupType (state, payload) {
       state.groupType = payload

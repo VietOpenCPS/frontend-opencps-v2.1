@@ -67,7 +67,7 @@
 	</style>
 </#if>
 
-<div class="container-fluid" id="wrapper">
+<div class="container-fluid" id="wrapper" style="    overflow: hidden;">
 	<header id="banner" class="row">
 		<div class="logo align-middle" style="
     width: 100%;    max-width: 1300px;
@@ -116,6 +116,8 @@
 		</#if>
 	</section>
 	
+</div>
+
 	<footer id="footer" >
 		<p class="site-name">Trung tâm Công nghệ thông tin<br>Bộ Giao thông Vận tải</p>
 		<p class="info" style="
@@ -128,8 +130,6 @@
 			<span>Email: bophanhotro@mt.gov.vn</span>
 		</p>
 	</footer>
-</div>
-
 <!-- inject:js -->
 	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=1231231"></script>
 	<#if permissionChecker.isOmniadmin()>
@@ -439,6 +439,9 @@ body #react-root > div > div {
 	}
 	body .page-theme #navigation {
 		border-top: 1px solid #ebebeb !important;
+	}
+	.v-window__container--is-active {
+		height: auto !important;
 	}
 	</style>
 </html>

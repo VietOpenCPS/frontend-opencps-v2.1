@@ -96,6 +96,7 @@ class App extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.goToDangNhapPress = this.goToDangNhapPress.bind(this);
   }
 
   handleToggle() {
@@ -182,6 +183,32 @@ class App extends React.Component {
     })
   };
 
+  goToDangNhapPress(e) {
+    if(e.keyCode == 13){
+      axios.post('/o/v1/opencps/login', {}, {
+        headers: {
+          'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+        }
+      }).then(function (response) {
+        console.log(response.data)
+        if (response.data !== '' && response.data !== 'ok') {
+          if (response.data === 'pending') {
+            window.location.href = window.themeDisplay.getURLHome() +
+            "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+              "&redirectURL=" + window.themeDisplay.getURLHome()
+          } else {
+            window.location.href = response.data
+          }
+        } else if (response.data === 'ok') {
+          window.location.href = window.themeDisplay.getURLHome()
+        } else {
+          toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+        }
+      }).catch(function (error) {
+        toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+      })
+    }
+  };
   doUserInfo() {
     if (themeDisplay !== null && themeDisplay !== undefined) {
       // eslint-disable-next-line
@@ -209,7 +236,7 @@ class App extends React.Component {
                 <input type="text" placeholder="Tài khoản đăng nhập" name="_npmreactlogin_login" id="_npmreactlogin_login" />
               </div>
               <div className="ico ico-pass">
-                <input type="password" placeholder="Mật khẩu" name="_npmreactlogin_password" id="_npmreactlogin_password" />
+                <input onKeyDown={this.goToDangNhapPress} type="password" placeholder="Mật khẩu" name="_npmreactlogin_password" id="_npmreactlogin_password" />
               </div>
             </div>
             <div className="login-input">
