@@ -39,6 +39,47 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    checkApplicantInfos ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        // test local
+        var url = '/o/rest/v2/applicants/ngsp/verify'
+        // var url = 'http://127.0.0.1:8081/api/applicants/ngsp/verify'
+        var dataCheck = new URLSearchParams()
+        dataCheck.append('applicantIdNo', filter.applicantIdNo ? filter.applicantIdNo : '')
+        dataCheck.append('applicantName', filter.applicantName ? filter.applicantName : '')
+        axios.post(url, dataCheck, param).then(result1 => {
+          resolve(result1.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
+    getApplicantInfos ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        // test local
+        // axios.get('http://127.0.0.1:8081/api/applicants/ngsp/0100109106', param).then(function (response) {
+        axios.get('/o/rest/v2/applicants/ngsp/' + filter.applicantIdNo, param).then(function (response) {
+          if (response.data && response.data['Data']) {
+            resolve(response.data['Data'])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     postApplicant ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
