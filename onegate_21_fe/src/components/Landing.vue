@@ -1774,14 +1774,21 @@ export default {
           dossierId: dossierItem.dossierId,
           overdue: dossierItem['extendDate']
         }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 111)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
+      } else if (String(item.form) === 'PREOVERDUE') {
+        let result = {
+          actionCode: 8501,
+          dossierId: dossierItem.dossierId,
+          preoverdue: dossierItem['extendDate']
+        }
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8501)
       } else if (String(item.form) === 'BETIMES') {
         let result = {
           actionCode: 8400,
           dossierId: dossierItem.dossierId,
           betimes: dossierItem['extendDate']
         }
-        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 333)
+        vm.processPullBtnDetailRouter(dossierItem, null, result, null, 8400)
       } else if (String(item.form) === 'CHANGE_DATA_DOSSIER') {
         vm.doChangeDossier(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'UNDO_DOSSIER') {

@@ -206,6 +206,24 @@
           </v-layout>
         </div> -->
       </div>
+      <div>
+        <v-layout class="mx-4" wrap>
+          <v-flex style="width:60px" class="my-0 py-1 text-bold">Ghi chú:</v-flex>
+          <v-flex style="width:calc(100% - 80px)">
+            <div v-if="!onlyView && applicantNote['edit']" class="pl-2">
+              <v-text-field class="py-0"
+              v-model="applicantNoteDossier"
+              multi-line
+              rows="3"
+              @input="changeApplicantNote"
+              ></v-text-field>
+            </div>
+            <p class="my-0 py-1" v-if="onlyView">
+              {{applicantNoteDossier}} 
+            </p>
+          </v-flex>
+        </v-layout>
+      </div>
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
@@ -231,16 +249,14 @@
               <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog">
                 Quay lại
               </v-btn>
-              <v-btn color="primary" flat="flat" @click.native="addOtherTemplate"
-              :loading="loadingAddOther"
-              >
-              Đồng ý
-              <span slot="loader">Loading...</span>
-            </v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
+              <v-btn color="primary" flat="flat" @click.native="addOtherTemplate" :loading="loadingAddOther">
+                Đồng ý
+                <span slot="loader">Loading...</span>
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-dialog>
     </v-card>
     <!-- <div class="absolute-lable" style="font-size: 12px" v-if="originality !== 1 && !onlyView">
       <span>Không chọn</span>
@@ -352,7 +368,8 @@ export default {
     currentFormView: '',
     pstFixed: 0,
     pstEl: 0,
-    endEl: 0
+    endEl: 0,
+    applicantNoteDossier: ''
   }),
   computed: {
     loading () {
@@ -380,6 +397,9 @@ export default {
     },
     applicantId () {
       return this.$store.getters.getApplicantIdNo
+    },
+    applicantNote () {
+      return this.$store.getters.getApplicantNote
     }
   },
   mounted () {
@@ -400,6 +420,17 @@ export default {
       if (val && vm.fileTemplateNoString) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
+    },
+    checkInput (val) {
+      let vm = this
+      let applicantNoteEdit = {
+        value: vm.thongTinHoSo['applicantNote'],
+        edit: false
+      }
+      if (val === 2) {
+        applicantNoteEdit['edit'] = true
+      }
+      vm.$store.commit('setApplicantNote', applicantNoteEdit)
     }
   },
   methods: {
@@ -428,9 +459,9 @@ export default {
     },
     initData (data) {
       var vm = this
-      console.log('partTypes', vm.partTypes)
+      vm.thongTinHoSo = data
+      vm.applicantNoteDossier = data['applicantNote']
       var arrTemp = []
-      // console.log('dossierId++++++++', data.dossierId)
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
         vm.sampleCount = data['sampleCount']
       }
@@ -440,7 +471,6 @@ export default {
       arrTemp.push(vm.$store.dispatch('getServiceInfo', {
         serviceInfoId: data.serviceCode
       }))
-      vm.thongTinHoSo = data
       Promise.all(arrTemp).then(values => {
         var dossierTemplates = values[0]
         var dossierMarks = values[1]
@@ -715,6 +745,15 @@ export default {
           }
         })
       }
+    },
+    changeApplicantNote () {
+      let vm = this
+      console.log('applicantNoteEdit', vm.applicantNoteDossier)
+      let applicantNoteEdit = {
+        value: vm.applicantNoteDossier,
+        edit: true
+      }
+      vm.$store.commit('setApplicantNote', applicantNoteEdit)
     },
     pickFile (item) {
       var vm = this
