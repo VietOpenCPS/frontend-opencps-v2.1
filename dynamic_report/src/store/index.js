@@ -82,7 +82,7 @@ export const store = new Vuex.Store({
             'Accept': 'application/json'
           }
         }
-        let body = AdminConfig.getAdminConfig
+        let body = AdminConfig.getDynamicReports
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           let serializable = response.data
           let itemsReportsData = []
