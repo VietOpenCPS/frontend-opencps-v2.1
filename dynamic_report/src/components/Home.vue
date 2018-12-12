@@ -16,9 +16,9 @@
           placeholder="GroupBy"
           item-text="text"
           item-value="value"
-          v-if="reportType !== 'REPORT_01'"
+          v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
-        <v-checkbox v-if="reportType !== 'REPORT_01'" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </div>
     </v-navigation-drawer>
     <v-content>
