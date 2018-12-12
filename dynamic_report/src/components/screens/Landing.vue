@@ -754,6 +754,15 @@ export default {
         }
       }
       vm.isShowLoading = true
+      // process
+      let labelGroup = 'Lĩnh vực'
+      if (vm.groupType !== 'domain') {
+        labelGroup = 'Sở Ban ngành'
+      }
+      if (vm.reportType === 'REPORT_FIX_01') {
+        docDefinition['content'][2]['table']['body'][0][0][1]['text'] = '\n\n\n' + labelGroup
+      }
+
       const pdfDocGenerator = pdfMake.createPdf(docDefinition)
       pdfDocGenerator.getBlob((blob) => {
         vm.pdfBlob = window.URL.createObjectURL(blob)
