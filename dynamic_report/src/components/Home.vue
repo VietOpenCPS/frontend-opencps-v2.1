@@ -18,6 +18,7 @@
           item-value="value"
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
+        <v-btn color="primary" v-if="userConfig.length > 0">Quay lại mặc định</v-btn>
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </div>
     </v-navigation-drawer>
@@ -92,7 +93,8 @@
           value: 'gov',
           text: 'đơn vị'
         }
-      ]
+      ],
+      userConfig: []
     }),
     computed: {
       itemsReports () {
@@ -152,28 +154,50 @@
         }
       }
     },
+    watch: {
+      selected (val) {
+        console.log('put userConfig,', val)
+      }
+    },
     created () {
     var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
           vm.itemsReportsConfig = []
+          vm.userConfig = []
           console.log('itemsReports', vm.itemsReports)
           if (String(vm.index) !== '0') {
             for (let key in vm.itemsReports) {
               if (vm.itemsReports[key]['code'] === String(vm.index)) {
                 vm.reportType = vm.itemsReports[key]['document']
                 vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
+                if (vm.itemsReports[key]['userConfig'] !== '') {
+                  let userConfigObjec = eval('( ' + vm.itemsReports[key]['userConfig'] + ' )')
+                  if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                    vm.userConfig = userConfigObjec[vm.getUserId()]
+                  }
+                }
                 break
               }
             }
           } else {
             vm.reportType = vm.itemsReports[0]['document']
             vm.itemsReportsConfig = eval('( ' + vm.itemsReports[0]['filterConfig'] + ' )')['reportConfig']
+            if (vm.itemsReports[0]['userConfig'] !== '') {
+              let userConfigObjec = eval('( ' + vm.itemsReports[0]['userConfig'] + ' )')
+              if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                vm.userConfig = userConfigObjec[vm.getUserId()]
+              }
+            }
           }
           vm.selected = []
-          for (let keySelected in vm.itemsReportsConfig) {
-            if (vm.itemsReportsConfig[keySelected]['selected']) {
-              vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+          if (vm.userConfig.length > 0) {
+            vm.selected = vm.userConfig
+          } else {
+            for (let keySelected in vm.itemsReportsConfig) {
+              if (vm.itemsReportsConfig[keySelected]['selected']) {
+                vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+              }
             }
           }
         }, 200)
@@ -198,10 +222,20 @@
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === data) {
             vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
+            if (vm.itemsReports[key]['userConfig'] !== '') {
+              let userConfigObjec = eval('( ' + vm.itemsReports[key]['userConfig'] + ' )')
+              if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
+                vm.userConfig = userConfigObjec[vm.getUserId()]
+              }
+            }
             vm.selected = []
-            for (let keySelected in vm.itemsReportsConfig) {
-              if (vm.itemsReportsConfig[keySelected]['selected']) {
-                vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+            if (vm.userConfig.length > 0) {
+              vm.selected = vm.userConfig
+            } else {
+              for (let keySelected in vm.itemsReportsConfig) {
+                if (vm.itemsReportsConfig[keySelected]['selected']) {
+                  vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+                }
               }
             }
             vm.$router.push('/bao-cao/' + vm.itemsReports[key]['code'])
