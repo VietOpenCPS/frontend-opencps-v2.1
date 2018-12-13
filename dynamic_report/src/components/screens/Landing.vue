@@ -782,6 +782,39 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
           let index = 1
+          let dataRowTotal = []
+          dataRowTotal.push({
+            text: index, 
+            colSpan: 2,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          dataRowTotal.push({
+            text: ''
+          })
+          for (let key in result) {
+            if (mappingData[keyMapping] === 'processCount' || mappingData[keyMapping] === 'releaseCount' || mappingData[keyMapping] === 'processingCount') {
+              dataRowTotal.push({
+                text: 0, 
+                bold: true,
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            } else if (mappingData[keyMapping] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              dataRowTotal.push({
+                text: 0, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+          }
           for (let key in result) {
             let flag = false
             if (vm.groupType !== 'domain') {
@@ -817,17 +850,23 @@ export default {
                   style: 'tdStyle'
                 })
               }
+              let indexTotal = 2
               for (let keyMapping in mappingData) {
                 dataRow.push({
                   text: result[key][mappingData[keyMapping]], 
                   alignment: 'center',
                   style: 'tdStyle'
                 })
+                if (dataRowTotal[indexTotal]['text'] !== '') {
+                  dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][mappingData[keyMapping]])
+                }
+                indexTotal = indexTotal + 1
               }
               index = index + 1
               docDefinition['content'][2]['table']['body'].push(dataRow)
             }
           }
+          docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           const pdfDocGenerator = pdfMake.createPdf(docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
