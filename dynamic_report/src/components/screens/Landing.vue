@@ -317,7 +317,7 @@ export default {
     ],
     month: 0,
     agencyLists: [],
-    govAgency: this.getScopeGroupId(),
+    govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? window.themeDisplay.getScopeGroupId() : 0,
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false
