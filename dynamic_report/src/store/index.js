@@ -175,7 +175,9 @@ export const store = new Vuex.Store({
                 }
               }))
             } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
-              param['headers']['groupId'] = govAgency['value']
+              if (govAgency['value'] !== undefined) {
+                param['headers']['groupId'] = govAgency['value']
+              }
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
