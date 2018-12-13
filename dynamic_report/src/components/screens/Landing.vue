@@ -784,7 +784,7 @@ export default {
           let index = 1
           let dataRowTotal = []
           dataRowTotal.push({
-            text: index, 
+            text: 'Tổng số', 
             colSpan: 2,
             bold: true,
             alignment: 'center',
