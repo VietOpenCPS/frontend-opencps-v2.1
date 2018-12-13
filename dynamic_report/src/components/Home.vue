@@ -170,6 +170,12 @@
             vm.reportType = vm.itemsReports[0]['document']
             vm.itemsReportsConfig = eval('( ' + vm.itemsReports[0]['filterConfig'] + ' )')['reportConfig']
           }
+          vm.selected = []
+          for (let keySelected in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keySelected]['selected']) {
+              vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+            }
+          }
         }, 200)
       })
     },
@@ -192,6 +198,12 @@
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === data) {
             vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
+            vm.selected = []
+            for (let keySelected in vm.itemsReportsConfig) {
+              if (vm.itemsReportsConfig[keySelected]['selected']) {
+                vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+              }
+            }
             vm.$router.push('/bao-cao/' + vm.itemsReports[key]['code'])
             break
           }
