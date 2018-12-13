@@ -635,7 +635,7 @@ export default {
       })
       let ine = 2
       for (let key in val) {
-        vm.docDefinition['content'][2]['table']['widths'].push('*')
+        vm.docDefinition['content'][2]['table']['widths'].push('auto')
         headerTableReport.push({
           text: vm.report1Def[val[key]],
           alignment: 'center',
