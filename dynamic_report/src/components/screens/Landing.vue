@@ -572,6 +572,16 @@ export default {
     },
     doDynamicReport (val) {
       let vm = this
+      let mappingData = []
+      vm.agencyLists = []
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['document'] === vm.reportType) {
+          vm.docDefinition = eval('( ' + vm.itemsReports[key]['tableConfig'] + ' )')['docDefinition']
+          mappingData = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['mappingData']
+          vm.agencyLists = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['govAgencyCode']
+          break
+        }
+      }
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
