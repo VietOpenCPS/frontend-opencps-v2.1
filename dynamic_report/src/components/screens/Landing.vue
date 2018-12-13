@@ -6,29 +6,27 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
-              <v-select
+              <v-autocomplete
                 :items="agencyLists"
                 v-model="govAgency"
-                autocomplete
                 item-text="text"
                 item-value="value"
                 return-object
                 :hide-selected="true"
                 @change="changeGov"
                 >
-              </v-select>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs6 sm2 class="px-2">
-              <v-select
+              <v-autocomplete
                 :items="years"
                 v-model="year"
-                autocomplete
                 item-text="name"
                 item-value="value"
                 :hide-selected="true"
                 @change="changeYear"
                 >
-              </v-select>
+              </v-autocomplete>
             </v-flex>
             <v-flex xs6 sm1 class="px-2">
               <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>

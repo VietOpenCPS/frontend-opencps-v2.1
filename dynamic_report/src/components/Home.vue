@@ -18,8 +18,8 @@
           item-value="value"
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
-        <v-btn color="primary" v-if="userConfig.length > 0">Quay lại mặc định</v-btn>
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-btn color="primary" block v-if="userConfig.length > 0">Quay lại mặc định</v-btn>
       </div>
     </v-navigation-drawer>
     <v-content>
