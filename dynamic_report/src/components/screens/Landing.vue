@@ -645,7 +645,7 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
-          let dataReport = result['data']
+          let dataReport = result
           let domainRaw = {}
           let dossierRaw = {}
           let dataReportCurrent = {}
