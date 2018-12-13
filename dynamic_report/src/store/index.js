@@ -95,7 +95,6 @@ export const store = new Vuex.Store({
         currentObject['userConfig'] = userConfigEdit
         currentObject['filterConfig'] = eval('( ' + currentObject['filterConfig'] + ' )')
         currentObject['tableConfig'] = eval('( ' + currentObject['tableConfig'] + ' )')
-        console.log('ddd: ', JSON.stringify(currentObject))
         let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(currentObject).replace(/"/g, '\\"').replace(/'/g, '\\"'))
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           console.log(response)
@@ -138,7 +137,6 @@ export const store = new Vuex.Store({
               'dynamicReportId' : current['dynamicReportId'],
               'reportCode' : current['reportCode'],
               'reportName' : current['reportName'],
-              'reportCode' : current['reportCode'],
               'sharing' : current['sharing']
             })
             indexKey = indexKey + 1
@@ -200,11 +198,9 @@ export const store = new Vuex.Store({
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
-                    console.log(args[i]['data']['data'])
                     myObject = myObject.concat(args[i]['data']['data'])
                   }
                 }
-                console.log('myObject', myObject)
                 if (myObject.length > 0) {
                   resolve(myObject)
                 } else {
@@ -271,11 +267,9 @@ export const store = new Vuex.Store({
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
-                    console.log(args[i]['data']['data'])
                     myObject = myObject.concat(args[i]['data']['data'])
                   }
                 }
-                console.log('myObjectdossier', myObject)
                 if (myObject.length > 0) {
                   resolve(myObject)
                 } else {
@@ -315,7 +309,6 @@ export const store = new Vuex.Store({
             responseType: 'blob',
             data: filter.data
           }).then(function (response) {
-            console.log('serializable', response)
             let serializable = response.data
             if (filter['download']) {
               saveAs(serializable, new Date().getTime() + '.xls')
