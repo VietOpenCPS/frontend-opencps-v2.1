@@ -211,7 +211,7 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  let dataReturn = serializable
+                  let dataReturn = serializable.data
                   resolve(dataReturn)
                 } else {
                   resolve(null)
@@ -251,7 +251,7 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  let dataReturn = serializable
+                  let dataReturn = serializable.data
                   resolve(dataReturn)
                 } else {
                   resolve(null)
