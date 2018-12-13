@@ -793,7 +793,7 @@ export default {
           dataRowTotal.push({
             text: ''
           })
-          for (let keyMapping in result) {
+          for (let keyMapping in mappingData) {
             if (mappingData[keyMapping] === 'processCount' || mappingData[keyMapping] === 'releaseCount' || mappingData[keyMapping] === 'processingCount') {
               dataRowTotal.push({
                 text: 0, 
