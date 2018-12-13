@@ -19,7 +19,7 @@
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
-        <v-btn color="primary" block v-if="userConfig.length > 0">Quay lại mặc định</v-btn>
+        <v-btn color="primary" block v-if="userConfig.length > 0" v-on:click.native="resetConfig">Quay lại mặc định</v-btn>
       </div>
     </v-navigation-drawer>
     <v-content>
@@ -156,7 +156,20 @@
     },
     watch: {
       selected (val) {
-        console.log('put userConfig,', val)
+        let vm = this
+        let currentObject = {}
+        for (let key in vm.itemsReports) {
+          if (vm.itemsReports[key]['code'] === String(vm.index)) {
+            currentObject = vm.itemsReports[key]
+            break
+          }
+        }
+        // putData
+        let userConfigEdit = eval('( ' + currentObject['userConfig'] + ' )')
+        userConfigEdit.put(vm.getUserId(), val)
+        currentObject.put('userConfig', JSON.stringify(userConfigEdit))
+        console.log('put userConfig,', currentObject)
+        vm.$store.dispatch('updateDynamicReport', currentObject)
       }
     },
     created () {
@@ -215,6 +228,15 @@
       },
       deliverableRouter (item) {
         console.log(item)
+      },
+      resetConfig () {
+        let vm = this
+        vm.selected = []
+        for (let keySelected in vm.itemsReportsConfig) {
+          if (vm.itemsReportsConfig[keySelected]['selected']) {
+            vm.selected.push(vm.itemsReportsConfig[keySelected]['value'])
+          }
+        }
       },
       changeReportType (data) {
         let vm = this
