@@ -353,6 +353,26 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       setTimeout(() => {
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (currentQuerys.hasOwnProperty('fromDate')) {
+          vm.year = currentQuerys.fromDate ? '' : vm.year
+          vm.fromDateFormatted = currentQuerys.fromDate
+        } else {
+          vm.fromDateFormatted = ''
+          let date = new Date()
+          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+        }
+        if (currentQuerys.hasOwnProperty('toDate')) {
+          vm.year = currentQuerys.toDate ? '' : vm.year
+          vm.toDateFormatted = currentQuerys.toDate
+        } else {
+          vm.toDateFormatted = ''
+          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+        }
+        if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+          vm.year = ''
+        }
         vm.doCreatePDF(vm.selected)
       }, 200)
     })
@@ -378,8 +398,9 @@ export default {
         vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
       }
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+        vm.year = ''
         vm.doCreatePDF(vm.selected)
-      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate == '' && currentQuery.year !== '') {
+      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate === '' && currentQuery.year !== '') {
         vm.doCreatePDF(vm.selected)
       }
     },
@@ -632,10 +653,8 @@ export default {
       let filter = {
         document: vm.reportType,
         fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
-      }
-      if (vm.reportType === 'REPORT_01') {
-        filter['year'] = vm.year
+        toDate: vm.toDateFormatted,
+        year: vm.year
       }
       if (vm.govAgency) {
         filter['govAgency'] = vm.govAgency
