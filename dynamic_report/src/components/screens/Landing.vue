@@ -317,7 +317,7 @@ export default {
     ],
     month: 0,
     agencyLists: [],
-    govAgency: null,
+    govAgency: this.getScopeGroupId(),
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false
