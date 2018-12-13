@@ -89,13 +89,13 @@ export const store = new Vuex.Store({
             break
           }
         }
-        console.log('currentObjectcurrentObjectcurrentObject: ', currentObject)
         // putData
         let userConfigEdit = currentObject['userConfig']
-        currentObject['filterConfig'] = currentObject['filterConfig']
-        currentObject['tableConfig'] = currentObject['tableConfig']
         userConfigEdit[doData.userId] = doData.selected
         currentObject['userConfig'] = userConfigEdit
+        currentObject['filterConfig'] = currentObject['filterConfig']
+        currentObject['tableConfig'] = currentObject['tableConfig']
+
         let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(currentObject).replace(/"/g, '\\"').replace(/'/g, '\\"'))
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           console.log(response)
@@ -142,6 +142,9 @@ export const store = new Vuex.Store({
             })
             indexKey = indexKey + 1
           }
+          itemsReportsData['userConfig'] = eval('( ' + itemsReportsData['userConfig'] + ' )')
+          itemsReportsData['filterConfig'] = eval('( ' + itemsReportsData['filterConfig'] + ' )')
+          itemsReportsData['tableConfig'] = eval('( ' + itemsReportsData['tableConfig'] + ' )')
           state.itemsReports = itemsReportsData
         }).catch(function () {
           state.itemsReports = []
