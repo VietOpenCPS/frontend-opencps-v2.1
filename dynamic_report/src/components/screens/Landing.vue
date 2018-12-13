@@ -769,7 +769,7 @@ export default {
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
       }
-      if (vm.reportType === 'REPORT_01') {
+      if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('REPORT_FIX')) {
         filter['year'] = vm.year
       }
       if (vm.isDVC && vm.govAgency) {
