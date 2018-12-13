@@ -188,8 +188,10 @@
       },
       changeReportType (data) {
         let vm = this
+        vm.itemsReportsConfig = []
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === data) {
+            vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
             vm.$router.push('/bao-cao/' + vm.itemsReports[key]['code'])
             break
           }
