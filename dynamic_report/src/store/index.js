@@ -158,14 +158,13 @@ export const store = new Vuex.Store({
                   promises.push(axios.get(requestURL, param))
                 }
               }
-              let myObject = []
               axios.all(promises)
               .then(axios.spread((...args) => {
+                let myObject = []
                 for (let i = 0; i < args.length; i++) {
-                  console.log(args[i])
                   if (args[i]['data']['total'] > 0) {
                     console.log(args[i]['data']['data'])
-                    myObject.concat(args[i]['data']['data'])
+                    myObject = myObject.concat(args[i]['data']['data'])
                   }
                 }
                 console.log('myObject', myObject)
