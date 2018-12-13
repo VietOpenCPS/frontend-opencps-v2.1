@@ -82,7 +82,7 @@
       drawer: null,
       dataSocket: {},
       support: support,
-      itemsReportsConfig: support['report1Conf'],
+      itemsReportsConfig: [],
       itemsGroups: [
         {
           value: 'domain',
@@ -156,16 +156,19 @@
     var vm = this
       vm.$nextTick(function () {
         setTimeout(() => {
+          vm.itemsReportsConfig = []
           console.log('itemsReports', vm.itemsReports)
           if (String(vm.index) !== '0') {
             for (let key in vm.itemsReports) {
               if (vm.itemsReports[key]['code'] === String(vm.index)) {
                 vm.reportType = vm.itemsReports[key]['document']
+                vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
                 break
               }
             }
           } else {
             vm.reportType = vm.itemsReports[0]['document']
+            vm.itemsReportsConfig = eval('( ' + vm.itemsReports[0]['filterConfig'] + ' )')['reportConfig']
           }
         }, 200)
       })
