@@ -166,8 +166,8 @@
         }
         // putData
         let userConfigEdit = eval('( ' + currentObject['userConfig'] + ' )')
-        userConfigEdit.put(vm.getUserId(), val)
-        currentObject.put('userConfig', JSON.stringify(userConfigEdit))
+        userConfigEdit[vm.getUserId()] = val
+        currentObject['userConfig'] = JSON.stringify(userConfigEdit)
         console.log('put userConfig,', currentObject)
         vm.$store.dispatch('updateDynamicReport', currentObject)
       }
