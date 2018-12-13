@@ -7,16 +7,16 @@
             <v-expansion-panel-content hide-actions value="1">
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
-                <v-flex xs12 class="text-right pr-2">
-                  <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits">
-                    <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
-                    >
-                      <v-icon dark>account_balance</v-icon>
-                    </v-btn>
-                    <span>Đối chiếu thông tin doanh nghiệp</span>
-                  </v-tooltip>
-                </v-flex>
-                <v-card-text class="pt-1">
+                <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
+                style="position:absolute;right:5px;z-index:101"
+                >
+                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
+                  >
+                    <v-icon dark>account_balance</v-icon>
+                  </v-btn>
+                  <span>Đối chiếu thông tin doanh nghiệp</span>
+                </v-tooltip>
+                <v-card-text class="pt-3">
                   <v-layout wrap>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">

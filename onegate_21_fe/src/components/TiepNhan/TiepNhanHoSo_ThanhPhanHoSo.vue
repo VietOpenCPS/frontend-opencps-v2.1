@@ -210,7 +210,7 @@
         <v-layout class="mx-4" wrap>
           <v-flex style="width:60px" class="my-0 py-1 text-bold">Ghi chú:</v-flex>
           <v-flex style="width:calc(100% - 80px)">
-            <div v-if="!onlyView && applicantNote['edit']" class="pl-2">
+            <div v-if="!onlyView" class="pl-2">
               <v-text-field class="py-0"
               v-model="applicantNoteDossier"
               multi-line
@@ -420,17 +420,6 @@ export default {
       if (val && vm.fileTemplateNoString) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
-    },
-    checkInput (val) {
-      let vm = this
-      let applicantNoteEdit = {
-        value: vm.thongTinHoSo['applicantNote'],
-        edit: false
-      }
-      if (val === 2) {
-        applicantNoteEdit['edit'] = true
-      }
-      vm.$store.commit('setApplicantNote', applicantNoteEdit)
     }
   },
   methods: {
@@ -749,11 +738,7 @@ export default {
     changeApplicantNote () {
       let vm = this
       console.log('applicantNoteEdit', vm.applicantNoteDossier)
-      let applicantNoteEdit = {
-        value: vm.applicantNoteDossier,
-        edit: true
-      }
-      vm.$store.commit('setApplicantNote', applicantNoteEdit)
+      vm.$store.commit('setApplicantNote', vm.applicantNoteDossier)
     },
     pickFile (item) {
       var vm = this
