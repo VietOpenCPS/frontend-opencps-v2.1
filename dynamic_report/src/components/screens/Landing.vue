@@ -761,6 +761,11 @@ export default {
       if (vm.groupType !== 'domain') {
         labelGroup = 'Sở Ban ngành'
       }
+      if (vm.year > 0) {
+        docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
+      } else {
+        docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + 'ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
+      }
       if (vm.reportType === 'REPORT_FIX_01') {
         docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
       }
