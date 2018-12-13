@@ -372,6 +372,7 @@ export default {
           vm.year = ''
         }
         vm.doCreatePDF(vm.selected)
+        console.log('watch created')
       }, 200)
     })
   },
@@ -400,19 +401,24 @@ export default {
       }
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
         vm.doCreatePDF(vm.selected)
+        console.log('watch route1')
       } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate === '' && currentQuery.year !== '') {
         vm.doCreatePDF(vm.selected)
+        console.log('watch route2')
       }
     },
     reportType (val) {
       console.debug(val)
+      console.log('watch reportType')
       this.doCreatePDF(this.selected)
     },
     groupType (val) {
       console.debug(val)
+      console.log('watch groupType')
       this.doCreatePDF(this.selected)
     },
     selected (val) {
+      console.log('watch selected')
       this.doCreatePDF(val)
     },
     fromDate (val) {
@@ -595,6 +601,7 @@ export default {
       let vm = this
       let mappingData = []
       vm.agencyLists = []
+      vm.docDefinition = {}
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('doDynamic: ', vm.itemsReports[key])
@@ -777,6 +784,7 @@ export default {
       let docDefinition = {}
       let mappingData = []
       vm.agencyLists = []
+      vm.docDefinition = {}
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
