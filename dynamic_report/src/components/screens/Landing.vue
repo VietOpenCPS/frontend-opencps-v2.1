@@ -317,7 +317,8 @@ export default {
     govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? parseInt(window.themeDisplay.getScopeGroupId()) : 0,
     danhSachBaoCao: [],
     pdfBlob: null,
-    isShowLoading: false
+    isShowLoading: false,
+    isCallData: false
   }),
   computed: {
     itemsReports () {
@@ -410,16 +411,22 @@ export default {
     reportType (val) {
       console.debug(val)
       console.log('watch reportType')
-      this.doCreatePDF(this.selected)
+      if (this.isCallData) {
+        this.doCreatePDF(this.selected)
+      }
     },
     groupType (val) {
       console.debug(val)
       console.log('watch groupType')
-      this.doCreatePDF(this.selected)
+      if (this.isCallData) {
+        this.doCreatePDF(this.selected)
+      }
     },
     selected (val) {
       console.log('watch selected')
-      this.doCreatePDF(val)
+      if (this.isCallData) {
+        this.doCreatePDF(val)
+      }
     },
     fromDate (val) {
       this.toDateMin = val
@@ -596,6 +603,7 @@ export default {
       } else {
         vm.doDynamicReport(val)
       }
+      vm.isCallData = true
     },
     doDynamicReport (val) {
       let vm = this
