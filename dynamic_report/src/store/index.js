@@ -128,6 +128,8 @@ export const store = new Vuex.Store({
               agency: filter['agency']
             }
           }
+          let govAgency = filter['govAgency']
+          let agencyLists = filter['agencyLists']
           let requestURL = ''
           if (filter.document === 'REPORT_01' || filter.document.startsWith('REPORT_FIX')) {
             // test local
@@ -135,9 +137,6 @@ export const store = new Vuex.Store({
             requestURL = '/o/rest/statistics'
             param.params['fromStatisticDate'] = filter.fromDate
             param.params['toStatisticDate'] = filter.toDate
-            let govAgency = filter['govAgency']
-            let agencyLists = filter['agencyLists']
-
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
