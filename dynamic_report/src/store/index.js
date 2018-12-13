@@ -150,9 +150,22 @@ export const store = new Vuex.Store({
                 console.log(error)
                 reject(error)
               })
-            } else if (String(govAgency['value']) === '' && govAgency !== undefined) {
-
-            } else if (String(govAgency['value']) !== '' && govAgency !== undefined) {
+            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+              let promises = []
+              for (let key in agencyLists) {
+                param['headers']['groupId'] = agencyLists[key]['value']
+                promises.push(axios.get(requestURL, param))
+              }
+              let myObject = []
+              axios.all(promises)
+              .then(axios.spread((...args) => {
+                for (let i = 0; i < args.length; i++) {
+                  console.log(args[i])
+                  myObject.push(args[i]['data']['data'])
+                }
+                console.log('myObject', myObject)
+              }))
+            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
               param['headers']['groupId'] = govAgency['value']
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
