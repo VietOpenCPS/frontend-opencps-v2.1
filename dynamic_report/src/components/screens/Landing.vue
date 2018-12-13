@@ -116,7 +116,6 @@
 </template>
 
 <script>
-import saveAs from 'file-saver'
 import support from '../../store/support.json'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
@@ -317,7 +316,7 @@ export default {
     ],
     month: 0,
     agencyLists: [],
-    govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? window.themeDisplay.getScopeGroupId() : 0,
+    govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? parseInt(window.themeDisplay.getScopeGroupId()) : 0,
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false
