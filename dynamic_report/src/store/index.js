@@ -161,9 +161,16 @@ export const store = new Vuex.Store({
               .then(axios.spread((...args) => {
                 for (let i = 0; i < args.length; i++) {
                   console.log(args[i])
-                  myObject.push(args[i]['data']['data'])
+                  if (args[i]['data']['total'] > 0) {
+                    myObject.concat(args[i]['data']['data'])
+                  }
                 }
                 console.log('myObject', myObject)
+                if (myObject.length > 0) {
+                  resolve(myObject)
+                } else {
+                  resolve(null)
+                }
               }))
             } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
               param['headers']['groupId'] = govAgency['value']
