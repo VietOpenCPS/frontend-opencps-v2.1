@@ -597,6 +597,7 @@ export default {
       vm.agencyLists = []
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
+          console.log('doDynamic: ', vm.itemsReports[key])
           vm.docDefinition = eval('( ' + vm.itemsReports[key]['tableConfig'] + ' )')['docDefinition']
           mappingData = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['mappingData']
           vm.agencyLists = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['govAgencyCode']

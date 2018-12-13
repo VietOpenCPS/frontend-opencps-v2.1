@@ -92,7 +92,7 @@
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
           clearable
-          :rows="2"
+          :rows="item['rows'] !== undefined ? item['rows']: 2"
           box
         ></v-textarea>
         <v-subheader class="px-0" v-if="item.type === 'codemirror'">{{item['label']}}</v-subheader>
