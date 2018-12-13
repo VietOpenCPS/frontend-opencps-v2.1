@@ -582,6 +582,10 @@ export default {
           break
         }
       }
+      if (vm.govAgency) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
