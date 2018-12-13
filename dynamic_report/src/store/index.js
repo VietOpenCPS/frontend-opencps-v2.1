@@ -73,7 +73,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    updateDynamicReport ({ commit, state }, input) {
+    updateDynamicReport ({ commit, state }, doData) {
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
@@ -82,11 +82,22 @@ export const store = new Vuex.Store({
             'Accept': 'application/json'
           }
         }
-        input['userConfig'] = eval('( ' + input['userConfig'] + ' )')
-        input['filterConfig'] = eval('( ' + input['filterConfig'] + ' )')
-        input['tableConfig'] = eval('( ' + input['tableConfig'] + ' )')
-        console.log('ddd: ', JSON.stringify(input))
-        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\"').replace(/'/g, '\\"'))
+        let currentObject = {}
+        for (let key in doData.itemsReports) {
+          if (doData.itemsReports[key]['code'] === String(doData.index)) {
+            currentObject = doData.itemsReports[key]
+            break
+          }
+        }
+        // putData
+        let userConfigEdit = eval('( ' + currentObject['userConfig'] + ' )')
+        userConfigEdit[vm.getUserId()] = val
+        currentObject['userConfig'] = userConfigEdit
+        currentObject['userConfig'] = eval('( ' + currentObject['userConfig'] + ' )')
+        currentObject['filterConfig'] = eval('( ' + currentObject['filterConfig'] + ' )')
+        currentObject['tableConfig'] = eval('( ' + currentObject['tableConfig'] + ' )')
+        console.log('ddd: ', JSON.stringify(currentObject))
+        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(currentObject).replace(/"/g, '\\"').replace(/'/g, '\\"'))
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           console.log(response)
           resolve(response.data)

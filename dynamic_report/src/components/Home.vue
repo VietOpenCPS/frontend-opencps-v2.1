@@ -157,21 +157,12 @@
     watch: {
       selected (val) {
         let vm = this
-        /*
-        let currentObject = {}
-        for (let key in vm.itemsReports) {
-          if (vm.itemsReports[key]['code'] === String(vm.index)) {
-            currentObject = vm.itemsReports[key]
-            break
-          }
+        let doData = {
+          selected: val,
+          itemsReports: vm.itemsReports,
+          index: vm.index
         }
-        // putData
-        let userConfigEdit = eval('( ' + currentObject['userConfig'] + ' )')
-        userConfigEdit[vm.getUserId()] = val
-        currentObject['userConfig'] = JSON.stringify(userConfigEdit)
-        console.log('put userConfig,', currentObject)
-        vm.$store.dispatch('updateDynamicReport', currentObject)
-        */
+        vm.$store.dispatch('updateDynamicReport', doData)
       }
     },
     created () {
