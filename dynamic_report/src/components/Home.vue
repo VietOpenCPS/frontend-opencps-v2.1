@@ -172,14 +172,13 @@
         setTimeout(() => {
           vm.itemsReportsConfig = []
           vm.userConfig = []
-          console.log('itemsReports', vm.itemsReports)
           if (String(vm.index) !== '0') {
             for (let key in vm.itemsReports) {
               if (vm.itemsReports[key]['code'] === String(vm.index)) {
                 vm.reportType = vm.itemsReports[key]['document']
-                vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
+                vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
                 if (vm.itemsReports[key]['userConfig'] !== '') {
-                  let userConfigObjec = eval('( ' + vm.itemsReports[key]['userConfig'] + ' )')
+                  let userConfigObjec = vm.itemsReports[key]['userConfig']
                   if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
                     vm.userConfig = userConfigObjec[vm.getUserId()]
                   }
@@ -189,9 +188,9 @@
             }
           } else {
             vm.reportType = vm.itemsReports[0]['document']
-            vm.itemsReportsConfig = eval('( ' + vm.itemsReports[0]['filterConfig'] + ' )')['reportConfig']
+            vm.itemsReportsConfig = vm.itemsReports[0]['filterConfig']['reportConfig']
             if (vm.itemsReports[0]['userConfig'] !== '') {
-              let userConfigObjec = eval('( ' + vm.itemsReports[0]['userConfig'] + ' )')
+              let userConfigObjec = vm.itemsReports[0]['userConfig']
               if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
                 vm.userConfig = userConfigObjec[vm.getUserId()]
               }
@@ -237,9 +236,9 @@
         vm.itemsReportsConfig = []
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === data) {
-            vm.itemsReportsConfig = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['reportConfig']
+            vm.itemsReportsConfig = vm.itemsReports[key]['filterConfig']['reportConfig']
             if (vm.itemsReports[key]['userConfig'] !== '') {
-              let userConfigObjec = eval('( ' + vm.itemsReports[key]['userConfig'] + ' )')
+              let userConfigObjec = vm.itemsReports[key]['userConfig']
               if (userConfigObjec.hasOwnProperty(vm.getUserId())) {
                 vm.userConfig = userConfigObjec[vm.getUserId()]
               }
