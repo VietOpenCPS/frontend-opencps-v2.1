@@ -408,13 +408,6 @@ export default {
         console.log('watch route2')
       }
     },
-    reportType (val) {
-      console.debug(val)
-      console.log('watch reportType')
-      if (this.isCallData) {
-        this.doCreatePDF(this.selected)
-      }
-    },
     groupType (val) {
       console.debug(val)
       console.log('watch groupType')
