@@ -208,18 +208,60 @@ export const store = new Vuex.Store({
               param.params['fromReceiveDate'] = filter.fromDate
               param.params['toReceiveDate'] = filter.toDate
             }
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = serializable
-                resolve(dataReturn)
-              } else {
-                resolve(null)
+            if (govAgency === undefined || govAgency === null || govAgency === '') {
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  let dataReturn = serializable
+                  resolve(dataReturn)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+              let promises = []
+              for (let key in agencyLists) {
+                if (String(agencyLists[key]['value']) !== '0') {
+                  param['headers']['groupId'] = agencyLists[key]['value']
+                  promises.push(axios.get(requestURL, param))
+                }
               }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
+              axios.all(promises)
+              .then(axios.spread((...args) => {
+                let myObject = []
+                for (let i = 0; i < args.length; i++) {
+                  if (args[i]['data']['total'] > 0) {
+                    console.log(args[i]['data']['data'])
+                    myObject = myObject.concat(args[i]['data']['data'])
+                  }
+                }
+                console.log('myObjectdossier', myObject)
+                if (myObject.length > 0) {
+                  resolve(myObject)
+                } else {
+                  resolve(null)
+                }
+              }))
+            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
+              if (govAgency['value'] !== undefined) {
+                param['headers']['groupId'] = govAgency['value']
+              }
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  let dataReturn = serializable
+                  resolve(dataReturn)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            }
           }
         })
       })
