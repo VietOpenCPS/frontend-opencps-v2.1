@@ -370,7 +370,7 @@ export default {
           vm.toDateFormatted = ''
           vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
         }
-        if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+        if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
           vm.year = ''
         }
         vm.doCreatePDF(vm.selected)
@@ -397,8 +397,10 @@ export default {
         vm.toDateFormatted = ''
         vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
       }
-      if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
+      if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
         vm.year = ''
+      }
+      if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
         vm.doCreatePDF(vm.selected)
       } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate === '' && currentQuery.year !== '') {
         vm.doCreatePDF(vm.selected)
