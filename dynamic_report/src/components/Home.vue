@@ -157,6 +157,7 @@
     watch: {
       selected (val) {
         let vm = this
+        /*
         let currentObject = {}
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['code'] === String(vm.index)) {
@@ -170,6 +171,7 @@
         currentObject['userConfig'] = JSON.stringify(userConfigEdit)
         console.log('put userConfig,', currentObject)
         vm.$store.dispatch('updateDynamicReport', currentObject)
+        */
       }
     },
     created () {
