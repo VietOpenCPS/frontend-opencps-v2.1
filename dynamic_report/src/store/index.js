@@ -132,9 +132,9 @@ export const store = new Vuex.Store({
               'active' : false,
               'type' : typeCurrent,
               'title' : current['reportName'],
-              'filterConfig' : current['filterConfig'],
-              'tableConfig' : current['tableConfig'],
-              'userConfig' : current['userConfig'],
+              'filterConfig' : eval('( ' + current['filterConfig'] + ' )'),
+              'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+              'userConfig' : eval('( ' + current['userConfig'] + ' )'),
               'dynamicReportId' : current['dynamicReportId'],
               'reportCode' : current['reportCode'],
               'reportName' : current['reportName'],
@@ -142,9 +142,6 @@ export const store = new Vuex.Store({
             })
             indexKey = indexKey + 1
           }
-          itemsReportsData['userConfig'] = eval('( ' + itemsReportsData['userConfig'] + ' )')
-          itemsReportsData['filterConfig'] = eval('( ' + itemsReportsData['filterConfig'] + ' )')
-          itemsReportsData['tableConfig'] = eval('( ' + itemsReportsData['tableConfig'] + ' )')
           state.itemsReports = itemsReportsData
           console.log('state.itemsReports', state.itemsReports)
         }).catch(function () {
