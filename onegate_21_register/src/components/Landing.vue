@@ -249,7 +249,8 @@ export default {
     agreeRules: false,
     functionTimeOut: null,
     bussinessExits: false,
-    validBussinessInfos: false,
+    validBussinessInfos: true,
+    messageCheckApplicant: '',
     ruleContent: '',
     e1: true,
     e2: true,
@@ -316,26 +317,34 @@ export default {
         password: vm.passWord
       }
       console.log('dataForm', dataForm)
-      if (!vm.applicantType && !vm.validBussinessInfos) {
-        toastr.error('Thông tin tổ chức, doanh nghiệp không chính xác. Vui lòng kiểm tra lại')
-        return
-      }
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        vm.loading = true
-        let filter = dataForm
-        vm.$store.dispatch('postApplicant', filter).then(function (result) {
-          vm.loading = false
-          router.push({
-            path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+        let passValid = false
+        if (!vm.validBussinessInfos) {
+          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
+          if (x) {
+            passValid = true
+          }
+        } else { passValid = true }
+        if (passValid) {
+          vm.loading = true
+          let filter = dataForm
+          vm.$store.dispatch('postApplicant', filter).then(function (result) {
+            vm.loading = false
+            router.push({
+              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+            })
+          }).catch(function (reject) {
+            vm.loading = false
           })
-        }).catch(function (reject) {
-          vm.loading = false
-        })
+        }
       }
     },
     changeApplicantType () {
       var vm = this
       console.log(vm.applicantType)
+      if (!vm.applicantType) {
+        vm.validBussinessInfos = true
+      }
       vm.changeApplicantInfos()
     },
     changeApplicantInfos () {
@@ -358,23 +367,25 @@ export default {
           applicantIdNo: vm.applicantIdNo,
           applicantName: vm.applicantName
         }
-        vm.loadingVerify = true
+        // vm.loadingVerify = true
         vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          vm.loadingVerify = false
+          // vm.loadingVerify = false
           if (result && result.hasOwnProperty('error') && result.error === true) {
             vm.validBussinessInfos = false
             vm.bussinessExits = false
-            vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+            // vm.$store.commit('setApplicantBussinessExit', false)
+            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+            vm.messageCheckApplicant = result.message
           } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
             vm.validBussinessInfos = false
             vm.bussinessExits = true
-            vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+            // vm.$store.commit('setApplicantBussinessExit', false)
+            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+            vm.messageCheckApplicant = result.message
           } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
             vm.validBussinessInfos = true
             vm.bussinessExits = true
-            vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
           }
         }).catch(function () {
           vm.loadingVerify = false

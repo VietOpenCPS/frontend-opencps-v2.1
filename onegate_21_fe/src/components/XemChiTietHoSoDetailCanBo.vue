@@ -206,7 +206,7 @@
                 </v-btn>
               </div>
             </v-layout>
-            <v-alert v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
+            <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
               {{alertObj.message}}
             </v-alert>
             <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
@@ -1684,6 +1684,10 @@ export default {
         } else {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             // console.log('result======', result)
+            if (vm.checkInput === 2 || vm.checkInput === '2') {
+              vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+              })
+            }
             vm.loadingAction = false
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false

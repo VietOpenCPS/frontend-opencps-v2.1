@@ -7,16 +7,16 @@
             <v-expansion-panel-content hide-actions value="1">
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
-                <v-flex xs12 class="text-right pr-2">
-                  <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits">
-                    <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
-                    >
-                      <v-icon dark>account_balance</v-icon>
-                    </v-btn>
-                    <span>Đối chiếu thông tin doanh nghiệp</span>
-                  </v-tooltip>
-                </v-flex>
-                <v-card-text class="pt-1">
+                <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
+                style="position:absolute;right:5px;z-index:101"
+                >
+                  <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
+                  >
+                    <v-icon dark>account_balance</v-icon>
+                  </v-btn>
+                  <span>Đối chiếu thông tin doanh nghiệp</span>
+                </v-tooltip>
+                <v-card-text class="pt-3">
                   <v-layout wrap>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -496,7 +496,8 @@ export default {
       representatives: ''
     },
     bussinessExits: false,
-    validBussinessInfos: false,
+    validBussinessInfos: true,
+    messageCheckApplicant: '',
     search: null,
     search2: null,
     searchQuery: '',
@@ -782,18 +783,12 @@ export default {
     },
     showValid () {
       var vm = this
-      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo['applicantIdType'] === 'business')) {
-        if (vm.validBussinessInfos && vm.$refs.formChuHoSo.validate()) {
-          return true
-        } else {
-          if (!vm.validBussinessInfos) {
-            toastr.error('Thông tin tổ chức, doanh nghiệp không chính xác. Vui lòng kiểm tra lại')
-          }
-          return false
-        }
-      } else {
-        return vm.$refs.formChuHoSo.validate()
+      let result = {
+        validForm: vm.$refs.formChuHoSo.validate(),
+        message: vm.messageCheckApplicant,
+        validApplicant: vm.validBussinessInfos
       }
+      return result
     },
     onChangeDelegateDistrict (data) {
       var vm = this
@@ -812,14 +807,15 @@ export default {
     },
     onInputChange (query) {
       let vm = this
-      if (!vm.thongTinChuHoSo.userType) {
-        if (vm.functionTimeOut) {
-          clearTimeout(vm.functionTimeOut)
-        }
-        vm.functionTimeOut = setTimeout(function () {
-          vm.checkApplicantInfos()
-        }, 2000)
+      if (vm.functionTimeOut) {
+        clearTimeout(vm.functionTimeOut)
       }
+      vm.functionTimeOut = setTimeout(function () {
+        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+          vm.checkApplicantInfos()
+        }
+        vm.$store.commit('setApplicantId', query)
+      }, 2000)
       if (query.trim().length === 0) {
         return null
       }
@@ -886,6 +882,7 @@ export default {
       vm.thongTinChuHoSo['contactEmail'] = item['contactEmail'] ? item['contactEmail'] : ''
       vm.thongTinChuHoSo.cityCode = item['cityCode'] ? item['cityCode'] : ''
       vm.$store.commit('setApplicantId', vm.thongTinChuHoSo['applicantIdNo'])
+      vm.checkApplicantInfos()
       function changeCity (data) {
         return new Promise((resolve, reject) => {
           setTimeout(
@@ -967,14 +964,15 @@ export default {
     },
     changeApplicantInfos () {
       let vm = this
-      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
-        if (vm.functionTimeOut) {
-          clearTimeout(vm.functionTimeOut)
-        }
-        vm.functionTimeOut = setTimeout(function () {
-          vm.checkApplicantInfos()
-        }, 2000)
+      if (vm.functionTimeOut) {
+        clearTimeout(vm.functionTimeOut)
       }
+      vm.functionTimeOut = setTimeout(function () {
+        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+          vm.checkApplicantInfos()
+        }
+        vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
+      }, 2000)
     },
     checkApplicantInfos () {
       let vm = this
@@ -983,23 +981,25 @@ export default {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
           applicantName: vm.thongTinChuHoSo.applicantName
         }
-        vm.loadingVerify = true
+        // vm.loadingVerify = true
         vm.$store.dispatch('checkApplicantInfos', filter).then(result => {
-          vm.loadingVerify = false
+          // vm.loadingVerify = false
           if (result && result.hasOwnProperty('error') && result.error === true) {
             vm.bussinessExits = false
             vm.validBussinessInfos = false
-            vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
+            // vm.$store.commit('setApplicantBussinessExit', false)
+            vm.messageCheckApplicant = result.message
+            // toastr.error(result.message + ' Vui lòng kiểm tra lại mã số thuế')
           } else if (result && result.hasOwnProperty('warning') && result.warning === true) {
             vm.bussinessExits = true
             vm.validBussinessInfos = false
-            vm.$store.commit('setApplicantBussinessExit', false)
-            toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
+            // vm.$store.commit('setApplicantBussinessExit', false)
+            vm.messageCheckApplicant = result.message
+            // toastr.error(result.message + ' Vui lòng đối chiếu thông tin doanh nghiệp')
           } else if (result && !result.hasOwnProperty('error') && !result.hasOwnProperty('warning')) {
             vm.bussinessExits = true
             vm.validBussinessInfos = true
-            vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
+            // vm.$store.commit('setApplicantBussinessExit', filter['applicantIdNo'])
           }
         }).catch(function () {
           vm.loadingVerify = false
