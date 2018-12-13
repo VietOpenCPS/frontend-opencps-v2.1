@@ -74,10 +74,7 @@ export const store = new Vuex.Store({
     dossierTemplates: support.dossierTemplates,
     applicantId: '',
     applicantBussinessExit: false,
-    applicantNote: {
-      value: '',
-      edit: false
-    },
+    applicantNote: '',
     thongTinChuHoSo: {
       userType: true,
       cityCode: '',
@@ -995,9 +992,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateCityCode', data.delegateCityCode)
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
         dataPutdossier.append('delegateWardCode', data.delegateWardCode)
-        if (state.applicantNote['edit']) {
-          dataPutdossier.append('applicantNote', state.applicantNote['value'])
-        }
+        dataPutdossier.append('applicantNote', state.applicantNote)
         if (data.originality !== 1) {
           dataPutdossier.append('dossierName', data.dossierName)
         }
@@ -1023,6 +1018,25 @@ export const store = new Vuex.Store({
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
+        }).catch(rejectXhr => {
+          reject(rejectXhr)
+        })
+      })
+    },
+    updateApplicantNote ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': state.initData.cps_auth
+          }
+        }
+        var dataPutdossier = new URLSearchParams()
+        dataPutdossier.append('applicantNote', state.applicantNote)
+        axios.put(state.initData.postDossierApi + '/' + data.dossierId, dataPutdossier, options).then(function (response) {
+          resolve(response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)
         })
