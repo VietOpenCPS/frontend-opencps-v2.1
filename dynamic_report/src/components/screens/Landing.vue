@@ -5,13 +5,13 @@
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2" v-if="isDVC">
+            <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
               <v-select
                 :items="agencyLists"
                 v-model="govAgency"
                 autocomplete
-                item-text="itemName"
-                item-value="itemCode"
+                item-text="text"
+                item-value="value"
                 return-object
                 :hide-selected="true"
                 @change="changeGov"
@@ -748,10 +748,12 @@ export default {
       let vm = this
       let docDefinition = {}
       let mappingData = []
+      vm.agencyLists = []
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           docDefinition = eval('( ' + vm.itemsReports[key]['tableConfig'] + ' )')['docDefinition']
           mappingData = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['mappingData']
+          vm.agencyLists = eval('( ' + vm.itemsReports[key]['filterConfig'] + ' )')['govAgencyCode']
           break
         }
       }
@@ -764,7 +766,7 @@ export default {
       if (vm.year > 0) {
         docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
       } else {
-        docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + 'ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
+        docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
       }
       if (vm.reportType === 'REPORT_FIX_01') {
         docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
@@ -777,10 +779,9 @@ export default {
       if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('REPORT_FIX')) {
         filter['year'] = vm.year
       }
-      if (vm.isDVC && vm.govAgency) {
-        filter['agency'] = vm.govAgency['itemCode']
-      } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
+      if (vm.govAgency) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
       vm.isShowLoading = true

@@ -135,17 +135,37 @@ export const store = new Vuex.Store({
             requestURL = '/o/rest/statistics'
             param.params['fromStatisticDate'] = filter.fromDate
             param.params['toStatisticDate'] = filter.toDate
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                resolve(serializable.data)
-              } else {
-                resolve(null)
-              }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
+            let govAgency = filter['govAgency']
+            let agencyLists = filter['agencyLists']
+
+            if (govAgency === undefined || govAgency === null || govAgency === '') {
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  resolve(serializable.data)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            } else if (String(govAgency['value']) === '' && govAgency !== undefined) {
+
+            } else if (String(govAgency['value']) !== '' && govAgency !== undefined) {
+              param['headers']['groupId'] = govAgency['value']
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  resolve(serializable.data)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            }
           } else {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
