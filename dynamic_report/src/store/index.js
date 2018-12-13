@@ -82,7 +82,7 @@ export const store = new Vuex.Store({
             'Accept': 'application/json'
           }
         }
-        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\\"'))
+        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\"').replace(/'/g, '\\"'))
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           console.log(response)
           resolve(response.data)
