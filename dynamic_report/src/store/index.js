@@ -146,6 +146,7 @@ export const store = new Vuex.Store({
           itemsReportsData['filterConfig'] = eval('( ' + itemsReportsData['filterConfig'] + ' )')
           itemsReportsData['tableConfig'] = eval('( ' + itemsReportsData['tableConfig'] + ' )')
           state.itemsReports = itemsReportsData
+          console.log('state.itemsReports', state.itemsReports)
         }).catch(function () {
           state.itemsReports = []
           commit('setsnackbarerror', true)
