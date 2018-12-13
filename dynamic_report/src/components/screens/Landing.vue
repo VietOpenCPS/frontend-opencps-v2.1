@@ -582,10 +582,6 @@ export default {
           break
         }
       }
-      if (vm.govAgency) {
-        filter['govAgency'] = vm.govAgency
-        filter['agencyLists'] = vm.agencyLists
-      }
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
@@ -641,10 +637,9 @@ export default {
       if (vm.reportType === 'REPORT_01') {
         filter['year'] = vm.year
       }
-      if (vm.isDVC && vm.govAgency) {
-        filter['agency'] = vm.govAgency['itemCode']
-      } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
+      if (vm.govAgency) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
