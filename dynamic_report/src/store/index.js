@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import saveAs from 'file-saver'
-import support from './support.json'
+// import support from './support.json'
 import AdminConfig from './AdminConfig'
 Vue.use(Vuex)
 
@@ -73,7 +73,26 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDynamicReports ({state}) {
+    updateDynamicReport ({ commit, state }, input) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(input).replace(/"/g, '\\\"'))
+        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+          console.log(response)
+          resolve(response.data)
+        }).catch(function (error) {
+          commit('setsnackbarerror', true)
+          reject(error)
+        })
+      })
+    },
+    getDynamicReports ({commit, state}) {
       return new Promise(() => {
         let options = {
           headers: {
