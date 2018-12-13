@@ -153,8 +153,10 @@ export const store = new Vuex.Store({
             } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
               let promises = []
               for (let key in agencyLists) {
-                param['headers']['groupId'] = agencyLists[key]['value']
-                promises.push(axios.get(requestURL, param))
+                if (String(agencyLists[key]['value']) !== '0') {
+                  param['headers']['groupId'] = agencyLists[key]['value']
+                  promises.push(axios.get(requestURL, param))
+                }
               }
               let myObject = []
               axios.all(promises)
@@ -162,6 +164,7 @@ export const store = new Vuex.Store({
                 for (let i = 0; i < args.length; i++) {
                   console.log(args[i])
                   if (args[i]['data']['total'] > 0) {
+                    console.log(args[i]['data']['data'])
                     myObject.concat(args[i]['data']['data'])
                   }
                 }
