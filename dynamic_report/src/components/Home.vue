@@ -160,7 +160,8 @@
         let doData = {
           selected: val,
           itemsReports: vm.itemsReports,
-          index: vm.index
+          index: vm.index,
+          userId: vm.getUserId()
         }
         vm.$store.dispatch('updateDynamicReport', doData)
       }

@@ -91,7 +91,7 @@ export const store = new Vuex.Store({
         }
         // putData
         let userConfigEdit = eval('( ' + currentObject['userConfig'] + ' )')
-        userConfigEdit[vm.getUserId()] = val
+        userConfigEdit[doData.userId] = doData.selected
         currentObject['userConfig'] = userConfigEdit
         currentObject['userConfig'] = eval('( ' + currentObject['userConfig'] + ' )')
         currentObject['filterConfig'] = eval('( ' + currentObject['filterConfig'] + ' )')
