@@ -134,7 +134,12 @@ export const store = new Vuex.Store({
               'title' : current['reportName'],
               'filterConfig' : current['filterConfig'],
               'tableConfig' : current['tableConfig'],
-              'userConfig' : current['userConfig']
+              'userConfig' : current['userConfig'],
+              'dynamicReportId' : current['dynamicReportId'],
+              'reportCode' : current['reportCode'],
+              'reportName' : current['reportName'],
+              'reportCode' : current['reportCode'],
+              'sharing' : current['sharing']
             })
             indexKey = indexKey + 1
           }
