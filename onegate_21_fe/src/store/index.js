@@ -145,7 +145,7 @@ export const store = new Vuex.Store({
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
           }).catch(function (error) {
-            state['user'].role = ['default']
+            state['user'].role = ['Administrator_data']
             console.log(error)
           })
         }
@@ -515,6 +515,27 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
             let serializable = response.data
+            let jsonParse = function (string) {
+              try {
+                JSON.parse(string)
+                return JSON.parse(string)
+              } catch (e) {
+                let partTip = {
+                  tip: string,
+                  maxSize: 10,
+                  extensions: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf'
+                }
+                return partTip
+              }
+            }
+            if (serializable && serializable['dossierParts']) {
+              for (let key in serializable['dossierParts']) {
+                let partTip = serializable['dossierParts'][key]['partTip']
+                if (partTip) {
+                  serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
+                }
+              }
+            }
             resolve(serializable.dossierParts)
           }, error => {
             reject(error)
@@ -532,6 +553,27 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
             let serializable = response.data
+            let jsonParse = function (string) {
+              try {
+                JSON.parse(string)
+                return JSON.parse(string)
+              } catch (e) {
+                let partTip = {
+                  tip: string,
+                  maxSize: 10,
+                  extensions: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf'
+                }
+                return partTip
+              }
+            }
+            if (serializable && serializable['dossierParts']) {
+              for (let key in serializable['dossierParts']) {
+                let partTip = serializable['dossierParts'][key]['partTip']
+                if (partTip) {
+                  serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
+                }
+              }
+            }
             resolve(serializable.dossierParts)
           }, error => {
             reject(error)
@@ -611,7 +653,6 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let files = window.$('#file' + data.partNo)[0].files
         let file = files[0]
-        file['typeAllow'] = state.fileTypeTPHS
         let formData = new FormData()
         if (data.partType === 3) {
           formData.append('displayName', data['displayName'])
@@ -627,7 +668,11 @@ export const store = new Vuex.Store({
         formData.append('fileTemplateNo', data.fileTemplateNo)
         formData.append('formData', '')
         formData.append('referenceUid', '')
-        store.dispatch('validFileUpload', file) // check size, type tài liệu upload
+        let fileUpload = {
+          partTip: data.partTip,
+          file: file
+        }
+        store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
         if (file && state.validFileUpload) {
           axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
             headers: {
@@ -678,13 +723,16 @@ export const store = new Vuex.Store({
     },
     uploadPaymentFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        console.log('data', data)
         let files = $('#' + data.selector)[0].files
         let file = files[0]
-        file['typeAllow'] = state.fileTypePAYMENT
+        // file['typeAllow'] = state.fileTypePAYMENT
         let formData = new FormData()
         formData.append('file', file)
-        store.dispatch('validFileUpload', file) // check size, type tài liệu upload
+        let fileUpload = {
+          partTip: data['partTip'],
+          file: file
+        }
+        store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
         if (file && state.validFileUpload) {
           axios.put(state.initData.dossierApi + '/' + data.dossierId + '/payments/' + data.referenceUid + '/confirmfile', formData, {
             headers: {
@@ -2834,25 +2882,29 @@ export const store = new Vuex.Store({
         })
       })
     },
-    validFileUpload ({commit, state}, file) {
-      let getFileType = file.name ? file.name.split('.') : ''
+    validFileUpload ({commit, state}, data) {
+      let getFileType = data.file.name ? data.file.name.split('.') : ''
       let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
-      let fileTypeAllow = file.typeAllow
-      let fileSizeAllow = 10
-      let fileTypeInput = fileTypeAllow.filter(function (item) {
+      let fileTypeAllow = data.partTip['extensions'] ? data.partTip['extensions'].split(",") : ''
+      let fileSizeAllow = data.partTip['maxSize']
+      let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
         return item === fileType
-      })
+      }) : ''
       store.commit('setValidFileUpload', false)
       if (fileTypeInput && fileTypeInput.length > 0) {
-        if (Number(file.size) <= fileSizeAllow * 1048576) {
+        if (Number(data.file.size) <= data.partTip['maxSize'] * 1048576 || !data.partTip['maxSize']) {
           store.commit('setValidFileUpload', true)
         } else {
-          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + data.partTip['maxSize'] + ' MB')
           store.commit('setValidFileUpload', false)
         }
       } else {
-        toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + file.typeAllow.toString().replace(/\,/g,', '))
-        store.commit('setValidFileUpload', false)
+        if (!data.partTip['extensions']) {
+          store.commit('setValidFileUpload', true)
+        } else {
+          toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + data.partTip['extensions'])
+          store.commit('setValidFileUpload', false)
+        }
       }
     }
     // ----End---------
