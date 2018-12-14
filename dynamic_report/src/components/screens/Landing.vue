@@ -800,7 +800,6 @@ export default {
           break
         }
       }
-      /*
       console.log('vm.docDefinition', vm.docDefinition)
       vm.isShowLoading = true
       // process
@@ -828,6 +827,7 @@ export default {
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
       }
+      /*
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
