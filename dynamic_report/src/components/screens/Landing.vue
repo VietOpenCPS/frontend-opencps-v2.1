@@ -6,9 +6,14 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex class="px-2 text-right">
+              <v-btn flat class="mx-0 my-0" v-on:click.native="doSaveConfig">
+                <v-icon>settings</v-icon> &nbsp;
+                Lưu thay đổi
+              </v-btn>
               <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
                 <v-icon>settings</v-icon> &nbsp;
-                Tuỳ chọn
+                <span v-if="showConfig">Quay lại</span>
+                <span v-else>Tuỳ chọn</span>
               </v-btn>
               <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
                 Xuất Excel
@@ -18,7 +23,7 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap class="filter_menu mt-2" v-if="showConfig">
+    <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
       <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
@@ -1058,6 +1063,18 @@ export default {
           }
           vm.$store.dispatch('doStatisticReportPrint', filterPostData)
         }
+      })
+    },
+    doSaveConfig () {
+      let vm = this
+      let doData = {
+        selected: vm.selected,
+        itemsReports: vm.itemsReports,
+        index: vm.index,
+        userId: vm.getUserId()
+      }
+      vm.$store.dispatch('updateDynamicReport', doData).then(function (result) {
+        vm.showConfig = false
       })
     }
   }
