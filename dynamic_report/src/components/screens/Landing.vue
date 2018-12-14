@@ -800,6 +800,7 @@ export default {
           break
         }
       }
+      /*
       console.log('vm.docDefinition', vm.docDefinition)
       vm.isShowLoading = true
       // process
@@ -927,6 +928,7 @@ export default {
           vm.isShowLoading = false
         }
       })
+      */
     },
     doPrintReport () {
       let vm = this
