@@ -65,7 +65,6 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
-      vm.$store.dispatch('getDynamicReports')
       if (window.location.href.endsWith('#/')) {
         vm.$router.push('/bao-cao/0')
       }

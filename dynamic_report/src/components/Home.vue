@@ -169,9 +169,10 @@
     created () {
     var vm = this
       vm.$nextTick(function () {
-        setTimeout(() => {
+        vm.$store.dispatch('getDynamicReports').then(function (result) {
           vm.itemsReportsConfig = []
           vm.userConfig = []
+          console.log('aaa', vm.itemsReports)
           if (String(vm.index) !== '0') {
             for (let key in vm.itemsReports) {
               if (vm.itemsReports[key]['code'] === String(vm.index)) {
@@ -206,7 +207,7 @@
               }
             }
           }
-        }, 200)
+        })
       })
     },
     methods: {

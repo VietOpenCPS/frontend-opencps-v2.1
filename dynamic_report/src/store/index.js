@@ -106,7 +106,7 @@ export const store = new Vuex.Store({
       })
     },
     getDynamicReports ({commit, state}) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -143,9 +143,11 @@ export const store = new Vuex.Store({
           }
           state.itemsReports = itemsReportsData
           console.log('state.itemsReports', state.itemsReports)
-        }).catch(function () {
+          resolve(itemsReportsData)
+        }).catch(function (error) {
           state.itemsReports = []
           commit('setsnackbarerror', true)
+          reject(error)
         })
       })
     },
