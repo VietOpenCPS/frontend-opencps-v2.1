@@ -92,6 +92,7 @@
       </div>
     </div>
     <div>
+      {{tableConfig}}
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
       <div v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
@@ -318,7 +319,8 @@ export default {
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false,
-    isCallData: false
+    isCallData: false,
+    tableConfig: {}
   }),
   computed: {
     itemsReports () {
@@ -785,9 +787,11 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
+      vm.tableConfig = null
       console.log('vm.docDefinition', vm.docDefinition)
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
+          vm.tableConfig = vm.itemsReports[key]['tableConfig']
           console.log('vm.docDefinitionXXX', vm.itemsReports[key]['tableConfig'])
           vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
