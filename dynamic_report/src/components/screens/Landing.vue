@@ -352,6 +352,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      /*
       setTimeout(() => {
         let currentParams = vm.$router.history.current.params
         let currentQuerys = vm.$router.history.current.query
@@ -376,6 +377,7 @@ export default {
         vm.doCreatePDF(vm.selected)
         console.log('watch created')
       }, 200)
+      */
     })
   },
   watch: {
