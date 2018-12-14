@@ -2076,14 +2076,6 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
           }
           resultAction['payment'] = paymentsOut
-          let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
-          if (feeTotal === 0 && vm.originality === 3) {
-            let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
-            if (!x) {
-              vm.loadingActionProcess = false
-              return
-            }
-          }
         }
         if (vm.showYkienCanBoThucHien) {
           let result = vm.$refs.ykiencanbo.doExport()

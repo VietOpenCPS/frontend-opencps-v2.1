@@ -531,9 +531,7 @@ export const store = new Vuex.Store({
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
                 let partTip = serializable['dossierParts'][key]['partTip']
-                if (partTip) {
-                  serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
-                }
+                serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
               }
             }
             resolve(serializable.dossierParts)
@@ -569,9 +567,7 @@ export const store = new Vuex.Store({
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
                 let partTip = serializable['dossierParts'][key]['partTip']
-                if (partTip) {
-                  serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
-                }
+                serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
               }
             }
             resolve(serializable.dossierParts)
