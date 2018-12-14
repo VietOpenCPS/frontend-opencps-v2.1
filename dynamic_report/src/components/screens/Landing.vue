@@ -603,7 +603,7 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
-      for (let key in c) {
+      for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('doDynamic: ', vm.itemsReports[key])
           vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
