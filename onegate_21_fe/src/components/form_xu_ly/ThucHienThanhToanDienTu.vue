@@ -258,6 +258,11 @@ export default {
       data['dossierId'] = vm.detailDossier.dossierId
       data['referenceUid'] = vm.detailDossier.referenceUid
       data['selector'] = 'paymentFile1'
+      data['partTip'] = {
+        tip: '',
+        maxSize: 10,
+        extensions: 'jpg,png,jpeg'
+      }
       let file = $('#paymentFile1')[0].files[0]
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {
         vm.epaymentValid = true

@@ -15,7 +15,7 @@
                         <span v-if="item.required" style="color: red"> (*) </span>
                         &nbsp;&nbsp;
                       </span>
-                      <span v-if="item.partTip">{{item.partTip}}</span>
+                      <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
                     <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
@@ -70,7 +70,7 @@
                 </div>
                 <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
                   <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="item.partNo === itemFileView.dossierPartNo  && !itemFileView.eForm" >
-                    <div :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                    <div :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                       <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                         <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                         {{itemFileView.displayName}} - 
@@ -157,13 +157,14 @@
               indeterminate
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
-              <v-tooltip top v-else-if="progressUploadPart !== item.partNo && !onlyView">
+              <v-tooltip left v-else-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
                     <v-icon size="16" color="primary">cloud_upload</v-icon>
                   </v-badge>
                 </v-btn>
-                <span>Tải file lên</span>
+                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
+                <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
               </v-tooltip>
               <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
@@ -206,9 +207,9 @@
           </v-layout>
         </div> -->
       </div>
-      <div>
+      <div v-if="!partTypes.includes(2)">
         <v-layout class="mx-4" wrap>
-          <v-flex style="width:60px" class="my-0 py-1 text-bold">Ghi chú:</v-flex>
+          <v-flex style="width:60px" class="my-0 py-2 text-bold" v-if="!onlyView || (onlyView && applicantNoteDossier)">Ghi chú:</v-flex>
           <v-flex style="width:calc(100% - 80px)">
             <div v-if="!onlyView" class="pl-2">
               <v-text-field class="py-0"
@@ -218,7 +219,7 @@
               @input="changeApplicantNote"
               ></v-text-field>
             </div>
-            <p class="my-0 py-1" v-if="onlyView">
+            <p class="my-0 py-2" v-if="onlyView && applicantNoteDossier">
               {{applicantNoteDossier}} 
             </p>
           </v-flex>

@@ -42,7 +42,7 @@
     </v-dialog>
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
-    <div id="actionContent">
+    <div>
       <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
@@ -1409,6 +1409,14 @@ export default {
       }
       if (vm.showThuPhi) {
         filter['payment'] = paymentsOut
+        let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
+        if (feeTotal === 0 && vm.originality === 3) {
+          let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
+          if (!x) {
+            vm.loadingActionProcess = false
+            return
+          }
+        }
       }
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
@@ -1424,6 +1432,15 @@ export default {
             paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
             serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : 0,
             shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : 0
+          }
+          let paymentsOut = filter['payment']
+          let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
+          if (feeTotal === 0 && vm.originality === 3) {
+            let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
+            if (!x) {
+              vm.loadingActionProcess = false
+              return
+            }
           }
         } else {
           validThanhToanDienTu = false
@@ -1619,6 +1636,14 @@ export default {
                     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
                   }
                   resultAction['payment'] = paymentsOut
+                  let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
+                  if (feeTotal === 0 && vm.originality === 3) {
+                    let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
+                    if (!x) {
+                      vm.loadingActionProcess = false
+                      return
+                    }
+                  }
                 }
                 if (vm.showYkienCanBoThucHien) {
                   let result = vm.$refs.ykiencanbo.doExport()
@@ -1674,8 +1699,8 @@ export default {
                 })
               }
               $('html, body').animate({
-                scrollTop: $('#actionContent').offset().top
-              }, 500, 'linear')
+                scrollTop: 0
+              }, 700, 'linear')
             }).catch(function (reject) {
               vm.loadingAction = false
               vm.loadingActionProcess = false
@@ -1720,7 +1745,7 @@ export default {
               })
             }
             $('html, body').animate({
-              scrollTop: $('#actionContent').offset().top
+              scrollTop: 0
             }, 500, 'linear')
           }).catch(function (reject) {
             vm.loadingAction = false
@@ -2051,6 +2076,14 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
           }
           resultAction['payment'] = paymentsOut
+          let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
+          if (feeTotal === 0 && vm.originality === 3) {
+            let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
+            if (!x) {
+              vm.loadingActionProcess = false
+              return
+            }
+          }
         }
         if (vm.showYkienCanBoThucHien) {
           let result = vm.$refs.ykiencanbo.doExport()

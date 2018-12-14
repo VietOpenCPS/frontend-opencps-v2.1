@@ -83,7 +83,6 @@
             ></v-text-field> &nbsp;
             <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
             <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
-            <span style="position: absolute; right: 15px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xls, xlsx, txt, rtf (Tối đa 10MB)</span>
           </div>
           <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
         </v-expansion-panel-content>
