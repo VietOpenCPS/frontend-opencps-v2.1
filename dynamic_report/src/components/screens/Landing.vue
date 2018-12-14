@@ -608,7 +608,7 @@ export default {
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('doDynamic: ', vm.itemsReports[key])
-          vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
+          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
@@ -789,14 +789,12 @@ export default {
       vm.docDefinition = {}
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
-          console.log('djkk: ', vm.itemsReports[key]['tableConfig'])
           vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
         }
       }
-      console.log('docDefinition: ', vm.docDefinition)
       vm.isShowLoading = true
       // process
       let labelGroup = 'Lĩnh vực'
@@ -823,7 +821,6 @@ export default {
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
       }
-      /*
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
@@ -924,7 +921,6 @@ export default {
           vm.isShowLoading = false
         }
       })
-      */
     },
     doPrintReport () {
       let vm = this
