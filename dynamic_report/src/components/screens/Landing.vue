@@ -11,7 +11,8 @@
                 Lưu thay đổi
               </v-btn>
               <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
-                <v-icon>settings</v-icon> &nbsp;
+                <v-icon v-if="showConfig">reply</v-icon>
+                <v-icon v-else>settings</v-icon> &nbsp;
                 <span v-if="showConfig">Quay lại</span>
                 <span v-else>Tuỳ chọn</span>
               </v-btn>
