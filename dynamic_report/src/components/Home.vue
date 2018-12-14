@@ -163,7 +163,7 @@
           index: vm.index,
           userId: vm.getUserId()
         }
-        vm.$store.dispatch('updateDynamicReport', doData)
+        // vm.$store.dispatch('updateDynamicReport', doData)
       }
     },
     created () {
