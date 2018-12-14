@@ -358,6 +358,9 @@ export default {
           break
         }
       }
+      console.log('itemsReports', vm.itemsReports)
+      console.log('reportType', vm.reportType)
+      console.log('agencyLists', vm.agencyLists)
       /*
       setTimeout(() => {
         let currentParams = vm.$router.history.current.params
