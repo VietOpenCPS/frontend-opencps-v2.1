@@ -603,7 +603,7 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
-      for (let key in vm.itemsReports) {
+      for (let key in c) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('doDynamic: ', vm.itemsReports[key])
           vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
@@ -782,13 +782,12 @@ export default {
     },
     doPrintReportFix () {
       let vm = this
-      let docDefinition = {}
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
-          docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
+          vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
@@ -801,12 +800,12 @@ export default {
         labelGroup = 'Sở Ban ngành'
       }
       if (vm.year > 0) {
-        docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
+        vm.docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
       } else {
-        docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
+        vm.docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
       }
       if (vm.reportType === 'REPORT_FIX_01') {
-        docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
+        vm.docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
       }
       let filter = {
         document: vm.reportType,
@@ -906,11 +905,11 @@ export default {
                 indexTotal = indexTotal + 1
               }
               index = index + 1
-              docDefinition['content'][2]['table']['body'].push(dataRow)
+              vm.docDefinition['content'][2]['table']['body'].push(dataRow)
             }
           }
-          docDefinition['content'][2]['table']['body'].push(dataRowTotal)
-          let pdfDocGenerator = pdfMake.createPdf(docDefinition)
+          vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
+          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
