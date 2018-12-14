@@ -20,23 +20,19 @@
           item-value="value"
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
-        <v-list class="py-0 nav_trang_thai_ho_so">
-          <v-list-group
-            v-for="(item, index) in itemsReports"
-            v-model="reportType"
-            :key="index"
-            prepend-icon="description"
-            :append-icon="''"
-            no-action
-            ref="listGroupCustom"
-          >
-            <v-list-tile slot="activator"
-              @click="toTableIndexing(item, index)" >
+        <v-list>
+            <v-list-tile 
+              v-for="(item, index) in itemsReports"
+              v-model="reportType"
+              :key="index"
+            >
+              <v-list-tile-action>
+                <v-icon color="primary">description</v-icon>
+              </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-          </v-list-group>
         </v-list>
         <!--
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
