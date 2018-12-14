@@ -351,16 +351,18 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.agencyLists = []
-      for (let key in vm.itemsReports) {
-        if (vm.itemsReports[key]['document'] === vm.reportType) {
-          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
-          break
+      setTimeout(() => {
+        vm.agencyLists = []
+        for (let key in vm.itemsReports) {
+          if (vm.itemsReports[key]['document'] === vm.reportType) {
+            vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
+            break
+          }
         }
-      }
-      console.log('itemsReports', vm.itemsReports)
-      console.log('reportType', vm.reportType)
-      console.log('agencyLists', vm.agencyLists)
+        console.log('itemsReports', vm.itemsReports)
+        console.log('reportType', vm.reportType)
+        console.log('agencyLists', vm.agencyLists)
+      }, 200)
       /*
       setTimeout(() => {
         let currentParams = vm.$router.history.current.params
