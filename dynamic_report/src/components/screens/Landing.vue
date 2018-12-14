@@ -6,7 +6,7 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex class="px-2 text-right">
-              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+              <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
                 <v-icon>settings</v-icon> &nbsp;
                 Tuỳ chọn
               </v-btn>
@@ -18,7 +18,12 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap class="filter_menu mt-2">
+    <v-layout row wrap class="filter_menu mt-2" v-if="showConfig">
+      <v-flex xs12>
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap class="filter_menu mt-2" v-else>
       <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
         <v-autocomplete
           :items="agencyLists"
@@ -132,6 +137,7 @@ export default {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    itemsReportsConfig: [],
     report1Def: support['report1Def'],
     docDefinition: {
       pageOrientation: 'landscape',
@@ -325,7 +331,8 @@ export default {
     pdfBlob: null,
     isShowLoading: false,
     isCallData: false,
-    nameReport: ''
+    nameReport: '',
+    showConfig: false
   }),
   computed: {
     itemsReports () {
@@ -362,6 +369,7 @@ export default {
         vm.agencyLists = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         /*
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === vm.reportType) {
@@ -433,6 +441,7 @@ export default {
         console.log('watch route2')
       }
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
     },
     groupType (val) {
       console.debug(val)
