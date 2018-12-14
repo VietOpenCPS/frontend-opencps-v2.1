@@ -20,11 +20,11 @@
           item-value="value"
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
-        <v-list>
+        <v-list style="padding: 0;">
             <v-list-tile 
               v-for="(item, index) in itemsReports"
-              v-model="reportType"
               :key="index"
+              style="padding: 0;"
             >
               <v-list-tile-action>
                 <v-icon color="primary">description</v-icon>
