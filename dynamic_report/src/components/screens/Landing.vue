@@ -351,6 +351,13 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      vm.agencyLists = []
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['document'] === vm.reportType) {
+          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
+          break
+        }
+      }
       /*
       setTimeout(() => {
         let currentParams = vm.$router.history.current.params
