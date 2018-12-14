@@ -790,7 +790,7 @@ export default {
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('djkk: ', vm.itemsReports[key]['tableConfig'])
-          Object.assign(vm.itemsReports[key]['tableConfig']['docDefinition'], vm.docDefinition)
+          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
