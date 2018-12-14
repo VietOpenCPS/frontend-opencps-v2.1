@@ -1,70 +1,52 @@
 <template>
   <div class="form-chitiet">
     <div class="row-header">
-      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
+      <div class="background-triangle-big"> <span>{{itemsReports[index]['reportName']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
-              <v-autocomplete
-                :items="agencyLists"
-                v-model="govAgency"
-                item-text="text"
-                item-value="value"
-                return-object
-                :hide-selected="true"
-                @change="changeGov"
-                >
-              </v-autocomplete>
+            <v-flex class="px-2 text-right">
+              <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+                Xuất Excel
+              </v-btn>
             </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-autocomplete
-                :items="years"
-                v-model="year"
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-autocomplete>
-            </v-flex>
-            <v-flex xs6 sm1 class="px-2">
-              <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-layout wrap>
-                <v-flex>
-                  <v-menu
-                    ref="menufromDate"
-                    :close-on-content-click="false"
-                    v-model="menufromDate"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      placeholder="dd/mm/yyyy"
-                      slot="activator"
-                      v-model="fromDateFormatted"
-                      append-icon="event"
-                      @blur="fromDate = parseDate(fromDateFormatted)"
-                    ></v-text-field>
-                    <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
-                  </v-menu>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex xs6 sm1 class="px-2">
-              <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
+          </v-layout>
+        </div>
+      </div>
+      <v-layout row wrap>
+        <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
+          <v-autocomplete
+            :items="agencyLists"
+            v-model="govAgency"
+            item-text="text"
+            item-value="value"
+            return-object
+            :hide-selected="true"
+            @change="changeGov"
+            >
+          </v-autocomplete>
+        </v-flex>
+        <v-flex xs6 sm2 class="px-2">
+          <v-autocomplete
+            :items="years"
+            v-model="year"
+            item-text="name"
+            item-value="value"
+            :hide-selected="true"
+            @change="changeYear"
+            >
+          </v-autocomplete>
+        </v-flex>
+        <v-flex xs6 sm1 class="px-2">
+          <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
+        </v-flex>
+        <v-flex xs6 sm2 class="px-2">
+          <v-layout wrap>
+            <v-flex>
               <v-menu
-                ref="menutoDate"
+                ref="menufromDate"
                 :close-on-content-click="false"
-                v-model="menutoDate"
+                v-model="menufromDate"
                 lazy
                 transition="scale-transition"
                 offset-y
@@ -75,21 +57,41 @@
                 <v-text-field
                   placeholder="dd/mm/yyyy"
                   slot="activator"
-                  v-model="toDateFormatted"
+                  v-model="fromDateFormatted"
                   append-icon="event"
-                  @blur="toDate = parseDate(toDateFormatted)"
+                  @blur="fromDate = parseDate(fromDateFormatted)"
                 ></v-text-field>
-                <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
+                <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
               </v-menu>
             </v-flex>
-            <v-flex class="px-2 text-right">
-              <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
-                Xuất Excel
-              </v-btn>
-            </v-flex>
           </v-layout>
-        </div>
-      </div>
+        </v-flex>
+        <v-flex xs6 sm1 class="px-2">
+          <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
+        </v-flex>
+        <v-flex xs6 sm2 class="px-2">
+          <v-menu
+            ref="menutoDate"
+            :close-on-content-click="false"
+            v-model="menutoDate"
+            lazy
+            transition="scale-transition"
+            offset-y
+            full-width
+            max-width="290px"
+            min-width="290px"
+          >
+            <v-text-field
+              placeholder="dd/mm/yyyy"
+              slot="activator"
+              v-model="toDateFormatted"
+              append-icon="event"
+              @blur="toDate = parseDate(toDateFormatted)"
+            ></v-text-field>
+            <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
+          </v-menu>
+        </v-flex>
+      </v-layout>
     </div>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
