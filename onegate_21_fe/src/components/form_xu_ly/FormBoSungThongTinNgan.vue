@@ -9,41 +9,41 @@
           <v-card-text class="py-2 px-2">
             <v-layout wrap>
               <v-flex xs12>
-                  <v-text-field v-if="item.fieldType === 'textarea'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    multi-line
-                    @input="inputChangeValue(item)"
-                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                    :required="(item.required === true || item.required === 'true') ? true : false"
-                  ></v-text-field>
-                  <v-text-field v-if="item.fieldType === 'string'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    @input="inputChangeValue(item)"
-                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                    :required="(item.required === true || item.required === 'true') ? true : false"
-                  ></v-text-field>
-                  <v-text-field v-if="item.fieldType === 'number'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    @input="inputChangeValue(item)"
-                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
-                    :required="(item.required === true || item.required === 'true') ? true : false"
-                  ></v-text-field>
-                  <v-text-field v-if="item.fieldType === 'date'"
-                    :id="item.fieldName"
-                    :value="item.value"
-                    :placeholder="item.placeholder"
-                    readonly
-                    append-icon="event"
-                    v-on:click.native="openDialogCustom(item, item.fieldName)"
-                    :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
-                    :required="(item.required === true || item.required === 'true') ? true : false"
-                  ></v-text-field>
+                <v-text-field v-if="item.fieldType === 'textarea'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  multi-line
+                  @input="inputChangeValue(item)"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                ></v-text-field>
+                <v-text-field v-if="item.fieldType === 'string'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  @input="inputChangeValue(item)"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                ></v-text-field>
+                <v-text-field v-if="item.fieldType === 'number'"
+                  :id="item.fieldName"
+                  :value="item.value"
+                  :placeholder="item.placeholder"
+                  @input="inputChangeValue(item)"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                ></v-text-field>
+                <v-text-field v-if="item.fieldType === 'date'"
+                  :id="item.fieldName"
+                  :value="item.value|parseDate"
+                  :placeholder="item.placeholder"
+                  readonly
+                  append-icon="event"
+                  v-on:click.native="openDialogCustom(item, item.fieldName)"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                ></v-text-field>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -109,7 +109,7 @@
               <v-text-field v-if="item.fieldType === 'date'"
                 box
                 :id="item.fieldName"
-                :value="item.value"
+                :value="item.value|parseDate"
                 :placeholder="item.placeholder"
                 readonly
                 append-icon="event"
@@ -220,7 +220,9 @@
       pickDateCustom () {
         let vm = this
         console.log(vm.date)
-        vm.itemId.value = vm.dateTimeView(vm.date)
+        if (vm.date) {
+          vm.itemId.value = new Date(vm.date)
+        }
         vm.dialog = false
       },
       inputChangeValue (item) {
@@ -265,12 +267,23 @@
         for (let key in vm.formBuilder) {
           let valueEdit = vm.formBuilder[key].value
           if (vm.formBuilder[key].fieldType === 'date') {
-            valueEdit = (new Date(vm.parseCurrentDate(vm.formBuilder[key].value))).getTime() ? (new Date(vm.parseCurrentDate(vm.formBuilder[key].value))).getTime() : ''
+            valueEdit = (new Date(vm.formBuilder[key].value)).getTime() ? (new Date(vm.formBuilder[key].value)).getTime() : ''
           }
           objectReturn[vm.formBuilder[key].fieldName] = valueEdit
         }
         // console.log('objectReturn', objectReturn)
         return objectReturn
+      }
+    },
+    filters: {
+      parseDate: function (value) {
+        if (!value) return ''
+        let date = new Date(Number(value))
+        if (date) {
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        } else {
+          return ''
+        }
       }
     }
   }

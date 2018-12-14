@@ -6,7 +6,6 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div> Kết quả xử lý
-          <span style="position: absolute; right: 15px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, pdf, docx, doc, xls, xlsx, txt, rtf (Tối đa 10MB)</span>
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
@@ -92,7 +91,8 @@
                         <v-icon size="16" color="primary">cloud_upload</v-icon>
                       </v-badge>
                     </v-btn>
-                    <span>Tải file lên</span>
+                    <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
+                    <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
                   </v-tooltip>
                   <!-- <v-tooltip top>
                     <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
@@ -202,13 +202,32 @@
       vm.$nextTick(function () {
         // console.log('vm.detailDossier------------', vm.detailDossier)
         if (vm.detailDossier['dossierId']) {
-          vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-            vm.dossierFilesItems = resFiles
-            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
-            // console.log('vm.createFiles------------', vm.createFiles)
-            // console.log('vm.dossierFilesItems------------', vm.dossierFilesItems)
-          }).catch(reject => {
+          var arrTemp = []
+          arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
+          arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
+          Promise.all(arrTemp).then(values => {
+            var dossierTemplates = values[1]
+            var dossierFiles = values[0]
+            vm.dossierFilesItems = dossierFiles
+            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, dossierFiles)
+            if (dossierTemplates.length !== 0) {
+              vm.createFiles.forEach(template => {
+                var itemFind = dossierTemplates.find(part => {
+                  return template.partNo === part.partNo
+                })
+                if (itemFind) {
+                  template['partTip'] = itemFind['partTip']
+                }
+              })
+            }
+            console.log('creataaaaaa', vm.createFiles)
           })
+
+          // vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
+          //   vm.dossierFilesItems = resFiles
+          //   vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
+          // }).catch(reject => {
+          // })
         }
       })
     },
