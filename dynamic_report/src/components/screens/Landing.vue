@@ -382,6 +382,7 @@ export default {
         vm.agencyLists = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         /*
         for (let key in vm.itemsReports) {
@@ -454,6 +455,8 @@ export default {
         console.log('watch route2')
       }
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      vm.itemsReportsConfig = []
+      console.log('sdsss: ', vm.itemsReports[vm.index]['filterConfig']['reportConfig'])
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
     },
     groupType (val) {
