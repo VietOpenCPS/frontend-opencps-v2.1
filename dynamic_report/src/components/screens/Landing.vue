@@ -769,7 +769,7 @@ export default {
               }
             }
           }
-          const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
@@ -910,7 +910,7 @@ export default {
             }
           }
           docDefinition['content'][2]['table']['body'].push(dataRowTotal)
-          const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+          let pdfDocGenerator = pdfMake.createPdf(docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
