@@ -228,3 +228,7 @@ body .drawer__filter .v-input--selection-controls.v-input .v-label {
 .report_list > div > .v-list__tile{
     padding: 0;
 }
+.filter_menu .v-text-field {
+    padding: 0;
+    margin: 0;
+}
