@@ -790,12 +790,13 @@ export default {
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('djkk: ', vm.itemsReports[key]['tableConfig'])
-          Object.assign(vm.itemsReports[key]['tableConfig'], vm.docDefinition)
+          Object.assign(vm.itemsReports[key]['tableConfig']['docDefinition'], vm.docDefinition)
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
         }
       }
+      console.log('docDefinition: ', vm.docDefinition)
       vm.isShowLoading = true
       // process
       let labelGroup = 'Lĩnh vực'
