@@ -39,7 +39,7 @@
         </v-autocomplete>
       </v-flex>
       <v-flex xs6 sm1 class="px-2">
-        <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
+        <v-subheader class="pl-0 text-header" style="float: right;">Từ ngày: </v-subheader>
       </v-flex>
       <v-flex xs6 sm2 class="px-2">
         <v-layout wrap>
@@ -68,7 +68,7 @@
         </v-layout>
       </v-flex>
       <v-flex xs6 sm1 class="px-2">
-        <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
+        <v-subheader class="pl-0 text-header" style="float: right;">Đến ngày:</v-subheader>
       </v-flex>
       <v-flex xs6 sm2 class="px-2">
         <v-menu
