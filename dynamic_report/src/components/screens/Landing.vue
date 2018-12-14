@@ -344,8 +344,15 @@ export default {
     itemsReports () {
       return this.$store.getters.itemsReports
     },
-    selected () {
-      return this.$store.getters.selected
+    selected: {
+      // getter
+      get: function() {
+        return this.$store.getters.selected
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setselected', newValue)
+      }
     },
     reportType: {
       // getter
@@ -1074,7 +1081,7 @@ export default {
         index: vm.index,
         userId: vm.getUserId()
       }
-      vm.$store.dispatch('updateDynamicReport', doData).then(function (result) {
+      vm.$store.dispatch('updateDynamicReport', doData).then(function () {
         vm.showConfig = false
       })
     }
