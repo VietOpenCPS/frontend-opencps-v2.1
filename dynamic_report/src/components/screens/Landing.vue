@@ -19,8 +19,8 @@
       </div>
     </div>
     <v-layout row wrap class="filter_menu mt-2" v-if="showConfig">
-      <v-flex xs12>
-        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
     </v-layout>
     <v-layout row wrap class="filter_menu mt-2" v-else>
