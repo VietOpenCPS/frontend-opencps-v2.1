@@ -6,6 +6,10 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex class="px-2 text-right">
+              <v-btn flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
+                <v-icon>settings</v-icon> &nbsp;
+                Tuỳ chọn
+              </v-btn>
               <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
                 Xuất Excel
               </v-btn>
