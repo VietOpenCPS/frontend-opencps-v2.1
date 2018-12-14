@@ -785,14 +785,17 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
+      console.log('vm.docDefinition', vm.docDefinition)
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
+          console.log('vm.docDefinitionXXX', vm.itemsReports[key]['tableConfig'])
           vm.docDefinition = vm.itemsReports[key]['tableConfig']['docDefinition']
           mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
           vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
           break
         }
       }
+      console.log('vm.docDefinition', vm.docDefinition)
       vm.isShowLoading = true
       // process
       let labelGroup = 'Lĩnh vực'
