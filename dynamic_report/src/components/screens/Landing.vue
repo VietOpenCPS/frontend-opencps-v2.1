@@ -92,7 +92,6 @@
       </div>
     </div>
     <div>
-      {{tableConfig}}
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
       <div v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
