@@ -1,7 +1,7 @@
 <template>
   <div class="form-chitiet">
     <div class="row-header">
-      <div class="background-triangle-big"> <span>{{itemsReports[index]['reportName']}}</span> </div>
+      <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
@@ -320,7 +320,8 @@ export default {
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false,
-    isCallData: false
+    isCallData: false,
+    nameReport: ''
   }),
   computed: {
     itemsReports () {
@@ -355,6 +356,9 @@ export default {
     vm.$nextTick(function () {
       setTimeout(() => {
         vm.agencyLists = []
+        vm.nameReport = vm.itemsReports[vm.index]['reportName']
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        /*
         for (let key in vm.itemsReports) {
           if (vm.itemsReports[key]['document'] === vm.reportType) {
             vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
@@ -364,6 +368,7 @@ export default {
         console.log('itemsReports', vm.itemsReports)
         console.log('reportType', vm.reportType)
         console.log('agencyLists', vm.agencyLists)
+        */
       }, 200)
       /*
       setTimeout(() => {
@@ -423,6 +428,7 @@ export default {
         vm.doCreatePDF(vm.selected)
         console.log('watch route2')
       }
+      vm.nameReport = vm.itemsReports[vm.index]['reportName']
     },
     groupType (val) {
       console.debug(val)
@@ -619,6 +625,12 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
+      let reportName = ''
+      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      reportName = vm.itemsReports[vm.index]['title']
+      /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           console.log('doDynamic: ', vm.itemsReports[key])
@@ -628,18 +640,20 @@ export default {
           break
         }
       }
+      */
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
-      let reportName = ''
+      /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['code'] === String(vm.index)) {
-          reportName = vm.itemsReports[key]['title']
+          
           break
         }
       }
+      */
       vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
       vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
@@ -801,6 +815,10 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
+      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
           vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
@@ -809,6 +827,7 @@ export default {
           break
         }
       }
+      */
       vm.isShowLoading = true
       // process
       let labelGroup = 'Lĩnh vực'
