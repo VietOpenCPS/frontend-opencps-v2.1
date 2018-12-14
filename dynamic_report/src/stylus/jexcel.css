@@ -225,3 +225,6 @@ body .drawer__filter .v-input--selection-controls.v-input .v-label {
     width: calc(100% - 32px);
     padding-top: 2px;
 }
+.report_list > div > .v-list__tile{
+    padding: 0;
+}
