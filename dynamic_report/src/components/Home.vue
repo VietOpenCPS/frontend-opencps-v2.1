@@ -20,18 +20,21 @@
           item-value="value"
           v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
         ></v-select>
-        <v-list style="padding: 0;" class="report_list">
-            <v-list-tile 
-              v-for="(item, index) in itemsReports"
-              :key="index"
-            >
-              <v-list-tile-action>
-                <v-icon color="primary">description</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+        <v-list dense style="padding: 0;" class="report_list">
+          <v-list-tile
+            v-for="(item, indexItem) in itemsReports"
+            :key="indexItem"
+            :to="'/bao-cao/' + indexItem"
+          >
+            <v-list-tile-action>
+              <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">play_arrow</v-icon>
+              <v-icon v-else>description</v-icon>
+            </v-list-tile-action>
+
+            <v-list-tile-content>
+              <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
         </v-list>
         <!--
         <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
