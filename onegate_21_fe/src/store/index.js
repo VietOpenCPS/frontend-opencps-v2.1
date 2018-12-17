@@ -2875,8 +2875,9 @@ export const store = new Vuex.Store({
           // test local
           axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
           // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
-            if (result.data) {
-              resolve(result.data.data)
+            let serializable = result.data
+            if (serializable && serializable.data) {
+              resolve(serializable.data)
             } else {
               resolve([])
             }
