@@ -42,6 +42,15 @@ const routes = [
         }
       },
       {
+        path: '/table/opencps_certnumbers/ext/editor/:id',
+        name: 'ThamSoHeThong',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/ThamSoHeThong.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/:tableName/tool_import',
         name: 'Import',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/import.vue'),

@@ -64,6 +64,12 @@ export const store = new Vuex.Store({
             text: 'Dịch vụ công'
           },
           {
+            icon: 'filter_5',
+            link: '/table/opencps_certnumbers',
+            code: 'opencps_certnumbers',
+            text: 'Tham số hệ thống'
+          },
+          {
             icon: 'import_export',
             link: '/table/import/tool_import',
             code: 'import',
@@ -1021,6 +1027,56 @@ export const store = new Vuex.Store({
               reject(error)
               commit('setsnackbarerror', true)
               // toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            })
+          }
+        })
+      })
+    },
+    // THAM SỐ HỆ THỐNG
+    getCertNumberDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/vr-app/certnumbers/' + filter.certId, param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    updateCertNumber({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostCertNumber = new URLSearchParams()
+          dataPostCertNumber.append('pattern', data.pattern ? data.pattern : '')
+          dataPostCertNumber.append('initNumber', data.initNumber ? data.initNumber : '')
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/vr-app/certnumbers', dataPostCertNumber, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/vr-app/certnumbers/' + data.certId, dataPostCertNumber, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              commit('setsnackbarerror', true)
             })
           }
         })
