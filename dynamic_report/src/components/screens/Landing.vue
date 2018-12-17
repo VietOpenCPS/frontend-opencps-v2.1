@@ -1113,18 +1113,6 @@ export default {
         }
       })
     },
-    doSaveConfig () {
-      let vm = this
-      let doData = {
-        selected: vm.selected,
-        itemsReports: vm.itemsReports,
-        index: vm.index,
-        userId: vm.getUserId()
-      }
-      vm.$store.dispatch('updateDynamicReport', doData).then(function () {
-        vm.showConfig = false
-      })
-    },
     doCreateReport() {
       let vm = this
       let doData = {

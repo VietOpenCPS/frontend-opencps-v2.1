@@ -174,18 +174,6 @@
         }
       }
     },
-    watch: {
-      selected (val) {
-        let vm = this
-        let doData = {
-          selected: val,
-          itemsReports: vm.itemsReports,
-          index: vm.index,
-          userId: vm.getUserId()
-        }
-        // vm.$store.dispatch('updateDynamicReport', doData)
-      }
-    },
     created () {
     var vm = this
       vm.$nextTick(function () {
