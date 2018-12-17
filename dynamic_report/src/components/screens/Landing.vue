@@ -412,6 +412,7 @@ export default {
         console.log('reportType', vm.reportType)
         console.log('agencyLists', vm.agencyLists)
         */
+        vm.pdfBlob = ''
       }, 200)
       /*
       setTimeout(() => {
