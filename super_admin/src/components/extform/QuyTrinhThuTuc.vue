@@ -746,7 +746,14 @@
                       item-value="stepCode"
                       :hide-selected="true"
                       clearable
-                    ></v-autocomplete>
+                    >
+                      <template
+                        slot="item"
+                        slot-scope="data"
+                      >
+                        <v-flex xs12>{{data.item.stepCode}} - {{data.item.stepName}}</v-flex>
+                      </template>
+                    </v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 class="pl-2">
                     <v-autocomplete
@@ -758,7 +765,14 @@
                       item-value="stepCode"
                       :hide-selected="true"
                       clearable
-                    ></v-autocomplete>
+                    >
+                      <template
+                        slot="item"
+                        slot-scope="data"
+                      >
+                        <v-flex xs12>{{data.item.stepCode}} - {{data.item.stepName}}</v-flex>
+                      </template>
+                    </v-autocomplete>
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm6 class="pr-2">
