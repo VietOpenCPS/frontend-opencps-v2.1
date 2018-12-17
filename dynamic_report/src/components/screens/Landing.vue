@@ -467,7 +467,6 @@ export default {
       */
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
-      console.log('sdsss: ', vm.itemsReports[vm.index]['filterConfig']['reportConfig'])
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
