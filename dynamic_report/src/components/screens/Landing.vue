@@ -108,9 +108,14 @@
         </v-menu>
       </v-flex>
     </v-layout>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <v-btn v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+      </v-flex>
+    </v-layout>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div v-else-if="!isShowLoading">
+      <div class="mx-2" v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -453,6 +458,7 @@ export default {
       if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
         vm.year = ''
       }
+      /*
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
         vm.doCreatePDF(vm.selected)
         console.log('watch route1')
@@ -460,6 +466,7 @@ export default {
         vm.doCreatePDF(vm.selected)
         console.log('watch route2')
       }
+      */
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
       console.log('sdsss: ', vm.itemsReports[vm.index]['filterConfig']['reportConfig'])
@@ -471,6 +478,7 @@ export default {
         }, 200)
       }
     },
+    /*
     groupType (val) {
       console.debug(val)
       console.log('watch groupType')
@@ -484,6 +492,7 @@ export default {
         this.doCreatePDF(val)
       }
     },
+    */
     fromDate (val) {
       this.toDateMin = val
       this.fromDateFormatted = this.formatDate(this.fromDate)
@@ -1099,6 +1108,10 @@ export default {
       vm.$store.dispatch('updateDynamicReport', doData).then(function () {
         vm.showConfig = false
       })
+    },
+    doCreateReport() {
+      let vm = this
+      vm.doCreatePDF(vm.selected)
     }
   }
 }
