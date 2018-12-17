@@ -471,6 +471,10 @@ export default {
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
