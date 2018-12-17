@@ -43,7 +43,7 @@
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
-      <v-tabs icons-and-text centered class="mb-4" v-model="activeTab">
+      <v-tabs icons-and-text class="mb-4" v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -70,16 +70,11 @@
             TIẾN TRÌNH THỤ LÝ
           </v-btn>
         </v-tab>
-        <v-tab :key="6" href="#tabs-6" @click="loadDossierLogs()">
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            NHẬT KÝ SỬA ĐỔI
-          </v-btn>
-        </v-tab>
-        <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
+        <!-- <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THEO DÕI HỒ SƠ
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
@@ -213,6 +208,175 @@
               <!-- <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn> -->
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
+            <!--  -->
+          </v-tab-item>
+          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <v-expansion-panel expand  class="expansion-pl ext__form">
+              <v-expansion-panel-content v-bind:value="true">
+                <div slot="header" class="text-bold">
+                  <div class="background-triangle-small"> I.</div>
+                  Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                  <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+                </div>
+                <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="stateViewResult">
+              <v-expansion-panel-content v-bind:value="true">
+                <div slot="header" class="text-bold">
+                  <div class="background-triangle-small"> II.</div>
+                  Kết quả xử lý
+                </div>
+                <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+              <v-expansion-panel-content v-bind:value="true">
+                <div slot="header" class="text-bold">
+                  <div class="background-triangle-small"> III.</div>
+                  Văn bản hành chính
+                </div>
+                <div v-for="(item, index) in documents" v-bind:key="index">
+                  <v-card>
+                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                      <v-flex xs11>
+                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
+                        <div style="margin-left: 30px;">{{item.documentName}}</div>
+                      </v-flex>
+                      <v-flex xs1 class="text-right">
+                        <v-tooltip top>
+                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
+                            <v-icon style="font-size: 14px;">visibility</v-icon>
+                          </v-btn>
+                          <span>Xem</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-layout>
+                  </v-card>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-tab-item>
+          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card>
+              <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+            <v-card>
+              <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
+              <v-card-text v-else>
+                <v-flex xs12 class="text-xs-center">
+                  <span>Không có hồ sơ liên thông</span>
+                </v-flex>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
+            <v-flex xs12 style="height:42px">
+              <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
+                <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
+                <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
+              </v-radio-group>
+            </v-flex>
+            <v-data-table v-if="typeTienTrinh === 1" :headers="headers" :items="dossierActions" class="table-landing table-bordered"
+            hide-actions no-data-text="Không có dữ liệu"
+            >
+              <template slot="headerCell" slot-scope="props">
+                <v-tooltip bottom>
+                  <span slot="activator">
+                    {{ props.header.text }}
+                  </span>
+                  <span>
+                    {{ props.header.text }}
+                  </span>
+                </v-tooltip>
+              </template>
+              <template slot="items" slot-scope="props">
+                <td class="text-xs-center">{{props.index + 1}}</td>
+                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
+                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
+                <td class="text-xs-left">
+                  <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
+                    {{itemUser.userName}} <br>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                    <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
+                  </div>
+                  <div v-if="props.item.statusText">
+                    <span style="color: green">{{props.item.statusText}}</span>
+                  </div>
+                </td>
+              </template>
+            </v-data-table>
+            <div v-else>
+              <content-placeholders v-if="loadingMermaidgraph">
+                <content-placeholders-img />
+                <content-placeholders-heading />
+              </content-placeholders>
+              <div v-else id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
+            </div>
+          </v-tab-item>
+          <!-- <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
+            <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
+          </v-tab-item> -->
+        </v-tabs-items>
+      </v-tabs>
+      <!--  -->
+      <v-tabs icons-and-text class="mb-4" v-model="activeTab2">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab :key="1" href="#tabs-1b" v-if="originality === 3 || (originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done')">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            ĐÁNH GIÁ
+          </v-btn>
+        </v-tab>
+        <v-tab :key="2" href="#tabs-2b">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            TRAO ĐỔI
+          </v-btn>
+        </v-tab>
+        <v-tab :key="3" href="#tabs-3b" @click="loadDossierLogs()">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            NHẬT KÝ SỬA ĐỔI
+          </v-btn>
+        </v-tab>
+        <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item v-if="originality === 3 || (originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done')"
+          id="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+            <div class="px-2 py-2">
+              <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
+                <div class="text-bold">
+                  {{index + 1}}.&nbsp; {{ item.subject }}
+                </div>
+                <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                  <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
+                </v-radio-group>
+                <v-layout wrap class="ml-3" style="margin-top:-10px">
+                  <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
+                    <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
+                  </v-flex>
+                </v-layout>
+              </div>
+              <div v-else class="mx-3">
+                <v-alert outline color="warning" icon="priority_high" :value="true">
+                  Không có đánh giá
+                </v-alert>
+              </div>
+              <div class="ml-2 mt-4">
+                <v-btn color="primary"
+                  :loading="loadingVoting"
+                  :disabled="loadingVoting"
+                  @click="submitVoting"
+                >Gửi đánh giá</v-btn>
+              </div>
+            </div>
+          </v-tab-item>
+          <v-tab-item id="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online">
               <v-expansion-panel class="expansion-pl">
@@ -281,108 +445,8 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
-            <!--  -->
           </v-tab-item>
-          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel expand  class="expansion-pl ext__form">
-              <v-expansion-panel-content v-bind:value="true">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> I.</div>
-                  Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                  <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-                </div>
-                <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="stateViewResult">
-              <v-expansion-panel-content v-bind:value="true">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> II.</div>
-                  Kết quả xử lý
-                </div>
-                <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
-              <v-expansion-panel-content v-bind:value="true">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> III.</div>
-                  Văn bản hành chính
-                </div>
-                <div v-for="(item, index) in documents" v-bind:key="index">
-                  <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
-                      <v-flex xs11>
-                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.documentName}}</div>
-                      </v-flex>
-                      <v-flex xs1 class="text-right">
-                        <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
-                            <v-icon style="font-size: 14px;">visibility</v-icon>
-                          </v-btn>
-                          <span>Xem</span>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-layout>
-                  </v-card>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-tab-item>
-          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
-            <v-card>
-              <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
-            </v-card>
-          </v-tab-item>
-          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
-            <v-card>
-              <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
-              <v-card-text v-else>
-                <v-flex xs12 class="text-xs-center">
-                  <span>Không có hồ sơ liên thông</span>
-                </v-flex>
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
-            <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
-            hide-actions no-data-text="Không có dữ liệu"
-            >
-              <template slot="headerCell" slot-scope="props">
-                <v-tooltip bottom>
-                  <span slot="activator">
-                    {{ props.header.text }}
-                  </span>
-                  <span>
-                    {{ props.header.text }}
-                  </span>
-                </v-tooltip>
-              </template>
-              <template slot="items" slot-scope="props">
-                <td class="text-xs-center">{{props.index + 1}}</td>
-                <td class="text-xs-left">{{props.item.sequenceRole}}</td>
-                <td class="text-xs-left">{{props.item.sequenceName}}</td>
-                <td class="text-xs-left">{{props.item.durationCount|getThoiHanQuyDinh}}</td>
-                <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
-                <td class="text-xs-left">
-                  <div v-for="itemUser in props.item.assignUsers" :key="itemUser.userId">
-                    {{itemUser.userName}} <br>
-                  </div>
-                </td>
-                <td class="text-xs-left">
-                  <div v-for="(itemAction, index) in props.item.actions" :key="index">
-                    {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
-                    <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
-                  </div>
-                  <div v-if="props.item.statusText">
-                    <span style="color: green">{{props.item.statusText}}</span>
-                  </div>
-                </td>
-              </template>
-            </v-data-table>
-          </v-tab-item>
-          <v-tab-item id="tabs-6" :key="6" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item id="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">
@@ -403,11 +467,6 @@
                 </p>
               </td>
             </div>
-          </v-tab-item>
-          <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
-            
-            <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
-
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
@@ -539,6 +598,7 @@ export default {
     btnIndex: -1,
     processActionCurrent: 0,
     activeTab: 'tabs-1',
+    activeTab2: '',
     btnDossierDynamics: [],
     btnStepsDynamics: [],
     loadingAction: false,
@@ -691,7 +751,11 @@ export default {
     listLienThong: [],
     modelPlugin: null,
     dialogPlugin: false,
-    dialog_reAsign: false
+    dialog_reAsign: false,
+    loadingMermaidgraph: false,
+    typeTienTrinh: 1,
+    votingItems: [],
+    loadingVoting: false
   }),
   computed: {
     loading () {
@@ -796,6 +860,12 @@ export default {
         }
         if (vm.getOriginality() !== 1) {
           vm.loadHoSoLienThong()
+          vm.activeTab2 = 'tabs-1b'
+          vm.loadVoting()
+        }
+        if (vm.getOriginality() === 1 && resultDossier['dossierStatus'] === 'done') {
+          vm.activeTab2 = 'tabs-1b'
+          vm.loadVoting()
         }
         vm.runComment()
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
@@ -888,7 +958,9 @@ export default {
         let dataParams = {
           dossierId: vm.thongTinChiTietHoSo.dossierId
         }
+        vm.loadingMermaidgraph = true
         vm.$store.dispatch('loadMermaidgraph', dataParams).then(chartData => {
+          vm.loadingMermaidgraph = false
           mermaid.render('theGraph', chartData, function (svgCode) {
             document.getElementById('mermaid_dossier').innerHTML = svgCode
           })
@@ -901,6 +973,8 @@ export default {
               minZoom: 0.1
             })
           }, 500)
+        }).catch(function () {
+          vm.loadingMermaidgraph = false
         })
       }
     },
@@ -922,6 +996,14 @@ export default {
             vm.dossierSyncs = []
           }
         })
+      }
+    },
+    changeTypeTienTrinh (event) {
+      let vm = this
+      if (event === 2) {
+        setTimeout(function () {
+          vm.loadMermaidgraph()
+        }, 200)
       }
     },
     loadDossierLogs (data) {
@@ -2058,6 +2140,36 @@ export default {
         console.log(reject)
       })
     },
+    loadVoting () {
+      let vm = this
+      let filter = {
+        className: 'dosssier',
+        classPK: vm.id
+      }
+      vm.$store.dispatch('loadVoting', filter).then(function (result) {
+        vm.votingItems = result
+        console.log('votingItems', vm.votingItems)
+      }).catch(function (reject) {
+      })
+    },
+    submitVoting () {
+      let vm = this
+      let arrAction = []
+      if (vm.votingItems.length > 0) {
+        vm.loadingVoting = true
+        for (var index in vm.votingItems) {
+          vm.votingItems[index]['className'] = 'dossier'
+          vm.votingItems[index]['classPk'] = vm.id
+          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+        }
+        Promise.all(arrAction).then(results => {
+          vm.loadingVoting = false
+          toastr.success('Đánh giá của bạn được gửi thành công')
+        }).catch(xhr => {
+          vm.loadingVoting = false
+        })
+      }
+    },
     doAction () {
       let vm = this
       let filter = {
@@ -2076,14 +2188,6 @@ export default {
             shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
           }
           resultAction['payment'] = paymentsOut
-          let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
-          if (feeTotal === 0 && vm.originality === 3) {
-            let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')
-            if (!x) {
-              vm.loadingActionProcess = false
-              return
-            }
-          }
         }
         if (vm.showYkienCanBoThucHien) {
           let result = vm.$refs.ykiencanbo.doExport()
