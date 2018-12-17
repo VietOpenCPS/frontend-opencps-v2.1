@@ -122,7 +122,7 @@ export const store = new Vuex.Store({
           for (let key in serializable['getDynamicReports']) {
             let current = serializable['getDynamicReports'][key]
             let typeCurrent = 'dossier'
-            if (current['reportCode'].startsWith('REPORT_FIX')) {
+            if (current['reportCode'].startsWith('STATISTIC')) {
               typeCurrent = 'thong_ke'
             }
             itemsReportsData.push({
@@ -170,7 +170,7 @@ export const store = new Vuex.Store({
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
           let requestURL = ''
-          if (filter.document === 'REPORT_01' || filter.document.startsWith('REPORT_FIX')) {
+          if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = '/o/rest/statistics'

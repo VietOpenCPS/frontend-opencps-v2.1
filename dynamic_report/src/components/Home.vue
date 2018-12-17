@@ -17,7 +17,7 @@
           placeholder="GroupBy"
           item-text="text"
           item-value="value"
-          v-if="reportType !== 'REPORT_01' || reportType.startsWith('REPORT_FIX')"
+          v-if="reportType !== 'REPORT_01' || reportType.startsWith('STATISTIC')"
         ></v-select>
         -->
         <v-list dense style="padding: 0;" class="report_list">
@@ -37,7 +37,7 @@
           </v-list-tile>
         </v-list>
         <!--
-        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-for="(item, index) in itemsReportsConfig" v-bind:key="index" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
         <v-btn color="primary" block v-if="userConfig.length > 0" v-on:click.native="resetConfig">Quay lại mặc định</v-btn>
         -->
       </div>
