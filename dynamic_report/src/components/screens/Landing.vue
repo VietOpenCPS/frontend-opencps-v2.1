@@ -39,7 +39,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs6 sm2 class="px-2">
+      <v-flex xs6 sm2 class="px-2" v-if="years.length > 0">
         <v-autocomplete
           :items="years"
           v-model="year"
@@ -50,10 +50,10 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs6 sm1 class="px-2">
+      <v-flex xs6 sm1 class="px-2" v-if="fromDateShow">
         <v-subheader class="pl-0 text-header" style="float: right;">Từ ngày: </v-subheader>
       </v-flex>
-      <v-flex xs6 sm2 class="px-2">
+      <v-flex xs6 sm2 class="px-2" v-if="fromDateShow">
         <v-layout wrap>
           <v-flex>
             <v-menu
@@ -79,10 +79,10 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs6 sm1 class="px-2">
+      <v-flex xs6 sm1 class="px-2" v-if="toDateShow">
         <v-subheader class="pl-0 text-header" style="float: right;">Đến ngày:</v-subheader>
       </v-flex>
-      <v-flex xs6 sm2 class="px-2">
+      <v-flex xs6 sm2 class="px-2" v-if="toDateShow">
         <v-menu
           ref="menutoDate"
           :close-on-content-click="false"
@@ -260,31 +260,16 @@ export default {
     isDVC: false,
     isCallBack: true,
     fromDate: null,
+    fromDateShow: false,
     menufromDate: false,
     fromDateFormatted: null,
     toDate: null,
+    toDateShow: false,
     menutoDate: false,
     toDateMin: null,
     toDateFormatted: null,
     danhSachBaoCaos: [],
-    years: [
-      {
-        'value': '',
-        'name': 'Lọc theo năm'
-      },
-      {
-        'value': '2017',
-        'name': 'năm 2017'
-      },
-      {
-        'value': '2018',
-        'name': 'năm 2018'
-      },
-      {
-        'value': '2019',
-        'name': 'năm 2019'
-      }
-    ],
+    years: [],
     year: (new Date()).getFullYear() + '',
     months: [
       {
@@ -390,8 +375,14 @@ export default {
     vm.$nextTick(function () {
       setTimeout(() => {
         vm.agencyLists = []
+        vm.years = []
+        vm.fromDateShow = false
+        vm.toDateShow = false
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+        vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+        vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         vm.reportType = vm.itemsReports[vm.index]['document']
@@ -688,11 +679,17 @@ export default {
       let vm = this
       let mappingData = []
       vm.agencyLists = []
+      vm.years = []
+      vm.fromDateShow = false
+      vm.toDateShow = false
       vm.docDefinition = {}
       let reportName = ''
       vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       reportName = vm.itemsReports[vm.index]['title']
       /*
       for (let key in vm.itemsReports) {
