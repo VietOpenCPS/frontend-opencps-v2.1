@@ -1,90 +1,23 @@
 <template>
   <div class="form-chitiet">
     <div class="row-header">
-      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
+      <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2" v-if="isDVC">
-              <v-select
-                :items="agencyLists"
-                v-model="govAgency"
-                autocomplete
-                item-text="itemName"
-                item-value="itemCode"
-                return-object
-                :hide-selected="true"
-                @change="changeGov"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="years"
-                v-model="year"
-                autocomplete
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs6 sm1 class="px-2">
-              <v-subheader class="pl-0 text-header">Từ ngày: </v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-layout wrap>
-                <v-flex>
-                  <v-menu
-                    ref="menufromDate"
-                    :close-on-content-click="false"
-                    v-model="menufromDate"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      placeholder="dd/mm/yyyy"
-                      slot="activator"
-                      v-model="fromDateFormatted"
-                      append-icon="event"
-                      @blur="fromDate = parseDate(fromDateFormatted)"
-                    ></v-text-field>
-                    <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
-                  </v-menu>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-            <v-flex xs6 sm1 class="px-2">
-              <v-subheader class="pl-0 text-header">Đến ngày:</v-subheader>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-menu
-                ref="menutoDate"
-                :close-on-content-click="false"
-                v-model="menutoDate"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                max-width="290px"
-                min-width="290px"
-              >
-                <v-text-field
-                  placeholder="dd/mm/yyyy"
-                  slot="activator"
-                  v-model="toDateFormatted"
-                  append-icon="event"
-                  @blur="toDate = parseDate(toDateFormatted)"
-                ></v-text-field>
-                <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
-              </v-menu>
-            </v-flex>
             <v-flex class="px-2 text-right">
+              <!--
+              <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
+                <v-icon>settings</v-icon> &nbsp;
+                Lưu thay đổi
+              </v-btn>
+              -->
+              <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
+                <v-icon v-if="showConfig">reply</v-icon>
+                <v-icon v-else>settings</v-icon> &nbsp;
+                <span v-if="showConfig">Quay lại</span>
+                <span v-else>Tuỳ chọn</span>
+              </v-btn>
               <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
                 Xuất Excel
               </v-btn>
@@ -93,9 +26,101 @@
         </div>
       </div>
     </div>
+    <v-layout row wrap class="filter_menu mt-2">
+      <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
+        <v-autocomplete
+          :items="agencyLists"
+          v-model="govAgency"
+          item-text="text"
+          item-value="value"
+          return-object
+          :hide-selected="true"
+          @change="changeGov"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="years.length > 0">
+        <v-autocomplete
+          :items="years"
+          v-model="year"
+          item-text="name"
+          item-value="value"
+          :hide-selected="true"
+          @change="changeYear"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm1 class="px-2" v-if="fromDateShow">
+        <v-subheader class="pl-0 text-header" style="float: right;">Từ ngày: </v-subheader>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="fromDateShow">
+        <v-layout wrap>
+          <v-flex>
+            <v-menu
+              ref="menufromDate"
+              :close-on-content-click="false"
+              v-model="menufromDate"
+              lazy
+              transition="scale-transition"
+              offset-y
+              full-width
+              max-width="290px"
+              min-width="290px"
+            >
+              <v-text-field
+                placeholder="dd/mm/yyyy"
+                slot="activator"
+                v-model="fromDateFormatted"
+                append-icon="event"
+                @blur="fromDate = parseDate(fromDateFormatted)"
+              ></v-text-field>
+              <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
+            </v-menu>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+      <v-flex xs6 sm1 class="px-2" v-if="toDateShow">
+        <v-subheader class="pl-0 text-header" style="float: right;">Đến ngày:</v-subheader>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="toDateShow">
+        <v-menu
+          ref="menutoDate"
+          :close-on-content-click="false"
+          v-model="menutoDate"
+          lazy
+          transition="scale-transition"
+          offset-y
+          full-width
+          max-width="290px"
+          min-width="290px"
+        >
+          <v-text-field
+            placeholder="dd/mm/yyyy"
+            slot="activator"
+            v-model="toDateFormatted"
+            append-icon="event"
+            @blur="toDate = parseDate(toDateFormatted)"
+          ></v-text-field>
+          <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
+        </v-menu>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+      <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+      </v-flex>
+    </v-layout>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div v-else-if="!isShowLoading">
+      <div class="mx-2" v-else-if="pdfBlob === ''">
+        
+      </div>
+      <div class="mx-2" v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -116,7 +141,6 @@
 </template>
 
 <script>
-import saveAs from 'file-saver'
 import support from '../../store/support.json'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
@@ -124,11 +148,12 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 export default {
-  props: ['index', 'id'],
+  props: ['index'],
   components: {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    itemsReportsConfig: [],
     report1Def: support['report1Def'],
     docDefinition: {
       pageOrientation: 'landscape',
@@ -235,31 +260,16 @@ export default {
     isDVC: false,
     isCallBack: true,
     fromDate: null,
+    fromDateShow: false,
     menufromDate: false,
     fromDateFormatted: null,
     toDate: null,
+    toDateShow: false,
     menutoDate: false,
     toDateMin: null,
     toDateFormatted: null,
     danhSachBaoCaos: [],
-    years: [
-      {
-        'value': '',
-        'name': 'Lọc theo năm'
-      },
-      {
-        'value': '2017',
-        'name': 'năm 2017'
-      },
-      {
-        'value': '2018',
-        'name': 'năm 2018'
-      },
-      {
-        'value': '2019',
-        'name': 'năm 2019'
-      }
-    ],
+    years: [],
     year: (new Date()).getFullYear() + '',
     months: [
       {
@@ -317,17 +327,27 @@ export default {
     ],
     month: 0,
     agencyLists: [],
-    govAgency: null,
+    govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? parseInt(window.themeDisplay.getScopeGroupId()) : 0,
     danhSachBaoCao: [],
     pdfBlob: null,
-    isShowLoading: false
+    isShowLoading: false,
+    isCallData: false,
+    nameReport: '',
+    showConfig: false
   }),
   computed: {
     itemsReports () {
       return this.$store.getters.itemsReports
     },
-    selected () {
-      return this.$store.getters.selected
+    selected: {
+      // getter
+      get: function() {
+        return this.$store.getters.selected
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setselected', newValue)
+      }
     },
     reportType: {
       // getter
@@ -354,8 +374,63 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       setTimeout(() => {
+        vm.agencyLists = []
+        vm.years = []
+        vm.fromDateShow = false
+        vm.toDateShow = false
+        vm.nameReport = vm.itemsReports[vm.index]['reportName']
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+        vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+        vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+        vm.itemsReportsConfig = []
+        vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+        vm.reportType = vm.itemsReports[vm.index]['document']
+        if (vm.showConfig) {
+          vm.showConfig = false
+          setTimeout(() => {
+            vm.showConfig = true
+          }, 200)
+        }
+        /*
+        for (let key in vm.itemsReports) {
+          if (vm.itemsReports[key]['document'] === vm.reportType) {
+            vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
+            break
+          }
+        }
+        console.log('itemsReports', vm.itemsReports)
+        console.log('reportType', vm.reportType)
+        console.log('agencyLists', vm.agencyLists)
+        */
+        vm.pdfBlob = ''
+      }, 500)
+      /*
+      setTimeout(() => {
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (currentQuerys.hasOwnProperty('fromDate')) {
+          vm.year = currentQuerys.fromDate ? '' : vm.year
+          vm.fromDateFormatted = currentQuerys.fromDate
+        } else {
+          vm.fromDateFormatted = ''
+          let date = new Date()
+          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+        }
+        if (currentQuerys.hasOwnProperty('toDate')) {
+          vm.year = currentQuerys.toDate ? '' : vm.year
+          vm.toDateFormatted = currentQuerys.toDate
+        } else {
+          vm.toDateFormatted = ''
+          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+        }
+        if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
+          vm.year = ''
+        }
         vm.doCreatePDF(vm.selected)
+        console.log('watch created')
       }, 200)
+      */
     })
   },
   watch: {
@@ -378,23 +453,49 @@ export default {
         vm.toDateFormatted = ''
         vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
       }
+      if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
+        vm.year = ''
+      }
+      /*
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
         vm.doCreatePDF(vm.selected)
-      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate == '' && currentQuery.year !== '') {
+        console.log('watch route1')
+      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate === '' && currentQuery.year !== '') {
         vm.doCreatePDF(vm.selected)
+        console.log('watch route2')
+      }
+      */
+      vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      vm.itemsReportsConfig = []
+      vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+      vm.reportType = vm.itemsReports[vm.index]['document']
+      vm.pdfBlob = ''
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+      if (vm.showConfig) {
+        vm.showConfig = false
+        setTimeout(() => {
+          vm.showConfig = true
+        }, 200)
       }
     },
-    reportType (val) {
-      console.debug(val)
-      this.doCreatePDF(this.selected)
-    },
+    /*
     groupType (val) {
       console.debug(val)
-      this.doCreatePDF(this.selected)
+      console.log('watch groupType')
+      if (this.isCallData) {
+        this.doCreatePDF(this.selected)
+      }
     },
     selected (val) {
-      this.doCreatePDF(val)
+      console.log('watch selected')
+      if (this.isCallData) {
+        this.doCreatePDF(val)
+      }
     },
+    */
     fromDate (val) {
       this.toDateMin = val
       this.fromDateFormatted = this.formatDate(this.fromDate)
@@ -407,7 +508,12 @@ export default {
     changeGov (item) {
       let vm = this
       vm.govAgency = item
-      router.push({
+      if (vm.govAgency === 0 || String(vm.govAgency) === '0') {
+        vm.groupType = 'gov'
+      } else {
+        vm.groupType = 'domain'
+      }
+      vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {
           year: vm.year,
@@ -565,24 +671,53 @@ export default {
       let vm = this
       if (vm.reportType === 'REPORT_01') {
         vm.doPrintReport()
+      } else if (vm.reportType.startsWith('STATISTIC')) {
+        vm.doPrintReportFix()
       } else {
         vm.doDynamicReport(val)
       }
+      vm.isCallData = true
     },
     doDynamicReport (val) {
       let vm = this
+      let mappingData = []
+      vm.agencyLists = []
+      vm.years = []
+      vm.fromDateShow = false
+      vm.toDateShow = false
+      vm.docDefinition = {}
+      let reportName = ''
+      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+      reportName = vm.itemsReports[vm.index]['title']
+      /*
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['document'] === vm.reportType) {
+          console.log('doDynamic: ', vm.itemsReports[key])
+          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
+          mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
+          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
+          break
+        }
+      }
+      */
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
-      let reportName = ''
+      /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['code'] === String(vm.index)) {
-          reportName = vm.itemsReports[key]['title']
+          
           break
         }
       }
+      */
       vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
       vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
@@ -601,7 +736,7 @@ export default {
       })
       let ine = 2
       for (let key in val) {
-        vm.docDefinition['content'][2]['table']['widths'].push('*')
+        vm.docDefinition['content'][2]['table']['widths'].push('auto')
         headerTableReport.push({
           text: vm.report1Def[val[key]],
           alignment: 'center',
@@ -621,21 +756,18 @@ export default {
       let filter = {
         document: vm.reportType,
         fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
+        toDate: vm.toDateFormatted,
+        year: vm.year
       }
-      if (vm.reportType === 'REPORT_01') {
-        filter['year'] = vm.year
-      }
-      if (vm.isDVC && vm.govAgency) {
-        filter['agency'] = vm.govAgency['itemCode']
-      } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
+      if (vm.govAgency) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
-          let dataReport = result['data']
+          let dataReport = result
           let domainRaw = {}
           let dossierRaw = {}
           let dataReportCurrent = {}
@@ -731,7 +863,154 @@ export default {
               }
             }
           }
-          const pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          pdfDocGenerator.getBlob((blob) => {
+            vm.pdfBlob = window.URL.createObjectURL(blob)
+            vm.isShowLoading = false
+          })
+        } else {
+          // vm.agencyLists = []
+          vm.isShowLoading = false
+        }
+      })
+    },
+    doPrintReportFix () {
+      let vm = this
+      let mappingData = []
+      vm.agencyLists = []
+      vm.docDefinition = {}
+      console.log('vm.itemsReports[vm.index]', vm.itemsReports[vm.index])
+      console.log('vm.itemsReports[vm.index]2 ', vm.itemsReports[vm.index]['tableConfig'])
+      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      /*
+      for (let key in vm.itemsReports) {
+        if (vm.itemsReports[key]['document'] === vm.reportType) {
+          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
+          mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
+          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
+          break
+        }
+      }
+      */
+      vm.isShowLoading = true
+      // process
+      let labelGroup = 'Lĩnh vực'
+      if (vm.groupType !== 'domain') {
+        labelGroup = 'Sở Ban ngành'
+      }
+      if (vm.year > 0) {
+        vm.docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
+      } else {
+        vm.docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
+      }
+      if (vm.reportType === 'STATISTIC_01') {
+        vm.docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
+      }
+      let filter = {
+        document: vm.reportType,
+        fromDate: vm.fromDateFormatted,
+        toDate: vm.toDateFormatted
+      }
+      if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('STATISTIC')) {
+        filter['year'] = vm.year
+      }
+      if (vm.govAgency) {
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
+      }
+      vm.pdfBlob = null
+      vm.isShowLoading = true
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null && result !== undefined) {
+          let index = 1
+          let dataRowTotal = []
+          dataRowTotal.push({
+            text: 'Tổng số', 
+            colSpan: 2,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          dataRowTotal.push({
+            text: ''
+          })
+          for (let keyMapping in mappingData) {
+            if (mappingData[keyMapping] === 'processCount' || mappingData[keyMapping] === 'releaseCount' || mappingData[keyMapping] === 'processingCount') {
+              dataRowTotal.push({
+                text: 0, 
+                bold: true,
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            } else if (mappingData[keyMapping] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              dataRowTotal.push({
+                text: 0, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+          }
+          for (let key in result) {
+            let flag = false
+            if (vm.groupType !== 'domain') {
+              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
+                flag = true
+              } else {
+                flag = false
+              }
+            } else {
+              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
+                flag = true
+              } else {
+                flag = false
+              }
+            }
+            if (flag) {
+              let dataRow = []
+              dataRow.push({
+                text: index, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+              if (vm.groupType !== 'domain') {
+                dataRow.push({
+                  text: result[key]['govAgencyName'], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              } else {
+                dataRow.push({
+                  text: result[key]['domainName'], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
+              let indexTotal = 2
+              for (let keyMapping in mappingData) {
+                dataRow.push({
+                  text: result[key][mappingData[keyMapping]], 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                if (dataRowTotal[indexTotal]['text'] !== '') {
+                  dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][mappingData[keyMapping]])
+                }
+                indexTotal = indexTotal + 1
+              }
+              index = index + 1
+              vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+            }
+          }
+          vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
+          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
@@ -832,6 +1111,19 @@ export default {
           }
           vm.$store.dispatch('doStatisticReportPrint', filterPostData)
         }
+      })
+    },
+    doCreateReport() {
+      let vm = this
+      let doData = {
+        selected: vm.selected,
+        itemsReports: vm.itemsReports,
+        index: vm.index,
+        userId: vm.getUserId()
+      }
+      vm.$store.dispatch('updateDynamicReport', doData).then(function () {
+        vm.showConfig = false
+        vm.doCreatePDF(vm.selected)
       })
     }
   }

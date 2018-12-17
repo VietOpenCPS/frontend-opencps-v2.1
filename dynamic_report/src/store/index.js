@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import saveAs from 'file-saver'
-import support from './support.json'
+// import support from './support.json'
+import AdminConfig from './AdminConfig'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -36,7 +37,7 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: support['trangThaiHoSoList']
+    itemsReports: []
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -72,6 +73,84 @@ export const store = new Vuex.Store({
         })
       })
     },
+    updateDynamicReport ({ commit, state }, doData) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let currentObject = {}
+        for (let key in doData.itemsReports) {
+          if (doData.itemsReports[key]['code'] === String(doData.index)) {
+            currentObject['dynamicReportId'] = doData.itemsReports[key]['dynamicReportId']
+            currentObject['userConfig'] = doData.itemsReports[key]['userConfig']
+            break
+          }
+        }
+        // putData
+        let userConfigEdit = currentObject['userConfig']
+        userConfigEdit[doData.userId] = doData.selected
+        currentObject['userConfig'] = userConfigEdit
+
+        let body = AdminConfig.updateDynamicReport.replace('INPUTBODY', JSON.stringify(currentObject).replace(/"/g, '\\"').replace(/'/g, '\\"'))
+        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+          console.log(response)
+          resolve(response.data)
+        }).catch(function (error) {
+          commit('setsnackbarerror', true)
+          reject(error)
+        })
+      })
+    },
+    getDynamicReports ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        }
+        let body = AdminConfig.getDynamicReports
+        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+          let serializable = response.data
+          let itemsReportsData = []
+          let indexKey = 0
+          for (let key in serializable['getDynamicReports']) {
+            let current = serializable['getDynamicReports'][key]
+            let typeCurrent = 'dossier'
+            if (current['reportCode'].startsWith('STATISTIC')) {
+              typeCurrent = 'thong_ke'
+            }
+            itemsReportsData.push({
+              'code' : String(indexKey),
+              'document' : current['reportCode'],
+              'active' : false,
+              'type' : typeCurrent,
+              'title' : current['reportName'],
+              'filterConfig' : eval('( ' + current['filterConfig'] + ' )'),
+              'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+              'userConfig' : eval('( ' + current['userConfig'] + ' )'),
+              'dynamicReportId' : current['dynamicReportId'],
+              'reportCode' : current['reportCode'],
+              'reportName' : current['reportName'],
+              'sharing' : current['sharing']
+            })
+            indexKey = indexKey + 1
+          }
+          state.itemsReports = itemsReportsData
+          console.log('state.itemsReports', state.itemsReports)
+          resolve(itemsReportsData)
+        }).catch(function (error) {
+          state.itemsReports = []
+          commit('setsnackbarerror', true)
+          reject(error)
+        })
+      })
+    },
     getAgencyReportLists ({state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -88,27 +167,65 @@ export const store = new Vuex.Store({
               agency: filter['agency']
             }
           }
+          let govAgency = filter['govAgency']
+          let agencyLists = filter['agencyLists']
           let requestURL = ''
-          if (filter.document === 'REPORT_01') {
+          if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = '/o/rest/statistics'
             param.params['fromStatisticDate'] = filter.fromDate
             param.params['toStatisticDate'] = filter.toDate
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = {
-                  data: serializable.data
+            if (govAgency === undefined || govAgency === null || govAgency === '') {
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  resolve(serializable.data)
+                } else {
+                  resolve(null)
                 }
-                resolve(dataReturn)
-              } else {
-                resolve(null)
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+              let promises = []
+              for (let key in agencyLists) {
+                if (String(agencyLists[key]['value']) !== '0') {
+                  param['headers']['groupId'] = agencyLists[key]['value']
+                  promises.push(axios.get(requestURL, param))
+                }
               }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
+              axios.all(promises)
+              .then(axios.spread((...args) => {
+                let myObject = []
+                for (let i = 0; i < args.length; i++) {
+                  if (args[i]['data']['total'] > 0) {
+                    myObject = myObject.concat(args[i]['data']['data'])
+                  }
+                }
+                if (myObject.length > 0) {
+                  resolve(myObject)
+                } else {
+                  resolve(null)
+                }
+              }))
+            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
+              if (govAgency['value'] !== undefined) {
+                param['headers']['groupId'] = govAgency['value']
+              }
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  resolve(serializable.data)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            }
           } else {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
@@ -127,18 +244,58 @@ export const store = new Vuex.Store({
               param.params['fromReceiveDate'] = filter.fromDate
               param.params['toReceiveDate'] = filter.toDate
             }
-            axios.get(requestURL, param).then(function (response) {
-              let serializable = response.data
-              if (serializable.data) {
-                let dataReturn = serializable
-                resolve(dataReturn)
-              } else {
-                resolve(null)
+            if (govAgency === undefined || govAgency === null || govAgency === '') {
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  let dataReturn = serializable.data
+                  resolve(dataReturn)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+              let promises = []
+              for (let key in agencyLists) {
+                if (String(agencyLists[key]['value']) !== '0') {
+                  param['headers']['groupId'] = agencyLists[key]['value']
+                  promises.push(axios.get(requestURL, param))
+                }
               }
-            }).catch(function (error) {
-              console.log(error)
-              reject(error)
-            })
+              axios.all(promises)
+              .then(axios.spread((...args) => {
+                let myObject = []
+                for (let i = 0; i < args.length; i++) {
+                  if (args[i]['data']['total'] > 0) {
+                    myObject = myObject.concat(args[i]['data']['data'])
+                  }
+                }
+                if (myObject.length > 0) {
+                  resolve(myObject)
+                } else {
+                  resolve(null)
+                }
+              }))
+            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
+              if (govAgency['value'] !== undefined) {
+                param['headers']['groupId'] = govAgency['value']
+              }
+              axios.get(requestURL, param).then(function (response) {
+                let serializable = response.data
+                if (serializable.data) {
+                  let dataReturn = serializable.data
+                  resolve(dataReturn)
+                } else {
+                  resolve(null)
+                }
+              }).catch(function (error) {
+                console.log(error)
+                reject(error)
+              })
+            }
           }
         })
       })
@@ -155,7 +312,6 @@ export const store = new Vuex.Store({
             responseType: 'blob',
             data: filter.data
           }).then(function (response) {
-            console.log('serializable', response)
             let serializable = response.data
             if (filter['download']) {
               saveAs(serializable, new Date().getTime() + '.xls')
@@ -191,6 +347,7 @@ export const store = new Vuex.Store({
     },
     setreportType (state, payload) {
       state.reportType = payload
+
     },
     setgroupType (state, payload) {
       state.groupType = payload

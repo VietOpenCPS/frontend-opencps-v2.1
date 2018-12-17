@@ -38,7 +38,7 @@
           :key="2"
         >
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TẢI GIẤY PHÉP TỪ MÁY TÍNH
+            FORM NHẬP GIẤY PHÉP
           </v-btn>
         </v-tab>
         <v-tab
@@ -46,7 +46,7 @@
           :key="3"
         >
           <v-btn flat class="px-0 py-0 mx-0 my-0">
-            FORM NHẬP GIẤY PHÉP
+            TẢI GIẤY PHÉP TỪ MÁY TÍNH
           </v-btn>
         </v-tab>
         <v-tab :key="4" href="#tab-4" 
@@ -70,14 +70,15 @@
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <attached-file-template ref="attachedObj" :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
+            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
           </v-tab-item>
+
           <v-tab-item
             value="tab-3"
             :key="3"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
+            <attached-file-template ref="attachedObj" :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
           </v-tab-item>
           <v-tab-item
             value="tab-4"
