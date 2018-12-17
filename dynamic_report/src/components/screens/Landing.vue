@@ -404,7 +404,7 @@ export default {
         console.log('agencyLists', vm.agencyLists)
         */
         vm.pdfBlob = ''
-      }, 200)
+      }, 500)
       /*
       setTimeout(() => {
         let currentParams = vm.$router.history.current.params
