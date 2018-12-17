@@ -26,12 +26,7 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
-      <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
-      </v-flex>
-    </v-layout>
-    <v-layout row wrap class="filter_menu mt-2" v-else>
+    <v-layout row wrap class="filter_menu mt-2">
       <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
         <v-autocomplete
           :items="agencyLists"
@@ -110,6 +105,11 @@
         </v-menu>
       </v-flex>
     </v-layout>
+    <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+      <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      </v-flex>
+    </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
         <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
@@ -117,7 +117,10 @@
     </v-layout>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div class="mx-2" v-else-if="!isShowLoading && (pdfBlob === null || pdfBlob === undefined || pdfBlob === '')">
+      <div class="mx-2" v-else-if="pdfBlob === ''">
+        
+      </div>
+      <div class="mx-2" v-else-if="!isShowLoading">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -475,6 +478,7 @@ export default {
       console.log('sdsss: ', vm.itemsReports[vm.index]['filterConfig']['reportConfig'])
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       vm.reportType = vm.itemsReports[vm.index]['document']
+      vm.pdfBlob = ''
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
