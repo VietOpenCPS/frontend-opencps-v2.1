@@ -110,7 +110,7 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <v-btn v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+        <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
       </v-flex>
     </v-layout>
     <div>
@@ -143,7 +143,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 export default {
-  props: ['index', 'id'],
+  props: ['index'],
   components: {
     'vue-friendly-iframe': VueFriendlyIframe
   },
@@ -865,6 +865,8 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.docDefinition = {}
+      console.log('vm.itemsReports[vm.index]', vm.itemsReports[vm.index])
+      console.log('vm.itemsReports[vm.index]2 ', vm.itemsReports[vm.index]['tableConfig'])
       vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
@@ -1111,6 +1113,8 @@ export default {
     },
     doCreateReport() {
       let vm = this
+      console.log('vm.index', vm.index)
+      console.log('vm.indexs', vm.itemsReports)
       vm.doCreatePDF(vm.selected)
     }
   }
