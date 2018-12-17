@@ -6,10 +6,12 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex class="px-2 text-right">
+              <!--
               <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
                 <v-icon>settings</v-icon> &nbsp;
                 Lưu thay đổi
               </v-btn>
+              -->
               <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
@@ -115,7 +117,7 @@
     </v-layout>
     <div>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div class="mx-2" v-else-if="!isShowLoading">
+      <div class="mx-2" v-else-if="!isShowLoading && (pdfBlob === null || pdfBlob === undefined || pdfBlob === '')">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -1120,9 +1122,16 @@ export default {
     },
     doCreateReport() {
       let vm = this
-      console.log('vm.index', vm.index)
-      console.log('vm.indexs', vm.itemsReports)
-      vm.doCreatePDF(vm.selected)
+      let doData = {
+        selected: vm.selected,
+        itemsReports: vm.itemsReports,
+        index: vm.index,
+        userId: vm.getUserId()
+      }
+      vm.$store.dispatch('updateDynamicReport', doData).then(function () {
+        vm.showConfig = false
+        vm.doCreatePDF(vm.selected)
+      })
     }
   }
 }
