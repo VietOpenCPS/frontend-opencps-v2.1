@@ -2878,6 +2878,50 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+            if (result.data) {
+              resolve(result.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    submitVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          var params = new URLSearchParams()
+          const config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          params.append('className', data.className)
+          params.append('classPk', data.classPk)
+          params.append('selected', data.selected)
+          // test local
+          // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
+          axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+            resolve(result.data)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     validFileUpload ({commit, state}, data) {
       let getFileType = data.file.name ? data.file.name.split('.') : ''
       let fileType = getFileType ? getFileType[getFileType.length - 1] : ''

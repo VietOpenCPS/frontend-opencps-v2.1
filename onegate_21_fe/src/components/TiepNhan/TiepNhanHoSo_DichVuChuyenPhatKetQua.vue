@@ -5,7 +5,7 @@
         
         <v-slide-y-transition>
           <span v-if="dichVuChuyenPhatKetQua.viaPostal === 1">
-            <v-icon size="16">check_circle</v-icon> <b>Đăng ký trả kết quả tại nhà</b> để điền thông tin chuyển phát tận nhà
+            <v-icon size="16">check_circle</v-icon> <b>Nhận kết quả tại nhà</b> để điền thông tin chuyển phát tận nhà
           </span>
           <v-form v-else v-model="valid_dichvuchuyenphat" ref="formDichVuChuyenPhat" lazy-validation>
             <v-layout wrap>
@@ -176,17 +176,23 @@
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 230px; margin-top: 4px;">
+    <div class="absolute__btn" style="width: 400px; margin-top: 4px;">
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
-      <v-checkbox
+      <!--  -->
+      <v-radio-group v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
+        <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
+        <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+      </v-radio-group>
+      <!--  -->
+      <!-- <v-checkbox
         v-else
         label="Đăng ký trả kết quả tại nhà"
         v-model="dichVuChuyenPhatKetQua.viaPostal"
         :value="2"
         @change="changeViaPostal($event)"
-      ></v-checkbox>
+      ></v-checkbox> -->
     </div>
   </div>
 </template>
