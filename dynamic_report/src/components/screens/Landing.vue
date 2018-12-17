@@ -26,7 +26,7 @@
     </div>
     <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
       <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('REPORT_FIX')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
     </v-layout>
     <v-layout row wrap class="filter_menu mt-2" v-else>
@@ -670,7 +670,7 @@ export default {
       let vm = this
       if (vm.reportType === 'REPORT_01') {
         vm.doPrintReport()
-      } else if (vm.reportType.startsWith('REPORT_FIX')) {
+      } else if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
       } else {
         vm.doDynamicReport(val)
@@ -898,7 +898,7 @@ export default {
       } else {
         vm.docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
       }
-      if (vm.reportType === 'REPORT_FIX_01') {
+      if (vm.reportType === 'STATISTIC_01') {
         vm.docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
       }
       let filter = {
@@ -906,7 +906,7 @@ export default {
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
       }
-      if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('REPORT_FIX')) {
+      if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('STATISTIC')) {
         filter['year'] = vm.year
       }
       if (vm.govAgency) {
