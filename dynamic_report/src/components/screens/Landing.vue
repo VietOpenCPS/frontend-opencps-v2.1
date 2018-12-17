@@ -507,6 +507,11 @@ export default {
     changeGov (item) {
       let vm = this
       vm.govAgency = item
+      if (vm.govAgency === 0 || String(vm.govAgency) === '0') {
+        vm.groupType = 'gov'
+      } else {
+        vm.groupType = 'domain'
+      }
       vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {
