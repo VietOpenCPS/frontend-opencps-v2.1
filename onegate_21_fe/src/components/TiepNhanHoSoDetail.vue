@@ -218,6 +218,9 @@ export default {
     },
     dichVuChuyenPhatKetQua () {
       return this.$store.getters.dichVuChuyenPhatKetQua
+    },
+    thongTinChuHoSo () {
+      return this.$store.getters.thongTinChuHoSo
     }
   },
   created () {
@@ -293,6 +296,11 @@ export default {
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
         if (result.viaPostal > 0) {
+          let postalAddress = result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName
+          if (vm.formCode === 'NEW') {
+            result['postalAddress'] = postalAddress
+            result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+          }
           vm.$store.commit('setDichVuChuyenPhatKetQua', result)
           // vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
