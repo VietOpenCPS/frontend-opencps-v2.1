@@ -389,6 +389,7 @@ export default {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+        vm.reportType = vm.itemsReports[vm.index]['document']
         if (vm.showConfig) {
           vm.showConfig = false
           setTimeout(() => {
@@ -471,6 +472,7 @@ export default {
       vm.itemsReportsConfig = []
       console.log('sdsss: ', vm.itemsReports[vm.index]['filterConfig']['reportConfig'])
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+      vm.reportType = vm.itemsReports[vm.index]['document']
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
