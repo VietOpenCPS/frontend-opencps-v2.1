@@ -1031,14 +1031,13 @@ export const store = new Vuex.Store({
     SOCKET_ONOPEN (state, event) {
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
-      /*
       setTimeout(() => {
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
-          window.location.reload(true)
+          // window.location.reload(true)
+          state.snackbarsocket = false
         }
       }, 4000)
-      */
     },
     SOCKET_ONCLOSE (state, event) {
       console.log('SOCKET_ONCLOSE', event)
