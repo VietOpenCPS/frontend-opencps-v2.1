@@ -24,6 +24,7 @@ export const store = new Vuex.Store({
       message: '',
       reconnectError: false
     },
+    isConnected: false,
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
     listTableMenu: [
@@ -1031,9 +1032,11 @@ export const store = new Vuex.Store({
     SOCKET_ONOPEN (state, event) {
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
+      state.isConnected = true
       setTimeout(() => {
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
+          state.isConnected = false
           // window.location.reload(true)
           state.snackbarsocket = false
         }
@@ -1044,6 +1047,7 @@ export const store = new Vuex.Store({
       state.refreshSocket = 3
       state.snackbarsocket = true
       state.socket.isConnected = false
+      state.isConnected = false
     },
     SOCKET_ONERROR (state, event) {
       console.error(state, event)
@@ -1166,6 +1170,9 @@ export const store = new Vuex.Store({
     },
     getloginUser (state) {
       return state.loginUser[0]
+    },
+    getisConnected (state) {
+      return state.isConnected
     }
   }
 })
