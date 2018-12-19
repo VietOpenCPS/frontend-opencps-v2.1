@@ -176,6 +176,7 @@ export const store = new Vuex.Store({
             requestURL = '/o/rest/statistics'
             param.params['fromStatisticDate'] = filter.fromDate
             param.params['toStatisticDate'] = filter.toDate
+            param.params['online'] = filter['online']
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data

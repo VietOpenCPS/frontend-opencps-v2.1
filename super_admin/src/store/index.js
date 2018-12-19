@@ -1213,8 +1213,11 @@ export const store = new Vuex.Store({
         if (state.socket.isConnected && state.refreshSocket === 3) {
           state.refreshSocket = 0
           state.isConnected = false
+          state.socket.isConnected = false
           // window.location.reload(true)
           state.snackbarsocket = false
+          Vue.prototype.$socket.close()
+          delete Vue.prototype.$socket
         }
       }, 4000)
     },

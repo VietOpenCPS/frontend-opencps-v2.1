@@ -50,6 +50,17 @@
           >
         </v-autocomplete>
       </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="onlines.length > 0">
+        <v-autocomplete
+          :items="onlines"
+          v-model="online"
+          item-text="name"
+          item-value="value"
+          :hide-selected="true"
+          @change="changeOnline"
+          >
+        </v-autocomplete>
+      </v-flex>
       <v-flex xs6 sm1 class="px-2" v-if="fromDateShow">
         <v-subheader class="pl-0 text-header" style="float: right;">Từ ngày: </v-subheader>
       </v-flex>
@@ -153,6 +164,8 @@ export default {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    onlines: [],
+    online: false,
     itemsReportsConfig: [],
     report1Def: support['report1Def'],
     docDefinition: {
@@ -376,11 +389,13 @@ export default {
       setTimeout(() => {
         vm.agencyLists = []
         vm.years = []
+        vm.onlines = []
         vm.fromDateShow = false
         vm.toDateShow = false
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
         vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+        vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
         vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
         vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
         vm.itemsReportsConfig = []
@@ -404,6 +419,21 @@ export default {
         console.log('agencyLists', vm.agencyLists)
         */
         vm.pdfBlob = ''
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (currentQuerys.hasOwnProperty('fromDate')) {
+          vm.fromDateFormatted = currentQuerys.fromDate
+        } else {
+          vm.fromDateFormatted = ''
+          let date = new Date()
+          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+        }
+        if (currentQuerys.hasOwnProperty('toDate')) {
+          vm.toDateFormatted = currentQuerys.toDate
+        } else {
+          vm.toDateFormatted = ''
+          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+        }
       }, 500)
       /*
       setTimeout(() => {
@@ -472,6 +502,7 @@ export default {
       vm.pdfBlob = ''
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
       vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
       vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       if (vm.showConfig) {
@@ -683,6 +714,7 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.years = []
+      vm.onlines = []
       vm.fromDateShow = false
       vm.toDateShow = false
       vm.docDefinition = {}
@@ -691,6 +723,7 @@ export default {
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
       vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
       vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       reportName = vm.itemsReports[vm.index]['title']

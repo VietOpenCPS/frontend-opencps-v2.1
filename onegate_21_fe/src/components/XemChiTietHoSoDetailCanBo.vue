@@ -345,7 +345,7 @@
           </v-btn>
         </v-tab>
         <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
-          <v-tab-item v-if="originality === 3 || (originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done')"
+          <v-tab-item v-if="thongTinChiTietHoSo['dossierStatus'] === 'done'"
           id="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <div class="px-2 py-2">
               <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
