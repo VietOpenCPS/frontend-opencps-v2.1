@@ -65,9 +65,15 @@ export const store = new Vuex.Store({
           },
           {
             icon: 'filter_5',
-            link: '/table/opencps_certnumbers',
-            code: 'opencps_certnumbers',
+            link: '/table/opencps_certnumbers/certnumbers',
+            code: 'certnumbers',
             text: 'Tham số hệ thống'
+          },
+          {
+            icon: 'filter_6',
+            link: '/table/opencps_voting/votings',
+            code: 'votings',
+            text: 'Voting'
           },
           {
             icon: 'import_export',
@@ -1033,6 +1039,31 @@ export const store = new Vuex.Store({
       })
     },
     // THAM SỐ HỆ THỐNG
+    getCertNumberList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let paramInput = filter.page ? {
+            start: filter.page * 10 - 10,
+            end: filter.page * 10
+          } : {}
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramInput
+          }
+          axios.get(state.endPointApi + '/vr-app/certnumbers', param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
     getCertNumberDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {
@@ -1079,6 +1110,95 @@ export const store = new Vuex.Store({
               commit('setsnackbarerror', true)
             })
           }
+        })
+      })
+    },
+    deleteCertNumber ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/vr-app/certnumbers/' + filter.certId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    // VOTING - CÂU HỎI KHẢO SÁT
+    getVotingList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.endPointApi + '/postal/votings/' + filter.className + '/0', param).then(function (response) {
+            let seriable = response.data
+            if (seriable) {
+              resolve(seriable)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+            commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    updateVotings ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          var dataPostVoting = new URLSearchParams()
+          dataPostVoting.append('className', data.className ? data.className : '')
+          dataPostVoting.append('classPK', data.classPK ? data.classPK : '')
+          dataPostVoting.append('subject', data.subject ? data.subject : '')
+          dataPostVoting.append('choices', data.choices ? data.choices : '')
+          dataPostVoting.append('commentable', data.commentable ? data.commentable : '')
+          if (data.type === 'add') {
+            axios.post(state.endPointApi + '/postal/votings', dataPostVoting, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+            })
+          } else {
+            axios.put(state.endPointApi + '/postal/votings/' + data.votingId, dataPostVoting, options).then(function (response) {
+              resolve(response.data)
+            }).catch(function (error) {
+              reject(error)
+              commit('setsnackbarerror', true)
+            })
+          }
+        })
+      })
+    },
+    deleteVotings ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let options = {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          axios.delete(state.endPointApi + '/postal/votings/' + filter.votingId).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+            commit('setsnackbarerror', true)
+          })
         })
       })
     }

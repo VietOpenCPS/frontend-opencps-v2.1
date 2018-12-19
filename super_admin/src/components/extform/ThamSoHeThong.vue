@@ -22,16 +22,75 @@
           <v-icon>edit</v-icon>
         </v-btn>
         <v-toolbar-title class="ml-0">
-          {{currentCertNumber.pattern}}
+          {{activeCertNumberDetail ? currentCertNumber.pattern : 'Danh sách tham số hệ thống'}}
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-icon dark>more_vert</v-icon>
         <v-btn dark icon v-on:click.native="backToList">
           <v-icon>reply</v-icon>
         </v-btn>
       </v-toolbar>
       <div class="grid-list mt-3">
-        <v-form ref="formAddCertNumber" v-model="validAddCertNumber" lazy-validation>
+        <!-- Danh sách tham số -->
+        <v-card v-if="!activeCertNumberDetail" class="py-2" style="margin-bottom:40px">
+          <v-btn color="blue darken-3" dark
+            class="mb-3 mx-0"
+            @click="createCertNumbers"
+          >
+            <v-icon>add_circle_outline</v-icon>&nbsp;
+            Thêm tham số hệ thống
+          </v-btn>
+          <v-data-table
+            :headers="headerCertNumber"
+            :items="certNumberList"
+            hide-actions
+            class="elevation-1 table-bordered"
+            style="border: 1px solid #dedede"
+          >
+            <template slot="items" slot-scope="props">
+              <td class="text-xs-center" width="10%">
+                <div>
+                  <span>{{pageCertNumber * 10 - 10 + props.index + 1}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" width="35%">{{ props.item.certId }}</td>
+              <td class="text-xs-left" width="20%">{{ props.item.pattern }}</td>
+              <td class="text-xs-left" width="10%">{{ props.item.initNumber }}</td>
+              <td class="text-xs-center px-0" width="15%">
+                <v-icon
+                  small color="blue"
+                  class="mr-3"
+                  @click="editCertNumber(props.item)"
+                >
+                  edit
+                </v-icon>
+                <v-icon
+                  small color="red"
+                  @click="deleteCertNumber(props.item)"
+                >
+                  delete
+                </v-icon>
+              </td>
+            </template>
+            <template slot="no-data">
+            </template>
+          </v-data-table>
+          <v-flex xs12 class="text-right" style="
+            position: fixed;
+            bottom: 0;
+            width: -webkit-calc( 100% - 300px );
+            width: calc( 100% - 300px );
+            background: white;
+            z-index: 2;
+          ">
+            <div class="text-xs-right layout wrap mt-2 pr-2" style="position: relative;">
+              <v-flex xs12>
+                <tiny-pagination :total="pageTotalCertNumber" :page="pageCertNumber" @tiny:change-page="paggingCertData" custom-class="custom-tiny-class"></tiny-pagination> 
+              </v-flex>
+            </div>
+          </v-flex>
+        </v-card>
+        <!-- form chi tiet -->
+        <v-form v-else ref="formAddCertNumber" v-model="validAddCertNumber" lazy-validation>
           <v-layout wrap>
             <v-flex xs12 sm12 v-if="id !== 0 && id !== '0'">
               <v-text-field
@@ -106,7 +165,6 @@
 <script>
   import TinyPagination from '../ext/TinyPagination.vue'
   export default {
-    props: ['id'],
     components: {
       'tiny-pagination': TinyPagination
     },
@@ -122,6 +180,38 @@
             disabled: false
           }
         ],
+        id: '',
+        activeCertNumberDetail: false,
+        headerCertNumber: [
+          {
+            text: 'STT',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Tên tham số',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Pattern',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Số khởi tạo',
+            align: 'center',
+            sortable: false
+          },
+          {
+            text: 'Thao tác',
+            align: 'center',
+            sortable: false
+          }
+        ],
+        pageTotalCertNumber: 0,
+        pageCertNumber: 1,
+        certNumberList: [],
         currentCertNumber: {
           certId: '',
           pattern: '',
@@ -137,14 +227,21 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
-        if (vm.id !== 0 && vm.id !== '0') {
-          vm.getCertNumberDetail()
-        } else {
-          vm.currentCertNumber = {
-            certId: '',
-            pattern: '',
-            initNumber: ''
+        let currentQuery = vm.$router.history.current.query
+        vm.activeCertNumberDetail = currentQuery.hasOwnProperty('id') && currentQuery.id !== ''
+        if (vm.activeCertNumberDetail) {
+          vm.id = currentQuery.id
+          if (vm.id !== 0 && vm.id !== '0') {
+            vm.getCertNumberDetail()
+          } else {
+            vm.currentCertNumber = {
+              certId: '',
+              pattern: '',
+              initNumber: ''
+            }
           }
+        } else {
+          vm.getCertNumberList()
         }
       })
     },
@@ -153,18 +250,50 @@
     watch: {
       '$route': function (newRoute) {
         let vm = this
-        if (vm.id !== 0 && vm.id !== '0') {
-          vm.getCertNumberDetail()
-        } else {
-          vm.currentCertNumber = {
-            certId: '',
-            pattern: '',
-            initNumber: ''
+        let currentQuery = newRoute.query
+        vm.activeCertNumberDetail = currentQuery.hasOwnProperty('id') && currentQuery.id !== ''
+        if (vm.activeCertNumberDetail) {
+          vm.id = currentQuery.id
+          if (vm.id !== 0 && vm.id !== '0') {
+            vm.getCertNumberDetail()
+          } else {
+            vm.currentCertNumber = {
+              certId: '',
+              pattern: '',
+              initNumber: ''
+            }
           }
+        } else {
+          vm.getCertNumberList()
         }
       }
     },
     methods: {
+      createCertNumbers () {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?id=0',
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      getCertNumberList () {
+        let vm = this
+        let currentQuery = vm.$router.history.current.query
+        let filter = {
+          page: currentQuery.page ? currentQuery.page : 1
+        }
+        vm.pageCertNumber = currentQuery.page ? Number(currentQuery.page) : 1
+        vm.pageTotalCertNumber = 0
+        vm.$store.dispatch('getCertNumberList', filter).then(function (result) {
+          vm.pageTotalCertNumber = result.total
+          vm.certNumberList = result.data
+        }).catch(reject => {
+          console.log(reject)
+        })
+      },
       getCertNumberDetail () {
         let vm = this
         let filter = {
@@ -175,6 +304,48 @@
         }).catch(reject => {
           console.log(reject)
         })
+      },
+      paggingCertData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
+      },
+      editCertNumber (item) {
+        var vm = this
+        let currentPath = vm.$router.history.current.path
+        vm.$router.push({
+          path: currentPath + '?id=' + item.certId,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      deleteCertNumber (item) {
+        let x = confirm('Xác nhận xóa dữ liệu')
+        if (x) {
+          var vm = this
+          let filter = {
+            certId: item.certId
+          }
+          vm.$store.dispatch('deleteCertNumber', filter).then(function () {
+            setTimeout (function () {
+              vm.getCertNumberList()
+            }, 300)
+          }).catch(reject => {
+            console.log(reject)
+          })
+        }
       },
       updateCertNumber (type) {
         var vm = this
@@ -201,9 +372,7 @@
         }
       },
       backToList () {
-        let vm = this
-        let currentPath = vm.$router.history.current.path
-        vm.$router.push(currentPath.substring(0, currentPath.indexOf('/ext/editor/')))
+        window.history.back()
       }
     },
     filters: {
