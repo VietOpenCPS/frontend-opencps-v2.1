@@ -42,6 +42,24 @@ const routes = [
         }
       },
       {
+        path: '/table/opencps_certnumbers/certnumbers',
+        name: 'ThamSoHeThong',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/ThamSoHeThong.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_voting/votings',
+        name: 'Voting',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/extform/Voting.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/:tableName/tool_import',
         name: 'Import',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/import.vue'),

@@ -34,6 +34,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURL /*+ ':8080'*/ + '/o/v1/socket/web?gro
   + '&userName=' + userName
   + '&Token=' + token, 
   {
+    connectManually: true,
     store: store,
     format: 'json',
     reconnection: true,
@@ -90,6 +91,7 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
+      vm.$connect()
       setTimeout(() => {
         vm.$socket.sendObj(
           {
@@ -120,6 +122,22 @@ new Vue({
         }
       }, 100)
     })
+  },
+  computed: {
+    getisConnected () {
+      return this.$store.getters.getisConnected
+    }
+  },
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      console.log('getisConnected: ', vm.getisConnected)
+      console.debug(newRoute)
+      console.debug(oldRoute)
+      if (!vm.getisConnected) {
+        vm.$connect()
+      }
+    }
   }
 })
 
