@@ -32,7 +32,8 @@
         </div>
         <div class="text-center text-bold mt-3" style="color:#065694">
           <p class="mb-1">Mã tra cứu là dãy số gồm 4 ký tự được in trên</p>
-          <p> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
+          <p>GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ, </p>
+          <P>NỘI DUNG EMAIL THÔNG BÁO TIẾP NHẬN HỒ SƠ</P>
         </div>
       </v-layout>
     </v-card>

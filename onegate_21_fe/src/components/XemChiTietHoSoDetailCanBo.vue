@@ -122,7 +122,6 @@
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                     <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
-                    <span v-if="checkInput === 2" style="position: absolute; right: 15px; margin-top: 5px; color: #de1313; font-weight: normal;">Có thể tải lên các định dạng sau: png, jpg, jpeg, txt, rtf, pdf, docx, doc, xls, xlsx (Tối đa 10MB)</span>
                   </div>
                   <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
@@ -157,7 +156,7 @@
                 <span slot="loader">Loading...</span>
               </v-btn> -->
               <!-- Action special -->
-              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0">
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
@@ -330,7 +329,7 @@
       <!--  -->
       <v-tabs icons-and-text class="mb-4" v-model="activeTab2">
         <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab :key="1" href="#tabs-1b" v-if="originality === 3 || (originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done')">
+        <v-tab :key="1" href="#tabs-1b" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done'">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             ĐÁNH GIÁ
           </v-btn>
@@ -964,15 +963,6 @@ export default {
           mermaid.render('theGraph', chartData, function (svgCode) {
             document.getElementById('mermaid_dossier').innerHTML = svgCode
           })
-          setTimeout(function () {
-            window.svgPanZoom('#theGraph', {
-              zoomEnabled: true,
-              controlIconsEnabled: true,
-              fit: true,
-              center: true,
-              minZoom: 0.1
-            })
-          }, 500)
         }).catch(function () {
           vm.loadingMermaidgraph = false
         })

@@ -4,15 +4,15 @@
       <content-placeholders-text :lines="1" />
     </content-placeholders>
     <div v-else-if="dossierSelected.length > 0" class="row-header">
-      <div class="background-triangle-big"> <span>XỬ LÝ HỒ SƠ</span> </div>
+      <div class="background-triangle-big"> <span>{{actionActive['tiltle'] ? actionActive['tiltle'] : 'XỬ LÝ HỒ SƠ'}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="dossierSelected[0].serviceName">
           {{dossierSelected[0].serviceName}}
         </div>
         <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
           <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-            Quay lại &nbsp;
-            <v-icon size="16">undo</v-icon>
+            <v-icon size="16">reply</v-icon> &nbsp;
+            Quay lại
           </v-btn>
         </div>
       </div>
@@ -96,28 +96,29 @@
     <!--  -->
     <div>
       <v-layout wrap v-if="btnStateVisible">
-        <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-        <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
-        <!-- <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua> -->
-        <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
-        <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
-        <tra-ket-qua v-if="showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-        <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-        <ky-duyet ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
-        <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
-        <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
-        <v-btn color="primary" @click.native="processAction()"
+        <form-bo-sung-thong-tin v-if="showFormBoSungThongTinNgan" ref="formBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
+        <phan-cong v-if="showPhanCongNguoiThucHien" ref="phancong" v-model="assign_items" :type="type_assign" ></phan-cong>
+        <tai-lieu-ket-qua v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+        <ngay-gia-han v-if="showExtendDateEdit" ref="ngaygiahan" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
+        <ngay-hen-tra v-if="showEditDate" ref="ngayhentra" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
+        <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
+        <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+        <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
+        <y-kien-can-bo v-if="showYkienCanBoThucHien" ref="ykiencanbo" :user_note="userNote"></y-kien-can-bo>
+        <div class="my-2 mx-3">
+          <v-btn color="primary" @click.native="processAction()"
           :loading="loadingActionProcess"
           :disabled="loadingActionProcess"
           >
-          <v-icon>save</v-icon>&nbsp;
-          Xác nhận
-          <span slot="loader">Loading...</span>
-        </v-btn>
-        <v-btn color="primary" @click="goBack()">
-          <v-icon>undo</v-icon>&nbsp;
-          Quay lại
-        </v-btn>
+            <v-icon>save</v-icon>&nbsp;
+            Xác nhận
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn color="primary" @click="goBack()">
+            <v-icon size="16">reply</v-icon> &nbsp;
+            Quay lại
+          </v-btn>
+        </div>
       </v-layout>
       <v-alert v-if="!btnStateVisible" outline color="success" icon="check_circle" :value="true">
         Thực hiện thành công!
@@ -194,6 +195,8 @@ import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
+import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
+import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
 export default {
   props: ['index'],
   components: {
@@ -206,7 +209,9 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
-    'ngay-hen-tra': EditDate
+    'ngay-hen-tra': EditDate,
+    'ngay-gia-han': ExtendDateEdit,
+    'thong-tin-buu-chinh': ThongTinBuuChinh
   },
   data: () => ({
     headersTable: [
@@ -259,6 +264,8 @@ export default {
     showTraKetQua: false,
     showThuPhi: false,
     showEditDate: false,
+    showExtendDateEdit: false,
+    showPostalService: false,
     dueDateEdit: '',
     checkInput: 0,
     viaPortalDetail: 0,
@@ -306,16 +313,25 @@ export default {
   },
   created () {
     var vm = this
-    console.log('this.$store.getters.dossierSelected-------', this.$store.getters.dossierSelected)
     vm.$nextTick(function () {
       vm.btnIndex = -1
       let currentQuery = vm.$router.history.current.query
       console.log('currentQuery', currentQuery)
       if (vm.dossierSelected.length === 0) {
-        return vm.$store.getters.dossierSelected
+        let arrDossier = []
+        if (currentQuery.hasOwnProperty('dossiers')) {
+          let arrDossierIdTemp = currentQuery.dossiers.split(',')
+          vm.arrDossierId = arrDossierIdTemp
+          arrDossierIdTemp.forEach(dossierId => {
+            arrDossier.push(vm.$store.dispatch('getDetailDossier', dossierId))
+          })
+          Promise.all(arrDossier).then(results => {
+            vm.$store.dispatch('loadDossierSelected', results)
+          }).catch(reject => {
+          })
+        }
       } else {
         let arrDossier = []
-        let currentQuery = vm.$router.history.current.query
         if (currentQuery.hasOwnProperty('dossiers')) {
           let arrDossierIdTemp = currentQuery.dossiers.split(',')
           vm.arrDossierId = arrDossierIdTemp
@@ -597,6 +613,9 @@ export default {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
+              setTimeout(function () {
+                vm.goBack()
+              }, 500)
             }
             // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           }).catch(function (reject) {
@@ -611,6 +630,9 @@ export default {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
+              setTimeout(function () {
+                vm.goBack()
+              }, 500)
             }
             // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           })
@@ -627,6 +649,9 @@ export default {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
+              setTimeout(function () {
+                vm.goBack()
+              }, 500)
             }
             // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           }).catch(function (reject) {
@@ -639,6 +664,9 @@ export default {
               vm.loadingActionProcess = false
               vm.loadingAction = false
               vm.btnStateVisible = false
+              setTimeout(function () {
+                vm.goBack()
+              }, 500)
             }
             // vm.$store.dispatch('getActiveGetCounter', !vm.activeGetCounter)
           })
@@ -786,8 +814,12 @@ export default {
       }
     },
     closeDialogStatusAction () {
-      this.dialog_statusAction = false
-      this.btnStateVisible = false
+      let vm = this
+      vm.dialog_statusAction = false
+      vm.btnStateVisible = false
+      setTimeout(function () {
+        vm.goBack()
+      }, 500)
     }
   },
   filters: {
