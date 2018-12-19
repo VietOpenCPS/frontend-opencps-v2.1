@@ -941,7 +941,8 @@ export default {
       let filter = {
         document: vm.reportType,
         fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
+        toDate: vm.toDateFormatted,
+        online: vm.online
       }
       if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('STATISTIC')) {
         filter['year'] = vm.year
