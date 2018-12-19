@@ -4,10 +4,10 @@
       <v-card-text>
         
         <v-slide-y-transition>
-          <span v-if="dichVuChuyenPhatKetQua.viaPostal === 1">
+          <!-- <span v-if="dichVuChuyenPhatKetQua.viaPostal === 1">
             <v-icon size="16">check_circle</v-icon> <b>Nhận kết quả tại nhà</b> để điền thông tin chuyển phát tận nhà
-          </span>
-          <v-form v-else v-model="valid_dichvuchuyenphat" ref="formDichVuChuyenPhat" lazy-validation>
+          </span> -->
+          <v-form v-if="dichVuChuyenPhatKetQua.viaPostal === 2" v-model="valid_dichvuchuyenphat" ref="formDichVuChuyenPhat" lazy-validation>
             <v-layout wrap>
               <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">

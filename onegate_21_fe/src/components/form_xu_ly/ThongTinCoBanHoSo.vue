@@ -131,6 +131,11 @@
                 <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.dossierNo}} </span>
               </div>
               <!--  -->
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo.originDossierNo">
+                <span class="pr-2">Hồ sơ gốc: </span>
+                <span class="pl-0 text-bold ">  {{thongTinChiTietHoSo.originDossierNo}} </span>
+              </div>
+              <!--  -->
               <div class="xs12 sm12 pb-1">
                 <span class="pr-2">Trạng thái: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
