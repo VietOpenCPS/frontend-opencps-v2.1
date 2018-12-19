@@ -165,7 +165,7 @@ export default {
   },
   data: () => ({
     onlines: [],
-    online: false,
+    online: '',
     itemsReportsConfig: [],
     report1Def: support['report1Def'],
     docDefinition: {
@@ -477,14 +477,10 @@ export default {
         vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
       }
       if (currentQuery.hasOwnProperty('toDate')) {
-        vm.year = currentQuery.toDate ? '' : vm.year
         vm.toDateFormatted = currentQuery.toDate
       } else {
         vm.toDateFormatted = ''
         vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
-      }
-      if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
-        vm.year = ''
       }
       /*
       if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
@@ -502,6 +498,7 @@ export default {
       vm.pdfBlob = ''
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
+      vm.onlines = []
       vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
       vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
       vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
