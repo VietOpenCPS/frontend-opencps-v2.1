@@ -419,6 +419,21 @@ export default {
         console.log('agencyLists', vm.agencyLists)
         */
         vm.pdfBlob = ''
+        let currentParams = vm.$router.history.current.params
+        let currentQuerys = vm.$router.history.current.query
+        if (currentQuerys.hasOwnProperty('fromDate')) {
+          vm.fromDateFormatted = currentQuerys.fromDate
+        } else {
+          vm.fromDateFormatted = ''
+          let date = new Date()
+          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
+        }
+        if (currentQuerys.hasOwnProperty('toDate')) {
+          vm.toDateFormatted = currentQuerys.toDate
+        } else {
+          vm.toDateFormatted = ''
+          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
+        }
       }, 500)
       /*
       setTimeout(() => {
