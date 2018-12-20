@@ -857,12 +857,7 @@ export default {
             vm.btnStepsDynamics = result
           })
         }
-        if (vm.getOriginality() !== 1) {
-          vm.loadHoSoLienThong()
-          vm.activeTab2 = 'tabs-1b'
-          vm.loadVoting()
-        }
-        if (vm.getOriginality() === 1 && resultDossier['dossierStatus'] === 'done') {
+        if (resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
         }
@@ -1780,7 +1775,6 @@ export default {
           }
         } else {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-            // console.log('result======', result)
             if (vm.checkInput === 2 || vm.checkInput === '2') {
               vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
               })
