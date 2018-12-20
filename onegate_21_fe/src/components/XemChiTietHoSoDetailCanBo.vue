@@ -103,7 +103,7 @@
                   </v-flex>
                   <v-flex class="text-xs-right" style="width:100px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
+                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
                       <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>
