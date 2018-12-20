@@ -146,12 +146,6 @@ new Vue({
       console.debug(newRoute)
       console.debug(oldRoute)
       vm.problem = true
-      console.log('problem: ', vm.problem)
-      vm.isConnected = true
-      setTimeout(() => {
-        vm.problem = false
-        console.log('problem1111111111: ', vm.problem)
-      }, 500)
     }
   },
 })

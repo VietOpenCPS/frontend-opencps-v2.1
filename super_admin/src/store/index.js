@@ -1209,7 +1209,6 @@ export const store = new Vuex.Store({
     SOCKET_ONOPEN (state, event)  {
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
-      state.isConnected = true
     },
     SOCKET_ONCLOSE (state, event)  {
       state.socket.isConnected = false
