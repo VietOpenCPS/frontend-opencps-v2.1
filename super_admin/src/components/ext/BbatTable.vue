@@ -107,7 +107,6 @@
       return {
         backTableName: '',
         depen: false,
-        problem: true,
         showLoadingTable: true,
         nameScreen: '',
         showFilter: false,
@@ -136,12 +135,24 @@
         pageTotalCounter: 0
       }
     },
+    computed: {
+      problem: {
+        // getter
+        get: function() {
+          return this.$store.getters.getproblem
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setproblem', newValue)
+        }
+      }
+    },
     watch: {
       '$route': function (newRoute, oldRoute) {
         console.debug(oldRoute)
         let vm = this
         vm.dataSocket = {}
-        vm.problem = true
+        console.log('vm.problem', vm.problem)
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('state_change') && String(currentQuery['state_change']) !== '0') {
           vm.showFilter = false
@@ -152,6 +163,47 @@
           vm.page = 1
         }
         vm.showLoadingTable = true
+        vm.$socket.onmessage = function (data) {
+          let dataObj = eval('( ' + data.data + ' )')
+          if (dataObj['status'] === '200') {
+             console.log('vm.wwwatchhhhhhhhhhhh', vm.problem)
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
+              vm.nameScreen = vm.dataSocket['tableConfig']['name']
+              vm.backTableName = vm.dataSocket['tableConfig']['dependency_title']
+              if (vm.dataSocket['tableConfig'].hasOwnProperty('dependency_title')) {
+                vm.depen = true
+              } else {
+                vm.depen = false
+              }
+              vm.generateTable()
+            }
+            if (dataObj.respone === 'pageTotalCounter') {
+              vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
+              vm.showLoadingTable = false
+            } else if (dataObj.respone === 'loginUser') {
+              vm.$store.commit('setloginUser', dataObj['loginUser'])
+            } else if (dataObj.respone === 'listTableMenu') {
+              vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+            }
+            if (dataObj['cmd'] !== 'get') {
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
+              })
+            }
+          }
+        }
         vm.getData()
       }
     },
