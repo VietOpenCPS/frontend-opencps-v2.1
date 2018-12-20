@@ -84,9 +84,11 @@
 
 <script>
   import router from '@/router'
+  import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
       active: null,
+      pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
       currentDomain: '',
       currentLevel: '',
@@ -109,6 +111,7 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh' : '/thu-tuc-hanh-chinh'
         let current = vm.$router.history.current
         let newQuery = current.query
         console.log('current', current)
@@ -128,7 +131,7 @@
               }
             }
             router.push({
-              path: '/thu-tuc-hanh-chinh' + queryString,
+              path: vm.pathRouter + queryString,
               query: {
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
@@ -175,7 +178,7 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -197,7 +200,7 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -219,7 +222,7 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }

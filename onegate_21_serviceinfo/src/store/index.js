@@ -8,6 +8,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     initData: {},
+    // endPoint: '/o/rest/v2',
+    endPoint: 'http://127.0.0.1:8081/api',
     loading: false,
     index: 0,
     agencyList: [],
@@ -35,32 +37,6 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    // loadInitResource ({commit, state}) {
-    //   if (state.initData == null) {
-    //     return new Promise((resolve, reject) => {
-    //       let param = {}
-    //       let orginURL = window.location.href
-    //       let coma = window.location.href.lastIndexOf('#/')
-    //       if (coma > 0) {
-    //         orginURL = window.location.href.substr(0, coma)
-    //       }
-    //       /* test local */
-    //       orginURL = 'http://127.0.0.1:8081/api/initdata'
-    //       axios.get(orginURL + support.renderURLInit, param).then(function (response) {
-    //         let serializable = response.data
-    //         commit('setInitData', serializable)
-    //         resolve(serializable)
-    //       }).catch(function (error) {
-    //         console.log(error)
-    //         reject(error)
-    //       })
-    //     })
-    //   } else {
-    //     return new Promise((resolve, reject) => {
-    //       resolve(state.initData)
-    //     })
-    //   }
-    // },
     getGovAgency ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -69,9 +45,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+          axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -96,9 +70,7 @@ export const store = new Vuex.Store({
               agency: data.agencyCode
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/domains', param).then(function (response) {
+          axios.get(state.endPoint + '/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -120,9 +92,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos/statistics/levels', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/levels', param).then(function (response) {
+          axios.get(state.endPoint + '/serviceinfos/statistics/levels', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -156,9 +126,7 @@ export const store = new Vuex.Store({
               domain: filter.domain ? filter.domain : ''
             }
           }
-          // test local
-          axios.get('/o/rest/v2/serviceinfos', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos', param).then(function (response) {
+          axios.get(state.endPoint + '/serviceinfos', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -176,9 +144,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          // test local
           axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + filter.index, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
