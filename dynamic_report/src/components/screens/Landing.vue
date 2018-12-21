@@ -872,7 +872,7 @@ export default {
           }
           for (let key in result) {
             let flag = false
-            console.log('vm.govAgency', vm.govAgencys)
+            console.log('vm.govAgency', vm.govAgency)
             if (String(vm.govAgency) !== '0' && String(vm.govAgency) !== '' && String(vm.govAgency) !== '0') {
               if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
                 flag = true
