@@ -924,12 +924,10 @@ export default {
             }
           }
           vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
-          console.log('vm.docDefinitionXXX: ', vm.docDefinition)
-          console.log('vm.docDefinitionXXX: ', JSON.stringify(vm.docDefinition))
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = falses
+            vm.isShowLoading = false
           })
         } else {
           // vm.agencyLists = []
