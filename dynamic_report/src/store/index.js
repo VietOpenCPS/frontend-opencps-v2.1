@@ -125,13 +125,31 @@ export const store = new Vuex.Store({
             if (current['reportCode'].startsWith('STATISTIC')) {
               typeCurrent = 'thong_ke'
             }
+            // push default current siteName
+            let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
+            if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
+              let govCodes = filterconfigObject['govAgencyCode']
+              let exit = false
+              for (let key in govCodes) {
+                if (String(state.groupId) === govCodes[key]['value']) {
+                  exit = true
+                  break;
+                }
+              }
+              if (!exit) {
+                filterconfigObject.push({
+                  "value": state.groupId,
+                  "name": state.siteName
+                })
+              }
+            }
             itemsReportsData.push({
               'code' : String(indexKey),
               'document' : current['reportCode'],
               'active' : false,
               'type' : typeCurrent,
               'title' : current['reportName'],
-              'filterConfig' : eval('( ' + current['filterConfig'] + ' )'),
+              'filterConfig' : filterconfigObject,
               'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
               'userConfig' : eval('( ' + current['userConfig'] + ' )'),
               'dynamicReportId' : current['dynamicReportId'],
@@ -173,9 +191,9 @@ export const store = new Vuex.Store({
           if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
-            requestURL = '/o/rest/statistics'
-            param.params['fromStatisticDate'] = filter.fromDate
-            param.params['toStatisticDate'] = filter.toDate
+            requestURL = filter['api']
+            param.params['fromStatisticDate'] = filter['fromStatisticDate']
+            param.params['toStatisticDate'] = filter['toStatisticDate']
             param.params['online'] = filter['online']
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
@@ -230,20 +248,24 @@ export const store = new Vuex.Store({
           } else {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
-            requestURL = '/o/rest/v2/dossiers'
+            requestURL = filter['api']
             param.params['sort'] = 'domainCode'
-            if (filter.document === 'REPORT_05') {
-              param.params['fromFinishDate'] = filter.fromDate
-              param.params['toFinishDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_09') {
-              param.params['fromReleaseDate'] = filter.fromDate
-              param.params['toReleaseDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_10') {
-              param.params['fromReceiveNotDoneDate'] = filter.fromDate
-              param.params['toReceiveNotDoneDate'] = filter.toDate
-            } else {
-              param.params['fromReceiveDate'] = filter.fromDate
-              param.params['toReceiveDate'] = filter.toDate
+            if (filter['fromFinishDate'] !== '' && filter['fromFinishDate'] !== undefined) {
+              param.params['fromFinishDate'] = filter['fromFinishDate']
+            } else if (filter['toFinishDate'] !== '' && filter['toFinishDate'] !== undefined) {
+              param.params['toFinishDate'] = filter['toFinishDate']
+            } else if (filter['fromReleaseDate'] !== '' && filter['fromReleaseDate'] !== undefined) {
+              param.params['fromReleaseDate'] = filter['fromReleaseDate']
+            } else if (filter['toReleaseDate'] !== '' && filter['toReleaseDate'] !== undefined) {
+              param.params['toReleaseDate'] = filter['toReleaseDate']
+            } else if (filter['fromReceiveNotDoneDate'] !== '' && filter['fromReceiveNotDoneDate'] !== undefined) {
+              param.params['fromReceiveNotDoneDate'] = filter['fromReceiveNotDoneDate']
+            } else if (filter['toReceiveNotDoneDate'] !== '' && filter['toReceiveNotDoneDate'] !== undefined) {
+              param.params['toReceiveNotDoneDate'] = filter['toReceiveNotDoneDate']
+            } else if (filter['fromReceiveDate'] !== '' && filter['fromReceiveDate'] !== undefined) {
+              param.params['fromReceiveDate'] = filter['fromReceiveDate']
+            } else if (filter['toReceiveDate'] !== '' && filter['toReceiveDate'] !== undefined) {
+              param.params['toReceiveDate'] = filter['toReceiveDate']
             }
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
