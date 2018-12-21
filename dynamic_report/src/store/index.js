@@ -140,7 +140,7 @@ export const store = new Vuex.Store({
                   }
                   if (!exit) {
                     govCodes.push({
-                      "value": state.groupId,
+                      "value": parseInt(state.groupId),
                       "text": state.siteName
                     })
                   }
@@ -203,7 +203,7 @@ export const store = new Vuex.Store({
                 }
                 if (!exit) {
                   govCodes.push({
-                    "value": state.groupId,
+                    "value": parseInt(state.groupId),
                     "text": state.siteName
                   })
                 }
