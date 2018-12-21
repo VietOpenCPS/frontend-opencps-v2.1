@@ -848,9 +848,6 @@ export default {
             alignment: 'center',
             style: 'tdStyle'
           })
-          dataRowTotal.push({
-            text: ''
-          })
           for (let keyMapping in mappingData) {
             if (mappingData[keyMapping] === 'processCount' || mappingData[keyMapping] === 'releaseCount' || mappingData[keyMapping] === 'processingCount') {
               dataRowTotal.push({
@@ -932,7 +929,7 @@ export default {
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
-            vm.isShowLoading = false
+            vm.isShowLoading = falses
           })
         } else {
           // vm.agencyLists = []
