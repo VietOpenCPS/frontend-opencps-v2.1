@@ -209,13 +209,21 @@ export const store = new Vuex.Store({
                     break;
                   }
                 }
-                if (!exit) {
+                if (govCodes.length <= 1) {
+                  govCodes = []
                   govCodes.push({
                     "value": state.groupId,
-                    "text": state.siteName
+                    "text": "Cơ quan hiện tại"
                   })
-                  filterconfigObject['govAgencyCode'] = govCodes
+                } else {
+                  if (!exit) {
+                    govCodes.push({
+                      "value": state.groupId,
+                      "text": "Cơ quan hiện tại"
+                    })
+                  }
                 }
+                filterconfigObject['govAgencyCode'] = govCodes
               }
               itemsReportsData.push({
                 'code' : String(indexKey),
