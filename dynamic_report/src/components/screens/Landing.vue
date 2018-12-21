@@ -241,6 +241,7 @@ export default {
         vm.api = ''
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
         vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
         vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
@@ -433,32 +434,9 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
-      if (vm.reportType === 'REPORT_01') {
-        if (vm.year) {
-          vm.fromDateFormatted = ''
-          vm.toDateFormatted = ''
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              year: vm.year,
-              fromDate: '',
-              toDate: '',
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        } else {
-          let date = new Date()
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              year: vm.year,
-              fromDate: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN'),
-              toDate: new Date().toLocaleDateString('vi-VN'),
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }
-      } else {
+      if (vm.year) {
+        vm.fromDateFormatted = ''
+        vm.toDateFormatted = ''
         vm.$router.push({
           path: '/bao-cao/' + vm.index,
           query: {
@@ -468,97 +446,65 @@ export default {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })
+      } else {
+        let date = new Date()
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            fromDate: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN'),
+            toDate: new Date().toLocaleDateString('vi-VN'),
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
       }
     },
     changeMonth (item) {
       let vm = this
       vm.month = item
-      if (vm.reportType === 'REPORT_01') {
-        vm.fromDateFormatted = ''
-        vm.toDateFormatted = ''
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            month: vm.month,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      } else {
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            month: vm.month,
-            fromDate: vm.fromDate,
-            toDate: vm.toDate,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      }
+      vm.$router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          fromDate: vm.fromDate,
+          toDate: vm.toDate,
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
     },
     changeFromDate () {
       let vm = this
       vm.menufromDate = false
       vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      if (vm.reportType === 'REPORT_01') {
-        vm.year = ''
-        // vm.month = '0'
-        if (vm.fromDateFormatted && vm.toDateFormatted) {
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              fromDate: vm.fromDateFormatted,
-              toDate: vm.toDateFormatted,
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }
-      } else {
-        if (vm.fromDateFormatted && vm.toDateFormatted) {
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              year: vm.year,
-              month: vm.month,
-              fromDate: vm.fromDateFormatted,
-              toDate: vm.toDateFormatted,
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }
+      if (vm.fromDateFormatted && vm.toDateFormatted) {
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            month: vm.month,
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
       }
     },
     changeToDate () {
       let vm = this
       vm.menutoDate = false
       vm.toDateFormatted = vm.formatDate(vm.toDate)
-      if (vm.reportType === 'REPORT_01') {
-        vm.year = ''
-        // vm.month = '0'
-        if (vm.fromDateFormatted && vm.toDateFormatted) {
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              fromDate: vm.fromDateFormatted,
-              toDate: vm.toDateFormatted,
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }
-      } else {
-        if (vm.fromDateFormatted && vm.toDateFormatted) {
-          vm.$router.push({
-            path: '/bao-cao/' + vm.index,
-            query: {
-              year: vm.year,
-              // month: vm.month,
-              fromDate: vm.fromDateFormatted,
-              toDate: vm.toDateFormatted,
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
-          })
-        }
+      if (vm.fromDateFormatted && vm.toDateFormatted) {
+        vm.$router.push({
+          path: '/bao-cao/' + vm.index,
+          query: {
+            year: vm.year,
+            // month: vm.month,
+            fromDate: vm.fromDateFormatted,
+            toDate: vm.toDateFormatted,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
       }
     },
     formatDate (date) {
@@ -790,9 +736,9 @@ export default {
       vm.agencyLists = []
       vm.api = ''
       vm.docDefinition = {}
-      console.log('vm.itemsReports[vm.index]', vm.itemsReports[vm.index])
-      console.log('vm.itemsReports[vm.index]2 ', vm.itemsReports[vm.index]['tableConfig'])
-      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      docDString = docDString.replace(/[$siteName$]/g, siteName)
+      vm.docDefinition = JSON.parse(docDString)
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
