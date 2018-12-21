@@ -2182,6 +2182,14 @@ export default {
       }
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
+      let queryString = '?'
+      currentQuery['recount'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      currentQuery['renew'] = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      for (let key in currentQuery) {
+        if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
+          queryString += key + '=' + currentQuery[key] + '&'
+        }
+      }
       vm.loadingActionProcess = true
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
@@ -2189,13 +2197,8 @@ export default {
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
-            router.push({
-              path: vm.$router.history.current.path,
-              query: {
-                recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                q: currentQuery['q']
-              }
+            vm.$router.push({
+              path: vm.$router.history.current.path + queryString
             })
           })
         } else {

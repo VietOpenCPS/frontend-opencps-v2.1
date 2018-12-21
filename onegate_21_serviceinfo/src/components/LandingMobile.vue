@@ -1,10 +1,7 @@
 <template>
   <div class="list-thu-tuc">
-    <div class="row-header">
-      <div class="background-triangle-big"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
-    </div>
     <v-layout wrap class="white py-2">
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs12 sm3 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="govAgencyList"
@@ -17,7 +14,7 @@
           @change="changeAdministration"
         ></v-select>
       </v-flex>
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs12 sm3 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="domainListCurrent"
@@ -30,7 +27,7 @@
           @change="changeDomain"
         ></v-select>
       </v-flex>
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs12 sm3 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="levelList"
@@ -45,13 +42,15 @@
         >
         </v-select>
       </v-flex>
-      <v-flex xs3 class="pl-2 pr-2">
+      <v-flex xs12 sm3 class="pl-2 pr-2">
         <div style="position:relative">
           <v-text-field class="input-border input-search"
             placeholder="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
             @keyup.enter="filterServiceName()"
             box
+            append-icon="search"
+            :append-icon-cb="filterServiceName"
           ></v-text-field>
         </div>
       </v-flex>
@@ -59,8 +58,8 @@
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div v-else class="service__info__table">
-      <v-data-table
+    <div v-else class="service__info__table mt-2">
+      <!-- <v-data-table
         :headers="headers"
         :items="serviceInfoList"
         hide-actions
@@ -142,7 +141,32 @@
             Không có thủ tục nào được tìm thấy
           </div>
         </template>
-      </v-data-table>
+      </v-data-table> -->
+      <v-card class="">
+        <v-toolbar color="indigo" dark>
+          <v-toolbar-title>STT | Tên thủ tục</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+        <v-list class="py-0">
+          <template v-for="(item, index) in serviceInfoList" >
+            <v-list-tile :key="index" style="border-bottom:1px solid #dedede">
+              <v-list-tile-avatar>
+                <span>{{index + 1}}</span>
+              </v-list-tile-avatar>
+              <v-list-tile-content>
+                <div class="text-bold">{{item.serviceName}}</div>
+                <div> <span class="text-bold">Lĩnh vực: </span> <span>{{item.domainName}}</span> </div>
+                <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
+              </v-list-tile-content>
+              <v-list-tile-action>
+                <v-btn icon ripple>
+                  <v-icon color="grey lighten-1">more_vert</v-icon>
+                </v-btn>
+              </v-list-tile-action>
+            </v-list-tile>
+          </template>
+        </v-list>
+      </v-card>
       <div class="text-xs-right layout wrap mt-2" style="position: relative;">
         <div class="flex pagging-table px-2"> 
           <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
@@ -377,7 +401,7 @@ export default {
         router.push({
           path: vm.pathRouter + queryString,
           query: {
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            renew: newQuery['renew'] ? (newQuery['renew'] + 1) : 101
           }
         })
       }, 100)
