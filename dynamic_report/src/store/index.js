@@ -138,19 +138,11 @@ export const store = new Vuex.Store({
                       break;
                     }
                   }
-                  if (govCodes.length <= 1) {
-                    govCodes = []
+                  if (!exit) {
                     govCodes.push({
                       "value": state.groupId,
                       "text": "Cơ quan hiện tại"
                     })
-                  } else {
-                    if (!exit) {
-                      govCodes.push({
-                        "value": state.groupId,
-                        "text": "Cơ quan hiện tại"
-                      })
-                    }
                   }
                   filterconfigObject['govAgencyCode'] = govCodes
                 }
@@ -209,19 +201,11 @@ export const store = new Vuex.Store({
                     break;
                   }
                 }
-                if (govCodes.length <= 1) {
-                  govCodes = []
+                if (!exit) {
                   govCodes.push({
                     "value": state.groupId,
                     "text": "Cơ quan hiện tại"
                   })
-                } else {
-                  if (!exit) {
-                    govCodes.push({
-                      "value": state.groupId,
-                      "text": "Cơ quan hiện tại"
-                    })
-                  }
                 }
                 filterconfigObject['govAgencyCode'] = govCodes
               }
