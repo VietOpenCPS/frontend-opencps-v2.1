@@ -239,8 +239,10 @@ export default {
         vm.onlines = []
         vm.fromDateShow = false
         vm.toDateShow = false
+        vm.api = ''
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
         vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
         vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
         // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
@@ -358,6 +360,8 @@ export default {
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.api = ''
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
       vm.onlines = []
       vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
@@ -586,6 +590,7 @@ export default {
       let mappingData = []
       vm.agencyLists = []
       vm.years = []
+      vm.api = ''
       vm.onlines = []
       vm.fromDateShow = false
       vm.toDateShow = false
@@ -594,6 +599,7 @@ export default {
       vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
       vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
       vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
@@ -783,12 +789,14 @@ export default {
       let vm = this
       let mappingData = []
       vm.agencyLists = []
+      vm.api = ''
       vm.docDefinition = {}
       console.log('vm.itemsReports[vm.index]', vm.itemsReports[vm.index])
       console.log('vm.itemsReports[vm.index]2 ', vm.itemsReports[vm.index]['tableConfig'])
       vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
@@ -955,6 +963,7 @@ export default {
         filter['fromStatisticDate'] = vm.fromDateFormatted
         filter['toStatisticDate'] = vm.toDateFormatted
       }
+      filter['api'] = vm.api
       if (vm.reportType === 'REPORT_01') {
         filter['year'] = vm.year
       }
