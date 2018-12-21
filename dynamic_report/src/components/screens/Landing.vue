@@ -810,6 +810,7 @@ export default {
               })
             }
           }
+          let dataRowI = ''
           for (let key in result) {
             let flag = false
             /*
@@ -870,8 +871,12 @@ export default {
               */
               let indexTotal = 1
               for (let keyMapping in mappingData) {
+                let dataText = ''
+                if (result[key][mappingData[keyMapping]] !== undefined && result[key][mappingData[keyMapping]] !== null) {
+                  dataText = result[key][mappingData[keyMapping]] + ' '
+                }
                 dataRow.push({
-                  text: result[key][mappingData[keyMapping]] + ' ', 
+                  text: dataText, 
                   alignment: 'center',
                   style: 'tdStyle'
                 })
@@ -882,9 +887,11 @@ export default {
               }
               index = index + 1
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              docDString = docDString.replace(/"\[\$report\$\]"/g, JSON.stringify(dataRow))
+              dataRowI += JSON.stringify(dataRow)
             }
           }
+          dataRowI += JSON.stringify(dataRowTotal)
+          docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
           console.log('docDString: ', docDString)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
