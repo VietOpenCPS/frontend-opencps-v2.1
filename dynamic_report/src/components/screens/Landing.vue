@@ -749,7 +749,6 @@ export default {
                              .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
                              .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
                              .replace(/\[\$online\$\]/g, onlineStr)
-      vm.docDefinition = JSON.parse(docDString)
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -813,6 +812,7 @@ export default {
           }
           for (let key in result) {
             let flag = false
+            /*
             if (String(vm.govAgency) !== '0' && String(vm.govAgency) !== '' && String(vm.govAgency) !== '0') {
               if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
                 flag = true
@@ -821,6 +821,26 @@ export default {
               }
             } else {
               if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
+                flag = true
+              } else {
+                flag = false
+              }
+            }
+            */
+            if (String(mappingData[0]) === 'govAgencyName') {
+              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
+                flag = true
+              } else {
+                flag = false
+              }
+            } else if (String(mappingData[0]) === 'domainName') {
+              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
+                flag = true
+              } else {
+                flag = false
+              }
+            } else if (String(mappingData[0]) === 'month') {
+              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && result[key]['govAgencyName'] !== undefined && result[key]['govAgencyName'] !== '') {
                 flag = true
               } else {
                 flag = false
@@ -861,10 +881,13 @@ export default {
                 indexTotal = indexTotal + 1
               }
               index = index + 1
-              vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+              // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+              docDString = docDString.replace(/\[\$report\$\]/g, JSON.stringify(dataRow))
             }
           }
-          vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
+          console.log('docDString: ', docDString)
+          // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
+          vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
