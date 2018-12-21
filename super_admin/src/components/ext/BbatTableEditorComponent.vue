@@ -401,6 +401,18 @@
         }
       }
     },
+    computed: {
+      isConnected: {
+        // getter
+        get: function() {
+          return this.$store.getters.getisConnected
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setisConnected', newValue)
+        }
+      }
+    },
     created() {
       var vm = this
       vm.$nextTick(function() {
@@ -524,6 +536,59 @@
       },
       saveToData (cmdText) {
         let vm = this
+        if (vm.isConnected) {
+          vm.isConnected = false
+          vm.$socket.onmessage = function (data) {
+            let dataObj = eval('( ' + data.data + ' )')
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (dataObj.respone === 'detail') {
+              if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+                if (vm.dataSocket['detail'].length === 0) {
+                  vm.data = {}
+                } else {
+                  vm.data = vm.dataSocket[dataObj.respone][0]
+                }
+                vm.processDataSourceVerify()
+              } else {
+                vm.data = {}
+              }
+            } else if (dataObj.respone === 'loginUser') {
+              vm.$store.commit('setloginUser', dataObj['loginUser'])
+            } 
+            if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+              vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+              console.log('load tableConfig')
+              vm.processDataSource()
+            }
+            vm.loading = false
+            if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let currentPath = current.path
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+              })
+            } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
+              vm.snackbarsuccess = true
+              vm.data = {}
+            }
+            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+              vm.pullCounter = vm.pullCounter - 1
+              if (vm.pullCounter === 0) {
+                vm.pullOk = true
+              }
+            }
+          }
+        }
         if (vm.$refs.form.validate()) {
           vm.loading = true
           let current = vm.$router.history.current

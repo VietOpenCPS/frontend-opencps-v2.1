@@ -164,112 +164,12 @@ export default {
     'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
+    api: '',
     onlines: [],
     online: '',
     itemsReportsConfig: [],
-    report1Def: support['report1Def'],
-    docDefinition: {
-      pageOrientation: 'landscape',
-      content: [
-        {
-          columns: [
-            {
-              width: '*',
-              style: 'borderHeader',
-              text: [
-                  '\n',
-                  '-------------------------------------------'
-              ]
-            },
-            {
-              width: 250,
-              style: 'title',
-              text: [
-                  {text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\n'},
-                  {text: 'Độc lập - Tự do - Hạnh phúc\n'},
-                  {text: '-------------------------------------------\n'},
-                  {text: 'Hà Nội, ngày ' + new Date().getDate() + ' tháng ' + (new Date().getMonth() + 1) +' năm ' + new Date().getFullYear(), style: 'ngayThangNam'}
-                ]
-            }
-          ]
-        },
-        {
-          text: [
-            {text: '\n'},
-            {text: 'Đơn vị: Cục nghệ thuật biểu diễn\n\n'},
-            {text: 'Năm: ' + new Date().getFullYear() + '\n', fontSize: 11},
-          ], 
-          margin: [0, 20],
-          style: 'headerTitle'
-        },
-        {
-          style: 'tableExample',
-          table: {
-            widths: [],
-            body: []
-          },
-          margin: [0, 0, 0, 20]
-        },
-        {
-          columns: [
-            {
-              width: '*',
-              text: ''
-            },
-            {
-              width: 150,
-              style: 'title',
-              text: 'NGƯỜI TIẾP NHẬN HỒ SƠ'
-            }
-          ]
-        },
-        {
-          columns: [
-            {
-              width: '*',
-              text: ''
-            },
-            {
-              width: 150,
-              style: 'titleSub',
-              text: '(Ký và ghi rõ họ tên)'
-            }
-          ]
-        }
-      ],
-      styles: {
-        ngayThangNam: {
-          fontSize: 9,
-          italics: true,
-          bold: false,
-          alignment: 'right'
-        },
-        headerTitle: {
-            alignment: 'center',
-            bold: true,
-            fontSize: 13
-        },
-        borderHeader: {
-            alignment: 'left'
-        },
-        title: {
-          bold: true,
-          alignment: 'center'
-        },
-        titleSub: {
-            fontSize: 10,
-            italics: true,
-            alignment: 'center'
-        },
-        tdStyle: {
-          fontSize: 10
-        }
-      },
-      defaultStyle: {
-        columnGap: 20,
-        fontSize: 11
-      }
-    },
+    report1Def: [],
+    docDefinition: {},
     isDVC: false,
     isCallBack: true,
     fromDate: null,
@@ -284,60 +184,7 @@ export default {
     danhSachBaoCaos: [],
     years: [],
     year: (new Date()).getFullYear() + '',
-    months: [
-      {
-        'value': '0',
-        'name': 'Cả năm'
-      },
-      {
-        'value': '1',
-        'name': 'tháng 1'
-      },
-      {
-        'value': '2',
-        'name': 'tháng 2'
-      },
-      {
-        'value': '3',
-        'name': 'tháng 3'
-      },
-      {
-        'value': '4',
-        'name': 'tháng 4'
-      },
-      {
-        'value': '5',
-        'name': 'tháng 5'
-      },
-      {
-        'value': '6',
-        'name': 'tháng 6'
-      },
-      {
-        'value': '7',
-        'name': 'tháng 7'
-      },
-      {
-        'value': '8',
-        'name': 'tháng 8'
-      },
-      {
-        'value': '9',
-        'name': 'tháng 9'
-      },
-      {
-        'value': '10',
-        'name': 'tháng 10'
-      },
-      {
-        'value': '11',
-        'name': 'tháng 11'
-      },
-      {
-        'value': '12',
-        'name': 'tháng 12'
-      }
-    ],
+    months: [],
     month: 0,
     agencyLists: [],
     govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? parseInt(window.themeDisplay.getScopeGroupId()) : 0,
@@ -940,9 +787,10 @@ export default {
       }
       let filter = {
         document: vm.reportType,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted,
-        online: vm.online
+        fromStatisticDate: vm.fromDateFormatted,
+        toStatisticDate: vm.toDateFormatted,
+        online: vm.online,
+        api: vm.api
       }
       if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('STATISTIC')) {
         filter['year'] = vm.year
@@ -1011,6 +859,7 @@ export default {
                 alignment: 'center',
                 style: 'tdStyle'
               })
+              /*
               if (vm.groupType !== 'domain') {
                 dataRow.push({
                   text: result[key]['govAgencyName'], 
@@ -1024,6 +873,7 @@ export default {
                   style: 'tdStyle'
                 })
               }
+              */
               let indexTotal = 2
               for (let keyMapping in mappingData) {
                 dataRow.push({
