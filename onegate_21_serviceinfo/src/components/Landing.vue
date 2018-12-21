@@ -178,7 +178,7 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
-    pathRouter: '/thu-tuc-hanh-chinh',
+    pathRouter: '/thu-tuc-hanh-chinh/',
     serviceInfoList: [],
     totalThuTuc: 0,
     thutucPage: 1,
@@ -232,7 +232,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh' : '/thu-tuc-hanh-chinh'
+      vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh/' : '/thu-tuc-hanh-chinh/'
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''

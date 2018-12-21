@@ -8,8 +8,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     initData: {},
-    // endPoint: '/o/rest/v2',
-    endPoint: 'http://127.0.0.1:8081/api',
+    endPoint: '/o/rest/v2',
+    // endPoint: 'http://127.0.0.1:8081/api',
     loading: false,
     index: 0,
     agencyList: [],
@@ -144,7 +144,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get('/o/rest/v2/serviceinfos/' + filter.index, param).then(function (response) {
+          axios.get(state.endPoint + '/serviceinfos/' + filter.index, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

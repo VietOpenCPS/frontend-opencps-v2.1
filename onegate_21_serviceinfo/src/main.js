@@ -1,5 +1,5 @@
-import 'vuetify/dist/vuetify.min.css'
-import './stylus/main.css'
+// import 'vuetify/dist/vuetify.min.css'
+// import './stylus/main.css'
 import Vue from 'vue/dist/vue.js'
 import App from './App'
 import router from './router'
