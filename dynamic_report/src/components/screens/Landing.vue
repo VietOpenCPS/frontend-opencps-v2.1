@@ -872,14 +872,14 @@ export default {
           }
           for (let key in result) {
             let flag = false
-            if (vm.groupType !== 'domain') {
-              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
+            if (vm.govAgency) {
+              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
                 flag = true
               } else {
                 flag = false
               }
             } else {
-              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
+              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
                 flag = true
               } else {
                 flag = false
