@@ -65,6 +65,7 @@ new Vue({
   created() {
     var vm = this
     vm.$nextTick(function() {
+      vm.$store.dispatch('loadInitResource')
       if (window.location.href.endsWith('#/')) {
         vm.$router.push('/bao-cao/0')
       }
