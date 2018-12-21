@@ -243,8 +243,22 @@ export default {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
         vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
         vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
-        vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
-        vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+        // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+        // vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+        if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate'] || 
+            vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
+          vm.fromDateShow = true
+        }
+        if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
+            vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['toReceiveNotDoneDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
+            vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
+          vm.toDateShow = true
+        }
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         vm.reportType = vm.itemsReports[vm.index]['document']
@@ -347,8 +361,22 @@ export default {
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
       vm.onlines = []
       vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
-      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
-      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+      // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
+      // vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
+      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate'] || 
+          vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
+        vm.fromDateShow = true
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
+          vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['toReceiveNotDoneDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
+          vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
+        vm.toDateShow = true
+      }
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
@@ -905,9 +933,27 @@ export default {
     doPrintReport () {
       let vm = this
       let filter = {
-        document: vm.reportType,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
+        document: vm.reportType
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate']) {
+        filter['fromFinishDate'] = vm.fromDateFormatted
+        filter['toFinishDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate']) {
+        filter['fromReleaseDate'] = vm.fromDateFormatted
+        filter['toReleaseDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate']) {
+        filter['fromReceiveNotDoneDate'] = vm.fromDateFormatted
+        filter['toReceiveNotDoneDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate']) {
+        filter['fromReceiveDate'] = vm.fromDateFormatted
+        filter['toReceiveDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
+        filter['fromStatisticDate'] = vm.fromDateFormatted
+        filter['toStatisticDate'] = vm.toDateFormatted
       }
       if (vm.reportType === 'REPORT_01') {
         filter['year'] = vm.year
