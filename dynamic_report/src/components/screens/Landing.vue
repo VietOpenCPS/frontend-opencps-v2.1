@@ -33,7 +33,6 @@
           v-model="govAgency"
           item-text="text"
           item-value="value"
-          return-object
           :hide-selected="true"
           @change="changeGov"
           >
@@ -965,9 +964,9 @@ export default {
       if (vm.reportType === 'REPORT_01') {
         filter['year'] = vm.year
       }
-      if (vm.isDVC && vm.govAgency) {
-        filter['agency'] = vm.govAgency['itemCode']
-      } else if (vm.isDVC && !vm.govAgency) {
+      if (vm.isDVC && vm.govAgency !== 0 && String(vm.govAgency) !== '0') {
+        filter['agency'] = vm.govAgency
+      } else if (vm.isDVC && (vm.govAgency === 0 || String(vm.govAgency) === '0')) {
         filter['agency'] = 'all'
       }
       vm.pdfBlob = null
