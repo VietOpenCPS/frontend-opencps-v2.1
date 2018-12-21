@@ -887,7 +887,7 @@ export default {
               }
               index = index + 1
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              dataRowI += JSON.stringify(dataRow)
+              dataRowI += JSON.stringify(dataRow) + ','
             }
           }
           dataRowI += JSON.stringify(dataRowTotal)
