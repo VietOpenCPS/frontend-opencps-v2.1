@@ -882,7 +882,7 @@ export default {
               }
               index = index + 1
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              docDString = docDString.replace(/\[\$report\$\]/g, JSON.stringify(dataRow))
+              docDString = docDString.replace(/"\[\$report\$\]"/g, JSON.stringify(dataRow))
             }
           }
           console.log('docDString: ', docDString)
