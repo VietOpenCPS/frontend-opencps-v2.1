@@ -872,7 +872,8 @@ export default {
           }
           for (let key in result) {
             let flag = false
-            if (vm.govAgency) {
+            console.log('vm.govAgency', vm.govAgencys)
+            if (String(vm.govAgency) !== '0' && String(vm.govAgency) !== '' && String(vm.govAgency) !== '0') {
               if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
                 flag = true
               } else {
@@ -909,9 +910,6 @@ export default {
               */
               let indexTotal = 1
               for (let keyMapping in mappingData) {
-                console.log('result[key]', result[key])
-                console.log('mappingData[keyMapping]', mappingData[keyMapping])
-                console.log('result[key][mappingData[keyMapping]]', result[key][mappingData[keyMapping]])
                 dataRow.push({
                   text: result[key][mappingData[keyMapping]], 
                   alignment: 'center',
