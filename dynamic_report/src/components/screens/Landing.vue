@@ -871,7 +871,7 @@ export default {
               let indexTotal = 1
               for (let keyMapping in mappingData) {
                 dataRow.push({
-                  text: result[key][mappingData[keyMapping]], 
+                  text: result[key][mappingData[keyMapping]] + ' ', 
                   alignment: 'center',
                   style: 'tdStyle'
                 })
