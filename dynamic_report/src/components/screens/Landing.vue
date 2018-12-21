@@ -914,7 +914,7 @@ export default {
                   alignment: 'center',
                   style: 'tdStyle'
                 })
-                if (dataRowTotal[indexTotal]['text'] !== '') {
+                if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
                   dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][mappingData[keyMapping]])
                 }
                 indexTotal = indexTotal + 1
