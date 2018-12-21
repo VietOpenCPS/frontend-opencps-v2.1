@@ -141,7 +141,7 @@ export const store = new Vuex.Store({
                   if (!exit) {
                     govCodes.push({
                       "value": state.groupId,
-                      "text": "Cơ quan hiện tại"
+                      "text": state.siteName
                     })
                   }
                   filterconfigObject['govAgencyCode'] = govCodes
@@ -204,7 +204,7 @@ export const store = new Vuex.Store({
                 if (!exit) {
                   govCodes.push({
                     "value": state.groupId,
-                    "text": "Cơ quan hiện tại"
+                    "text": state.siteName
                   })
                 }
                 filterconfigObject['govAgencyCode'] = govCodes
