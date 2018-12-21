@@ -107,67 +107,133 @@ export const store = new Vuex.Store({
     },
     getDynamicReports ({commit, state}) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.groupId,
-            'Content-Type': 'text/plain',
-            'Accept': 'application/json'
-          }
-        }
-        let body = AdminConfig.getDynamicReports
-        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
-          let serializable = response.data
-          let itemsReportsData = []
-          let indexKey = 0
-          for (let key in serializable['getDynamicReports']) {
-            let current = serializable['getDynamicReports'][key]
-            let typeCurrent = 'dossier'
-            if (current['reportCode'].startsWith('STATISTIC')) {
-              typeCurrent = 'thong_ke'
+        if (state.siteName !== '') {
+          store.dispatch('loadInitResource').then(function () {
+            let options = {
+              headers: {
+                'groupId': state.groupId,
+                'Content-Type': 'text/plain',
+                'Accept': 'application/json'
+              }
             }
-            // push default current siteName
-            let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-            if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
-              let govCodes = filterconfigObject['govAgencyCode']
-              let exit = false
-              for (let key in govCodes) {
-                if (String(state.groupId) === govCodes[key]['value']) {
-                  exit = true
-                  break;
+            let body = AdminConfig.getDynamicReports
+            axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+              let serializable = response.data
+              let itemsReportsData = []
+              let indexKey = 0
+              for (let key in serializable['getDynamicReports']) {
+                let current = serializable['getDynamicReports'][key]
+                let typeCurrent = 'dossier'
+                if (current['reportCode'].startsWith('STATISTIC')) {
+                  typeCurrent = 'thong_ke'
+                }
+                // push default current siteName
+                let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
+                if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
+                  let govCodes = filterconfigObject['govAgencyCode']
+                  let exit = false
+                  for (let key in govCodes) {
+                    if (String(state.groupId) === govCodes[key]['value']) {
+                      exit = true
+                      break;
+                    }
+                  }
+                  if (!exit) {
+                    govCodes.push({
+                      "value": state.groupId,
+                      "text": state.siteName
+                    })
+                    filterconfigObject['govAgencyCode'] = govCodes
+                  }
+                }
+                itemsReportsData.push({
+                  'code' : String(indexKey),
+                  'document' : current['reportCode'],
+                  'active' : false,
+                  'type' : typeCurrent,
+                  'title' : current['reportName'],
+                  'filterConfig' : filterconfigObject,
+                  'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+                  'userConfig' : eval('( ' + current['userConfig'] + ' )'),
+                  'dynamicReportId' : current['dynamicReportId'],
+                  'reportCode' : current['reportCode'],
+                  'reportName' : current['reportName'],
+                  'sharing' : current['sharing']
+                })
+                indexKey = indexKey + 1
+              }
+              state.itemsReports = itemsReportsData
+              console.log('state.itemsReports', state.itemsReports)
+              resolve(itemsReportsData)
+            }).catch(function (error) {
+              state.itemsReports = []
+              commit('setsnackbarerror', true)
+              reject(error)
+            })
+          })
+        } else {
+          let options = {
+            headers: {
+              'groupId': state.groupId,
+              'Content-Type': 'text/plain',
+              'Accept': 'application/json'
+            }
+          }
+          let body = AdminConfig.getDynamicReports
+          axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+            let serializable = response.data
+            let itemsReportsData = []
+            let indexKey = 0
+            for (let key in serializable['getDynamicReports']) {
+              let current = serializable['getDynamicReports'][key]
+              let typeCurrent = 'dossier'
+              if (current['reportCode'].startsWith('STATISTIC')) {
+                typeCurrent = 'thong_ke'
+              }
+              // push default current siteName
+              let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
+              if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
+                let govCodes = filterconfigObject['govAgencyCode']
+                let exit = false
+                for (let key in govCodes) {
+                  if (String(state.groupId) === govCodes[key]['value']) {
+                    exit = true
+                    break;
+                  }
+                }
+                if (!exit) {
+                  govCodes.push({
+                    "value": state.groupId,
+                    "text": state.siteName
+                  })
+                  filterconfigObject['govAgencyCode'] = govCodes
                 }
               }
-              if (!exit) {
-                govCodes.push({
-                  "value": state.groupId,
-                  "text": state.siteName
-                })
-                filterconfigObject['govAgencyCode'] = govCodes
-              }
+              itemsReportsData.push({
+                'code' : String(indexKey),
+                'document' : current['reportCode'],
+                'active' : false,
+                'type' : typeCurrent,
+                'title' : current['reportName'],
+                'filterConfig' : filterconfigObject,
+                'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+                'userConfig' : eval('( ' + current['userConfig'] + ' )'),
+                'dynamicReportId' : current['dynamicReportId'],
+                'reportCode' : current['reportCode'],
+                'reportName' : current['reportName'],
+                'sharing' : current['sharing']
+              })
+              indexKey = indexKey + 1
             }
-            itemsReportsData.push({
-              'code' : String(indexKey),
-              'document' : current['reportCode'],
-              'active' : false,
-              'type' : typeCurrent,
-              'title' : current['reportName'],
-              'filterConfig' : filterconfigObject,
-              'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
-              'userConfig' : eval('( ' + current['userConfig'] + ' )'),
-              'dynamicReportId' : current['dynamicReportId'],
-              'reportCode' : current['reportCode'],
-              'reportName' : current['reportName'],
-              'sharing' : current['sharing']
-            })
-            indexKey = indexKey + 1
-          }
-          state.itemsReports = itemsReportsData
-          console.log('state.itemsReports', state.itemsReports)
-          resolve(itemsReportsData)
-        }).catch(function (error) {
-          state.itemsReports = []
-          commit('setsnackbarerror', true)
-          reject(error)
-        })
+            state.itemsReports = itemsReportsData
+            console.log('state.itemsReports', state.itemsReports)
+            resolve(itemsReportsData)
+          }).catch(function (error) {
+            state.itemsReports = []
+            commit('setsnackbarerror', true)
+            reject(error)
+          })
+        }
       })
     },
     getAgencyReportLists ({state}, filter) {
