@@ -738,6 +738,7 @@ export default {
       vm.docDefinition = {}
       let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
       docDString = docDString.replace(/[$siteName$]/g, vm.$store.getters.siteName)
+      console.log('docDString: ', docDString)
       vm.docDefinition = JSON.parse(docDString)
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
