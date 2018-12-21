@@ -909,6 +909,7 @@ export default {
               */
               let indexTotal = 1
               for (let keyMapping in mappingData) {
+                console.log('result[key]', result[key])
                 console.log('mappingData[keyMapping]', mappingData[keyMapping])
                 console.log('result[key][mappingData[keyMapping]]', result[key][mappingData[keyMapping]])
                 dataRow.push({
