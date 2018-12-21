@@ -737,8 +737,18 @@ export default {
       vm.api = ''
       vm.docDefinition = {}
       let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      let onlineStr = ''
+      if (String(vm.online) === 'true') {
+        onlineStr = 'TRỰC TUYẾN'
+      } else if (String(vm.online) === 'false') {
+        onlineStr = 'TRỰC TIẾP'
+      } else {
+        onlineStr = 'TRỰC TIẾP/TRỰC TUYẾN'
+      }
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
-      console.log('docDString: ', docDString)
+                             .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
+                             .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
+                             .replace(/\[\$online\$\]/g, onlineStr)
       vm.docDefinition = JSON.parse(docDString)
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
@@ -754,19 +764,6 @@ export default {
       }
       */
       vm.isShowLoading = true
-      // process
-      let labelGroup = 'Lĩnh vực'
-      if (vm.groupType !== 'domain') {
-        labelGroup = 'Sở Ban ngành'
-      }
-      if (vm.year > 0) {
-        vm.docDefinition['content'][1]['text'][1]['text'] = 'Năm: ' + vm.year + '\n'
-      } else {
-        vm.docDefinition['content'][1]['text'][1]['text'] = 'TỪ NGÀY: ' + vm.fromDateFormatted + ' ĐẾN NGÀY: ' + vm.toDateFormatted + '\n'
-      }
-      if (vm.reportType === 'STATISTIC_01') {
-        vm.docDefinition['content'][2]['table']['body'][0][1]['text'] = '\n\n\n' + labelGroup
-      }
       let filter = {
         document: vm.reportType,
         fromStatisticDate: vm.fromDateFormatted,
@@ -774,10 +771,8 @@ export default {
         online: vm.online,
         api: vm.api
       }
-      if (vm.reportType === 'REPORT_01' || vm.reportType.startsWith('STATISTIC')) {
-        filter['year'] = vm.year
-      }
       if (vm.govAgency) {
+        filter['year'] = vm.year
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
       }
@@ -818,7 +813,6 @@ export default {
           }
           for (let key in result) {
             let flag = false
-            console.log('vm.govAgency', vm.govAgency)
             if (String(vm.govAgency) !== '0' && String(vm.govAgency) !== '' && String(vm.govAgency) !== '0') {
               if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
                 flag = true
