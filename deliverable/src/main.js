@@ -44,11 +44,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURL + ':8080/o/v1/socket/web?groupId='+ g
   {
     store: store,
     format: 'json',
-    reconnection: true,
-    reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-    reconnectionDelay: 3000,
-    maxHttpBufferSize: 30 * 1024 * 1024,
-    maxPayload: 30 * 1024 * 1024
+    reconnection: true
   }
 )
 

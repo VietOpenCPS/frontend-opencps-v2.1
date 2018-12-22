@@ -195,3 +195,7 @@ body .fix_tool_bottom {
     width: calc(100% - 240px);
     width: -webkit-calc(100% - 240px);
 }
+
+body #app {
+    margin-bottom: 265px;
+}

@@ -548,7 +548,7 @@ export default {
       } else if (String(vm.online) === 'false') {
         onlineStr = 'TRỰC TIẾP'
       } else {
-        onlineStr = 'TRỰC TIẾP/TRỰC TUYẾN'
+        onlineStr = ''
       }
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       reportName = vm.itemsReports[vm.index]['title']
