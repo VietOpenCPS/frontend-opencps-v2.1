@@ -296,7 +296,7 @@ export default {
         // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
         if (result.viaPostal > 0) {
-          let postalAddress = result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName
+          let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
           if (vm.formCode === 'NEW' && vm.originality === 1) {
             result['postalAddress'] = postalAddress
             result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']

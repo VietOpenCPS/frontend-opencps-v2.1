@@ -102,14 +102,14 @@
                     </span>
                   </v-flex>
                   <v-flex class="text-xs-right" style="width:100px">
-                    <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || checkPemissionPhanCongLai(currentUser) === false || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
-                      <span v-if="String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
+                    <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
+                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
+                      <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>
                 </v-layout>
               </div>
-              <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate">
+              <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate && btnStateVisible">
                 <p class="mb-2">
                   Hồ sơ đã hoàn thành quá trình xử lý
                 </p>
@@ -232,7 +232,10 @@
             <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> III.</div>
+                  <div class="background-triangle-small"> 
+                    <span v-if="stateViewResult">III</span>
+                    <span v-else>II</span>
+                  </div>
                   Văn bản hành chính
                 </div>
                 <div v-for="(item, index) in documents" v-bind:key="index">
@@ -1727,47 +1730,6 @@ export default {
                 vm.loadingActionProcess = false
                 vm.$refs.kypheduyettailieu.kySo(resultAction)
               }
-            }).catch(function (reject) {
-              vm.loadingAction = false
-              vm.loadingActionProcess = false
-            })
-          } else if (!useKySo && vm.dataEsign.signatureType === 'digital') {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              // console.log('result======', result)
-              vm.loadingAction = false
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              vm.alertObj = {
-                icon: 'check_circle',
-                color: 'success',
-                message: 'Thực hiện thành công!'
-              }
-              vm.btnStateVisible = false
-              if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                vm.rollbackable = result.rollbackable
-              }
-              if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                vm.printDocument = true
-              }
-              if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-              }
-              vm.checkInput = 0
-              vm.$store.commit('setCheckInput', 0)
-              if (String(item.form) === 'ACTIONS') {
-              } else {
-                router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
-                  }
-                })
-              }
-              $('html, body').animate({
-                scrollTop: 0
-              }, 700, 'linear')
             }).catch(function (reject) {
               vm.loadingAction = false
               vm.loadingActionProcess = false

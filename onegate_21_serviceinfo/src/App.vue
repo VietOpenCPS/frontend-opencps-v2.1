@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app clipped floating width="310">
+    <v-navigation-drawer app clipped floating width="310" v-if="!viewMobile">
       <v-tabs v-model="active" class="service__info__menu">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab key="tab-1" ripple class="primary--text">
@@ -74,24 +74,117 @@
         </v-tab-item>
       </v-tabs>
     </v-navigation-drawer>
-  
+    <div v-if="viewMobile && !isDetail">
+      <div class="row-header mb-2">
+        <div class="ml-2 text-bold primary--text"> <span>THỦ TỤC HÀNH CHÍNH</span> </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left primary--text" @click="goBack" active-class="temp_active">
+              <v-icon size="18">reply</v-icon> &nbsp; Quay lại
+            </v-btn>
+          </div>
+        </div> 
+      </div>
+      <v-tabs v-model="active" class="service__info__menu">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <v-tab key="tab-1" ripple class="primary--text">
+          Cơ quan quản lý
+        </v-tab>
+        <v-tab key="tab-2" ripple class="primary--text">
+          Lĩnh vực
+        </v-tab>
+        <v-tab key="tab-3" ripple class="primary--text">
+          Mức độ
+        </v-tab>
+        <v-tab-item key="tab-1" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
+          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
+            <v-list class="pt-0">
+              <v-list-tile v-for="item in govAgencyList" :key="item.administrationCode"
+                :class="{'list__tile--active': String(currentAgency) === String(item.administrationCode)}"
+                @click="filterAgency(item)"
+              >
+                <v-list-tile-action>
+                  <v-icon color="primary" v-if="String(currentAgency) === String(item.administrationCode)">play_arrow</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title v-text="item.administrationName"></v-list-tile-title>
+                  <span class="status__counter" style="color:#0b72ba">
+                    {{item.count}}
+                  </span>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-card>
+          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
+        </v-tab-item>
+        <v-tab-item key="tab-2" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
+          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
+            <v-list class="pt-0">
+              <v-list-tile v-for="item in domainList" :key="item.domainCode"
+                :class="{'list__tile--active': String(currentDomain) === String(item.domainCode)}"
+                @click="filterDomain(item)"
+              >
+                <v-list-tile-action>
+                  <v-icon color="primary" v-if="String(currentDomain) === String(item.domainCode)">play_arrow</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title v-text="item.domainName"></v-list-tile-title>
+                  <span class="status__counter" style="color:#0b72ba">
+                    {{item.count}}
+                  </span>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-card>
+          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
+        </v-tab-item>
+        <v-tab-item key="tab-3" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
+          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
+            <v-list class="pt-0">
+              <v-list-tile v-for="item in levelList" :key="item.level"
+                :class="{'list__tile--active': String(currentLevel) === String(item.level)}"
+                @click="filterLevel(item)"
+              >
+                <v-list-tile-action>
+                  <v-icon color="primary" v-if="String(currentLevel) === String(item.level)">play_arrow</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
+                  <span class="status__counter" style="color:#0b72ba">
+                    {{item.count}}
+                  </span>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-card>
+          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
+        </v-tab-item>
+      </v-tabs>
+    </div>
     <v-content>
       <router-view></router-view>
     </v-content>
-  
+    <go-top v-if="viewMobile" :size="42" bg-color="#0064c7"></go-top>
   </v-app>
 </template>
 
 <script>
   import router from '@/router'
+  import { isMobile } from 'mobile-device-detect'
+  import GoTop from '@inotom/vue-go-top'
   export default {
     data: () => ({
       active: null,
+      pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
       currentDomain: '',
       currentLevel: '',
+      isDetail: false,
       text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
     }),
+    components: {
+      GoTop
+    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
@@ -104,11 +197,16 @@
       },
       levelList () {
         return this.$store.getters.getLevelList
+      },
+      viewMobile () {
+        return isMobile
       }
     },
     created () {
       var vm = this
+      console.log('isMobile', isMobile)
       vm.$nextTick(function () {
+        vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh' : '/thu-tuc-hanh-chinh'
         let current = vm.$router.history.current
         let newQuery = current.query
         console.log('current', current)
@@ -128,7 +226,7 @@
               }
             }
             router.push({
-              path: '/thu-tuc-hanh-chinh' + queryString,
+              path: vm.pathRouter + queryString,
               query: {
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
@@ -153,6 +251,11 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        if (currentParams.hasOwnProperty('index') && currentParams['index']) {
+          vm.isDetail = true
+        } else {
+          vm.isDetail = false
+        }
         vm.currentAgency = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
@@ -175,7 +278,7 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -197,7 +300,7 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -219,11 +322,14 @@
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })
+      },
+      goBack () {
+        window.history.back()
       }
     }
   }

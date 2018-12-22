@@ -2,23 +2,13 @@
   <div class='phancong' style='background-color: white;width:100%'>
     <v-expansion-panel class='expansion-pl'>
       <v-expansion-panel-content hide-actions value='1'>
-        <div slot='header'>
+        <div slot='header' v-if="esignType !== '' && esignType !== 'digital'">
           <div class='background-triangle-small'> 
             <v-icon size='18' color='white'>star_rate</v-icon> 
           </div>Duyệt hồ sơ
         </div>
         <v-card >
           <v-card-text class='px-0 py-0'>
-            <v-checkbox v-if="esignType === 'digital'"
-              class="ml-3"
-              v-model='activeKS'
-              label='Sử dụng chữ ký số'
-            ></v-checkbox>
-            <v-checkbox v-if="esignType === ''"
-              class="ml-3"
-              v-model='activeKS'
-              label='Xác nhận ký số'
-            ></v-checkbox>
             <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
               <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
               <v-captcha ref="captcha"></v-captcha>
@@ -68,6 +58,9 @@ export default {
     e1: true
   }),
   created () {
+    if (this.esignType === '' || this.esignType === 'digital') {
+      this.activeKS = true
+    }
   },
   computed: {
     kysoSuccess () {
@@ -80,7 +73,7 @@ export default {
   watch: {
   },
   mounted () {
-    if (this.esignType === '') {
+    if (this.esignType === '' || this.esignType === 'digital') {
       this.activeKS = true
     }
   },
