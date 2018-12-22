@@ -75,11 +75,11 @@
       </v-tabs>
     </v-navigation-drawer>
     <div v-if="viewMobile && !isDetail">
-      <div class="row-header mb-2">
-        <div class="ml-2 text-bold primary--text"> <span>THỦ TỤC HÀNH CHÍNH</span> </div>
+      <div class="row-header mb-2 py-1" style="background-color: #070f52">
+        <div class="ml-2 text-bold white--text"> <span>THỦ TỤC HÀNH CHÍNH</span> </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left primary--text" @click="goBack" active-class="temp_active">
+            <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
               <v-icon size="18">reply</v-icon> &nbsp; Quay lại
             </v-btn>
           </div>
