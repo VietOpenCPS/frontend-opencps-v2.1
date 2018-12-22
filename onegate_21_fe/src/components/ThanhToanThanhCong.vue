@@ -94,6 +94,7 @@ export default {
       var vm = this
       let query = vm.$router.history.current.query
       let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
+      let referenceUidQuery = query.hasOwnProperty('referenceUid') ? query.referenceUid : ''
       let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
       if (dossierId) {
         vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
@@ -106,13 +107,13 @@ export default {
           vm.dossierDetail['paymentAmount'] = query.net_cost
           let filter = {
             dossierId: resultDossier.dossierId,
-            referenceUid: resultDossier.referenceUid
+            referenceUid: referenceUidQuery ? referenceUidQuery : resultDossier.referenceUid
           }
           vm.$store.dispatch('putPayments', filter).then(result => {
             vm.dossierDetail['paymentFee'] = result.paymentFee
             if (actionCode) {
               let fiter2 = {
-                dossierId: dossierId,
+                dossierId: referenceUidQuery ? referenceUidQuery : resultDossier.referenceUid,
                 actionCode: actionCode
               }
               vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
