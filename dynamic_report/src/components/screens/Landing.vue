@@ -615,10 +615,36 @@ export default {
       */
       // bild data
       let filter = {
-        document: vm.reportType,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted,
-        year: vm.year
+        document: vm.reportType
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate']) {
+        filter['fromFinishDate'] = vm.fromDateFormatted
+        filter['toFinishDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate']) {
+        filter['fromReleaseDate'] = vm.fromDateFormatted
+        filter['toReleaseDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate']) {
+        filter['fromReceiveNotDoneDate'] = vm.fromDateFormatted
+        filter['toReceiveNotDoneDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate']) {
+        filter['fromReceiveDate'] = vm.fromDateFormatted
+        filter['toReceiveDate'] = vm.toDateFormatted
+      }
+      if (vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
+        filter['fromStatisticDate'] = vm.fromDateFormatted
+        filter['toStatisticDate'] = vm.toDateFormatted
+      }
+      filter['api'] = vm.api
+      if (vm.reportType === 'REPORT_01') {
+        filter['year'] = vm.year
+      }
+      if (vm.isDVC && vm.govAgency !== 0 && String(vm.govAgency) !== '0') {
+        filter['agency'] = vm.govAgency
+      } else if (vm.isDVC && (vm.govAgency === 0 || String(vm.govAgency) === '0')) {
+        filter['agency'] = 'all'
       }
       if (vm.govAgency) {
         filter['govAgency'] = vm.govAgency
