@@ -252,6 +252,9 @@
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
             }
+            setTimeout(() => {
+              vm.pullOk = true
+            }, 1000)
           }, 500)
         }
       })
