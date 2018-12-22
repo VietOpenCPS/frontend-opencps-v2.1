@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-card>
-      <div class="row-header">
+      <div class="row-header" :style="viewMobile ? 'background-color: #070f52' : ''">
         <div v-if="!viewMobile" class="background-triangle-big"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
-        <div v-else class="ml-2 text-bold primary--text"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
+        <div v-else class="ml-2 py-2 text-bold white--text"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
         <div class="layout row wrap header_tools row-blue">
           <div v-if="!viewMobile" class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -11,7 +11,7 @@
             </v-btn>
           </div>
           <div v-else class="flex text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left primary--text" @click="goBack" active-class="temp_active">
+            <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
               <v-icon size="18">reply</v-icon> &nbsp; Quay lại
             </v-btn>
           </div>
@@ -50,7 +50,7 @@
                       <table class="datatable table">
                         <tbody>
                           <tr>
-                            <td width="200"><span class="text-bold">Cơ quan quản lý</span></td>
+                            <td :width="viewMobile ? 150 : 200"><span class="text-bold">Cơ quan quản lý</span></td>
                             <td><span>{{serviceDetail.administrationName}}</span></td>
                           </tr>
                           <tr>

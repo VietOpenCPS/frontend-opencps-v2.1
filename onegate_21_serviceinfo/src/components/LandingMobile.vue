@@ -60,7 +60,7 @@
     </content-placeholders>
     <div v-else class="service__info__table mt-2">
       <v-card class="mx-2">
-        <div class="px-2 py-2 blue text-bold">
+        <div class="px-2 py-2 blue text-bold white--text">
           STT | Tên thủ tục
         </div>
         <v-list class="py-0">
@@ -75,12 +75,12 @@
                 <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
               </v-flex>
               <v-flex xs1 class="text-xs-center mt-1">
-                <v-menu :close-on-content-click="false" left>
+                <v-menu :close-on-content-click="false" left style="position:relative !important;">
                   <v-btn slot="activator" icon class="mx-0 my-0" style="width:100%">
                     <v-icon color="primary lighten-1">more_vert</v-icon>
                   </v-btn>
                   <v-list>
-                    <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1">
+                    <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1" style="position:relative !important;">
                       <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                       <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                       <v-list v-if="item.serviceConfigs">
@@ -90,13 +90,13 @@
                         </v-list-tile>
                       </v-list>
                     </v-menu>
-                    <v-btn class="mx-0 my-0" small slot="activator" color="primary" 
+                    <v-btn class="mx-0 my-0" small color="primary" 
                       v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) > 2"
                       @click="createDossier(serviceConfigs(item.serviceConfigs)[0])"
                     >
                       Nộp hồ sơ
                     </v-btn>
-                    <v-btn class="mx-0 my-0" small slot="activator" color="primary" 
+                    <v-btn class="mx-0 my-0" small color="primary" 
                       v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) <= 2"
                       @click="viewGuide(serviceConfigs(item.serviceConfigs)[0])"
                     >
