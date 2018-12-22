@@ -576,7 +576,7 @@ export default {
       vm.docDefinition['content'][2]['table']['widths'].push(30)
       */
       let widthsConfig = []
-      let dataReport = ''
+      let dataReportXX = ''
       widthsConfig.push(30)
       let headerTableReport = '['
       let header2TableReport = '['
@@ -630,9 +630,9 @@ export default {
         */
         ine = ine + 1
       }
-      dataReport += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
-      dataReport += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
-      console.log('dataReportdataReportdataReportdataReportdataReport:', dataReport)
+      dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
+      dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
+      console.log('dataReportdataReportdataReportdataReportdataReport:', dataReportXX)
       /*
       vm.docDefinition['content'][2]['table']['body'] = []
       vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
@@ -792,12 +792,13 @@ export default {
                 indexStt = indexStt + 1
               }
             }
+            console.log('dataReportTotal: ', dataReportTotal)
+            console.log('dataReport: ', dataReportXX)
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
-            dataReport += dataReportTotal
+            dataReportXX += dataReportTotal
           }
-          console.log('dataReport4: ', dataReport)
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
-          docDString = docDString.replace(/"\[\$report\$\]"/g, dataReport)
+          docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
           console.log('report2: ', docDString)
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
