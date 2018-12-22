@@ -199,3 +199,8 @@ body .fix_tool_bottom {
 body #app {
     margin-bottom: 265px;
 }
+body #footer .container {
+    overflow: hidden;
+    padding-top: 15px;
+    padding-bottom: 0;
+}

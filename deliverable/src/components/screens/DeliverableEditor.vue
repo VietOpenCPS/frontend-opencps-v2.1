@@ -229,6 +229,7 @@
       onScroll (e) {
         this.offsetTop = window.pageYOffset || document.documentElement.scrollTop
         this.offsetCheck = document.getElementById('wrapper').offsetHeight - this.offsetTop
+        console.log('this.offsetCheck', this.offsetCheck)
       },
       goBack () {
         window.history.back()
