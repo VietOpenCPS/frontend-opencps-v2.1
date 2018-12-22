@@ -153,6 +153,16 @@
           this.$store.commit('setselected', newValue)
         }
       },
+      selectedText: {
+        // getter
+        get: function() {
+          return this.$store.getters.selectedText
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setselectedText', newValue)
+        }
+      },
       snackbarerror: {
         // getter
         get: function() {
