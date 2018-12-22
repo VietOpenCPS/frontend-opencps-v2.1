@@ -228,7 +228,7 @@
     methods: {
       onScroll (e) {
         this.offsetTop = window.pageYOffset || document.documentElement.scrollTop
-        this.offsetCheck = document.getElementById('wrapper').offsetHeight - this.offsetTop
+        this.offsetCheck = document.getElementById('mWrapper').offsetHeight - this.offsetTop
         console.log('this.offsetCheck', this.offsetCheck)
       },
       goBack () {
