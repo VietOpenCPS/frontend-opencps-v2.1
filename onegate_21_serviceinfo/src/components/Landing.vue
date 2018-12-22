@@ -171,12 +171,14 @@ import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import support from '../store/support.json'
 import TinyPagination from './Pagination.vue'
+import { isMobile } from 'mobile-device-detect'
 export default {
   props: [],
   components: {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    pathRouter: '/thu-tuc-hanh-chinh/',
     serviceInfoList: [],
     totalThuTuc: 0,
     thutucPage: 1,
@@ -230,7 +232,7 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      var vm = this
+      vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh/' : '/thu-tuc-hanh-chinh/'
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
@@ -308,7 +310,7 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -330,7 +332,7 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -352,7 +354,7 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -373,7 +375,7 @@ export default {
           }
         }
         router.push({
-          path: '/thu-tuc-hanh-chinh' + queryString,
+          path: vm.pathRouter + queryString,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
@@ -431,7 +433,7 @@ export default {
       console.log('item', item)
       var vm = this
       vm.$router.push({
-        path: '/thu-tuc-hanh-chinh/' + item.serviceInfoId
+        path: vm.pathRouter + item.serviceInfoId
       })
     },
     createDossier (item) {
