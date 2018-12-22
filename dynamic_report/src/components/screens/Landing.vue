@@ -606,8 +606,12 @@ export default {
       for (let key in val) {
         widthsConfig.push('auto')
         // vm.docDefinition['content'][2]['table']['widths'].push('auto')
+        let str1 = ' '
+        if (vm.report1Def[val[key]] !== undefined && vm.report1Def[val[key]] !== null && vm.report1Def[val[key]] !== '') {
+          str1 = vm.report1Def[val[key]]
+        }
         headerTableReport += JSON.stringify({
-          text: vm.report1Def[val[key]],
+          text: str1,
           alignment: 'center',
           bold: true
         }) + ','
@@ -781,8 +785,12 @@ export default {
                 style: 'tdStyle'
                 })
                 for (let keyVal in val) {
+                  let ddStr = ' '
+                  if (dossierObj[val[keyVal]] !== undefined && dossierObj[val[keyVal]] !== null && dossierObj[val[keyVal]] !== '') {
+                    ddStr = dossierObj[val[keyVal]]
+                  }
                   dataRow.push({
-                    text: dossierObj[val[keyVal]], 
+                    text: ddStr, 
                     alignment: 'center',
                     style: 'tdStyle'
                   })
