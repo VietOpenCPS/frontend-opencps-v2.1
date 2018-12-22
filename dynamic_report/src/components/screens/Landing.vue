@@ -578,8 +578,19 @@ export default {
       let widthsConfig = []
       let dataReport = ''
       widthsConfig.push(30)
-      let headerTableReport = []
-      let header2TableReport = []
+      let headerTableReport = '['
+      let header2TableReport = '['
+      headerTableReport += JSON.stringify({
+        text: 'STT',
+        alignment: 'center',
+        bold: true
+      }) + ','
+      header2TableReport += JSON.stringify({
+        text: '(1)',
+        alignment: 'center',
+        italics: true
+      }) + ','
+      /*
       headerTableReport.push({
         text: 'STT',
         alignment: 'center',
@@ -590,10 +601,22 @@ export default {
         alignment: 'center',
         italics: true
       })
+      */
       let ine = 2
       for (let key in val) {
         widthsConfig.push('auto')
         // vm.docDefinition['content'][2]['table']['widths'].push('auto')
+        headerTableReport += JSON.stringify({
+          text: vm.report1Def[val[key]],
+          alignment: 'center',
+          bold: true
+        }) + ','
+        header2TableReport += JSON.stringify({
+          text: '(' + ine + ')',
+          alignment: 'center',
+          italics: true
+        }) + ','
+        /*
         headerTableReport.push({
           text: vm.report1Def[val[key]],
           alignment: 'center',
@@ -604,10 +627,12 @@ export default {
           alignment: 'center',
           italics: true
         })
+        */
         ine = ine + 1
       }
-      dataReport += JSON.stringify(headerTableReport) + ', '
-      dataReport += JSON.stringify(header2TableReport) + ', '
+      dataReport += headerTableReport.substring(0, headerTableReport.length - 1)
+      dataReport += header2TableReport.substring(0, header2TableReport.length - 1)
+      console.log('dataReportdataReportdataReportdataReportdataReport:', dataReport)
       /*
       vm.docDefinition['content'][2]['table']['body'] = []
       vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
