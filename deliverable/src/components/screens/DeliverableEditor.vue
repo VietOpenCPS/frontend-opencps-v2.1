@@ -170,6 +170,34 @@
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
+        let vm = this
+        if (vm.isConnected) {
+          vm.isConnected = false
+          let formId = vm.items[vm.index]['formScriptFileId']
+          vm.deName = ''
+          vm.$store.dispatch('getContentFile', formId)
+          vm.showComponent = false
+          vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+            vm.detail = result
+            vm.deName = vm.detail['deliverableName']
+            vm.showComponent = true
+          })
+          vm.$store.dispatch('getContentFileSimple')
+          vm.tempCounter = vm.pullCounter
+          vm.$socket.onmessage = function (data) {
+            let dataObj = eval('( ' + data.data + ' )')
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            console.log('vm.dataSocket', vm.dataSocket)
+            vm.$store.commit('setdataSocket', vm.dataSocket)
+            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+              vm.tempCounter = vm.tempCounter - 1
+              if (vm.tempCounter < 0) {
+                vm.tempCounter = 0
+              }
+              vm.$store.commit('setpullCounter', vm.tempCounter)
+            }
+          }
+        }
       }
     },
     computed: {
@@ -184,6 +212,16 @@
         // setter
         set: function(newValue) {
           this.$store.commit('setpullCounter', newValue)
+        }
+      },
+      isConnected: {
+        // getter
+        get: function() {
+          return this.$store.getters.getisConnected
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setisConnected', newValue)
         }
       }
     },
