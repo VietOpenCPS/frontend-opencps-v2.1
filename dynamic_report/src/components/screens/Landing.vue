@@ -770,6 +770,8 @@ export default {
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             dataReport += dataReportTotal
           }
+          console.log('dataReport: ', dataReport)
+          docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReport)
           console.log('report2: ', docDString)
           vm.docDefinition = JSON.parse(docDString)
