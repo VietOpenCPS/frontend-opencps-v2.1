@@ -630,8 +630,8 @@ export default {
         */
         ine = ine + 1
       }
-      dataReport += headerTableReport.substring(0, headerTableReport.length - 1)
-      dataReport += header2TableReport.substring(0, header2TableReport.length - 1)
+      dataReport += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
+      dataReport += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
       console.log('dataReportdataReportdataReportdataReportdataReport:', dataReport)
       /*
       vm.docDefinition['content'][2]['table']['body'] = []
@@ -795,7 +795,7 @@ export default {
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             dataReport += dataReportTotal
           }
-          console.log('dataReport: ', dataReport)
+          console.log('dataReport4: ', dataReport)
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReport)
           console.log('report2: ', docDString)
