@@ -117,7 +117,7 @@
     </v-layout>
     <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
       <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="reportType !== 'REPORT_01' && !reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
     </v-layout>
     <v-layout row wrap>
@@ -167,7 +167,7 @@ export default {
     onlines: [],
     online: '',
     itemsReportsConfig: [],
-    report1Def: [],
+    report1Def: {},
     docDefinition: {},
     isDVC: false,
     isCallBack: true,
@@ -263,6 +263,10 @@ export default {
         }
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+        vm.report1Def = {}
+        for (let key in vm.itemsReportsConfig) {
+          vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+        }
         vm.reportType = vm.itemsReports[vm.index]['document']
         if (vm.showConfig) {
           vm.showConfig = false
@@ -357,6 +361,10 @@ export default {
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+      vm.report1Def = {}
+      for (let key in vm.itemsReportsConfig) {
+        vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+      }
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']

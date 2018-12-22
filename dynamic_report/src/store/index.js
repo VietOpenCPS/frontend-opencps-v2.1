@@ -435,9 +435,11 @@ export const store = new Vuex.Store({
     setselected (state, payload) {
       state.selected = payload
     },
+    setselectedText (state, payload) {
+      state.selectedText = payload
+    },
     setreportType (state, payload) {
       state.reportType = payload
-
     },
     setgroupType (state, payload) {
       state.groupType = payload
@@ -473,6 +475,9 @@ export const store = new Vuex.Store({
     },
     selected (state) {
       return state.selected
+    },
+    selectedText (state) {
+      return state.selectedText
     },
     reportType (state) {
       return state.reportType
