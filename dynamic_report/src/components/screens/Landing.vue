@@ -253,6 +253,8 @@ export default {
             vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
             vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
           vm.fromDateShow = true
+        } else {
+          vm.fromDateShow = false
         }
         if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
             vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
@@ -260,6 +262,8 @@ export default {
             vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
             vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
           vm.toDateShow = true
+        } else {
+          vm.toDateShow = false
         }
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -381,6 +385,8 @@ export default {
           vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
           vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
         vm.fromDateShow = true
+      } else {
+        vm.fromDateShow = false
       }
       if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
           vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
@@ -388,6 +394,8 @@ export default {
           vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
           vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
         vm.toDateShow = true
+      } else {
+        vm.toDateShow = false
       }
       if (vm.showConfig) {
         vm.showConfig = false
@@ -863,10 +871,12 @@ export default {
       vm.isShowLoading = true
       let filter = {
         document: vm.reportType,
-        fromStatisticDate: vm.fromDateFormatted,
-        toStatisticDate: vm.toDateFormatted,
         online: vm.online,
         api: vm.api
+      }
+      if (vm.fromDateShow) {
+        filter['fromStatisticDate'] = vm.fromDateFormatted,
+        filter['toStatisticDate'] = vm.toDateFormatted
       }
       if (vm.govAgency) {
         filter['year'] = vm.year
