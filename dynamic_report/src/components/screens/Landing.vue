@@ -521,9 +521,7 @@ export default {
     },
     doCreatePDF (val) {
       let vm = this
-      if (vm.reportType === 'REPORT_01') {
-        vm.doPrintReport()
-      } else if (vm.reportType.startsWith('STATISTIC')) {
+      if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
       } else {
         vm.doDynamicReport(val)
