@@ -138,7 +138,7 @@ export const store = new Vuex.Store({
                       break;
                     }
                   }
-                  if (!exit) {
+                  if (!exit && ((filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) || !filterconfigObject.hasOwnProperty('exclusive'))) {
                     govCodes.push({
                       "value": parseInt(state.groupId),
                       "text": state.siteName
@@ -192,7 +192,7 @@ export const store = new Vuex.Store({
               }
               // push default current siteName
               let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-              if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
+              if (filterconfigObject.hasOwnProperty('govAgencyCode') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
                 let govCodes = filterconfigObject['govAgencyCode']
                 let exit = false
                 for (let key in govCodes) {
@@ -201,7 +201,7 @@ export const store = new Vuex.Store({
                     break;
                   }
                 }
-                if (!exit) {
+                if (!exit && ((filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) || !filterconfigObject.hasOwnProperty('exclusive'))) {
                   govCodes.push({
                     "value": parseInt(state.groupId),
                     "text": state.siteName
