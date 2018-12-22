@@ -531,12 +531,6 @@ export default {
     doDynamicReport (val) {
       let vm = this
       let mappingData = []
-      vm.agencyLists = []
-      vm.years = []
-      vm.api = ''
-      vm.onlines = []
-      vm.fromDateShow = false
-      vm.toDateShow = false
       vm.docDefinition = {}
       let reportName = ''
       let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
@@ -549,12 +543,6 @@ export default {
         onlineStr = 'TRỰC TIẾP/TRỰC TUYẾN'
       }
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
-      vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
-      vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
-      vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       reportName = vm.itemsReports[vm.index]['title']
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
                              .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
@@ -757,6 +745,7 @@ export default {
             dataReport += dataReportTotal
           }
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReport)
+          console.log('report2: ', docDString)
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
