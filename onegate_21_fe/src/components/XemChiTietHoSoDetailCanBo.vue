@@ -2089,7 +2089,7 @@ export default {
     loadVoting () {
       let vm = this
       let filter = {
-        className: 'dosssier',
+        className: 'dossier',
         classPK: vm.id
       }
       vm.$store.dispatch('loadVoting', filter).then(function (result) {
