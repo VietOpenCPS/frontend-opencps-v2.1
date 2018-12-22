@@ -541,7 +541,15 @@ export default {
       vm.toDateShow = false
       vm.docDefinition = {}
       let reportName = ''
-      vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition']))
+      let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      let onlineStr = ''
+      if (String(vm.online) === 'true') {
+        onlineStr = 'TRỰC TUYẾN'
+      } else if (String(vm.online) === 'false') {
+        onlineStr = 'TRỰC TIẾP'
+      } else {
+        onlineStr = 'TRỰC TIẾP/TRỰC TUYẾN'
+      }
       mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -550,6 +558,11 @@ export default {
       vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
       vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       reportName = vm.itemsReports[vm.index]['title']
+      docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+                             .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
+                             .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
+                             .replace(/\[\$online\$\]/g, onlineStr)
+                             .replace(/\[\$reportName\$\]/g, reportName)
       /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['document'] === vm.reportType) {
@@ -560,24 +573,25 @@ export default {
           break
         }
       }
-      */
       if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
       } else {
         vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
       }
-      /*
       for (let key in vm.itemsReports) {
         if (vm.itemsReports[key]['code'] === String(vm.index)) {
           
           break
         }
       }
-      */
       vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
       vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
       vm.docDefinition['content'][2]['table']['widths'] = []
       vm.docDefinition['content'][2]['table']['widths'].push(30)
+      */
+      let widthsConfig = []
+      let dataReport = ''
+      widthsConfig.push(30)
       let headerTableReport = []
       let header2TableReport = []
       headerTableReport.push({
@@ -592,7 +606,8 @@ export default {
       })
       let ine = 2
       for (let key in val) {
-        vm.docDefinition['content'][2]['table']['widths'].push('auto')
+        widthsConfig.push('auto')
+        // vm.docDefinition['content'][2]['table']['widths'].push('auto')
         headerTableReport.push({
           text: vm.report1Def[val[key]],
           alignment: 'center',
@@ -605,9 +620,13 @@ export default {
         })
         ine = ine + 1
       }
+      dataReport += JSON.stringify(headerTableReport) + ', '
+      dataReport += JSON.stringify(header2TableReport) + ', '
+      /*
       vm.docDefinition['content'][2]['table']['body'] = []
       vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
       vm.docDefinition['content'][2]['table']['body'].push(header2TableReport)
+      */
       // bild data
       let filter = {
         document: vm.reportType,
@@ -683,19 +702,36 @@ export default {
             }
           }
           if (domains.length > 0) {
+            let dataReportTotal = ''
+            dataReportTotal += JSON.stringify([{
+              colSpan: val.length + 1,
+              text: domains[0]['domainName'],
+              bold: true,
+              style: 'tdStyle'
+            }]) + ','
+            /*
             vm.docDefinition['content'][2]['table']['body'].push([{
               colSpan: val.length + 1,
               text: domains[0]['domainName'],
               bold: true,
               style: 'tdStyle'
             }])
+            */
             for (let key in domains[0]['services']) {
+              dataReportTotal += JSON.stringify([{
+                colSpan: val.length + 1,
+                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+                bold: true,
+                style: 'tdStyle'
+              }]) + ','
+              /*
               vm.docDefinition['content'][2]['table']['body'].push([{
                 colSpan: val.length + 1,
                 text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
                 bold: true,
                 style: 'tdStyle'
               }])
+              */
               let dossiersArray = domains[0]['services'][key]['dossiers']
               let indexStt = 1
               let dataRow = []
@@ -714,11 +750,16 @@ export default {
                     style: 'tdStyle'
                   })
                 }
-                vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                dataReportTotal += JSON.stringify(dataRow) + ','
+                // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
                 indexStt = indexStt + 1
               }
             }
+            dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
+            dataReport += dataReportTotal
           }
+          docDString = docDString.replace(/"\[\$report\$\]"/g, dataReport)
+          vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -892,7 +933,6 @@ export default {
           }
           dataRowI += JSON.stringify(dataRowTotal)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
-          console.log('docDString: ', docDString)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
