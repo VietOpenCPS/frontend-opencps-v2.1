@@ -572,10 +572,8 @@ export default {
       
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
-        let re = new RegExp(find, 'g')
-        docDString = docDString.replace(re, vm.data[vm.filters[key]['key']])
+        docDString = docDString.replace(eval('/\[\$' + find + '\$\]/g'), vm.data[vm.filters[key]['key']])
         console.log('key hhh: ', docDString)
-        console.log('hhh: ', vm.data[vm.filters[key]['key']])
       }
 
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
