@@ -27,6 +27,17 @@
       </div>
     </div>
     <v-layout row wrap class="filter_menu mt-4">
+      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 0">
+        <v-autocomplete
+          :items="agencyLists"
+          v-model="govAgency"
+          item-text="text"
+          item-value="value"
+          :hide-selected="true"
+          @change="changeGov"
+          >
+        </v-autocomplete>
+      </v-flex>
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date'"
@@ -176,7 +187,7 @@ export default {
         vm.api = ''
         vm.filters = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
-        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -211,7 +222,7 @@ export default {
       }
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       vm.api = ''
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.filters = []
@@ -468,7 +479,7 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.isShowLoading = true
       let filter = {

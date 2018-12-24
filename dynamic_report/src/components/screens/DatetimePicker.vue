@@ -40,6 +40,7 @@
         formatDate (date) {
             if (!date) return null
             let dateObj = new Date(date)
+            this.$emit('input', dateObj.getTime())
             return dateObj.getDate() + '/' + (dateObj.getMonth() + 1) + '/' + dateObj.getFullYear()
         },
         parseDate (date) {
