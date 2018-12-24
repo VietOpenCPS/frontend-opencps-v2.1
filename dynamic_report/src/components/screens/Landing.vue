@@ -31,6 +31,7 @@
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
+          label="Chọn đơn vị"
           item-text="text"
           item-value="value"
           >
