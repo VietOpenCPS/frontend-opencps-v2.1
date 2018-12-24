@@ -572,7 +572,7 @@ export default {
       
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
-        docDString = docDString.replace(eval('/\[\$' + find + '\$\]/g'), vm.data[vm.filters[key]['key']])
+        docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), vm.data[vm.filters[key]['key']])
         console.log('key hhh: ', docDString)
       }
 
