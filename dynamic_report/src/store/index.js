@@ -243,6 +243,9 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId,
               Accept: 'application/json'
+            },
+            params: {
+              
             }
           }
           for (let key in filter['data']) {
