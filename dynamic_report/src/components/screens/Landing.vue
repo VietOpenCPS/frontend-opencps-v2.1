@@ -585,7 +585,7 @@ export default {
           resultDataTotal = []
           for (let key in resultDataVariTotal) {
             console.log('resultData', key)
-            if (key !== undefined && key !== 'undefined_') {
+            if (key === undefined || key === 'undefined_') {
               resultDataTotal.push(resultDataVariTotal[key])
             }
           }
