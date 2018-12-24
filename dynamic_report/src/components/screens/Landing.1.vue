@@ -240,10 +240,8 @@ export default {
         vm.fromDateShow = false
         vm.toDateShow = false
         vm.api = ''
-        vm.filters = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
-        vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
         vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
@@ -379,9 +377,7 @@ export default {
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
       vm.onlines = []
-      vm.filters = []
       vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
-      vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
       // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
       // vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
       if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate'] || 
