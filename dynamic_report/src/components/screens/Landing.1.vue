@@ -27,27 +27,92 @@
       </div>
     </div>
     <v-layout row wrap class="filter_menu mt-2">
-      <v-flex xs12 sm2 v-for="(item, indexTool) in filters" v-bind:key="indexTool">
-        <datetime-picker
-          v-if="item['type'] === 'date'"
-          v-model="data[item.model]" 
-          :item="item" 
-          :data-value="data[item.key]">
-        </datetime-picker>
-        <v-text-field 
-          v-if="item['type'] === 'text'"
-          v-model="data[item.key]" 
-          :label="item['label']">
-        </v-text-field>
-        <v-select
-          v-if="item['type'] === 'select'"
-          :items="item['source']"
-          v-model="data[item.key]"
-          :label="item['label']"
-          single-line
+      <v-flex xs6 sm2 class="px-2" v-if="agencyLists.length > 0">
+        <v-autocomplete
+          :items="agencyLists"
+          v-model="govAgency"
+          item-text="text"
           item-value="value"
+          :hide-selected="true"
+          @change="changeGov"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="years.length > 0">
+        <v-autocomplete
+          :items="years"
+          v-model="year"
           item-text="name"
-        ></v-select>
+          item-value="value"
+          :hide-selected="true"
+          @change="changeYear"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="onlines.length > 0">
+        <v-autocomplete
+          :items="onlines"
+          v-model="online"
+          item-text="name"
+          item-value="value"
+          :hide-selected="true"
+          @change="changeOnline"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm1 class="px-2" v-if="fromDateShow">
+        <v-subheader class="pl-0 text-header" style="float: right;">Từ ngày: </v-subheader>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="fromDateShow">
+        <v-layout wrap>
+          <v-flex>
+            <v-menu
+              ref="menufromDate"
+              :close-on-content-click="false"
+              v-model="menufromDate"
+              lazy
+              transition="scale-transition"
+              offset-y
+              full-width
+              max-width="290px"
+              min-width="290px"
+            >
+              <v-text-field
+                placeholder="dd/mm/yyyy"
+                slot="activator"
+                v-model="fromDateFormatted"
+                append-icon="event"
+                @blur="fromDate = parseDate(fromDateFormatted)"
+              ></v-text-field>
+              <v-date-picker v-model="fromDate" no-title @input="changeFromDate"></v-date-picker>
+            </v-menu>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+      <v-flex xs6 sm1 class="px-2" v-if="toDateShow">
+        <v-subheader class="pl-0 text-header" style="float: right;">Đến ngày:</v-subheader>
+      </v-flex>
+      <v-flex xs6 sm2 class="px-2" v-if="toDateShow">
+        <v-menu
+          ref="menutoDate"
+          :close-on-content-click="false"
+          v-model="menutoDate"
+          lazy
+          transition="scale-transition"
+          offset-y
+          full-width
+          max-width="290px"
+          min-width="290px"
+        >
+          <v-text-field
+            placeholder="dd/mm/yyyy"
+            slot="activator"
+            v-model="toDateFormatted"
+            append-icon="event"
+            @blur="toDate = parseDate(toDateFormatted)"
+          ></v-text-field>
+          <v-date-picker v-model="toDate" :min="toDateMin" no-title @input="changeToDate"></v-date-picker>
+        </v-menu>
       </v-flex>
     </v-layout>
     <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
@@ -91,13 +156,11 @@ import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
-import DatetimePicker from './DatetimePicker.vue'
 
 export default {
   props: ['index'],
   components: {
-    'vue-friendly-iframe': VueFriendlyIframe,
-    DatetimePicker
+    'vue-friendly-iframe': VueFriendlyIframe
   },
   data: () => ({
     api: '',
@@ -130,8 +193,7 @@ export default {
     isCallData: false,
     nameReport: '',
     showConfig: false,
-    filters: [],
-    data: {}
+    filters: []
   }),
   computed: {
     itemsReports () {
@@ -792,7 +854,7 @@ export default {
       } else if (String(vm.online) === 'false') {
         onlineStr = 'TRỰC TIẾP'
       } else {
-        onlineStr = ''
+        onlineStr = 'TRỰC TIẾP/TRỰC TUYẾN'
       }
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
                              .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
@@ -814,8 +876,17 @@ export default {
       vm.isShowLoading = true
       let filter = {
         document: vm.reportType,
-        data: vm.data,
+        online: vm.online,
         api: vm.api
+      }
+      if (vm.fromDateShow) {
+        filter['fromStatisticDate'] = vm.fromDateFormatted,
+        filter['toStatisticDate'] = vm.toDateFormatted
+      }
+      if (vm.govAgency) {
+        filter['year'] = vm.year
+        filter['govAgency'] = vm.govAgency
+        filter['agencyLists'] = vm.agencyLists
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
