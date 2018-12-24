@@ -521,7 +521,7 @@ export default {
 
           for (let key in respData['data']) {
             let result = respData['data'][key]['data']
-            vm.buildDataRowStatic(result, dataRowI, index)
+            vm.buildDataRowStatic(result, dataRowI, index, dataRowTotal)
           }
           console.log('dataRowI', dataRowI)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
@@ -639,7 +639,7 @@ export default {
         vm.doCreatePDF(vm.selected)
       })
     },
-    buildDataRowStatic (result, dataRowI, index) {
+    buildDataRowStatic (result, dataRowI, index, dataRowTotal) {
       let vm = this
       let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
       let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
