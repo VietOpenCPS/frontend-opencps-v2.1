@@ -521,8 +521,48 @@ export default {
 
           for (let key in respData['data']) {
             let result = respData['data'][key]['data']
-            vm.buildDataRowStatic(result, dataRowI, index)
+            // TODO
+            let resultData = result.filter(function(obj) {
+              for (let keySe in selection) {
+                if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                  return obj
+                }
+              }
+            })
+            let resultDataTotal = resultData.filter(function(obj) {
+              if (obj[sumKey] === '' || obj[sumKey] === undefined || obj[sumKey] === null) {
+                  return obj
+              }
+            })
+            for (let key in resultData) {
+              if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+                let dataRow = []
+                dataRow.push({
+                  text: index, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                let indexTotal = 1
+                for (let keyMapping in vm.itemsReportsConfig) {
+                  let dataText = ''
+                  let currentConfig = vm.itemsReportsConfig[keyMapping]
+                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                    dataText = resultData[key][currentConfig['value']] + ' '
+                  }
+                  dataRow.push({
+                    text: dataText, 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                  indexTotal = indexTotal + 1
+                }
+                index = index + 1
+                // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                dataRowI += JSON.stringify(dataRow) + ','
+              }
+            }
           }
+          console.log('dataRowI', dataRowI)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
