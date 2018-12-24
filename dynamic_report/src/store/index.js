@@ -261,8 +261,6 @@ export const store = new Vuex.Store({
           }
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
-          console.log('govAgencygovAgencygovAgency: ', govAgency)
-          console.log('agencyListsagencyListsagencyLists: ', agencyLists)
           let requestURL = ''
           if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
@@ -272,10 +270,7 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve({
-                    type: 0,
-                    data: serializable.data
-                  })
+                  resolve(serializable.data)
                 } else {
                   resolve(null)
                 }
@@ -323,10 +318,7 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve({
-                    type: 0,
-                    data: serializable.data
-                  })
+                  resolve(serializable.data)
                 } else {
                   resolve(null)
                 }
