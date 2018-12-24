@@ -33,8 +33,6 @@
           v-model="govAgency"
           item-text="text"
           item-value="value"
-          :hide-selected="true"
-          @change="changeGov"
           >
         </v-autocomplete>
       </v-flex>
@@ -306,10 +304,8 @@ export default {
         document: vm.reportType
       }
       filter['api'] = vm.api
-      if (vm.govAgency) {
-        filter['govAgency'] = vm.govAgency
-        filter['agencyLists'] = vm.agencyLists
-      }
+      filter['govAgency'] = vm.govAgency
+      filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
@@ -487,6 +483,8 @@ export default {
         data: vm.data,
         api: vm.api
       }
+      filter['govAgency'] = vm.govAgency
+      filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
