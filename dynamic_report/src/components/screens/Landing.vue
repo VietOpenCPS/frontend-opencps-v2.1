@@ -531,6 +531,7 @@ export default {
             }
           })
           for (let key in resultData) {
+            console.log(key + ': ', JSON.stringify(resultData[key]))
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
               dataRow.push({
