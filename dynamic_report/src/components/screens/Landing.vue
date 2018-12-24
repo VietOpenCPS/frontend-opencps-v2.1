@@ -552,6 +552,7 @@ export default {
             }
           }
           console.log('resultDataVari', resultDataVari)
+          /*
           resultData = []
           for (let key in resultDataVari) {
             console.log('resultData', key)
@@ -559,6 +560,7 @@ export default {
               resultData.push(resultDataVari[key])
             }
           }
+          */
           console.log('resultData', resultData)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
