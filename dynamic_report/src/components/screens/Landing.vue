@@ -611,17 +611,18 @@ export default {
           }
           let dataRowI = ''
           let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
-          let selection = vm.itemsReports[vm.index]['filterConfig']['sumKey']
-
+          let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+          console.log('selection: ', selection)
           // TODO
-          result = result.filter(function(obj) {
+          let dkstest = result.filter(function(obj) {
             for (let keySe in selection) {
+              console.log('xxx: ', obj[selection[keySe]['key']])
               if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                 return obj
               }
             }
           })
-          console.log('result: ', result)
+          console.log('dkstest: ', dkstest)
           for (let key in result) {
             let dataRow = []
             dataRow.push({
