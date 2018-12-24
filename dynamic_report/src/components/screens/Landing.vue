@@ -571,10 +571,11 @@ export default {
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
       
       for (let key in vm.filters) {
-        console.log('key hhh: ', vm.filters[key]['key'])
+        let find = vm.filters[key]['key']
+        let re = new RegExp(find, 'g')
+        docDString = docDString.replace(re, vm.data[vm.filters[key]['key']])
+        console.log('key hhh: ', str)
         console.log('hhh: ', vm.data[vm.filters[key]['key']])
-        let regul = '/\[\$' + vm.filters[key]['key'] + '\$\]/g'
-        docDString = docDString.replace(regul, vm.data[vm.filters[key]['key']])
       }
 
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
