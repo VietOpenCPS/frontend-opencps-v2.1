@@ -581,10 +581,10 @@ export default {
             for (let keyMapping in vm.itemsReportsConfig) {
               let dataText = ''
               let currentConfig = vm.itemsReportsConfig[keyMapping]
-              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null) {
+              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
                 dataText = resultDataTotal[key][currentConfig['value']] + ' '
               }
-              dataRowTotal[indexTotal]['text'] = resultDataTotal[key][currentConfig['value']] + ' '
+              dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText) + ' '
               indexTotal = indexTotal + 1
             }
           }
