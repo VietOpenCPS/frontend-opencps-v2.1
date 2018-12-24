@@ -299,6 +299,7 @@ export const store = new Vuex.Store({
                     }
                   }
                 }
+                console.log('serializable', serializable)
                 if (serializable.length > 0) {
                   resolve(serializable)
                 } else {
