@@ -294,6 +294,7 @@ export const store = new Vuex.Store({
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
                     let myl = args[i]['data']['data']
+                    console.log('mylmyl', myl)
                     for (let bibo in myl) {
                       myObject.push(myl[bibo])
                     }
