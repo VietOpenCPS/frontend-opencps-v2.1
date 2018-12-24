@@ -33,7 +33,7 @@
     watch: {
         toDate (val) {
             this.toDateFormatted = this.formatDate(val)
-            this.$emit('input', this.toDateFormatted)
+            this.$emit('input', new Date(val).getTime())
         }
     },
     methods: {
