@@ -532,28 +532,6 @@ export default {
             }
           })
           console.log('resultDataTotal: ', resultDataTotal)
-          let resultDataVariTotal = {}
-          for (let key in resultDataTotal) {
-            let keyVari = ''
-            for (let keysd in merge) {
-              keyVari += resultDataTotal[key][merge[keysd]] + '_'
-            }
-            if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
-              resultDataVariTotal[keyVari] = resultDataTotal[key]
-            } else {
-              for (let kkey in resultDataVariTotal[keyVari]) {
-                if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
-                  if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
-                    resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
-                  } else if (kkey === 'ontimePercentage') {
-                    resultDataVariTotal[keyVari][kkey] = (parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey]))/2
-                  } else {
-                    resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
-                  }
-                }
-              }
-            }
-          }
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -582,13 +560,6 @@ export default {
               resultData.push(resultDataVari[key])
             }
           }
-          resultDataTotal = []
-          for (let key in resultDataVariTotal) {
-            console.log('resultData', key)
-            if (key === undefined || key === 'undefined_') {
-              resultDataTotal.push(resultDataVariTotal[key])
-            }
-          }
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
@@ -609,6 +580,17 @@ export default {
                   alignment: 'center',
                   style: 'tdStyle'
                 })
+                if (vm.govAgency === 0) {
+                  if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
+                    if (currentConfig['value'] === 'ontimePercentage') {
+                      dataRowTotal[indexTotal]['text'] = (parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)) / 2
+                    } else if (isNaN(dataText)) {
+                      dataRowTotal[indexTotal]['text'] = ' '
+                    } else {
+                      dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)
+                    }
+                  }
+                }
                 indexTotal = indexTotal + 1
               }
               index = index + 1
@@ -616,16 +598,48 @@ export default {
               dataRowI += JSON.stringify(dataRow) + ','
             }
           }
-          for (let key in resultDataTotal) {
-            let indexTotal = 1
-            for (let keyMapping in vm.itemsReportsConfig) {
-              let dataText = ''
-              let currentConfig = vm.itemsReportsConfig[keyMapping]
-              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
-                dataText = resultDataTotal[key][currentConfig['value']] + ' '
+
+          if (vm.govAgency !== 0) {
+            let resultDataVariTotal = {}
+            for (let key in resultDataTotal) {
+              let keyVari = ''
+              for (let keysd in merge) {
+                keyVari += resultDataTotal[key][merge[keysd]] + '_'
               }
-              dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
-              indexTotal = indexTotal + 1
+              if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
+                resultDataVariTotal[keyVari] = resultDataTotal[key]
+              } else {
+                for (let kkey in resultDataVariTotal[keyVari]) {
+                  if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
+                    if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
+                      resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
+                    } else if (kkey === 'ontimePercentage') {
+                      resultDataVariTotal[keyVari][kkey] = (parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey]))/2
+                    } else {
+                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
+                    }
+                  }
+                }
+              }
+            }
+            resultDataTotal = []
+            for (let key in resultDataVariTotal) {
+              console.log('resultData', key)
+              if (key === undefined || key === 'undefined_') {
+                resultDataTotal.push(resultDataVariTotal[key])
+              }
+            }
+            for (let key in resultDataTotal) {
+              let indexTotal = 1
+              for (let keyMapping in vm.itemsReportsConfig) {
+                let dataText = ''
+                let currentConfig = vm.itemsReportsConfig[keyMapping]
+                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
+                }
+                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+                indexTotal = indexTotal + 1
+              }
             }
           }
           dataRowI += JSON.stringify(dataRowTotal)
