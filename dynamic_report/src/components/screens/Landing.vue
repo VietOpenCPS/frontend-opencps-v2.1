@@ -534,8 +534,8 @@ export default {
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
-            for (let key in merge) {
-              keyVari += merge[key] + '_'
+            for (let keysd in merge) {
+              keyVari += resultData[key][merge[keysd]] + '_'
             }
             if (resultDataVari[keyVari] === undefined || resultDataVari[keyVari] === null || resultDataVari[keyVari] === '') {
               resultDataVari[keyVari] = resultData[key]
