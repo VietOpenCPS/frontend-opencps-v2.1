@@ -531,6 +531,7 @@ export default {
                 return obj
             }
           })
+          console.log('resultDataTotal: ', resultDataTotal)
           let resultDataVariTotal = {}
           for (let key in resultDataTotal) {
             let keyVari = ''
@@ -624,7 +625,7 @@ export default {
               if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
                 dataText = resultDataTotal[key][currentConfig['value']] + ' '
               }
-              dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText) + ' '
+              dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
               indexTotal = indexTotal + 1
             }
           }
