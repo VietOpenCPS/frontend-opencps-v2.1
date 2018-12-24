@@ -531,6 +531,28 @@ export default {
                 return obj
             }
           })
+          let resultDataVariTotal = {}
+          for (let key in resultDataTotal) {
+            let keyVari = ''
+            for (let keysd in merge) {
+              keyVari += resultDataTotal[key][merge[keysd]] + '_'
+            }
+            if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
+              resultDataVariTotal[keyVari] = resultDataTotal[key]
+            } else {
+              for (let kkey in resultDataVariTotal[keyVari]) {
+                if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
+                  if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
+                    resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
+                  } else if (kkey === 'ontimePercentage') {
+                    resultDataVariTotal[keyVari][kkey] = (parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey]))/2
+                  } else {
+                    resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
+                  }
+                }
+              }
+            }
+          }
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -553,15 +575,20 @@ export default {
               }
             }
           }
-          console.log('resultDataVari', resultDataVari)
+          console.log('resultDataVariTotal', resultDataVariTotal)
           resultData = []
           for (let key in resultDataVari) {
-            console.log('resultData', key)
             if (key !== undefined && key !== 'undefined_') {
               resultData.push(resultDataVari[key])
             }
           }
-          console.log('resultData', resultData)
+          resultDataTotal = []
+          for (let key in resultDataVariTotal) {
+            console.log('resultData', key)
+            if (key !== undefined && key !== 'undefined_') {
+              resultDataTotal.push(resultDataVariTotal[key])
+            }
+          }
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
