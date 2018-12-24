@@ -32,7 +32,7 @@
           v-if="item['type'] === 'date'"
           v-model="data[item.key]" 
           :item="item" 
-          :data-value="data[item.key]">
+          :data-value="data[item.value]">
         </datetime-picker>
         <v-text-field 
           v-if="item['type'] === 'text'"
@@ -222,123 +222,9 @@ export default {
           vm.showConfig = true
         }, 200)
       }
-    },
-    fromDate (val) {
-      this.toDateMin = val
-      this.fromDateFormatted = this.formatDate(this.fromDate)
-    },
-    toDate (val) {
-      this.toDateFormatted = this.formatDate(val)
     }
   },
   methods: {
-    changeGov (item) {
-      let vm = this
-      vm.govAgency = item
-      if (vm.govAgency === 0 || String(vm.govAgency) === '0') {
-        vm.groupType = 'gov'
-      } else {
-        vm.groupType = 'domain'
-      }
-      vm.$router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          // month: vm.month,
-          fromDate: vm.fromDateFormatted,
-          toDate: vm.toDateFormatted,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
-    },
-    changeYear (item) {
-      let vm = this
-      vm.year = item
-      if (vm.year) {
-        vm.fromDateFormatted = ''
-        vm.toDateFormatted = ''
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            fromDate: '',
-            toDate: '',
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      } else {
-        let date = new Date()
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            fromDate: new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN'),
-            toDate: new Date().toLocaleDateString('vi-VN'),
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      }
-    },
-    changeMonth (item) {
-      let vm = this
-      vm.month = item
-      vm.$router.push({
-        path: '/bao-cao/' + vm.index,
-        query: {
-          year: vm.year,
-          month: vm.month,
-          fromDate: vm.fromDate,
-          toDate: vm.toDate,
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
-    },
-    changeFromDate () {
-      let vm = this
-      vm.menufromDate = false
-      vm.fromDateFormatted = vm.formatDate(vm.fromDate)
-      if (vm.fromDateFormatted && vm.toDateFormatted) {
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            month: vm.month,
-            fromDate: vm.fromDateFormatted,
-            toDate: vm.toDateFormatted,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      }
-    },
-    changeToDate () {
-      let vm = this
-      vm.menutoDate = false
-      vm.toDateFormatted = vm.formatDate(vm.toDate)
-      if (vm.fromDateFormatted && vm.toDateFormatted) {
-        vm.$router.push({
-          path: '/bao-cao/' + vm.index,
-          query: {
-            year: vm.year,
-            // month: vm.month,
-            fromDate: vm.fromDateFormatted,
-            toDate: vm.toDateFormatted,
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      }
-    },
-    formatDate (date) {
-      if (!date) return null
-      console.log('formatDate', date)
-      const [year, month, day] = date.split('-')
-      return `${day}/${month}/${year}`
-    },
-    parseDate (date) {
-      if (!date) return null
-      console.log('parseDate', date)
-      const [day, month, year] = date.split('/')
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-    },
     doCreatePDF (val) {
       let vm = this
       if (vm.reportType.startsWith('STATISTIC')) {
@@ -534,8 +420,6 @@ export default {
                 indexStt = indexStt + 1
               }
             }
-            console.log('dataReportTotal: ', dataReportTotal)
-            console.log('dataReport: ', dataReportXX)
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             dataReportXX += dataReportTotal
           }
@@ -623,11 +507,9 @@ export default {
           let dataRowI = ''
           let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
           let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
-          console.log('selection: ', selection)
           // TODO
           let resultData = result.filter(function(obj) {
             for (let keySe in selection) {
-              console.log('xxx: ', obj[selection[keySe]['key']])
               if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                 return obj
               }
@@ -638,8 +520,6 @@ export default {
                 return obj
             }
           })
-          console.log('resultData: ', resultData)
-          console.log('resultDataTotal: ', resultDataTotal)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
@@ -691,117 +571,6 @@ export default {
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
-        }
-      })
-    },
-    doPrintReport () {
-      let vm = this
-      let filter = {
-        document: vm.reportType
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate']) {
-        filter['fromFinishDate'] = vm.fromDateFormatted
-        filter['toFinishDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate']) {
-        filter['fromReleaseDate'] = vm.fromDateFormatted
-        filter['toReleaseDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate']) {
-        filter['fromReceiveNotDoneDate'] = vm.fromDateFormatted
-        filter['toReceiveNotDoneDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate']) {
-        filter['fromReceiveDate'] = vm.fromDateFormatted
-        filter['toReceiveDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
-        filter['fromStatisticDate'] = vm.fromDateFormatted
-        filter['toStatisticDate'] = vm.toDateFormatted
-      }
-      filter['api'] = vm.api
-      if (vm.reportType === 'REPORT_01') {
-        filter['year'] = vm.year
-      }
-      if (vm.isDVC && vm.govAgency !== 0 && String(vm.govAgency) !== '0') {
-        filter['agency'] = vm.govAgency
-      } else if (vm.isDVC && (vm.govAgency === 0 || String(vm.govAgency) === '0')) {
-        filter['agency'] = 'all'
-      }
-      vm.pdfBlob = null
-      vm.isShowLoading = true
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        let putData = {}
-        if (result !== null && result !== undefined) {
-          putData = result
-          if (filter['agency'] === 'all') {
-            putData['flagAgency'] = 1
-          } else {
-            putData['flagAgency'] = 0
-          }
-          if (vm.reportType === 'REPORT_01') {
-            putData['year'] = vm.year
-            // putData['month'] = vm.month
-            putData['fromStatisticDate'] = vm.fromDateFormatted
-            putData['toStatisticDate'] = vm.toDateFormatted
-          } else {
-            putData['fromDate'] = vm.fromDateFormatted
-            putData['toDate'] = vm.toDateFormatted
-          }
-          let filterPostData = {
-            document: vm.reportType,
-            data: putData
-          }
-          vm.$store.dispatch('doStatisticReportPrint', filterPostData).then(function (result) {
-            vm.pdfBlob = result
-            vm.isShowLoading = false
-          })
-        } else {
-          // vm.agencyLists = []
-          vm.isShowLoading = false
-        }
-      })
-    },
-    doExcelFunc () {
-      let vm = this
-      let filter = {
-        document: vm.reportType,
-        fromDate: vm.fromDateFormatted,
-        toDate: vm.toDateFormatted
-      }
-      if (vm.reportType === 'REPORT_01') {
-        filter['year'] = vm.year
-      }
-      if (vm.isDVC && vm.govAgency) {
-        filter['agency'] = vm.govAgency['itemCode']
-      } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
-      }
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        let putData = {}
-        if (result !== null && result !== undefined) {
-          putData = result
-          if (filter['agency'] === 'all') {
-            putData['flagAgency'] = 1
-          } else {
-            putData['flagAgency'] = 0
-          }
-          if (vm.reportType === 'REPORT_01') {
-            putData['year'] = vm.year
-            putData['month'] = '0'
-            putData['fromStatisticDate'] = vm.fromDateFormatted
-            putData['toStatisticDate'] = vm.toDateFormatted
-          } else {
-            putData['fromDate'] = vm.fromDateFormatted
-            putData['toDate'] = vm.toDateFormatted
-          }
-          putData['reportType'] = 'excel'
-          let filterPostData = {
-            document: vm.reportType,
-            data: putData,
-            download: true
-          }
-          vm.$store.dispatch('doStatisticReportPrint', filterPostData)
         }
       })
     },
