@@ -594,8 +594,8 @@ export default {
             alignment: 'center',
             style: 'tdStyle'
           })
-          for (let keyMapping in vm.reportConfig) {
-            if (vm.reportConfig[keyMapping]['value'] === 'note') {
+          for (let keyMapping in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
               dataRowTotal.push({
                 text: '', 
                 alignment: 'center',
@@ -619,9 +619,9 @@ export default {
               style: 'tdStyle'
             })
             let indexTotal = 1
-            for (let keyMapping in vm.reportConfig) {
+            for (let keyMapping in vm.itemsReportsConfig) {
               let dataText = ''
-              let currentConfig = vm.reportConfig[keyMapping]
+              let currentConfig = vm.itemsReportsConfig[keyMapping]
               if (result[key][currentConfig['value']] !== undefined && result[key][currentConfig['value']] !== null) {
                 dataText = result[key][currentConfig['value']] + ' '
               }
