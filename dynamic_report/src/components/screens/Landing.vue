@@ -542,7 +542,7 @@ export default {
             } else {
               for (let kkey in resultDataVari[keyVari]) {
                 if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
-                  if (String(parseInt('sdsdfsf')) === 'NaN') {
+                  if (String(parseInt(resultDataVari[keyVari][kkey])) === 'NaN') {
                     resultDataVari[keyVari][kkey] = resultData[key][kkey]
                   } else {
                     resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
