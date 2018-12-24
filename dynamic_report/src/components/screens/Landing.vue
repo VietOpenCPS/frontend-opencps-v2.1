@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <v-layout row wrap class="filter_menu mt-2">
+    <v-layout row wrap class="filter_menu mt-4">
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date'"
@@ -173,10 +173,6 @@ export default {
     vm.$nextTick(function () {
       setTimeout(() => {
         vm.agencyLists = []
-        vm.years = []
-        vm.onlines = []
-        vm.fromDateShow = false
-        vm.toDateShow = false
         vm.api = ''
         vm.filters = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
@@ -184,28 +180,6 @@ export default {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-        vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
-        vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
-        // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
-        // vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
-        if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate'] || 
-            vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
-          vm.fromDateShow = true
-        } else {
-          vm.fromDateShow = false
-        }
-        if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
-            vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['toReceiveNotDoneDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
-            vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
-          vm.toDateShow = true
-        } else {
-          vm.toDateShow = false
-        }
         vm.itemsReportsConfig = []
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         vm.report1Def = {}
@@ -219,60 +193,8 @@ export default {
             vm.showConfig = true
           }, 200)
         }
-        /*
-        for (let key in vm.itemsReports) {
-          if (vm.itemsReports[key]['document'] === vm.reportType) {
-            vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
-            break
-          }
-        }
-        console.log('itemsReports', vm.itemsReports)
-        console.log('reportType', vm.reportType)
-        console.log('agencyLists', vm.agencyLists)
-        */
         vm.pdfBlob = ''
-        let currentParams = vm.$router.history.current.params
-        let currentQuerys = vm.$router.history.current.query
-        if (currentQuerys.hasOwnProperty('fromDate')) {
-          vm.fromDateFormatted = currentQuerys.fromDate
-        } else {
-          vm.fromDateFormatted = ''
-          let date = new Date()
-          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
-        }
-        if (currentQuerys.hasOwnProperty('toDate')) {
-          vm.toDateFormatted = currentQuerys.toDate
-        } else {
-          vm.toDateFormatted = ''
-          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
-        }
       }, 500)
-      /*
-      setTimeout(() => {
-        let currentParams = vm.$router.history.current.params
-        let currentQuerys = vm.$router.history.current.query
-        if (currentQuerys.hasOwnProperty('fromDate')) {
-          vm.year = currentQuerys.fromDate ? '' : vm.year
-          vm.fromDateFormatted = currentQuerys.fromDate
-        } else {
-          vm.fromDateFormatted = ''
-          let date = new Date()
-          vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
-        }
-        if (currentQuerys.hasOwnProperty('toDate')) {
-          vm.year = currentQuerys.toDate ? '' : vm.year
-          vm.toDateFormatted = currentQuerys.toDate
-        } else {
-          vm.toDateFormatted = ''
-          vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
-        }
-        if (vm.toDateFormatted !== '' && vm.fromDateFormatted !== '') {
-          vm.year = ''
-        }
-        vm.doCreatePDF(vm.selected)
-        console.log('watch created')
-      }, 200)
-      */
     })
   },
   watch: {
@@ -280,29 +202,6 @@ export default {
       let vm = this
       console.debug(oldRoute)
       let currentQuery = newRoute.query
-      if (currentQuery.hasOwnProperty('fromDate')) {
-        vm.year = currentQuery.fromDate ? '' : vm.year
-        vm.fromDateFormatted = currentQuery.fromDate
-      } else {
-        vm.fromDateFormatted = ''
-        let date = new Date()
-        vm.fromDateFormatted = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString('vi-VN')
-      }
-      if (currentQuery.hasOwnProperty('toDate')) {
-        vm.toDateFormatted = currentQuery.toDate
-      } else {
-        vm.toDateFormatted = ''
-        vm.toDateFormatted = new Date().toLocaleDateString('vi-VN')
-      }
-      /*
-      if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate !== '' && currentQuery.toDate !== '') {
-        vm.doCreatePDF(vm.selected)
-        console.log('watch route1')
-      } else if (currentQuery.hasOwnProperty('toDate') && currentQuery.hasOwnProperty('fromDate') && currentQuery.fromDate === '' && currentQuery.toDate === '' && currentQuery.year !== '') {
-        vm.doCreatePDF(vm.selected)
-        console.log('watch route2')
-      }
-      */
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -315,31 +214,8 @@ export default {
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = ''
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-      vm.years = vm.itemsReports[vm.index]['filterConfig']['year']
-      vm.onlines = []
       vm.filters = []
-      vm.onlines = vm.itemsReports[vm.index]['filterConfig']['online']
       vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-      // vm.fromDateShow = vm.itemsReports[vm.index]['filterConfig']['fromDate']
-      // vm.toDateShow = vm.itemsReports[vm.index]['filterConfig']['toDate']
-      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate'] || 
-          vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
-        vm.fromDateShow = true
-      } else {
-        vm.fromDateShow = false
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['toFinishDate'] || 
-          vm.itemsReports[vm.index]['filterConfig']['toReleaseDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['toReceiveNotDoneDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['toReceiveDate'] ||
-          vm.itemsReports[vm.index]['filterConfig']['toStatisticDate']) {
-        vm.toDateShow = true
-      } else {
-        vm.toDateShow = false
-      }
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
@@ -347,21 +223,6 @@ export default {
         }, 200)
       }
     },
-    /*
-    groupType (val) {
-      console.debug(val)
-      console.log('watch groupType')
-      if (this.isCallData) {
-        this.doCreatePDF(this.selected)
-      }
-    },
-    selected (val) {
-      console.log('watch selected')
-      if (this.isCallData) {
-        this.doCreatePDF(val)
-      }
-    },
-    */
     fromDate (val) {
       this.toDateMin = val
       this.fromDateFormatted = this.formatDate(this.fromDate)
@@ -489,7 +350,6 @@ export default {
     },
     doDynamicReport (val) {
       let vm = this
-      let mappingData = []
       vm.docDefinition = {}
       let reportName = ''
       let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
@@ -501,39 +361,12 @@ export default {
       } else {
         onlineStr = ''
       }
-      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       reportName = vm.itemsReports[vm.index]['title']
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
                              .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
                              .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
                              .replace(/\[\$online\$\]/g, onlineStr)
                              .replace(/\[\$reportName\$\]/g, reportName)
-      /*
-      for (let key in vm.itemsReports) {
-        if (vm.itemsReports[key]['document'] === vm.reportType) {
-          console.log('doDynamic: ', vm.itemsReports[key])
-          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
-          mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
-          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
-          break
-        }
-      }
-      if (vm.fromDateFormatted !== '' && vm.toDateFormatted !== '' && vm.year === '') {
-        vm.docDefinition['content'][1]['text'][2]['text'] = 'Từ ngày ' + vm.fromDateFormatted + ' đến ngày ' + vm.toDateFormatted
-      } else {
-        vm.docDefinition['content'][1]['text'][2]['text'] = 'Năm: ' + vm.year
-      }
-      for (let key in vm.itemsReports) {
-        if (vm.itemsReports[key]['code'] === String(vm.index)) {
-          
-          break
-        }
-      }
-      vm.docDefinition['content'][1]['text'][0]['text'] = 'BÁO CÁO ' + reportName + '\n'
-      vm.docDefinition['content'][0]['columns'][0]['text'][0] = vm.$store.getters.siteName + '\n'
-      vm.docDefinition['content'][2]['table']['widths'] = []
-      vm.docDefinition['content'][2]['table']['widths'].push(30)
-      */
       let widthsConfig = []
       let dataReportXX = ''
       widthsConfig.push(30)
@@ -549,18 +382,6 @@ export default {
         alignment: 'center',
         italics: true
       }) + ','
-      /*
-      headerTableReport.push({
-        text: 'STT',
-        alignment: 'center',
-        bold: true
-      })
-      header2TableReport.push({
-        text: '(1)',
-        alignment: 'center',
-        italics: true
-      })
-      */
       let ine = 2
       for (let key in val) {
         widthsConfig.push('auto')
@@ -579,61 +400,15 @@ export default {
           alignment: 'center',
           italics: true
         }) + ','
-        /*
-        headerTableReport.push({
-          text: vm.report1Def[val[key]],
-          alignment: 'center',
-          bold: true
-        })
-        header2TableReport.push({
-          text: '(' + ine + ')',
-          alignment: 'center',
-          italics: true
-        })
-        */
         ine = ine + 1
       }
       dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
       dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
-      console.log('dataReportdataReportdataReportdataReportdataReport:', dataReportXX)
-      /*
-      vm.docDefinition['content'][2]['table']['body'] = []
-      vm.docDefinition['content'][2]['table']['body'].push(headerTableReport)
-      vm.docDefinition['content'][2]['table']['body'].push(header2TableReport)
-      */
       // bild data
       let filter = {
         document: vm.reportType
       }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromFinishDate']) {
-        filter['fromFinishDate'] = vm.fromDateFormatted
-        filter['toFinishDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReleaseDate']) {
-        filter['fromReleaseDate'] = vm.fromDateFormatted
-        filter['toReleaseDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveNotDoneDate']) {
-        filter['fromReceiveNotDoneDate'] = vm.fromDateFormatted
-        filter['toReceiveNotDoneDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromReceiveDate']) {
-        filter['fromReceiveDate'] = vm.fromDateFormatted
-        filter['toReceiveDate'] = vm.toDateFormatted
-      }
-      if (vm.itemsReports[vm.index]['filterConfig']['fromStatisticDate']) {
-        filter['fromStatisticDate'] = vm.fromDateFormatted
-        filter['toStatisticDate'] = vm.toDateFormatted
-      }
       filter['api'] = vm.api
-      if (vm.reportType === 'REPORT_01') {
-        filter['year'] = vm.year
-      }
-      if (vm.isDVC && vm.govAgency !== 0 && String(vm.govAgency) !== '0') {
-        filter['agency'] = vm.govAgency
-      } else if (vm.isDVC && (vm.govAgency === 0 || String(vm.govAgency) === '0')) {
-        filter['agency'] = 'all'
-      }
       if (vm.govAgency) {
         filter['govAgency'] = vm.govAgency
         filter['agencyLists'] = vm.agencyLists
@@ -781,7 +556,6 @@ export default {
     },
     doPrintReportFix () {
       let vm = this
-      let mappingData = []
       vm.agencyLists = []
       vm.api = ''
       vm.docDefinition = {}
@@ -798,19 +572,9 @@ export default {
                              .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
                              .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
                              .replace(/\[\$online\$\]/g, onlineStr)
-      mappingData = vm.itemsReports[vm.index]['filterConfig']['mappingData']
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-      /*
-      for (let key in vm.itemsReports) {
-        if (vm.itemsReports[key]['document'] === vm.reportType) {
-          vm.docDefinition = JSON.parse(JSON.stringify(vm.itemsReports[key]['tableConfig']['docDefinition']))
-          mappingData = vm.itemsReports[key]['filterConfig']['mappingData']
-          vm.agencyLists = vm.itemsReports[key]['filterConfig']['govAgencyCode']
-          break
-        }
-      }
-      */
+    
       vm.isShowLoading = true
       let filter = {
         document: vm.reportType,
@@ -830,15 +594,8 @@ export default {
             alignment: 'center',
             style: 'tdStyle'
           })
-          for (let keyMapping in mappingData) {
-            if (mappingData[keyMapping] === 'processCount' || mappingData[keyMapping] === 'releaseCount' || mappingData[keyMapping] === 'processingCount') {
-              dataRowTotal.push({
-                text: 0, 
-                bold: true,
-                alignment: 'center',
-                style: 'tdStyle'
-              })
-            } else if (mappingData[keyMapping] === 'note') {
+          for (let keyMapping in vm.reportConfig) {
+            if (vm.reportConfig[keyMapping]['value'] === 'note') {
               dataRowTotal.push({
                 text: '', 
                 alignment: 'center',
@@ -853,84 +610,34 @@ export default {
             }
           }
           let dataRowI = ''
+          let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
           for (let key in result) {
-            let flag = false
-            /*
-            if (String(vm.govAgency) !== '0' && String(vm.govAgency) !== '' && String(vm.govAgency) !== '0') {
-              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
-                flag = true
-              } else {
-                flag = false
+            let dataRow = []
+            dataRow.push({
+              text: index, 
+              alignment: 'center',
+              style: 'tdStyle'
+            })
+            let indexTotal = 1
+            for (let keyMapping in vm.reportConfig) {
+              let dataText = ''
+              let currentConfig = vm.reportConfig[keyMapping]
+              if (result[key][currentConfig['value']] !== undefined && result[key][currentConfig['value']] !== null) {
+                dataText = result[key][currentConfig['value']] + ' '
               }
-            } else {
-              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
-                flag = true
-              } else {
-                flag = false
-              }
-            }
-            */
-            if (String(mappingData[0]) === 'govAgencyName') {
-              if (result[key]['govAgencyName'] !== '' && result[key]['govAgencyName'] !== undefined && (result[key]['domainName'] === undefined || result[key]['domainName'] === '')) {
-                flag = true
-              } else {
-                flag = false
-              }
-            } else if (String(mappingData[0]) === 'domainName') {
-              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && (result[key]['govAgencyName'] === undefined || result[key]['govAgencyName'] === '')) {
-                flag = true
-              } else {
-                flag = false
-              }
-            } else if (String(mappingData[0]) === 'month') {
-              if (result[key]['domainName'] !== '' && result[key]['domainName'] !== undefined && result[key]['govAgencyName'] !== undefined && result[key]['govAgencyName'] !== '') {
-                flag = true
-              } else {
-                flag = false
-              }
-            }
-            if (flag) {
-              let dataRow = []
               dataRow.push({
-                text: index, 
+                text: dataText, 
                 alignment: 'center',
                 style: 'tdStyle'
               })
-              /*
-              if (vm.groupType !== 'domain') {
-                dataRow.push({
-                  text: result[key]['govAgencyName'], 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
-              } else {
-                dataRow.push({
-                  text: result[key]['domainName'], 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
+              if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
+                dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][currentConfig['value']])
               }
-              */
-              let indexTotal = 1
-              for (let keyMapping in mappingData) {
-                let dataText = ''
-                if (result[key][mappingData[keyMapping]] !== undefined && result[key][mappingData[keyMapping]] !== null) {
-                  dataText = result[key][mappingData[keyMapping]] + ' '
-                }
-                dataRow.push({
-                  text: dataText, 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
-                if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
-                  dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][mappingData[keyMapping]])
-                }
-                indexTotal = indexTotal + 1
-              }
-              index = index + 1
-              // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              dataRowI += JSON.stringify(dataRow) + ','
+              indexTotal = indexTotal + 1
             }
+            index = index + 1
+            // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+            dataRowI += JSON.stringify(dataRow) + ','
           }
           dataRowI += JSON.stringify(dataRowTotal)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
