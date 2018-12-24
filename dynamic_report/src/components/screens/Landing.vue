@@ -569,9 +569,14 @@ export default {
         onlineStr = ''
       }
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
-                             .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
-                             .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
-                             .replace(/\[\$online\$\]/g, onlineStr)
+      
+      for (let key in vm.filters) {
+        console.log('key hhh: ', vm.filters[key]['key'])
+        console.log('hhh: ', vm.data[vm.filters[key]['key']])
+        let regul = '/\[\$' + vm.filters[key]['key'] + '\$\]/g'
+        docDString = docDString.replace(regul, vm.data[vm.filters[key]['key']])
+      }
+
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['govAgencyCode']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
     
