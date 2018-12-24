@@ -289,6 +289,11 @@ export const store = new Vuex.Store({
                 }
               }
               axios.all(promises)
+              .then(function(results) {
+                let temp = results.map(r => r.data)
+                console.log('temp', temp)
+              })
+              /*
               .then(axios.spread((...args) => {
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
@@ -305,6 +310,7 @@ export const store = new Vuex.Store({
                   resolve(null)
                 }
               }))
+              */
             } else if (String(govAgency) !== '0' && agencyLists.length > 0) {
               param['headers']['groupId'] = govAgency
               axios.get(requestURL, param).then(function (response) {
