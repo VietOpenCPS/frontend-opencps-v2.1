@@ -294,7 +294,6 @@ export const store = new Vuex.Store({
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
                     console.log('myObjectZZZZZ: ', args[i]['data']['data'])
-                    myObject = myObject.concat(args[i]['data']['data'])
                   }
                 }
                 if (myObject.length > 0) {
