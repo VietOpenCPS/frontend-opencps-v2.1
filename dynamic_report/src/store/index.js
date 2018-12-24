@@ -243,12 +243,13 @@ export const store = new Vuex.Store({
             headers: {
               groupId: state.initData.groupId,
               Accept: 'application/json'
-            }
-          }
-          for (let key in filter['data']) {
-            let currentVal = filter['data'][key]
-            if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-              param.params[key] = currentVal
+            },
+            params: {
+              year: filter.year,
+              month: filter.month ? filter.month : 0,
+              group: filter.group,
+              reporting: false,
+              agency: filter['agency']
             }
           }
           let govAgency = filter['govAgency']
@@ -258,6 +259,9 @@ export const store = new Vuex.Store({
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = filter['api']
+            param.params['fromStatisticDate'] = filter['fromStatisticDate']
+            param.params['toStatisticDate'] = filter['toStatisticDate']
+            param.params['online'] = filter['online']
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
@@ -313,6 +317,23 @@ export const store = new Vuex.Store({
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
             requestURL = filter['api']
             param.params['sort'] = 'domainCode'
+            if (filter['fromFinishDate'] !== '' && filter['fromFinishDate'] !== undefined) {
+              param.params['fromFinishDate'] = filter['fromFinishDate']
+            } else if (filter['toFinishDate'] !== '' && filter['toFinishDate'] !== undefined) {
+              param.params['toFinishDate'] = filter['toFinishDate']
+            } else if (filter['fromReleaseDate'] !== '' && filter['fromReleaseDate'] !== undefined) {
+              param.params['fromReleaseDate'] = filter['fromReleaseDate']
+            } else if (filter['toReleaseDate'] !== '' && filter['toReleaseDate'] !== undefined) {
+              param.params['toReleaseDate'] = filter['toReleaseDate']
+            } else if (filter['fromReceiveNotDoneDate'] !== '' && filter['fromReceiveNotDoneDate'] !== undefined) {
+              param.params['fromReceiveNotDoneDate'] = filter['fromReceiveNotDoneDate']
+            } else if (filter['toReceiveNotDoneDate'] !== '' && filter['toReceiveNotDoneDate'] !== undefined) {
+              param.params['toReceiveNotDoneDate'] = filter['toReceiveNotDoneDate']
+            } else if (filter['fromReceiveDate'] !== '' && filter['fromReceiveDate'] !== undefined) {
+              param.params['fromReceiveDate'] = filter['fromReceiveDate']
+            } else if (filter['toReceiveDate'] !== '' && filter['toReceiveDate'] !== undefined) {
+              param.params['toReceiveDate'] = filter['toReceiveDate']
+            }
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
