@@ -245,13 +245,18 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             },
             params: {
-              
+
             }
           }
           for (let key in filter['data']) {
             let currentVal = filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
-              param.params[key] = currentVal
+              let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+              if (dateStr !== 'Invalid Date') {
+                param.params[key] = dateStr
+              } else {
+                param.params[key] = currentVal
+              }
             }
           }
           let govAgency = filter['govAgency']
