@@ -291,7 +291,14 @@ export const store = new Vuex.Store({
               axios.all(promises)
               .then(function(results) {
                 let temp = results.map(r => r.data)
+                let serializable = []
+                for (let key in temp) {
+                  for (let keyObj in temp[key]) {
+                    serializable.push(temp[key][keyObj])
+                  }
+                }
                 console.log('temp', temp)
+                console.log('serializable', serializable)
               })
               /*
               .then(axios.spread((...args) => {
