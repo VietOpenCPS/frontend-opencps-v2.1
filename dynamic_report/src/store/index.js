@@ -268,7 +268,7 @@ export const store = new Vuex.Store({
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = filter['api']
-            if (govAgency === undefined || govAgency === null || govAgency === '') {
+            if (agencyLists.length === 0) {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
@@ -280,7 +280,7 @@ export const store = new Vuex.Store({
                 console.log(error)
                 reject(error)
               })
-            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+            } else if (String(govAgency) === '0' && agencyLists.length > 0) {
               let promises = []
               for (let key in agencyLists) {
                 if (String(agencyLists[key]['value']) !== '0') {
@@ -302,10 +302,8 @@ export const store = new Vuex.Store({
                   resolve(null)
                 }
               }))
-            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
-              if (govAgency['value'] !== undefined) {
-                param['headers']['groupId'] = govAgency['value']
-              }
+            } else if (String(govAgency) !== '0' && agencyLists.length > 0) {
+              param['headers']['groupId'] = govAgency
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
