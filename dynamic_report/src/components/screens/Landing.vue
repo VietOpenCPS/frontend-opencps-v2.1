@@ -540,9 +540,8 @@ export default {
             if (resultDataVari[keyVari] === undefined || resultDataVari[keyVari] === null || resultDataVari[keyVari] === '') {
               resultDataVari[keyVari] = resultData[key]
             } else {
-              let sumDataVari = resultDataVari[keyVari]
               for (let kkey in resultDataVari[keyVari]) {
-                if (resultDataVari[keyVari][key][kkey] !== '' && resultDataVari[keyVari][key][kkey] !== undefined && resultDataVari[keyVari][key][kkey] !== null) {
+                if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
                   resultDataVari[keyVari][kkey] =  parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
                 }
               }
