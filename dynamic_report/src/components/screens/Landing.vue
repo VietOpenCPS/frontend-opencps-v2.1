@@ -640,6 +640,9 @@ export default {
     },
     buildDataRowStatic (result, dataRowI) {
       let vm = this
+      let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+      let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
       // TODO
       let resultData = result.filter(function(obj) {
         for (let keySe in selection) {
