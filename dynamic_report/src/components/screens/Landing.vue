@@ -531,7 +531,6 @@ export default {
                 return obj
             }
           })
-          /*
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -543,13 +542,24 @@ export default {
             } else {
               for (let kkey in resultDataVari[keyVari]) {
                 if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
-                  resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
+                  if (String(parseInt('sdsdfsf')) === 'NaN') {
+                    resultDataVari[keyVari][kkey] = resultData[key][kkey]
+                  } else {
+                    resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
+                  }
                 }
               }
             }
           }
           console.log('resultDataVari', resultDataVari)
-          */
+          resultData = []
+          for (let key in resultDataVari) {
+            console.log('resultData', key)
+            if (key !== undefined && key !== 'undefined_') {
+              resultData.push(resultDataVari[key])
+            }
+          }
+          console.log('resultData', resultData)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
