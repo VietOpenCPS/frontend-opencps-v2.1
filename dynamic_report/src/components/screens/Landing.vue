@@ -531,6 +531,7 @@ export default {
                 return obj
             }
           })
+          /*
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -542,12 +543,13 @@ export default {
             } else {
               for (let kkey in resultDataVari[keyVari]) {
                 if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
-                  resultDataVari[keyVari][kkey] =  parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
+                  resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
                 }
               }
             }
           }
           console.log('resultDataVari', resultDataVari)
+          */
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
