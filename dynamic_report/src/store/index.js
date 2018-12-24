@@ -272,7 +272,10 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve(serializable.data)
+                  resolve({
+                    type: 0,
+                    data: serializable.data
+                  })
                 } else {
                   resolve(null)
                 }
@@ -291,17 +294,12 @@ export const store = new Vuex.Store({
               axios.all(promises)
               .then(function(results) {
                 let temp = results.map(r => r.data)
-                let serializable = []
-                for (let key in temp) {
-                  if (temp[key]['total'] > 0) {
-                    for (let keyObj in temp[key]['data']) {
-                      serializable.push(temp[key]['data'][keyObj])
-                    }
-                  }
-                }
                 console.log('serializable', serializable)
-                if (serializable.length > 0) {
-                  resolve(serializable)
+                if (temp.length > 0) {
+                  resolve({
+                    type: 1,
+                    data: temp
+                  })
                 } else {
                   resolve(null)
                 }
@@ -329,7 +327,10 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve(serializable.data)
+                  resolve({
+                    type: 0,
+                    data: serializable.data
+                  })
                 } else {
                   resolve(null)
                 }

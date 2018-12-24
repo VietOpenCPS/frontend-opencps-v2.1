@@ -488,8 +488,11 @@ export default {
       filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
       vm.isShowLoading = true
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        if (result !== null && result !== undefined) {
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (respData) {
+        let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
+        let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+        let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+        if (respData !== null && respData.type === 1) {
           let index = 1
           let dataRowTotal = []
           dataRowTotal.push({
@@ -515,9 +518,85 @@ export default {
             }
           }
           let dataRowI = ''
-          let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
-          let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
-          let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+
+          for (let key in respData['data']) {
+            let result = respData['data'][key]['data']
+            // TODO
+            let resultData = result.filter(function(obj) {
+              for (let keySe in selection) {
+                if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                  return obj
+                }
+              }
+            })
+            let resultDataTotal = resultData.filter(function(obj) {
+              if (obj[sumKey] === '' || obj[sumKey] === undefined || obj[sumKey] === null) {
+                  return obj
+              }
+            })
+            for (let key in resultData) {
+              if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+                let dataRow = []
+                dataRow.push({
+                  text: index, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                let indexTotal = 1
+                for (let keyMapping in vm.itemsReportsConfig) {
+                  let dataText = ''
+                  let currentConfig = vm.itemsReportsConfig[keyMapping]
+                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                    dataText = resultData[key][currentConfig['value']] + ' '
+                  }
+                  dataRow.push({
+                    text: dataText, 
+                    alignment: 'center',
+                    style: 'tdStyle'
+                  })
+                  indexTotal = indexTotal + 1
+                }
+                index = index + 1
+                // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+                dataRowI += JSON.stringify(dataRow) + ','
+              }
+            }
+          }
+          docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
+          // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
+          vm.docDefinition = JSON.parse(docDString)
+          let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
+          pdfDocGenerator.getBlob((blob) => {
+            vm.pdfBlob = window.URL.createObjectURL(blob)
+            vm.isShowLoading = false
+          })
+        } else if (respData !== null && respData.type === 0) {
+          let result = respData.data
+          let index = 1
+          let dataRowTotal = []
+          dataRowTotal.push({
+            text: 'Tổng số', 
+            colSpan: 2,
+            bold: true,
+            alignment: 'center',
+            style: 'tdStyle'
+          })
+          for (let keyMapping in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[keyMapping]['value'] === 'note') {
+              dataRowTotal.push({
+                text: '', 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }  else {
+              dataRowTotal.push({
+                text: 0, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+            }
+          }
+          let dataRowI = ''
           // TODO
           let resultData = result.filter(function(obj) {
             for (let keySe in selection) {
@@ -531,64 +610,6 @@ export default {
                 return obj
             }
           })
-          console.log('resultDataTotal: ', resultDataTotal)
-          let resultDataVariTotal = {}
-          for (let key in resultDataTotal) {
-            let keyVari = ''
-            for (let keysd in merge) {
-              keyVari += resultDataTotal[key][merge[keysd]] + '_'
-            }
-            if (resultDataVariTotal[keyVari] === undefined || resultDataVariTotal[keyVari] === null || resultDataVariTotal[keyVari] === '') {
-              resultDataVariTotal[keyVari] = resultDataTotal[key]
-            } else {
-              for (let kkey in resultDataVariTotal[keyVari]) {
-                if (resultDataVariTotal[keyVari][kkey] !== '' && resultDataVariTotal[keyVari][kkey] !== undefined && resultDataVariTotal[keyVari][kkey] !== null) {
-                  if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
-                    resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
-                  } else if (kkey === 'ontimePercentage') {
-                    resultDataVariTotal[keyVari][kkey] = (parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey]))/2
-                  } else {
-                    resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
-                  }
-                }
-              }
-            }
-          }
-          let resultDataVari = {}
-          for (let key in resultData) {
-            let keyVari = ''
-            for (let keysd in merge) {
-              keyVari += resultData[key][merge[keysd]] + '_'
-            }
-            if (resultDataVari[keyVari] === undefined || resultDataVari[keyVari] === null || resultDataVari[keyVari] === '') {
-              resultDataVari[keyVari] = resultData[key]
-            } else {
-              for (let kkey in resultDataVari[keyVari]) {
-                if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
-                  if (String(parseInt(resultDataVari[keyVari][kkey])) === 'NaN') {
-                    resultDataVari[keyVari][kkey] = resultData[key][kkey]
-                  } else if (kkey === 'ontimePercentage') {
-                    resultDataVari[keyVari][kkey] = (parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey]))/2
-                  } else {
-                    resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
-                  }
-                }
-              }
-            }
-          }
-          resultData = []
-          for (let key in resultDataVari) {
-            if (key !== undefined && key !== 'undefined_') {
-              resultData.push(resultDataVari[key])
-            }
-          }
-          resultDataTotal = []
-          for (let key in resultDataVariTotal) {
-            console.log('resultData', key)
-            if (key === undefined || key === 'undefined_') {
-              resultDataTotal.push(resultDataVariTotal[key])
-            }
-          }
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
