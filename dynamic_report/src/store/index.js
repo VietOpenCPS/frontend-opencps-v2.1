@@ -292,6 +292,7 @@ export const store = new Vuex.Store({
                 }
               }
               axios.all(promises)
+              /*
               .then(function(results) {
                 let temp = results.map(r => r.data)
                 if (temp.length > 0) {
@@ -303,24 +304,20 @@ export const store = new Vuex.Store({
                   resolve(null)
                 }
               })
-              /*
+              */
               .then(axios.spread((...args) => {
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
-                    let myl = args[i]['data']['data']
-                    console.log('mylmyl', myl)
-                    // myObject.push.apply(myObject, myl)
+                    myObject = myObject.concat(args[i]['data']['data'])
                   }
                 }
                 if (myObject.length > 0) {
-                  console.log('XXXX', myObject)
                   resolve(myObject)
                 } else {
                   resolve(null)
                 }
               }))
-              */
             } else if (String(govAgency) !== '0' && agencyLists.length > 0) {
               param['headers']['groupId'] = govAgency
               axios.get(requestURL, param).then(function (response) {
