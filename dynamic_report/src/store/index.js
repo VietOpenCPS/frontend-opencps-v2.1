@@ -300,6 +300,7 @@ export const store = new Vuex.Store({
                   }
                 }
                 if (myObject.length > 0) {
+                  console.log('XXXX', myObject)
                   resolve(myObject)
                 } else {
                   resolve(null)
