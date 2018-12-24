@@ -261,6 +261,8 @@ export const store = new Vuex.Store({
           }
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
+          console.log('govAgencygovAgencygovAgency: ', govAgency)
+          console.log('agencyListsagencyListsagencyLists: ', agencyLists)
           let requestURL = ''
           if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
