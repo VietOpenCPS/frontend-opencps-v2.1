@@ -489,7 +489,7 @@ export default {
       vm.pdfBlob = null
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (respData) {
-        if (respData !== null && respData.type === 0) {
+        if (respData !== null) {
           let result = respData.data
           let index = 1
           let dataRowTotal = []
