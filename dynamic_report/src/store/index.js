@@ -293,9 +293,9 @@ export const store = new Vuex.Store({
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
-                    let myO = args[i]['data']['data']
-                    for (let bibo in my0) {
-                      myObject.push(my0[bibo])
+                    let myl = args[i]['data']['data']
+                    for (let bibo in myl) {
+                      myObject.push(myl[bibo])
                     }
                   }
                 }
