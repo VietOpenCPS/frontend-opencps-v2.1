@@ -517,6 +517,7 @@ export default {
           let dataRowI = ''
           let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
           let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+          let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
           // TODO
           let resultData = result.filter(function(obj) {
             for (let keySe in selection) {
@@ -530,8 +531,25 @@ export default {
                 return obj
             }
           })
+          let resultDataVari = {}
           for (let key in resultData) {
-            console.log(key + ': ', JSON.stringify(resultData[key]))
+            let keyVari = ''
+            for (let key in merge) {
+              keyVari += merge[key] + '_'
+            }
+            if (resultDataVari[keyVari] === undefined || resultDataVari[keyVari] === null || resultDataVari[keyVari] === '') {
+              resultDataVari[keyVari] = resultData[key]
+            } else {
+              let sumDataVari = resultDataVari[keyVari]
+              for (let kkey in resultDataVari[keyVari]) {
+                if (resultDataVari[keyVari][key][kkey] !== '' && resultDataVari[keyVari][key][kkey] !== undefined && resultDataVari[keyVari][key][kkey] !== null) {
+                  resultDataVari[keyVari][kkey] =  parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
+                }
+              }
+            }
+          }
+          console.log('resultDataVari', resultDataVari)
+          for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
               dataRow.push({
