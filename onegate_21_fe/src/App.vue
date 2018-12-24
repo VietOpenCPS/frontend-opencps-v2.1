@@ -60,6 +60,7 @@
 
 <script>
   import router from '@/router'
+  import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
       isCallBack: true,
@@ -75,6 +76,12 @@
       },
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
+      },
+      viewMobile () {
+        return isMobile
+      },
+      pathLanding () {
+        return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
       }
     },
     created () {
@@ -90,7 +97,7 @@
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
                 router.push({
-                  path: '/danh-sach-ho-so/0',
+                  path: vm.pathLanding + '/0',
                   query: {
                     q: vm.trangThaiHoSoList[0]['queryParams']
                   }
@@ -149,9 +156,10 @@
     },
     methods: {
       toTableIndexing (item, index) {
+        let vm = this
         this.$store.commit('setIndex', index)
         router.push({
-          path: '/danh-sach-ho-so/' + index,
+          path: vm.pathLanding + '/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
             q: item.queryParams
@@ -159,6 +167,7 @@
         })
       },
       filterSteps (item) {
+        let vm = this
         let currentQuery = this.$router.history.current.query
         let currentParams = this.$router.history.current.params
         console.log('currentParams', currentParams)
@@ -186,7 +195,7 @@
         // }
         console.log('queryString++++++++22222222+++', queryString)
         router.push({
-          path: '/danh-sach-ho-so/' + currentParams.index,
+          path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
             q: queryString + item.stepCode,
