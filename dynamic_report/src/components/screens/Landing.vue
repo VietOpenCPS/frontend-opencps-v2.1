@@ -488,9 +488,8 @@ export default {
       filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
       vm.isShowLoading = true
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (respData) {
-        if (respData !== null) {
-          let result = respData.data
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null) {
           let index = 1
           let dataRowTotal = []
           dataRowTotal.push({
