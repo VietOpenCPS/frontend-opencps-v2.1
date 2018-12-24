@@ -293,8 +293,10 @@ export const store = new Vuex.Store({
                 let temp = results.map(r => r.data)
                 let serializable = []
                 for (let key in temp) {
-                  for (let keyObj in temp[key]) {
-                    serializable.push(temp[key][keyObj])
+                  if (temp[key]['total'] > 0) {
+                    for (let keyObj in temp[key]['data']) {
+                      serializable.push(temp[key]['data'][keyObj])
+                    }
                   }
                 }
                 console.log('temp', temp)
