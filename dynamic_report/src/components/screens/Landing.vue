@@ -544,6 +544,8 @@ export default {
                 if (resultDataVari[keyVari][kkey] !== '' && resultDataVari[keyVari][kkey] !== undefined && resultDataVari[keyVari][kkey] !== null) {
                   if (String(parseInt(resultDataVari[keyVari][kkey])) === 'NaN') {
                     resultDataVari[keyVari][kkey] = resultData[key][kkey]
+                  } else if (kkey === 'ontimePercentage') {
+                    resultDataVari[keyVari][kkey] = (parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey]))/2
                   } else {
                     resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
                   }
@@ -552,7 +554,6 @@ export default {
             }
           }
           console.log('resultDataVari', resultDataVari)
-          /*
           resultData = []
           for (let key in resultDataVari) {
             console.log('resultData', key)
@@ -560,7 +561,6 @@ export default {
               resultData.push(resultDataVari[key])
             }
           }
-          */
           console.log('resultData', resultData)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
