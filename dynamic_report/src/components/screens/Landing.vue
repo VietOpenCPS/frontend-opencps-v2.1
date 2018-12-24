@@ -27,7 +27,7 @@
       </div>
     </div>
     <v-layout row wrap class="filter_menu mt-2">
-      <v-flex xs12 sm2 v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+      <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date'"
           v-model="data[item.key]" 
