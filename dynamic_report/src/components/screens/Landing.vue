@@ -616,14 +616,11 @@ export default {
               dataRowI += JSON.stringify(dataRow) + ','
             }
           }
-          console.log('resultDataTotal', resultDataTotal)
           for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
               let dataText = ''
-              console.log('saoooo: ', resultDataTotal[key])
               let currentConfig = vm.itemsReportsConfig[keyMapping]
-              console.log(currentConfig['value'])
               if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
                 dataText = resultDataTotal[key][currentConfig['value']] + ' '
               }

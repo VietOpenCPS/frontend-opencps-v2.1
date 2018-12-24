@@ -295,7 +295,7 @@ export const store = new Vuex.Store({
                   if (args[i]['data']['total'] > 0) {
                     let myl = args[i]['data']['data']
                     console.log('mylmyl', myl)
-                    myObject.push.apply(myObject, myl)
+                    // myObject.push.apply(myObject, myl)
                   }
                 }
                 if (myObject.length > 0) {
