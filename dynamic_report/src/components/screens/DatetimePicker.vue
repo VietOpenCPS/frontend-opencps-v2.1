@@ -10,7 +10,6 @@
     >
         <v-text-field
             slot="activator"
-            box
             append-icon="event"
             @blur="toDate = parseDate(toDateFormatted)"
             :rules="processRules(item.rules)"
@@ -34,7 +33,7 @@
     watch: {
         toDate (val) {
             this.toDateFormatted = this.formatDate(val)
-            this.$emit('input', new Date(val).getTime())
+            this.$emit('input', this.toDateFormatted)
         }
     },
     methods: {
