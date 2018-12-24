@@ -614,7 +614,7 @@ export default {
           let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
           console.log('selection: ', selection)
           // TODO
-          let dkstest = result.filter(function(obj) {
+          let resultData = result.filter(function(obj) {
             for (let keySe in selection) {
               console.log('xxx: ', obj[selection[keySe]['key']])
               if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
@@ -622,8 +622,14 @@ export default {
               }
             }
           })
-          console.log('dkstest: ', dkstest)
-          for (let key in result) {
+          let resultDataTotal = resultData.filter(function(obj) {
+            if (obj[sumKey] === '' || obj[sumKey] === undefined || obj[sumKey] === null) {
+                return obj
+            }
+          })
+          console.log('resultData: ', resultData)
+          console.log('resultDataTotal: ', resultDataTotal)
+          for (let key in resultData) {
             let dataRow = []
             dataRow.push({
               text: index, 
@@ -634,8 +640,8 @@ export default {
             for (let keyMapping in vm.itemsReportsConfig) {
               let dataText = ''
               let currentConfig = vm.itemsReportsConfig[keyMapping]
-              if (result[key][currentConfig['value']] !== undefined && result[key][currentConfig['value']] !== null) {
-                dataText = result[key][currentConfig['value']] + ' '
+              if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                dataText = resultData[key][currentConfig['value']] + ' '
               }
               dataRow.push({
                 text: dataText, 
@@ -643,7 +649,7 @@ export default {
                 style: 'tdStyle'
               })
               if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
-                dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(result[key][currentConfig['value']])
+                dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(resultData[key][currentConfig['value']])
               }
               indexTotal = indexTotal + 1
             }
