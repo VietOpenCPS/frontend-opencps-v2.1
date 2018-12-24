@@ -293,11 +293,13 @@ export const store = new Vuex.Store({
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
-                    console.log('myObjectZZZZZ: ', args[i]['data']['data'])
+                    let myO = args[i]['data']['data']
+                    for (let bibo in my0) {
+                      myObject.push(my0[bibo])
+                    }
                   }
                 }
                 if (myObject.length > 0) {
-                  console.log('myObject: ', myObject)
                   resolve(myObject)
                 } else {
                   resolve(null)
