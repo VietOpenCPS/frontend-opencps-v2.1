@@ -294,7 +294,6 @@ export const store = new Vuex.Store({
               axios.all(promises)
               .then(function(results) {
                 let temp = results.map(r => r.data)
-                console.log('serializable', serializable)
                 if (temp.length > 0) {
                   resolve({
                     type: 1,
