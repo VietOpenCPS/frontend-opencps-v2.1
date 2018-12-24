@@ -630,32 +630,43 @@ export default {
           console.log('resultData: ', resultData)
           console.log('resultDataTotal: ', resultDataTotal)
           for (let key in resultData) {
-            let dataRow = []
-            dataRow.push({
-              text: index, 
-              alignment: 'center',
-              style: 'tdStyle'
-            })
+            if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+              let dataRow = []
+              dataRow.push({
+                text: index, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+              let indexTotal = 1
+              for (let keyMapping in vm.itemsReportsConfig) {
+                let dataText = ''
+                let currentConfig = vm.itemsReportsConfig[keyMapping]
+                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                  dataText = resultData[key][currentConfig['value']] + ' '
+                }
+                dataRow.push({
+                  text: dataText, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+                indexTotal = indexTotal + 1
+              }
+              index = index + 1
+              // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+              dataRowI += JSON.stringify(dataRow) + ','
+            }
+          }
+          for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
               let dataText = ''
               let currentConfig = vm.itemsReportsConfig[keyMapping]
-              if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                dataText = resultData[key][currentConfig['value']] + ' '
+              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null) {
+                dataText = resultDataTotal[key][currentConfig['value']] + ' '
               }
-              dataRow.push({
-                text: dataText, 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
-              if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
-                dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(resultData[key][currentConfig['value']])
-              }
+              dataRowTotal[indexTotal]['text'] = resultDataTotal[key][currentConfig['value']] + ' '
               indexTotal = indexTotal + 1
             }
-            index = index + 1
-            // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-            dataRowI += JSON.stringify(dataRow) + ','
           }
           dataRowI += JSON.stringify(dataRowTotal)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
