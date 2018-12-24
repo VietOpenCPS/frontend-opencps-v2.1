@@ -574,7 +574,7 @@ export default {
         let find = vm.filters[key]['key']
         let re = new RegExp(find, 'g')
         docDString = docDString.replace(re, vm.data[vm.filters[key]['key']])
-        console.log('key hhh: ', str)
+        console.log('key hhh: ', docDString)
         console.log('hhh: ', vm.data[vm.filters[key]['key']])
       }
 
