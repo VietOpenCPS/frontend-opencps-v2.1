@@ -311,7 +311,6 @@ export default {
       }
       reportName = vm.itemsReports[vm.index]['title']
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
-      
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -322,7 +321,8 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (String(vm.filters[key]['source'][keySource]) === currentVal) {
+                console.log('KKK: ', vm.filters[key]['source'][keySource]['value'])
+                if (String(vm.filters[key]['source'][keySource]['value']) === currentVal) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
