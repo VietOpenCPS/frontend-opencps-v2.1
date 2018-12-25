@@ -580,9 +580,13 @@ export default {
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                   dataText = resultData[key][currentConfig['value']] + ' '
                 }
+                let alignmentConfig = 'center'
+                if (currentConfig.hasOwnProperty('align')) {
+                  alignmentConfig = currentConfig['align']
+                }
                 dataRow.push({
                   text: dataText, 
-                  alignment: 'center',
+                  alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
                 if (vm.govAgency === 0) {
