@@ -191,6 +191,11 @@ export default {
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        for (let key in vm.filters) {
+          if (vm.filters[key]['type'] === 'select') {
+            vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          }
+        }
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
         console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -233,6 +238,11 @@ export default {
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.filters = []
       vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+      for (let key in vm.filters) {
+        if (vm.filters[key]['type'] === 'select') {
+          vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+        }
+      }
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
