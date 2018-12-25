@@ -39,8 +39,8 @@
           :items="groupBy"
           v-model="groupByVal"
           label="Group By"
-          item-text="text"
-          item-value="value"
+          item-text="label"
+          item-value="key"
           >
         </v-autocomplete>
       </v-flex>
