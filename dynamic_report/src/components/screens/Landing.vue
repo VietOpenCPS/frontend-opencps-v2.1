@@ -637,7 +637,7 @@ export default {
             }
           }
 
-          if (vm.govAgency !== 0) {
+          if (agencyLists.length > 0) {
             let resultDataVariTotal = {}
             for (let key in resultDataTotal) {
               let keyVari = ''
