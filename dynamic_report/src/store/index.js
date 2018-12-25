@@ -129,8 +129,8 @@ export const store = new Vuex.Store({
                 }
                 // push default current siteName
                 let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-                if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
-                  let govCodes = filterconfigObject['govAgencyCode']
+                if (filterconfigObject.hasOwnProperty('groupIds') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
+                  let govCodes = filterconfigObject['groupIds']
                   let exit = false
                   for (let key in govCodes) {
                     if (String(state.groupId) === govCodes[key]['value']) {
@@ -144,7 +144,7 @@ export const store = new Vuex.Store({
                       "text": state.siteName
                     })
                   }
-                  filterconfigObject['govAgencyCode'] = govCodes
+                  filterconfigObject['groupIds'] = govCodes
                 }
                 itemsReportsData.push({
                   'code' : String(indexKey),
