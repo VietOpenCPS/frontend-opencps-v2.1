@@ -329,9 +329,10 @@ export default {
       dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
       // bild data
       let filter = {
-        document: vm.reportType
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api
       }
-      filter['api'] = vm.api
       filter['govAgency'] = vm.govAgency
       filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
