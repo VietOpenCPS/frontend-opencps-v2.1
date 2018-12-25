@@ -53,7 +53,6 @@
           v-if="item['type'] === 'select'"
           :items="item['source']"
           v-model="data[item.key]"
-          :value="item['value']"
           :label="item['label']"
           single-line
           item-value="value"
