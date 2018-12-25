@@ -632,7 +632,7 @@ export default {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  dataText = currentConfig['prefix'] + ' ' +resultData[key][currentConfig['value']] + ' '
+                  dataText = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''  + ' ' +resultData[key][currentConfig['value']] + ' '
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
