@@ -630,9 +630,9 @@ export default {
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
-                let dataText = currentConfig['prefix'] + ' '
+                let dataText = ' '
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  dataText = resultData[key][currentConfig['value']] + ' '
+                  dataText = currentConfig['prefix'] + ' ' +resultData[key][currentConfig['value']] + ' '
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
