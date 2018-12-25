@@ -320,6 +320,13 @@ export default {
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
+            if (vm.filters[key]['type'] === 'select') {
+              for (let keySource in vm.filters[key]['source']) {
+                if (String(vm.filters[key]['source'][keySource]) === currentVal) {
+                  currentVal = vm.filters[key]['source'][keySource]['name']
+                }
+              }
+            }
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
