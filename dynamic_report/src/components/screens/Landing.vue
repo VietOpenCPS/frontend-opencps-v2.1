@@ -531,7 +531,10 @@ export default {
           if (selection !== undefined && selection !== null && selection.length > 0) {
             resultData = result.filter(function(obj) {
               for (let keySe in selection) {
+                console.log('compare #: ', selection[keySe]['compare'] === '#')
+                console.log('compare value: ', selection[keySe]['value'])
                 if (selection[keySe]['compare'] === '#') {
+                  console.log('compare value XXXX: ', obj[selection[keySe]['key']])
                   if (obj[selection[keySe]['key']] !== selection[keySe]['value']) {
                     return obj
                   }
