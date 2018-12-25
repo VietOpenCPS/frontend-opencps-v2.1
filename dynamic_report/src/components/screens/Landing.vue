@@ -536,7 +536,7 @@ export default {
           })
           let resultDataTotal = resultData.filter(function(obj) {
             if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
-                return obj
+              return obj
             }
           })
           console.log('resultDataTotal: ', resultDataTotal)
@@ -574,7 +574,7 @@ export default {
           }
           console.log('after sort: ', resultData)
           for (let key in resultData) {
-            if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+            if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
               dataRow.push({
                 text: index, 
@@ -646,17 +646,17 @@ export default {
                 resultDataTotal.push(resultDataVariTotal[key])
               }
             }
-            for (let key in resultDataTotal) {
-              let indexTotal = 1
-              for (let keyMapping in vm.itemsReportsConfig) {
-                let dataText = ''
-                let currentConfig = vm.itemsReportsConfig[keyMapping]
-                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
-                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
-                }
-                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
-                indexTotal = indexTotal + 1
+          }
+          for (let key in resultDataTotal) {
+            let indexTotal = 1
+            for (let keyMapping in vm.itemsReportsConfig) {
+              let dataText = ''
+              let currentConfig = vm.itemsReportsConfig[keyMapping]
+              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                dataText = resultDataTotal[key][currentConfig['value']] + ' '
               }
+              dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+              indexTotal = indexTotal + 1
             }
           }
           dataRowI += JSON.stringify(dataRowTotal)
