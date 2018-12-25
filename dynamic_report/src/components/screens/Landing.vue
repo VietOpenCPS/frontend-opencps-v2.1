@@ -533,7 +533,7 @@ export default {
             }
           })
           let resultDataTotal = resultData.filter(function(obj) {
-            if (obj[sumKey] === '' || obj[sumKey] === undefined || obj[sumKey] === null) {
+            if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
                 return obj
             }
           })
