@@ -556,11 +556,13 @@ export default {
               }
             })
           }
-          let resultDataTotal = resultData.filter(function(obj) {
+          console.log('resultDataTotal1: ', resultDataTotal)
+          let resultDataTotal = result.filter(function(obj) {
             if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
               return obj
             }
           })
+          console.log('resultDataTotal2: ', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -589,11 +591,9 @@ export default {
               resultData.push(resultDataVari[key])
             }
           }
-          console.log('before sort: ', resultData)
           if (sort !== '' && sort !== undefined && sort !== null) {
             resultData = vm.sortByKey(resultData, sort)
           }
-          console.log('after sort: ', resultData)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
