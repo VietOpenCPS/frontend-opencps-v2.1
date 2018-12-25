@@ -483,6 +483,10 @@ export default {
                   style: 'tdStyle'
                 })
                 for (let keyVal in val) {
+                  let alignmentConfig = 'center'
+                  if (val[key].hasOwnProperty('align')) {
+                    alignmentConfig = val[key]['align']
+                  }
                   let ddStr = ' '
                   if (dossierObj[val[keyVal]] !== undefined && dossierObj[val[keyVal]] !== null && dossierObj[val[keyVal]] !== '') {
                     ddStr = dossierObj[val[keyVal]]
