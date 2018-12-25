@@ -489,9 +489,10 @@ export default {
                     if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
                       alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
                     }
+                    console.log(vm.itemsReportsConfig[keyVal]['value'] + ': ', alignmentConfig)
                     let ddStr = ' '
-                    if (dossierObj[vm.itemsReportsConfig[keyVal]] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]] !== null && dossierObj[vm.itemsReportsConfig[keyVal]] !== '') {
-                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]]
+                    if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
                     }
                     dataRow.push({
                       text: ddStr, 
@@ -510,7 +511,6 @@ export default {
           }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
-          console.log('report2: ', docDString)
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
