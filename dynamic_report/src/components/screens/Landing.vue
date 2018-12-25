@@ -187,6 +187,7 @@ export default {
         vm.api = ''
         vm.filters = []
         vm.customize = false
+        vm.data = {}
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
@@ -218,6 +219,7 @@ export default {
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
       vm.customize = false
+      vm.data = {}
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       vm.report1Def = {}
@@ -472,7 +474,7 @@ export default {
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
           let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
-          if (dateStr !== 'Invalid Date'&& currentVal.length === 13) {
+          if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
