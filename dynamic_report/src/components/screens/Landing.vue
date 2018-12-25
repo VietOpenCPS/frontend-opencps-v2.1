@@ -68,7 +68,7 @@
     </v-layout>
     <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
       <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
     </v-layout>
     <v-layout row wrap>
@@ -482,20 +482,23 @@ export default {
                   alignment: 'center',
                   style: 'tdStyle'
                 })
-                for (let keyVal in val) {
-                  let alignmentConfig = 'center'
-                  if (val[keyVal].hasOwnProperty('align')) {
-                    alignmentConfig = val[keyVal]['align']
+                for (let keyVal in vm.itemsReportsConfig) {
+                  console.log('vm.itemsReportsConfig[keyVal]', vm.itemsReportsConfig[keyVal])
+                  if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
+                    let alignmentConfig = 'center'
+                    if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
+                      alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
+                    }
+                    let ddStr = ' '
+                    if (dossierObj[vm.itemsReportsConfig[keyVal]] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]] !== null && dossierObj[vm.itemsReportsConfig[keyVal]] !== '') {
+                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]]
+                    }
+                    dataRow.push({
+                      text: ddStr, 
+                      alignment: alignmentConfig,
+                      style: 'tdStyle'
+                    })
                   }
-                  let ddStr = ' '
-                  if (dossierObj[val[keyVal]] !== undefined && dossierObj[val[keyVal]] !== null && dossierObj[val[keyVal]] !== '') {
-                    ddStr = dossierObj[val[keyVal]]
-                  }
-                  dataRow.push({
-                    text: ddStr, 
-                    alignment: alignmentConfig,
-                    style: 'tdStyle'
-                  })
                 }
                 dataReportTotal += JSON.stringify(dataRow) + ','
                 // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
@@ -796,6 +799,18 @@ export default {
         var x = a[key]; var y = b[key];
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
       })
+    },
+    changeConfig (index) {
+      let vm = this
+      if (vm.itemsReportsConfig[index].hasOwnProperty('selected')) {
+        if (vm.itemsReportsConfig[index]['selected']) {
+          vm.itemsReportsConfig[index]['selected'] = false
+        } else {
+          vm.itemsReportsConfig[index]['selected'] = true
+        }
+      } else {
+        vm.itemsReportsConfig[index]['selected'] = true
+      }
     }
   }
 }
