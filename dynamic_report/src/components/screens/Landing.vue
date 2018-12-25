@@ -735,10 +735,14 @@ export default {
         index: vm.index,
         userId: vm.getUserId()
       }
+      vm.showConfig = false
+      vm.doCreatePDF(vm.selected)
+      /*
       vm.$store.dispatch('updateDynamicReport', doData).then(function () {
         vm.showConfig = false
         vm.doCreatePDF(vm.selected)
       })
+      */
     },
     sortByKey (array, key) {
       return array.sort(function(a, b) {
