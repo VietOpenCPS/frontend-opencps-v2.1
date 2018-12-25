@@ -28,7 +28,7 @@
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
-          label="Group By"
+          label="Chọn đơn vị"
           item-text="text"
           item-value="value"
           >
@@ -38,7 +38,7 @@
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
-          label="Chọn đơn vị"
+          label="Group By"
           item-text="text"
           item-value="value"
           >
@@ -197,20 +197,30 @@ export default {
         vm.customize = false
         vm.data = {}
         vm.groupBy = []
-        vm.nameReport = vm.itemsReports[vm.index]['reportName']
-        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-        vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
-        vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+        vm.itemsReportsConfig = []
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+          vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+          vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+          vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+          vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+          vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+          vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        }
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select') {
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
           }
         }
-        vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
-        console.log('agencyLists: ', vm.agencyLists)
-        vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-        vm.itemsReportsConfig = []
-        vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         vm.report1Def = {}
         for (let key in vm.itemsReportsConfig) {
           vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -231,25 +241,37 @@ export default {
       let vm = this
       console.debug(oldRoute)
       let currentQuery = newRoute.query
-      vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
       vm.groupBy = []
       vm.customize = false
       vm.data = {}
-      vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
-      vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
-      vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+      vm.api = ''
+      vm.filters = []
       vm.report1Def = {}
+      vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+        vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+        vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+        vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+        vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+        vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+      }
       for (let key in vm.itemsReportsConfig) {
         vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
       }
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-      vm.api = ''
-      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
-      vm.filters = []
-      vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select') {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
