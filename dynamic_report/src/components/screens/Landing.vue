@@ -345,6 +345,10 @@ export default {
       }) + ','
       let ine = 2
       for (let key in val) {
+        let alignmentConfig = 'center'
+        if (val[key].hasOwnProperty('align')) {
+          alignmentConfig = val[key]['align']
+        }
         widthsConfig.push('auto')
         // vm.docDefinition['content'][2]['table']['widths'].push('auto')
         let str1 = ' '
@@ -353,12 +357,12 @@ export default {
         }
         headerTableReport += JSON.stringify({
           text: str1,
-          alignment: 'center',
+          alignment: alignmentConfig,
           bold: true
         }) + ','
         header2TableReport += JSON.stringify({
           text: '(' + ine + ')',
-          alignment: 'center',
+          alignment: alignmentConfig,
           italics: true
         }) + ','
         ine = ine + 1
@@ -474,9 +478,9 @@ export default {
                 dataRow = []
                 let dossierObj = dossiersArray[keyDossier]
                 dataRow.push({
-                text: indexStt, 
-                alignment: 'center',
-                style: 'tdStyle'
+                  text: indexStt, 
+                  alignment: 'center',
+                  style: 'tdStyle'
                 })
                 for (let keyVal in val) {
                   let ddStr = ' '
@@ -485,7 +489,7 @@ export default {
                   }
                   dataRow.push({
                     text: ddStr, 
-                    alignment: 'center',
+                    alignment: alignmentConfig,
                     style: 'tdStyle'
                   })
                 }
