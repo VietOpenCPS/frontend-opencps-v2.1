@@ -646,8 +646,9 @@ export default {
               dataRowI += JSON.stringify(dataRow) + ','
             }
           }
-
-          if (vm.agencyLists.length > 0 && vm.govAgency !== 0) {
+          console.log('vm.govAgency', vm.govAgency)
+          console.log('vm.govAgency === 0', vm.govAgency === 0)
+          if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
             let resultDataVariTotal = {}
             for (let key in resultDataTotal) {
               let keyVari = ''
