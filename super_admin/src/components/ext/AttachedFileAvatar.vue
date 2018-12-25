@@ -91,7 +91,9 @@
     created() {
       var vm = this
       vm.$nextTick(function() {
-        this.loadImageComponent()
+        if (this.pk) {
+          this.loadImageComponent()
+        }
       })
     },
     mounted: function() {
@@ -103,6 +105,15 @@
       document.getElementById('browseAvata').onclick = function() {
         document.getElementsByClassName('e-file-select-wrap')[0].querySelector('button').click();
         return false;
+      }
+    },
+    watch: {
+      pk (val) {
+        this.path = {
+          saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
+          removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
+        }
+        this.loadImageComponent()
       }
     },
     methods: {

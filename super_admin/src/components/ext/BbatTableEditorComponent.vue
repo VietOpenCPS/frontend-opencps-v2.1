@@ -719,7 +719,9 @@
             console.log(data)
           })
         } else {
-          vm.deactiveAccountFlag = !dataLock
+          setTimeout(function() {
+            vm.deactiveAccountFlagBoolean = !dataLock
+          }, 10)
         }
       },
       showAccount (item) {
