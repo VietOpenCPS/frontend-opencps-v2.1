@@ -534,6 +534,7 @@ export default {
                 console.log('compare #: ', selection[keySe]['compare'] === '#')
                 console.log('compare value: ', selection[keySe]['value'])
                 if (selection[keySe]['compare'] === '#') {
+                  console.log('compare value XXXX: ', obj[selection[keySe]['key']])
                   if (obj[selection[keySe]['key']] !== selection[keySe]['value']) {
                     return obj
                   }
