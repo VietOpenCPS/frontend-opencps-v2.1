@@ -527,13 +527,31 @@ export default {
           let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
           let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
           // TODO
-          let resultData = result.filter(function(obj) {
-            for (let keySe in selection) {
-              if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
-                return obj
+          if (selection !== undefined && selection !== null && selection.length > 0) {
+            let resultData = result.filter(function(obj) {
+              for (let keySe in selection) {
+                if (selection[keySe]['compare'] === '#') {
+                  if (obj[selection[keySe]['key']] !== selection[keySe]['value']) {
+                    return obj
+                  }
+                } else if (selection[keySe]['compare'] === '=') {
+                  if (selection[keySe]['value'] === '') {
+                    if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                      return obj
+                    }
+                  } else {
+                    if (obj[selection[keySe]['key']] === selection[keySe]['value']) {
+                      return obj
+                    }
+                  }
+                } else {
+                  if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                    return obj
+                  }
+                }
               }
-            }
-          })
+            })
+          }
           let resultDataTotal = resultData.filter(function(obj) {
             if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
               return obj
