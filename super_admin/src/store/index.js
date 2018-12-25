@@ -24,6 +24,7 @@ export const store = new Vuex.Store({
       message: '',
       reconnectError: false
     },
+    isConnected: false,
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
     listTableMenu: [
@@ -121,7 +122,8 @@ export const store = new Vuex.Store({
     dossierTemplatesList: [],
     processStepList: [],
     processActionList: [],
-    processRoleList: []
+    processRoleList: [],
+    problem: true
   },
   actions: {
     loadInitResource ({state}) {
@@ -1205,33 +1207,27 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
-    SOCKET_ONOPEN (state, event) {
+    SOCKET_ONOPEN (state, event)  {
       Vue.prototype.$socket = event.currentTarget
       state.socket.isConnected = true
-      setTimeout(() => {
-        if (state.socket.isConnected && state.refreshSocket === 3) {
-          state.refreshSocket = 0
-          window.location.reload(true)
-        }
-      }, 4000)
     },
-    SOCKET_ONCLOSE (state, event) {
-      console.log('SOCKET_ONCLOSE', event)
-      state.refreshSocket = 3
-      state.snackbarsocket = true
+    SOCKET_ONCLOSE (state, event)  {
       state.socket.isConnected = false
+      state.isConnected = false
     },
-    SOCKET_ONERROR (state, event) {
+    SOCKET_ONERROR (state, event)  {
       console.error(state, event)
     },
-    SOCKET_ONMESSAGE (state, message) {
-      state.message = message
+    // default handler called for all methods
+    SOCKET_ONMESSAGE (state, message)  {
+      state.socket.message = message
     },
-    [WebSocket.WS_RECONNECT](state, count) {
-      console.log('WS_RECONNECT', state)
-      console.log('WS_RECONNECT', count)
+    // mutations for reconnect methods
+    SOCKET_RECONNECT(state, count) {
+      console.info(state, count)
+      state.isConnected = true
     },
-    [WebSocket.WS_RECONNECT_ERROR](state) {
+    SOCKET_RECONNECT_ERROR(state) {
       state.socket.reconnectError = true
     },
     setlistTableMenu (state, payload) {
@@ -1304,6 +1300,12 @@ export const store = new Vuex.Store({
         }
         state.loginUser = payload
       }
+    },
+    setproblem (state, payload) {
+      state.problem = payload
+    },
+    setisConnected (state, payload) {
+      state.isConnected = payload
     }
   },
   getters: {
@@ -1342,6 +1344,12 @@ export const store = new Vuex.Store({
     },
     getloginUser (state) {
       return state.loginUser[0]
+    },
+    getisConnected (state) {
+      return state.isConnected
+    },
+    getproblem (state) {
+      return state.problem
     }
   }
 })

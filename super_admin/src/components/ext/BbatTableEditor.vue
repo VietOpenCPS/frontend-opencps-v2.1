@@ -75,6 +75,50 @@
         dataSocket: {}
       }
     },
+    computed: {
+      isConnected: {
+        // getter
+        get: function() {
+          return this.$store.getters.getisConnected
+        },
+        // setter
+        set: function(newValue) {
+          this.$store.commit('setisConnected', newValue)
+        }
+      }
+    },
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+        console.debug(oldRoute)
+        let vm = this
+        if (vm.isConnected) {
+          vm.isConnected = false
+          vm.$socket.onmessage = function (data) {
+            let dataObj = eval('( ' + data.data + ' )')
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined && (dataObj.respone === 'detail' || dataObj.respone === 'tableConfig')) {
+              if (vm.dataSocket['detail'] !== '[]') {
+                vm.nameScreen = vm.dataSocket['detail'][0][dataObj.title]
+                vm.showDetailForm = true
+                vm.noDetail = false
+              } else {
+                vm.noDetail = true
+              }
+            }
+            if (dataObj.respone === 'listTableMenu') {
+              vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+            } else if (dataObj.respone === 'loginUser') {
+              vm.$store.commit('setloginUser', dataObj['loginUser'])
+            } 
+            if (String(vm.id) === '0') {
+              vm.nameScreen = 'Thêm mới dữ liệu'
+              vm.showDetailForm = true
+              vm.noDetail = false
+            }
+          }
+        }
+      }
+    },
     created () {
       var vm = this
       vm.$nextTick(function () {

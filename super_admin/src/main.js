@@ -27,7 +27,7 @@ let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPor
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + portalURL /*+ ':8080'*/ + '/o/v1/socket/web?groupId='+ groupId
+Vue.use(VueNativeSock, 'ws://' + portalURL +':8080'/**/ + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalURL
   + '&companyId=' + companyId
   + '&userId=' + userId
@@ -36,11 +36,7 @@ Vue.use(VueNativeSock, 'ws://' + portalURL /*+ ':8080'*/ + '/o/v1/socket/web?gro
   {
     store: store,
     format: 'json',
-    reconnection: true,
-    reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-    reconnectionDelay: 3000,
-    maxHttpBufferSize: 30 * 1024 * 1024,
-    maxPayload: 30 * 1024 * 1024
+    reconnection: true
   }
 )
 
@@ -120,6 +116,37 @@ new Vue({
         }
       }, 100)
     })
-  }
+  },
+  computed: {
+    problem: {
+      // getter
+      get: function() {
+        return this.$store.getters.getproblem
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setproblem', newValue)
+      }
+    },
+    isConnected: {
+      // getter
+      get: function() {
+        return this.$store.getters.getisConnected
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit('setisConnected', newValue)
+      }
+    }
+  },
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      console.log('getisConnected: ', vm.isConnected)
+      console.debug(newRoute)
+      console.debug(oldRoute)
+      vm.problem = true
+    }
+  },
 })
 

@@ -107,48 +107,133 @@ export const store = new Vuex.Store({
     },
     getDynamicReports ({commit, state}) {
       return new Promise((resolve, reject) => {
-        let options = {
-          headers: {
-            'groupId': state.groupId,
-            'Content-Type': 'text/plain',
-            'Accept': 'application/json'
-          }
-        }
-        let body = AdminConfig.getDynamicReports
-        axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
-          let serializable = response.data
-          let itemsReportsData = []
-          let indexKey = 0
-          for (let key in serializable['getDynamicReports']) {
-            let current = serializable['getDynamicReports'][key]
-            let typeCurrent = 'dossier'
-            if (current['reportCode'].startsWith('STATISTIC')) {
-              typeCurrent = 'thong_ke'
+        if (state.siteName !== '') {
+          store.dispatch('loadInitResource').then(function () {
+            let options = {
+              headers: {
+                'groupId': state.groupId,
+                'Content-Type': 'text/plain',
+                'Accept': 'application/json'
+              }
             }
-            itemsReportsData.push({
-              'code' : String(indexKey),
-              'document' : current['reportCode'],
-              'active' : false,
-              'type' : typeCurrent,
-              'title' : current['reportName'],
-              'filterConfig' : eval('( ' + current['filterConfig'] + ' )'),
-              'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
-              'userConfig' : eval('( ' + current['userConfig'] + ' )'),
-              'dynamicReportId' : current['dynamicReportId'],
-              'reportCode' : current['reportCode'],
-              'reportName' : current['reportName'],
-              'sharing' : current['sharing']
+            let body = AdminConfig.getDynamicReports
+            axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+              let serializable = response.data
+              let itemsReportsData = []
+              let indexKey = 0
+              for (let key in serializable['getDynamicReports']) {
+                let current = serializable['getDynamicReports'][key]
+                let typeCurrent = 'dossier'
+                if (current['reportCode'].startsWith('STATISTIC')) {
+                  typeCurrent = 'thong_ke'
+                }
+                // push default current siteName
+                let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
+                if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
+                  let govCodes = filterconfigObject['govAgencyCode']
+                  let exit = false
+                  for (let key in govCodes) {
+                    if (String(state.groupId) === govCodes[key]['value']) {
+                      exit = true
+                      break;
+                    }
+                  }
+                  if (!exit && ((filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) || !filterconfigObject.hasOwnProperty('exclusive'))) {
+                    govCodes.push({
+                      "value": parseInt(state.groupId),
+                      "text": state.siteName
+                    })
+                  }
+                  filterconfigObject['govAgencyCode'] = govCodes
+                }
+                itemsReportsData.push({
+                  'code' : String(indexKey),
+                  'document' : current['reportCode'],
+                  'active' : false,
+                  'type' : typeCurrent,
+                  'title' : current['reportName'],
+                  'filterConfig' : filterconfigObject,
+                  'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+                  'userConfig' : eval('( ' + current['userConfig'] + ' )'),
+                  'dynamicReportId' : current['dynamicReportId'],
+                  'reportCode' : current['reportCode'],
+                  'reportName' : current['reportName'],
+                  'sharing' : current['sharing']
+                })
+                indexKey = indexKey + 1
+              }
+              state.itemsReports = itemsReportsData
+              console.log('state.itemsReports', state.itemsReports)
+              resolve(itemsReportsData)
+            }).catch(function (error) {
+              state.itemsReports = []
+              commit('setsnackbarerror', true)
+              reject(error)
             })
-            indexKey = indexKey + 1
+          })
+        } else {
+          let options = {
+            headers: {
+              'groupId': state.groupId,
+              'Content-Type': 'text/plain',
+              'Accept': 'application/json'
+            }
           }
-          state.itemsReports = itemsReportsData
-          console.log('state.itemsReports', state.itemsReports)
-          resolve(itemsReportsData)
-        }).catch(function (error) {
-          state.itemsReports = []
-          commit('setsnackbarerror', true)
-          reject(error)
-        })
+          let body = AdminConfig.getDynamicReports
+          axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
+            let serializable = response.data
+            let itemsReportsData = []
+            let indexKey = 0
+            for (let key in serializable['getDynamicReports']) {
+              let current = serializable['getDynamicReports'][key]
+              let typeCurrent = 'dossier'
+              if (current['reportCode'].startsWith('STATISTIC')) {
+                typeCurrent = 'thong_ke'
+              }
+              // push default current siteName
+              let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
+              if (filterconfigObject.hasOwnProperty('groupIds') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
+                let govCodes = filterconfigObject['groupIds']
+                let exit = false
+                for (let key in govCodes) {
+                  if (String(state.groupId) === govCodes[key]['value']) {
+                    exit = true
+                    break;
+                  }
+                }
+                if (!exit && ((filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) || !filterconfigObject.hasOwnProperty('exclusive'))) {
+                  govCodes.push({
+                    "value": parseInt(state.groupId),
+                    "text": state.siteName
+                  })
+                }
+                filterconfigObject['groupIds'] = govCodes
+              }
+              itemsReportsData.push({
+                'code' : String(indexKey),
+                'document' : current['reportCode'],
+                'active' : false,
+                'type' : typeCurrent,
+                'title' : current['reportName'],
+                'filterConfig' : filterconfigObject,
+                'tableConfig' : eval('( ' + current['tableConfig'] + ' )'),
+                'userConfig' : eval('( ' + current['userConfig'] + ' )'),
+                'dynamicReportId' : current['dynamicReportId'],
+                'reportCode' : current['reportCode'],
+                'reportName' : current['reportName'],
+                'sharing' : current['sharing']
+              })
+              indexKey = indexKey + 1
+            }
+            state.itemsReports = itemsReportsData
+            console.log('state.itemsReports', state.itemsReports)
+            resolve(itemsReportsData)
+          }).catch(function (error) {
+            state.itemsReports = []
+            commit('setsnackbarerror', true)
+            reject(error)
+          })
+        }
       })
     },
     getAgencyReportLists ({state}, filter) {
@@ -160,11 +245,18 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             },
             params: {
-              year: filter.year,
-              month: filter.month ? filter.month : 0,
-              group: filter.group,
-              reporting: false,
-              agency: filter['agency']
+
+            }
+          }
+          for (let key in filter['data']) {
+            let currentVal = filter['data'][key]
+            if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+              let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+              if (dateStr !== 'Invalid Date') {
+                param.params[key] = dateStr
+              } else {
+                param.params[key] = currentVal
+              }
             }
           }
           let govAgency = filter['govAgency']
@@ -173,10 +265,8 @@ export const store = new Vuex.Store({
           if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
-            requestURL = '/o/rest/statistics'
-            param.params['fromStatisticDate'] = filter.fromDate
-            param.params['toStatisticDate'] = filter.toDate
-            if (govAgency === undefined || govAgency === null || govAgency === '') {
+            requestURL = filter['api']
+            if (agencyLists.length === 0) {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
@@ -188,7 +278,7 @@ export const store = new Vuex.Store({
                 console.log(error)
                 reject(error)
               })
-            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
+            } else if (String(govAgency) === '0' && agencyLists.length > 0) {
               let promises = []
               for (let key in agencyLists) {
                 if (String(agencyLists[key]['value']) !== '0') {
@@ -197,6 +287,19 @@ export const store = new Vuex.Store({
                 }
               }
               axios.all(promises)
+              /*
+              .then(function(results) {
+                let temp = results.map(r => r.data)
+                if (temp.length > 0) {
+                  resolve({
+                    type: 1,
+                    data: temp
+                  })
+                } else {
+                  resolve(null)
+                }
+              })
+              */
               .then(axios.spread((...args) => {
                 let myObject = []
                 for (let i = 0; i < args.length; i++) {
@@ -210,10 +313,8 @@ export const store = new Vuex.Store({
                   resolve(null)
                 }
               }))
-            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
-              if (govAgency['value'] !== undefined) {
-                param['headers']['groupId'] = govAgency['value']
-              }
+            } else if (String(govAgency) !== '0' && agencyLists.length > 0) {
+              param['headers']['groupId'] = govAgency
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
@@ -229,21 +330,8 @@ export const store = new Vuex.Store({
           } else {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
-            requestURL = '/o/rest/v2/dossiers'
+            requestURL = filter['api']
             param.params['sort'] = 'domainCode'
-            if (filter.document === 'REPORT_05') {
-              param.params['fromFinishDate'] = filter.fromDate
-              param.params['toFinishDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_09') {
-              param.params['fromReleaseDate'] = filter.fromDate
-              param.params['toReleaseDate'] = filter.toDate
-            } else if (filter.document === 'REPORT_10') {
-              param.params['fromReceiveNotDoneDate'] = filter.fromDate
-              param.params['toReceiveNotDoneDate'] = filter.toDate
-            } else {
-              param.params['fromReceiveDate'] = filter.fromDate
-              param.params['toReceiveDate'] = filter.toDate
-            }
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
@@ -345,9 +433,11 @@ export const store = new Vuex.Store({
     setselected (state, payload) {
       state.selected = payload
     },
+    setselectedText (state, payload) {
+      state.selectedText = payload
+    },
     setreportType (state, payload) {
       state.reportType = payload
-
     },
     setgroupType (state, payload) {
       state.groupType = payload
@@ -383,6 +473,9 @@ export const store = new Vuex.Store({
     },
     selected (state) {
       return state.selected
+    },
+    selectedText (state) {
+      return state.selectedText
     },
     reportType (state) {
       return state.reportType
