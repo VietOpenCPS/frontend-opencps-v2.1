@@ -535,21 +535,21 @@ export default {
                 console.log('compare value: ', selection[keySe]['value'])
                 if (selection[keySe]['compare'] === '#') {
                   console.log('compare value XXXX: ', obj[selection[keySe]['key']])
-                  if (obj[selection[keySe]['key']] !== selection[keySe]['value']) {
+                  if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
                     return obj
                   }
                 } else if (selection[keySe]['compare'] === '=') {
                   if (selection[keySe]['value'] === '') {
-                    if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                    if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                       return obj
                     }
                   } else {
-                    if (obj[selection[keySe]['key']] === selection[keySe]['value']) {
+                    if (String(obj[selection[keySe]['key']]) === String(selection[keySe]['value'])) {
                       return obj
                     }
                   }
                 } else {
-                  if (obj[selection[keySe]['key']] === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
+                  if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                     return obj
                   }
                 }
