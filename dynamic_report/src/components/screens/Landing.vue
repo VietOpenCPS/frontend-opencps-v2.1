@@ -561,7 +561,6 @@ export default {
               return obj
             }
           })
-          console.log('resultDataTotal: ', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -669,6 +668,7 @@ export default {
               }
             }
           }
+          console.log('resultDataTotal: ', resultDataTotal)
           for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
@@ -681,6 +681,7 @@ export default {
               indexTotal = indexTotal + 1
             }
           }
+          console.log('dataRowTotal: ', dataRowTotal)
           dataRowI += JSON.stringify(dataRowTotal)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
