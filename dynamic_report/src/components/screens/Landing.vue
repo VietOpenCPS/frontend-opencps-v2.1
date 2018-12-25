@@ -515,12 +515,20 @@ export default {
       filter['agencyLists'] = vm.agencyLists
       vm.pdfBlob = null
       vm.isShowLoading = true
+      let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
+      let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
+      let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+      let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
           let index = 1
           let dataRowTotal = []
+          let totalText = 'Tổng số'
+          if (sumKey === 'month') {
+            totalText = 'Cả năm'
+          }
           dataRowTotal.push({
-            text: 'Tổng số', 
+            text: totalText, 
             colSpan: 2,
             bold: true,
             alignment: 'center',
@@ -542,10 +550,7 @@ export default {
             }
           }
           let dataRowI = ''
-          let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
-          let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
-          let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
-          let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
+          
           // TODO
           let resultData = result
           if (selection !== undefined && selection !== null && selection.length > 0) {
