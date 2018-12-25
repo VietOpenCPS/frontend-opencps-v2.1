@@ -527,8 +527,9 @@ export default {
           let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
           let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
           // TODO
+          let resultData = result
           if (selection !== undefined && selection !== null && selection.length > 0) {
-            let resultData = result.filter(function(obj) {
+            resultData = result.filter(function(obj) {
               for (let keySe in selection) {
                 if (selection[keySe]['compare'] === '#') {
                   if (obj[selection[keySe]['key']] !== selection[keySe]['value']) {
