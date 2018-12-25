@@ -357,12 +357,12 @@ export default {
         }
         headerTableReport += JSON.stringify({
           text: str1,
-          alignment: alignmentConfig,
+          alignment: 'center',
           bold: true
         }) + ','
         header2TableReport += JSON.stringify({
           text: '(' + ine + ')',
-          alignment: alignmentConfig,
+          alignment: 'center',
           italics: true
         }) + ','
         ine = ine + 1
