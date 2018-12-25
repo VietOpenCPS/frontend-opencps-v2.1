@@ -654,7 +654,7 @@ export const store = new Vuex.Store({
             console.log('upload file success!')
           }).catch(function (xhr) {
             console.log(xhr)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(xhr)
           })
         } else {
@@ -686,7 +686,7 @@ export const store = new Vuex.Store({
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           reject(xhr)
         })
       })
@@ -924,7 +924,7 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
       })
@@ -944,7 +944,7 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
       })
@@ -964,7 +964,7 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
       })
@@ -1213,7 +1213,7 @@ export const store = new Vuex.Store({
           store.dispatch('getActiveGetCounter', !state.activeGetCounter)
         }).catch(function (xhr) {
           reject(xhr)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           store.commit('setLoading', false)
         })
       })
@@ -1389,7 +1389,7 @@ export const store = new Vuex.Store({
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
       })
@@ -1712,7 +1712,7 @@ export const store = new Vuex.Store({
           resolve(resPostCmt)
         })
         .catch(function (error) {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           console.log(error)
         })
       })
@@ -2115,7 +2115,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2137,7 +2137,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2210,7 +2210,7 @@ export const store = new Vuex.Store({
                 store.dispatch('getActiveGetCounter', !state.activeGetCounter)
                 store.dispatch('getActiveLoadingDataHoSo', !state.activeLoadingDataHoSo)
               }
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
               reject(error)
             })
           }
@@ -2235,7 +2235,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2259,7 +2259,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2291,7 +2291,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2317,7 +2317,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2338,7 +2338,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
@@ -2457,7 +2457,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
         })
