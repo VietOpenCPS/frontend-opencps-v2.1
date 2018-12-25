@@ -12,15 +12,11 @@
                 Lưu thay đổi
               </v-btn>
               -->
-              {{customize}}
               <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
                 <span v-if="showConfig">Quay lại</span>
                 <span v-else>Tuỳ chọn</span>
-              </v-btn>
-              <v-btn v-if="reportType === 'REPORT_01'" flat class="mx-0 my-0" v-on:click.native="doExcelFunc">
-                Xuất Excel
               </v-btn>
             </v-flex>
           </v-layout>
@@ -61,8 +57,8 @@
         ></v-select>
       </v-flex>
     </v-layout>
-    <v-layout row wrap class="filter_menu my-3 px-4" v-if="showConfig">
-      <v-flex v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+    <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+      <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
         <v-checkbox v-if="!reportType.startsWith('STATISTIC')" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
       </v-flex>
     </v-layout>
