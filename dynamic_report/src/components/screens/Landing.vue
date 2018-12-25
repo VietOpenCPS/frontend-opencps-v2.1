@@ -28,7 +28,7 @@
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
-          label="Chọn đơn vị"
+          label="Group By"
           item-text="text"
           item-value="value"
           >
@@ -361,7 +361,11 @@ export default {
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             let domainRawItem = {}
-            domainRawItem['domainName'] = vm.groupByVal
+            if (vm.groupByVal === 'domainCode') {
+              domainRawItem['domainName'] = dataReportCurrent['domainName']
+            } else {
+              domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
+            }
             domainRawItem['services'] = []
             if (vm.groupByVal === 'domainCode') {
               if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
