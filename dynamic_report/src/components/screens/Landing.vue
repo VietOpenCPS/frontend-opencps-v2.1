@@ -34,6 +34,16 @@
           >
         </v-autocomplete>
       </v-flex>
+      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 0">
+        <v-autocomplete
+          :items="groupBy"
+          v-model="groupByVal"
+          label="Chọn đơn vị"
+          item-text="text"
+          item-value="value"
+          >
+        </v-autocomplete>
+      </v-flex>
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date'"
@@ -51,7 +61,6 @@
           :items="item['source']"
           v-model="data[item.key]"
           :label="item['label']"
-          single-line
           item-value="value"
           item-text="name"
         ></v-select>
@@ -139,7 +148,9 @@ export default {
     showConfig: false,
     filters: [],
     data: {},
-    customize: false
+    customize: false,
+    groupBy: [],
+    groupByVal: ''
   }),
   computed: {
     itemsReports () {
@@ -185,9 +196,11 @@ export default {
         vm.filters = []
         vm.customize = false
         vm.data = {}
+        vm.groupBy = []
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select') {
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
@@ -220,10 +233,12 @@ export default {
       let currentQuery = newRoute.query
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
+      vm.groupBy = []
       vm.customize = false
       vm.data = {}
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+      vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
       vm.report1Def = {}
       for (let key in vm.itemsReportsConfig) {
         vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -346,13 +361,9 @@ export default {
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             let domainRawItem = {}
-            if (vm.groupType === 'domain') {
-              domainRawItem['domainName'] = dataReportCurrent['domainName']
-            } else {
-              domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
-            }
-              domainRawItem['services'] = []
-            if (vm.groupType === 'domain') {
+            domainRawItem['domainName'] = vm.groupByVal
+            domainRawItem['services'] = []
+            if (vm.groupByVal === 'domainCode') {
               if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
                 domainRaw[dataReportCurrent['domainName']] = domainRawItem
               }
@@ -369,7 +380,7 @@ export default {
               let dossierRawItem = {}
               dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
               dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
-              if (vm.groupType === 'domain') {
+              if (vm.groupByVal === 'domainCode') {
                 dossierRawItem['domainName'] = dataReportCurrent['domainName']
               } else {
                 dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
