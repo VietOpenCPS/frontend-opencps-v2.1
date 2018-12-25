@@ -711,7 +711,7 @@
           let postData = {
             id: vm.detailData[0]['mappingUserId'],
             data: {
-              locked: dataLock
+              locked: !dataLock
             }
           }
           vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
