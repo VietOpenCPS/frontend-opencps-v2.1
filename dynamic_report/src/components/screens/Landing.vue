@@ -600,7 +600,9 @@ export default {
                   if (String(parseInt(resultDataVari[keyVari][kkey])) === 'NaN') {
                     resultDataVari[keyVari][kkey] = resultData[key][kkey]
                   } else if (kkey === 'ontimePercentage') {
-                    resultDataVari[keyVari][kkey] = (parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey]))/2
+                    resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey])
+                  } else if (kkey === 'month' || kkey === 'year') {
+                    resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey])
                   } else {
                     resultDataVari[keyVari][kkey] = parseInt(resultData[key][kkey]) + parseInt(resultDataVari[keyVari][kkey])
                   }
@@ -627,8 +629,8 @@ export default {
               })
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
-                let dataText = ''
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
+                let dataText = currentConfig['prefix'] + ' '
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                   dataText = resultData[key][currentConfig['value']] + ' '
                 }
@@ -644,7 +646,7 @@ export default {
                 if (vm.govAgency === 0) {
                   if (dataRowTotal[indexTotal] !== null && dataRowTotal[indexTotal] !== undefined && dataRowTotal[indexTotal]['text'] !== '') {
                     if (currentConfig['value'] === 'ontimePercentage') {
-                      dataRowTotal[indexTotal]['text'] = (parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)) / 2
+                      dataRowTotal[indexTotal]['text'] = parseInt(dataText)
                     } else if (isNaN(dataText)) {
                       dataRowTotal[indexTotal]['text'] = ' '
                     } else {
@@ -676,7 +678,7 @@ export default {
                     if (String(parseInt(resultDataVariTotal[keyVari][kkey])) === 'NaN') {
                       resultDataVariTotal[keyVari][kkey] = resultDataTotal[key][kkey]
                     } else if (kkey === 'ontimePercentage') {
-                      resultDataVariTotal[keyVari][kkey] = (parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey]))/2
+                      resultDataVariTotal[keyVari][kkey] = parseInt(resultDataVariTotal[keyVari][kkey])
                     } else {
                       resultDataVariTotal[keyVari][kkey] = parseInt(resultDataTotal[key][kkey]) + parseInt(resultDataVariTotal[keyVari][kkey])
                     }
