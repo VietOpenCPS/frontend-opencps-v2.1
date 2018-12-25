@@ -331,7 +331,7 @@ export const store = new Vuex.Store({
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
             requestURL = filter['api']
-            param.params['sort'] = 'domainCode'
+            // param.params['sort'] = 'domainCode'
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data

@@ -300,7 +300,8 @@ export default {
       let vm = this
       vm.docDefinition = {}
       let reportName = ''
-      let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      let docDString = {}
+      docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
@@ -321,7 +322,6 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                console.log('KKK: ', vm.filters[key]['source'][keySource]['value'])
                 if (String(vm.filters[key]['source'][keySource]['value']) === currentVal) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
@@ -535,7 +535,8 @@ export default {
       vm.agencyLists = []
       vm.api = ''
       vm.docDefinition = {}
-      let docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      let docDString = {}
+      docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
