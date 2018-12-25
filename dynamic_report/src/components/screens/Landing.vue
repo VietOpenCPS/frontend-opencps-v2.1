@@ -12,7 +12,7 @@
                 Lưu thay đổi
               </v-btn>
               -->
-              <v-btn flat class="mx-0 my-0" v-on:click.native="showConfig = !showConfig">
+              <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
                 <span v-if="showConfig">Quay lại</span>
@@ -141,7 +141,8 @@ export default {
     nameReport: '',
     showConfig: false,
     filters: [],
-    data: {}
+    data: {},
+    customize: false
   }),
   computed: {
     itemsReports () {
@@ -185,9 +186,11 @@ export default {
         vm.agencyLists = []
         vm.api = ''
         vm.filters = []
+        vm.customize = false
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+        vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
         console.log('agencyLists: ', vm.agencyLists)
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
         vm.itemsReportsConfig = []
@@ -214,7 +217,9 @@ export default {
       let currentQuery = newRoute.query
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       vm.itemsReportsConfig = []
+      vm.customize = false
       vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+      vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       vm.report1Def = {}
       for (let key in vm.itemsReportsConfig) {
         vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
