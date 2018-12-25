@@ -566,8 +566,8 @@ export default {
               }
             })
           }
-          console.log('resultDataTotal1: ', resultDataTotal)
-          let resultDataTotal = result.filter(function(obj) {
+          console.log('resultDataTotal1: ', resultData)
+          let resultDataTotal = resultData.filter(function(obj) {
             if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
               return obj
             }
@@ -605,7 +605,7 @@ export default {
             resultData = vm.sortByKey(resultData, sort)
           }
           for (let key in resultData) {
-            if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+            if (resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
               dataRow.push({
                 text: index, 
