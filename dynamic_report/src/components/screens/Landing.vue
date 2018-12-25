@@ -276,10 +276,23 @@ export default {
       }
       reportName = vm.itemsReports[vm.index]['title']
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
-                             .replace(/\[\$fromDate\$\]/g, vm.fromDateFormatted)
-                             .replace(/\[\$toDate\$\]/g, vm.toDateFormatted)
-                             .replace(/\[\$online\$\]/g, onlineStr)
-                             .replace(/\[\$reportName\$\]/g, reportName)
+      
+      for (let key in vm.filters) {
+        let find = vm.filters[key]['key']
+        let currentVal = vm.data[vm.filters[key]['key']]
+        if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+          let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+          if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
+            docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
+          } else {
+            docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
+          }
+        } else {
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
+        }
+      }
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       let widthsConfig = []
       let dataReportXX = ''
       widthsConfig.push(30)
