@@ -523,6 +523,7 @@ export default {
           let sumKey = vm.itemsReports[vm.index]['filterConfig']['sumKey']
           let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
           let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
+          let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
           // TODO
           let resultData = result.filter(function(obj) {
             for (let keySe in selection) {
@@ -565,6 +566,11 @@ export default {
               resultData.push(resultDataVari[key])
             }
           }
+          console.log('before sort: ', resultData)
+          if (sort !== '' && sort !== undefined && sort !== null) {
+            resultData = vm.sortByKey(resultData, sort)
+          }
+          console.log('after sort: ', resultData)
           for (let key in resultData) {
             if (resultData[key][sumKey] !== '' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
               let dataRow = []
@@ -677,6 +683,12 @@ export default {
       vm.$store.dispatch('updateDynamicReport', doData).then(function () {
         vm.showConfig = false
         vm.doCreatePDF(vm.selected)
+      })
+    },
+    sortByKey (array, key) {
+      return array.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
       })
     }
   }
