@@ -472,7 +472,7 @@ export default {
         let currentVal = vm.data[vm.filters[key]['key']]
         if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
           let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
-          if (dateStr !== 'Invalid Date') {
+          if (dateStr !== 'Invalid Date'&& currentVal.length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
