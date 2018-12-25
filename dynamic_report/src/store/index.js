@@ -252,7 +252,7 @@ export const store = new Vuex.Store({
             let currentVal = filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
-              if (dateStr !== 'Invalid Date' && currentVal.length === 13) {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
                 param.params[key] = dateStr
               } else {
                 param.params[key] = currentVal
