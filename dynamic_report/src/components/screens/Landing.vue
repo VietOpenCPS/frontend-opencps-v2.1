@@ -198,6 +198,7 @@ export default {
         vm.data = {}
         vm.groupBy = []
         vm.itemsReportsConfig = []
+        vm.nameReport = vm.itemsReports[vm.index]['reportName']
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
           vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
         }
