@@ -520,7 +520,7 @@ export default {
           }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
-          console.log('widthsConfigwidthsConfigwidthsConfigwidthsConfig', widthsConfig)
+          console.log('dataReportXX', dataReportXX.length)
           vm.docDefinition = JSON.parse(docDString)
           console.log('docDStringdocDStringdocDStringdocDString', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -538,6 +538,7 @@ export default {
       let vm = this
       vm.agencyLists = []
       vm.api = ''
+      let dataRowI = ''
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
@@ -618,7 +619,6 @@ export default {
               })
             }
           }
-          let dataRowI = ''
           
           // TODO
           let resultData = result
