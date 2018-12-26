@@ -37,7 +37,8 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: []
+    itemsReports: [],
+    reportConfigStatic: {}
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -146,6 +147,7 @@ export const store = new Vuex.Store({
                   }
                   filterconfigObject['groupIds'] = govCodes
                 }
+                state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
                 itemsReportsData.push({
                   'code' : String(indexKey),
                   'document' : current['reportCode'],
@@ -209,6 +211,7 @@ export const store = new Vuex.Store({
                 }
                 filterconfigObject['groupIds'] = govCodes
               }
+              state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
               itemsReportsData.push({
                 'code' : String(indexKey),
                 'document' : current['reportCode'],
@@ -447,6 +450,9 @@ export const store = new Vuex.Store({
     },
     setitemsReports (state, payload) {
       state.itemsReports = payload
+    },
+    setreportConfigStatic (state, payload) {
+      state.reportConfigStatic = payload
     }
   },
   getters: {
@@ -488,6 +494,9 @@ export const store = new Vuex.Store({
     },
     itemsReports (state) {
       return state.itemsReports
+    },
+    reportConfigStatic (state) {
+      return state.reportConfigStatic
     }
   }
 })

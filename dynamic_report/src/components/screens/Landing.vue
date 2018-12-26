@@ -156,6 +156,9 @@ export default {
     itemsReports () {
       return this.$store.getters.itemsReports
     },
+    reportConfigStatic () {
+      return this.$store.getters.reportConfigStatic
+    },
     selected: {
       // getter
       get: function() {
@@ -252,6 +255,7 @@ export default {
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+        console.log('AAAAAAAAAAAAAA', vm.itemsReportsConfig)
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
@@ -301,7 +305,8 @@ export default {
       vm.docDefinition = {}
       let reportName = ''
       let docDString = {}
-      docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
+      console.log('docDStringdocDStringdocDString', docDString)
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
@@ -322,7 +327,7 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (String(vm.filters[key]['source'][keySource]['value']) === currentVal) {
+                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
@@ -490,13 +495,11 @@ export default {
                   style: 'tdStyle'
                 })
                 for (let keyVal in vm.itemsReportsConfig) {
-                  console.log('vm.itemsReportsConfig[keyVal]', vm.itemsReportsConfig[keyVal])
                   if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
                     let alignmentConfig = 'center'
                     if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
                       alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
                     }
-                    console.log(vm.itemsReportsConfig[keyVal]['value'] + ': ', alignmentConfig)
                     let ddStr = ' '
                     if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
                       ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
@@ -536,7 +539,8 @@ export default {
       vm.api = ''
       vm.docDefinition = {}
       let docDString = {}
-      docDString = JSON.stringify(vm.itemsReports[vm.index]['tableConfig']['docDefinition'])
+      docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
+      console.log('docDStringdocDStringdocDStringdocDString', docDString)
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
@@ -555,6 +559,13 @@ export default {
           if (dateStr !== 'Invalid Date'&& String(currentVal).length === 13) {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), dateStr)
           } else {
+            if (vm.filters[key]['type'] === 'select') {
+              for (let keySource in vm.filters[key]['source']) {
+                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                  currentVal = vm.filters[key]['source'][keySource]['name']
+                }
+              }
+            }
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
@@ -614,10 +625,7 @@ export default {
           if (selection !== undefined && selection !== null && selection.length > 0) {
             resultData = result.filter(function(obj) {
               for (let keySe in selection) {
-                console.log('compare #: ', selection[keySe]['compare'] === '#')
-                console.log('compare value: ', selection[keySe]['value'])
                 if (selection[keySe]['compare'] === '#') {
-                  console.log('compare value XXXX: ', obj[selection[keySe]['key']])
                   if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
                     return obj
                   }
@@ -639,13 +647,11 @@ export default {
               }
             })
           }
-          console.log('resultDataTotal1: ', resultData)
           let resultDataTotal = resultData.filter(function(obj) {
             if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
               return obj
             }
           })
-          console.log('resultDataTotal2: ', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -693,7 +699,6 @@ export default {
                 let dataText = ''
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  console.log('iiiiiii: ', resultData[key][currentConfig['value']])
                   dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                 }
                 let alignmentConfig = 'center'
@@ -723,8 +728,6 @@ export default {
               dataRowI += JSON.stringify(dataRow) + ','
             }
           }
-          console.log('vm.govAgency', vm.govAgency)
-          console.log('vm.govAgency === 0', vm.govAgency === 0)
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
             let resultDataVariTotal = {}
             for (let key in resultDataTotal) {
@@ -750,13 +753,11 @@ export default {
             }
             resultDataTotal = []
             for (let key in resultDataVariTotal) {
-              console.log('resultData', key)
               if (key === undefined || key === 'undefined_') {
                 resultDataTotal.push(resultDataVariTotal[key])
               }
             }
           }
-          console.log('resultDataTotal: ', resultDataTotal)
           for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
@@ -769,7 +770,6 @@ export default {
               indexTotal = indexTotal + 1
             }
           }
-          console.log('dataRowTotal: ', dataRowTotal)
           dataRowI += JSON.stringify(dataRowTotal)
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
