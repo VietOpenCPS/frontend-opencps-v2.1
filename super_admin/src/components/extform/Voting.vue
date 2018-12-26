@@ -102,6 +102,17 @@
                 <v-layout wrap class="py-1 align-center row-list-style">
                   <v-flex xs12 class="">
                     <!-- <div class="my-2 text-bold">:</div> -->
+                    <v-text-field
+                      label="Mã câu hỏi"
+                      box
+                      v-model="votingCode"
+                      :rules="type === 'add' ? [v => !!v || 'Trường dữ liệu bắt buộc'] : []"
+                      :required="type === 'add'"
+                      :disabled="type !== 'add'"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 class="">
+                    <!-- <div class="my-2 text-bold">:</div> -->
                     <v-textarea
                       label="Nội dung câu hỏi"
                       box
@@ -228,6 +239,7 @@
         currentQuestion: {
         },
         subject: '',
+        votingCode: '',
         answer: '',
         choicesCurrent: [],
         votingIdCurrent: '',
@@ -284,8 +296,10 @@
       createQuestion () {
         let vm = this
         vm.type = 'add'
+        // vm.votingCode = ''
         vm.answer = ''
         vm.choicesCurrent = []
+        vm.$refs.formAddQuestion.reset()
         vm.dialog_addQuestion = true
       },
       addChoices () {
@@ -314,6 +328,7 @@
           choices: choicesItems,
           commentable: '',
           type: vm.type,
+          votingCode: vm.votingCode,
           votingId: vm.votingIdCurrent
         }
         console.log('filter data', filter)
@@ -340,6 +355,7 @@
         let vm = this
         vm.answer = ''
         vm.type = 'update'
+        vm.votingCode = item['votingCode']
         vm.subject = item['subject']
         vm.choicesCurrent = item['choices']
         vm.votingIdCurrent = item['votingId']

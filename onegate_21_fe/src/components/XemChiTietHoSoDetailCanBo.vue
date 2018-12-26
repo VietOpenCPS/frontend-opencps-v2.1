@@ -548,6 +548,7 @@
 <script>
 import router from '@/router'
 import $ from 'jquery'
+import toastr from 'toastr'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
@@ -2110,6 +2111,7 @@ export default {
         }
         Promise.all(arrAction).then(results => {
           vm.loadingVoting = false
+          vm.loadVoting()
           toastr.success('Đánh giá của bạn được gửi thành công')
         }).catch(xhr => {
           vm.loadingVoting = false

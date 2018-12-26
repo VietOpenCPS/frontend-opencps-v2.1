@@ -1621,7 +1621,7 @@ header span {
 	padding: 20px 15px 20px 65px;
 	font-size: 22px;
 	color: white;
-	height: 100px;
+	height: 85px;
 	position: relative;
 }
 
@@ -1636,23 +1636,31 @@ header span {
 	background-color: #29bec4;
 }
 .tab-item .left a:nth-child(2) {
-    background-color: #0ca040;
+    background-color: #ca7828;
     margin: 0 0 8px 0;
 }
 .tab-item .left a:nth-child(2):hover {
+	background-color: #ca7828b0;
+}
+
+.tab-item .left a:nth-child(3) {
+    background-color: #0ca040;
+    margin: 0 0 8px 0;
+}
+.tab-item .left a:nth-child(3):hover {
     background-color: #10cf53;
 }
-.tab-item .left a:nth-child(3) {
+.tab-item .left a:nth-child(4) {
 	background-color: #005792;
 	margin: 0 0 8px 0;
 }
-.tab-item .left a:nth-child(3):hover {
+.tab-item .left a:nth-child(4):hover {
 	background-color: #0090ff;
 }
-.tab-item .left a:nth-child(4) {
+.tab-item .left a:nth-child(5) {
 	background-color: #cdbe1c;
 }
-.tab-item .left a:nth-child(4):hover {
+.tab-item .left a:nth-child(5):hover {
 	background-color: #e4d538;
 }
 .mWrapper > header {
