@@ -711,7 +711,7 @@
           let postData = {
             id: vm.detailData[0]['mappingUserId'],
             data: {
-              locked: dataLock
+              locked: !dataLock
             }
           }
           vm.$store.dispatch('doChangeStatusAccount', postData).then(function (data) {
@@ -719,7 +719,9 @@
             console.log(data)
           })
         } else {
-          vm.deactiveAccountFlag = !dataLock
+          setTimeout(function() {
+            vm.deactiveAccountFlagBoolean = !dataLock
+          }, 10)
         }
       },
       showAccount (item) {

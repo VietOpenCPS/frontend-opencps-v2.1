@@ -170,7 +170,7 @@ export const store = new Vuex.Store({
             }
           }
           axios.put('/o/v1/opencps/user/' + postData['id'] + '/deactive', postData['data'], param).then(function () {
-            resolve({statu: 200})
+            resolve({status: 200})
           }).catch(function (xhr) {
             reject(xhr)
             commit('setsnackbarerror', true)
@@ -228,9 +228,9 @@ export const store = new Vuex.Store({
           axios.post('/o/rest/v2/employees/' + postData['id'] + '/account', dataPostProcess, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
-          }).catch(function (error) {
-            reject(error)
-            if (error.statusCode === 409) {
+          }).catch(function (errorRes, response) {
+            reject(errorRes)
+            if (errorRes.response.data && errorRes.response.data['code'] === 409) {
               alert('Địa chỉ email đã được sử dụng.')
             } else {
               commit('setsnackbarerror', true)
@@ -1166,6 +1166,7 @@ export const store = new Vuex.Store({
           var dataPostVoting = new URLSearchParams()
           dataPostVoting.append('className', data.className ? data.className : '')
           dataPostVoting.append('classPK', data.classPK ? data.classPK : '')
+          dataPostVoting.append('votingCode', data.votingCode ? data.votingCode : '')
           dataPostVoting.append('subject', data.subject ? data.subject : '')
           dataPostVoting.append('choices', data.choices ? data.choices : '')
           dataPostVoting.append('commentable', data.commentable ? data.commentable : '')

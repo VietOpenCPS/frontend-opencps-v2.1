@@ -17,7 +17,14 @@
               <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Kết quả hồ sơ</span><br>
-                <span>Tra cứu kết quả hồ sơ</span>
+                <span>Tra cứu hồ sơ có kết quả</span>
+              </p>
+            </a>
+            <a href="javascript:;" class="active" @click="goPage('tiepnhanhoso')">
+              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons8-open-file-50.png"></p>
+              <p class="ml-2 my-0">
+                <span class="text-bold">Tiếp nhận hồ sơ</span><br>
+                <span>Tra cứu hồ sơ đã tiếp nhận</span>
               </p>
             </a>
             <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
@@ -74,7 +81,7 @@
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
         if (!newQuery.hasOwnProperty('secretKey')) {
-          vm.setInterval()
+          // vm.setInterval()
           vm.isKios = true
           // console.log('isKios')
         } else {
@@ -129,6 +136,8 @@
         let queryString
         if (page === 'ketquahoso') {
           queryString = '/'
+        } else if (page === 'tiepnhanhoso') {
+          queryString = '/tiep-nhan-ho-so'
         } else if (page === 'tracuuhoso') {
           queryString = '/tra-cuu-ho-so'
         } else if (page === 'tracuuthutuc') {

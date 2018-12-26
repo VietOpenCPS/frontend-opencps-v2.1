@@ -37,7 +37,10 @@
                   <v-list class="px-2 pt-1">
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Tên người nộp:</span>
-                      <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{thongTinChiTietHoSo.applicantName}}
+                      </span>
+                      <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Địa chỉ:</span>

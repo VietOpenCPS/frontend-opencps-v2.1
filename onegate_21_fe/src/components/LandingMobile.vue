@@ -1,183 +1,7 @@
 <template>
   <div>
-    <div class="row-header no__hidden_class">
-      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-select
-            v-model="advSearchItems"
-            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục ..."
-            solo
-            chips
-            tags
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @input="keywordEventChange"
-            content-class="adv__search__select"
-            return-object
-          ></v-select>
-          <v-fade-transition>
-            <div v-if="menusss"
-            class="adv__search_container"
-            >
-              <v-layout wrap v-for="(item, indexTool) in advSearchTools" v-bind:key="indexTool" v-if="item.display">
-                <v-flex xs12 sm5>
-                  <v-select
-                    :items="advSearchTools"
-                    v-model="item.value"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="value"
-                    item-text="text"
-                    disabled
-                  ></v-select>
-                </v-flex>
-                <v-flex xs12 sm1 class="text-center">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">drag_handle</v-icon>
-                  </v-btn>
-                </v-flex>
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
-                  <v-select
-                    :items="itemFilterSupport.years"
-                    v-model="itemFilterSupport.year"
-                    label="Chọn năm"
-                    autocomplete
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    hide-selected
-                    @change="changeAdvFilterData($event, 'year', item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs2 sm2 class="text-center" v-if="item.spec === 'year_month'">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">remove</v-icon>
-                  </v-btn>
-                </v-flex>
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
-                  <v-select
-                    :items="itemFilterSupport.months"
-                    v-model="itemFilterSupport.month"
-                    label="Chọn tháng"
-                    autocomplete
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, 'month', item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'top'">
-                  <v-select
-                    :items="itemFilterSupport.tops"
-                    v-model="itemFilterSupport.top"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'status'">
-                  <v-select
-                    :items="itemFilterSupport.statusLists"
-                    v-model="itemFilterSupport.status"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'substatus'">
-                  <v-select
-                    :items="itemFilterSupport.substatusLists"
-                    v-model="itemFilterSupport.substatus"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'agency'">
-                  <v-select
-                    :items="itemFilterSupport.agencyLists"
-                    v-model="itemFilterSupport.agency"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="administrationCode"
-                    item-text="administrationName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'service'">
-                  <v-select
-                    :items="itemFilterSupport.serviceLists"
-                    v-model="itemFilterSupport.service"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="serviceCode"
-                    item-text="serviceName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'domain'">
-                  <v-select
-                    :items="itemFilterSupport.domainLists"
-                    v-model="itemFilterSupport.domain"
-                    :label="item.text + ':'"
-                    autocomplete
-                    single-line
-                    item-value="domainCode"
-                    item-text="domainName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'register'">
-                  <v-text-field 
-                    v-model="itemFilterSupport.register" 
-                    :placeholder="item.text">
-                  </v-text-field>
-                </v-flex>
-              </v-layout>
-              <v-layout wrap>
-                <v-flex xs12 sm10 class="no__selected__items">
-                  <v-select
-                    :items="advSearchTools"
-                    v-model="advSearchToolsSelected"
-                    label="Chọn điều kiện lọc"
-                    autocomplete
-                    single-line
-                    item-value="text"
-                    item-text="text"
-                    return-object
-                    @change="selectedAdvFilter"
-                    hide-selected
-                  ></v-select>
-                </v-flex>
-                <v-flex xs12 sm2 class="text-right">
-                  <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
-                    <v-icon class="mr-2">clear</v-icon>
-                    Quay lại
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </div>
-          </v-fade-transition>
-        </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
-            <v-icon size="16">filter_list</v-icon>
-          </v-btn>
-        </div>
-      </div> 
+    <div class="row-header no__hidden_class" style="background-color: #070f52">
+      <div class="ml-2 py-2 text-bold white--text" v-if="trangThaiHoSoList !== null"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
     </div>
     <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
@@ -226,12 +50,12 @@
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative">
             <v-text-field
-              placeholder="Nhập mã hồ sơ"
-              v-model="dossierNoKey"
-              @keyup.enter="changeDossierNoKey"
+              placeholder="Mã hồ sơ, tên hồ sơ, tên thủ tục ..."
+              v-model="searchKey"
+              @keyup.enter="keywordEventChange"
               append-icon="search"
               box
-              :append-icon-cb="changeDossierNoKey"
+              :append-icon-cb="keywordEventChange"
             ></v-text-field>
             <!-- <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon> -->
           </div>
@@ -246,6 +70,18 @@
         </v-chip>
       </div>
     </v-layout>
+    <v-flex xs12 sm3 class="pl-2 pr-2" v-if="originality === 1 && viewMobile">
+      <div style="position:relative">
+        <v-text-field
+          placeholder="Tìm theo mã hồ sơ, tên hồ sơ, tên thủ tục ..."
+          v-model="searchKey"
+          @keyup.enter="keywordEventChange"
+          append-icon="search"
+          box
+          :append-icon-cb="keywordEventChange"
+        ></v-text-field>
+      </div>
+    </v-flex>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
       </v-flex>
@@ -352,17 +188,13 @@
               @click.native="toggleAll"
             ></v-checkbox>
           </th>
-          <th
-            v-for="header in props.headers"
-            :key="header.text"
-            :class="header['class'] ? header['class'] : ''"
-            :width="header['width'] ? header['width'] + 'px' : ''"
-          >
-            <v-tooltip bottom>
-              <span slot="activator">{{ header.text }}</span>
-              <span>{{ header.text }}</span>
-            </v-tooltip>
+          <th width="30px">
+            <span>STT</span>
           </th>
+          <th>
+            <span>Tên thủ tục</span>
+          </th>
+          <th width="30px" v-if="!hideAction"></th>
         </tr>
       </template>
       <!--  -->
@@ -394,26 +226,24 @@
               {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
             </span>
           </td>
-
-          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
-            :class="itemHeader['class_column']"
-            v-if="itemHeader.hasOwnProperty('value')"
-          >
+          <td class="px-1 py-0">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item" :layout_view="itemHeader.layout_view"></template-rendering>
-              <span v-else>
-                {{ props.item[itemHeader.value] }}
-              </span>
+              <span class="primary--text"> {{ props.item.dossierNo }} - {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
+              <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
+              <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
+              <span class="text-bold">Tiếp nhận: </span> <span>{{ props.item.receiveDate }}</span><br>
+              <span class="text-bold">Hẹn trả: </span> <span>{{ props.item.dueDate }}</span><br>
+              <span v-if="props.item.dossierOverdue" :class="props.item.dossierOverdue.indexOf('Quá hạn') >= 0 ? 'red--text' : 'green--text'">{{ props.item.dossierOverdue }}</span>
             </div>
           </td>
           <td class="text-xs-center px-0 py-0" v-if="!hideAction">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-menu left :nudge-left="50" :nudge-top="15" 
+            <v-menu left bottom
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
               <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
@@ -450,7 +280,7 @@
         </tr>
       </template>
     </v-data-table>
-    <div class="text-xs-right layout wrap" style="position: relative;">
+    <div :class="!viewMobile ? 'text-xs-right layout wrap' : ''" style="position: relative;">
       <div class="flex pagging-table px-2"> 
         <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
           @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -771,7 +601,7 @@ import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
-
+import { isMobile } from 'mobile-device-detect'
 export default {
   props: ['index'],
   components: {
@@ -974,6 +804,7 @@ export default {
     serviceCode: '',
     templateNo: '',
     dossierNoKey: '',
+    searchKey: '',
     dialogAction: false,
     loadingAction: false,
     dialogActionProcess: false,
@@ -1021,6 +852,9 @@ export default {
     },
     activeLoadingDataHoSo () {
       return this.$store.getters.activeLoadingDataHoSo
+    },
+    viewMobile () {
+      return isMobile
     }
   },
   created () {
@@ -1506,7 +1340,7 @@ export default {
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
-            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            keyword: currentQuery.hasOwnProperty('keyword') && currentQuery.keyword ? currentQuery.keyword : vm.searchKey,
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
@@ -1526,7 +1360,7 @@ export default {
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
-            keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
+            keyword: currentQuery.hasOwnProperty('keyword') && currentQuery.keyword ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
