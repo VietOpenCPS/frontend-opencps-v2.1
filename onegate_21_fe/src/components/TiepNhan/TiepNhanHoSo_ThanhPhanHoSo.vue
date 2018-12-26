@@ -522,7 +522,9 @@ export default {
         console.log('dossierTemplateItems', vm.dossierTemplateItems)
         let fileTemplateNoArr = []
         for (let key in vm.dossierTemplateItems) {
-          fileTemplateNoArr.push(vm.dossierTemplateItems[key]['fileTemplateNo'])
+          if (vm.dossierTemplateItems[key]['fileTemplateNo']) {
+            fileTemplateNoArr.push(vm.dossierTemplateItems[key]['fileTemplateNo'])
+          }
         }
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
@@ -714,7 +716,7 @@ export default {
           })
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
@@ -725,10 +727,10 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
     },
@@ -867,7 +869,7 @@ export default {
                 })
               }, 1000)
             }).catch(reject => {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           } else {
             vm.$store.dispatch('viewFile', file).then(result => {
@@ -894,7 +896,7 @@ export default {
             vm.setDaKhai(item)
           })
         }).catch(reject => {
-          toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
     },
