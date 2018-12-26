@@ -150,7 +150,8 @@ export default {
     data: {},
     customize: false,
     groupBy: [],
-    groupByVal: ''
+    groupByVal: '',
+    dataReportXX: ''
   }),
   computed: {
     itemsReports () {
@@ -201,6 +202,7 @@ export default {
         vm.data = {}
         vm.groupBy = []
         vm.itemsReportsConfig = []
+        vm.dataReportXX = ''
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
           vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -252,6 +254,7 @@ export default {
       vm.api = ''
       vm.filters = []
       vm.report1Def = {}
+      vm.dataReportXX = ''
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -305,6 +308,7 @@ export default {
       vm.docDefinition = {}
       let reportName = ''
       let docDString = {}
+      vm.dataReportXX = ''
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
       let onlineStr = ''
       if (String(vm.online) === 'true') {
@@ -340,7 +344,6 @@ export default {
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       let widthsConfig = []
-      let dataReportXX = ''
       widthsConfig.push(30)
       let headerTableReport = '['
       let header2TableReport = '['
@@ -378,8 +381,8 @@ export default {
         }) + ','
         ine = ine + 1
       }
-      dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
-      dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
+      vm.dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
+      vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
       // bild data
       let filter = {
         document: vm.reportType,
@@ -516,11 +519,11 @@ export default {
               }
             }
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
-            dataReportXX += dataReportTotal
+            vm.dataReportXX += dataReportTotal
           }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
-          docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
-          console.log('dataReportXX', dataReportXX.length)
+          docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          console.log('dataReportXX', vm.dataReportXX.length)
           vm.docDefinition = JSON.parse(docDString)
           console.log('docDStringdocDStringdocDStringdocDString', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
@@ -538,7 +541,7 @@ export default {
       let vm = this
       vm.agencyLists = []
       vm.api = ''
-      let dataRowI = ''
+      vm.dataReportXX = ''
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
@@ -725,7 +728,7 @@ export default {
               }
               index = index + 1
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-              dataRowI += JSON.stringify(dataRow) + ','
+              vm.dataReportXX += JSON.stringify(dataRow) + ','
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
@@ -770,8 +773,8 @@ export default {
               indexTotal = indexTotal + 1
             }
           }
-          dataRowI += JSON.stringify(dataRowTotal)
-          docDString = docDString.replace(/"\[\$report\$\]"/g, dataRowI)
+          vm.dataReportXX += JSON.stringify(dataRowTotal)
+          docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
