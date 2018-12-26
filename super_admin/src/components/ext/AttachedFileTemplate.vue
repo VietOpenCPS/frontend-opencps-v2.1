@@ -50,7 +50,6 @@
                               label="Số biểu mẫu" 
                               v-model="item['fileTemplateNo']"
                               @change="processUpdateDataFileAttach($event, item, index)"
-                              @click.stop=""
                             >
                             </v-text-field>
                           </v-flex>

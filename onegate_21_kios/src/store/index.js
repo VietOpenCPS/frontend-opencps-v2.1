@@ -122,6 +122,30 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingDataHoSoTN ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              fromReceiveDate: filter.fromDate,
+              toReceiveDate: filter.toDate
+            }
+          }
+          // test local
+          axios.get(state.endPoint + '/dossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getDomainLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
