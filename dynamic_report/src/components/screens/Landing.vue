@@ -396,6 +396,7 @@ export default {
           let domainRaw = {}
           let dossierRaw = {}
           let dataReportCurrent = {}
+          let dataReportTotal = ''
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             let domainRawItem = {}
@@ -452,7 +453,6 @@ export default {
             }
           }
           if (domains.length > 0) {
-            let dataReportTotal = ''
             dataReportTotal += JSON.stringify([{
               colSpan: val.length + 1,
               text: domains[0]['domainName'],
@@ -520,6 +520,7 @@ export default {
           }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
+          console.log('widthsConfigwidthsConfigwidthsConfigwidthsConfig', widthsConfig)
           vm.docDefinition = JSON.parse(docDString)
           console.log('docDStringdocDStringdocDStringdocDString', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
