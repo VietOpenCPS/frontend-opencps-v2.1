@@ -306,7 +306,6 @@ export default {
       let reportName = ''
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      console.log('docDStringdocDStringdocDString', docDString)
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
@@ -522,6 +521,7 @@ export default {
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, dataReportXX)
           vm.docDefinition = JSON.parse(docDString)
+          console.log('docDStringdocDStringdocDStringdocDString', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -540,7 +540,6 @@ export default {
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
-      console.log('docDStringdocDStringdocDStringdocDString', docDString)
       let onlineStr = ''
       if (String(vm.online) === 'true') {
         onlineStr = 'TRỰC TUYẾN'
