@@ -358,28 +358,32 @@ export default {
         italics: true
       }) + ','
       let ine = 2
-      for (let key in val) {
-        let alignmentConfig = 'center'
-        if (val[key].hasOwnProperty('align')) {
-          alignmentConfig = val[key]['align']
+      let colLeng = 0
+      for (let key in vm.itemsReportsConfig) {
+        if (vm.itemsReportsConfig[key].hasOwnProperty('selected') && vm.itemsReportsConfig[key]['selected']) {
+          colLeng = colLeng + 1
+          let alignmentConfig = 'center'
+          if (vm.itemsReportsConfig[key].hasOwnProperty('align')) {
+            alignmentConfig = vm.itemsReportsConfig[key]['align']
+          }
+          widthsConfig.push('auto')
+          // vm.docDefinition['content'][2]['table']['widths'].push('auto')
+          let str1 = ' '
+          if (vm.report1Def[vm.itemsReportsConfig[key]['value']] !== undefined && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== null && vm.report1Def[vm.itemsReportsConfig[key]['value']] !== '') {
+            str1 = vm.report1Def[vm.itemsReportsConfig[key]['value']]
+          }
+          headerTableReport += JSON.stringify({
+            text: str1,
+            alignment: 'center',
+            bold: true
+          }) + ','
+          header2TableReport += JSON.stringify({
+            text: '(' + ine + ')',
+            alignment: 'center',
+            italics: true
+          }) + ','
+          ine = ine + 1
         }
-        widthsConfig.push('auto')
-        // vm.docDefinition['content'][2]['table']['widths'].push('auto')
-        let str1 = ' '
-        if (vm.report1Def[val[key]] !== undefined && vm.report1Def[val[key]] !== null && vm.report1Def[val[key]] !== '') {
-          str1 = vm.report1Def[val[key]]
-        }
-        headerTableReport += JSON.stringify({
-          text: str1,
-          alignment: 'center',
-          bold: true
-        }) + ','
-        header2TableReport += JSON.stringify({
-          text: '(' + ine + ')',
-          alignment: 'center',
-          italics: true
-        }) + ','
-        ine = ine + 1
       }
       vm.dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
       vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
@@ -457,7 +461,7 @@ export default {
           }
           if (domains.length > 0) {
             dataReportTotal += JSON.stringify([{
-              colSpan: val.length + 1,
+              colSpan: colLeng + 1,
               text: domains[0]['domainName'],
               bold: true,
               style: 'tdStyle'
@@ -472,7 +476,7 @@ export default {
             */
             for (let key in domains[0]['services']) {
               dataReportTotal += JSON.stringify([{
-                colSpan: val.length + 1,
+                colSpan: colLeng + 1,
                 text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
                 bold: true,
                 style: 'tdStyle'
