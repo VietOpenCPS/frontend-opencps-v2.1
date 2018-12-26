@@ -69,13 +69,26 @@
                   </div>
                 </div>
                 <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
-                  <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="item.partNo === itemFileView.dossierPartNo  && !itemFileView.eForm" >
-                    <div :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                      <span v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
-                        <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
-                        {{itemFileView.displayName}} - 
-                        <i>{{itemFileView.modifiedDate}}</i>
-                      </span>
+                  <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
+                    <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                      <v-tooltip top>
+                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
+                          <i style="color: #0d71bb; font-size: 13px;" class="ml-1 fa fa-file-o"></i>
+                          {{itemFileView.referenceUid}}.{{itemFileView.fileType}} - 
+                          <i>{{itemFileView.modifiedDate}}</i>
+                        </span>
+                        <span>Bản khai trực tuyến</span>
+                      </v-tooltip>
+                    </div>
+                    <div v-else :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                      <v-tooltip top>
+                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
+                          <v-icon style="color: #0d71bb" v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
+                          {{itemFileView.displayName}} - 
+                          <i>{{itemFileView.modifiedDate}}</i>
+                        </span>
+                        <span>Đính kèm</span>
+                      </v-tooltip>
                     </div>
                   </div>
                 </div>
@@ -1259,7 +1272,7 @@ export default {
     partNoApplicantHasFile (partNo) {
       let vm = this
       let hasFile = vm.dossierFilesApplicant.find(file => {
-        return file.dossierPartNo === partNo
+        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo && !file.eForm)
       })
       if (hasFile) {
         return true

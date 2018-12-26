@@ -75,7 +75,7 @@
             THEO DÕI HỒ SƠ
           </v-btn>
         </v-tab> -->
-        <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition">
+        <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition" style="overflow: visible!important">
           <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
             <div class="px-4 pt-2">
@@ -2115,6 +2115,7 @@ export default {
           toastr.success('Đánh giá của bạn được gửi thành công')
         }).catch(xhr => {
           vm.loadingVoting = false
+          toastr.error('Gửi đánh giá không thành công')
         })
       }
     },
