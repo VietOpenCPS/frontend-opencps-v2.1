@@ -773,11 +773,19 @@ export default {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
               let dataRow = []
-              dataRow.push({
-                text: index, 
-                alignment: 'center',
-                style: 'tdStyle'
-              })
+              if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+                dataRow.push({
+                  text: '', 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              } else {
+                dataRow.push({
+                  text: index, 
+                  alignment: 'center',
+                  style: 'tdStyle'
+                })
+              }
               console.log('resultData[key]', resultData[key])
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
@@ -813,7 +821,10 @@ export default {
                 }
                 indexTotal = indexTotal + 1
               }
-              index = index + 1
+              if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+              } else {
+                index = index + 1
+              }
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
             }
