@@ -437,15 +437,27 @@ export default {
           let dossierRaw = {}
           let dataReportCurrent = {}
           let dataReportTotal = ''
+          let textGroup = ''
+          for (let keyGroup in vm.groupBy) {
+            if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
+              textGroup = vm.groupBy[keyGroup]['display']
+              break
+            }
+          }
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             let domainRawItem = {}
+            /*
             if (vm.groupByVal === 'domainCode') {
               domainRawItem['domainName'] = dataReportCurrent['domainName']
             } else {
               domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
             }
+            */
+            
+            domainRawItem['domainName'] = dataReportCurrent[textGroup]
             domainRawItem['services'] = []
+            /*
             if (vm.groupByVal === 'domainCode') {
               if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
                 domainRaw[dataReportCurrent['domainName']] = domainRawItem
@@ -455,6 +467,8 @@ export default {
                 domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
               }
             }
+            */
+            domainRaw[dataReportCurrent[textGroup]] = domainRawItem
             if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
               if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
                 dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
@@ -463,11 +477,14 @@ export default {
               let dossierRawItem = {}
               dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
               dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+              /*
               if (vm.groupByVal === 'domainCode') {
                 dossierRawItem['domainName'] = dataReportCurrent['domainName']
               } else {
                 dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
               }
+              */
+              domainRawItem['domainName'] = dataReportCurrent[textGroup]
               dossierRawItem['dossiers'] = []
               dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
               dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
