@@ -48,11 +48,19 @@
             </v-layout>
           </v-card-text>
           <v-dialog v-model="dialog" width="500">
-            <v-date-picker
+            <!-- <v-date-picker
               v-model="date"
               full-width
               landscape
-            ></v-date-picker>
+            ></v-date-picker> -->
+            <vue-ctk-date-time-picker
+              v-model="date"
+              formatted="DD/MM/YYYY HH:mm"
+              format="YYYY-MM-DDTHH:mm"
+              time-format="HH:mm"
+              :without-header="true"
+              without-input
+            />
             <v-card-actions style="background: #fff">
               <v-spacer></v-spacer>
               <v-btn color="primary" flat @click="pickDateCustom">
@@ -132,11 +140,18 @@
           </v-layout>
         </v-form>
         <v-dialog v-model="dialog" width="500">
-          <v-date-picker
+          <!-- <v-date-picker
             v-model="date"
             full-width
             landscape
-          ></v-date-picker>
+          ></v-date-picker> -->
+          <vue-ctk-date-time-picker
+            v-model="date"
+            formatted="DD/MM/YYYY HH:mm"
+            format="YYYY-MM-DDTHH:mm"
+            time-format="HH:mm"
+            without-input
+          />
           <v-card-actions style="background: #fff">
             <v-spacer></v-spacer>
             <v-btn color="primary" flat @click="pickDateCustom">
@@ -149,7 +164,11 @@
   </div>
 </template>
 <script>
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
+    components: {
+      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+    },
     props: {
       dossier_id: {
         type: Number
@@ -280,7 +299,7 @@
         if (!value) return ''
         let date = new Date(Number(value))
         if (date) {
-          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
         } else {
           return ''
         }
