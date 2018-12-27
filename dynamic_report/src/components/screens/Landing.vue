@@ -724,7 +724,8 @@ export default {
             resultData = vm.sortByKey(resultData, sort)
           }
           for (let key in resultData) {
-            if (resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) {
+            if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
+                resultData[key].hasOwnProperty(subKey)) {
               let dataRow = []
               dataRow.push({
                 text: index, 
