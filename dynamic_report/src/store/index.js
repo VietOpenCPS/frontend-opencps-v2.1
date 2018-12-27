@@ -276,6 +276,7 @@ export const store = new Vuex.Store({
                   //test
                   resolve(serializable.data)
                 } else {
+                  console.log('docu', filter.document === 'STATISTIC_05')
                   if (filter.document === 'STATISTIC_05') {
                     resolve([
                       {
