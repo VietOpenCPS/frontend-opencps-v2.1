@@ -367,9 +367,7 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (currentVal === '') {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
-                } else if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
@@ -377,7 +375,13 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
-          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
+          for (let keySource in vm.filters[key]['source']) {
+            if (currentVal === '' || currentVal === '0') {
+              currentVal = vm.filters[key]['source'][keySource]['name']
+              break
+            }
+          }
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -640,9 +644,7 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (currentVal === '') {
-                  currentVal = vm.filters[key]['source'][keySource]['name']
-                } else if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
@@ -650,7 +652,13 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
-          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
+          for (let keySource in vm.filters[key]['source']) {
+            if (currentVal === '' || currentVal === '0') {
+              currentVal = vm.filters[key]['source'][keySource]['name']
+              break
+            }
+          }
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
