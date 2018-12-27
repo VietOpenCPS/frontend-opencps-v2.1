@@ -147,7 +147,7 @@ export const store = new Vuex.Store({
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
           }).catch(function (error) {
-            state['user'].role = ['default']
+            state['user'].role = ['Administrator_data']
             console.log(error)
           })
         }
@@ -1299,6 +1299,28 @@ export const store = new Vuex.Store({
           var dataRollBack = new URLSearchParams()
           let url = state.initData.dossierApi + '/' + data.dossierId + '/rollback'
           axios.post(url, dataRollBack, options).then(function (response) {
+            resolve(response.data)
+            store.dispatch('getActiveGetCounter', !state.activeGetCounter)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    goToStep ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        try {
+          var dataGoto = new URLSearchParams()
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/goto/' + data.stepCode
+          axios.post(url, dataGoto, options).then(function (response) {
             resolve(response.data)
             store.dispatch('getActiveGetCounter', !state.activeGetCounter)
           }).catch(function (xhr) {

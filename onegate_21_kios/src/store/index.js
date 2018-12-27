@@ -462,6 +462,9 @@ export const store = new Vuex.Store({
           params.append('className', data.className)
           params.append('classPk', data.classPk)
           params.append('selected', data.selected)
+          if (data.className === 'dossier') {
+            params.append('votingCode', data.votingCode ? data.votingCode : '')
+          }
           // test local
           // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
           axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {

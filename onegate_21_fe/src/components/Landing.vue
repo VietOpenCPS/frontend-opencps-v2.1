@@ -1817,27 +1817,30 @@ export default {
           return
         }
         let result = {
-          actionCode: 4000
+          stepCode: 400,
+          stepName: 'hoàn thành'
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.gotoStep(dossierItem, result)
       } else if (String(item.form) === 'GOTO_CANCEL') {
         if (!dossierItem) {
           alert('Chọn hồ sơ để thực hiện')
           return
         }
         let result = {
-          actionCode: 4100
+          stepCode: 410,
+          stepName: 'rút'
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.gotoStep(dossierItem, result)
       } else if (String(item.form) === 'GOTO_DENY') {
         if (!dossierItem) {
           alert('Chọn hồ sơ để thực hiện')
           return
         }
         let result = {
-          actionCode: 4200
+          stepCode: 420,
+          stepName: 'từ chối'
         }
-        vm.processAction(dossierItem, item, result, index, true)
+        vm.gotoStep(dossierItem, result)
       }
     },
     doPrint01 (dossierItem, item, index, isGroup) {
@@ -2032,6 +2035,31 @@ export default {
             dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId
           }
           vm.$store.dispatch('rollBack', fiter).then(function (result) {
+            setTimeout(function () {
+              vm.doLoadingDataHoSo()
+            }, 300)
+          }).catch(function () {
+            setTimeout(function () {
+              vm.doLoadingDataHoSo()
+            }, 300)
+          })
+        }
+      } else {
+        alert('Chọn hồ sơ để thực hiện')
+      }
+    },
+    gotoStep (dossierItem, result) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (vm.selectedDoAction.length > 0) {
+        let countSelectedDoAction = vm.selectedDoAction.length
+        let x = confirm('Xác thực ' + result['stepName'] + ' hồ sơ với mã: ' + vm.selectedDoAction[countSelectedDoAction - 1].dossierNo)
+        if (x) {
+          let fiter = {
+            dossierId: vm.selectedDoAction[countSelectedDoAction - 1].dossierId,
+            stepCode: result['stepCode']
+          }
+          vm.$store.dispatch('goToStep', fiter).then(function (result) {
             setTimeout(function () {
               vm.doLoadingDataHoSo()
             }, 300)
