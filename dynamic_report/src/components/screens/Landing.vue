@@ -724,28 +724,26 @@ export default {
                 alignment: 'center',
                 style: 'tdStyle'
               })
+              console.log('resultData[key]', resultData[key])
+              if (resultData[key][sumKey] === undefined || resultData[key][sumKey] === null || resultData[key][sumKey] === '') {
+                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                  // dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                }
+              }
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
-                console.log('resultData[key]', resultData[key])
-                console.log('resultData[key][sumKey]', (resultData[key][sumKey] === undefined || resultData[key][sumKey] === null || resultData[key][sumKey] === ''))
-                if (resultData[key][sumKey] === undefined || resultData[key][sumKey] === null || resultData[key][sumKey] === '') {
-                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                  if (currentConfig.hasOwnProperty('subValue')) {
+                    console.log('subValue', currentConfig['subValue'])
+                    console.log('resultData[subValue]', resultData[key][currentConfig['subValue']])
+                    dataText = resultData[key][currentConfig['subValue']] + ' '
+                  } else {
                     dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                   }
-                  console.log('resultData[key][sumKey]', dataText)
-                } else {
-                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                    if (currentConfig.hasOwnProperty('subValue')) {
-                      dataText = resultData[key][currentConfig['subValue']] + ' '
-                    } else {
-                      dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
-                    }
-                  }
                 }
-                
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
                   alignmentConfig = currentConfig['align']
