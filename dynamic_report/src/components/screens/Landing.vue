@@ -705,7 +705,7 @@ export default {
           }
           let resultDataTotal = resultData.filter(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
-              if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[sumKey] === '') {
+              if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
                 return obj
               }
             } else {
