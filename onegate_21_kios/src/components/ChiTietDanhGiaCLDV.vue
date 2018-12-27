@@ -52,7 +52,7 @@
           :disabled="loadingAction"
           @click="submitVoting"
           class="kios-btn"
-        >Gửi kết quả đánh giá</v-btn>
+        >Gửi kết quả</v-btn>
       </div>
     </div>
     <v-btn v-if="votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
