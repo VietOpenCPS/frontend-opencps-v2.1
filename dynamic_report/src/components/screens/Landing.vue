@@ -725,7 +725,7 @@ export default {
           }
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
-                resultData[key].hasOwnProperty(subKey)) {
+                (subKey !== null && subKey !== undefined && subKey !== '' && !resultData[key].hasOwnProperty(subKey))) {
               let dataRow = []
               dataRow.push({
                 text: index, 
