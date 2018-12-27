@@ -715,6 +715,12 @@ export default {
           if (sort !== '' && sort !== undefined && sort !== null) {
             resultData = vm.sortByKey(resultData, sort)
           }
+          if (subKey !== null && subKey !== undefined && subKey !== '') {
+            resultData = resultData.sort(function (a, b) {
+              return a[sumKey] - b[sumKey] || a[subKey] - b[subKey]
+            })
+            console.log('resultDataresultDataresultDataresultData: ', resultData)
+          }
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
