@@ -729,13 +729,20 @@ export default {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
-                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  if (currentConfig.hasOwnProperty('subValue')) {
-                    dataText = resultData[key][currentConfig['subValue']] + ' '
-                  } else {
+                if (resultData[sumKey] === undefined || resultData[sumKey] === null || resultData[sumKey] === '') {
+                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                   }
+                } else {
+                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                    if (currentConfig.hasOwnProperty('subValue')) {
+                      dataText = resultData[key][currentConfig['subValue']] + ' '
+                    } else {
+                      dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                    }
+                  }
                 }
+                
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
                   alignmentConfig = currentConfig['align']
