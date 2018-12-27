@@ -729,7 +729,8 @@ export default {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
-                if (resultData[sumKey] === undefined || resultData[sumKey] === null || resultData[sumKey] === '') {
+                console.log('resultData[key][sumKey]', resultData[key][sumKey])
+                if (resultData[key][sumKey] === undefined || resultData[key][sumKey] === null || resultData[key][sumKey] === '') {
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                   }
