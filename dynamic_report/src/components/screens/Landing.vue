@@ -490,6 +490,7 @@ export default {
               dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
             }
           }
+          /*
           for (let key in dossierRaw) {
             let keyObject = dossierRaw[key]
             if (key !== '' && keyObject !== undefined) {
@@ -509,13 +510,16 @@ export default {
               domains.push(domainRawItem)
             }
           }
-          if (domains.length > 0) {
+          */
+          // if (domains.length > 0) {
+            /*
             dataReportTotal += JSON.stringify([{
               colSpan: colLeng + 1,
               text: domains[0]['domainName'],
               bold: true,
               style: 'tdStyle'
             }]) + ','
+            */
             /*
             vm.docDefinition['content'][2]['table']['body'].push([{
               colSpan: val.length + 1,
@@ -524,10 +528,11 @@ export default {
               style: 'tdStyle'
             }])
             */
-            for (let key in domains[0]['services']) {
+            // for (let key in domains[0]['services']) {
+              for (let key in dossierRaw) {
               dataReportTotal += JSON.stringify([{
                 colSpan: colLeng + 1,
-                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+                text: '- ' + dossierRaw[key]['serviceCode'] + ' - ' + dossierRaw[key]['serviceName'],
                 bold: true,
                 style: 'tdStyle'
               }]) + ','
@@ -539,7 +544,7 @@ export default {
                 style: 'tdStyle'
               }])
               */
-              let dossiersArray = domains[0]['services'][key]['dossiers']
+              let dossiersArray = dossierRaw[key]['dossiers']
               let indexStt = 1
               let dataRow = []
               for (let keyDossier in dossiersArray) {
@@ -574,7 +579,7 @@ export default {
             }
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             vm.dataReportXX += dataReportTotal
-          }
+          // }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           console.log('dataReportXX', vm.dataReportXX.length)
