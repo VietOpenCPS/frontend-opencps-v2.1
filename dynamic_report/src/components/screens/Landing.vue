@@ -230,7 +230,7 @@ export default {
         }
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select') {
-            console.log('value: ', vm.filters[key]['value'])
+            console.log('source: ', vm.filters[key]['source'])
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
             console.log('vm.data: ', vm.data)
           }
@@ -709,13 +709,10 @@ export default {
           console.log('resultDataVari', resultDataVari)
           resultData = []
           for (let key in resultDataVari) {
-            if (key !== undefined && key !== 'undefined_') {
+            if (key !== undefined && !key.includes('undefined')) {
               console.log('resultDataVari[key]', resultDataVari[key])
               if (subKey !== undefined && subKey !== null && subKey !== '') {
-                let parentSubKey = JSON.parse(JSON.stringify(resultDataVari[key]))
-                parentSubKey[sumKey] = resultDataVari[key][subKey]
                 resultData.push(resultDataVari[key])
-                resultData.push(parentSubKey)
               } else {
                 resultData.push(resultDataVari[key])
               }
