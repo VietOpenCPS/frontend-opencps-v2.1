@@ -454,10 +454,10 @@ export default {
               domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
             }
             */
-            
+            /*
             domainRawItem['domainName'] = dataReportCurrent[textGroup]
             domainRawItem['services'] = []
-            /*
+            
             if (vm.groupByVal === 'domainCode') {
               if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
                 domainRaw[dataReportCurrent['domainName']] = domainRawItem
@@ -468,7 +468,8 @@ export default {
               }
             }
             */
-            domainRaw[dataReportCurrent[textGroup]] = domainRawItem
+            // domainRaw[dataReportCurrent[vm.groupByVal]] = domainRawItem
+            console.log('KKK: ', dossierRaw[dataReportCurrent[vm.groupByVal]])
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
               if (dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] === dataReportCurrent[textGroup]) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
