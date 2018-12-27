@@ -218,8 +218,15 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
           vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-          if (vm.agencyLists.length === 1) {
-            vm.govAgency = vm.agencyLists[0]['value']
+          if (vm.agencyLists.length > 0) {
+            let defaultVal = vm.agencyLists[0]['value']
+            for (let key in vm.agencyLists) {
+              if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
+                defaultVal = vm.agencyLists[key]['text']
+                break
+              }
+            }
+            vm.govAgency = defaultVal
           }
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
@@ -279,8 +286,15 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
-        if (vm.agencyLists.length === 1) {
-          vm.govAgency = vm.agencyLists[0]['value']
+        if (vm.agencyLists.length > 0) {
+          let defaultVal = vm.agencyLists[0]['value']
+          for (let key in vm.agencyLists) {
+            if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
+              defaultVal = vm.agencyLists[key]['text']
+              break
+            }
+          }
+          vm.govAgency = defaultVal
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
@@ -690,8 +704,14 @@ export default {
             })
           }
           let resultDataTotal = resultData.filter(function(obj) {
-            if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
-              return obj
+            if (subKey !== null && subKey !== undefined && subKey !== '') {
+              if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[sumKey] === '') {
+                return obj
+              }
+            } else {
+              if (obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) {
+                return obj
+              }
             }
           })
           let resultDataVari = {}
