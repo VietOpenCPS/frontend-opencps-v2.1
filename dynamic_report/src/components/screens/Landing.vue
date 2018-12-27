@@ -532,12 +532,14 @@ export default {
             */
             // for (let key in domains[0]['services']) {
               for (let key in dossierRaw) {
-              dataReportTotal += JSON.stringify([{
-                colSpan: colLeng + 1,
-                text: '- ' + dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
-                bold: true,
-                style: 'tdStyle'
-              }]) + ','
+              if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
+                dataReportTotal += JSON.stringify([{
+                  colSpan: colLeng + 1,
+                  text: '- ' + dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
+                  bold: true,
+                  style: 'tdStyle'
+                }]) + ','
+              }
               /*
               vm.docDefinition['content'][2]['table']['body'].push([{
                 colSpan: val.length + 1,
