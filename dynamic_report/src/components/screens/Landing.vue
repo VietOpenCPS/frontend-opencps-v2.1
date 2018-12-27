@@ -139,7 +139,7 @@ export default {
     months: [],
     month: 0,
     agencyLists: [],
-    govAgency: (window.themeDisplay !== null && window.themeDisplay !== undefined) ? parseInt(window.themeDisplay.getScopeGroupId()) : 0,
+    govAgency: 0,
     danhSachBaoCao: [],
     pdfBlob: null,
     isShowLoading: false,
@@ -221,7 +221,7 @@ export default {
           if (vm.agencyLists.length > 0) {
             let defaultVal = vm.agencyLists[0]['value']
             for (let key in vm.agencyLists) {
-              if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
+              if (vm.agencyLists[key]['selected']) {
                 defaultVal = vm.agencyLists[key]['value']
                 break
               }
@@ -288,7 +288,7 @@ export default {
         if (vm.agencyLists.length > 0) {
           let defaultVal = vm.agencyLists[0]['value']
           for (let key in vm.agencyLists) {
-            if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
+            if (vm.agencyLists[key]['selected']) {
               defaultVal = vm.agencyLists[key]['value']
               break
             }
