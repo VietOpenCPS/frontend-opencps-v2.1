@@ -212,9 +212,14 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
           vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
-          if (vm.groupBy.length === 1) {
-            vm.groupByVal = vm.groupBy[0]['key']
+          let defaultValGroup = vm.groupBy[0]['key']
+          for (let keyGroup in vm.groupBy) {
+            if (vm.groupBy[keyGroup]['selected']) {
+              defaultValGroup = vm.groupBy[keyGroup]['key']
+              break
+            }
           }
+          vm.groupByVal = defaultValGroup
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
           vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -279,9 +284,14 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
-        if (vm.groupBy.length === 1) {
-          vm.groupByVal = vm.groupBy[0]['key']
+        let defaultValGroup = vm.groupBy[0]['key']
+        for (let keyGroup in vm.groupBy) {
+          if (vm.groupBy[keyGroup]['selected']) {
+            defaultValGroup = vm.groupBy[keyGroup]['key']
+            break
+          }
         }
+        vm.groupByVal = defaultValGroup
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -357,7 +367,9 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                if (currentVal === '') {
+                  currentVal = vm.filters[key]['source'][keySource]['name']
+                } else if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
@@ -628,7 +640,9 @@ export default {
           } else {
             if (vm.filters[key]['type'] === 'select') {
               for (let keySource in vm.filters[key]['source']) {
-                if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
+                if (currentVal === '') {
+                  currentVal = vm.filters[key]['source'][keySource]['name']
+                } else if (String(vm.filters[key]['source'][keySource]['value']) === String(currentVal)) {
                   currentVal = vm.filters[key]['source'][keySource]['name']
                 }
               }
