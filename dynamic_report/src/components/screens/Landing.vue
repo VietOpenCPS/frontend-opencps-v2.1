@@ -711,12 +711,11 @@ export default {
           for (let key in resultDataVari) {
             if (key !== undefined && !key.startsWith('undefined')) {
               console.log('resultDataVari[key]', resultDataVari[key])
-              let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
               if (subKey !== undefined && subKey !== null && subKey !== '') {
                 resultDataVari[key][sumKey] = resultDataVari[key][subKey]
                 resultData.push(resultDataVari[key])
               } else {
-                resultDataVari[key][sumKey] = preff + ' ' + resultDataVari[key][sumKey]
+                resultDataVari[key][sumKey] = resultDataVari[key][sumKey]
                 resultData.push(resultDataVari[key])
               }
             }
@@ -736,9 +735,9 @@ export default {
               for (let keyMapping in vm.itemsReportsConfig) {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
-                // let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
+                let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  dataText = resultData[key][currentConfig['value']] + ' '
+                  dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
