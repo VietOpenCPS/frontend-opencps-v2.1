@@ -222,7 +222,7 @@ export default {
             let defaultVal = vm.agencyLists[0]['value']
             for (let key in vm.agencyLists) {
               if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
-                defaultVal = vm.agencyLists[key]['text']
+                defaultVal = vm.agencyLists[key]['value']
                 break
               }
             }
@@ -273,7 +273,6 @@ export default {
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
-        console.log('AAAAAAAAAAAAAA', vm.itemsReportsConfig)
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
@@ -290,7 +289,7 @@ export default {
           let defaultVal = vm.agencyLists[0]['value']
           for (let key in vm.agencyLists) {
             if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
-              defaultVal = vm.agencyLists[key]['text']
+              defaultVal = vm.agencyLists[key]['value']
               break
             }
           }
