@@ -765,9 +765,9 @@ export default {
                 }
                 indexTotal = indexTotal + 1
               }
-              if (subKey === null || subKey === undefined && subKey === '') {
-                index = index + 1
-              } else if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '') {
+              if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+                
+              } else {
                 index = index + 1
               }
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
