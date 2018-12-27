@@ -717,7 +717,7 @@ export default {
           }
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
-                (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '')) {
+                (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && (resultData[key][sumKey] === '' || resultData[key][sumKey] === '0'))) {
               let dataRow = []
               dataRow.push({
                 text: index, 
@@ -731,7 +731,7 @@ export default {
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  if (currentConfig.hasOwnProperty('subValue')) {
+                  if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
                     console.log('subValue', currentConfig['subValue'])
                     console.log('resultData[subValue]', resultData[key][currentConfig['subValue']])
                     dataText = resultData[key][currentConfig['subValue']] + ' '
