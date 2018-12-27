@@ -274,6 +274,8 @@ export const store = new Vuex.Store({
                 let serializable = response.data
                 if (serializable.data) {
                   //test
+                  resolve(serializable.data)
+                } else {
                   if (filter.document === 'STATISTIC_05') {
                     resolve([
                       {
@@ -318,10 +320,8 @@ export const store = new Vuex.Store({
                       }
                     ])
                   } else {
-                    resolve(serializable.data)
+                    resolve(null)
                   }
-                } else {
-                  resolve(null)
                 }
               }).catch(function (error) {
                 console.log(error)
