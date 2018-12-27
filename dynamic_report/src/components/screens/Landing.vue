@@ -212,9 +212,15 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
           vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+          if (vm.groupBy.length === 1) {
+            vm.groupByVal = vm.groupBy[0]['key']
+          }
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
           vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+          if (vm.agencyLists.length === 1) {
+            vm.govAgency = vm.agencyLists[0]['value']
+          }
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
           vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
@@ -265,9 +271,15 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+        if (vm.groupBy.length === 1) {
+          vm.groupByVal = vm.groupBy[0]['key']
+        }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+        if (vm.agencyLists.length === 1) {
+          vm.govAgency = vm.agencyLists[0]['value']
+        }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
         vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
