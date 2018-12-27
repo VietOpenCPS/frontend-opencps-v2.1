@@ -10,9 +10,9 @@
           </div>
         </a>
       </header>
-      <section :class="isKios ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
+      <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
         <div :class="isKios ? 'tab-item' : ''">
-          <div class="left" :class="fullScreen ? 'smallScreen' : ''">
+          <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
             <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
               <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
               <p class="ml-2 my-0">
@@ -44,8 +44,8 @@
             <a href="javascript:;" @click="goPage('danhgia')">
               <p class="icon pl-1 pr-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-evaluation.png"></p>
               <p class="ml-2 my-0">
-                <span class="text-bold">Đánh giá</span><br>
-                <span>Đánh giá chất lượng dịch vụ</span>
+                <span class="text-bold">Khảo sát</span><br>
+                <span>Khảo sát mức độ hài lòng</span>
               </p>
             </a>
           </div>
@@ -69,7 +69,8 @@
       currentIndex: 0,
       interVal: '',
       loading: true,
-      isKios: true
+      isKios: true,
+      wrapStyle: true
     }),
     created () {
       var vm = this
@@ -77,6 +78,7 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        console.log('current', current)
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
@@ -87,6 +89,11 @@
         } else {
           vm.isKios = false
           // console.log('NOT Kios')
+        }
+        if (current['path'] && current['path'] === '/tra-cuu-ho-so-homepage') {
+          vm.wrapStyle = false
+        } else {
+          vm.wrapStyle = true
         }
       })
     },
@@ -108,7 +115,20 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
-        // console.log('currentParams', currentParams)
+        console.log('newRoute', newRoute)
+        if (!currentQuery.hasOwnProperty('secretKey')) {
+          // vm.setInterval()
+          vm.isKios = true
+          // console.log('isKios')
+        } else {
+          vm.isKios = false
+          // console.log('NOT Kios')
+        }
+        if (newRoute['path'] && newRoute['path'] === '/tra-cuu-ho-so-homepage') {
+          vm.wrapStyle = false
+        } else {
+          vm.wrapStyle = true
+        }
       }
     },
     methods: {
