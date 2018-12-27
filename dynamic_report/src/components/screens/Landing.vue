@@ -469,14 +469,14 @@ export default {
             }
             */
             domainRaw[dataReportCurrent[textGroup]] = domainRawItem
-            if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
-              if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
-                dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+            if (dossierRaw[dataReportCurrent[textGroup]] !== '' && dossierRaw[dataReportCurrent[textGroup]] !== undefined) {
+              if (dossierRaw[dataReportCurrent[textGroup]]['serviceCode'] === dataReportCurrent[textGroup]) {
+                dossierRaw[dataReportCurrent[textGroup]]['dossiers'].push(dataReportCurrent)
               }
             } else {
               let dossierRawItem = {}
-              dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
-              dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+              dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+              dossierRawItem[textGroup] = dataReportCurrent[textGroup]
               /*
               if (vm.groupByVal === 'domainCode') {
                 dossierRawItem['domainName'] = dataReportCurrent['domainName']
@@ -484,10 +484,10 @@ export default {
                 dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
               }
               */
-              domainRawItem['domainName'] = dataReportCurrent[textGroup]
+              // domainRawItem['domainName'] = dataReportCurrent[textGroup]
               dossierRawItem['dossiers'] = []
-              dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
-              dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
+              dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+              dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
             }
           }
           /*
@@ -532,7 +532,7 @@ export default {
               for (let key in dossierRaw) {
               dataReportTotal += JSON.stringify([{
                 colSpan: colLeng + 1,
-                text: '- ' + dossierRaw[key]['serviceCode'] + ' - ' + dossierRaw[key]['serviceName'],
+                text: '- ' + dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
                 bold: true,
                 style: 'tdStyle'
               }]) + ','
