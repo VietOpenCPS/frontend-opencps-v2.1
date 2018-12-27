@@ -725,11 +725,6 @@ export default {
                 style: 'tdStyle'
               })
               console.log('resultData[key]', resultData[key])
-              if (resultData[key][sumKey] === undefined || resultData[key][sumKey] === null || resultData[key][sumKey] === '') {
-                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  // dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
-                }
-              }
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
