@@ -24,7 +24,7 @@
       </div>
     </div>
     <v-layout row wrap class="filter_menu mt-4">
-      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 0">
+      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 1">
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
@@ -34,7 +34,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 0">
+      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 1">
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
@@ -596,6 +596,7 @@ export default {
       let selection = vm.itemsReports[vm.index]['filterConfig']['selection']
       let merge = vm.itemsReports[vm.index]['filterConfig']['merge']
       let sort = vm.itemsReports[vm.index]['filterConfig']['sort']
+      let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
           let index = 1
@@ -631,26 +632,34 @@ export default {
           let resultData = result
           if (selection !== undefined && selection !== null && selection.length > 0) {
             resultData = result.filter(function(obj) {
+              let totalCHK = 0
               for (let keySe in selection) {
                 if (selection[keySe]['compare'] === '#') {
                   if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
-                    return obj
+                    totalCHK = totalCHK + 1
+                    // return obj
                   }
                 } else if (selection[keySe]['compare'] === '=') {
                   if (selection[keySe]['value'] === '') {
                     if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
-                      return obj
+                      totalCHK = totalCHK + 1
+                      // return obj
                     }
                   } else {
                     if (String(obj[selection[keySe]['key']]) === String(selection[keySe]['value'])) {
-                      return obj
+                      totalCHK = totalCHK + 1
+                      // return obj
                     }
                   }
                 } else {
                   if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
-                    return obj
+                    totalCHK = totalCHK + 1
+                    // return obj
                   }
                 }
+              }
+              if (totalCHK === selection.length) {
+                return obj
               }
             })
           }
@@ -686,7 +695,14 @@ export default {
           resultData = []
           for (let key in resultDataVari) {
             if (key !== undefined && key !== 'undefined_') {
-              resultData.push(resultDataVari[key])
+              if (subKey !== undefined && subKey !== null && subKey !== '') {
+                let parentSubKey = JSON.parse(JSON.stringify(resultDataVari[key]))
+                parentSubKey[sumKey] = resultDataVari[key][subKey]
+                resultData.push(resultDataVari[key])
+                resultData.push(parentSubKey)
+              } else {
+                resultData.push(resultDataVari[key])
+              }
             }
           }
           if (sort !== '' && sort !== undefined && sort !== null) {
