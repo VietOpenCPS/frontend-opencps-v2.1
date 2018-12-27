@@ -706,18 +706,10 @@ export default {
               }
             }
           }
-          console.log('resultDataVari', resultDataVari)
           resultData = []
           for (let key in resultDataVari) {
             if (key !== undefined && !key.startsWith('undefined')) {
-              console.log('resultDataVari[key]', resultDataVari[key])
-              if (subKey !== undefined && subKey !== null && subKey !== '') {
-                resultDataVari[key][sumKey] = resultDataVari[key][subKey]
-                resultData.push(resultDataVari[key])
-              } else {
-                resultDataVari[key][sumKey] = resultDataVari[key][sumKey]
-                resultData.push(resultDataVari[key])
-              }
+              resultData.push(resultDataVari[key])
             }
           }
           if (sort !== '' && sort !== undefined && sort !== null) {
@@ -725,7 +717,7 @@ export default {
           }
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
-                (subKey !== null && subKey !== undefined && subKey !== '' && !resultData[key].hasOwnProperty(subKey))) {
+                (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '')) {
               let dataRow = []
               dataRow.push({
                 text: index, 
@@ -738,7 +730,11 @@ export default {
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                  if (currentConfig.hasOwnProperty('subValue')) {
+                    dataText = resultData[key][currentConfig['subValue']] + ' '
+                  } else {
+                    dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                  }
                 }
                 let alignmentConfig = 'center'
                 if (currentConfig.hasOwnProperty('align')) {
