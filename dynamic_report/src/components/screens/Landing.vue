@@ -357,7 +357,7 @@ export default {
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       for (let key in vm.agencyLists) {
-        if (String(vm.agencyLists[key]['value']) === String(vm.groupByVal)) {
+        if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
           break
         }
@@ -602,7 +602,7 @@ export default {
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
       for (let key in vm.agencyLists) {
-        if (String(vm.agencyLists[key]['value']) === String(vm.groupByVal)) {
+        if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
           docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
           break
         }
@@ -767,7 +767,7 @@ export default {
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                   if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
-                    dataText = resultData[key][currentConfig['subValue']] + ' '
+                    dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
                   } else {
                     dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
                   }
@@ -829,6 +829,7 @@ export default {
               }
             }
           }
+          console.log('resultDataTotal', resultDataTotal)
           for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
