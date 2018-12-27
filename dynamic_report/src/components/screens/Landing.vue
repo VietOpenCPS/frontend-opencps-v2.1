@@ -356,6 +356,12 @@ export default {
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      for (let key in vm.agencyLists) {
+        if (String(vm.agencyLists[key]['value']) === String(vm.groupByVal)) {
+          docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          break
+        }
+      }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       let widthsConfig = []
       widthsConfig.push(30)
@@ -595,6 +601,12 @@ export default {
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      for (let key in vm.agencyLists) {
+        if (String(vm.agencyLists[key]['value']) === String(vm.groupByVal)) {
+          docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          break
+        }
+      }
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       vm.isShowLoading = true
       let filter = {
@@ -728,9 +740,14 @@ export default {
                 }
               }
             }
+            resultData = []
             for (let key in arraySubKey) {
               console.log('arraySubKey key', key)
-              console.log('arraySubKey', arraySubKey[key])
+              let subKeySortData = vm.sortByKey(arraySubKey[key], subKey)
+              console.log('subKeySortData', subKeySortData)
+              for (let keyData in subKeySortData) {
+                resultData.push(subKeySortData[keyData])
+              }
             }
           }
           for (let key in resultData) {
