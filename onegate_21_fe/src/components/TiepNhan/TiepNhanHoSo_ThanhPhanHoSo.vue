@@ -71,9 +71,9 @@
                 <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
                   <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                      <v-tooltip top>
+                      <v-tooltip top style="max-width:100%">
                         <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
-                          <i style="color: #0d71bb; font-size: 13px;" class="ml-1 fa fa-file-o"></i>
+                          <i style="color: #0d71bb; font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
                           {{itemFileView.referenceUid}}.{{itemFileView.fileType}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
@@ -81,7 +81,7 @@
                       </v-tooltip>
                     </div>
                     <div v-else :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                      <v-tooltip top>
+                      <v-tooltip top style="max-width:100%">
                         <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
                           <v-icon style="color: #0d71bb" v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                           {{itemFileView.displayName}} - 

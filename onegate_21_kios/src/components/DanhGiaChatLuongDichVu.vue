@@ -4,10 +4,10 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <h4 class="pt-2 ml-2" v-if="!detailActive">
-      <span style="color:#065694">CHỌN ĐƠN VỊ ĐỂ ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ </span>
+      <span style="color:#065694">CHỌN ĐƠN VỊ </span>
     </h4>
     <div class="text-xs-center" v-if="detailActive">
-      <h4 class="py-2" style="color:#065694">ĐÁNH GIÁ CHẤT LƯỢNG DỊCH VỤ</h4>
+      <h4 class="py-2" style="color:#065694">KHẢO SÁT MỨC ĐỘ HÀI LÒNG</h4>
       <h4 class="pb-2" style="color:green">{{govAgencyName(govAgencySelected)}}</h4>
     </div>
     <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">

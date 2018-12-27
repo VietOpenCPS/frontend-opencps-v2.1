@@ -33,7 +33,8 @@
           <!-- <v-tab key="1" ripple class="mx-2" @click="loadDossiertemplate"> Thành phần hồ sơ </v-tab> -->
           <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
           <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
-          <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
+          <v-tab key="3" ripple class="mx-2" @click="loadVoting()" v-if="dossierDetail['dossierStatus'] === 'done'"> Đánh giá </v-tab>
+          <!-- <v-tab key="4" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
           <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
             <v-card >
               <v-card-text class="px-0 py-0">
@@ -169,6 +170,39 @@
           <v-tab-item key="3" class="wrap-scroll wrap-scroll-dossier">
             <v-card>
               <v-card-text class="px-0 py-0">
+                <div class="px-2 py-2">
+                  <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
+                    <div class="text-bold">
+                      {{index + 1}}.&nbsp; {{ item.subject }}
+                    </div>
+                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                      <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
+                    </v-radio-group>
+                    <v-layout wrap class="ml-3" style="margin-top:-10px">
+                      <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
+                        <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
+                      </v-flex>
+                    </v-layout>
+                  </div>
+                  <div v-if="votingItems.length === 0" class="mx-3">
+                    <v-alert outline color="warning" icon="priority_high" :value="true">
+                      Không có đánh giá
+                    </v-alert>
+                  </div>
+                  <div class="ml-3" v-if="votingItems.length > 0">
+                    <v-btn color="primary"
+                      :loading="loadingVoting"
+                      :disabled="loadingVoting"
+                      @click="submitVoting"
+                    >Gửi đánh giá</v-btn>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item key="4" class="wrap-scroll wrap-scroll-dossier">
+            <v-card>
+              <v-card-text class="px-0 py-0">
                 <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                   <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                   <td class="text-xs-left px-2 py-2">
@@ -203,6 +237,8 @@
       dossierActions: [],
       tailieuNop: [],
       tailieuKeyQua: [],
+      votingItems: [],
+      loadingVoting: false,
       headers: [{
         text: '#',
         align: 'center',
@@ -314,6 +350,36 @@
             vm.tailieuKeyQua = result.filter(function (item) {
               return item.partType === 2
             })
+          })
+        }
+      },
+      loadVoting () {
+        let vm = this
+        let filter = {
+          className: 'dossier',
+          classPK: vm.dossierDetail.dossierId
+        }
+        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+          vm.votingItems = result
+          console.log('votingItems', vm.votingItems)
+        }).catch(function (reject) {
+        })
+      },
+      submitVoting () {
+        let vm = this
+        let arrAction = []
+        if (vm.votingItems.length > 0) {
+          vm.loadingVoting = true
+          for (var index in vm.votingItems) {
+            vm.votingItems[index]['className'] = 'dossier'
+            vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+          }
+          Promise.all(arrAction).then(results => {
+            vm.loadingVoting = false
+            vm.loadVoting()
+          }).catch(xhr => {
+            vm.loadingVoting = false
           })
         }
       },
