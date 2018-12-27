@@ -38,7 +38,7 @@
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
-          label="Group By"
+          label="Nhóm dữ liệu"
           item-text="label"
           item-value="key"
           >
