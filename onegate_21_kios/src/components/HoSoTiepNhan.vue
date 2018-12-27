@@ -38,10 +38,11 @@
                         <span>{{props.item.applicantName}}</span>
                       </td>
                       <td class="text-xs-left">
-                        <span>{{props.item.receiveDate}}</span>
+                        <span v-if="props.item.online">{{props.item.submitDate}}</span>
+                        <span v-else>{{props.item.receiveDate}}</span>
                       </td>
                       <td class="text-xs-left">
-                        <span>{{props.item.releaseDate}}</span>
+                        <span>{{props.item.receiveDate}}</span>
                       </td>
                     </tr>
                   </template>
@@ -103,7 +104,7 @@ export default {
         width: '100px'
       },
       {
-        text: 'Ngày có kết quả',
+        text: 'Ngày tiếp nhận',
         align: 'center',
         sortable: false,
         width: '130px'

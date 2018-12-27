@@ -273,7 +273,53 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
-                  resolve(serializable.data)
+                  //test
+                  if (filter.document === 'STATISTIC_05') {
+                    resolve([
+                      {
+                        month: 0,
+                        year: 0,
+                        companyId: 0,
+                        groupId: 0,
+                        totalCount: 0,
+                        totalVoted: 0,
+                        veryGoodCount: 0,
+                        goodCount: 0,
+                        badCount: 0,
+                        percentVeryGood: 0,
+                        percentGood: 0,
+                        percentBad: 0,
+                        govAgencyCode: 'a',
+                        govAgencyName: 'a',
+                        domain: 'ac',
+                        domainName: 'ac',
+                        votingCode: 'votingCode',
+                        subject: 'subject'
+                      },
+                      {
+                        month: 0,
+                        year: 0,
+                        companyId: 0,
+                        groupId: 0,
+                        totalCount: 0,
+                        totalVoted: 0,
+                        veryGoodCount: 0,
+                        goodCount: 0,
+                        badCount: 0,
+                        percentVeryGood: 0,
+                        percentGood: 0,
+                        percentBad: 0,
+                        govAgencyCode: 'a',
+                        govAgencyName: 'a',
+                        domain: 'acd',
+                        domainName: 'acd',
+                        votingCode: 'votingCoded',
+                        subject: 'subjectd'
+                      }
+                    ])
+                  } else {
+                    resolve(serializable.data)
+                  }
                 } else {
                   resolve(null)
                 }

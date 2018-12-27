@@ -109,7 +109,7 @@
        &nbsp; &nbsp; Undo&nbsp; &nbsp;
       </v-btn>
       
-      <v-menu bottom v-if="getUser('Administrator_data')" style="position:relative !important">
+      <v-menu left v-if="getUser('Administrator_data')" style="position:relative !important">
         <v-btn slot="activator" color="red" dark>Go to &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
         <v-list>
           <v-list-tile @click="btnActionEvent(selectedDoAction[selectedDoAction.length - 1], {form: 'GOTO_DONE'}, 0, true)" >
@@ -231,7 +231,7 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              <span class="primary--text"> {{ props.item.dossierNo }} - {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
+              <span class="primary--text" v-if="props.item.dossierNo"> {{ props.item.dossierNo }} - </span><span class="primary--text"> {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
               <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
               <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
               <span class="text-bold">Tiếp nhận: </span> <span>{{ props.item.receiveDate }}</span><br>
@@ -243,7 +243,7 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-menu left bottom
+            <v-menu left style="position:relative !important"
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
               <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
