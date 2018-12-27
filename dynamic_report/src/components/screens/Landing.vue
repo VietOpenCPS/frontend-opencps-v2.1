@@ -487,8 +487,8 @@ export default {
               */
               // domainRawItem['domainName'] = dataReportCurrent[textGroup]
               dossierRawItem['dossiers'] = []
-              dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
               dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+              dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
               dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
             }
           }
