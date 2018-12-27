@@ -12,7 +12,6 @@
             slot="activator"
             append-icon="event"
             @blur="toDate = parseDate(toDateFormatted)"
-            :rules="processRules(item.rules)"
             :value="formatDate(dataValue)"
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
@@ -40,7 +39,7 @@
         formatDate (date) {
             if (!date) return null
             let dateObj = new Date(date)
-            this.$emit('input', dateObj.getTime())
+            // this.$emit('input', dateObj.getTime())
             return dateObj.getDate() + '/' + (dateObj.getMonth() + 1) + '/' + dateObj.getFullYear()
         },
         parseDate (date) {
