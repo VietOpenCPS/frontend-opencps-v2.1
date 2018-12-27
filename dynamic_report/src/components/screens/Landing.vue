@@ -771,7 +771,7 @@ export default {
           }
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
-                (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
+                (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
               if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
                 dataRow.push({
