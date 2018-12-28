@@ -362,6 +362,7 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
+          currentVal = ''
           for (let keySource in vm.filters[key]['source']) {
             if (currentVal === '' || currentVal === '0') {
               currentVal = vm.filters[key]['source'][keySource]['name']
@@ -552,6 +553,7 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
+          currentVal = ''
           for (let keySource in vm.filters[key]['source']) {
             if (currentVal === '' || currentVal === '0') {
               currentVal = vm.filters[key]['source'][keySource]['name']
