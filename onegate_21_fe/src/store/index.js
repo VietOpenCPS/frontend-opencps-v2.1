@@ -147,7 +147,7 @@ export const store = new Vuex.Store({
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
           }).catch(function (error) {
-            state['user'].role = ['Administrator_data']
+            state['user'].role = ['default']
             console.log(error)
           })
         }

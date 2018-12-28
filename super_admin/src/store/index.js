@@ -1166,7 +1166,9 @@ export const store = new Vuex.Store({
           var dataPostVoting = new URLSearchParams()
           dataPostVoting.append('className', data.className ? data.className : '')
           dataPostVoting.append('classPK', data.classPK ? data.classPK : '')
-          dataPostVoting.append('votingCode', data.votingCode ? data.votingCode : '')
+          if (data.className && data.className === 'dossier') {
+            dataPostVoting.append('votingCode', data.votingCode)
+          }
           dataPostVoting.append('subject', data.subject ? data.subject : '')
           dataPostVoting.append('choices', data.choices ? data.choices : '')
           dataPostVoting.append('commentable', data.commentable ? data.commentable : '')

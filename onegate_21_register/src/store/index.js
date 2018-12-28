@@ -134,7 +134,7 @@ export const store = new Vuex.Store({
           }
           // test local
           // axios.get('http://127.0.0.1:8081/api/dictcollections/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/collectionCode/dataForm', param).then(function (response) {
-          axios.get('/o/gate/v2/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/collectionCode/dataForm', param).then(function (response) {
+          axios.get('/o/v1/opencps/jexcel/backend.datamgt.service/org.opencps.datamgt.model.DictCollection/org.opencps.datamgt.service.DictCollectionLocalServiceUtil/collectionCode/dataForm', param).then(function (response) {
             if (response.data) {
               let dataReturn = response.data
               let dataRule

@@ -861,7 +861,7 @@ export default {
             vm.btnStepsDynamics = result
           })
         }
-        if (resultDossier['dossierStatus'] === 'done') {
+        if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
         }
