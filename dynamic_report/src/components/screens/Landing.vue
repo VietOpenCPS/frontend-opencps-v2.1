@@ -243,6 +243,8 @@ export default {
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select'/* || vm.filters[key]['type'] === 'date'*/) {
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+          } else if (vm.filters[key]['type'] === 'date') {
+            vm.data[vm.filters[key]['key']] = ''
           }
         }
         vm.report1Def = {}
@@ -317,6 +319,8 @@ export default {
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select'/* || vm.filters[key]['type'] === 'date'*/) {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+        } else if (vm.filters[key]['type'] === 'date') {
+          vm.data[vm.filters[key]['key']] = ''
         }
       }
       if (vm.showConfig) {
