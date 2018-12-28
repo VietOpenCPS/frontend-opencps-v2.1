@@ -1,109 +1,104 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation>
-    <div class="form-chitiet">
-      <div class="row-header">
-        <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
-        <div class="layout row wrap header_tools row-blue">
-          <div class="flex xs12 pl-3 text-ellipsis text-bold">
-            <v-layout wrap class="chart__report">
-              <v-flex class="px-2 text-right">
-                <!--
-                <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                  <v-icon>settings</v-icon> &nbsp;
-                  Lưu thay đổi
-                </v-btn>
-                -->
-                <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
-                  <v-icon v-if="showConfig">reply</v-icon>
-                  <v-icon v-else>settings</v-icon> &nbsp;
-                  <span v-if="showConfig">Quay lại</span>
-                  <span v-else>Tuỳ chọn</span>
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </div>
+  <div class="form-chitiet">
+    <div class="row-header">
+      <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex xs12 pl-3 text-ellipsis text-bold">
+          <v-layout wrap class="chart__report">
+            <v-flex class="px-2 text-right">
+              <!--
+              <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
+                <v-icon>settings</v-icon> &nbsp;
+                Lưu thay đổi
+              </v-btn>
+              -->
+              <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
+                <v-icon v-if="showConfig">reply</v-icon>
+                <v-icon v-else>settings</v-icon> &nbsp;
+                <span v-if="showConfig">Quay lại</span>
+                <span v-else>Tuỳ chọn</span>
+              </v-btn>
+            </v-flex>
+          </v-layout>
         </div>
-      </div>
-      <v-layout row wrap class="filter_menu mt-4">
-        <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 1">
-          <v-autocomplete
-            :items="agencyLists"
-            v-model="govAgency"
-            label="Chọn đơn vị"
-            item-text="text"
-            item-value="value"
-            :rules="[rules.required]"
-            >
-          </v-autocomplete>
-        </v-flex>
-        <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 1">
-          <v-autocomplete
-            :items="groupBy"
-            v-model="groupByVal"
-            label="Nhóm dữ liệu"
-            item-text="label"
-            item-value="key"
-            :rules="[rules.required]"
-            >
-          </v-autocomplete>
-        </v-flex>
-        <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
-          <datetime-picker
-            v-if="item['type'] === 'date'"
-            v-model="data[item.key]" 
-            :item="item" 
-            :data-value="data[item.key]">
-          </datetime-picker>
-          <v-text-field 
-            v-if="item['type'] === 'text'"
-            v-model="data[item.key]" 
-            :label="item['label']">
-          </v-text-field>
-          <v-select
-            v-if="item['type'] === 'select'"
-            :items="item['source']"
-            v-model="data[item.key]"
-            :label="item['label']"
-            item-value="value"
-            item-text="name"
-            :rules="[rules.required]"
-          ></v-select>
-        </v-flex>
-      </v-layout>
-      <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
-        <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-          <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
-        </v-flex>
-      </v-layout>
-      <v-layout row wrap>
-        <v-flex xs12>
-          <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
-        </v-flex>
-      </v-layout>
-      <div>
-        <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-        <div class="mx-2" v-else-if="pdfBlob === ''">
-          
-        </div>
-        <div class="mx-2" v-else-if="!isShowLoading">
-          <v-alert :value="true" outline color="info" icon="info">
-            Không có dữ liệu báo cáo.
-          </v-alert>
-        </div>
-        <v-layout row wrap v-if="isShowLoading">
-          <v-flex xs12 class="text-xs-center" mt-5>
-            <v-progress-circular
-              :size="100"
-              :width="1"
-              color="primary"
-              indeterminate
-            ></v-progress-circular>
-          </v-flex>
-        </v-layout>
-        
       </div>
     </div>
-  </v-form>
+    <v-layout row wrap class="filter_menu mt-4">
+      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 1">
+        <v-autocomplete
+          :items="agencyLists"
+          v-model="govAgency"
+          label="Chọn đơn vị"
+          item-text="text"
+          item-value="value"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 1">
+        <v-autocomplete
+          :items="groupBy"
+          v-model="groupByVal"
+          label="Nhóm dữ liệu"
+          item-text="label"
+          item-value="key"
+          >
+        </v-autocomplete>
+      </v-flex>
+      <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+        <datetime-picker
+          v-if="item['type'] === 'date'"
+          v-model="data[item.key]" 
+          :item="item" 
+          :data-value="data[item.key]">
+        </datetime-picker>
+        <v-text-field 
+          v-if="item['type'] === 'text'"
+          v-model="data[item.key]" 
+          :label="item['label']">
+        </v-text-field>
+        <v-select
+          v-if="item['type'] === 'select'"
+          :items="item['source']"
+          v-model="data[item.key]"
+          :label="item['label']"
+          item-value="value"
+          item-text="name"
+        ></v-select>
+      </v-flex>
+    </v-layout>
+    <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
+      <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
+        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+      </v-flex>
+    </v-layout>
+    <div>
+      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
+      <div class="mx-2" v-else-if="pdfBlob === ''">
+        
+      </div>
+      <div class="mx-2" v-else-if="!isShowLoading">
+        <v-alert :value="true" outline color="info" icon="info">
+          Không có dữ liệu báo cáo.
+        </v-alert>
+      </div>
+      <v-layout row wrap v-if="isShowLoading">
+        <v-flex xs12 class="text-xs-center" mt-5>
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </v-flex>
+      </v-layout>
+      
+    </div>
+  </div>
 </template>
 
 <script>
@@ -156,18 +151,7 @@ export default {
     customize: false,
     groupBy: [],
     groupByVal: '',
-    dataReportXX: '',
-    rules: {
-      required: value => !!value || 'Bắt buộc phải nhập.',
-      number: value => {
-        const pattern = /^\d+$/
-        return pattern.test(value) || 'Bắt buộc phải nhập kiểu số.'
-      },
-      email: value => {
-        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        return pattern.test(value) || 'Sai định dạng thư điện tử.'
-      }
-    }
+    dataReportXX: ''
   }),
   computed: {
     itemsReports () {
@@ -850,10 +834,8 @@ export default {
     },
     doCreateReport() {
       let vm = this
-      if (vm.$refs.form.validate()) {
-        vm.showConfig = false
-        vm.doCreatePDF()
-      }
+      vm.showConfig = false
+      vm.doCreatePDF()
     },
     sortByKey (array, key) {
       return array.sort(function(a, b) {
