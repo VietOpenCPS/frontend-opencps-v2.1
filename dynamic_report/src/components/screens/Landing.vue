@@ -257,7 +257,7 @@ export default {
           vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
         }
         for (let key in vm.filters) {
-          if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+          if (vm.filters[key]['type'] === 'select'/* || vm.filters[key]['type'] === 'date'*/) {
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
           }
         }
@@ -331,7 +331,7 @@ export default {
       vm.reportType = vm.itemsReports[vm.index]['document']
       vm.pdfBlob = ''
       for (let key in vm.filters) {
-        if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+        if (vm.filters[key]['type'] === 'select'/* || vm.filters[key]['type'] === 'date'*/) {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
         }
       }
