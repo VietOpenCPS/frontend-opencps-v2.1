@@ -49,7 +49,7 @@
           v-if="item['type'] === 'date'"
           v-model="data[item.key]" 
           :item="item" 
-          :data-value="data[item.key]">
+          :data-value="item['value']">
         </datetime-picker>
         <v-text-field 
           v-if="item['type'] === 'text'"
@@ -102,6 +102,7 @@
 </template>
 
 <script>
+import support from '../../store/support.json'
 import VueFriendlyIframe from 'vue-friendly-iframe'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
@@ -211,14 +212,9 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
           vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
-          let defaultValGroup = vm.groupBy[0]['key']
-          for (let keyGroup in vm.groupBy) {
-            if (vm.groupBy[keyGroup]['selected']) {
-              defaultValGroup = vm.groupBy[keyGroup]['key']
-              break
-            }
+          if (vm.groupBy.length === 1) {
+            vm.groupByVal = vm.groupBy[0]['key']
           }
-          vm.groupByVal = defaultValGroup
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
           vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -241,7 +237,9 @@ export default {
         }
         for (let key in vm.filters) {
           if (vm.filters[key]['type'] === 'select') {
+            console.log('source: ', vm.filters[key]['source'])
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+            console.log('vm.data: ', vm.data)
           }
         }
         vm.report1Def = {}
@@ -263,6 +261,7 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       console.debug(oldRoute)
+      let currentQuery = newRoute.query
       vm.itemsReportsConfig = []
       vm.groupBy = []
       vm.customize = false
@@ -280,14 +279,9 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
-        let defaultValGroup = vm.groupBy[0]['key']
-        for (let keyGroup in vm.groupBy) {
-          if (vm.groupBy[keyGroup]['selected']) {
-            defaultValGroup = vm.groupBy[keyGroup]['key']
-            break
-          }
+        if (vm.groupBy.length === 1) {
+          vm.groupByVal = vm.groupBy[0]['key']
         }
-        vm.groupByVal = defaultValGroup
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
         vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -327,21 +321,31 @@ export default {
     }
   },
   methods: {
-    doCreatePDF () {
+    doCreatePDF (val) {
       let vm = this
       if (vm.reportType.startsWith('STATISTIC')) {
         vm.doPrintReportFix()
       } else {
-        vm.doDynamicReport()
+        vm.doDynamicReport(val)
       }
       vm.isCallData = true
     },
-    doDynamicReport () {
+    doDynamicReport (val) {
       let vm = this
       vm.docDefinition = {}
+      let reportName = ''
       let docDString = {}
       vm.dataReportXX = ''
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
+      let onlineStr = ''
+      if (String(vm.online) === 'true') {
+        onlineStr = 'TRỰC TUYẾN'
+      } else if (String(vm.online) === 'false') {
+        onlineStr = 'TRỰC TIẾP'
+      } else {
+        onlineStr = ''
+      }
+      reportName = vm.itemsReports[vm.index]['title']
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
@@ -361,13 +365,7 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
-          for (let keySource in vm.filters[key]['source']) {
-            if (currentVal === '' || currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
-              break
-            }
-          }
-          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -397,6 +395,10 @@ export default {
       for (let key in vm.itemsReportsConfig) {
         if (vm.itemsReportsConfig[key].hasOwnProperty('selected') && vm.itemsReportsConfig[key]['selected']) {
           colLeng = colLeng + 1
+          let alignmentConfig = 'center'
+          if (vm.itemsReportsConfig[key].hasOwnProperty('align')) {
+            alignmentConfig = vm.itemsReportsConfig[key]['align']
+          }
           widthsConfig.push('auto')
           // vm.docDefinition['content'][2]['table']['widths'].push('auto')
           let str1 = ' '
@@ -431,41 +433,87 @@ export default {
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
           let dataReport = result
+          let domainRaw = {}
           let dossierRaw = {}
           let dataReportCurrent = {}
           let dataReportTotal = ''
-          let textGroup = ''
-          for (let keyGroup in vm.groupBy) {
-            if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
-              textGroup = vm.groupBy[keyGroup]['display']
-              break
-            }
-          }
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
-            if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] === dataReportCurrent[textGroup]) {
-                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+            let domainRawItem = {}
+            if (vm.groupByVal === 'domainCode') {
+              domainRawItem['domainName'] = dataReportCurrent['domainName']
+            } else {
+              domainRawItem['domainName'] = dataReportCurrent['govAgencyName']
+            }
+            domainRawItem['services'] = []
+            if (vm.groupByVal === 'domainCode') {
+              if (domainRaw[dataReportCurrent['domainName']] === '' || domainRaw[dataReportCurrent['domainName']] === undefined) {
+                domainRaw[dataReportCurrent['domainName']] = domainRawItem
+              }
+            } else {
+              if (domainRaw[dataReportCurrent['govAgencyName']] === '' || domainRaw[dataReportCurrent['govAgencyName']] === undefined) {
+                domainRaw[dataReportCurrent['govAgencyName']] = domainRawItem
+              }
+            }
+            if (dossierRaw[dataReportCurrent['serviceCode']] !== '' && dossierRaw[dataReportCurrent['serviceCode']] !== undefined) {
+              if (dossierRaw[dataReportCurrent['serviceCode']]['serviceCode'] === dataReportCurrent['serviceCode']) {
+                dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
               }
             } else {
               let dossierRawItem = {}
-              dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
-              dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+              dossierRawItem['serviceCode'] = dataReportCurrent['serviceCode']
+              dossierRawItem['serviceName'] = dataReportCurrent['serviceName']
+              if (vm.groupByVal === 'domainCode') {
+                dossierRawItem['domainName'] = dataReportCurrent['domainName']
+              } else {
+                dossierRawItem['domainName'] = dataReportCurrent['govAgencyName']
+              }
               dossierRawItem['dossiers'] = []
-              dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
-              dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
-              dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+              dossierRaw[dataReportCurrent['serviceCode']] = dossierRawItem
+              dossierRaw[dataReportCurrent['serviceCode']]['dossiers'].push(dataReportCurrent)
             }
           }
-            for (let key in dossierRaw) {
-              if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
-                dataReportTotal += JSON.stringify([{
-                  colSpan: colLeng + 1,
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
-                  bold: true,
-                  style: 'tdStyle'
-                }]) + ','
+          for (let key in dossierRaw) {
+            let keyObject = dossierRaw[key]
+            if (key !== '' && keyObject !== undefined) {
+              if (domainRaw[keyObject['domainName']] !== '' && domainRaw[keyObject['domainName']] !== undefined && 
+                domainRaw[keyObject['domainName']]['domainName'] === keyObject['domainName']) {
+                domainRaw[keyObject['domainName']]['services'].push(keyObject)
               }
+            }
+          }
+          let domains = []
+          for (let key in domainRaw) {
+            let keyObject = domainRaw[key]
+            if (key !== '') {
+              let domainRawItem = {}
+              domainRawItem['domainName'] = key
+              domainRawItem['services'] = keyObject['services']
+              domains.push(domainRawItem)
+            }
+          }
+          if (domains.length > 0) {
+            dataReportTotal += JSON.stringify([{
+              colSpan: colLeng + 1,
+              text: domains[0]['domainName'],
+              bold: true,
+              style: 'tdStyle'
+            }]) + ','
+            /*
+            vm.docDefinition['content'][2]['table']['body'].push([{
+              colSpan: val.length + 1,
+              text: domains[0]['domainName'],
+              bold: true,
+              style: 'tdStyle'
+            }])
+            */
+            for (let key in domains[0]['services']) {
+              dataReportTotal += JSON.stringify([{
+                colSpan: colLeng + 1,
+                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+                bold: true,
+                style: 'tdStyle'
+              }]) + ','
               /*
               vm.docDefinition['content'][2]['table']['body'].push([{
                 colSpan: val.length + 1,
@@ -474,7 +522,7 @@ export default {
                 style: 'tdStyle'
               }])
               */
-              let dossiersArray = dossierRaw[key]['dossiers']
+              let dossiersArray = domains[0]['services'][key]['dossiers']
               let indexStt = 1
               let dataRow = []
               for (let keyDossier in dossiersArray) {
@@ -509,10 +557,12 @@ export default {
             }
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             vm.dataReportXX += dataReportTotal
-          // }
+          }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          console.log('dataReportXX', vm.dataReportXX.length)
           vm.docDefinition = JSON.parse(docDString)
+          console.log('docDStringdocDStringdocDStringdocDString', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -532,7 +582,16 @@ export default {
       vm.docDefinition = {}
       let docDString = {}
       docDString = JSON.stringify(vm.reportConfigStatic[vm.index]['docDefinition'])
+      let onlineStr = ''
+      if (String(vm.online) === 'true') {
+        onlineStr = 'TRỰC TUYẾN'
+      } else if (String(vm.online) === 'false') {
+        onlineStr = 'TRỰC TIẾP'
+      } else {
+        onlineStr = ''
+      }
       docDString = docDString.replace(/\[\$siteName\$\]/g, vm.$store.getters.siteName)
+      
       for (let key in vm.filters) {
         let find = vm.filters[key]['key']
         let currentVal = vm.data[vm.filters[key]['key']]
@@ -551,13 +610,7 @@ export default {
             docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
           }
         } else {
-          for (let keySource in vm.filters[key]['source']) {
-            if (currentVal === '' || currentVal === '0') {
-              currentVal = vm.filters[key]['source'][keySource]['name']
-              break
-            }
-          }
-          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
+          docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), '')
         }
       }
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
@@ -708,7 +761,9 @@ export default {
             }
             resultData = []
             for (let key in arraySubKey) {
+              console.log('arraySubKey key', key)
               let subKeySortData = vm.sortByKey(arraySubKey[key], subKey)
+              console.log('subKeySortData', subKeySortData)
               for (let keyData in subKeySortData) {
                 resultData.push(subKeySortData[keyData])
               }
@@ -731,6 +786,7 @@ export default {
                   style: 'tdStyle'
                 })
               }
+              console.log('resultData[key]', resultData[key])
               let indexTotal = 1
               for (let keyMapping in vm.itemsReportsConfig) {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
@@ -766,7 +822,6 @@ export default {
                 indexTotal = indexTotal + 1
               }
               if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
-                
               } else {
                 index = index + 1
               }
@@ -804,6 +859,7 @@ export default {
               }
             }
           }
+          console.log('resultDataTotal', resultDataTotal)
           for (let key in resultDataTotal) {
             let indexTotal = 1
             for (let keyMapping in vm.itemsReportsConfig) {
@@ -833,8 +889,20 @@ export default {
     },
     doCreateReport() {
       let vm = this
+      let doData = {
+        selected: vm.selected,
+        itemsReports: vm.itemsReports,
+        index: vm.index,
+        userId: vm.getUserId()
+      }
       vm.showConfig = false
-      vm.doCreatePDF()
+      vm.doCreatePDF(vm.selected)
+      /*
+      vm.$store.dispatch('updateDynamicReport', doData).then(function () {
+        vm.showConfig = false
+        vm.doCreatePDF(vm.selected)
+      })
+      */
     },
     sortByKey (array, key) {
       return array.sort(function(a, b) {

@@ -37,7 +37,8 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: []
+    itemsReports: [],
+    reportConfigStatic: {}
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -129,8 +130,8 @@ export const store = new Vuex.Store({
                 }
                 // push default current siteName
                 let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-                if (filterconfigObject.hasOwnProperty('govAgencyCode')) {
-                  let govCodes = filterconfigObject['govAgencyCode']
+                if (filterconfigObject.hasOwnProperty('groupIds') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
+                  let govCodes = filterconfigObject['groupIds']
                   let exit = false
                   for (let key in govCodes) {
                     if (String(state.groupId) === govCodes[key]['value']) {
@@ -144,8 +145,9 @@ export const store = new Vuex.Store({
                       "text": state.siteName
                     })
                   }
-                  filterconfigObject['govAgencyCode'] = govCodes
+                  filterconfigObject['groupIds'] = govCodes
                 }
+                state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
                 itemsReportsData.push({
                   'code' : String(indexKey),
                   'document' : current['reportCode'],
@@ -209,6 +211,7 @@ export const store = new Vuex.Store({
                 }
                 filterconfigObject['groupIds'] = govCodes
               }
+              state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
               itemsReportsData.push({
                 'code' : String(indexKey),
                 'document' : current['reportCode'],
@@ -252,7 +255,7 @@ export const store = new Vuex.Store({
             let currentVal = filter['data'][key]
             if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
               let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
-              if (dateStr !== 'Invalid Date') {
+              if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
                 param.params[key] = dateStr
               } else {
                 param.params[key] = currentVal
@@ -270,9 +273,56 @@ export const store = new Vuex.Store({
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
                 if (serializable.data) {
+                  //test
                   resolve(serializable.data)
                 } else {
-                  resolve(null)
+                  console.log('docu', filter.document === 'STATISTIC_05')
+                  if (filter.document === 'STATISTIC_05') {
+                    resolve([
+                      {
+                        month: 0,
+                        year: 0,
+                        companyId: 0,
+                        groupId: 0,
+                        totalCount: 0,
+                        totalVoted: 0,
+                        veryGoodCount: 0,
+                        goodCount: 0,
+                        badCount: 0,
+                        percentVeryGood: 0,
+                        percentGood: 0,
+                        percentBad: 0,
+                        govAgencyCode: '',
+                        govAgencyName: '',
+                        domain: 'ac',
+                        domainName: 'ac',
+                        votingCode: 'votingCode',
+                        subject: 'subject'
+                      },
+                      {
+                        month: 0,
+                        year: 0,
+                        companyId: 0,
+                        groupId: 0,
+                        totalCount: 0,
+                        totalVoted: 0,
+                        veryGoodCount: 0,
+                        goodCount: 0,
+                        badCount: 0,
+                        percentVeryGood: 0,
+                        percentGood: 0,
+                        percentBad: 0,
+                        govAgencyCode: '',
+                        govAgencyName: '',
+                        domain: 'acd',
+                        domainName: 'acd',
+                        votingCode: 'votingCoded',
+                        subject: 'subjectd'
+                      }
+                    ])
+                  } else {
+                    resolve(null)
+                  }
                 }
               }).catch(function (error) {
                 console.log(error)
@@ -331,7 +381,7 @@ export const store = new Vuex.Store({
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/dossiers'
             requestURL = filter['api']
-            param.params['sort'] = 'domainCode'
+            // param.params['sort'] = 'domainCode'
             if (govAgency === undefined || govAgency === null || govAgency === '') {
               axios.get(requestURL, param).then(function (response) {
                 let serializable = response.data
@@ -447,6 +497,9 @@ export const store = new Vuex.Store({
     },
     setitemsReports (state, payload) {
       state.itemsReports = payload
+    },
+    setreportConfigStatic (state, payload) {
+      state.reportConfigStatic = payload
     }
   },
   getters: {
@@ -488,6 +541,9 @@ export const store = new Vuex.Store({
     },
     itemsReports (state) {
       return state.itemsReports
+    },
+    reportConfigStatic (state) {
+      return state.reportConfigStatic
     }
   }
 })
