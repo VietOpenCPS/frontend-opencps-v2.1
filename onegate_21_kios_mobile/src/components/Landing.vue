@@ -39,7 +39,7 @@
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
-            <p>Năm 2018</p>
+            <p>Năm {{ (new Date()).getFullYear() }}</p>
   
             <div class="numbers align-space-between">
               <div class="tiepnhan">

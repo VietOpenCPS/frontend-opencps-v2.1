@@ -12,7 +12,7 @@
             slot="activator"
             append-icon="event"
             @blur="toDate = parseDate(toDateFormatted)"
-            :value="formatDate(dataValue)"
+            :value="formatDate(rawDate)"
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
@@ -25,13 +25,21 @@
     data () {
       return {
         toDateFormatted: null,
-        toDate: null
+        toDate: null,
+        rawDate: null
       }
     },
     props: ['value', 'item', 'dataValue'],
+    created () {
+        var vm = this
+        vm.$nextTick(function () {
+            vm.rawDate = vm.parseDate(vm.dataValue)
+        })
+    },
     watch: {
         toDate (val) {
             this.toDateFormatted = this.formatDate(val)
+            this.rawDate = this.parseDate(this.toDateFormatted)
             this.$emit('input', new Date(val).getTime())
         }
     },
