@@ -575,7 +575,6 @@ export default {
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
           // }
-          console.log('dataToExportCSV', dataToExportCSV)
           vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []

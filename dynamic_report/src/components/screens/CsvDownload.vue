@@ -24,7 +24,6 @@ export default {
             lines.splice(0,1);
             let newtext = rawHeader + lines.join('\n');
             vm.dataToExport = newtext
-            console.log('dataToExport', vm.dataToExport)
         })
     },
     computed: {
