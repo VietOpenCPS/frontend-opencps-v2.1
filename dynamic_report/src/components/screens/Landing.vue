@@ -16,7 +16,7 @@
                 :data="csvExport"
                 :fields="fields"
                 :downloadname="nameReport"
-                v-if="fields.length > 0"
+                v-if="showCSVDownload"
               >
               </vue-csv-downloader>
               <v-select
@@ -137,6 +137,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    showCSVDownload: false,
     csvExport: [],
     fields: [],
     valid: false,
@@ -222,6 +223,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       setTimeout(() => {
+        vm.showCSVDownload = false
         vm.agencyLists = []
         vm.api = ''
         vm.filters = []
@@ -302,6 +304,7 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       console.debug(oldRoute)
+      vm.showCSVDownload = false
       vm.itemsReportsConfig = []
       vm.groupBy = []
       vm.customize = false
@@ -586,6 +589,7 @@ export default {
               vm.fields.push(stringColumn)
             }
           }
+          vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.docDefinition = JSON.parse(docDString)
@@ -920,6 +924,7 @@ export default {
               vm.fields.push(stringColumn)
             }
           }
+          vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
