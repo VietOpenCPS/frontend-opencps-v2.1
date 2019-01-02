@@ -12,6 +12,14 @@
                 Lưu thay đổi
               </v-btn>
               -->
+              <v-select
+                v-if="buttons.length > 0"
+                :items="buttons['source']"
+                :label="buttons['label']"
+                v-model="buttonsVal"
+                item-text="name"
+                item-value="value"
+              ></v-select>
               <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
                 <v-icon v-else>settings</v-icon> &nbsp;
@@ -151,7 +159,9 @@ export default {
     customize: false,
     groupBy: [],
     groupByVal: '',
-    dataReportXX: ''
+    dataReportXX: '',
+    buttons: [],
+    buttonsVal: ''
   }),
   computed: {
     itemsReports () {
@@ -203,6 +213,8 @@ export default {
         vm.groupBy = []
         vm.itemsReportsConfig = []
         vm.dataReportXX = ''
+        vm.buttons = []
+        vm.buttonsVal = ''
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
           vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -245,6 +257,9 @@ export default {
             vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
           }
         }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+          vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+        }
         vm.report1Def = {}
         for (let key in vm.itemsReportsConfig) {
           vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -272,6 +287,8 @@ export default {
       vm.filters = []
       vm.report1Def = {}
       vm.dataReportXX = ''
+      vm.buttons = []
+      vm.buttonsVal = ''
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -318,6 +335,9 @@ export default {
         if (vm.filters[key]['type'] === 'select'/* || vm.filters[key]['type'] === 'date'*/) {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
         }
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+        vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
       }
       if (vm.showConfig) {
         vm.showConfig = false
