@@ -283,8 +283,6 @@ export default {
             }, 100)
           }
         }
-        console.log('buttons CHK: ', vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons'))
-        console.log('buttons', vm.buttons)
         vm.report1Def = {}
         for (let key in vm.itemsReportsConfig) {
           vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -568,6 +566,7 @@ export default {
           dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
           vm.dataReportXX += dataReportTotal
           // }
+          vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []
           vm.fields.push('STT')
@@ -900,6 +899,7 @@ export default {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
           }
           dataToExportCSV.push(itemTotal)
+          vm.csvExport = []
           vm.csvExport = dataToExportCSV
           vm.fields = []
           vm.fields.push('STT')
