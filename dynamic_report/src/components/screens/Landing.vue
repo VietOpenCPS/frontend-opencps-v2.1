@@ -260,6 +260,8 @@ export default {
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
           vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
         }
+        console.log('buttons CHK: ', vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons'))
+        console.log('buttons', vm.buttons)
         vm.report1Def = {}
         for (let key in vm.itemsReportsConfig) {
           vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
