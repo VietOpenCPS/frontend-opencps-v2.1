@@ -1,5 +1,5 @@
 <template>
-    <a :download="downloadName" :href="downloadUrl" :disabled="this.data.length === 0">
+    <a :download="downloadname" :href="downloadUrl" :disabled="this.data.length === 0">
        <v-icon>receipt</v-icon> &nbsp; Export CSV
     </a>
 </template>
@@ -24,7 +24,7 @@ export default {
             lines.splice(0,1);
             let newtext = rawHeader + lines.join('\n');
             vm.dataToExport = newtext
-            console.log('dataToExport', vm.dataToExport)
+            console.log('downloadname', vm.downloadname)
         })
     },
     computed: {
