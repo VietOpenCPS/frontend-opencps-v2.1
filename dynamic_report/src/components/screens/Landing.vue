@@ -15,6 +15,7 @@
               <vue-csv-downloader
                 :data="csvExport"
                 :fields="fields"
+                :downloadname="reportName"
                 v-if="fields.length > 0"
               >
               </vue-csv-downloader>

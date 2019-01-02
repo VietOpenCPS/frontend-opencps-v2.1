@@ -10,9 +10,7 @@ export default {
     props: {
         fields: undefined,
         data: undefined,
-        downloadName: {
-            default: 'export.csv'
-        }
+        downloadname: 'export.csv'
     },
     data: () => ({
         dataToExport: ''
@@ -31,7 +29,7 @@ export default {
     },
     computed: {
         downloadUrl() {
-            return this.data.length > 0 ? "data:text/csv," + encodeURIComponent(this.dataToExport) : 'javascript:void(0);';
+            return this.data.length > 0 ? "data:text/csv; charset=utf-8," + encodeURIComponent(this.dataToExport) : 'javascript:void(0);';
         }
     }
 }
