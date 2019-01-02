@@ -511,7 +511,10 @@ export default {
           let dataToExportCSV = []
           for (let key in dossierRaw) {
             if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
-              // dataToExportCSV.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup])
+              dataToExportCSV.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup])
+              for (let colLengIndex in colLeng) {
+                dataToExportCSV.push('')
+              }
               dataReportTotal += JSON.stringify([{
                 colSpan: colLeng + 1,
                 text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
