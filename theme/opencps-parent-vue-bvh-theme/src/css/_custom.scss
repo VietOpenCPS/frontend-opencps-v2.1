@@ -793,3 +793,13 @@ border: none !important; }
   body .bootstrap-datetimepicker-widget .datepicker > div:first-child {
     display: block !important;
 }
+
+body .v-suggestions {
+  padding-top: 3px;
+}
+body .v-suggestions > input{
+  padding: 0;
+  border-bottom: 1px solid #949494;
+  height: 28px;
+  width: 100%;
+}

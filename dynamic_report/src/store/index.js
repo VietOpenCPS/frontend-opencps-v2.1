@@ -106,6 +106,33 @@ export const store = new Vuex.Store({
         })
       })
     },
+    doChotSoLieu ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            'groupId': state.groupId,
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          },
+          params: {
+
+          }
+        }
+        param['params'][filter['key']] = filter['value']
+        axios.get(filter['api'], param).then(function (response) {
+          let serializable = response.data
+          if (serializable.data) {
+            let dataReturn = serializable.data
+            resolve(dataReturn)
+          } else {
+            resolve(null)
+          }
+        }).catch(function (error) {
+          console.log(error)
+          reject(error)
+        })
+      })
+    },
     getDynamicReports ({commit, state}) {
       return new Promise((resolve, reject) => {
         if (state.siteName !== '') {
@@ -278,48 +305,7 @@ export const store = new Vuex.Store({
                 } else {
                   console.log('docu', filter.document === 'STATISTIC_05')
                   if (filter.document === 'STATISTIC_05') {
-                    resolve([
-                      {
-                        month: 0,
-                        year: 0,
-                        companyId: 0,
-                        groupId: 0,
-                        totalCount: 0,
-                        totalVoted: 0,
-                        veryGoodCount: 0,
-                        goodCount: 0,
-                        badCount: 0,
-                        percentVeryGood: 0,
-                        percentGood: 0,
-                        percentBad: 0,
-                        govAgencyCode: '',
-                        govAgencyName: '',
-                        domain: 'ac',
-                        domainName: 'ac',
-                        votingCode: 'votingCode',
-                        subject: 'subject'
-                      },
-                      {
-                        month: 0,
-                        year: 0,
-                        companyId: 0,
-                        groupId: 0,
-                        totalCount: 0,
-                        totalVoted: 0,
-                        veryGoodCount: 0,
-                        goodCount: 0,
-                        badCount: 0,
-                        percentVeryGood: 0,
-                        percentGood: 0,
-                        percentBad: 0,
-                        govAgencyCode: '',
-                        govAgencyName: '',
-                        domain: 'acd',
-                        domainName: 'acd',
-                        votingCode: 'votingCoded',
-                        subject: 'subjectd'
-                      }
-                    ])
+                    resolve([])
                   } else {
                     resolve(null)
                   }

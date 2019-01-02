@@ -23,6 +23,7 @@
                 single-line
                 style="float: right;"
                 class="btn__chot"
+                @change="doChotSoLieu($event, button)"
               ></v-select>
               <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
@@ -895,6 +896,17 @@ export default {
       } else {
         vm.itemsReportsConfig[index]['selected'] = true
       }
+    },
+    doChotSoLieu (data, button) {
+      let vm = this
+      let filter = {
+        api: button['api'],
+        key: button['key'],
+        value: data
+      }
+      vm.$store.dispatch('doChotSoLieu', filter).then(function () {
+        vm.doCreatePDF()
+      })
     }
   }
 }
