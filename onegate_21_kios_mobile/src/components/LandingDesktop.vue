@@ -35,7 +35,7 @@
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
-            <p>Năm 2018</p>
+            <p>Năm {{ (new Date()).getFullYear() }}</p>
   
             <div class="numbers align-space-between">
               <div class="tiepnhan">
@@ -84,7 +84,7 @@
         <div class="chart-progress" v-if="showReport1">
           <div class="card" style="height: auto; border-radius: 0px;">
             <div class="card__title headline">
-              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM 2018
+              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM {{ (new Date()).getFullYear() }}
             </div>
             <div class="card__text pt-2 pb-0 pl-5 pr-4">
 
@@ -96,7 +96,7 @@
         <div class="chart-result" v-if="showReport2">
           <div class="card" style="height: auto; border-radius: 0px;">
             <div class="card__title headline">
-              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM 2018
+              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM {{ (new Date()).getFullYear() }}
             </div>
             <div class="card__text pt-2 pb-0 pl-5 pr-4">
 
