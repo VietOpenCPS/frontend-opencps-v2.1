@@ -13,7 +13,7 @@
               </v-btn>
               -->
               <v-select
-                v-if="buttons.length > 0"
+                v-if="buttonsShow"
                 :items="buttons['source']"
                 :label="buttons['label']"
                 v-model="buttonsVal"
@@ -161,7 +161,8 @@ export default {
     groupByVal: '',
     dataReportXX: '',
     buttons: [],
-    buttonsVal: ''
+    buttonsVal: '',
+    buttonsShow: false
   }),
   computed: {
     itemsReports () {
@@ -215,6 +216,7 @@ export default {
         vm.dataReportXX = ''
         vm.buttons = []
         vm.buttonsVal = ''
+        vm.buttonsShow = false
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
           vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -259,6 +261,11 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
           vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+          if (vm.buttons.length > 0) {
+            setTimeout(() => {
+              vm.buttonsShow = true
+            }, 100)
+          }
         }
         console.log('buttons CHK: ', vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons'))
         console.log('buttons', vm.buttons)
@@ -291,6 +298,7 @@ export default {
       vm.dataReportXX = ''
       vm.buttons = []
       vm.buttonsVal = ''
+      vm.buttonsShow = false
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -340,6 +348,11 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
         vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+        if (vm.buttons.length > 0) {
+          setTimeout(() => {
+            vm.buttonsShow = true
+          }, 100)
+        }
       }
       if (vm.showConfig) {
         vm.showConfig = false
