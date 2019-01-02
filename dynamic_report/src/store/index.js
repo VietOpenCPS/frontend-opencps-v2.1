@@ -119,6 +119,17 @@ export const store = new Vuex.Store({
           }
         }
         param['params'][filter['key']] = filter['value']
+        for (let key in filter['data']) {
+          let currentVal = filter['data'][key]
+          if (currentVal !== '' && currentVal !== undefined && currentVal !== null) {
+            let dateStr = new Date(currentVal).toLocaleDateString('vi-VN')
+            if (dateStr !== 'Invalid Date' && String(currentVal).length === 13) {
+              param.params[key] = dateStr
+            } else {
+              param.params[key] = currentVal
+            }
+          }
+        }
         axios.get(filter['api'], param).then(function (response) {
           let serializable = response.data
           if (serializable.data) {

@@ -897,12 +897,13 @@ export default {
         vm.itemsReportsConfig[index]['selected'] = true
       }
     },
-    doChotSoLieu (data, button) {
+    doChotSoLieu (dataSelect, button) {
       let vm = this
       let filter = {
         api: button['api'],
         key: button['key'],
-        value: data
+        value: dataSelect,
+        data: vm.data
       }
       vm.$store.dispatch('doChotSoLieu', filter).then(function () {
         vm.doCreatePDF()
