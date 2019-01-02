@@ -509,60 +509,65 @@ export default {
               dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
             }
           }
-            for (let key in dossierRaw) {
-              if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
-                dataReportTotal += JSON.stringify([{
-                  colSpan: colLeng + 1,
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
-                  bold: true,
-                  style: 'tdStyle'
-                }]) + ','
-              }
-              /*
-              vm.docDefinition['content'][2]['table']['body'].push([{
-                colSpan: val.length + 1,
-                text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+          let dataToExportCSV = []
+          for (let key in dossierRaw) {
+            if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
+              dataReportTotal += JSON.stringify([{
+                colSpan: colLeng + 1,
+                text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
                 bold: true,
                 style: 'tdStyle'
-              }])
-              */
-              let dossiersArray = dossierRaw[key]['dossiers']
-              let indexStt = 1
-              let dataRow = []
-              for (let keyDossier in dossiersArray) {
-                dataRow = []
-                let dossierObj = dossiersArray[keyDossier]
-                dataRow.push({
-                  text: indexStt, 
-                  alignment: 'center',
-                  style: 'tdStyle'
-                })
-                for (let keyVal in vm.itemsReportsConfig) {
-                  if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
-                    let alignmentConfig = 'center'
-                    if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
-                      alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
-                    }
-                    let ddStr = ' '
-                    if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
-                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
-                    }
-                    dataRow.push({
-                      text: ddStr, 
-                      alignment: alignmentConfig,
-                      style: 'tdStyle'
-                    })
-                  }
-                }
-                dataReportTotal += JSON.stringify(dataRow) + ','
-                // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
-                indexStt = indexStt + 1
-              }
+              }]) + ','
             }
-            dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
-            vm.dataReportXX += dataReportTotal
+            /*
+            vm.docDefinition['content'][2]['table']['body'].push([{
+              colSpan: val.length + 1,
+              text: '- ' + domains[0]['services'][key]['serviceCode'] + ' - ' + domains[0]['services'][key]['serviceName'],
+              bold: true,
+              style: 'tdStyle'
+            }])
+            */
+            let dossiersArray = dossierRaw[key]['dossiers']
+            let indexStt = 1
+            let dataRow = []
+            let dataToExportCSVItem = []
+            for (let keyDossier in dossiersArray) {
+              dataRow = []
+              let dossierObj = dossiersArray[keyDossier]
+              dataToExportCSVItem.push(indexStt)
+              dataRow.push({
+                text: indexStt, 
+                alignment: 'center',
+                style: 'tdStyle'
+              })
+              for (let keyVal in vm.itemsReportsConfig) {
+                if (vm.itemsReportsConfig[keyVal].hasOwnProperty('selected') && vm.itemsReportsConfig[keyVal]['selected']) {
+                  let alignmentConfig = 'center'
+                  if (vm.itemsReportsConfig[keyVal].hasOwnProperty('align')) {
+                    alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
+                  }
+                  let ddStr = ' '
+                  if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                    ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                  }
+                  dataToExportCSVItem.push(ddStr)
+                  dataRow.push({
+                    text: ddStr, 
+                    alignment: alignmentConfig,
+                    style: 'tdStyle'
+                  })
+                }
+              }
+              dataReportTotal += JSON.stringify(dataRow) + ','
+              // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
+              indexStt = indexStt + 1
+              dataToExportCSV.push(dataToExportCSVItem)
+            }
+          }
+          dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
+          vm.dataReportXX += dataReportTotal
           // }
-          vm.csvExport = eval('( [ ' + vm.dataReportXX + ' ] )' )
+          vm.csvExport = dataToExportCSV
           vm.fields = []
           vm.fields.push('STT')
           for (let excelKey in vm.itemsReportsConfig) {
@@ -779,17 +784,21 @@ export default {
               }
             }
           }
+          let dataToExportCSV = []
           for (let key in resultData) {
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
+              let dataToExportCSVItem = []
               if (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] !== '') {
+                dataToExportCSVItem.push('')
                 dataRow.push({
                   text: '', 
                   alignment: 'center',
                   style: 'tdStyle'
                 })
               } else {
+                dataToExportCSVItem.push(index)
                 dataRow.push({
                   text: index, 
                   alignment: 'center',
@@ -812,6 +821,7 @@ export default {
                 if (currentConfig.hasOwnProperty('align')) {
                   alignmentConfig = currentConfig['align']
                 }
+                dataToExportCSVItem.push(dataText)
                 dataRow.push({
                   text: dataText, 
                   alignment: alignmentConfig,
@@ -837,6 +847,7 @@ export default {
               }
               // vm.docDefinition['content'][2]['table']['body'].push(dataRow)
               vm.dataReportXX += JSON.stringify(dataRow) + ','
+              dataToExportCSV.push(dataToExportCSVItem)
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
@@ -882,7 +893,13 @@ export default {
             }
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          vm.csvExport = eval('( [ ' + vm.dataReportXX + ' ] )' )
+          dataToExportCSV
+          let itemTotal = []
+          for (let keyTotalCSV in dataRowTotal) {
+            itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
+          }
+          dataToExportCSV.push(itemTotal)
+          vm.csvExport = dataToExportCSV
           vm.fields = []
           vm.fields.push('STT')
           vm.fields.push(sumKey)
