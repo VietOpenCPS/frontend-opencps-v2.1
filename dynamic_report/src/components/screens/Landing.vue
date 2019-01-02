@@ -797,6 +797,7 @@ export default {
           }
           let dataToExportCSV = []
           for (let key in resultData) {
+            let dataInput = resultData[key]
             if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0')) {
               let dataRow = []
@@ -821,11 +822,15 @@ export default {
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
-                if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
-                  if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
-                    dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
-                  } else {
-                    dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                if (currentConfig.hasOwnProperty('calculator')) {
+                  dataText = eval(currentConfig)
+                } else {
+                  if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
+                    if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
+                      dataText =  ' - ' + resultData[key][currentConfig['subValue']] + ' '
+                    } else {
+                      dataText = preff + ' ' + resultData[key][currentConfig['value']] + ' '
+                    }
                   }
                 }
                 let alignmentConfig = 'center'
