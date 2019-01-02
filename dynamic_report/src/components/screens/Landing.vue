@@ -823,7 +823,7 @@ export default {
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (currentConfig.hasOwnProperty('calculator')) {
-                  dataText = eval(currentConfig)
+                  dataText = eval(currentConfig['calculator'])
                 } else {
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
