@@ -12,6 +12,12 @@
                 Lưu thay đổi
               </v-btn>
               -->
+              <vue-csv-downloader
+                :data="csvExport"
+                :fields="fields"
+                v-if="fields.length > 0"
+              >
+              </vue-csv-downloader>
               <v-select
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 v-if="buttonsShow"
@@ -120,14 +126,18 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 import DatetimePicker from './DatetimePicker.vue'
+import CsvDownload from './CsvDownload.vue'
 
 export default {
   props: ['index'],
   components: {
     'vue-friendly-iframe': VueFriendlyIframe,
-    DatetimePicker
+    DatetimePicker,
+    'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    csvExport: [],
+    fields: [],
     valid: false,
     api: '',
     onlines: [],
@@ -552,6 +562,18 @@ export default {
             dataReportTotal = dataReportTotal.substring(0, dataReportTotal.length - 1)
             vm.dataReportXX += dataReportTotal
           // }
+          vm.csvExport = eval('( [ ' + vm.dataReportXX + ' ] )' )
+          vm.fields = []
+          vm.fields.push('STT')
+          for (let excelKey in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[excelKey]['selected']) {
+              let stringColumn = vm.itemsReportsConfig[excelKey]['value']
+              if (vm.itemsReportsConfig[excelKey]['text'] !== '') {
+                stringColumn = vm.itemsReportsConfig[excelKey]['text']
+              }
+              vm.fields.push(stringColumn)
+            }
+          }
           docDString = docDString.replace(/"\[\$tableWidth\$\]"/g, JSON.stringify(widthsConfig))
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           vm.docDefinition = JSON.parse(docDString)
@@ -860,6 +882,19 @@ export default {
             }
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
+          vm.csvExport = eval('( [ ' + vm.dataReportXX + ' ] )' )
+          vm.fields = []
+          vm.fields.push('STT')
+          vm.fields.push(sumKey)
+          for (let excelKey in vm.itemsReportsConfig) {
+            if (vm.itemsReportsConfig[excelKey]['selected']) {
+              let stringColumn = vm.itemsReportsConfig[excelKey]['value']
+              if (vm.itemsReportsConfig[excelKey]['text'] !== '') {
+                stringColumn = vm.itemsReportsConfig[excelKey]['text']
+              }
+              vm.fields.push(stringColumn)
+            }
+          }
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
