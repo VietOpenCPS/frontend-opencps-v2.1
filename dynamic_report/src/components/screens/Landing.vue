@@ -13,9 +13,10 @@
               </v-btn>
               -->
               <v-select
+                v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 v-if="buttonsShow"
-                :items="buttons['source']"
-                :label="buttons['label']"
+                :items="button['source']"
+                :label="button['label']"
                 v-model="buttonsVal"
                 item-text="name"
                 item-value="value"
