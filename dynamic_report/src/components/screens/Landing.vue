@@ -20,6 +20,9 @@
                 v-model="buttonsVal"
                 item-text="name"
                 item-value="value"
+                single-line
+                style="float: right;"
+                class="btn__chot"
               ></v-select>
               <v-btn flat class="mx-0 my-0" v-if="customize" v-on:click.native="showConfig = !showConfig">
                 <v-icon v-if="showConfig">reply</v-icon>
