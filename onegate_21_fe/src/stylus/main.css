@@ -2585,20 +2585,20 @@ body .hover-pointer:hover {
     cursor: pointer;
 }
 body .v-suggestions {
-    padding-top: 3px;
+    padding-top: 3px !important;
 }
 body .v-suggestions > input{
     padding: 0;
-    border-bottom: 1px solid #949494;
-    height: 28px;
-    width: 100%;
+    border-bottom: 1px solid #949494 !important;
+    height: 28px !important;
+    width: 100% !important
 }
-body .v-suggestions > input:focus {
+/* body .v-suggestions > input:focus {
     outline: medium !important
 }
 body .v-suggestions>input:hover {
     border-color: #212121
-}
+} */
 body .datetimepicker .datepicker {
     left: -50px !important
 }

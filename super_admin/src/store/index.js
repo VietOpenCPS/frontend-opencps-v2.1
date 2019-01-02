@@ -228,10 +228,10 @@ export const store = new Vuex.Store({
           axios.post('/o/rest/v2/employees/' + postData['id'] + '/account', dataPostProcess, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
-          }).catch(function (errorRes, response) {
+          }).catch(function (errorRes) {
             reject(errorRes)
-            if (errorRes.response.data && errorRes.response.data['code'] === 409) {
-              alert('Địa chỉ email đã được sử dụng.')
+            if (errorRes.response['status'] && errorRes.response['status'] === 409) {
+              alert('Địa chỉ email đã được sử dụng trên hệ thống')
             } else {
               commit('setsnackbarerror', true)
             }
