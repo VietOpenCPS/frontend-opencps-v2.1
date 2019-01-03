@@ -855,6 +855,7 @@ export default {
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
+        vm.loadHoSoLienThong()
         vm.getNextActions()
         if (resultDossier['dossierSubStatus']) {
           vm.$store.dispatch('pullBtnConfigStep', resultDossier).then(result => {
