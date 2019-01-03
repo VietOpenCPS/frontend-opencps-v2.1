@@ -72,7 +72,7 @@
       <div class="procedure align-middle align-space-between">
         <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd1#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-1.png"> <span>Xem hướng dẫn<br> thủ tục hành chính</span> </a></div>
         <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd2#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-2.png"> <span>Nộp hồ sơ và<br> thanh toán trực tuyến<br> tại Cổng Dịch vụ công</span> </a> <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd3#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-3.png"> <span>Nộp hồ sơ trực tiếp tại<br> Trung tâm Phục vụ<br> Hành chính công</span> </a></div>
-        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd4#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-4.png"> <span>Theo d��i tiến trình<br> thụ lý hồ sơ</span> </a></div>
+        <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd4#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-4.png"> <span>Theo dõi tiến trình<br> thụ lý hồ sơ</span> </a></div>
         <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd5#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-5.png"> <span>Nhận kết quả trực tuyến</span> </a> <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd6#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-6.png"> <span>Nhận kết quả<br> tại nhà qua dịch vụ<br> chuyển phát nhanh</span> </a>      <a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd7#chi-tiet"> <img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-7.png"> <span>Nhận kết quả<br> tại Trung tâm Phục vụ<br> Hành chính công</span> </a></div>
         <div class="col"><a class="box" href="/web/cong-dich-vu-cong/huong-dan?type=hd8#chi-tiet"><img src="http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/sm-img-8.png"> <span>Đánh giá cán bộ</span> </a></div>
       </div>
@@ -96,7 +96,7 @@
         <div class="chart-result" v-if="showReport2">
           <div class="card" style="height: auto; border-radius: 0px;">
             <div class="card__title headline">
-              THEO DÕI TÌNH HÌNH GIẢI QUYẾT HỒ SƠ
+              TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM {{ (new Date()).getFullYear() }}
             </div>
             <div class="card__text pt-2 pb-0 pl-5 pr-4">
 
@@ -126,10 +126,6 @@
                 <v-flex style="font-size: 11px;padding: 4px 0;">
                   <span style="width: 15px;height: 15px;background: #C62828;border-radius: 50%;display: block;position: absolute;"></span>
                   <span style="padding-left: 22px;">Đã giải quyết quá hạn</span>
-                </v-flex>
-                <v-flex style="font-size: 11px;padding: 4px 0;">
-                  <span style="width: 15px;height: 15px;background: #780ae8;border-radius: 50%;display: block;position: absolute;"></span>
-                  <span style="padding-left: 22px;">Rút không giải quyết</span>
                 </v-flex>
               </v-layout>
 
@@ -188,10 +184,10 @@
         data: [23, 43, 54, 12, 44, 52, 32, 11]
       }],
       donutOptions: {
-        labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn', 'Rút không giải quyết'],
-        colors: ['#A5D6A7', '#EF9A9A', '#78909C', '#90CAF9', '#1565C0', '#C62828', '#780ae8']
+        labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn'],
+        colors: ['#A5D6A7', '#EF9A9A', '#78909C', '#90CAF9', '#1565C0', '#C62828']
       },
-      donutChart: [0, 0, 0, 0, 0, 0, 0]
+      donutChart: [0, 0, 0, 0, 0, 0]
     }),
     created () {
       let vm = this
@@ -215,10 +211,9 @@
           if (result === null || result === undefined || result === 'undefined') {} else {
             dataReport1 = result
           }
-          console.log('dataReport1', dataReport1)
           vm.doProcessReport1(dataReport1)
         }).catch(function () {
-          // vm.doProcessReport1(support.fakeReport)
+          vm.doProcessReport1(support.fakeReport)
         })
         let filterPie = {
           year: vm.currentYear,
@@ -255,7 +250,7 @@
         vm.donutChart = []
         for (let key in data) {
           if (data[key].hasOwnProperty('month') && data[key]['month'] === 0) {
-            vm.donutChart = [data[key]['undueCount'], data[key]['overdueCount'], data[key]['waitingCount'], data[key]['betimesCount'], data[key]['ontimeCount'], data[key]['overtimeCount'], data[key]['cancelledCount']]
+            vm.donutChart = [data[key]['undueCount'], data[key]['overdueCount'], data[key]['waitingCount'], data[key]['betimesCount'], data[key]['ontimeCount'], data[key]['overtimeCount']]
           }
         }
         vm.showReport2 = true

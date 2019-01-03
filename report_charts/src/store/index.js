@@ -103,7 +103,7 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             }
           }
-          axios.get('/o/rest/statistics?reporting=false&year=' + (new Date()).getFullYear() + '&domain=total&agency=total&month=0', param).then(function (response) {
+          axios.get('/o/rest/statistics?year=' + (new Date()).getFullYear() + '&domain=total&agency=total&month=0', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -130,7 +130,6 @@ export const store = new Vuex.Store({
               year: filter.year,
               month: filter.month,
               group: filter.group,
-              reporting: false,
               agency: filter['agency']
             }
           }

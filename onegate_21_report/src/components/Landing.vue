@@ -346,13 +346,13 @@ export default {
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
       } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
+        filter['agency'] = 'total'
       }
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all') {
+          if (filter['agency'] === 'total') {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0
@@ -387,13 +387,14 @@ export default {
         fromDate: vm.fromDateFormatted,
         toDate: vm.toDateFormatted
       }
-      if (vm.documentTYPE === 'REPORT_01') {
-        filter['year'] = vm.year
-      }
       if (vm.isDVC && vm.govAgency) {
         filter['agency'] = vm.govAgency['itemCode']
       } else if (vm.isDVC && !vm.govAgency) {
-        filter['agency'] = 'all'
+        filter['agency'] = 'total'
+      }
+      if (vm.documentTYPE === 'REPORT_01') {
+        filter['year'] = vm.year
+        filter['agency'] = vm.year === '' ? 'all' : 'total'
       }
       vm.pdfBlob = null
       vm.isShowLoading = true
@@ -401,7 +402,7 @@ export default {
         let putData = {}
         if (result !== null && result !== undefined) {
           putData = result
-          if (filter['agency'] === 'all') {
+          if (filter['agency'] === 'total' || filter['agency'] === 'all') {
             putData['flagAgency'] = 1
           } else {
             putData['flagAgency'] = 0

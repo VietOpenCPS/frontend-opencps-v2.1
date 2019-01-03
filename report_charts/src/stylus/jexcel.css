@@ -224,9 +224,8 @@ body .drawer__filter .v-input--selection-controls.v-input .v-label {
 }
 
 .report__table {
+    max-width: 100% !important;
     margin: 0 auto;
-    border-right: 1px solid;
-    border-bottom: 1px solid;
 }
 
 .report__table th, 

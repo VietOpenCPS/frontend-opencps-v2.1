@@ -97,11 +97,8 @@
       </v-flex>
     </v-layout>
     <div>
-      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' " :src="pdfBlob"></vue-friendly-iframe>
-      <div class="mx-2" v-else-if="pdfBlob === ''">
-        
-      </div>
-      <div class="mx-2" v-else-if="!isShowLoading">
+      <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+      <div class="mx-2" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -137,6 +134,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    showErrorData: false,
     showCSVDownload: false,
     csvExport: [],
     fields: [],
@@ -223,6 +221,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       setTimeout(() => {
+        vm.showErrorData = false
         vm.showCSVDownload = false
         vm.agencyLists = []
         vm.api = ''
@@ -304,6 +303,7 @@ export default {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       console.debug(oldRoute)
+      vm.showErrorData = false
       vm.showCSVDownload = false
       vm.itemsReportsConfig = []
       vm.groupBy = []
@@ -600,6 +600,7 @@ export default {
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
+          vm.showErrorData = true
         }
       })
     },
@@ -866,6 +867,7 @@ export default {
             }
           }
           if (vm.agencyLists.length > 0 && vm.govAgency === 0) {
+            /*
             let resultDataVariTotal = {}
             for (let key in resultDataTotal) {
               let keyVari = ''
@@ -894,19 +896,35 @@ export default {
                 resultDataTotal.push(resultDataVariTotal[key])
               }
             }
-          }
-          for (let key in resultDataTotal) {
-            let indexTotal = 1
-            for (let keyMapping in vm.itemsReportsConfig) {
-              let dataText = ''
-              let currentConfig = vm.itemsReportsConfig[keyMapping]
-              if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
-                dataText = resultDataTotal[key][currentConfig['value']] + ' '
+            */
+            for (let key in resultDataTotal) {
+              let indexTotal = 1
+              for (let keyMapping in vm.itemsReportsConfig) {
+                let dataText = ''
+                let currentConfig = vm.itemsReportsConfig[keyMapping]
+                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
+                }
+                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+                indexTotal = indexTotal + 1
               }
-              dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
-              indexTotal = indexTotal + 1
+              break
+            }
+          } else {
+            for (let key in resultDataTotal) {
+              let indexTotal = 1
+              for (let keyMapping in vm.itemsReportsConfig) {
+                let dataText = ''
+                let currentConfig = vm.itemsReportsConfig[keyMapping]
+                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
+                }
+                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+                indexTotal = indexTotal + 1
+              }
             }
           }
+          console.log('dataRowTotal: ', dataRowTotal)
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           dataToExportCSV
           let itemTotal = []
@@ -940,6 +958,7 @@ export default {
         } else {
           // vm.agencyLists = []
           vm.isShowLoading = false
+          vm.showErrorData = true
         }
       })
     },
