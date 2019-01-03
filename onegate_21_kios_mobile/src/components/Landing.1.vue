@@ -136,7 +136,7 @@
         data: [23, 43, 54, 12, 44, 52, 32, 11]
       }],
       donutOptions: {
-        labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn', 'Rút không giải quyết'],
+        labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn'],
         responsive: [{
           breakpoint: 480,
           options: {
@@ -149,7 +149,7 @@
           }
         }]
       },
-      donutChart: [0, 0, 0, 0, 0, 0, 0]
+      donutChart: [0, 0, 0, 0, 0, 0]
     }),
     created () {
       let vm = this
@@ -212,7 +212,7 @@
         vm.donutChart = []
         for (let key in data) {
           if (data[key].hasOwnProperty('month') && data[key]['month'] === 0) {
-            vm.donutChart = [data[key]['undueCount'], data[key]['overdueCount'], data[key]['waitingCount'], data[key]['betimesCount'], data[key]['ontimeCount'], data[key]['overtimeCount'], data[key]['cancelledCount']]
+            vm.donutChart = [data[key]['undueCount'], data[key]['overdueCount'], data[key]['waitingCount'], data[key]['betimesCount'], data[key]['ontimeCount'], data[key]['overtimeCount']]
           }
         }
         vm.showReport2 = true
@@ -229,16 +229,17 @@
             if (data[key].month > 0) {
               labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
               if (vm.gov_agency_code === '' && data[key].govAgencyName !== '') {
+                // releasingCount
                 if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                   monthData[data[key].govAgencyName].push({
                     month: data[key].month,
-                    total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                    total: data[key].releasingCount // data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
                   })
                 } else {
                   monthData[data[key].govAgencyName] = []
                   monthData[data[key].govAgencyName].push({
                     month: data[key].month,
-                    total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                    total: data[key].releasingCount // data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
                   })
                 }
               }

@@ -59,6 +59,7 @@ export const store = new Vuex.Store({
               year: filter.year,
               month: filter.month,
               group: filter.group,
+              reporting: false,
               agency: filter['agency']
             }
           }
@@ -80,47 +81,6 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
-      })
-    },
-    getAgencyReportLists6 ({commit, state}, filter) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId,
-              Accept: 'application/json'
-            }
-          }
-          let promises = []
-          let currentMonth = (new Date()).getMonth() + 1
-          for (let i = 0; i < 6; i++) {
-            let qMonth = currentMonth - i
-            let qYear = (new Date()).getFullYear()
-            if (qMonth <= 0) {
-              qMonth = qMonth + 12
-              qYear = qYear - 1
-            }
-            console.log('currentMonth', currentMonth)
-            console.log('qMonth', qMonth)
-            let requestURL = '/o/rest/statistics?agency=total&domain=total&year=' + qYear + '&month=' + qMonth
-            console.log('requestURL', requestURL)
-            promises.push(axios.get(requestURL, param))
-          }
-          axios.all(promises)
-          .then(axios.spread((...args) => {
-            let myObject = []
-            for (let i = 0; i < args.length; i++) {
-              if (args[i]['data']['total'] > 0) {
-                myObject = myObject.concat(args[i]['data']['data'])
-              }
-            }
-            if (myObject.length > 0) {
-              resolve(myObject)
-            } else {
-              resolve(null)
-            }
-          }))
         })
       })
     },

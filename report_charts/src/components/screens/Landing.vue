@@ -73,7 +73,7 @@
               </v-list-tile>
               <v-list-tile>
                 <v-list-tile-content>
-                  <v-list-tile-title>Tổng số thủ tục hành chính</v-list-tile-title>
+                  <v-list-tile-title>TỔNG SỐ THỦ TỤC HÀNH CHÍNH</v-list-tile-title>
                   <span class="status__counter" style="color:#0b72ba">
                     {{totalTTHC}}
                   </span>
@@ -92,7 +92,7 @@
               <span v-else>Đóng lại</span>
             </a>
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
+          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal" style="padding-bottom: 46px !important;">
             <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public>
           </v-card-text>
         </v-card>
@@ -100,32 +100,25 @@
       <v-flex xs12 sm4 class="mt-4">
         <v-card class="wrap_report mx-2" style="border-radius: 0;">
           <v-card-title class="headline">
-            TÌNH HÌNH XỬ LÝ HỒ SƠ NĂM {{year}}
+            Tình hình xử lý hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
             <div>
-              <div class="numbers align-space-between" style="margin: 20px 0;overflow: hidden;">
-                <div class="tiepnhan" style="
-                  width: 50%;
-                  text-align: center;
-                  float: left;
-                ">
-                  <p style="text-transform: uppercase;margin-bottom: 5px;">Đã tiếp nhận</p>
-                  <span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span>
-                  <label style="text-transform: uppercase;font-weight: 400;margin-top: 5px;display: block;">Hồ sơ</label>
+              <div class="numbers align-space-between" style="margin: 5px 0px;overflow: hidden;">
+                <div class="tiepnhan" style="width: 50%; text-align: center; float: left;">
+                  <div class="mb-2">
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Tổng giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px;font-weight: 700;">{{itemTotal['processCount']}}</span></div>
+                  <div class="mb-2">
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đã giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['releaseCount']}}</span></div>
                 </div>
-                <div class="giaiquyet" style="width: 50%;text-align: center;float: left;">
-                  <p style="text-transform: uppercase;margin-bottom: 5px;">Đã giải quyết</p>
-                  <span id="da_giai_quyet" style="font-size: 24px;font-weight: 700;">{{itemTotal['releaseCount']}}</span>
-                  <label style="text-transform: uppercase;font-weight: 400;margin-top: 5px;display: block;">Hồ sơ</label>
+                <div class="giaiquyet" style="width: 50%; text-align: center; float: left;">
+                  <div class="mb-2">
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Nhận Trong kỳ</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['receivedCount']}}</span></div>
+                  <div class="mb-2">
+                    <div style="text-transform: uppercase; margin-bottom: 5px;">Đang giải quyết</div><span id="da_tiep_nhan" style="font-size: 24px; font-weight: 700;">{{itemTotal['processingCount']}}</span></div>
                 </div>
               </div>
-              <div class="result" style="text-align: center;padding-bottom: 15px;">
-                <p id="phan_tram" style="font-size: 36px;color: #fdb44b;font-weight: 500;margin: 0;">
-                  {{itemTotal['ontimePercentage']}} %
-                </p> 
-                <span style="text-transform: uppercase;">Trong hạn</span>
-              </div>
+              <div class="mb-2 text-center"><div style="text-transform: uppercase; margin-bottom: 5px;">Tỉ lệ sớm và đúng hạn</div><span id="da_tiep_nhan" style="font-size: 36px;font-weight: 700;color: rgb(253, 180, 75);">{{Math.round(itemTotal['ontimePercentage'])}} %</span></div>
             </div>
           </v-card-text>
         </v-card>
@@ -198,16 +191,16 @@
         border-bottom: 1px solid #ddd;">
         <v-card-text>
           <v-layout wrap id="contentToPDF">
-            <v-flex xs6 class="text-center text-bold">
+            <v-flex xs7 class="text-center text-bold">
             </v-flex>
-            <v-flex xs6 class="text-center text-bold">
+            <v-flex xs5 class="text-center text-bold">
               CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM <br/>
               Độc lập - Tự do - Hạnh phúc 
               <hr align="center" width="120px" style="margin: auto;">
             </v-flex>
-            <v-flex xs6 class="text-center text-bold">
+            <v-flex xs7 class="text-center text-bold">
             </v-flex>
-            <v-flex xs6 class="text-center mt-2">
+            <v-flex xs5 class="text-center mt-2">
               Ngày {{currentDay}} tháng {{currentMonth}} năm {{(new Date()).getFullYear()}} 
             </v-flex>
             <v-flex xs12 class="text-center text-bold mt-3 fs14">
@@ -218,81 +211,66 @@
               <table>
                 <thead>
                   <tr>
-                    <th rowspan="5" colspan="1" width="40"> <span v-if="govAgencyCode !== '' || String(chartView) === 'false'">Lĩnh vực</span> <span v-else>Đơn vị</span></th>
-                    <th rowspan="5" colspan="1" width="40">Tổng số</th>
-                    <th rowspan="5" colspan="1" width="40">Từ chối tiếp nhận trong kỳ</th>
-                    <th rowspan="5" colspan="1" width="40">Hồ sơ rút không giải quyết</th>
+                    <th rowspan="5" colspan="1" width="60"><span>STT</span></th>
+                    <th rowspan="5" colspan="1"><span v-if="govAgencyCode !== '' || String(chartView) === 'false'">Lĩnh vực</span> <span v-else>Đơn vị</span></th>
                     <th rowspan="1" colspan="5">Nhận giải quyết</th>
-                    <th rowspan="1" colspan="15">Kết quả giải quyết</th>
+                    <th rowspan="1" colspan="7">Kết quả giải quyết</th>
+
+                    <th rowspan="1" colspan="3">Đang giải quyết</th>
+                    <th rowspan="5" colspan="1" width="60">Tạm dừng bổ sung điều kiện</th>
+                    <th rowspan="5" colspan="1" width="60">Rút không giải quyết</th>
+                    <th rowspan="5" colspan="1" width="60">Tỉ lệ sớm và đúng hạn</th>
                   </tr>
                   <tr>
-                    <th rowspan="4" colspan="1" width="40">Tổng số</th>
-                    <th rowspan="4" colspan="1" width="40">Tồn trước</th>
+                    <th rowspan="4" colspan="1" width="60">Tổng số</th>
+                    <th rowspan="4" colspan="1" width="60">Tồn trước</th>
                     <th rowspan="1" colspan="3">Nhận trong kỳ</th>
-                    <th rowspan="1" colspan="9">Hồ sơ đã có kết quả</th>
-                    <th rowspan="1" colspan="4">Đang giải quyết</th>
-                    <th rowspan="4" colspan="1" width="40">Tạm dừng bổ sung điều kiện</th>
-                    <th rowspan="4" colspan="1" width="40">% trước và đúng hạn</th>
+                    <th rowspan="4" colspan="1" width="60">Tổng số</th>
+                    <th rowspan="1" colspan="3">Tình hình thực hiện</th>
+                    <th rowspan="4" colspan="1" width="60">Từ chối giải quyết</th>
+                    <th rowspan="1" colspan="2">Trả kết quả</th>
+                    <th rowspan="4" colspan="1" width="60">Tổng số</th>
+                    <th rowspan="4" colspan="1" width="60">Còn hạn</th>
+                    <th rowspan="4" colspan="1" width="60">Quá hạn</th>
                   </tr>
                   <tr>
-                    <th rowspan="3" width="40">Tổng số</th>
-                    <th rowspan="3" width="40">Một cửa</th>
-                    <th rowspan="3" width="40">Trực tuyến</th>
-                    <th rowspan="3" width="40">Tổng số</th>
-                    <th colspan="5">Tình trạng thực hiện</th>
-                    <th colspan="2">Trả kết quả</th>
-                    <th rowspan="3" width="40">Từ chối giải quyết</th>
-                    <th rowspan="3" width="40">Tổng số</th>
-                    <th rowspan="3" width="40">Còn hạn giải quyết</th>
-                    <th rowspan="3" width="40">Quá hạn giải quyết</th>
-                    <th rowspan="3" width="40">Đang xử lý ngoài đơn vị</th>
-                  </tr>
-                  <tr>
-                    <th rowspan="2" width="40">Trước hạn</th>
-                    <th rowspan="2" width="40">Đúng hạn</th>
-                    <th colspan="3">Quá hạn</th>
-                    <th rowspan="2" width="40">Đã trả</th>
-                    <th rowspan="2" width="40">Chưa trả</th>
-                  </tr>
-                  <tr>
-                    <th width="40">Tổng số</th>
-                    <th width="40">Trong đơn vị</th>
-                    <th width="40">Ngoài đơn vị</th>
+                    <th rowspan="3" width="60">Tổng số</th>
+                    <th rowspan="3" width="60">Một cửa</th>
+                    <th rowspan="3" width="60">Trực tuyến</th>
+                    <th rowspan="3" width="60">Trước hạn</th>
+                    <th rowspan="3" width="60">Đúng hạn</th>
+                    <th rowspan="3" width="60">Quá hạn</th>
+                    <th rowspan="3" width="60">Đã trả</th>
+                    <th rowspan="3" width="60">Chưa trả</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr class="note__column">
-                    <td align="center">1</td>
-                    <td align="center">2</td>
-                    <td align="center">3</td>
-                    <td align="center">4</td>
-                    <td align="center">5</td>
-                    <td align="center">6</td>
-                    <td align="center">7</td>
-                    <td align="center">8</td>
-                    <td align="center">9</td>
-                    <td align="center">10</td>
-                    <td align="center">11</td>
-                    <td align="center">12</td>
-                    <td align="center">13</td>
-                    <td align="center">14</td>
-                    <td align="center">15</td>
-                    <td align="center">16</td>
-                    <td align="center">17</td>
-                    <td align="center">18</td>
-                    <td align="center">19</td>
-                    <td align="center">20</td>
-                    <td align="center">21</td>
-                    <td align="center">22</td>
-                    <td align="center">23</td>
-                    <td align="center">24</td>
+                    <td align="center">(1)</td>
+                    <td align="center">(2)</td>
+                    <td align="center">(3)</td>
+                    <td align="center">(4)</td>
+                    <td align="center">(5)</td>
+                    <td align="center">(6)</td>
+                    <td align="center">(7)</td>
+                    <td align="center">(8)</td>
+                    <td align="center">(9)</td>
+                    <td align="center">(10)</td>
+                    <td align="center">(11)</td>
+                    <td align="center">(12)</td>
+                    <td align="center">(13)</td>
+                    <td align="center">(14)</td>
+                    <td align="center">(15)</td>
+                    <td align="center">(16)</td>
+                    <td align="center">(17)</td>
+                    <td align="center">(18)</td>
+                    <td align="center">(19)</td>
+                    <td align="center">(20)</td>
                   </tr>
                   <tr v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' || String(chartView) === 'true') && item.govAgencyName !== '') || ((govAgencyCode !== ''  || String(chartView) === 'false') && item.domainName !== '')">
-                    <td v-if="govAgencyCode !== '' || String(chartView) === 'false'" align="center">{{item.domainName}}</td>
-                    <td v-else align="center">{{item.govAgencyName}}</td>
-                    <td align="center">{{item.totalCount}}</td>
-                    <td align="center">{{item.deniedCount}}</td>
-                    <td align="center">{{item.cancelledCount}}</td>
+                    <td align="center">{{index}}</td>
+                    <td v-if="govAgencyCode !== '' || String(chartView) === 'false'" align="left" style="padding: 8px 10px;">{{item.domainName}}</td>
+                    <td v-else align="left" style="padding: 8px 10px;">{{item.govAgencyName}}</td>
                     <td align="center">{{item.processCount}}</td>
                     <td align="center">{{item.remainingCount}}</td>
                     <td align="center">{{item.receivedCount}}</td>
@@ -302,20 +280,18 @@
                     <td align="center">{{item.betimesCount}}</td>
                     <td align="center">{{item.ontimeCount}}</td>
                     <td align="center">{{item.overtimeCount}}</td>
-                    <td align="center">{{item.overtimeInside}}</td>
-                    <td align="center">{{item.overtimeOutside}}</td>
+                    <td align="center">{{item.unresolvedCount}}</td>
                     <td align="center">{{item.doneCount}}</td>
                     <td align="center">{{item.releasingCount}}</td>
-                    <td align="center">{{item.unresolvedCount}}</td>
                     <td align="center">{{item.processingCount}}</td>
                     <td align="center">{{item.undueCount}}</td>
                     <td align="center">{{item.overdueCount}}</td>
-                    <td align="center">{{item.outsideCount}}</td>
                     <td align="center">{{item.waitingCount}}</td>
+                    <td align="center">{{item.cancelledCount}}</td>
                     <td align="center">{{item.ontimePercentage}}</td>
                   </tr>
                   <tr class="sum__column" style="font-weight: bold;" v-if="showTable">
-                    <td align="center">Tổng số <br> <span v-if="agencyLists !== null && agencyLists.length > 0"> {{agencyLists.length - 1}} </span></td>
+                    <td align="center" colspan="2">Tổng số</td>
                     <td align="center ">{{totalCounter['total_3']}}</td>
                     <td align="center">{{totalCounter['total_4']}}</td>
                     <td align="center">{{totalCounter['total_5']}}</td>
@@ -334,11 +310,6 @@
                     <td align="center">{{totalCounter['total_18']}}</td>
                     <td align="center">{{totalCounter['total_19']}}</td>
                     <td align="center">{{totalCounter['total_20']}}</td>
-                    <td align="center">{{totalCounter['total_21']}}</td>
-                    <td align="center">{{totalCounter['total_22']}}</td>
-                    <td align="center">{{totalCounter['total_23']}}</td>
-                    <td align="center">{{totalCounter['total_24']}}</td>
-                    <td align="center">{{totalCounter['total_25']}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -550,17 +521,7 @@ export default {
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
             if (currentData.domainName === '' && currentData.domainName === '') {
-              vm.itemTotal = {
-                undueCount: currentData.undueCount,
-                overdueCount: currentData.overdueCount,
-                waitingCount: currentData.waitingCount,
-                betimesCount: currentData.betimesCount,
-                ontimeCount: currentData.ontimeCount,
-                overtimeCount: currentData.overtimeCount,
-                ontimePercentage: currentData.ontimePercentage,
-                processCount: currentData.processCount,
-                releaseCount: currentData.releaseCount,
-              }
+              vm.itemTotal = currentData
               vm.showTableTotal = true
               break
             }
@@ -723,29 +684,24 @@ export default {
         for (let key in vm.agencyLists) {
           let currentData = vm.agencyLists[key]
           if (currentData.domainName === '' && currentData.domainName === '') {
-            vm.totalCounter['total_3'] = currentData.totalCount
-            vm.totalCounter['total_4'] = currentData.deniedCount
-            vm.totalCounter['total_5'] = currentData.cancelledCount
-            vm.totalCounter['total_6'] = currentData.processCount
-            vm.totalCounter['total_7'] = currentData.remainingCount
-            vm.totalCounter['total_8'] = currentData.receivedCount
-            vm.totalCounter['total_9'] = currentData.onegateCount
-            vm.totalCounter['total_10'] = currentData.onlineCount
-            vm.totalCounter['total_11'] = currentData.releaseCount
-            vm.totalCounter['total_12'] = currentData.betimesCount
-            vm.totalCounter['total_13'] = currentData.ontimeCount
-            vm.totalCounter['total_14'] = currentData.overtimeCount
-            vm.totalCounter['total_15'] = currentData.overtimeInside
-            vm.totalCounter['total_16'] = currentData.overtimeOutside
-            vm.totalCounter['total_17'] = currentData.doneCount
-            vm.totalCounter['total_18'] = currentData.releasingCount
-            vm.totalCounter['total_19'] = currentData.unresolvedCount
-            vm.totalCounter['total_20'] = currentData.processingCount
-            vm.totalCounter['total_21'] = currentData.undueCount
-            vm.totalCounter['total_22'] = currentData.overdueCount
-            vm.totalCounter['total_23'] = currentData.outsideCount
-            vm.totalCounter['total_24'] = currentData.waitingCount
-            vm.totalCounter['total_25'] = currentData.ontimePercentage
+            vm.totalCounter['total_3'] = currentData.processCount
+            vm.totalCounter['total_4'] = currentData.remainingCount
+            vm.totalCounter['total_5'] = currentData.receivedCount
+            vm.totalCounter['total_6'] = currentData.onegateCount
+            vm.totalCounter['total_7'] = currentData.onlineCount
+            vm.totalCounter['total_8'] = currentData.releaseCount
+            vm.totalCounter['total_9'] = currentData.betimesCount
+            vm.totalCounter['total_10'] = currentData.ontimeCount
+            vm.totalCounter['total_11'] = currentData.overtimeCount
+            vm.totalCounter['total_12'] = currentData.unresolvedCount
+            vm.totalCounter['total_13'] = currentData.doneCount
+            vm.totalCounter['total_14'] = currentData.releasingCount
+            vm.totalCounter['total_15'] = currentData.processingCount
+            vm.totalCounter['total_16'] = currentData.undueCount
+            vm.totalCounter['total_17'] = currentData.overdueCount
+            vm.totalCounter['total_18'] = currentData.waitingCount
+            vm.totalCounter['total_19'] = currentData.cancelledCount
+            vm.totalCounter['total_20'] = currentData.ontimePercentage
             vm.showTable = true
             break
           }

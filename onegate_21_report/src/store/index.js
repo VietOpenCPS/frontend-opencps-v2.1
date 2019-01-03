@@ -74,8 +74,7 @@ export const store = new Vuex.Store({
               year: filter.year,
               month: filter.month ? filter.month : 0,
               group: filter.group,
-              reporting: false,
-              agency: filter['agency']
+              domain: filter['agency']
             }
           }
           let requestURL = ''
