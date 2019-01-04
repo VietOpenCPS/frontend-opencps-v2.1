@@ -1,7 +1,7 @@
 <template>
   <div> 
+    <span>Kéo thả các ô vuông để cho đúng thứ tự</span> <br>
     <v-flex xs12 sm12 class="text-xs-center">
-      <span>Kéo thả các ô vuông để cho đúng thứ tự của từ</span> <br>
       <v-chip label style="background-color: #81D4FA;" text-color="white">
         {{captcha}}
       </v-chip>
@@ -71,7 +71,7 @@ export default {
       }
       return arra1
     },
-    checkValidCatcha () {
+    checkValidCaptcha () {
       var vm = this
       var str = ''
       let items = $('#captcha').children()
@@ -98,3 +98,16 @@ export default {
   }
 }
 </script>
+<style>
+  ul#captcha li {
+    display:inline;
+  }
+  ul#captcha li:focus {
+    outline:none;
+    box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+  }
+  ul#captcha li:hover {
+    box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+    cursor: pointer
+  }
+</style>
