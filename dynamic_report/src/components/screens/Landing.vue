@@ -97,7 +97,7 @@
       </v-flex>
     </v-layout>
     <div>
-      <vue-friendly-iframe :src="pdfBlob"></vue-friendly-iframe>
+      <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== ''" :src="pdfBlob"></vue-friendly-iframe>
       <div class="mx-2" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.

@@ -230,7 +230,7 @@ export default {
   filters: {
     dateTimeView2 (arg) {
       if (arg) {
-        return moment(String(arg)).utc().format('DD/MM/YYYY HH:mm:ss')
+        return moment(String(arg)).utc().format('DD/MM/YYYY')
       } else {
         return ''
       }

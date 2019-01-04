@@ -623,16 +623,27 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let files = window.$('#file' + data.partNo)[0].files
         let file = files[0]
+        let fileName = file['name']
+        if (file['name']) {
+          fileName = file['name'].replace(/\%/g, '')
+          fileName = fileName.replace(/\//g, '')
+          fileName = fileName.replace(/\\/g, '')
+        }
         let formData = new FormData()
         if (data.partType === 3) {
-          formData.append('displayName', data['displayName'])
+          if (data['displayName']) {
+            fileName = data['displayName'].replace(/\%/g, '')
+            fileName = fileName.replace(/\//g, '')
+            fileName = fileName.replace(/\\/g, '')
+          }
+          formData.append('displayName', fileName)
         } else {
-          formData.append('displayName', file.name)
+          formData.append('displayName', fileName)
         }
         formData.append('fileType', file.type)
         formData.append('fileSize', file.size)
         formData.append('isSync', 'false')
-        formData.append('file', file)
+        formData.append('file', file, fileName)
         formData.append('dossierPartNo', data.partNo)
         formData.append('dossierTemplateNo', data.dossierTemplateNo)
         formData.append('fileTemplateNo', data.fileTemplateNo)
@@ -665,7 +676,13 @@ export const store = new Vuex.Store({
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('displayName', data.displayName ? data.displayName : '')
+        let displayName = data['displayName']
+        if (data['displayName']) {
+          displayName = data['displayName'].replace(/\%/g, '')
+          displayName = displayName.replace(/\//g, '')
+          displayName = displayName.replace(/\\/g, '')
+        }
+        formData.append('displayName', data.displayName ? displayName : '')
         formData.append('dossierPartNo', data.partNo ? data.partNo : '')
         formData.append('file', '')
         formData.append('fileType', '')
@@ -695,9 +712,14 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let files = $('#' + data.selector)[0].files
         let file = files[0]
-        // file['typeAllow'] = state.fileTypePAYMENT
+        let fileName = file['name']
+        if (file['name']) {
+          fileName = file['name'].replace(/\%/g, '')
+          fileName = fileName.replace(/\//g, '')
+          fileName = fileName.replace(/\\/g, '')
+        }
         let formData = new FormData()
-        formData.append('file', file)
+        formData.append('file', file, fileName)
         let fileUpload = {
           partTip: data['partTip'],
           file: file

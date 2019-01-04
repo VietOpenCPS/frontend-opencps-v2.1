@@ -73,7 +73,8 @@
                     @blur="date = parseDate(applicantIdDateFormatted)"
                     placeholder="Ngày/tháng/năm"
                   ></v-text-field>
-                  <v-date-picker v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
+                  <v-date-picker :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" ref="picker"
+                  :first-day-of-week="1" locale="vi" v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
                 </v-menu>
               </v-flex>
               <v-flex xs12>
@@ -125,11 +126,14 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <v-layout wrap>
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+              <v-flex xs12>
+                <v-layout wrap class="pt-3">
                   <v-flex>
                     <v-checkbox 
-                      :rules="[v => !!v || 'Bạn phải đồng ý với điều khoản sử dụng']"
-                      required label="Tôi đồng ý với điều khoản sử dụng."
+                      :rules="[v => !!v || 'Vui lòng đồng ý với điều khoản sử dụng của chúng tôi']"
+                      required label="Tôi đồng ý với điều khoản sử dụng"
                       v-model="agreeRules"
                     >
                     </v-checkbox>
@@ -214,12 +218,13 @@ import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import support from '../store/support.json'
 import toastr from 'toastr'
+import Captcha from './Captcha.vue'
 // import Suggestions from 'v-suggestions'
 Vue.use(toastr)
 export default {
   props: [],
   components: {
-    // 'suggestions': Suggestions
+    'captcha': Captcha
   },
   data: () => ({
     date: null,
@@ -299,6 +304,9 @@ export default {
     },
     date (val) {
       this.applicantIdDateFormatted = this.formatDate(this.date)
+    },
+    menuApplicantIdDate (val) {
+      val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
     }
   },
   methods: {
@@ -318,24 +326,28 @@ export default {
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        let passValid = false
-        if (!vm.validBussinessInfos) {
-          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
-          if (x) {
-            passValid = true
-          }
-        } else { passValid = true }
-        if (passValid) {
-          vm.loading = true
-          let filter = dataForm
-          vm.$store.dispatch('postApplicant', filter).then(function (result) {
-            vm.loading = false
-            router.push({
-              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+        if (vm.$refs.captcha.checkValidCaptcha()) {
+          let passValid = false
+          if (!vm.validBussinessInfos) {
+            let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
+            if (x) {
+              passValid = true
+            }
+          } else { passValid = true }
+          if (passValid) {
+            vm.loading = true
+            let filter = dataForm
+            vm.$store.dispatch('postApplicant', filter).then(function (result) {
+              vm.loading = false
+              router.push({
+                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+              })
+            }).catch(function (reject) {
+              vm.loading = false
             })
-          }).catch(function (reject) {
-            vm.loading = false
-          })
+          }
+        } else {
+          toastr.error('Mã captcha không chính xác')
         }
       }
     },
