@@ -23,7 +23,7 @@
                   <v-icon color="primary" v-if="String(currentAgency) === String(item.administrationCode)">play_arrow</v-icon>
                 </v-list-tile-action>
                 <v-list-tile-content>
-                  <v-list-tile-title v-text="item.administrationName"></v-list-tile-title>
+                  <v-list-tile-title style="width: calc(100% - 45px)" :title="item.administrationName" v-text="item.administrationName"></v-list-tile-title>
                   <span class="status__counter" style="color:#0b72ba">
                     {{item.count}}
                   </span>

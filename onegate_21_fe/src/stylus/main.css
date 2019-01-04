@@ -170,6 +170,7 @@ body .expansion-panel {
 }
 body .expansion-panel .expansion-panel__body > .card{
     border-top: 1px solid #dddddd;
+    box-shadow: none !important;
 }
 body .expansion-panel__header {
     padding: 5px 0px;
