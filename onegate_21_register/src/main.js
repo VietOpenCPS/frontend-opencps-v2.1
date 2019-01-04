@@ -1,4 +1,5 @@
-import Vue from 'vue/dist/vue.js'
+const Vue = window.Vue
+// import Vue from 'vue/dist/vue.js'
 import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'

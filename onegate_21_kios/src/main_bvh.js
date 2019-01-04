@@ -1,7 +1,8 @@
+const Vue = window.Vue
 import 'vuetify/dist/vuetify.min.css'
 import 'toastr/build/toastr.min.css'
 import './stylus/main.css'
-import Vue from 'vue/dist/vue.min.js'
+// import Vue from 'vue/dist/vue.min.js'
 import App from './App_bvh'
 import router from './router'
 import Vuetify from 'vuetify'
