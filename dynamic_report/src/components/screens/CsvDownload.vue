@@ -34,6 +34,7 @@ export default {
             let filter = {
                 file: vm.myPdfToConvert
             }
+            console.log(filter)
             vm.$store.dispatch('doExportXlsx', filter)
         }
     }

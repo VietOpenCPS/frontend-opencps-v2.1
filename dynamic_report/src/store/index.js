@@ -468,7 +468,11 @@ export const store = new Vuex.Store({
           axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
             headers: {
               'groupId': state.initData.groupId,
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data',
+              'access-control-allow-origin': '*',
+              'Access-Control-Allow-Credentials': true,
+              'Access-Control-Allow-Methods': '*',
+              'Access-Control-Allow-Headers': '*'
             },
             responseType: 'blob'
           }).then(function (response) {
