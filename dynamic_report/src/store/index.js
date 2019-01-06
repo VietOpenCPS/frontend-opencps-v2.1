@@ -466,7 +466,7 @@ export const store = new Vuex.Store({
           let formData = new FormData()
           formData.append('f', filter['file'])
           axios({
-            method: 'GET',
+            method: 'POST',
             mode: 'no-cors',
             headers: {
               'Access-Control-Allow-Origin': '*',
@@ -474,7 +474,7 @@ export const store = new Vuex.Store({
             },
             withCredentials: true,
             credentials: 'same-origin',
-            url: 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
+            url: 'https://cors-test.appspot.com/test'
           })
           axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
             headers: {
