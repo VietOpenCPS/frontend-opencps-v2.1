@@ -459,6 +459,26 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    doExportXlsx ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let formData = new FormData()
+          formData.append('f', filter['file'])
+          axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Content-Type': 'multipart/form-data'
+            },
+            responseType: 'blob'
+          }).then(function (response) {
+            let serializable = response.data
+            saveAs(serializable, new Date().getTime() + '.xlsx')
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {

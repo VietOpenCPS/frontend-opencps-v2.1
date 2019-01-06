@@ -17,11 +17,11 @@
                 :fields="fields"
                 :downloadname="nameReport"
                 v-if="showCSVDownload"
+                :pdfBlob="pdfBlob"
               >
               </vue-csv-downloader>
-              <v-select
+              <v-select v-if="buttonsShow"
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
-                v-if="buttonsShow"
                 :items="button['source']"
                 :label="button['label']"
                 v-model="buttonsVal"

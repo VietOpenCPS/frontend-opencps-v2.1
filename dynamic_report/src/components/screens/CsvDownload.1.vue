@@ -1,7 +1,7 @@
 <template>
-    <v-btn flat class="mx-0 my-0" v-on:click.native="doDownloadXlsx">
+    <a :download="downloadname" :href="downloadUrl" :disabled="this.data.length === 0">
        <v-icon>receipt</v-icon> &nbsp; Tải xuống XLSX
-    </v-btn>
+    </a>
 </template>
 
 <script>
@@ -10,31 +10,25 @@ export default {
     props: {
         fields: undefined,
         data: undefined,
-        downloadname: 'export.pdf',
-        pdfblob: null
+        downloadname: 'export.csv'
     },
     data: () => ({
-        dataToExport: '',
-        myPdfToConvert: null
+        dataToExport: ''
     }),
     created () {
         var vm = this
         vm.$nextTick(function () {
-            vm.myPdfToConvert = new File([vm.pdfblob], vm.downloadname, {lastModified: new Date().getTime()})
+            let rawHeader = json2csv({fields: this.fields}) + '\n'
+            let rawData = json2csv({data: this.data})
+            let lines = rawData.split('\n');
+            lines.splice(0,1);
+            let newtext = rawHeader + lines.join('\n');
+            vm.dataToExport = newtext
         })
     },
     computed: {
         downloadUrl() {
             return this.data.length > 0 ? "data:text/csv;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(this.dataToExport) : 'javascript:void(0);';
-        }
-    },
-    methods: {
-        doDownloadXlsx () {
-            let vm = this
-            let filter = {
-                file: vm.myPdfToConvert
-            }
-            vm.$store.dispatch.dispatch('doExportXlsx', filter)
         }
     }
 }
