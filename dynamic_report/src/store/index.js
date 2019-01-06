@@ -470,11 +470,11 @@ export const store = new Vuex.Store({
             mode: 'no-cors',
             headers: {
               'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'application/json',
+              'Content-Type': 'multipart/form-data',
             },
             withCredentials: true,
             credentials: 'same-origin',
-            url: 'https://cors-test.appspot.com/test'
+            url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single'
           })
           axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
             headers: {
