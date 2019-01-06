@@ -465,6 +465,17 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let formData = new FormData()
           formData.append('f', filter['file'])
+          axios({
+            method: 'GET',
+            mode: 'no-cors',
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true,
+            credentials: 'same-origin',
+            url: 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
+          })
           axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
             headers: {
               'groupId': state.initData.groupId,
