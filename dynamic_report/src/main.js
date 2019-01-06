@@ -26,6 +26,7 @@ Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
 
