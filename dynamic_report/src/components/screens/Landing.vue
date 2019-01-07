@@ -1012,6 +1012,7 @@ export default {
       console.log('dkdkdkkssss0002312312: ', vm.data[key])
       vm.showPicker = false
       setTimeout(() => {
+        vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
         vm.showPicker = true
       }, 200)
     }

@@ -47,6 +47,7 @@
     created () {
         var vm = this
         vm.$nextTick(function () {
+            console.log('input data: ', vm.dataValue)
             vm.rawDate = vm.parseDate(vm.dataValue)
             if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[vm.item['before']]
