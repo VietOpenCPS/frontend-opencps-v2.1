@@ -1,5 +1,7 @@
 <template>
   <div class="form-chitiet">
+    <input type="file" name="files" id="filefile"/>
+    <v-btn color="success" v-on:click.native="dkmmmmmm">upload</v-btn>
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
@@ -17,7 +19,7 @@
                 :fields="fields"
                 :downloadname="nameReport"
                 v-if="showCSVDownload"
-                :pdfBlob="pdfBlob"
+                :pdfblob="pdfBlob"
               >
               </vue-csv-downloader>
               <v-select v-if="buttonsShow"
@@ -996,6 +998,13 @@ export default {
       vm.$store.dispatch('doChotSoLieu', filter).then(function () {
         vm.doCreatePDF()
       })
+    },
+    dkmmmmmm () {
+      let vm = this
+      let filter = {
+      }
+      console.log(filter)
+      vm.$store.dispatch('doExportXlsx', filter)
     }
   }
 }
