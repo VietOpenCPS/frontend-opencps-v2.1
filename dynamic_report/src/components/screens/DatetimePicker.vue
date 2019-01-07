@@ -17,7 +17,7 @@
         >
             <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-text-field>
-        <v-date-picker v-model="toDate" no-title></v-date-picker>
+        <v-date-picker :max="maxDate" :min="minDate" v-model="toDate" no-title></v-date-picker>
     </v-menu>
 </template>
 
@@ -28,6 +28,8 @@
         toDateFormatted: null,
         toDate: null,
         rawDate: null,
+        maxDate: '',
+        minDate: '',
         rules: {
             required: value => !!value || 'Bắt buộc phải nhập.',
             number: value => {
@@ -41,11 +43,19 @@
         }
       }
     },
-    props: ['value', 'item', 'dataValue'],
+    props: ['value', 'item', 'dataValue', 'dataAll'],
     created () {
         var vm = this
         vm.$nextTick(function () {
             vm.rawDate = vm.parseDate(vm.dataValue)
+            if (item.hasOwnProperty('before')) {
+                let dataMax = vm.dataAll[item['before']]
+                console.log('dataMax: ', dataMax)
+            }
+            if (item.hasOwnProperty('after')) {
+                let dataMin = vm.dataAll[item['after']]
+                console.log('dataMin: ', dataMin)
+            }
         })
     },
     watch: {
