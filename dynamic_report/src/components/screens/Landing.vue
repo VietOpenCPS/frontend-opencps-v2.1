@@ -72,7 +72,7 @@
           :item="item" 
           :data-value="data[item.key]"
           :data-all="data"
-          @change="reloadPickerChange">
+          @change="reloadPickerChange(item.key)">
         </datetime-picker>
         <v-text-field 
           v-if="item['type'] === 'text'"
@@ -1006,9 +1006,10 @@ export default {
         vm.doCreatePDF()
       })
     },
-    reloadPickerChange () {
+    reloadPickerChange (key) {
       let vm = this
-      console.log('dkdkdkkssss0002312312')
+      console.log('key: ', key)
+      console.log('dkdkdkkssss0002312312: ', vm.data[key])
       vm.showPicker = false
       setTimeout(() => {
         vm.showPicker = true
