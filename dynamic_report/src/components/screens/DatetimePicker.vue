@@ -64,9 +64,22 @@
     },
     watch: {
         toDate (val) {
-            this.toDateFormatted = this.formatDate(val)
-            this.rawDate = this.parseDate(this.toDateFormatted)
-            this.$emit('input', new Date(val).getTime())
+            let vm = this
+            vm.toDateFormatted = vm.formatDate(val)
+            vm.rawDate = vm.parseDate(vm.toDateFormatted)
+            vm.$emit('input', new Date(val).getTime())
+            if (vm.item.hasOwnProperty('before')) {
+                vm.dataAll[vm.item['before']+ '_hidden'] = true
+                setTimeout(() => {
+                    vm.dataAll[vm.item['before']+ '_hidden'] = false
+                }, 200)
+            }
+            if (vm.item.hasOwnProperty('after')) {
+                vm.dataAll[vm.item['after']+ '_hidden'] = true
+                setTimeout(() => {
+                    vm.dataAll[vm.item['after']+ '_hidden'] = false
+                }, 200)
+            }
         }
     },
     methods: {
