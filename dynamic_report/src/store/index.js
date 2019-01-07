@@ -303,7 +303,6 @@ export const store = new Vuex.Store({
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
           let requestURL = ''
-          if (filter.document === 'REPORT_01' || filter.document.startsWith('STATISTIC')) {
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
             requestURL = filter['api']
@@ -374,64 +373,7 @@ export const store = new Vuex.Store({
                 reject(error)
               })
             }
-          } else {
-            // test local
-            // requestURL = 'http://127.0.0.1:8081/api/dossiers'
-            requestURL = filter['api']
-            // param.params['sort'] = 'domainCode'
-            if (govAgency === undefined || govAgency === null || govAgency === '') {
-              axios.get(requestURL, param).then(function (response) {
-                let serializable = response.data
-                if (serializable.data) {
-                  let dataReturn = serializable.data
-                  resolve(dataReturn)
-                } else {
-                  resolve(null)
-                }
-              }).catch(function (error) {
-                console.log(error)
-                reject(error)
-              })
-            } else if (String(govAgency['value']) === '0' && govAgency !== undefined) {
-              let promises = []
-              for (let key in agencyLists) {
-                if (String(agencyLists[key]['value']) !== '0') {
-                  param['headers']['groupId'] = agencyLists[key]['value']
-                  promises.push(axios.get(requestURL, param))
-                }
-              }
-              axios.all(promises)
-              .then(axios.spread((...args) => {
-                let myObject = []
-                for (let i = 0; i < args.length; i++) {
-                  if (args[i]['data']['total'] > 0) {
-                    myObject = myObject.concat(args[i]['data']['data'])
-                  }
-                }
-                if (myObject.length > 0) {
-                  resolve(myObject)
-                } else {
-                  resolve(null)
-                }
-              }))
-            } else if (String(govAgency['value']) !== '0' && govAgency !== undefined) {
-              if (govAgency['value'] !== undefined) {
-                param['headers']['groupId'] = govAgency['value']
-              }
-              axios.get(requestURL, param).then(function (response) {
-                let serializable = response.data
-                if (serializable.data) {
-                  let dataReturn = serializable.data
-                  resolve(dataReturn)
-                } else {
-                  resolve(null)
-                }
-              }).catch(function (error) {
-                console.log(error)
-                reject(error)
-              })
-            }
-          }
+          
         })
       })
     },
@@ -462,42 +404,44 @@ export const store = new Vuex.Store({
     },
     doExportXlsx ({state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function () {
-          let formData = new FormData()
-          formData.append('f', filter['file'])
-          window.$.support.cors = true;
-          window.$.ajax({
-              url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single',
-              headers: {
-                'cache-control': 'no-cache',
-                'Accept': '*/*',
-                'accept-encoding': 'gzip, deflate',
-                'content-type': 'multipart/form-data'
-              },
-              data: formData,
-              crossDomain: true,
-              type: 'POST',
-              success: function (data) {
-                console.log(data)
-              }
-          });
-          /*
-          axios({
-            method: 'POST',
-            mode: 'no-cors',
-            withCredentials: true,
-            credentials: 'same-origin',
-            url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single'
-          })
-          axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
-            responseType: 'blob'
-          }).then(function (response) {
-            let serializable = response.data
-            saveAs(serializable, new Date().getTime() + '.xlsx')
-          }).catch(function (error) {
-            reject(error)
-          })
-          */
+        let formData = new FormData()
+        formData.append('files', filter['file'])
+        window.$.support.cors = true;
+        window.$.ajax({
+            url: 'https://www.cleverpdf.com/pdf/uploadFiles',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: formData,
+            crossDomain: true,
+            type: 'POST',
+            success: function (data) {
+              console.log(data)
+              let formData2 = new FormData()
+              formData2.append('url', data['url'])
+              formData2.append('index', data['index'])
+              formData2.append('pid', 1)
+              formData2.append('oid', 3)
+              formData2.append('status', 0)
+              formData2.append('pwd', '')
+              formData2.append('formatv1', 2)
+              formData2.append('formatv2', 2)
+              let fileName = data['fileName']
+              window.$.ajax({
+                url: 'https://www.cleverpdf.com/pdf/doProcess.do',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: formData2,
+                crossDomain: true,
+                type: 'POST',
+                success: function (data2) {
+                  console.log(data2)
+                  console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', './xlsx'))
+                  window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', './xlsx'))
+                }
+              })
+            }
         })
       })
     }
