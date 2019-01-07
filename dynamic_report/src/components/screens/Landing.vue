@@ -67,11 +67,12 @@
       </v-flex>
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
-          v-if="item['type'] === 'date' && reloadPicker"
+          v-if="item['type'] === 'date' && showPicker"
           v-model="data[item.key]" 
           :item="item" 
           :data-value="data[item.key]"
-          :data-all="data">
+          :data-all="data"
+          @change="reloadPickerChange">
         </datetime-picker>
         <v-text-field 
           v-if="item['type'] === 'text'"
@@ -137,6 +138,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    showPicker: true,
     showErrorData: false,
     showCSVDownload: false,
     csvExport: [],
@@ -1004,9 +1006,13 @@ export default {
         vm.doCreatePDF()
       })
     },
-    reloadPicker () {
+    reloadPickerChange () {
+      let vm = this
       console.log('dkdkdkkssss0002312312')
-      return true
+      vm.showPicker = false
+      setTimeout(() => {
+        vm.showPicker = true
+      }, 200)
     }
   }
 }
