@@ -468,23 +468,11 @@ export const store = new Vuex.Store({
           axios({
             method: 'POST',
             mode: 'no-cors',
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'application/json',
-            },
             withCredentials: true,
             credentials: 'same-origin',
             url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single'
           })
           axios.post('https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single', formData, {
-            headers: {
-              'groupId': state.initData.groupId,
-              'Content-Type': 'multipart/form-data',
-              'access-control-allow-origin': '*',
-              'Access-Control-Allow-Credentials': true,
-              'Access-Control-Allow-Methods': '*',
-              'Access-Control-Allow-Headers': '*'
-            },
             responseType: 'blob'
           }).then(function (response) {
             let serializable = response.data
