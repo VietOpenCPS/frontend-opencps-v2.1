@@ -50,11 +50,15 @@
             vm.rawDate = vm.parseDate(vm.dataValue)
             if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[vm.item['before']]
-                console.log('dataMax: ', dataMax)
+                let dataMaxConvert = vm.parseDate(dataMax)
+                console.log('dataMax: ', dataMaxConvert)
+                vm.maxDate = dataMaxConvert
             }
             if (vm.item.hasOwnProperty('after')) {
                 let dataMin = vm.dataAll[vm.item['after']]
-                console.log('dataMin: ', dataMin)
+                let dataMinConvert = vm.parseDate(dataMin)
+                console.log('dataMinConvert: ', dataMinConvert)
+                vm.minDate = dataMinConvert
             }
         })
     },
