@@ -468,16 +468,20 @@ export const store = new Vuex.Store({
           window.$.support.cors = true;
           window.$.ajax({
               url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single',
+              headers: {
+                'cache-control': 'no-cache',
+                'Accept': '*/*',
+                'accept-encoding': 'gzip, deflate',
+                'content-type': 'multipart/form-data'
+              },
               data: formData,
-              processData: false,
-              contentType: 'multipart/form-data',
-              responseType: 'blob',
               crossDomain: true,
               type: 'POST',
               success: function (data) {
                 console.log(data)
               }
           });
+          /*
           axios({
             method: 'POST',
             mode: 'no-cors',
@@ -493,6 +497,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
+          */
         })
       })
     }
