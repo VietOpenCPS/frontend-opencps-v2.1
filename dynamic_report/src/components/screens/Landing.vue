@@ -67,7 +67,7 @@
       </v-flex>
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
-          v-if="item['type'] === 'date'"
+          v-if="item['type'] === 'date' && !data[item.key + '_hidden']"
           v-model="data[item.key]" 
           :item="item" 
           :data-value="data[item.key]"
