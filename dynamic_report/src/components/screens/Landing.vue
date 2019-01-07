@@ -1,4 +1,5 @@
 <template>
+<v-form ref="form" v-model="valid" lazy-validation>
   <div class="form-chitiet">
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
@@ -116,6 +117,7 @@
       
     </div>
   </div>
+</v-form>
 </template>
 
 <script>
@@ -823,7 +825,7 @@ export default {
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (currentConfig.hasOwnProperty('calculator')) {
-                  dataText = eval(currentConfig['calculator'])
+                  dataText = Math.round(eval(currentConfig['calculator']))
                 } else {
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
@@ -902,7 +904,9 @@ export default {
               for (let keyMapping in vm.itemsReportsConfig) {
                 let dataText = ''
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
-                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                if (currentConfig.hasOwnProperty('calculator')) {
+                  dataText = Math.round(eval(currentConfig['calculator']))
+                } else if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
                   dataText = resultDataTotal[key][currentConfig['value']] + ' '
                 }
                 dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
@@ -964,8 +968,10 @@ export default {
     },
     doCreateReport() {
       let vm = this
-      vm.showConfig = false
-      vm.doCreatePDF()
+      if (vm.$refs.form.validate()) {
+        vm.showConfig = false
+        vm.doCreatePDF()
+      }
     },
     sortByKey (array, key) {
       return array.sort(function(a, b) {
