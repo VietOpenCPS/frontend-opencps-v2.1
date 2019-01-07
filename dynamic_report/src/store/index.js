@@ -470,7 +470,7 @@ export const store = new Vuex.Store({
             mode: 'no-cors',
             headers: {
               'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             withCredentials: true,
             credentials: 'same-origin',
