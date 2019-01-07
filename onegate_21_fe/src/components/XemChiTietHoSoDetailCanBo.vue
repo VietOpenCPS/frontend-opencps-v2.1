@@ -380,7 +380,7 @@
           </v-tab-item>
           <v-tab-item id="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
-            <div v-if="thongTinChiTietHoSo.online">
+            <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
               <v-expansion-panel class="expansion-pl">
                 <v-expansion-panel-content hide-actions value="1">
                   <div slot="header">
