@@ -8,7 +8,9 @@ import router from '@/router'
 
 Vue.use(toastr)
 Vue.use(Vuex)
-
+toastr.options = {
+  'timeOut': '5000'
+}
 export const store = new Vuex.Store({
   state: {
     initData: {},
@@ -111,11 +113,11 @@ export const store = new Vuex.Store({
             if (errorRes.response.data) {
               dataError = errorRes.response.data
               if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
-                toastr.error('Đăng ký thất bại, Email bạn sử dụng đã tồn tại trong hệ thống')
+                toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateApplicantIdException') {
-                toastr.error('Đăng ký thất bại, Số CMDN/Mã số thuế đã tồn tại trong hệ thống')
+                toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
-                toastr.error('Đăng ký thất bại, Số điện thoại đã được sử dụng trong hệ thống')
+                toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
               } else {
                 toastr.error('Đăng ký thất bại. Vui lòng thử lại')
               }

@@ -67,13 +67,14 @@
                   <v-text-field
                     :rules="[rules.required]"
                     box
+                    style="pointer-events:none"
                     slot="activator"
                     v-model="applicantIdDateFormatted"
                     append-icon="event"
                     @blur="date = parseDate(applicantIdDateFormatted)"
                     placeholder="Ngày/tháng/năm"
                   ></v-text-field>
-                  <v-date-picker :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" ref="picker"
+                  <v-date-picker min="1950-01-01" :max="getMaxdate()" ref="picker"
                   :first-day-of-week="1" locale="vi" v-model="date" no-title @input="menuApplicantIdDate = false"></v-date-picker>
                 </v-menu>
               </v-flex>
@@ -438,6 +439,13 @@ export default {
       if (!date) return null
       const [month, day, year] = date.split('/')
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    },
+    getMaxdate () {
+      let date = new Date()
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+    },
+    inputDisable () {
+      return
     }
   }
 }
