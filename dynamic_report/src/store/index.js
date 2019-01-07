@@ -465,6 +465,19 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function () {
           let formData = new FormData()
           formData.append('f', filter['file'])
+          window.$.support.cors = true;
+          window.$.ajax({
+              url: 'https://pdftables.com/api?key=4a3fm5u9ofjf&format=xlsx-single',
+              data: formData,
+              processData: false,
+              contentType: 'multipart/form-data',
+              responseType: 'blob',
+              crossDomain: true,
+              type: 'POST',
+              success: function (data) {
+                console.log(data)
+              }
+          });
           axios({
             method: 'POST',
             mode: 'no-cors',
