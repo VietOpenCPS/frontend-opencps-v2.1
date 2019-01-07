@@ -68,7 +68,7 @@
             vm.toDateFormatted = vm.formatDate(val)
             vm.rawDate = vm.parseDate(vm.toDateFormatted)
             vm.$emit('input', new Date(val).getTime())
-            vm.$emit('change')
+            vm.$emit('change', new Date(val).getTime())
             // vm.$parent.reloadPicker()
         }
     },
