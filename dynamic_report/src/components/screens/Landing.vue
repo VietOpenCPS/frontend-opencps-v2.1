@@ -70,7 +70,8 @@
           v-if="item['type'] === 'date'"
           v-model="data[item.key]" 
           :item="item" 
-          :data-value="data[item.key]">
+          :data-value="data[item.key]"
+          :data-all="data">
         </datetime-picker>
         <v-text-field 
           v-if="item['type'] === 'text'"
