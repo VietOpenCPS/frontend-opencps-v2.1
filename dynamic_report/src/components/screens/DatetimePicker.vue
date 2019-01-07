@@ -48,11 +48,11 @@
         var vm = this
         vm.$nextTick(function () {
             vm.rawDate = vm.parseDate(vm.dataValue)
-            if (item.hasOwnProperty('before')) {
+            if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[item['before']]
                 console.log('dataMax: ', dataMax)
             }
-            if (item.hasOwnProperty('after')) {
+            if (vm.item.hasOwnProperty('after')) {
                 let dataMin = vm.dataAll[item['after']]
                 console.log('dataMin: ', dataMin)
             }
