@@ -67,7 +67,7 @@
       </v-flex>
       <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
-          v-if="item['type'] === 'date' && !data[item.key + '_hidden']"
+          v-if="item['type'] === 'date' && reloadPicker"
           v-model="data[item.key]" 
           :item="item" 
           :data-value="data[item.key]"
@@ -1003,6 +1003,10 @@ export default {
       vm.$store.dispatch('doChotSoLieu', filter).then(function () {
         vm.doCreatePDF()
       })
+    },
+    reloadPicker () {
+      console.log('dkdkdkkssss0002312312')
+      return true
     }
   }
 }
