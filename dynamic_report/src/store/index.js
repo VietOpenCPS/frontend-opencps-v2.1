@@ -444,6 +444,40 @@ export const store = new Vuex.Store({
             }
         })
       })
+    },
+    doExportXlsx2 ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let formData = new FormData()
+        formData.append('SuccessPage', ' /Success/{ID}')
+        formData.append('OutputFormat', 'Word')
+        formData.append('File', window.$('#filefile')[0].files[0])
+        formData.append('ReconstructionMode', 'flowing')
+        formData.append('DetectTables', true)
+        formData.append('DetectLists', 'detect')
+        formData.append('HeaderAndFooterMode', 'detect')
+        formData.append('AnnotRecoveryType', 'comment')
+        formData.append('DocFormat', 'Word')
+        formData.append('AutoRotate', true)
+        formData.append('TextRecoveryMode', 0)
+        formData.append('NSEMode', 0)
+        formData.append('ocrLanguage', 'au')
+        formData.append('Password', '')
+        formData.append('DynamicFile', window.$('#filefile')[0].files[0])
+        window.$.support.cors = true;
+        window.$.ajax({
+            url: 'https://simplypdf.com/api/convert',
+            dataType: 'jsonp',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: formData,
+            crossDomain: true,
+            type: 'POST',
+            success: function (data) {
+              console.log(data)
+            }
+        })
+      })
     }
   },
   mutations: {
