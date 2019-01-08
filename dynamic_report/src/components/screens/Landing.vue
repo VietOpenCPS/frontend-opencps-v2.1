@@ -906,15 +906,15 @@ export default {
             */
             for (let key in resultDataTotal) {
               let indexTotal = 1
-              for (let keyMapping in vm.itemsReportsConfig) {
-                let dataText = ''
-                let currentConfig = vm.itemsReportsConfig[keyMapping]
+              for (let keyMappingXXTT in vm.itemsReportsConfig) {
+                let dataTextXXTT = ''
+                let currentConfig = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfig.hasOwnProperty('calculator')) {
-                  dataText = Math.round(eval(currentConfig['calculator']))
+                  dataTextXXTT = Math.round(eval(currentConfig['calculator']))
                 } else if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
-                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
+                  dataTextXXTT = resultDataTotal[key][currentConfig['value']] + ' '
                 }
-                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+                dataRowTotal[indexTotal]['text'] = parseInt(dataTextXXTT) + ' '
                 indexTotal = indexTotal + 1
               }
               break
@@ -922,15 +922,15 @@ export default {
           } else {
             for (let key in resultDataTotal) {
               let indexTotal = 1
-              for (let keyMapping in vm.itemsReportsConfig) {
-                let dataText = ''
-                let currentConfig = vm.itemsReportsConfig[keyMapping]
+              for (let keyMappingXXTT in vm.itemsReportsConfig) {
+                let dataTextXXTT = ''
+                let currentConfig = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfig.hasOwnProperty('calculator')) {
-                  dataText = Math.round(eval(currentConfig['calculator']))
+                  dataTextXXTT = Math.round(eval(currentConfig['calculator']))
                 } else if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
-                  dataText = resultDataTotal[key][currentConfig['value']] + ' '
+                  dataTextXXTT = resultDataTotal[key][currentConfig['value']] + ' '
                 }
-                dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
+                dataRowTotal[indexTotal]['text'] = parseInt(dataTextXXTT) + ' '
                 indexTotal = indexTotal + 1
               }
             }
