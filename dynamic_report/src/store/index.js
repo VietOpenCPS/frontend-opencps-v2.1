@@ -405,7 +405,7 @@ export const store = new Vuex.Store({
     doExportXlsx ({state}, filter) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('files', filter['file'])
+        formData.append('files', filter['file'], 'blob.pdf')
         window.$.support.cors = true;
         window.$.ajax({
             url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/uploadFiles',
@@ -421,7 +421,7 @@ export const store = new Vuex.Store({
             success: function (data) {
               console.log(data)
               let formData2 = new FormData()
-              formData2.append('url', data['url'] + '.pdf')
+              formData2.append('url', data['url'])
               formData2.append('index', data['index'])
               formData2.append('pid', 1)
               formData2.append('oid', 3)
