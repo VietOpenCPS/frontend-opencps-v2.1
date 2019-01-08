@@ -1,7 +1,5 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
-  <input type="file" name="files" id="filefile" />
-  <v-btn color="success" v-on:click.native="sdfsdfdsf">text</v-btn>
   <div class="form-chitiet">
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
