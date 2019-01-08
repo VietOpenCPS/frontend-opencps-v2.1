@@ -20,7 +20,8 @@ export default {
     created () {
         var vm = this
         vm.$nextTick(function () {
-            vm.myPdfToConvert = new File([vm.pdfblob], new Date().getTime() + '.pdf', {lastModified: new Date().getTime()})
+            // vm.myPdfToConvert = new File([vm.pdfblob], new Date().getTime() + '.pdf', {lastModified: new Date().getTime()})
+            vm.myPdfToConvert = new Blob([vm.pdfblob], {type: 'application/pdf'})
         })
     },
     computed: {
