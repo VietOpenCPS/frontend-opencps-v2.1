@@ -1,5 +1,7 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
+  <input type="file" name="files" id="filefile" />
+  <v-btn color="success" v-on:click.native="sdfsdfdsf">text</v-btn>
   <div class="form-chitiet">
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
@@ -923,7 +925,9 @@ export default {
               for (let keyMapping in vm.itemsReportsConfig) {
                 let dataText = ''
                 let currentConfig = vm.itemsReportsConfig[keyMapping]
-                if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
+                if (currentConfig.hasOwnProperty('calculator')) {
+                  dataText = Math.round(eval(currentConfig['calculator']))
+                } else if (resultDataTotal[key][currentConfig['value']] !== undefined && resultDataTotal[key][currentConfig['value']] !== null && resultDataTotal[key][currentConfig['value']] !== '') {
                   dataText = resultDataTotal[key][currentConfig['value']] + ' '
                 }
                 dataRowTotal[indexTotal]['text'] = parseInt(dataText) + ' '
@@ -1015,6 +1019,10 @@ export default {
         vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
         vm.showPicker = true
       }, 200)
+    },
+    sdfsdfdsf () {
+      let vm = this
+      vm.$store.dispatch('doExportXlsxddd')
     }
   }
 }
