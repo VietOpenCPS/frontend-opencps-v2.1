@@ -904,11 +904,13 @@ export default {
             */
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
+              let dataInput = ''
+              dataInput = resultDataTotal[keyXXTT]
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
-                  console.log('resultDataTotal[keyXXTT]', resultDataTotal[keyXXTT])
+                  console.log('dataInput', dataInput)
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator']))
                   console.log('dataTextXXTT', dataTextXXTT)
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
@@ -922,6 +924,8 @@ export default {
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
+              let dataInput = ''
+              dataInput = resultDataTotal[keyXXTT]
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
