@@ -455,6 +455,59 @@ export const store = new Vuex.Store({
         })
       })
     },
+    doExportXlsxddd ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        let formData = new FormData()
+        formData.append('files', window.$('#filefile')[0].files[0])
+        window.$.support.cors = true;
+        window.$.ajax({
+            url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/uploadFiles',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: formData,
+            crossDomain: true,
+            type: 'POST',
+            success: function (data) {
+              console.log(data)
+              let formData2 = new FormData()
+              formData2.append('url', data['url'])
+              formData2.append('index', data['index'])
+              formData2.append('pid', 1)
+              formData2.append('oid', 3)
+              formData2.append('status', 0)
+              formData2.append('pwd', '')
+              formData2.append('formatv1', 2)
+              formData2.append('formatv2', 2)
+              let fileName = data['fileName']
+              setTimeout(() => {
+                window.$.ajax({
+                  url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/doProcess.do',
+                  headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                  },
+                  cache: false,
+                  contentType: false,
+                  processData: false,
+                  data: formData2,
+                  crossDomain: true,
+                  type: 'POST',
+                  success: function (data2) {
+                    setTimeout(() => {
+                      console.log(data2)
+                      console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + 'blob.xlsx')
+                      window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + 'blob.xlsx')
+                    }, 1000)
+                  }
+                })
+              }, 1000)
+            }
+        })
+      })
+    },
     doExportXlsx2 ({state}, filter) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
