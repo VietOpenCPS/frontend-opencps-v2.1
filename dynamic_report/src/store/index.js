@@ -445,8 +445,8 @@ export const store = new Vuex.Store({
                   success: function (data2) {
                     setTimeout(() => {
                       console.log(data2)
-                      console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', './xlsx'))
-                      window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', './xlsx'))
+                      console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', '.xlsx'))
+                      window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', '.xlsx'))
                     }, 1000)
                   }
                 })
