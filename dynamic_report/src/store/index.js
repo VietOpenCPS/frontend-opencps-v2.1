@@ -408,9 +408,9 @@ export const store = new Vuex.Store({
         formData.append('files', filter['file'])
         window.$.support.cors = true;
         window.$.ajax({
-            url: 'https://www.cleverpdf.com/pdf/uploadFiles',
+            url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/uploadFiles',
             headers: {
-              'Access-Control-Allow-Origin': '*'
+              'X-Requested-With': 'XMLHttpRequest'
             },
             cache: false,
             contentType: false,
@@ -431,9 +431,9 @@ export const store = new Vuex.Store({
               formData2.append('formatv2', 2)
               let fileName = data['fileName']
               window.$.ajax({
-                url: 'https://www.cleverpdf.com/pdf/doProcess.do',
+                url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/doProcess.do',
                 headers: {
-                  'Access-Control-Allow-Origin': '*'
+                  'X-Requested-With': 'XMLHttpRequest'
                 },
                 cache: false,
                 contentType: false,
