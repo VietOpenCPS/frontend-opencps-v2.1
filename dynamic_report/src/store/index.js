@@ -409,6 +409,9 @@ export const store = new Vuex.Store({
         window.$.support.cors = true;
         window.$.ajax({
             url: 'https://www.cleverpdf.com/pdf/uploadFiles',
+            headers: {
+              'Access-Control-Allow-Origin': '*'
+            },
             cache: false,
             contentType: false,
             processData: false,
@@ -429,6 +432,9 @@ export const store = new Vuex.Store({
               let fileName = data['fileName']
               window.$.ajax({
                 url: 'https://www.cleverpdf.com/pdf/doProcess.do',
+                headers: {
+                  'Access-Control-Allow-Origin': '*'
+                },
                 cache: false,
                 contentType: false,
                 processData: false,

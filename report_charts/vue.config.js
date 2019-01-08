@@ -50,12 +50,6 @@ module.exports = {
         .tap(options => Object.assign(options, {
           name: '../../docs/o/opencps-frontend/report_charts_new/images/[name].[ext]'
         }))
-      config.entry('main_section_1')
-        .add('./src/main_section_1.js')
-        .end()
-      .entry('main_section_2')
-        .add('./src/main_section_2.js')
-        .end() 
     },
     css: {
       extract: {
