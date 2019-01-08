@@ -1369,6 +1369,13 @@ export const store = new Vuex.Store({
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
+          // let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
+          // for (var prop in field) {
+          //   if (field[prop].isRequired() && field[prop].getValue() === '') {
+          //     alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
+          //     return
+          //   }
+          // }
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
