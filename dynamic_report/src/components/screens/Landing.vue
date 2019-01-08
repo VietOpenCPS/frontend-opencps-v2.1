@@ -902,16 +902,17 @@ export default {
               }
             }
             */
-            for (let key in resultDataTotal) {
+            for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
+                  console.log('resultDataTotal[keyXXTT]', resultDataTotal[keyXXTT])
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator']))
                   console.log('dataTextXXTT', dataTextXXTT)
-                } else if (resultDataTotal[key][currentConfigXXTT['value']] !== undefined && resultDataTotal[key][currentConfigXXTT['value']] !== null && resultDataTotal[key][currentConfigXXTT['value']] !== '') {
-                  dataTextXXTT = resultDataTotal[key][currentConfigXXTT['value']] + ' '
+                } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
+                  dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
                 indexTotalXXTT = indexTotalXXTT + 1
@@ -919,15 +920,15 @@ export default {
               break
             }
           } else {
-            for (let key in resultDataTotal) {
+            for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator']))
-                } else if (resultDataTotal[key][currentConfigXXTT['value']] !== undefined && resultDataTotal[key][currentConfigXXTT['value']] !== null && resultDataTotal[key][currentConfigXXTT['value']] !== '') {
-                  dataTextXXTT = resultDataTotal[key][currentConfigXXTT['value']] + ' '
+                } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
+                  dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
                 dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
                 indexTotalXXTT = indexTotalXXTT + 1
