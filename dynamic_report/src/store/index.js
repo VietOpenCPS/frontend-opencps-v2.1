@@ -421,7 +421,7 @@ export const store = new Vuex.Store({
             success: function (data) {
               console.log(data)
               let formData2 = new FormData()
-              formData2.append('url', data['url'])
+              formData2.append('url', data['url'] + '.pdf')
               formData2.append('index', data['index'])
               formData2.append('pid', 1)
               formData2.append('oid', 3)
