@@ -405,7 +405,7 @@ export const store = new Vuex.Store({
     doExportXlsx ({state}, filter) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
-        formData.append('files', filter['file'], 'blob.pdf')
+        formData.append('files', filter['file'])
         window.$.support.cors = true;
         window.$.ajax({
             url: 'https://cors-anywhere.herokuapp.com/https://www.cleverpdf.com/pdf/uploadFiles',
@@ -445,8 +445,8 @@ export const store = new Vuex.Store({
                   success: function (data2) {
                     setTimeout(() => {
                       console.log(data2)
-                      console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', '.xlsx'))
-                      window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + fileName.replace('.pdf', '.xlsx'))
+                      console.log('https://www.cleverpdf.com/' + data2['index'] + '/' + 'blob.xlsx')
+                      window.open('https://www.cleverpdf.com/' + data2['index'] + '/' + 'blob.xlsx')
                     }, 1000)
                   }
                 })
