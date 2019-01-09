@@ -178,7 +178,10 @@ import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
-
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
@@ -386,7 +389,7 @@ export default {
                 })
               }
             }).catch(function (xhr) {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }, 500)
         }
@@ -519,7 +522,7 @@ export default {
           }).catch(rejectXhr => {
             vm.loadingAction = false
             console.log('rejectXhr==========', rejectXhr)
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
       }

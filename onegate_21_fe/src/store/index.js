@@ -8,7 +8,10 @@ import $ from 'jquery'
 
 Vue.use(toastr)
 Vue.use(Vuex)
-
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export const store = new Vuex.Store({
   state: {
     initData: support.initData,
@@ -621,7 +624,7 @@ export const store = new Vuex.Store({
     },
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = window.$('#file' + data.partNo)[0].files
+        let files = $('#file' + data.partNo)[0].files
         let file = files[0]
         let fileName = file['name']
         if (file['name']) {
@@ -1294,8 +1297,15 @@ export const store = new Vuex.Store({
         try {
           var control = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
           var formData = control.getValue()
-          console.log('Data Form ------', data)
-          console.log('formData-------', formData)
+          let field = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get').childrenByPropertyId
+          if (field) {
+            for (var prop in field) {
+              if (field[prop].isRequired() && field[prop].getValue() === '') {
+                alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
+                return
+              }
+            }
+          }
           var dataPutAlpacaForm = new URLSearchParams()
           dataPutAlpacaForm.append('formdata', JSON.stringify(formData))
           let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
@@ -1369,13 +1379,15 @@ export const store = new Vuex.Store({
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
-          // let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
-          // for (var prop in field) {
-          //   if (field[prop].isRequired() && field[prop].getValue() === '') {
-          //     alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
-          //     return
-          //   }
-          // }
+          let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
+          if (field) {
+            for (var prop in field) {
+              if (field[prop].isRequired() && field[prop].getValue() === '') {
+                alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
+                return
+              }
+            }
+          }
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)

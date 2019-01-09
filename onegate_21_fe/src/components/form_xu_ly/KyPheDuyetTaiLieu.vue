@@ -37,6 +37,10 @@
 import $ from 'jquery'
 import toastr from 'toastr'
 import VueCaptcha from './Captcha.vue'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 function plugin0 () {
   return document.getElementById('plugin0')
 }

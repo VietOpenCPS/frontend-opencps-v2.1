@@ -9,6 +9,7 @@ import router from '@/router'
 Vue.use(toastr)
 Vue.use(Vuex)
 toastr.options = {
+  'closeButton': true,
   'timeOut': '5000'
 }
 export const store = new Vuex.Store({
