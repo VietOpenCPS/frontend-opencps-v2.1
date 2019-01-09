@@ -75,7 +75,7 @@
               </td>
               <td class="text-xs-center">
                 <v-btn title="Export" class="mx-0 my-1" icon ripple
-                  @click="exportData('dictcollection')"
+                  @click="exportData('dictcollection', props.item.collectionCode)"
                   :loading="loading"
                   :disabled="loading"
                 >

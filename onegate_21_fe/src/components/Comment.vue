@@ -27,9 +27,11 @@
 
 <script>
 // import $ from 'jquery'
-// import axios from 'axios'
-// import 'jquery-textcomplete'
-// import 'jquery-comments'
+import toastr from 'toastr'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '10000'
+}
 export default {
   props: ['classPK', 'className'],
   data: () => ({
@@ -105,6 +107,28 @@ export default {
         // })
       }
     },
+    validateFile (data) {
+      let vm = this
+      let getFileType = data.file.name ? data.file.name.split('.') : ''
+      let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
+      let fileTypeAllow = vm.fileTypeAllow
+      let fileSizeAllow = 10
+      let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
+        return item === fileType
+      }) : ''
+      vm.validFileUpload = false
+      if (fileTypeInput && fileTypeInput.length > 0) {
+        if (Number(data.file.size) <= fileSizeAllow * 1048576) {
+          vm.validFileUpload = true
+        } else {
+          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          vm.validFileUpload = false
+        }
+      } else {
+        toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + fileTypeAllow.toString())
+        vm.validFileUpload = false
+      }
+    },
     initComment: function () {
       var vm = this
       window.$('#comments-container-el').comments({
@@ -112,7 +136,7 @@ export default {
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,
-        enablePinging: true,
+        enablePinging: false,
         postCommentOnEnter: false,
         forceResponsive: false,
         readOnly: false,
@@ -271,7 +295,7 @@ export default {
             let fileUpload = {
               file: comment.file
             }
-            vm.validFileUpload(fileUpload)
+            vm.validateFile(fileUpload)
             if (vm.validFileUpload) {
               window.$.ajax({
                 url: vm.initData.commentApi + '/uploads',
@@ -302,6 +326,8 @@ export default {
                   serverResponded()
                 }
               })
+            } else {
+              serverResponded()
             }
           })
         }
@@ -376,28 +402,6 @@ export default {
         return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
-      }
-    },
-    validFileUpload (data) {
-      let vm = this
-      let getFileType = data.file.name ? data.file.name.split('.') : ''
-      let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
-      let fileTypeAllow = vm.fileTypeAllow
-      let fileSizeAllow = 10
-      let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
-        return item === fileType
-      }) : ''
-      vm.validFileUpload = false
-      if (fileTypeInput && fileTypeInput.length > 0) {
-        if (Number(data.file.size) <= fileSizeAllow * 1048576) {
-          vm.validFileUpload = true
-        } else {
-          alert('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
-          vm.validFileUpload = false
-        }
-      } else {
-        alert('Tài liệu tải lên chỉ chấp nhận các định dạng ' + fileTypeAllow.toString())
-        vm.validFileUpload = false
       }
     }
   },

@@ -1055,7 +1055,6 @@ export default {
     vm.itemFilterSupport.days = [{'value': '', 'name': 'Lọc theo ngày'}]
     for (let i = 1; i <= 31; i++) {
       let item = {'value': i, 'name': 'Ngày ' + i}
-      console.log(item)
       vm.itemFilterSupport.days.push(item)
     }
     vm.$nextTick(function () {
@@ -1964,9 +1963,7 @@ export default {
           vm.loadingAction = false
           vm.dialog_printGuide = false
           vm.dialogPDFLoading = false
-          if (type === 'doc') {
-            window.open(result, '')
-          } else {
+          if (type !== 'doc') {
             document.getElementById('dialogPDFPreview').src = result
           }
         }).catch(function () {
