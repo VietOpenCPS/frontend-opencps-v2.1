@@ -6,7 +6,7 @@
       </h3>
       <v-layout wrap class="py-2">
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'collection' ? 'warning' : 'primary'" @click="getCollection()"
+          <v-btn :color="typeExport === 'dictcollection' ? 'warning' : 'primary'" @click="getCollection()"
             :loading="loading"
             :disabled="loading"
           >
@@ -16,7 +16,7 @@
           </v-btn>
         </v-flex>
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'serviceinfo' ? 'warning' : 'primary'" @click="exportData('serviceinfo')"
+          <v-btn :color="typeExport === 'serviceInfo' ? 'warning' : 'primary'" @click="exportData('serviceInfo', '')"
             :loading="loading"
             :disabled="loading"
           >
@@ -26,7 +26,7 @@
           </v-btn>
         </v-flex>
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'citizen' ? 'warning' : 'primary'" @click="exportData('citizen')"
+          <v-btn :color="typeExport === 'citizen' ? 'warning' : 'primary'" @click="exportData('applicant', 'citizen')"
             :loading="loading"
             :disabled="loading"
           >
@@ -36,7 +36,7 @@
           </v-btn>
         </v-flex>
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'bussiness' ? 'warning' : 'primary'"  @click="exportData('bussiness')"
+          <v-btn :color="typeExport === 'bussiness' ? 'warning' : 'primary'"  @click="exportData('applicant', 'business')"
             :loading="loading"
             :disabled="loading"
           >
@@ -46,7 +46,7 @@
           </v-btn>
         </v-flex>
       </v-layout>
-      <div class="my-3" v-if="typeExport === 'collection'">
+      <div class="my-3" v-if="typeExport === 'dictcollection'">
         <v-data-table
           :headers="headers"
           :items="dictCollectionList"
@@ -75,7 +75,7 @@
               </td>
               <td class="text-xs-center">
                 <v-btn title="Export" class="mx-0 my-1" icon ripple
-                  @click="exportData('collection')"
+                  @click="exportData('dictcollection')"
                   :loading="loading"
                   :disabled="loading"
                 >
@@ -91,14 +91,14 @@
           </template>
         </v-data-table>
       </div>
-      <div class="mx-2 my-3" v-if="typeExport !== 'collection'">
+      <div class="mx-2 my-3" v-if="typeExport !== 'dictcollection'">
         <v-alert
           outline
           :value="true"
           icon="info"
           type="warning"
         >
-          <span v-if="typeExport === 'serviceinfo'">Export dữ liệu thủ tục hành chính</span>
+          <span v-if="typeExport === 'serviceInfo'">Export dữ liệu thủ tục hành chính</span>
           <span v-if="typeExport === 'citizen'">Export dữ liệu công dân</span>
           <span v-if="typeExport === 'bussiness'">Export dữ liệu doanh nghiệp</span>
         </v-alert>
@@ -122,7 +122,7 @@ export default {
   data: () => ({
     loading: false,
     dictCollectionList: [],
-    typeExport: 'collection',
+    typeExport: 'dictcollection',
     headers: [
       {
         text: 'STT',
@@ -174,18 +174,22 @@ export default {
   methods: {
     getCollection () {
       let vm = this
-      vm.typeExport = 'collection'
+      vm.typeExport = 'dictcollection'
       vm.$store.dispatch('getDictCollections').then(result => {
         vm.dictCollectionList = result
       })
     },
-    exportData (type) {
+    exportData (dataCode, dataType) {
       let vm = this
-      vm.typeExport = type
+      vm.typeExport = dataCode
       vm.loading = true
-      setTimeout(function () {
+      let filter = {
+        dataCode: dataCode,
+        dataType: dataType
+      }
+      vm.$store.dispatch('exportData', filter).then(result => {
         vm.loading = false
-      }, 3000)
+      })
     }
   }
 }

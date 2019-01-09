@@ -983,7 +983,7 @@ export default {
         vm.pdfEform = false
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+        var url = vm.initDataResource.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid
         window.open(url)
       } else {
         if (data.referenceUid) {
@@ -1285,7 +1285,7 @@ export default {
     partNoApplicantHasFile (partNo) {
       let vm = this
       let hasFile = vm.dossierFilesApplicant.find(file => {
-        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo && !file.eForm)
+        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo)
       })
       if (hasFile) {
         return true
