@@ -158,7 +158,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số điện thoại <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số điện thoại <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -168,7 +168,7 @@
                       v-else
                       v-model="thongTinChuHoSo.contactTelNo"
                       append-icon="phone"
-                      :rules="originality === 1 ? [rules.telNo, rules.required] : [rules.telNo]"
+                      :rules="[rules.telNo, rules.required]"
                       required
                       ></v-text-field>
                     </v-flex>
@@ -438,6 +438,10 @@
 import axios from 'axios'
 import Suggestions from 'v-suggestions'
 import toastr from 'toastr'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   components: {
     'suggestions': Suggestions

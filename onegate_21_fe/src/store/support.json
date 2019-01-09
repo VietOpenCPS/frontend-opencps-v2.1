@@ -86,10 +86,10 @@
         {
             "index": 0,
             "value": "adv_0",
-            "text": "Lọc hồ sơ theo năm - tháng",
+            "text": "Lọc hồ sơ theo năm - tháng - ngày",
             "type": "select",
             "dataSource": "data",
-            "spec": "year_month",
+            "spec": "year_month_day",
             "display": false,
             "disabled": false
         },

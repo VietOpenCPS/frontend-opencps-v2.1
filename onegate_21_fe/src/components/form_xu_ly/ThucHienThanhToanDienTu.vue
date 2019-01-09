@@ -148,6 +148,10 @@ import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import toastr from 'toastr'
 import {VMoney} from 'v-money'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   props: {
     paymentProfile: {

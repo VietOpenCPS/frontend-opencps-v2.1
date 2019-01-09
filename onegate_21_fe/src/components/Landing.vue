@@ -38,7 +38,7 @@
                     <v-icon size="16">drag_handle</v-icon>
                   </v-btn>
                 </v-flex>
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
+                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
                   <v-select
                     :items="itemFilterSupport.years"
                     v-model="itemFilterSupport.year"
@@ -51,12 +51,12 @@
                     @change="changeAdvFilterData($event, 'year', item.index)"
                   ></v-select>
                 </v-flex>
-                <v-flex xs2 sm2 class="text-center" v-if="item.spec === 'year_month'">
+                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
                   <v-btn icon class="my-0 mx-0">
                     <v-icon size="16">remove</v-icon>
                   </v-btn>
-                </v-flex>
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month'">
+                </v-flex> -->
+                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
                   <v-select
                     :items="itemFilterSupport.months"
                     v-model="itemFilterSupport.month"
@@ -66,6 +66,23 @@
                     item-value="value"
                     item-text="name"
                     @change="changeAdvFilterData($event, 'month', item.index)"
+                  ></v-select>
+                </v-flex>
+                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
+                  <v-btn icon class="my-0 mx-0">
+                    <v-icon size="16">remove</v-icon>
+                  </v-btn>
+                </v-flex> -->
+                <v-flex xs2 sm2 v-if="item.spec === 'year_month_day'">
+                  <v-select
+                    :items="itemFilterSupport.days"
+                    v-model="itemFilterSupport.day"
+                    label="Chọn ngày"
+                    autocomplete
+                    single-line
+                    item-value="value"
+                    item-text="name"
+                    @change="changeAdvFilterData($event, 'day', item.index)"
                   ></v-select>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'top'">
@@ -721,7 +738,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="mr-3" color="primary" @click="doGuiding()"
+          <v-btn class="mr-3" color="primary" @click="doGuiding('doc')"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Lưu phiếu hướng dẫn
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click="doGuiding('pdf')"
           :loading="loadingAction"
           :disabled="loadingAction">
             <v-icon>print</v-icon> &nbsp;
@@ -871,6 +895,8 @@ export default {
         }
       ],
       month: '',
+      days: [],
+      day: '',
       tops: [
         {
           'value': '',
@@ -908,7 +934,7 @@ export default {
       keyword: '',
       register: ''
     },
-    itemFilterKey: ['year', 'month', 'top', 'status', 'substatus', 'agency', 'service', 'domain', 'keyword', 'register'],
+    itemFilterKey: ['year', 'month', 'day', 'top', 'status', 'substatus', 'agency', 'service', 'domain', 'keyword', 'register'],
     menuType: 0,
     type_assign: '',
     assign_items: [],
@@ -1026,6 +1052,12 @@ export default {
   created () {
     var vm = this
     vm.selectMultiplePage = []
+    vm.itemFilterSupport.days = [{'value': '', 'name': 'Lọc theo ngày'}]
+    for (let i = 1; i <= 31; i++) {
+      let item = {'value': i, 'name': 'Ngày ' + i}
+      console.log(item)
+      vm.itemFilterSupport.days.push(item)
+    }
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
       let currentQuery = vm.$router.history.current.query
@@ -1275,30 +1307,44 @@ export default {
                 index: -1
               })
             } else if (spec === 'year') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
+              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
               if (searchDate) {
-                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
-                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month']
+                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
+                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
                 searchDate['index'] = 0
               } else {
                 vm.advSearchItems.push({
-                  spec: 'year_month',
-                  value: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
-                  text: 'year_month' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'],
+                  spec: 'year_month_day',
+                  value: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
+                  text: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
                   index: 0
                 })
               }
             } else if (spec === 'month') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month' })
+              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
               if (searchDate) {
-                searchDate['value'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['text'] = 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec]
+                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
+                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
                 searchDate['index'] = 0
               } else {
                 vm.advSearchItems.push({
-                  spec: 'year_month',
-                  value: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
-                  text: 'year_month' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec],
+                  spec: 'year_month_day',
+                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
+                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
+                  index: 0
+                })
+              }
+            } else if (spec === 'day') {
+              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
+              if (searchDate) {
+                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
+                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
+                searchDate['index'] = 0
+              } else {
+                vm.advSearchItems.push({
+                  spec: 'year_month_day',
+                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
+                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
                   index: 0
                 })
               }
@@ -1505,6 +1551,7 @@ export default {
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            day: currentQuery.hasOwnProperty('day') ? currentQuery.day : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
@@ -1525,6 +1572,7 @@ export default {
             substatus: currentQuery.hasOwnProperty('substatus') ? currentQuery.substatus : '',
             year: currentQuery.hasOwnProperty('year') ? currentQuery.year : 0,
             month: currentQuery.hasOwnProperty('month') ? currentQuery.month : 0,
+            day: currentQuery.hasOwnProperty('day') ? currentQuery.day : 0,
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
@@ -1889,7 +1937,7 @@ export default {
         document.getElementById('dialogPDFPreview').src = result
       })
     },
-    doGuiding () {
+    doGuiding (type) {
       let vm = this
       if (vm.$refs.formGuide.validate()) {
         vm.loadingAction = true
@@ -1902,16 +1950,25 @@ export default {
           applicantAddress: vm.applicantAddressGuide,
           applicantEmail: vm.applicantEmailGuide,
           applicantTelNo: vm.applicantTelNoGuide,
-          employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
+          // employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
           typeCode: 'DOC_03'
         }
-        vm.dialogPDFLoading = true
-        vm.dialogPDF = true
+        if (type === 'doc') {
+          filter['reportType'] = 'word'
+        }
+        if (type !== 'doc') {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+        }
         vm.$store.dispatch('doGuiding', filter).then(function (result) {
           vm.loadingAction = false
           vm.dialog_printGuide = false
           vm.dialogPDFLoading = false
-          document.getElementById('dialogPDFPreview').src = result
+          if (type === 'doc') {
+            window.open(result, '')
+          } else {
+            document.getElementById('dialogPDFPreview').src = result
+          }
         }).catch(function () {
           vm.loadingAction = false
         })
@@ -2464,7 +2521,7 @@ export default {
       vm.advObjectSearch = {}
       for (let key in data) {
         if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
-          if (!data[key].startsWith('keyword:') && !data[key].startsWith('year_month:') && !data[key].startsWith('top:') &&
+          if (!data[key].startsWith('keyword:') && !data[key].startsWith('year_month_day:') && !data[key].startsWith('top:') &&
             !data[key].startsWith('status:') && !data[key].startsWith('substatus:') && !data[key].startsWith('agency:') &&
             !data[key].startsWith('service:') && !data[key].startsWith('domain:') && !data[key].startsWith('register:')) {
             vm.advObjectSearch['keyword'] = data[key]
@@ -2594,12 +2651,16 @@ export default {
       let valueFilter = data
       if (spec === 'year') {
         vm.itemFilterSupport.year = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month
-        spec = 'year_month'
+        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
+        spec = 'year_month_day'
       } else if (spec === 'month') {
         vm.itemFilterSupport.month = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month
-        spec = 'year_month'
+        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
+        spec = 'year_month_day'
+      } else if (spec === 'day') {
+        vm.itemFilterSupport.day = data
+        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
+        spec = 'year_month_day'
       } else {
         /* set State advSearch */
         vm.itemFilterSupport[spec] = data
@@ -2624,16 +2685,16 @@ export default {
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
           key !== 'top' && key !== 'status' && key !== 'substatus' && key !== 'agency' && key !== 'service' && key !== 'domain' &&
-          key !== 'register' && key !== 'year' && key !== 'month' && key !== 'adv_renew' && key !== 'keyword') {
+          key !== 'register' && key !== 'year' && key !== 'month' && key !== 'day' && key !== 'adv_renew' && key !== 'keyword') {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
       for (let key in vm.advSearchItems) {
         let currentItemFilter = vm.advSearchItems[key]
-        if (currentItemFilter.spec === 'year_month') {
+        if (currentItemFilter.spec === 'year_month_day') {
           let currentYearMonth = currentItemFilter.text.replace(currentItemFilter.spec + ':', '')
-          const [year, month] = currentYearMonth.split('_')
-          queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&'
+          const [year, month, day] = currentYearMonth.split('_')
+          queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&' + 'day' + '=' + day + '&'
         } else {
           console.log('currentItemFilter.spec', currentItemFilter.text.replace(currentItemFilter.spec + ':', ''))
           queryString += currentItemFilter.spec + '=' + currentItemFilter.text.replace(currentItemFilter.spec + ':', '') + '&'
