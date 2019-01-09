@@ -549,7 +549,7 @@
 import router from '@/router'
 import $ from 'jquery'
 import toastr from 'toastr'
-// import '../store/jquery-comments'
+import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -1157,7 +1157,7 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && dossierItem['stepCode'] === 610) {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && (dossierItem['stepCode'] === 610 || dossierItem['stepCode'] === 611)) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {

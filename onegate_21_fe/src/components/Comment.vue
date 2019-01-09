@@ -50,7 +50,9 @@ export default {
     comment: [],
     argShowMore: true,
     //
-    checkOpinion: true
+    checkOpinion: true,
+    validFileUpload: true,
+    fileTypeAllow: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf']
   }),
   computed: {
     loading () {
@@ -266,35 +268,41 @@ export default {
             formData.append('email', '')
             formData.append('fullname', vm.initData.user.userName)
             formData.append('opinion', document.getElementById('opinion').checked)
-            window.$.ajax({
-              url: vm.initData.commentApi + '/uploads',
-              dataType: 'json',
-              type: 'POST',
-              headers: {
-                'groupId': vm.initData.groupId
-                // 'groupId': 55301
-              },
-              data: formData,
-              cache: false,
-              contentType: false,
-              processData: false,
-              success: function (comment) {
-                if (comment.opinion) {
-                  window.$('.opinion').hide()
+            let fileUpload = {
+              file: comment.file
+            }
+            vm.validFileUpload(fileUpload)
+            if (vm.validFileUpload) {
+              window.$.ajax({
+                url: vm.initData.commentApi + '/uploads',
+                dataType: 'json',
+                type: 'POST',
+                headers: {
+                  'groupId': vm.initData.groupId
+                  // 'groupId': 55301
+                },
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (comment) {
+                  if (comment.opinion) {
+                    window.$('.opinion').hide()
+                  }
+                  document.getElementById('opinion').checked = false
+                  vm.formatComment(comment)
+                  successfulUploads.push(vm.comment)
+                  serverResponded()
+                  if (comment.opinion) {
+                    window.$('.opinion').hide()
+                  }
+                  document.getElementById('opinion').checked = false
+                },
+                error: function (xhr, data) {
+                  serverResponded()
                 }
-                document.getElementById('opinion').checked = false
-                vm.formatComment(comment)
-                successfulUploads.push(vm.comment)
-                serverResponded()
-                if (comment.opinion) {
-                  window.$('.opinion').hide()
-                }
-                document.getElementById('opinion').checked = false
-              },
-              error: function (xhr, data) {
-                serverResponded()
-              }
-            })
+              })
+            }
           })
         }
         // appendNewComments: function (commentJSONs, onSuccess, onError) {
@@ -368,6 +376,28 @@ export default {
         return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
       } else {
         return ''
+      }
+    },
+    validFileUpload (data) {
+      let vm = this
+      let getFileType = data.file.name ? data.file.name.split('.') : ''
+      let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
+      let fileTypeAllow = vm.fileTypeAllow
+      let fileSizeAllow = 10
+      let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
+        return item === fileType
+      }) : ''
+      vm.validFileUpload = false
+      if (fileTypeInput && fileTypeInput.length > 0) {
+        if (Number(data.file.size) <= fileSizeAllow * 1048576) {
+          vm.validFileUpload = true
+        } else {
+          alert('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          vm.validFileUpload = false
+        }
+      } else {
+        alert('Tài liệu tải lên chỉ chấp nhận các định dạng ' + fileTypeAllow.toString())
+        vm.validFileUpload = false
       }
     }
   },

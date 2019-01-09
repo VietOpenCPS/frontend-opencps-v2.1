@@ -44,7 +44,7 @@
                   :placeholder="applicantType ? 'Số CMND/ Hộ chiếu' : 'Mã số thuế'"
                   v-model="applicantIdNo"
                   box
-                  :rules="applicantType ? [rules.required] : [rules.required, rules.taxCode]"
+                  :rules="applicantType ? [rules.required, rules.credit] : [rules.required, rules.taxCode]"
                   required
                   @input="changeApplicantInfos"
                   :disabled="loadingVerify"
@@ -222,6 +222,10 @@ import toastr from 'toastr'
 import Captcha from './Captcha.vue'
 // import Suggestions from 'v-suggestions'
 Vue.use(toastr)
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   props: [],
   components: {
@@ -277,6 +281,15 @@ export default {
         } else {
           const pattern = /^(([0-9]{13,13}))$/
           return pattern.test(value) || 'Mã số thuế gồm 10 hoặc 13 ký tự 0-9'
+        }
+      },
+      credit: (value) => {
+        if (value.length === 9) {
+          const pattern = /^(([0-9]{9,9}))$/
+          return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
+        } else {
+          const pattern = /^(([0-9]{12,12}))$/
+          return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
         }
       }
     }

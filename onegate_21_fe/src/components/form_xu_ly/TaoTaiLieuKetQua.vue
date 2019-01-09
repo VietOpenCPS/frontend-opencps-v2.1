@@ -142,6 +142,10 @@
 <script>
   // import $ from 'jquery'
   import toastr from 'toastr'
+  toastr.options = {
+    'closeButton': true,
+    'timeOut': '5000'
+  }
   export default {
     props: {
       id: {

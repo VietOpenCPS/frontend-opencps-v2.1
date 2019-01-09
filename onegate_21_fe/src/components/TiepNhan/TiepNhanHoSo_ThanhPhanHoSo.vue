@@ -310,6 +310,10 @@
 <script>
 import $ from 'jquery'
 import toastr from 'toastr'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '10000'
+}
 export default {
   props: {
     onlyView: {
@@ -597,6 +601,7 @@ export default {
       if (dossierFiles.length !== 0) {
         dossierTemplates.forEach(template => {
           template['daKhai'] = false
+          template['passRequired'] = false
           var itemFind = dossierFiles.find(file => {
             return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed
           })
@@ -604,12 +609,10 @@ export default {
             template['daKhai'] = true
             template['hasForm'] = true
             template['referenceUid'] = itemFind['referenceUid']
-          } else if (!itemFind && template.hasForm) {
-            template['daKhai'] = false
           }
           dossierFiles.forEach(dossierFile => {
-            if (template.partNo === dossierFile.dossierPartNo && !dossierFile.eForm && !template.hasForm) {
-              template['daKhai'] = true
+            if (template.partNo === dossierFile.dossierPartNo) {
+              template['passRequired'] = true
             }
           })
         })
@@ -617,6 +620,7 @@ export default {
         dossierTemplates.forEach(template => {
           if (template.hasForm) {
             template['daKhai'] = false
+            template['passRequired'] = false
           }
         })
       }
@@ -770,9 +774,7 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          if (!vm.dossierTemplateItems[index]['hasForm']) {
-            vm.dossierTemplateItems[index]['daKhai'] = true
-          }
+          vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
@@ -829,7 +831,7 @@ export default {
     },
     deleteSingleFileEform (item, index) {
       var vm = this
-      let x = confirm('Bạn có chắc chắn muốn xóa file đính kèm này không?')
+      let x = confirm('Bạn có chắc chắn xóa file?')
       if (x) {
         vm.dossierFilesItems.forEach(file => {
           if (file.dossierPartNo === item.partNo && file.eForm) {
@@ -841,10 +843,12 @@ export default {
                 vm.dossierFilesItems = result
                 vm.recountFileTemplates()
                 var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-                  return file.dossierPartNo === item.partNo && !file.eForm
+                  return file.dossierPartNo === item.partNo
                 })
                 if (fileViewsTemp) {
-                  vm.fileViews = fileViewsTemp
+                  vm.dossierTemplateItems[index]['passRequired'] = true
+                } else {
+                  vm.dossierTemplateItems[index]['passRequired'] = false
                 }
               })
             })
@@ -882,7 +886,7 @@ export default {
     },
     deleteSingleFile (item, index) {
       var vm = this
-      let x = confirm('Bạn có muốn xóa?')
+      let x = confirm('Bạn có chắc chắn xóa file đính kèm ?')
       if (x) {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
@@ -916,8 +920,15 @@ export default {
       })
       if (indexFile === -1) {
         for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo && !vm.dossierTemplateItems[i].hasForm) {
-            vm.dossierTemplateItems[i]['daKhai'] = false
+          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo) {
+            vm.dossierTemplateItems[i]['passRequired'] = false
+            break
+          }
+        }
+      } else {
+        for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
+          if (vm.dossierTemplateItems[i].partNo === itemFile.dossierPartNo) {
+            vm.dossierTemplateItems[i]['passRequired'] = true
             break
           }
         }
@@ -972,7 +983,7 @@ export default {
         vm.pdfEform = false
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
-        var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
+        var url = vm.initDataResource.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid
         window.open(url)
       } else {
         if (data.referenceUid) {
@@ -1210,7 +1221,7 @@ export default {
       var vm = this
       if (vm.dossierTemplateItems.length > 0) {
         for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
-          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['daKhai'] && vm.partTypes.includes(vm.dossierTemplateItems[i].partType)) {
+          if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['passRequired'] && vm.partTypes.includes(vm.dossierTemplateItems[i].partType)) {
             let message = 'Chú ý :' + vm.dossierTemplateItems[i].partName + ' là thành phần bắt buộc!'
             toastr.error(message)
             return false
@@ -1274,7 +1285,7 @@ export default {
     partNoApplicantHasFile (partNo) {
       let vm = this
       let hasFile = vm.dossierFilesApplicant.find(file => {
-        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo && !file.eForm)
+        return (file.dossierTemplateNo === vm.thongTinHoSo['dossierTemplateNo'] && file.dossierPartNo === partNo)
       })
       if (hasFile) {
         return true
