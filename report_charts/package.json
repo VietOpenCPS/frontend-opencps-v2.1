@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "build": "vue-cli-service build",
+    "build:rp1": "vue-cli-service build --dest dist/report_1 src/mainrp1.js",
+    "build:rp2": "vue-cli-service build --dest dist/report_2 src/mainrp2.js",
+    "build:rp3": "vue-cli-service build --dest dist/report_3 src/mainrp3.js",
     "lint": "vue-cli-service lint",
     "dev": "vue-cli-service serve"
   },

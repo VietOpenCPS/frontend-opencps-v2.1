@@ -3,6 +3,7 @@ import './stylus/app.styl'
 import './stylus/jexcel.css'
 import App from './App'
 import router from './router'
+import App2 from './App2'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
@@ -63,6 +64,21 @@ new Vue({
   router,
   store,
   render: h => h(App),
+  created() {
+    var vm = this
+    vm.$nextTick(function() {
+      if (window.location.href.endsWith('#/')) {
+        vm.$router.push('/bao-cao/0')
+      }
+    })
+  }
+})
+
+new Vue({
+  el: '#app2',
+  router,
+  store,
+  render: h => h(App2),
   created() {
     var vm = this
     vm.$nextTick(function() {

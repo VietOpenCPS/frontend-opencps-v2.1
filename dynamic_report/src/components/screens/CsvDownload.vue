@@ -1,6 +1,6 @@
 <template>
     <v-btn flat class="mx-0 my-0" v-on:click.native="doDownloadXlsx">
-       <v-icon>receipt</v-icon> &nbsp; Tải xuống XLSX
+       <v-icon>receipt</v-icon> &nbsp; Tải Excel
     </v-btn>
 </template>
 

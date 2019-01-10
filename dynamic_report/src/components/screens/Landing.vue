@@ -12,15 +12,13 @@
                 <v-icon>settings</v-icon> &nbsp;
                 Lưu thay đổi
               </v-btn>
-              -->
               <vue-csv-downloader
                 :data="csvExport"
                 :fields="fields"
                 :downloadname="nameReport"
-                v-if="showCSVDownload"
-                :pdfblob="pdfBlob"
               >
               </vue-csv-downloader>
+              -->
               <v-select v-if="buttonsShow"
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 :items="button['source']"
@@ -97,9 +95,13 @@
     <v-layout row wrap>
       <v-flex xs12>
         <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+        <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds">
+          <v-icon>receipt</v-icon> &nbsp; Tải Excel
+        </v-btn>
       </v-flex>
     </v-layout>
     <div>
+      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/dynamic_report/assets/hdsd.pdf"></vue-friendly-iframe>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== ''" :src="pdfBlob"></vue-friendly-iframe>
       <div class="mx-2" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
@@ -138,6 +140,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    showGuilds: false,
     showPicker: true,
     showErrorData: false,
     showCSVDownload: false,
