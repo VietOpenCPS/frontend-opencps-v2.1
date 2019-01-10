@@ -6,7 +6,7 @@
       </h3>
       <v-layout wrap class="py-2">
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'dictcollection' ? 'warning' : 'primary'" @click="getCollection()"
+          <v-btn :color="typeExport === 'dictCollection' ? 'warning' : 'primary'" @click="getCollection()"
             :loading="loading"
             :disabled="loading"
           >
@@ -46,7 +46,7 @@
           </v-btn>
         </v-flex>
       </v-layout>
-      <div class="my-3" v-if="typeExport === 'dictcollection'">
+      <div class="my-3" v-if="typeExport === 'dictCollection'">
         <v-data-table
           :headers="headers"
           :items="dictCollectionList"
@@ -74,7 +74,7 @@
               </td>
               <td class="text-xs-center" width="80px">
                 <v-btn title="Export" class="mx-0 my-1" icon ripple
-                  @click="exportData('dictcollection', props.item.collectionCode)"
+                  @click="exportData('dictCollection', props.item.collectionCode)"
                   :loading="loading"
                   :disabled="loading"
                 >
@@ -90,7 +90,7 @@
           </template>
         </v-data-table>
       </div>
-      <div class="mx-2 my-3" v-if="typeExport !== 'dictcollection'">
+      <div class="mx-2 my-3" v-if="typeExport !== 'dictCollection'">
         <v-alert
           outline
           :value="true"
@@ -125,7 +125,7 @@ export default {
   data: () => ({
     loading: false,
     dictCollectionList: [],
-    typeExport: 'dictcollection',
+    typeExport: 'dictCollection',
     typeApplicant: '',
     headers: [
       {
@@ -178,7 +178,7 @@ export default {
   methods: {
     getCollection () {
       let vm = this
-      vm.typeExport = 'dictcollection'
+      vm.typeExport = 'dictCollection'
       vm.$store.dispatch('getDictCollections').then(result => {
         vm.dictCollectionList = result
       })
