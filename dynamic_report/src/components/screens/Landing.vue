@@ -19,9 +19,6 @@
               >
               </vue-csv-downloader>
               -->
-              <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds">
-                <v-icon>receipt</v-icon> &nbsp; Tải Excel
-              </v-btn>
               <v-select v-if="buttonsShow"
                 v-for="(button, btnIndex) in buttons" v-bind:key="btnIndex"
                 :items="button['source']"
@@ -98,6 +95,9 @@
     <v-layout row wrap>
       <v-flex xs12>
         <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
+        <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds">
+          <v-icon>receipt</v-icon> &nbsp; Tải Excel
+        </v-btn>
       </v-flex>
     </v-layout>
     <div>
