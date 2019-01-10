@@ -4,13 +4,14 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
 import $ from 'jquery'
+import saveAs from 'file-saver'
 // import router from '@/router'
 
 Vue.use(toastr)
 Vue.use(Vuex)
 toastr.options = {
   'closeButton': true,
-  'timeOut': '5000'
+  'timeOut': '15000'
 }
 export const store = new Vuex.Store({
   state: {
@@ -1303,7 +1304,7 @@ export const store = new Vuex.Store({
           if (field) {
             for (var prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
-                alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
+                toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 return
               }
             }
@@ -1385,7 +1386,7 @@ export const store = new Vuex.Store({
           if (field) {
             for (var prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
-                alert(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : 'Yêu cầu nhập đầy đủ thông tin các trường bắt buộc')
+                toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 return
               }
             }
@@ -2356,6 +2357,9 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getServiceConfigs + '/' + filter.serviceConfigId + '/guide', param).then(function (response) {
             let serializable = response.data
+            if (filter.reportType) {
+              saveAs(serializable, 'HDTT' + new Date().getTime() + '.doc')
+            }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {

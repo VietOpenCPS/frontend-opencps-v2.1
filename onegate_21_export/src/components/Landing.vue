@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-2" style="width: 90%; margin:auto;background:#fff">
+  <v-card flat class="mt-2" style="width: 90%; margin:auto;background:#fff">
     <v-card-text class="pt-2">
       <h3 class="mx-2 my-3">
         <span style="color:#065694"> EXPORT DỮ LIỆU </span>
@@ -26,7 +26,7 @@
           </v-btn>
         </v-flex>
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'citizen' ? 'warning' : 'primary'" @click="exportData('applicant', 'citizen')"
+          <v-btn :color="(typeExport === 'applicant' && typeApplicant === 'citizen') ? 'warning' : 'primary'" @click="exportData('applicant', 'citizen')"
             :loading="loading"
             :disabled="loading"
           >
@@ -36,7 +36,7 @@
           </v-btn>
         </v-flex>
         <v-flex xs12 sm3 class="">
-          <v-btn :color="typeExport === 'bussiness' ? 'warning' : 'primary'"  @click="exportData('applicant', 'business')"
+          <v-btn :color="(typeExport === 'applicant' && typeApplicant === 'business') ? 'warning' : 'primary'"  @click="exportData('applicant', 'business')"
             :loading="loading"
             :disabled="loading"
           >
@@ -52,7 +52,6 @@
           :items="dictCollectionList"
           hide-actions
           class="table-landing table-bordered mx-2"
-          style="border: 1px solid #dedede"
         >
           <template slot="items" slot-scope="props">
             <tr v-bind:class="{'active': props.index%2==1}">
@@ -73,9 +72,9 @@
                   </span>
                 </div>
               </td>
-              <td class="text-xs-center">
+              <td class="text-xs-center" width="80px">
                 <v-btn title="Export" class="mx-0 my-1" icon ripple
-                  @click="exportData('dictcollection')"
+                  @click="exportData('dictcollection', props.item.collectionCode)"
                   :loading="loading"
                   :disabled="loading"
                 >
@@ -99,8 +98,8 @@
           type="warning"
         >
           <span v-if="typeExport === 'serviceInfo'">Export dữ liệu thủ tục hành chính</span>
-          <span v-if="typeExport === 'citizen'">Export dữ liệu công dân</span>
-          <span v-if="typeExport === 'bussiness'">Export dữ liệu doanh nghiệp</span>
+          <span v-if="typeExport === 'applicant' && typeApplicant === 'citizen'">Export dữ liệu công dân</span>
+          <span v-if="typeExport === 'applicant' && typeApplicant === 'business'">Export dữ liệu doanh nghiệp</span>
         </v-alert>
       </div>
     </v-card-text>
@@ -115,6 +114,10 @@ import support from '../store/support.json'
 import toastr from 'toastr'
 // import Suggestions from 'v-suggestions'
 Vue.use(toastr)
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
   props: [],
   components: {
@@ -123,6 +126,7 @@ export default {
     loading: false,
     dictCollectionList: [],
     typeExport: 'dictcollection',
+    typeApplicant: '',
     headers: [
       {
         text: 'STT',
@@ -182,6 +186,7 @@ export default {
     exportData (dataCode, dataType) {
       let vm = this
       vm.typeExport = dataCode
+      vm.typeApplicant = dataType
       vm.loading = true
       let filter = {
         dataCode: dataCode,
@@ -189,9 +194,23 @@ export default {
       }
       vm.$store.dispatch('exportData', filter).then(result => {
         vm.loading = false
+      }).catch(function () {
+        vm.loading = false
       })
     }
   }
 }
 </script>
-
+<style>
+  body .table-bordered {
+    border: 1px solid #dedede;
+    border-right: 0;
+  }
+  body .table-bordered thead > tr > th {
+    border-right: 1px solid lightgray;
+    font-weight: bold;
+  }
+  body .table-bordered tbody > tr > td {
+    border-right: 1px solid lightgray;
+  }
+</style>

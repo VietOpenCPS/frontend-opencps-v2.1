@@ -5,6 +5,7 @@ import support from './support.json'
 import toastr from 'toastr'
 import $ from 'jquery'
 import router from '@/router'
+import saveAs from 'file-saver'
 
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -15,7 +16,7 @@ export const store = new Vuex.Store({
   state: {
     initData: {},
     loading: false,
-    endPoint: '/o/rest/v2',
+    endPoint: '/o/rest/v2'
     // endPoint: 'http://127.0.0.1:8081/api'
   },
   actions: {
@@ -43,7 +44,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: state.initData.groupId
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
         axios.get(state.endPoint + '/dictcollections', param).then(function (response) {
@@ -61,18 +62,23 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: state.initData.groupId
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           },
+          responseType: 'blob',
           params: filter
         }
         axios.get(state.endPoint + '/backupDatas/exportDB', param).then(function (response) {
           let data = response.data
           if (data) {
-            resolve(data.data)
+            saveAs(data)
+            toastr.success('Export dữ liệu thành công')
+            let file = window.URL.createObjectURL(data)
+            resolve(file)
           }
         }).catch(function (xhr) {
+          toastr.error('Export dữ liệu thất bại')
           console.log(xhr)
-          reject([])
+          reject(xhr)
         })
       })
     }

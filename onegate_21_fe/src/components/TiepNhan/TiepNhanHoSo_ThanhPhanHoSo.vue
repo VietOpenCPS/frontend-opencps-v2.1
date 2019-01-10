@@ -312,7 +312,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 toastr.options = {
   'closeButton': true,
-  'timeOut': '10000'
+  'timeOut': '20000'
 }
 export default {
   props: {
