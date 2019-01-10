@@ -549,7 +549,7 @@
 import router from '@/router'
 import $ from 'jquery'
 import toastr from 'toastr'
-import '../store/jquery-comments'
+// import '../store/jquery-comments'
 import Comment from './Comment.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
