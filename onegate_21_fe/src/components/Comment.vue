@@ -27,9 +27,11 @@
 
 <script>
 // import $ from 'jquery'
-// import axios from 'axios'
-// import 'jquery-textcomplete'
-// import 'jquery-comments'
+import toastr from 'toastr'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '10000'
+}
 export default {
   props: ['classPK', 'className'],
   data: () => ({
@@ -50,7 +52,9 @@ export default {
     comment: [],
     argShowMore: true,
     //
-    checkOpinion: true
+    checkOpinion: true,
+    validFileUpload: true,
+    fileTypeAllow: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf']
   }),
   computed: {
     loading () {
@@ -103,6 +107,28 @@ export default {
         // })
       }
     },
+    validateFile (data) {
+      let vm = this
+      let getFileType = data.file.name ? data.file.name.split('.') : ''
+      let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
+      let fileTypeAllow = vm.fileTypeAllow
+      let fileSizeAllow = 10
+      let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
+        return item === fileType
+      }) : ''
+      vm.validFileUpload = false
+      if (fileTypeInput && fileTypeInput.length > 0) {
+        if (Number(data.file.size) <= fileSizeAllow * 1048576) {
+          vm.validFileUpload = true
+        } else {
+          toastr.error('Tài liệu tải lên dung lượng tối đa là ' + fileSizeAllow + ' MB')
+          vm.validFileUpload = false
+        }
+      } else {
+        toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + fileTypeAllow.toString())
+        vm.validFileUpload = false
+      }
+    },
     initComment: function () {
       var vm = this
       window.$('#comments-container-el').comments({
@@ -110,7 +136,7 @@ export default {
         textareaRows: 2,
         enableAttachments: true,
         enableHashtags: true,
-        enablePinging: true,
+        enablePinging: false,
         postCommentOnEnter: false,
         forceResponsive: false,
         readOnly: false,
@@ -266,35 +292,43 @@ export default {
             formData.append('email', '')
             formData.append('fullname', vm.initData.user.userName)
             formData.append('opinion', document.getElementById('opinion').checked)
-            window.$.ajax({
-              url: vm.initData.commentApi + '/uploads',
-              dataType: 'json',
-              type: 'POST',
-              headers: {
-                'groupId': vm.initData.groupId
-                // 'groupId': 55301
-              },
-              data: formData,
-              cache: false,
-              contentType: false,
-              processData: false,
-              success: function (comment) {
-                if (comment.opinion) {
-                  window.$('.opinion').hide()
+            let fileUpload = {
+              file: comment.file
+            }
+            vm.validateFile(fileUpload)
+            if (vm.validFileUpload) {
+              window.$.ajax({
+                url: vm.initData.commentApi + '/uploads',
+                dataType: 'json',
+                type: 'POST',
+                headers: {
+                  'groupId': vm.initData.groupId
+                  // 'groupId': 55301
+                },
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (comment) {
+                  if (comment.opinion) {
+                    window.$('.opinion').hide()
+                  }
+                  document.getElementById('opinion').checked = false
+                  vm.formatComment(comment)
+                  successfulUploads.push(vm.comment)
+                  serverResponded()
+                  if (comment.opinion) {
+                    window.$('.opinion').hide()
+                  }
+                  document.getElementById('opinion').checked = false
+                },
+                error: function (xhr, data) {
+                  serverResponded()
                 }
-                document.getElementById('opinion').checked = false
-                vm.formatComment(comment)
-                successfulUploads.push(vm.comment)
-                serverResponded()
-                if (comment.opinion) {
-                  window.$('.opinion').hide()
-                }
-                document.getElementById('opinion').checked = false
-              },
-              error: function (xhr, data) {
-                serverResponded()
-              }
-            })
+              })
+            } else {
+              serverResponded()
+            }
           })
         }
         // appendNewComments: function (commentJSONs, onSuccess, onError) {

@@ -69,7 +69,11 @@
             <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Applicant'" row wrap class="px-3 py-3">
               <v-flex xs12 sm4>
                 <v-text-field v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
-                  <template slot="label">Tên người dùng <span class="red--text darken-3">*</span></template>
+                  <template slot="label"> 
+                    <span v-if="user['applicantType'] === 'business'">Tên tổ chức, doanh nghiệp</span>
+                    <span v-if="user['applicantType'] === 'citizen'">Họ tên</span> 
+                    <span class="red--text darken-3">*</span>
+                  </template>
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm4>

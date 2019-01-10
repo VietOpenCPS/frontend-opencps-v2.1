@@ -4,11 +4,15 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
 import $ from 'jquery'
+import saveAs from 'file-saver'
 // import router from '@/router'
 
 Vue.use(toastr)
 Vue.use(Vuex)
-
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '15000'
+}
 export const store = new Vuex.Store({
   state: {
     initData: support.initData,
@@ -292,6 +296,7 @@ export const store = new Vuex.Store({
             substatus: filter.substatus ? filter.substatus : '',
             year: filter.year ? filter.year : 0,
             month: filter.month ? filter.month : 0,
+            day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : ''
           }
@@ -332,6 +337,7 @@ export const store = new Vuex.Store({
             substatus: filter.substatus ? filter.substatus : '',
             year: filter.year ? filter.year : 0,
             month: filter.month ? filter.month : 0,
+            day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : ''
           }
@@ -621,7 +627,7 @@ export const store = new Vuex.Store({
     },
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
-        let files = window.$('#file' + data.partNo)[0].files
+        let files = $('#file' + data.partNo)[0].files
         let file = files[0]
         let fileName = file['name']
         if (file['name']) {
@@ -1294,8 +1300,15 @@ export const store = new Vuex.Store({
         try {
           var control = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
           var formData = control.getValue()
-          console.log('Data Form ------', data)
-          console.log('formData-------', formData)
+          let field = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get').childrenByPropertyId
+          if (field) {
+            for (var prop in field) {
+              if (field[prop].isRequired() && field[prop].getValue() === '') {
+                toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                return
+              }
+            }
+          }
           var dataPutAlpacaForm = new URLSearchParams()
           dataPutAlpacaForm.append('formdata', JSON.stringify(formData))
           let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
@@ -1369,6 +1382,15 @@ export const store = new Vuex.Store({
           var formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
+          let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
+          if (field) {
+            for (var prop in field) {
+              if (field[prop].isRequired() && field[prop].getValue() === '') {
+                toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                return
+              }
+            }
+          }
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
@@ -2312,25 +2334,32 @@ export const store = new Vuex.Store({
     doGuiding ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            serviceCode: filter.serviceCode ? filter.serviceCode : '',
+            serviceName: filter.serviceName ? filter.serviceName : '',
+            typeCode: filter.typeCode ? filter.typeCode : '',
+            templateNo: filter.templateNo ? filter.templateNo : '',
+            applicantName: filter.applicantName ? filter.applicantName : '',
+            applicantAddress: filter.applicantAddress ? filter.applicantAddress : '',
+            applicantEmail: filter.applicantEmail ? filter.applicantEmail : '',
+            applicantTelNo: filter.applicantTelNo ? filter.applicantTelNo : '',
+            employeeName: filter.employeeName ? filter.employeeName : ''
+          }
+          if (filter.reportType) {
+            paramGet['reportType'] = filter.reportType
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
             },
             responseType: 'blob',
-            params: {
-              serviceCode: filter.serviceCode ? filter.serviceCode : '',
-              serviceName: filter.serviceName ? filter.serviceName : '',
-              typeCode: filter.typeCode ? filter.typeCode : '',
-              templateNo: filter.templateNo ? filter.templateNo : '',
-              applicantName: filter.applicantName ? filter.applicantName : '',
-              applicantAddress: filter.applicantAddress ? filter.applicantAddress : '',
-              applicantEmail: filter.applicantEmail ? filter.applicantEmail : '',
-              applicantTelNo: filter.applicantTelNo ? filter.applicantTelNo : '',
-              employeeName: filter.employeeName ? filter.employeeName : ''
-            }
+            params: paramGet
           }
           axios.get(state.initData.getServiceConfigs + '/' + filter.serviceConfigId + '/guide', param).then(function (response) {
             let serializable = response.data
+            if (filter.reportType) {
+              saveAs(serializable, 'HDTT' + new Date().getTime() + '.doc')
+            }
             let file = window.URL.createObjectURL(serializable)
             resolve(file)
           }).catch(function (error) {
