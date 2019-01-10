@@ -44,7 +44,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: state.initData.groupId
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
         axios.get(state.endPoint + '/dictcollections', param).then(function (response) {
@@ -62,8 +62,9 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: state.initData.groupId
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           },
+          responseType: 'blob',
           params: filter
         }
         axios.get(state.endPoint + '/backupDatas/exportDB', param).then(function (response) {
@@ -75,9 +76,9 @@ export const store = new Vuex.Store({
             resolve(file)
           }
         }).catch(function (xhr) {
-          toastr.success('Export dữ liệu thất bại')
+          toastr.error('Export dữ liệu thất bại')
           console.log(xhr)
-          reject([])
+          reject(xhr)
         })
       })
     }
