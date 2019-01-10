@@ -185,7 +185,8 @@ export default {
     dataReportXX: '',
     buttons: [],
     buttonsVal: '',
-    buttonsShow: false
+    buttonsShow: false,
+    noHeader: true
   }),
   computed: {
     itemsReports () {
@@ -248,6 +249,9 @@ export default {
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
           vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+        }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+          vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
         }
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
           vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
@@ -330,6 +334,9 @@ export default {
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+        vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
@@ -478,8 +485,11 @@ export default {
           ine = ine + 1
         }
       }
-      vm.dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
-      vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
+      if (vm.noHeader) {
+        vm.dataReportXX += headerTableReport.substring(0, headerTableReport.length - 1) + '],'
+        vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
+      }
+      
       // bild data
       let filter = {
         document: vm.reportType,
