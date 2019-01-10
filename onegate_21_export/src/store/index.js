@@ -64,20 +64,22 @@ export const store = new Vuex.Store({
           headers: {
             groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           },
-          responseType: 'blob',
-          params: filter
+          responseType: 'blob'
         }
-        axios.get(state.endPoint + '/backupDatas/exportDB', param).then(function (response) {
+        let formData = new URLSearchParams()
+        formData.append('dataCode', filter.dataCode)
+        formData.append('dataType', filter.dataType)
+        axios.post(state.endPoint + '/backupDatas/exportDB', formData, param).then(function (response) {
+          let disposition = response.headers['content-disposition']
+		      let fileName = decodeURI(disposition.match(/filename="(.*)"/)[1])
           let data = response.data
           if (data) {
-            saveAs(data)
+            saveAs(data, fileName)
             toastr.success('Export dữ liệu thành công')
-            let file = window.URL.createObjectURL(data)
-            resolve(file)
           }
+          resolve(data)
         }).catch(function (xhr) {
           toastr.error('Export dữ liệu thất bại')
-          console.log(xhr)
           reject(xhr)
         })
       })
