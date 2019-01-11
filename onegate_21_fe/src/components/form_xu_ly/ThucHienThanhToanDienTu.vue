@@ -327,6 +327,7 @@ export default {
     },
     pickFile () {
       var vm = this
+      document.getElementById('paymentFile1').value = ''
       document.getElementById('paymentFile1').click()
     },
     currency (value) {
