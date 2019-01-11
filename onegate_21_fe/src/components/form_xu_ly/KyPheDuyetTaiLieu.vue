@@ -193,6 +193,10 @@ export default {
         url: url,
         async: false,
         dataType: 'json',
+        headers: {
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': window.Liferay.authToken
+        },
         data: {
           strIdArr: strIdArr,
           actionCode: paramObj.actionCode,
@@ -328,6 +332,7 @@ export default {
         dataType: 'json',
         headers: {
           'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': window.Liferay ? window.Liferay.authToken : '',
           'Cache-Control': 'no-cache'
         },
         data: {
