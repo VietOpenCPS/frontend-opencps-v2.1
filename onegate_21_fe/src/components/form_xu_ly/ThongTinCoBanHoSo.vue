@@ -143,6 +143,13 @@
                 <span class="pr-2">Trạng thái: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">Ghi chú:</div>
+              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">
+                <v-tooltip top>
+                  <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
+                </v-tooltip>
+              </div>
               <!-- brief note -->
               <!-- <div class="xs12 sm12 pb-1 overHidden">
                 <span class="pr-2">Nội dung: </span>
