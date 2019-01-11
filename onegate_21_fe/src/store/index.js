@@ -1521,7 +1521,8 @@ export const store = new Vuex.Store({
         var urlPluginFormScript = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/formscript'
         var config_plugins = {
           headers: {
-            'groupId': state.initData.groupId
+            'groupId': state.initData.groupId,
+            Token: window.Liferay ? window.Liferay.authToken : ''
           },
           dataType: 'text'
         }
@@ -2461,7 +2462,8 @@ export const store = new Vuex.Store({
             url: state.initData.dossierTemplatesApi + '/' + data.templateFileNo + '/parts/' + data.partNo + '/formscript',
             type: 'GET',
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
             },
             dataType: 'text',
             success: function (result) {
@@ -2484,7 +2486,8 @@ export const store = new Vuex.Store({
             url: state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo + '/formdata',
             type: 'GET',
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
             },
             dataType: 'text',
             success: function (result) {
