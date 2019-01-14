@@ -101,6 +101,7 @@
         <v-btn flat class="mx-0 my-0" v-on:click.native="toDoNotDone">
           <v-icon>receipt</v-icon> &nbsp; Tải xuống Excel
         </v-btn>
+        <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
       </v-flex>
     </v-layout>
     <div>
@@ -134,6 +135,8 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
+import { toXML } from 'jstoxml'
+const jsonMapper = require('json-mapper-json')
 
 export default {
   props: ['index'],
@@ -189,7 +192,8 @@ export default {
     buttons: [],
     buttonsVal: '',
     buttonsShow: false,
-    noHeader: true
+    noHeader: true,
+    exportXML: false
   }),
   computed: {
     itemsReports () {
@@ -246,6 +250,7 @@ export default {
         vm.buttons = []
         vm.buttonsVal = ''
         vm.buttonsShow = false
+        vm.exportXML = false
         vm.nameReport = vm.itemsReports[vm.index]['reportName']
         if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
           vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -299,6 +304,9 @@ export default {
             }, 100)
           }
         }
+        if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+          vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+        }
         vm.report1Def = {}
         for (let key in vm.itemsReportsConfig) {
           vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
@@ -331,6 +339,7 @@ export default {
       vm.buttons = []
       vm.buttonsVal = ''
       vm.buttonsShow = false
+      vm.exportXML = false
       vm.nameReport = vm.itemsReports[vm.index]['reportName']
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
@@ -388,6 +397,9 @@ export default {
             vm.buttonsShow = true
           }, 100)
         }
+      }
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+        vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
       }
       if (vm.showConfig) {
         vm.showConfig = false
@@ -1032,8 +1044,6 @@ export default {
     },
     reloadPickerChange (key) {
       let vm = this
-      console.log('key: ', key)
-      console.log('dkdkdkkssss0002312312: ', vm.data[key])
       vm.showPicker = false
       setTimeout(() => {
         vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
@@ -1046,6 +1056,46 @@ export default {
     },
     toDoNotDone () {
       alert('Đang phát triển.')
+    },
+    doDynamicReportXML () {
+      let vm = this
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+      // bild data
+      let filter = {
+        document: vm.reportType,
+        data: vm.data,
+        api: vm.api
+      }
+      filter['govAgency'] = vm.govAgency
+      filter['agencyLists'] = vm.agencyLists
+      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+        if (result !== null && result !== undefined) {
+          jsonMapper({ 'content': result }, {
+            datas: {
+              path: 'content',
+              nested: {
+                'data': {
+                  path: '$item',
+                  nested: {
+                    name: 'dossierIdCTN',
+                    code: 'dossierId'
+                  }
+                }
+              },
+            },
+          }).then((result) => {
+            console.log(result)
+            const xmlOptions = {
+              header: true,
+              indent: '  '
+            };
+            let dkm = toXML(result, xmlOptions)
+            console.log(dkm)
+          })
+          
+        }
+      })
     }
   }
 }
