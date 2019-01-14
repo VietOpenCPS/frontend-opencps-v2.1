@@ -187,7 +187,9 @@
     created () {
     var vm = this
       vm.$nextTick(function () {
-        vm.$store.dispatch('getDynamicReports').then(function (result) {
+        let reportTypeFilter = vm.$route.query.reportType
+        console.log('reportTypeFilter', reportTypeFilter)
+        vm.$store.dispatch('getDynamicReports', reportTypeFilter).then(function (result) {
           vm.itemsReportsConfig = []
           vm.userConfig = []
           console.log('aaa', vm.itemsReports)
