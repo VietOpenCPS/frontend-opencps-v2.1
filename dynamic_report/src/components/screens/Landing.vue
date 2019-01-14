@@ -1082,7 +1082,8 @@ export default {
               indent: '  '
             };
             let xmlToExport = toXML(result, xmlOptions)
-            var blob = new Blob(xmlToExport, {
+            console.log(xmlToExport)
+            var blob = new Blob([ new TextEncoder().encode( xmlToExport ) ], {
                 type: "text/plain;charset=utf-8;",
             })
             saveAs(blob, vm.nameReport + ".xml");
