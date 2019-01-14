@@ -1075,7 +1075,7 @@ export default {
       filter['agencyLists'] = vm.agencyLists
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
-          jsonMapper({ 'content': result }, vm.jsonMapperJson).then((result) => {
+          jsonMapper({ 'content': result, 'blank': '' }, vm.jsonMapperJson).then((result) => {
             console.log(result)
             const xmlOptions = {
               header: true,
