@@ -118,4 +118,10 @@
 			display: none;
 		}
 	</style>
+	<script type="text/javascript">
+	    $.ajaxSetup({
+			headers: {"Token": Liferay.authToken},
+			global: true
+		});
+	</script>
 </html>

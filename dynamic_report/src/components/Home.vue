@@ -188,12 +188,12 @@
     created () {
     var vm = this
       vm.$nextTick(function () {
-        vm.reportTypeFilter = vm.$route.query.reportType
-        console.log('reportTypeFilter', vm.reportTypeFilter)
+        if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
+          vm.reportTypeFilter = vm.$route.query.reportType
+        }
         vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
           vm.itemsReportsConfig = []
           vm.userConfig = []
-          console.log('aaa', vm.itemsReports)
           if (String(vm.index) !== '0') {
             for (let key in vm.itemsReports) {
               if (vm.itemsReports[key]['code'] === String(vm.index)) {
