@@ -1082,7 +1082,6 @@ export default {
               indent: '  '
             };
             let xmlToExport = toXML(result, xmlOptions)
-            console.log(xmlToExport)
             var blob = new Blob([ new TextEncoder().encode( xmlToExport ) ], {
                 type: "text/plain;charset=utf-8;",
             })
