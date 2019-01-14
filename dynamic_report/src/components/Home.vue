@@ -24,7 +24,7 @@
           <v-list-tile
             v-for="(item, indexItem) in itemsReports"
             :key="indexItem"
-            :to="'/bao-cao/' + indexItem"
+            :to="'/bao-cao/' + indexItem + '?reportType=' + reportTypeFilter"
           >
             <v-list-tile-action>
               <v-icon v-if="String(indexItem) === String(index)" color="blue darken-3">play_arrow</v-icon>
@@ -114,7 +114,8 @@
           text: 'đơn vị'
         }
       ],
-      userConfig: []
+      userConfig: [],
+      reportTypeFilter: ''
     }),
     computed: {
       itemsReports () {
@@ -187,9 +188,9 @@
     created () {
     var vm = this
       vm.$nextTick(function () {
-        let reportTypeFilter = vm.$route.query.reportType
-        console.log('reportTypeFilter', reportTypeFilter)
-        vm.$store.dispatch('getDynamicReports', reportTypeFilter).then(function (result) {
+        vm.reportTypeFilter = vm.$route.query.reportType
+        console.log('reportTypeFilter', vm.reportTypeFilter)
+        vm.$store.dispatch('getDynamicReports', vm.reportTypeFilter).then(function (result) {
           vm.itemsReportsConfig = []
           vm.userConfig = []
           console.log('aaa', vm.itemsReports)
