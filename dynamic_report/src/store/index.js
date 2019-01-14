@@ -144,7 +144,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDynamicReports ({commit, state}) {
+    getDynamicReports ({commit, state}, reportType) {
       return new Promise((resolve, reject) => {
         if (state.siteName !== '') {
           store.dispatch('loadInitResource').then(function () {
@@ -152,7 +152,8 @@ export const store = new Vuex.Store({
               headers: {
                 'groupId': state.groupId,
                 'Content-Type': 'text/plain',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'reportType': reportType
               }
             }
             let body = AdminConfig.getDynamicReports
