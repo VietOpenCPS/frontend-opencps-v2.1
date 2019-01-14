@@ -217,7 +217,8 @@ export const store = new Vuex.Store({
             headers: {
               'groupId': state.groupId,
               'Content-Type': 'text/plain',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'reportType': reportType
             }
           }
           let body = AdminConfig.getDynamicReports

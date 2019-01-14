@@ -35,7 +35,7 @@
                   outline
                   v-if="changePassWordFail"
                 >
-                  Mật khẩu cũ không chính xác.
+                  Vui lòng kiểm tra lại mật khẩu cũ, mật khẩu yêu cầu 8 ký tự và có chữ hoa chữ thường.
                 </v-alert>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
