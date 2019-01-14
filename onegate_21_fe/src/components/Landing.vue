@@ -196,7 +196,7 @@
         </div>
       </div> 
     </div>
-    <v-layout wrap class="menu_header_list" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
+    <v-layout wrap class="menu_header_list pt-3 pb-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="originality !== 1">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -204,7 +204,7 @@
             :items="listLinhVuc"
             v-model="linhVucSelected"
             autocomplete
-            placeholder="Chọn lĩnh vực"
+            label="Chọn lĩnh vực"
             item-text="displayName"
             item-value="domainCode"
             return-object
@@ -218,7 +218,7 @@
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
             autocomplete
-            placeholder="Chọn thủ tục hành chính"
+            label="Chọn thủ tục hành chính"
             item-text="displayName"
             item-value="serviceConfigId"
             return-object
@@ -231,7 +231,7 @@
           <v-select
             :items="listDichVu"
             v-model="dichVuSelected"
-            placeholder="Chọn dịch vụ:"
+            label="Chọn dịch vụ"
             autocomplete
             item-text="optionName"
             item-value="processOptionId"
@@ -243,7 +243,7 @@
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative">
             <v-text-field
-              placeholder="Nhập mã hồ sơ"
+              label="Nhập mã hồ sơ"
               v-model="dossierNoKey"
               @keyup.enter="changeDossierNoKey"
               append-icon="search"

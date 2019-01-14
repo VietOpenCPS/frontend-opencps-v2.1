@@ -389,6 +389,7 @@
       pickFile (item) {
         var vm = this
         vm.stateAddFileOther = false
+        document.getElementById('file' + item.partNo).value = ''
         document.getElementById('file' + item.partNo).click()
       },
       onUploadSingleFile (e, data) {
