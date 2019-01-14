@@ -137,6 +137,7 @@ import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
 const jsonMapper = require('json-mapper-json')
+import saveAs from 'file-saver'
 
 export default {
   props: ['index'],
@@ -193,7 +194,8 @@ export default {
     buttonsVal: '',
     buttonsShow: false,
     noHeader: true,
-    exportXML: false
+    exportXML: false,
+    jsonMapperJson: {}
   }),
   computed: {
     itemsReports () {
@@ -1060,6 +1062,8 @@ export default {
     doDynamicReportXML () {
       let vm = this
       vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.jsonMapperJson = {}
+      vm.jsonMapperJson = vm.itemsReports[vm.index]['userConfig']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
       // bild data
       let filter = {
@@ -1071,29 +1075,18 @@ export default {
       filter['agencyLists'] = vm.agencyLists
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
-          jsonMapper({ 'content': result }, {
-            datas: {
-              path: 'content',
-              nested: {
-                'data': {
-                  path: '$item',
-                  nested: {
-                    name: 'dossierIdCTN',
-                    code: 'dossierId'
-                  }
-                }
-              },
-            },
-          }).then((result) => {
+          jsonMapper({ 'content': result }, vm.jsonMapperJson).then((result) => {
             console.log(result)
             const xmlOptions = {
               header: true,
               indent: '  '
             };
-            let dkm = toXML(result, xmlOptions)
-            console.log(dkm)
+            let xmlToExport = toXML(result, xmlOptions)
+            var blob = new Blob(xmlToExport, {
+                type: "text/plain;charset=utf-8;",
+            })
+            saveAs(blob, vm.nameReport + ".xml");
           })
-          
         }
       })
     }
