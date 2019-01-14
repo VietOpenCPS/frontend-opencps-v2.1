@@ -77,7 +77,7 @@
 					<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 					<div class="text-logo">
 						Cổng dịch vụ công trực tuyến
-						<span>${site_name}</span>
+						<span>Bộ văn hoá, thể thao và du lịch</span>
 					</div>
 				</a>
 			</div>
