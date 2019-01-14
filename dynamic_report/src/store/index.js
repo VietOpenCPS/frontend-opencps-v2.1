@@ -144,8 +144,12 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDynamicReports ({commit, state}, reportType) {
+    getDynamicReports ({commit, state}, reportTypeFilter) {
       return new Promise((resolve, reject) => {
+        let reportType = ''
+        if (reportTypeFilter !== undefined && reportTypeFilter !== null) {
+          reportType = reportTypeFilter
+        }
         if (state.siteName !== '') {
           store.dispatch('loadInitResource').then(function () {
             let options = {
