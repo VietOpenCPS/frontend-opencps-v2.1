@@ -131,7 +131,7 @@
 		</p>
 	</footer>
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=1231231"></script>
+	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=111212313"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />

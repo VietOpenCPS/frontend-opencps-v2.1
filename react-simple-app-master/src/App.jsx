@@ -164,8 +164,7 @@ class App extends React.Component {
         'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
       }
     }).then(function (response) {
-      console.log(response.data)
-      if (response.data !== '' && response.data !== 'ok') {
+      if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha') {
         if (response.data === 'pending') {
           window.location.href = window.themeDisplay.getURLHome() +
           "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
@@ -198,7 +197,7 @@ class App extends React.Component {
         }
       }).then(function (response) {
         console.log(response.data)
-        if (response.data !== '' && response.data !== 'ok') {
+        if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha') {
           if (response.data === 'pending') {
             window.location.href = window.themeDisplay.getURLHome() +
             "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
