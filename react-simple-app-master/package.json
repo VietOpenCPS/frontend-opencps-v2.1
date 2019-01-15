@@ -4,7 +4,8 @@
   "description": "",
   "main": "./src/index.jsx",
   "scripts": {
-    "dev-server": "./node_modules/.bin/webpack-dev-server --progress --colors --content-base public"
+    "dev-server": "./node_modules/.bin/webpack-dev-server --progress --colors --content-base public",
+    "build": "./node_modules/.bin/webpack"
   },
   "author": "Steve Winfield <mail.stevewinfield@gmail.com>",
   "license": "MIT",
@@ -12,10 +13,13 @@
     "@material-ui/core": "latest",
     "@material-ui/icons": "^2.0.3",
     "axios": "^0.18.0",
+    "clean-webpack-plugin": "^1.0.0",
+    "html-webpack-plugin": "^3.2.0",
     "prop-types": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-toastify": "^4.4.0"
+    "react-toastify": "^4.4.0",
+    "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",

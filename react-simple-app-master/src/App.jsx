@@ -175,6 +175,13 @@ class App extends React.Component {
         }
       } else if (response.data === 'ok') {
         window.location.href = window.themeDisplay.getURLHome()
+      } else if (response.data === 'captcha') {
+        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        if (redirectURL !== '') {
+          window.location.href = redirectURL + '/register#/login'
+        } else {
+          window.location.href = themeDisplay.getURLHome() + '/register#/login'
+        }
       } else {
         toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
       }
@@ -201,6 +208,13 @@ class App extends React.Component {
           }
         } else if (response.data === 'ok') {
           window.location.href = window.themeDisplay.getURLHome()
+        } else if (response.data === 'captcha') {
+          let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+          if (redirectURL !== '') {
+            window.location.href = redirectURL + '/register#/login'
+          } else {
+            window.location.href = themeDisplay.getURLHome() + '/register#/login'
+          }
         } else {
           toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
         }
