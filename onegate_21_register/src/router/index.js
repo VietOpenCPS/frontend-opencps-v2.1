@@ -4,6 +4,7 @@ import Landing from '@/components/Landing'
 import XacThucTaiKhoan from '@/components/XacThucTaiKhoan'
 import ForgotPassword from '@/components/ForgotPassword'
 import ConfirmPassword from '@/components/ConfirmPassword'
+import Login from '@/components/Login'
 import NotFound from '@/components/NotFound'
 
 const routes = [
@@ -11,6 +12,7 @@ const routes = [
   { path: '/xac-thuc-tai-khoan', name: 'XacThucTaiKhoan', component: XacThucTaiKhoan },
   { path: '/cap-lai-mat-khau', name: 'ForgotPassword', component: ForgotPassword },
   { path: '/xac-thuc-cap-lai-mat-khau', name: 'ConfirmPassword', component: ConfirmPassword },
+  { path: '/login', name: 'Login', component: Login },
   { path: '*', name: 'NotFound', component: NotFound }
 ]
 

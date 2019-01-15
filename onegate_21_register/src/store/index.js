@@ -124,7 +124,7 @@ export const store = new Vuex.Store({
           console.log('dataPostApplicant', dataPostApplicant)
           // test local
           // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
-          axios.post('/o/rest/v2/applicants', dataPostApplicant, configs).then(function (response) {
+          axios.post('/o/rest/v2/applicants/withcaptcha', dataPostApplicant, configs).then(function (response) {
             toastr.success('Đăng ký thành công')
             resolve(response.data)
           }).catch(function (errorRes, response) {
@@ -142,7 +142,7 @@ export const store = new Vuex.Store({
               } else if (dataError && dataError.description && dataError.description === 'Captcha incorrect') {
                 toastr.error('Nhập sai Captcha')
               } else {
-                toastr.error('Đăng ký thất bại. Vui lòng thử lại')
+                toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
               }
             }
           })

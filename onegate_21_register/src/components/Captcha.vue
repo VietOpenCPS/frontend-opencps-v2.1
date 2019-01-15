@@ -2,7 +2,7 @@
   <v-layout row wrap>
     <v-flex xs12>
       <img :src="chapchablob" alt="capcha">
-      <v-btn flat icon v-on:click.native="makeImageCap">
+      <v-btn class="mt-5" flat icon v-on:click.native="makeImageCap">
         <v-icon size="48">refresh</v-icon>
       </v-btn>
     </v-flex>
