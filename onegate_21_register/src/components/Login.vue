@@ -33,6 +33,12 @@
               <v-icon size="48">refresh</v-icon>
             </v-btn>
           </v-flex>
+          <v-flex xs12 class="mt-2">
+            <v-text-field
+              v-model="j_captcha_response"
+              placeholder="Nhập captcha"
+            ></v-text-field>
+          </v-flex>
           <div class="my-2">
             <v-btn color="primary"
               :loading="loading"
@@ -60,6 +66,7 @@ export default {
   data: () => ({
     npmreactlogin_login: '',
     npmreactlogin_password: '',
+    j_captcha_response: '',
     chapchablob: '',
     loading: false,
     valid: false,
