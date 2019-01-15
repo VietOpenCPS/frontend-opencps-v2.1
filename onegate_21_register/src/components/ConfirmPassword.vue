@@ -20,6 +20,9 @@
               required
             ></v-text-field>
           </v-flex>
+          <v-flex xs12>
+            <captcha ref="captcha"></captcha>
+          </v-flex>
           <div class="text-xs-center my-2">
             <v-btn color="primary"
               :loading="loading"
@@ -41,9 +44,12 @@ import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import support from '../store/support.json'
+import Captcha from './Captcha.vue'
 export default {
   props: [],
-  components: {},
+  components: {
+    'captcha': Captcha
+  },
   data: () => ({
     loading: false,
     valid: false,
@@ -73,7 +79,8 @@ export default {
       let currentParams = vm.$router.history.current.params
       let dataForm = {
         userCode: currentQuery.hasOwnProperty('active_user_id') ? currentQuery.active_user_id : '',
-        confirmCode: vm.confirmCode
+        confirmCode: vm.confirmCode,
+        j_captcha_response: vm.$refs.captcha.j_captcha_response
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate()) {
