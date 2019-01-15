@@ -12,7 +12,7 @@
             <v-text-field
               box
               placeholder="Tài khoản đăng nhập"
-              v-model="_npmreactlogin_login"
+              v-model="npmreactlogin_login"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
             ></v-text-field>
@@ -21,7 +21,8 @@
             <v-text-field
               box
               placeholder="Mật khẩu"
-              v-model="_npmreactlogin_password"
+              v-model="npmreactlogin_password"
+              :type="'password'"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
             ></v-text-field>
@@ -57,8 +58,8 @@ export default {
   props: [],
   components: {},
   data: () => ({
-    _npmreactlogin_login: '',
-    _npmreactlogin_password: '',
+    npmreactlogin_login: '',
+    npmreactlogin_password: '',
     chapchablob: '',
     loading: false,
     valid: false,
@@ -97,11 +98,11 @@ export default {
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
       let filter = {
-        _npmreactlogin_login: vm._npmreactlogin_login,
-        _npmreactlogin_password: vm._npmreactlogin_password,
+        npmreactlogin_login: vm.npmreactlogin_login,
+        npmreactlogin_password: vm.npmreactlogin_password,
         j_captcha_response: vm.j_captcha_response
       }
-      vm.$store.dispatch('doLoginCaptcha', filter)
+      vm.$store.dispatch('goToDangNhap', filter)
     }
   }
 }
