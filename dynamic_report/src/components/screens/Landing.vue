@@ -122,7 +122,7 @@
           ></v-progress-circular>
         </v-flex>
       </v-layout>
-      <div id="html-result"></div>
+      <div v-show="false" id="html-result"></div>
     </div>
   </div>
 </v-form>
@@ -1135,7 +1135,19 @@ export default {
           }
           table_dom.append(tr_dom)
         }
-        window.$('#html-result').append(table_dom)
+         var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">'
+        tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+        tab_text = tab_text + '<x:Name>Test Sheet</x:Name>'
+        tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
+        tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
+        tab_text = tab_text + "<table border='1px'>"
+        tab_text = tab_text + table_dom
+        tab_text = tab_text + '</table></body></html>'
+
+        var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
+            type: "application/csv;charset=utf-8;",
+        })
+        saveAs(blob, new Date().getTime() + ".xlsx");
       })
     }
   }
