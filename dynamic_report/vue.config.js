@@ -1,4 +1,6 @@
 
+
+/*
 module.exports = {
   runtimeCompiler: true,
   configureWebpack: {
@@ -30,8 +32,7 @@ module.exports = {
     }
   }
 }
-
-/*
+*/
 module.exports = {
     runtimeCompiler: true,
     configureWebpack: {
@@ -63,4 +64,3 @@ module.exports = {
       }
     }
   }
-*/
