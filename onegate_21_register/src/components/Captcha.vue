@@ -1,9 +1,14 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12>
+    <v-flex xs6>
       <img :src="chapchablob" alt="capcha">
     </v-flex>
-    <v-flex xs12>
+    <v-flex xs6>
+      <v-btn flat icon v-on:click.native="makeImageCap">
+        <v-icon size="64">refresh</v-icon>
+      </v-btn>
+    </v-flex>
+    <v-flex xs12 class="mt-2">
       <v-text-field
         v-model="j_captcha_response"
         placeholder="Nhập captcha"

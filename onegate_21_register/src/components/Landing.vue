@@ -337,11 +337,12 @@ export default {
         applicantIdNoDate: vm.applicantIdDateFormatted,
         contactTelNo: vm.contactTelNo,
         contactEmail: vm.contactEmail,
-        password: vm.passWord
+        password: vm.passWord,
+        j_captcha_response: vm.$refs.captcha.j_captcha_response
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        if (vm.$refs.captcha.checkValidCaptcha()) {
+        // if (vm.$refs.captcha.checkValidCaptcha()) {
           let passValid = false
           if (!vm.validBussinessInfos) {
             let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
@@ -361,9 +362,9 @@ export default {
               vm.loading = false
             })
           }
-        } else {
-          toastr.error('Mã captcha không chính xác')
-        }
+        // } else {
+        //   toastr.error('Mã captcha không chính xác')
+        // }
       }
     },
     changeApplicantType () {
