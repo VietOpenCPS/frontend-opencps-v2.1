@@ -267,7 +267,7 @@ export const store = new Vuex.Store({
           }
           // test local
           // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
-          axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot', param).then(function (response) {
+          axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             resolve(response.data)
             // toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
