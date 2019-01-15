@@ -1141,13 +1141,15 @@ export default {
         tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
         tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
         tab_text = tab_text + "<table border='1px'>"
-        tab_text = tab_text + table_dom
+        tab_text = tab_text + table_dom.toString()
         tab_text = tab_text + '</table></body></html>'
 
-        var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
-            type: "application/csv;charset=utf-8;",
+        console.log(table_dom)
+        console.log(table_dom.toString())
+        var blob = new Blob([ new TextEncoder().encode( table_dom.toString() ) ], {
+          type: "text/plain;charset=utf-8;",
         })
-        saveAs(blob, new Date().getTime() + ".xlsx");
+        saveAs(blob, new Date().getTime() + ".xls");
       })
     }
   }
