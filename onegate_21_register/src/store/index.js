@@ -102,8 +102,46 @@ export const store = new Vuex.Store({
         })
       })
     },
+    goToDangNhap({ commit, state }, filter) {
+      store.dispatch('loadInitResource').then(function (result) {
+        let configs = {
+          headers: {
+            'Authorization': 'BASIC ' + window.btoa(filter['_npmreactlogin_login'] + ":" + filter['_npmreactlogin_password']),
+          }
+        }
+        var dataPostApplicant = new URLSearchParams()
+        dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+        axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+          console.log(response.data)
+          if (response.data !== '' && response.data !== 'ok') {
+            if (response.data === 'pending') {
+              window.location.href = window.themeDisplay.getURLHome() +
+              "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                "&redirectURL=" + window.themeDisplay.getURLHome()
+            } else {
+              window.location.href = response.data
+            }
+          } else if (response.data === 'ok') {
+            window.location.href = window.themeDisplay.getURLHome()
+          } else if (response.data === 'captcha') {
+            alert('captcha wrong')
+          } else {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          }
+        }).catch(function (error) {
+          toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+        })
+      })
+    },
     postApplicant ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
+        let configs = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
         store.dispatch('loadInitResource').then(function (result) {
           let configs = {
             headers: {
