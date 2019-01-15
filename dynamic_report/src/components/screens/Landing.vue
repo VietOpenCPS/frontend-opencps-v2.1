@@ -1117,7 +1117,7 @@ export default {
         for (let r = 0; r < tables.length; r++) {
           let tr_dom = $('<tr></tr>')
           for (let c = 0; c < tables[r].length; c++) {
-            r_c = [r, c].join('-')
+            let r_c = [r, c].join('-')
             if (merge_alias[r_c]) {
               continue
             }
