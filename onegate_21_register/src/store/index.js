@@ -42,6 +42,25 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    makeImageCap ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/rest/v2/applicants/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     checkApplicantInfos ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
