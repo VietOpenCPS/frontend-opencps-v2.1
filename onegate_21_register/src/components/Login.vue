@@ -28,11 +28,11 @@
           </v-flex>
           <v-flex xs12>
             <img :src="chapchablob" alt="capcha">
-            <v-btn class="mt-5" flat icon v-on:click.native="makeImageCap">
+            <v-btn flat icon v-on:click.native="makeImageCap">
               <v-icon size="48">refresh</v-icon>
             </v-btn>
           </v-flex>
-          <div class="text-xs-center my-2">
+          <div class="my-2">
             <v-btn color="primary"
               :loading="loading"
               :disabled="loading"
@@ -97,13 +97,11 @@ export default {
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
       let filter = {
-        
+        _npmreactlogin_login: vm._npmreactlogin_login,
+        _npmreactlogin_password: vm._npmreactlogin_password,
+        j_captcha_response: vm.j_captcha_response
       }
-      vm.$store.dispatch('doLoginCaptcha', filter).then(function (result) {
-        vm.chapchablob = result
-      }).catch(function (reject) {
-        vm.chapchablob = ''
-      })
+      vm.$store.dispatch('doLoginCaptcha', filter)
     }
   }
 }
