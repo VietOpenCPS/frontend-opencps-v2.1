@@ -106,7 +106,7 @@ export const store = new Vuex.Store({
       store.dispatch('loadInitResource').then(function (result) {
         let configs = {
           headers: {
-            'Authorization': 'BASIC ' + window.btoa(filter['_npmreactlogin_login'] + ":" + filter['_npmreactlogin_password']),
+            'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
           }
         }
         var dataPostApplicant = new URLSearchParams()
