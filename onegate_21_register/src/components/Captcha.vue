@@ -1,11 +1,9 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs6>
+    <v-flex xs12>
       <img :src="chapchablob" alt="capcha">
-    </v-flex>
-    <v-flex xs6>
       <v-btn flat icon v-on:click.native="makeImageCap">
-        <v-icon size="64">refresh</v-icon>
+        <v-icon size="48">refresh</v-icon>
       </v-btn>
     </v-flex>
     <v-flex xs12 class="mt-2">
