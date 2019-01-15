@@ -126,6 +126,13 @@
 
 <!-- endinject -->
 
+<script type="text/javascript">
+    $.ajaxSetup({
+		headers: {"Token": Liferay.authToken},
+		global: true
+	});
+</script>
+
 </body>
 
 </html>
