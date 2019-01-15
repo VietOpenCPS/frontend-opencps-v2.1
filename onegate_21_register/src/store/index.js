@@ -120,6 +120,7 @@ export const store = new Vuex.Store({
           dataPostApplicant.append('contactEmail', data.contactEmail)
           dataPostApplicant.append('contactTelNo', data.contactTelNo)
           dataPostApplicant.append('password', data.password)
+          dataPostApplicant.append('j_captcha_response', data.j_captcha_response)
           console.log('dataPostApplicant', dataPostApplicant)
           // test local
           // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
@@ -138,6 +139,8 @@ export const store = new Vuex.Store({
                 toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
                 toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
+              } else if (dataError && dataError.description && dataError.description === 'Captcha incorrect') {
+                toastr.error('Nhập sai Captcha')
               } else {
                 toastr.error('Đăng ký thất bại. Vui lòng thử lại')
               }
