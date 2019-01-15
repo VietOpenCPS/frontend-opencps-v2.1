@@ -1006,10 +1006,10 @@ export default {
               reader.onload = function(e) {
                   var data = e.target.result
                   console.log('data', data)
+                  vm.convertPDFToHTML(data)
               };
               reader.readAsArrayBuffer(fileToExcel)
             }
-            console.log('fileToExcel', fileToExcel)
           })
         } else {
           // vm.agencyLists = []
@@ -1098,6 +1098,44 @@ export default {
             })
             saveAs(blob, new Date().getTime() + ".xml");
           })
+        }
+      })
+    },
+    convertPDFToHTML (content) {
+      let vm = this
+      window.PDFJS.getDocument(content).then(window.pdf_table_extractor).then(function (result) {
+        console.log('result PDFJS', result)
+        $('#html-result').html('');
+        var all_tables = [];
+        while (page_tables = result.pageTables.shift()) {
+          all_tables = all_tables.concat(page_tables.tables);
+          table_dom = $('<table></table>').attr('border', 1);
+          var tables = page_tables.tables;
+          var merge_alias = page_tables.merge_alias;
+          var merges = page_tables.merges;
+
+          for (var r = 0; r < tables.length; r++) {
+            tr_dom = $('<tr></tr>')
+            for (var c = 0; c < tables[r].length; c++) {
+              r_c = [r, c].join('-')
+              if (merge_alias[r_c]) {
+                continue
+              }
+              td_dom = $('<td></td>');
+              if (merges[r_c]) {
+                if (merges[r_c].width > 1) {
+                  td_dom.attr('colspan', merges[r_c].width)
+                }
+                if (merges[r_c].height > 1) {
+                  td_dom.attr('rowspan', merges[r_c].height)
+                }
+              }
+              td_dom.text(tables[r][c])
+              tr_dom.append(td_dom)
+            }
+            table_dom.append(tr_dom)
+          }
+          window.$('#html-result').append(table_dom)
         }
       })
     }
