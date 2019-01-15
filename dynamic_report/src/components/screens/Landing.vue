@@ -122,7 +122,7 @@
           ></v-progress-circular>
         </v-flex>
       </v-layout>
-      
+      <div id="html-result"></div>
     </div>
   </div>
 </v-form>
@@ -999,6 +999,17 @@ export default {
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
+            let currentTimestemp = new Date().getTime()
+            let fileToExcel = new File([blob], currentTimestemp + '.pdf')
+            {
+              var reader = new FileReader()
+              reader.onload = function(e) {
+                  var data = e.target.result
+                  console.log('data', data)
+              };
+              reader.readAsArrayBuffer(fileToExcel)
+            }
+            console.log('fileToExcel', fileToExcel)
           })
         } else {
           // vm.agencyLists = []
