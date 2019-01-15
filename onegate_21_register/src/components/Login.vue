@@ -94,7 +94,7 @@ export default {
     makeImageCap () {
       var vm = this
       vm.chapchablob = ''
-      vm.$store.dispatch('makeImageCap').then(function (result) {
+      vm.$store.dispatch('makeImageCapLogin').then(function (result) {
         vm.chapchablob = result
       }).catch(function (reject) {
         vm.chapchablob = ''

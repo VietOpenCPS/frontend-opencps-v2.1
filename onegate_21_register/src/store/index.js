@@ -42,6 +42,25 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    makeImageCapLogin ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = 'o/v1/opencps/users/login/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },,
     makeImageCap ({commit, state}) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -124,7 +143,7 @@ export const store = new Vuex.Store({
           } else if (response.data === 'ok') {
             window.location.href = window.themeDisplay.getURLHome()
           } else if (response.data === 'captcha') {
-            alert('captcha wrong')
+            toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
           } else {
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
           }
@@ -177,7 +196,7 @@ export const store = new Vuex.Store({
                 toastr.error('Đăng ký thất bại. Số CMDN/Mã số thuế đã tồn tại trên hệ thống. Sử dụng số CMDN/mã số thuế khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'DuplicateContactTelNoException') {
                 toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
-              } else if (dataError && dataError.description && dataError.description === 'Captcha incorrect') {
+              } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
                 toastr.error('Nhập sai Captcha')
               } else {
                 toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
