@@ -52,7 +52,7 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         // test local
-        var url = 'o/v1/opencps/users/login/jcaptcha'
+        var url = '/o/v1/opencps/users/login/jcaptcha'
         axios.get(url, param).then(response => {
           var url = window.URL.createObjectURL(response.data)
           resolve(url)
@@ -60,7 +60,7 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    },,
+    },
     makeImageCap ({commit, state}) {
       return new Promise((resolve, reject) => {
         let param = {
