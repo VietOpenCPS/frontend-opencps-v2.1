@@ -368,13 +368,20 @@
         vm.problem = true
       },
       show (e) {
-        e.preventDefault()
-        this.showMenu = false
-        this.x = e.clientX
-        this.y = e.clientY
-        this.$nextTick(() => {
-          this.showMenu = true
-        })
+        if (e !== undefined && e !== null) {
+          e.preventDefault()
+          this.showMenu = false
+          this.x = e.clientX
+          this.y = e.clientY
+          this.$nextTick(() => {
+            this.showMenu = true
+          })
+        } else {
+          this.showMenu = false
+          this.$nextTick(() => {
+            this.showMenu = true
+          })
+        }
       },
       addFilterRow () {
         let vm = this
