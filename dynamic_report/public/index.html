@@ -107,8 +107,6 @@
       PDFJS.workerSrc = 'build/pdf.worker.js';
       PDFJS.getDocument(content).then(pdf_table_extractor).then(function (result) {
 
-
-        console.log('result PDFJS', result.pageTables)
         // JSON output
         $('#html-result').html('');
 
@@ -149,11 +147,12 @@
                   td_dom.attr('rowspan', merges[r_c].height);
                 }
               }
-              td_dom.text(tables[r][c]);
+              td_dom.text(tables[r][c].replace(/\n/ig, '<br/>').replace(/↵/ig, '<br/>'));
               tr_dom.append(td_dom);
             }
             table_dom.append(tr_dom);
           }
+          console.log('tables[r][c]', table_dom[0].innerHTML)
           $('#html-result').append(table_dom);
       });
     };

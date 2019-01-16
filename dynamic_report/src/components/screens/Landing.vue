@@ -1127,7 +1127,7 @@ export default {
                 td_dom.attr('rowspan', merges[r_c].height)
               }
             }
-            td_dom.text(tables[r][c])
+            td_dom.text(tables[r][c].replace(/\n/ig, '<br/>').replace(/↵/ig, '<br/>'))
             tr_dom.append(td_dom)
           }
           table_dom.append(tr_dom)
@@ -1141,7 +1141,7 @@ export default {
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="4" valign="top" width="167"><p align="center"><strong>TỔNG CỤC ĐBVN (UBND TỈNH ……)</strong><br>Cục QLĐB (Sở GTVT)…..<br><strong>-------</strong></p></td><td valign="top" width="275" colspan="8"><p align="center"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc <br>---------------</strong></p></td></tr></tbody></table><table></table>';
         tab_text = tab_text + '<table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="12" valign="top" width="167"><p align="center"><strong>TỔNG HỢP HỒ SƠ NỘP TRỰC TUYẾN THEO LĨNH VỰC</strong></p></td></td></tr></tbody></table><table></table>';
 
-        tab_text = tab_text + "<table border='1px'>"
+        tab_text = tab_text + "<table border='1px' wi>"
         tab_text = tab_text + table_dom[0].innerHTML
         
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="4" valign="top" width="167"><p align="left"><strong>Nơi nhận:</strong></p></td><td valign="top" width="275" colspan="8"><p align="right"><strong>THỦ TRƯỞNG ĐƠN VỊ</strong><br/>(Ký và ghi rõ họ tên)</p></td></tr></tbody></table><table></table>';
