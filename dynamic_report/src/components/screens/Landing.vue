@@ -1148,7 +1148,7 @@ export default {
         tab_text = tab_text + '</body></html>';
 
         var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
-          type: '**application/octet-stream**',
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         })
         saveAs(blob, new Date().getTime() + ".xls");
       })
