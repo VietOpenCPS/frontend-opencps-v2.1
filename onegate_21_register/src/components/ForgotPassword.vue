@@ -85,11 +85,13 @@ export default {
         vm.loading = true
         let filter = dataForm
         vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
+          alert('then')
           vm.loading = false
           router.push({
             path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
           })
         }).catch(function (reject) {
+          alert('then')
           vm.loading = false
         })
       }
