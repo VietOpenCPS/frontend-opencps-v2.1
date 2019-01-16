@@ -718,6 +718,7 @@ export default {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
           })
+          vm.dossierTemplateItems[index]['passRequired'] = true
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
@@ -728,6 +729,7 @@ export default {
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.dossierTemplateItems[index].daKhai = true
+          vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -843,11 +845,15 @@ export default {
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
                 vm.recountFileTemplates()
-                var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-                  return file.dossierPartNo === item.partNo
-                })
-                if (fileViewsTemp) {
-                  vm.dossierTemplateItems[index]['passRequired'] = true
+                if (vm.dossierFilesItems.length !== 0) {
+                  var fileViewsTemp = vm.dossierFilesItems.filter(file => {
+                    return file.dossierPartNo === item.partNo
+                  })
+                  if (fileViewsTemp) {
+                    vm.dossierTemplateItems[index]['passRequired'] = true
+                  } else {
+                    vm.dossierTemplateItems[index]['passRequired'] = false
+                  }
                 } else {
                   vm.dossierTemplateItems[index]['passRequired'] = false
                 }
