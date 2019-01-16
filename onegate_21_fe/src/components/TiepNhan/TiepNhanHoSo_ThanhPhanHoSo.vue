@@ -721,6 +721,7 @@ export default {
           vm.dossierTemplateItems[index]['passRequired'] = true
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       } else {
@@ -733,9 +734,11 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }).catch(reject => {
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
@@ -880,6 +883,7 @@ export default {
                 })
               }, 1000)
             }).catch(reject => {
+              toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           } else {
@@ -907,6 +911,7 @@ export default {
             vm.setDaKhai(item)
           })
         }).catch(reject => {
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
@@ -975,6 +980,7 @@ export default {
             document.getElementById('dialogPDFPreview' + vm.id).src = result
           })
         } else {
+          toastr.clear()
           toastr.error('File dữ liệu không tồn tại')
         }
       }
@@ -1001,6 +1007,7 @@ export default {
             document.getElementById('dialogPDFPreview' + vm.id).src = result
           })
         } else {
+          toastr.clear()
           toastr.error('File dữ liệu không tồn tại')
         }
       }
@@ -1230,6 +1237,7 @@ export default {
         for (var i = 0; i < vm.dossierTemplateItems.length; i++) {
           if (vm.dossierTemplateItems[i]['required'] && !vm.dossierTemplateItems[i]['passRequired'] && vm.partTypes.includes(vm.dossierTemplateItems[i].partType)) {
             let message = 'Chú ý :' + vm.dossierTemplateItems[i].partName + ' là thành phần bắt buộc!'
+            toastr.clear()
             toastr.error(message)
             return false
           }

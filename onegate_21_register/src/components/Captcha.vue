@@ -8,6 +8,7 @@
     </v-flex>
     <v-flex xs12 class="mt-2">
       <v-text-field
+        box
         v-model="j_captcha_response"
         placeholder="Nhập captcha"
       ></v-text-field>

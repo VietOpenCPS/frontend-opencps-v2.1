@@ -11,8 +11,7 @@ import 'babel-polyfill'
 import VueDraggable from 'vue-draggable'
 import axios from 'axios'
 
-// axios.defaults.headers.common['Token'] = window.Liferay.authToken
-
+axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueDraggable)
 Vue.use(VueContentPlaceholders)
 Vue.use(Vuetify)

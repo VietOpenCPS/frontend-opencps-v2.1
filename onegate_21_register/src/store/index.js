@@ -121,11 +121,11 @@ export const store = new Vuex.Store({
         })
       })
     },
-    goToDangNhap({ commit, state }, filter) {
+    goToDangNhap ({ commit, state }, filter) {
       store.dispatch('loadInitResource').then(function (result) {
         let configs = {
           headers: {
-            'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+            'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ':' + filter['npmreactlogin_password'])
           }
         }
         var dataPostApplicant = new URLSearchParams()
@@ -135,20 +135,23 @@ export const store = new Vuex.Store({
           if (response.data !== '' && response.data !== 'ok') {
             if (response.data === 'pending') {
               window.location.href = window.themeDisplay.getURLHome() +
-              "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                "&redirectURL=" + window.themeDisplay.getURLHome()
+              '/register#/xac-thuc-tai-khoan?active_user_id=' + window.themeDisplay.getUserId() +
+                '&redirectURL=' + window.themeDisplay.getURLHome()
             } else {
               window.location.href = response.data
             }
           } else if (response.data === 'ok') {
             window.location.href = window.themeDisplay.getURLHome()
           } else if (response.data === 'captcha') {
-            toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
+            toastr.clear()
+            toastr.error('Nhập sai mã Captcha.', { autoClose: 2000 })
           } else {
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+            toastr.clear()
+            toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác.', { autoClose: 2000 })
           }
-        }).catch(function (error) {
-          toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+        }).catch(function (xhr) {
+          toastr.clear()
+          toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác.', { autoClose: 2000 })
         })
       })
     },
@@ -182,6 +185,7 @@ export const store = new Vuex.Store({
           // test local
           // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
           axios.post('/o/rest/v2/applicants/withcaptcha', dataPostApplicant, configs).then(function (response) {
+            toastr.clear()
             toastr.success('Đăng ký thành công')
             resolve(response.data)
           }).catch(function (errorRes, response) {
@@ -189,6 +193,7 @@ export const store = new Vuex.Store({
             console.log('response', errorRes.response)
             let dataError
             if (errorRes.response.data) {
+              toastr.clear()
               dataError = errorRes.response.data
               if (dataError && dataError.description && dataError.description === 'DuplicateContactEmailException') {
                 toastr.error('Đăng ký thất bại. Email sử dụng đã tồn tại trên hệ thống. Sử dụng Email khác để đăng ký')
@@ -198,8 +203,10 @@ export const store = new Vuex.Store({
                 toastr.error('Đăng ký thất bại. Số điện thoại đã được sử dụng trên hệ thống. Sử dụng số điện thoại khác để đăng ký')
               } else if (dataError && dataError.description && dataError.description === 'Invalid ID, could not validate unexisting or already validated captcha') {
                 toastr.error('Nhập sai Captcha')
+              } else if (dataError && dataError.description && dataError.description === 'Password for user 0 must not be too trivial') {
+                toastr.error('Đăng ký thất bại. Mật khẩu yêu cầu 8 ký tự và có chữ hoa chữ thường')
               } else {
-                toastr.error('Đăng ký thất bại. Vui lòng thử lại ' + dataError.description)
+                toastr.error('Đăng ký thất bại. Vui lòng thử lại ')
               }
             }
           })
@@ -249,9 +256,11 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
           axios.get('/o/rest/v2/applicants/' + data.userId + '/activate/' + data.pinCode, param).then(function (response) {
             resolve(response.data)
+            toastr.clear()
             toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
             reject(xhr)
+            toastr.clear()
             toastr.error('Xác thực thất bại. Vui lòng thử lại')
           })
         })
@@ -269,14 +278,16 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
               toastr.error('Nhập sai mã Captcha')
-              reject(xhr)
+              reject(response)
             } else {
               resolve(response.data)
             }
             // toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
             reject(xhr)
+            toastr.clear()
             toastr.error('Yêu cầu thất bại. Vui lòng thử lại')
           })
         })
@@ -294,6 +305,7 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode + '?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             resolve(response.data)
+            toastr.clear()
             toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
             setTimeout(function () {
               let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
@@ -301,6 +313,7 @@ export const store = new Vuex.Store({
             }, 500)
           }).catch(function (xhr) {
             reject(xhr)
+            toastr.clear()
             toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
           })
         })

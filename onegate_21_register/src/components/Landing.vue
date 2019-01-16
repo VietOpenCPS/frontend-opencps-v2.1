@@ -272,8 +272,8 @@ export default {
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       passWord: (value) => {
-        const pattern = /^((?=.*\d)(?=.*[a-z])([0-9a-zA-Z@$!%*#?&]{6,}))$/
-        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+        const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+        return pattern.test(value) || 'Mật khẩu ít nhất 8 ký tự và có chữ hoa, chữ thường'
       },
       taxCode: (value) => {
         if (value.length === 10) {
@@ -343,25 +343,25 @@ export default {
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
         // if (vm.$refs.captcha.checkValidCaptcha()) {
-          let passValid = false
-          if (!vm.validBussinessInfos) {
-            let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
-            if (x) {
-              passValid = true
-            }
-          } else { passValid = true }
-          if (passValid) {
-            vm.loading = true
-            let filter = dataForm
-            vm.$store.dispatch('postApplicant', filter).then(function (result) {
-              vm.loading = false
-              router.push({
-                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
-              })
-            }).catch(function (reject) {
-              vm.loading = false
-            })
+        let passValid = false
+        if (!vm.validBussinessInfos) {
+          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
+          if (x) {
+            passValid = true
           }
+        } else { passValid = true }
+        if (passValid) {
+          vm.loading = true
+          let filter = dataForm
+          vm.$store.dispatch('postApplicant', filter).then(function (result) {
+            vm.loading = false
+            router.push({
+              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+            })
+          }).catch(function (reject) {
+            vm.loading = false
+          })
+        }
         // } else {
         //   toastr.error('Mã captcha không chính xác')
         // }

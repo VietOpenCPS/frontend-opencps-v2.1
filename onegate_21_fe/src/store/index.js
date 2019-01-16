@@ -671,6 +671,7 @@ export const store = new Vuex.Store({
             console.log('upload file success!')
           }).catch(function (xhr) {
             console.log(xhr)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(xhr)
           })
@@ -705,10 +706,12 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
+          toastr.clear()
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           reject(xhr)
         })
@@ -742,6 +745,7 @@ export const store = new Vuex.Store({
             console.log('Tải file lên thành công')
           }).catch(function (xhr) {
             console.log(xhr)
+            toastr.clear()
             toastr.error('Tải file lên thất bại')
             reject(xhr)
           })
@@ -948,10 +952,12 @@ export const store = new Vuex.Store({
           commit('setLePhi', response.data)
           commit('setThongTinChungHoSo', response.data)
           // commit('setDichVuChuyenPhatKetQua', response.data)
+          toastr.clear()
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
@@ -968,10 +974,12 @@ export const store = new Vuex.Store({
         }
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cloning', dataPostdossier, options).then(function (response) {
+          toastr.clear()
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
@@ -988,10 +996,12 @@ export const store = new Vuex.Store({
         }
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cancel', dataPostdossier, options).then(function (response) {
+          toastr.clear()
           toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
@@ -1241,6 +1251,7 @@ export const store = new Vuex.Store({
           store.dispatch('getActiveGetCounter', !state.activeGetCounter)
         }).catch(function (xhr) {
           reject(xhr)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           store.commit('setLoading', false)
         })
@@ -1304,6 +1315,7 @@ export const store = new Vuex.Store({
           if (field) {
             for (var prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
+                toastr.clear()
                 toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 return
               }
@@ -1386,6 +1398,7 @@ export const store = new Vuex.Store({
           if (field) {
             for (var prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
+                toastr.clear()
                 toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
                 return
               }
@@ -1455,6 +1468,7 @@ export const store = new Vuex.Store({
           commit('setLoading', false)
         }).catch(function (xhr) {
           reject(xhr)
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           commit('setLoading', false)
         })
@@ -1779,6 +1793,7 @@ export const store = new Vuex.Store({
           resolve(resPostCmt)
         })
         .catch(function (error) {
+          toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           console.log(error)
         })
@@ -2182,6 +2197,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2204,6 +2220,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2224,6 +2241,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2277,6 +2295,7 @@ export const store = new Vuex.Store({
                 store.dispatch('getActiveGetCounter', !state.activeGetCounter)
                 store.dispatch('getActiveLoadingDataHoSo', !state.activeLoadingDataHoSo)
               }
+              toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
               reject(error)
             })
@@ -2302,6 +2321,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2326,6 +2346,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2365,6 +2386,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2391,6 +2413,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2412,6 +2435,7 @@ export const store = new Vuex.Store({
             resolve(file)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2533,6 +2557,7 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
@@ -2973,6 +2998,7 @@ export const store = new Vuex.Store({
         if (Number(data.file.size) <= data.partTip['maxSize'] * 1048576 || !data.partTip['maxSize']) {
           store.commit('setValidFileUpload', true)
         } else {
+          toastr.clear()
           toastr.error('Tài liệu tải lên dung lượng tối đa là ' + data.partTip['maxSize'] + ' MB')
           store.commit('setValidFileUpload', false)
         }
@@ -2980,6 +3006,7 @@ export const store = new Vuex.Store({
         if (!data.partTip['extensions']) {
           store.commit('setValidFileUpload', true)
         } else {
+          toastr.clear()
           toastr.error('Tài liệu tải lên chỉ chấp nhận các định dạng ' + data.partTip['extensions'])
           store.commit('setValidFileUpload', false)
         }
