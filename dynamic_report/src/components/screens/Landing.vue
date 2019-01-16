@@ -1132,8 +1132,8 @@ export default {
           }
           table_dom.append(tr_dom)
         }
-         var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">'
-        tab_text = tab_text + '<head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+         var tab_text = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">'
+        tab_text = tab_text + '<head><meta http-equiv="content-type" content="text/html; charset=UTF-8"/><xml><meta name=ProgId content=Excel.Sheet/><meta name=Generator content="Microsoft Excel 11"/><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
         tab_text = tab_text + '<x:Name>Test Sheet</x:Name>'
         tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
         tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
