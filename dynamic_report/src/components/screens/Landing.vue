@@ -97,8 +97,8 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <v-btn dark v-on:click.native="doCreateReport" color="blue darken-3">Tạo báo cáo</v-btn>
-        <v-btn flat class="mx-0 my-0" v-on:click.native="toDoNotDone">
+        <v-btn dark v-on:click.native="doCreateReport(false)" color="blue darken-3">Tạo báo cáo</v-btn>
+        <v-btn flat class="mx-0 my-0" v-on:click.native="doCreateReport(true)">
           <v-icon>receipt</v-icon> &nbsp; Tải xuống Excel
         </v-btn>
         <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
@@ -146,6 +146,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    doExportExcel: false,
     showGuilds: false,
     showPicker: true,
     showErrorData: false,
@@ -998,16 +999,18 @@ export default {
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
-            let currentTimestemp = new Date().getTime()
-            let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-            {
-              var reader = new FileReader()
-              reader.onload = function(e) {
-                  var data = e.target.result
-                  console.log('data', data)
-                  vm.convertPDFToHTML(data)
-              };
-              reader.readAsArrayBuffer(fileToExcel)
+            if (vm.doExportExcel) {
+              let currentTimestemp = new Date().getTime()
+              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
+              {
+                var reader = new FileReader()
+                reader.onload = function(e) {
+                    var data = e.target.result
+                    console.log('data', data)
+                    vm.convertPDFToHTML(data)
+                };
+                reader.readAsArrayBuffer(fileToExcel)
+              }
             }
           })
         } else {
@@ -1017,9 +1020,10 @@ export default {
         }
       })
     },
-    doCreateReport() {
+    doCreateReport(isExportExcel) {
       let vm = this
       if (vm.$refs.form.validate()) {
+        vm.doExportExcel = isExportExcel
         vm.showConfig = false
         vm.doCreatePDF()
       }
@@ -1138,7 +1142,7 @@ export default {
         tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
         tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
         
-        tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="4" valign="top" width="167"><p align="center"><strong>TỔNG CỤC ĐBVN (UBND TỈNH ……)</strong><br>Cục QLĐB (Sở GTVT)…..<br><strong>-------</strong></p></td><td valign="top" width="275" colspan="16"><p align="center"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc <br>---------------</strong></p></td></tr></tbody></table><table></table>';
+        tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="10" valign="top" width="167"><p align="center"><strong>TỔNG CỤC ĐBVN (UBND TỈNH ……)</strong><br>Cục QLĐB (Sở GTVT)…..<br><strong>-------</strong></p></td><td valign="top" width="275" colspan="10"><p align="center"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc <br>---------------</strong></p></td></tr></tbody></table><table></table>';
         tab_text = tab_text + '<table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="20" valign="top" width="167"><p align="center"><strong>TỔNG HỢP HỒ SƠ NỘP TRỰC TUYẾN THEO LĨNH VỰC</strong></p></td></td></tr></tbody></table><table></table>';
 
         tab_text = tab_text + "<table border='1px'>"
