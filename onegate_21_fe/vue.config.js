@@ -1,4 +1,4 @@
-let prodDir = "../../docs/o/opencps-frontend-cli/dvc";
+let prodDir = "app";
 
 module.exports = {
     runtimeCompiler: true,
