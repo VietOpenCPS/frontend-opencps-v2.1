@@ -631,6 +631,19 @@ export default {
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
+            if (vm.doExportExcel) {
+              let currentTimestemp = new Date().getTime()
+              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
+              {
+                var reader = new FileReader()
+                reader.onload = function(e) {
+                    var data = e.target.result
+                    console.log('data', data)
+                    vm.convertPDFToHTML(data)
+                };
+                reader.readAsArrayBuffer(fileToExcel)
+              }
+            }
           })
         } else {
           // vm.agencyLists = []
@@ -822,13 +835,15 @@ export default {
                 }
               }
             }
+            /*
             resultData = []
-            for (let key in arraySubKey) {
-              let subKeySortData = vm.sortByKey(arraySubKey[key], subKey)
+            for (let keySUBARRAY in arraySubKey) {
+              let subKeySortData = vm.sortByKey(arraySubKey[keySUBARRAY], subKey)
               for (let keyData in subKeySortData) {
                 resultData.push(subKeySortData[keyData])
               }
             }
+            */
           }
           let dataToExportCSV = []
           for (let key in resultData) {
