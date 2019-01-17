@@ -1,4 +1,4 @@
-# onegate_21_fe
+# login_notification
 
 ## Project setup
 ```
