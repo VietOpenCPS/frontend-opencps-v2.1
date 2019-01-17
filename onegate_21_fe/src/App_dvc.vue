@@ -3,6 +3,15 @@
     <v-navigation-drawer app clipped floating width="240"
       :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
     >
+      <div class="mx-2">
+        <v-btn block color="primary" v-on:click.native="doAddDVC()"
+          :loading="loadingGov"
+          :disabled="loadingGov"
+        >
+          Thêm mới hồ sơ
+          <span slot="loader">Loading...</span>
+        </v-btn>
+      </div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
       </content-placeholders>
@@ -20,16 +29,16 @@
             @click="toTableIndexing(item, index)" >
             <v-list-tile-content>
               <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1 && item['menuType'] !== 3" class="status__counter_group status__counter">
+              <span v-if="item.hasOwnProperty('counter') && item['counter'] > -1" class="status__counter_group status__counter">
                 {{item.counter}}
               </span>
-              <span v-else-if="item['menuType'] !== 3" class="status__counter_group status__counter">
+              <span v-else class="status__counter_group status__counter">
                 <v-progress-circular :width="1" :size="16" indeterminate color="red"></v-progress-circular>
               </span>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile v-if="item.items && item.items.length > 1" v-for="subItem in item.items" :key="subItem.stepCode"
-            v-on:click.native="filterSteps(subItem)"
+          <v-list-tile v-for="subItem in item.items" :key="subItem.stepCode"
+            v-on:click.native="filterSteps(subItem, index)"
             :class="{'list__tile--active': String(currentStep) === String(subItem.stepCode)}"
             >
             <v-list-tile-action>
@@ -51,6 +60,15 @@
     <div v-if="trangThaiHoSoList.length !== 0 && viewMobile">
       <div class="row-header mb-2 py-2" style="background-color: #070f52">
         <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
+      </div>
+      <div class="mx-2">
+        <v-btn block color="primary" v-on:click.native="doAddDVC()"
+          :loading="loadingGov"
+          :disabled="loadingGov"
+        >
+          Thêm mới hồ sơ
+          <span slot="loader">Loading...</span>
+        </v-btn>
       </div>
       <div style="max-height:200px;overflow:hidden;overflow-y:scroll">
         <content-placeholders class="mt-3" v-if="loading">
@@ -125,6 +143,9 @@
       currentIndex () {
         return this.$store.getters.index
       },
+      loadingGov () {
+        return this.$store.getters.loadingGov
+      },
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
@@ -141,24 +162,22 @@
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
           vm.loading = false
-          if (result) {
+          if (result.length !== 0) {
             vm.trangThaiHoSoList = result
+            let route = vm.$router.history.current
             let currentParams = vm.$router.history.current.params
-            if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
-              if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
-                vm.trangThaiHoSoList[0]['active'] = true
-                router.push({
-                  path: vm.pathLanding + '/0',
-                  query: {
-                    q: vm.trangThaiHoSoList[0]['queryParams']
-                  }
-                })
-              } else {
-                vm.trangThaiHoSoList[currentParams.index]['active'] = true
-              }
+            if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode') && route.name !== 'ThanhToanThanhCong') {
+              vm.trangThaiHoSoList[0]['active'] = true
+              router.push({
+                path: vm.pathLanding + '/0',
+                query: {
+                  q: vm.trangThaiHoSoList[0]['queryParams']
+                }
+              })
+            } else if (currentParams.hasOwnProperty('index')) {
+              vm.trangThaiHoSoList[currentParams.index]['active'] = true
             }
             vm.loadingCounter()
-            vm.loading = false
           }
         })
       })
@@ -185,7 +204,6 @@
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
           vm.currentStep = String(currentQuery.step)
-          console.log('currentStep', String(currentQuery.step))
         } else {
           vm.currentStep = '0'
         }
@@ -217,14 +235,13 @@
           }
         })
       },
-      filterSteps (item) {
+      filterSteps (item, index) {
         let vm = this
         let currentQuery = this.$router.history.current.query
         let currentParams = this.$router.history.current.params
         console.log('currentParams', currentParams)
         console.log('currentQuery', currentQuery)
-        let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
-        console.log('queryString++++++1111111+++++', queryString)
+        let queryString = this.trangThaiHoSoList[index].queryParams
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
         if (currentQuery !== null && currentQuery !== undefined) {
@@ -234,17 +251,6 @@
           }
         }
         this.currentStep = String(item.stepCode)
-        // if (vm.currentStep) {
-        //   let urls = queryString.split("?")
-        //   if (urls !== null && urls.length !== 0) {
-        //     for (var i = 0; i < urls.length; i++) {
-        //       if (urls[i].indexOf('step') > 0) {
-        //         urls.splice(i, 1)
-        //       }
-        //     }
-        //   }
-        // }
-        console.log('queryString++++++++22222222+++', queryString)
         router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
@@ -302,6 +308,9 @@
           }
           vm.loading = false
         })
+      },
+      doAddDVC () {
+        router.push('/add-dvc/0')
       }
     }
   }
