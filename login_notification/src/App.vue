@@ -1,7 +1,7 @@
 <template>
-  <div id="app_login">
-    <login/>
-  </div>
+<v-app id="app_login">
+  <login/>
+</v-app>
 </template>
 
 <script>
