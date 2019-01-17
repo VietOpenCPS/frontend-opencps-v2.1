@@ -301,7 +301,7 @@ export const store = new Vuex.Store({
             }, 500)
           }).catch(function (xhr) {
             reject(xhr)
-            toastr.error('Yêu cầu thất bại. Vui lòng thử lại')
+            toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
           })
         })
       })
