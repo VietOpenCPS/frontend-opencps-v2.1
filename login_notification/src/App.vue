@@ -1,5 +1,5 @@
 <template>
-<v-app id="app_login_hight">
+<v-app id="app_login_hight_bee">
   <login/>
 </v-app>
 </template>
@@ -8,7 +8,7 @@
 import Login from './components/Login.vue'
 
 export default {
-  name: 'app_login_hight',
+  name: 'app_login_hight_bee',
   components: {
     Login
   }
