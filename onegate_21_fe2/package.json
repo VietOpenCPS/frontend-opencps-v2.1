@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build:dvc": "vue-cli-service build --dest ../docs/o/opencps-frontend-cli/dvc src/main_dvc.js",
+    "build:dvc": "vue-cli-service build src/main_dvc.js",
     "build:motcua": "vue-cli-service build --dest ../docs/o/opencps-frontend-cli/motcua src/main.js",
     "lint": "vue-cli-service lint"
   },
