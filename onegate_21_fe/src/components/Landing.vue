@@ -1,5 +1,6 @@
 <template>
   <div>
+    1232
     <div class="row-header no__hidden_class">
       <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
@@ -1027,7 +1028,7 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: true,
     filterForm: null,
-    checkSelectAll: (this.menuType !== 3 && this.originality !== 1),
+    checkSelectAll: false,
     titleLanding: '',
     currentQueryState: ''
   }),
@@ -1058,6 +1059,7 @@ export default {
       vm.itemFilterSupport.days.push(item)
     }
     vm.$nextTick(function () {
+      vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
       let query = vm.$router.history.current.query
       let currentQuery = vm.$router.history.current.query
       vm.currentQueryState = query
@@ -1079,6 +1081,7 @@ export default {
       vm.currentQueryState = currentQuery
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
         vm.isCallBack = false
+        vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
         vm.$store.commit('setLoadingDynamicBtn', true)
         setTimeout(() => {
           vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
@@ -1141,6 +1144,7 @@ export default {
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
+      vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
