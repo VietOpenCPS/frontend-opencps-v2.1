@@ -26,7 +26,8 @@ Vue.mixin({
 })
 
 new Vue({
+  el: '#app',
   router,
   store,
-  render: function (h) { return h(App) },
-}).$mount('#app')
+  render: h => h(App)
+})
