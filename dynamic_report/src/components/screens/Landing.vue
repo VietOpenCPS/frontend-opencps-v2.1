@@ -827,15 +827,14 @@ export default {
             for (let key in resultData) {
               if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
-                if (arraySubKey[resultData[key]['domain']] !== undefined && arraySubKey[resultData[key]['domain']] !== null) {
-                  arraySubKey[resultData[key]['domain']].push(resultData[key])
+                if (arraySubKey[resultData[key][sumKey]] !== undefined && arraySubKey[resultData[key][sumKey]] !== null) {
+                  arraySubKey[resultData[key][sumKey]].push(resultData[key])
                 } else {
-                  arraySubKey[resultData[key]['domain']] = []
-                  arraySubKey[resultData[key]['domain']].push(resultData[key])
+                  arraySubKey[resultData[key][sumKey]] = []
+                  arraySubKey[resultData[key][sumKey]].push(resultData[key])
                 }
               }
             }
-            /*
             resultData = []
             for (let keySUBARRAY in arraySubKey) {
               let subKeySortData = vm.sortByKey(arraySubKey[keySUBARRAY], subKey)
@@ -843,7 +842,6 @@ export default {
                 resultData.push(subKeySortData[keyData])
               }
             }
-            */
           }
           let dataToExportCSV = []
           for (let key in resultData) {
