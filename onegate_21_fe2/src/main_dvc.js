@@ -1,16 +1,17 @@
+import 'babel-polyfill'
 import 'vuetify/dist/vuetify.min.css'
 import 'toastr/build/toastr.min.css'
 import './stylus/main.css'
 import './stylus/jquery-comments.css'
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import App from './App_dvc'
-import router from './router'
+import router from './router_dev'
 import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
-import 'babel-polyfill'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
 import 'v-suggestions/dist/v-suggestions.css'
+import 'svg-pan-zoom/dist/svg-pan-zoom.min.js'
 import axios from 'axios'
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
@@ -26,9 +27,8 @@ Vue.mixin({
   }
 })
 
-new Vue({ // eslint-disable-line no-new
-  el: '#app',
+new Vue({
   router,
   store,
-  render: h => h(App)
-})
+  render: function (h) { return h(App) },
+}).$mount('#app')

@@ -1,12 +1,6 @@
 <template>
   <div>
-    <v-menu>
-          <v-btn
-            slot="activator"
-          >
-            Dropdown
-          </v-btn>
-        </v-menu>
+    213123213 asd fsd asf 
   </div>
 </template>
 
