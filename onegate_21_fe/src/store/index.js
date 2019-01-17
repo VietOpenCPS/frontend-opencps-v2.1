@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
@@ -162,7 +162,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let param = {
           headers: {
-            groupId: window.themeDisplay.getScopeGroupId() ? window.themeDisplay.getScopeGroupId() : ''
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
         }
         axios.get(state.endPointApi + '/users/login', param).then(function (response) {
