@@ -68,7 +68,11 @@ new Vue({
     vm.$nextTick(function() {
       vm.$store.dispatch('loadInitResource')
       if (window.location.href.endsWith('#/')) {
-        vm.$router.push('/bao-cao/0')
+        let strQuery = ''
+        if (window.location.href.includes('/so-theo-doi')) {
+          strQuery = '?reportType=register'
+        }
+        vm.$router.push('/bao-cao/0' + strQuery)
       }
     })
   }
