@@ -559,7 +559,7 @@ export default {
               dataToExportCSV.push(csvGroup)
               dataReportTotal += JSON.stringify([{
                 colSpan: colLeng + 1,
-                text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup],
+                text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
                 bold: true,
                 style: 'tdStyle'
               }]) + ','
