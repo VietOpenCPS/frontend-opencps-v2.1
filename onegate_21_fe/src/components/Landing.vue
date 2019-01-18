@@ -238,7 +238,7 @@
               @keyup.enter="changeDossierNoKey"
               append-icon="search"
               box
-              :append-icon-cb="changeDossierNoKey"
+              @click:append="changeDossierNoKey"
             ></v-text-field>
             <!-- <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon> -->
           </div>
