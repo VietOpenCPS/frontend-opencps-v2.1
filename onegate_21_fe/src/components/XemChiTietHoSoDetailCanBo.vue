@@ -76,7 +76,7 @@
           </v-btn>
         </v-tab> -->
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition" style="overflow: visible!important">
-          <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
             <div class="px-4 pt-2">
               <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
@@ -209,7 +209,7 @@
             </div>
             <!--  -->
           </v-tab-item>
-          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <v-expansion-panel expand  class="expansion-pl ext__form">
               <v-expansion-panel-content v-bind:value="true">
                 <div slot="header" class="text-bold">
@@ -259,12 +259,12 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-tab-item>
-          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
             </v-card>
           </v-tab-item>
-          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item v-if="listLienThong.length>0" value="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
               <v-card-text v-else>
@@ -274,7 +274,7 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <v-flex xs12 style="height:42px">
               <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                 <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
@@ -349,7 +349,7 @@
         </v-tab>
         <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
-          id="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <div class="px-2 py-2">
               <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
                 <div class="text-bold">
@@ -378,7 +378,7 @@
               </div>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
               <v-expansion-panel class="expansion-pl">
@@ -448,7 +448,7 @@
               </v-expansion-panel>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 py-2">

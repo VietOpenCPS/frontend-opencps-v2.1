@@ -174,3 +174,12 @@ body .input-group--text-field-box:not(.input-group--textarea):not(.input-group--
 body p {
     margin-bottom: 5px;
 }
+body .application .theme--light.v-table thead th:first-child, 
+body .theme--light .v-table thead th:first-child {
+    border-left: none;
+}
+body .v-tabs__container--icons-and-text {
+    height: 42px;
+    background-color: #e7ecf7;
+    border-color: #e7ecf7!important;
+}
