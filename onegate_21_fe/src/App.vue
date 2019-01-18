@@ -110,7 +110,6 @@
 </template>
 
 <script>
-  import router from '@/router'
   import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
@@ -147,7 +146,7 @@
             if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
-                router.push({
+               vm.$router.push({
                   path: vm.pathLanding + '/0',
                   query: {
                     q: vm.trangThaiHoSoList[0]['queryParams']
@@ -209,7 +208,7 @@
       toTableIndexing (item, index) {
         let vm = this
         this.$store.commit('setIndex', index)
-        router.push({
+       vm.$router.push({
           path: vm.pathLanding + '/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -219,11 +218,11 @@
       },
       filterSteps (item) {
         let vm = this
-        let currentQuery = this.$router.history.current.query
-        let currentParams = this.$router.history.current.params
+        let currentQuery = vm.$router.history.current.query
+        let currentParams = vm.$router.history.current.params
         console.log('currentParams', currentParams)
         console.log('currentQuery', currentQuery)
-        let queryString = this.trangThaiHoSoList[currentParams.index].queryParams
+        let queryString = vm.trangThaiHoSoList[currentParams.index].queryParams
         console.log('queryString++++++1111111+++++', queryString)
         /* test Local */
         /* let queryString = this.trangThaiHoSoList[0].queryParams */
@@ -233,7 +232,7 @@
             queryString = queryString.substr(0, coma + 1)
           }
         }
-        this.currentStep = String(item.stepCode)
+        vm.currentStep = String(item.stepCode)
         // if (vm.currentStep) {
         //   let urls = queryString.split("?")
         //   if (urls !== null && urls.length !== 0) {
@@ -245,7 +244,7 @@
         //   }
         // }
         console.log('queryString++++++++22222222+++', queryString)
-        router.push({
+       vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

@@ -1,0 +1,27 @@
+body .v-navigation-drawer--fixed {
+    position: absolute;
+}
+body .v-list__tile,
+body .v-list__group__items--no-action .v-list__tile {
+    padding: 0;
+    padding-left: 0px;
+    height: 36px;
+}
+body .v-navigation-drawer>.v-list:not(.v-list--dense) .v-list__tile {
+    font-size: 13px;
+}
+body .v-list__tile__title {
+    font-size: 12px;
+}
+body .v-list__group__header .v-list__group__header__append-icon,
+body .v-list__group__header .v-list__group__header__prepend-icon {
+    padding: 0 10px;
+}
+body .v-list__group__header--active .v-list__group__header__prepend-icon .v-icon {
+    font-size: 18px;
+}
+body .v-list__tile__action,
+body .v-list__tile__avatar {
+    justify-content: center;
+    min-width: 36px;
+}
