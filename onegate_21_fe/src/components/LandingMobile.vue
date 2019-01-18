@@ -589,7 +589,7 @@
 </template>
 
 <script>
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import router from '@/router'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
