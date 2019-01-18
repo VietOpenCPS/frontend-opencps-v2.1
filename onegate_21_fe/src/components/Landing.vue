@@ -175,7 +175,7 @@
                     item-value="text"
                     item-text="text"
                     return-object
-                    @change="selectedAdvFilter"
+                    @change="selectedAdvFilter($event)"
                     hide-selected
                   ></v-select>
                 </v-flex>
@@ -209,7 +209,7 @@
             item-value="domainCode"
             return-object
             :hide-selected="true"
-            @change="changeDomain"
+            @change="changeDomain($event)"
             clearable
             box
           ></v-select>
@@ -224,7 +224,7 @@
             item-value="serviceConfigId"
             return-object
             :hide-selected="true"
-            @change="changeServiceConfigs"
+            @change="changeServiceConfigs($event)"
             clearable
             box
           ></v-select>
@@ -239,7 +239,7 @@
             item-value="processOptionId"
             return-object
             :hide-selected="true"
-            @change="changeDichVuConfigs"
+            @change="changeDichVuConfigs($event)"
             box
           ></v-select>
         </v-flex>
@@ -391,7 +391,7 @@
           <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
-              @change="changeSelected"
+              @change="changeSelected($event)"
               primary
               hide-details
               color="primary"
@@ -400,7 +400,7 @@
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"
-              @change="changeSelected"
+              @change="changeSelected($event)"
               primary
               hide-details
               color="primary"
@@ -496,7 +496,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change = "changeServiceConfigs"
+                  @change="changeServiceConfigs($event)"
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -512,7 +512,7 @@
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
-                  @change = "changeDichVuConfigs"
+                  @change="changeDichVuConfigs($event)"
                   required
                 ></v-select>
               </v-flex>
@@ -682,7 +682,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change = "changeServiceConfigsGuide"
+                  @change="changeServiceConfigsGuide($event)"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
                   required
                 ></v-select>
