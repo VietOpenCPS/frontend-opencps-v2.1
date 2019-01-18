@@ -39,17 +39,16 @@
                   </v-btn>
                 </v-flex>
                 <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.years"
                     v-model="itemFilterSupport.year"
                     label="Chọn năm"
-                    autocomplete
                     single-line
                     item-value="value"
                     item-text="name"
                     hide-selected
                     @change="changeAdvFilterData($event, 'year', item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
                   <v-btn icon class="my-0 mx-0">
@@ -57,16 +56,15 @@
                   </v-btn>
                 </v-flex> -->
                 <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.months"
                     v-model="itemFilterSupport.month"
                     label="Chọn tháng"
-                    autocomplete
                     single-line
                     item-value="value"
                     item-text="name"
                     @change="changeAdvFilterData($event, 'month', item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
                   <v-btn icon class="my-0 mx-0">
@@ -74,88 +72,81 @@
                   </v-btn>
                 </v-flex> -->
                 <v-flex xs2 sm2 v-if="item.spec === 'year_month_day'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.days"
                     v-model="itemFilterSupport.day"
                     label="Chọn ngày"
-                    autocomplete
                     single-line
                     item-value="value"
                     item-text="name"
                     @change="changeAdvFilterData($event, 'day', item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'top'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.tops"
                     v-model="itemFilterSupport.top"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="value"
                     item-text="name"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'status'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.statusLists"
                     v-model="itemFilterSupport.status"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="itemCode"
                     item-text="itemName"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'substatus'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.substatusLists"
                     v-model="itemFilterSupport.substatus"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="itemCode"
                     item-text="itemName"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'agency'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.agencyLists"
                     v-model="itemFilterSupport.agency"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="administrationCode"
                     item-text="administrationName"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'service'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.serviceLists"
                     v-model="itemFilterSupport.service"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="serviceCode"
                     item-text="serviceName"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'domain'">
-                  <v-select
+                  <v-autocomplete
                     :items="itemFilterSupport.domainLists"
                     v-model="itemFilterSupport.domain"
                     :label="item.text + ':'"
-                    autocomplete
                     single-line
                     item-value="domainCode"
                     item-text="domainName"
                     @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs 12 sm6 v-if="item.spec === 'register'">
                   <v-text-field 
@@ -166,18 +157,17 @@
               </v-layout>
               <v-layout wrap>
                 <v-flex xs12 sm10 class="no__selected__items">
-                  <v-select
+                  <v-autocomplete
                     :items="advSearchTools"
                     v-model="advSearchToolsSelected"
                     label="Chọn điều kiện lọc"
-                    autocomplete
                     single-line
                     item-value="text"
                     item-text="text"
                     return-object
                     @change="selectedAdvFilter"
                     hide-selected
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs12 sm2 class="text-right">
                   <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
@@ -200,10 +190,9 @@
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="originality !== 1">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
-            autocomplete
             label="Chọn lĩnh vực"
             item-text="displayName"
             item-value="domainCode"
@@ -212,13 +201,12 @@
             @change="changeDomain"
             clearable
             box
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
-            autocomplete
             label="Chọn thủ tục hành chính"
             item-text="displayName"
             item-value="serviceConfigId"
@@ -227,21 +215,20 @@
             @change="changeServiceConfigs"
             clearable
             box
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listDichVu"
             v-model="dichVuSelected"
             label="Chọn dịch vụ"
-            autocomplete
             item-text="optionName"
             item-value="processOptionId"
             return-object
             :hide-selected="true"
             @change="changeDichVuConfigs"
             box
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative">
@@ -487,24 +474,22 @@
           <v-card-text class="pb-0 pt-4">
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
-                <v-select
+                <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  autocomplete
                   placeholder="chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
                   @change ="changeServiceConfigs"
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <v-select
+                <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  autocomplete
                   placeholder="chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
@@ -514,7 +499,7 @@
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change="changeDichVuConfigs"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -672,11 +657,10 @@
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12 class="px-2 pb-3">
                 <div class="my-2">Thủ tục hành chính:</div>
-                <v-select
+                <v-autocomplete
                   class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
-                  autocomplete
                   placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
@@ -685,23 +669,22 @@
                   @change="changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2">Dịch vụ:</div>
-                <v-select
+                <v-autocomplete
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
                   placeholder="Chọn dịch vụ"
-                  autocomplete
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2">Tên người làm thủ tục:</div>
