@@ -12,6 +12,14 @@ body .v-list__group__items--no-action .v-list__tile {
     padding: 0;
     padding-left: 0px;
     height: 36px;
+    cursor: pointer;
+}
+body .v-navigation-drawer .v-list__tile:hover,
+body .list__tile--active {
+    background: #e1e2e1;
+}
+body .v-list__group__header--active {
+    background: #ececec;
 }
 body .v-navigation-drawer>.v-list:not(.v-list--dense) .v-list__tile,
 body .v-input,
@@ -158,4 +166,10 @@ body .menuable__content__active .v-list > div:last-child .v-list__tile {
 }
 body .v-menu__content {
     min-width: 135px !important;
+}
+body .v-autocomplete.v-text-field--enclosed:not(.v-text-field--solo):not(.v-text-field--single-line) .v-select__slot>input {
+    margin-top: 0;
+}
+body .input-group--text-field-box:not(.input-group--textarea):not(.input-group--multi-line) label {
+    top: 21px;
 }
