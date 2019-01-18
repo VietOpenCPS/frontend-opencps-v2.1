@@ -1272,6 +1272,9 @@ export default {
     getUser (roleItem) {
       let vm = this
       let roles = vm.$store.getters.getUser.role
+      if (!roles) {
+        return false
+      }
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
     },
