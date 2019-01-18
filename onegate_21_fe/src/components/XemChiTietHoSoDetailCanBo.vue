@@ -852,6 +852,7 @@ export default {
     initData (data) {
       var vm = this
       vm.dossierId = data
+      console.log('init data datadatadatadatadata: ', data)
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
@@ -2211,7 +2212,9 @@ export default {
       let userCheckPermission = userArr.concat(userLastAction)
       if (userCheckPermission.length > 0) {
         let check = userCheckPermission.filter(function (item) {
-          return item['userId'].toString() === currentUser['userId'].toString()
+          if (item !== undefined && item !== null) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          }
         })
         if (check.length > 0) {
           checkValue = true
