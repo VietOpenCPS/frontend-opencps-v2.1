@@ -175,7 +175,7 @@
                     item-value="text"
                     item-text="text"
                     return-object
-                    @change="selectedAdvFilter($event)"
+                    @change="selectedAdvFilter"
                     hide-selected
                   ></v-select>
                 </v-flex>
@@ -209,7 +209,7 @@
             item-value="domainCode"
             return-object
             :hide-selected="true"
-            @change="changeDomain($event)"
+            @change="changeDomain"
             clearable
             box
           ></v-select>
@@ -224,7 +224,7 @@
             item-value="serviceConfigId"
             return-object
             :hide-selected="true"
-            @change="changeServiceConfigs($event)"
+            @change="changeServiceConfigs"
             clearable
             box
           ></v-select>
@@ -239,7 +239,7 @@
             item-value="processOptionId"
             return-object
             :hide-selected="true"
-            @change="changeDichVuConfigs($event)"
+            @change="changeDichVuConfigs"
             box
           ></v-select>
         </v-flex>
@@ -391,7 +391,7 @@
           <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
-              @change="changeSelected($event)"
+              @change="changeSelected"
               primary
               hide-details
               color="primary"
@@ -400,7 +400,7 @@
             <v-checkbox v-else
               :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"
-              @change="changeSelected($event)"
+              @change="changeSelected"
               primary
               hide-details
               color="primary"
@@ -496,7 +496,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change="changeServiceConfigs($event)"
+                  @change ="changeServiceConfigs"
                 ></v-select>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -512,7 +512,7 @@
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
-                  @change="changeDichVuConfigs($event)"
+                  @change="changeDichVuConfigs"
                   required
                 ></v-select>
               </v-flex>
@@ -682,7 +682,7 @@
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
-                  @change="changeServiceConfigsGuide($event)"
+                  @change="changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
                   required
                 ></v-select>
@@ -1635,7 +1635,7 @@ export default {
     changeServiceConfigs (item) {
       let vm = this
       vm.selectMultiplePage = []
-      if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
+      if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
         vm.listDichVu = item.options
       } else {
         vm.listDichVu = []
@@ -1677,16 +1677,16 @@ export default {
     },
     changeServiceConfigsGuide (item) {
       let vm = this
-      if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
-        this.listDichVuGuide = item.options
+      if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
+        vm.listDichVuGuide = item.options
       } else {
-        this.listDichVuGuide = []
+        vm.listDichVuGuide = []
       }
-      if (this.listDichVuGuide !== null && this.listDichVuGuide !== undefined && this.listDichVuGuide !== 'undefined' && this.listDichVuGuide.length > 0) {
-        this.dichVuSelectedGuide = this.listDichVuGuide[0]
-        this.templateNoGuide = this.dichVuSelectedGuide.templateNo
+      if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
+        vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
+        vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
       } else {
-        this.dichVuSelectedGuide = null
+        vm.dichVuSelectedGuide = null
       }
     },
     changeDomain (item) {
@@ -1712,7 +1712,7 @@ export default {
       } else {
         vm.listThuTucHanhChinh = vm.listThuTuc
       }
-      if (item !== null) {
+      if (item !== null && item !== undefined) {
         vm.domainCode = vm.linhVucSelected['domainCode']
       } else {
         vm.domainCode = ''
@@ -1770,8 +1770,10 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      queryString += 'template_no=' + item.templateNo
-      vm.templateNo = item.templateNo
+      if (item !== null && item !== undefined) {
+        queryString += 'template_no=' + item.templateNo
+        vm.templateNo = item.templateNo
+      }
       vm.$router.push({
         path: current.path + queryString
       })
