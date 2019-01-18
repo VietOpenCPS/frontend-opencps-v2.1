@@ -171,3 +171,6 @@ body .v-autocomplete.v-text-field--enclosed:not(.v-text-field--solo):not(.v-text
 body .input-group--text-field-box:not(.input-group--textarea):not(.input-group--multi-line) label {
     top: 21px;
 }
+body p {
+    margin-bottom: 5px;
+}
