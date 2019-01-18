@@ -6,6 +6,14 @@ import { store } from './store'
 
 Vue.config.productionTip = false
 
+Vue.mixin({
+  methods: {
+    getOriginality: function () {
+      return 3
+    }
+  }
+})
+
 new Vue({
   router,
   store,
