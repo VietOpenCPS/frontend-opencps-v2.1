@@ -535,11 +535,13 @@ export default {
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
               if (dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] === dataReportCurrent[textGroup]) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+                dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
               }
             } else {
               let dossierRawItem = {}
               dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
               dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+              dossierRawItem['totalChild'] = 1
               dossierRawItem['dossiers'] = []
               dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
               dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
@@ -550,7 +552,7 @@ export default {
           for (let key in dossierRaw) {
             if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []
-              csvGroup.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup])
+              csvGroup.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ')
               for (let colLengIndex in colLeng) {
                 csvGroup.push('')
               }
