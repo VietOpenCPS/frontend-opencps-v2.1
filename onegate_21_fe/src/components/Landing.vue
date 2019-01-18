@@ -211,6 +211,7 @@
             :hide-selected="true"
             @change="changeDomain"
             clearable
+            box
           ></v-select>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -225,6 +226,7 @@
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
+            box
           ></v-select>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -238,6 +240,7 @@
             return-object
             :hide-selected="true"
             @change="changeDichVuConfigs"
+            box
           ></v-select>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2">
@@ -2511,6 +2514,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
+      let vm = this
       console.log('permission: ', item.permission)
       if (item.permission !== null && item.permission !== '') {
        vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
