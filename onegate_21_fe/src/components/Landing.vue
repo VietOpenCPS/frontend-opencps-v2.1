@@ -4,19 +4,19 @@
       <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-select
+          <v-combobox
             v-model="advSearchItems"
             placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục ..."
             solo
             chips
-            tags
+            multiple
             deletable-chips
             item-value="value"
             item-text="text"
             @input="keywordEventChange"
             content-class="adv__search__select"
             return-object
-          ></v-select>
+          ></v-combobox>
           <v-fade-transition>
             <div v-if="menusss"
             class="adv__search_container"
@@ -1636,15 +1636,15 @@ export default {
       let vm = this
       vm.selectMultiplePage = []
       if (item !== null && item !== 'null' && item.hasOwnProperty('options')) {
-        this.listDichVu = item.options
+        vm.listDichVu = item.options
       } else {
-        this.listDichVu = []
+        vm.listDichVu = []
       }
-      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
-        this.dichVuSelected = this.listDichVu[0]
-        this.templateNo = this.dichVuSelected.templateNo
+      if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
+        vm.dichVuSelected = vm.listDichVu[0]
+        vm.templateNo = vm.dichVuSelected.templateNo
       } else {
-        this.dichVuSelected = null
+        vm.dichVuSelected = null
       }
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -1661,9 +1661,9 @@ export default {
       if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
         queryString += 'step=' + newQuery['step'] + '&'
       }
-      if (this.listDichVu !== null && this.listDichVu !== undefined && this.listDichVu !== 'undefined' && this.listDichVu.length > 0) {
+      if (vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu !== 'undefined' && vm.listDichVu.length > 0) {
         queryString += 'service_config=' + item.serviceConfigId
-        queryString += '&template_no=' + this.dichVuSelected.templateNo
+        queryString += '&template_no=' + vm.dichVuSelected.templateNo
         vm.govAgencyCode = item.govAgencyCode
         vm.serviceCode = item.serviceCode
       } else {
