@@ -1027,7 +1027,7 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: true,
     filterForm: null,
-    checkSelectAll: (this.menuType !== 3 && this.originality !== 1),
+    checkSelectAll: false,
     titleLanding: '',
     currentQueryState: ''
   }),
@@ -1052,7 +1052,8 @@ export default {
   created () {
     var vm = this
     vm.selectMultiplePage = []
-    vm.itemFilterSupport.days = [{'value': '', 'name': 'Lọc theo ngày'}]
+    vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
+    vm.itemFilterSupport['days'] = [{'value': '', 'name': 'Lọc theo ngày'}]
     for (let i = 1; i <= 31; i++) {
       let item = {'value': i, 'name': 'Ngày ' + i}
       vm.itemFilterSupport.days.push(item)
@@ -1085,6 +1086,7 @@ export default {
             vm.btnDynamics = []
             vm.trangThaiHoSoList = result
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
+            vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
@@ -1145,6 +1147,7 @@ export default {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
         vm.menuType = vm.trangThaiHoSoList[vm.index]['menuType']
+        vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
         // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
         vm.headers = vm.trangThaiHoSoList[vm.index]['tableConfig']['headers']
         if (vm.trangThaiHoSoList[vm.index]['tableConfig'] !== null && vm.trangThaiHoSoList[vm.index]['tableConfig'] !== undefined && vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('hideAction')) {
