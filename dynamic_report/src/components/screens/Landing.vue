@@ -631,6 +631,19 @@ export default {
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
+            if (vm.doExportExcel) {
+              let currentTimestemp = new Date().getTime()
+              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
+              {
+                var reader = new FileReader()
+                reader.onload = function(e) {
+                    var data = e.target.result
+                    console.log('data', data)
+                    vm.convertPDFToHTML(data)
+                };
+                reader.readAsArrayBuffer(fileToExcel)
+              }
+            }
           })
         } else {
           // vm.agencyLists = []
@@ -814,17 +827,17 @@ export default {
             for (let key in resultData) {
               if ((resultData[key][sumKey] !== '' && String(resultData[key][sumKey]) !== '0' && resultData[key][sumKey] !== undefined && resultData[key][sumKey] !== null) ||
                 (subKey !== null && subKey !== undefined && subKey !== '' && resultData[key][subKey] === '' && resultData[key][sumKey] !== '' && resultData[key][sumKey] !== '0')) {
-                if (arraySubKey[resultData[key]['domain']] !== undefined && arraySubKey[resultData[key]['domain']] !== null) {
-                  arraySubKey[resultData[key]['domain']].push(resultData[key])
+                if (arraySubKey[resultData[key][sumKey]] !== undefined && arraySubKey[resultData[key][sumKey]] !== null) {
+                  arraySubKey[resultData[key][sumKey]].push(resultData[key])
                 } else {
-                  arraySubKey[resultData[key]['domain']] = []
-                  arraySubKey[resultData[key]['domain']].push(resultData[key])
+                  arraySubKey[resultData[key][sumKey]] = []
+                  arraySubKey[resultData[key][sumKey]].push(resultData[key])
                 }
               }
             }
             resultData = []
-            for (let key in arraySubKey) {
-              let subKeySortData = vm.sortByKey(arraySubKey[key], subKey)
+            for (let keySUBARRAY in arraySubKey) {
+              let subKeySortData = vm.sortByKey(arraySubKey[keySUBARRAY], subKey)
               for (let keyData in subKeySortData) {
                 resultData.push(subKeySortData[keyData])
               }

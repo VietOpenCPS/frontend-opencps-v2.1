@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 export default {
   props: {
     item: {

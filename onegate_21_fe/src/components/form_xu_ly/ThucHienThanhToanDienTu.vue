@@ -144,7 +144,7 @@
 
 <script>
 import router from '@/router'
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import {VMoney} from 'v-money'
