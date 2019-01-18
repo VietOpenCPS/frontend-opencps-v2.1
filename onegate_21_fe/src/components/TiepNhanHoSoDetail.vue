@@ -19,14 +19,14 @@
       </div> 
     </div>
     <div style="position: relative;" v-if="originality !== 1">
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
     <div style="position: relative;" v-else>
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -44,7 +44,7 @@
     <thong-tin-chu-ho-so ref="thongtinchuhoso"></thong-tin-chu-ho-so>
     <!--  -->
     <div v-if="originality !== 1">
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -68,7 +68,7 @@
     </div>
     <!--  -->
     <div style="position: relative;">
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -90,7 +90,7 @@
     </div>
     <!--  -->
     <div style="position: relative;" v-if="viaPortalDetail !== 0">
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="2">
           <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
           <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
@@ -99,7 +99,7 @@
     </div>
     <!--  -->
     <div style="position: relative;">
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="2">
           <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
         </v-expansion-panel-content>

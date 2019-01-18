@@ -2,7 +2,7 @@
   <div class="comment-temp">
     <!-- Component Trao đổi thảo luận -->
     <div>
-      <v-expansion-panel class="expansion-pl-transparent">
+      <v-expansion-panel :value="[true]" class="expansion-pl-transparent">
         <v-expansion-panel-content hide-actions :value="true">
           <!-- <div slot="header">
             <div class="background-triangle-small"> 

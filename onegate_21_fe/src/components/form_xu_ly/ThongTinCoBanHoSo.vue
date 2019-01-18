@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel class="expansion-pl ext__form">
+  <v-expansion-panel :value="[true]" class="expansion-pl ext__form">
     <v-expansion-panel-content hide-actions value="1">
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
       <v-card>

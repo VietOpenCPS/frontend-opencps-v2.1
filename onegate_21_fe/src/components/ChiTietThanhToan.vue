@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -53,7 +53,7 @@
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-expansion-panel class="expansion-pl">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -101,7 +101,7 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
       <!--  -->
-      <v-expansion-panel class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
+      <v-expansion-panel :value="[true]" class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
         <v-expansion-panel-content hide-actions value="1">
           <div slot="header">
             <div class="background-triangle-small"> 
