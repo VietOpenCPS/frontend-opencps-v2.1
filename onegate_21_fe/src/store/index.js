@@ -155,6 +155,7 @@ export const store = new Vuex.Store({
             console.log(error)
           })
         }
+        commit('setInitData', state.initData)
         resolve(state.initData)
       })
     },
