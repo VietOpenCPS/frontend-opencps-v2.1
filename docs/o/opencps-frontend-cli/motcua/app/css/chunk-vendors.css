@@ -281,3 +281,9 @@ body .v-chip--select-multi {
 body .fade-transition-leave-to {
     display: none !important;
 }
+body .login_drawer {
+    position: fixed !important;
+}
+body .has-control-menu .login_drawer {
+    top: 55px;
+}

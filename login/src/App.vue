@@ -5,6 +5,9 @@
           top: 0;
           background: transparent;
       ">
+      <div @click="showNoti"
+      v-if="drawerLogin"
+      style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="drawer" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="!isSignedIn" style="
               position: relative;
@@ -89,7 +92,7 @@
         </v-menu>
       </div>
   
-      <v-navigation-drawer v-model="drawerLogin" fixed right hide-overlay temporary style="
+      <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
           -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
           box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
         ">
