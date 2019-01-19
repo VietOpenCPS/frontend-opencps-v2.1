@@ -781,7 +781,7 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
-      vm.$store.dispatch('loadInitResource').then(function (result) {
+      this.$store.dispatch('loadInitResource').then(function (result) {
         return result.user
       })
     },
