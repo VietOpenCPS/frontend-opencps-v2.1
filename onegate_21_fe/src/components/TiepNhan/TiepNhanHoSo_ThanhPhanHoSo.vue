@@ -2,8 +2,8 @@
   <div>
     <v-card>
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
-        <v-expansion-panel :value="[true]" class="expaned__list__data">
-          <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
+        <v-expansion-panel :value="[currentFormView === 'formAlpaca' + item.partNo + id ? true : false]" class="expaned__list__data">
+          <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
