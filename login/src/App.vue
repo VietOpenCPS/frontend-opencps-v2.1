@@ -96,20 +96,16 @@
           z-index: 999;
         ">
         <article class="glass down">
-          <v-list class="pa-1">
-            <v-list-tile>
-              <v-list-tile-content>
-                <v-btn-toggle style="width: 100%;" v-model="toggle_exclusive" mandatory>
-                  <v-btn block flat class="px-0">
-                    Thông báo mới
-                  </v-btn>
-                  <v-btn block flat class="px-0">
-                    Đánh dấu đã đọc
-                  </v-btn>
-                </v-btn-toggle>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list>
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-btn block flat class="px-0">
+                Thông báo mới
+              </v-btn>
+              <v-btn block flat class="px-0">
+                Đánh dấu đã đọc
+              </v-btn>
+            </v-flex>
+          </v-layout>
         </article>
       </v-navigation-drawer>
     </div>
