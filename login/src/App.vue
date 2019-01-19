@@ -41,7 +41,7 @@
     </div>
     <div v-else>
   
-      <div style="text-align: right;max-width: 1366px;margin-top: 25px;">
+      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;margin-top: 25px;">
         <v-badge color="red" v-if="notificationCount > 0">
           <span slot="badge">2</span>
           <v-btn @click="showNoti" icon class="mx-0 my-0">
@@ -200,7 +200,11 @@ article, .glass::before {
 .glass::before {
   background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
 }
-</style>
->
+.has-control-menu .login_wrap_app_panel {
+    margin-top: 80px;
+}
+.login_wrap_app_panel {
+    margin-top: 25px;
+}
 
 </style>
