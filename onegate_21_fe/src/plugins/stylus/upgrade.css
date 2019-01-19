@@ -201,7 +201,10 @@ body .v-input__slot {
     margin-bottom: 5px;
 }
 body .form_alpaca .absolute__btn {
-    top: 5px;
+    top: 3px;
+}
+body .form_alpaca .absolute__btn .v-text-field.v-input--is-disabled>.v-input__control>.v-input__slot:before {
+    border: none !important;
 }
 body .absolute__btn.v-input--selection-controls {
     margin-top: 6px;
@@ -220,4 +223,7 @@ body .v-chip--select-multi {
     background: #00204d !important;
     color: #fff !important;
     height: 25px;
+}
+body .fade-transition-leave-to {
+    display: none !important;
 }
