@@ -41,7 +41,7 @@
       <div style="text-align: right;">
         <v-badge color="red" v-if="notificationCount > 0">
           <span slot="badge">2</span>
-          <v-btn icon class="mx-0 my-0">
+          <v-btn @click="showNoti" icon class="mx-0 my-0">
             <v-icon
               size="20"
               color="blue darken-3"
@@ -133,11 +133,22 @@
           }
           axios.get('/o/rest/v2/users/' + themeDisplay.getUserId() + '/photo', param).then(function (response) {
             vm.avatarURL = window.URL.createObjectURL(response.data)
-          }).catch(function (error) {
-            reject(error)
           })
         }
       })
+    },
+    methods: {
+      showNoti () {
+        let vm = this
+        vm.drawer = !vm.drawer
+      },
+      doRegisterRedirect () {
+      },
+      doUserInfo () {
+      },
+      doExitApp () {
+        window.location.href = '/c/portal/logout'
+      }
     }
   }
 </script>
