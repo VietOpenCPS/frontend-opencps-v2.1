@@ -203,3 +203,15 @@ body .v-input__slot {
 body .form_alpaca .absolute__btn {
     top: 5px;
 }
+body .absolute__btn.v-input--selection-controls {
+    margin-top: 6px;
+}
+body .list_history_style {
+    background: #fff;
+}
+body .v-window-item .table-bordered {
+    border-bottom: 0;
+}
+body .v-window {
+    background-color: #fff;
+}
