@@ -25,11 +25,9 @@ Vue.mixin({
 new Vue({
   router,
   store,
-  created () {
+  beforeCreate () {
     var vm = this
-    vm.$nextTick(function () {
-      vm.$store.dispatch('loadInitResource')
-    })
+    vm.$store.dispatch('loadInitResource')
   },
   render: function (h) { return h(App) }
 }).$mount('#app')
