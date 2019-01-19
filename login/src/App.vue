@@ -215,8 +215,6 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
-        vm.isSignedIn = themeDisplay.isSignedIn()
-        vm.userNameLogin = themeDisplay.getUserName()
       })
     },
     methods: {
@@ -225,19 +223,11 @@
         vm.drawer = !vm.drawer
       },
       doRegisterRedirect () {
-        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        if (redirectURL !== '') {
-          window.location.href = redirectURL + '/register'
-        } else {
-          window.location.href = themeDisplay.getURLHome() + '/register'
-        }
+        let redire
       },
       doUserInfo () {
-        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        window.location.href = redirectURL + '/profile'
       },
       doExitApp () {
-        window.location.href = '/c/portal/logout'
       }
     }
   }
