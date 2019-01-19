@@ -55,9 +55,16 @@
         </v-btn>
         <v-menu offset-y :nudge-bottom="5">
           <v-chip slot="activator" @click="isShowUserMenu = !isShowUserMenu">
-            <v-avatar>
+            <v-avatar v-if="avatarURL !== ''">
               <img :src="avatarURL">
             </v-avatar>
+            <v-avatar v-else class="accent white--text">
+                {{ userNameLogin.slice(0, 1).toUpperCase() }}
+              </v-avatar>
+            {{userNameLogin}}
+            <v-avatar class="accent white--text">
+                {{ data.item.slice(0, 1).toUpperCase() }}
+              </v-avatar>
             {{userNameLogin}}
             <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
               expand_more
@@ -90,6 +97,7 @@
       <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
           -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
           box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+          z-index: 999;
         ">
         <article class="glass down">
           <h1>Pelican</h1>
@@ -127,7 +135,8 @@
       toggle_exclusive: 0,
       forgottenURLStr: '',
       userName: '',
-      passWord: ''
+      passWord: '',
+      userData: {}
     }),
     created() {
       let vm = this
@@ -141,11 +150,16 @@
           vm.forgottenURLStr = themeDisplay.getURLHome() + '/register/#/cap-lai-mat-khau'
         }
         if (vm.isSignedIn) {
+          vm.userData = {}
           let param = {
             responseType: 'blob'
           }
-          axios.get('/o/rest/v2/users/' + themeDisplay.getUserId() + '/photo', param).then(function(response) {
-            vm.avatarURL = window.URL.createObjectURL(response.data)
+          axios.get('/o/v1/opencps/users/' + themeDisplay.getUserId(), param).then(function(response) {
+            vm.userData = response.data
+            vm.avatarURL = vm.userData['avatar']
+            vm.userNameLogin = vm.userData['userName']
+          }).catch(function (error) {
+            vm.avatarURL = ''
           })
         }
       })
