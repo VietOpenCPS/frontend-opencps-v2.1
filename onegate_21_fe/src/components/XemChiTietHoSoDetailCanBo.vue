@@ -853,7 +853,6 @@ export default {
     initData (data) {
       var vm = this
       vm.dossierId = data
-      console.log('init data datadatadatadatadata: ', data)
       vm.activeTab2 = 'tabs-2b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
