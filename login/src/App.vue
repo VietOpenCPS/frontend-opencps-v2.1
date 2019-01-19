@@ -58,13 +58,9 @@
             <v-avatar v-if="avatarURL !== ''">
               <img :src="avatarURL">
             </v-avatar>
-            <v-avatar v-else class="accent white--text">
+            <v-avatar v-else class="white--text" :style="'background: #' + colorBG">
                 {{ userNameLogin.slice(0, 1).toUpperCase() }}
-              </v-avatar>
-            {{userNameLogin}}
-            <v-avatar class="white--text" :style="'background: #' + intToRGB(hashCode(userNameLogin))">
-                {{ userNameLogin.slice(0, 1).toUpperCase() }}
-              </v-avatar>
+            </v-avatar>
             {{userNameLogin}}
             <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
               expand_more
@@ -136,13 +132,15 @@
       forgottenURLStr: '',
       userName: '',
       passWord: '',
-      userData: {}
+      userData: {},
+      colorBG: '009688'
     }),
     created() {
       let vm = this
       vm.$nextTick(function() {
         vm.isSignedIn = themeDisplay.isSignedIn()
         vm.userNameLogin = themeDisplay.getUserName()
+        vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin))
         let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
         if (redirectURL !== '') {
           vm.forgottenURLStr = redirectURL + '/register/#/cap-lai-mat-khau'
@@ -157,7 +155,11 @@
           axios.get('/o/v1/opencps/users/' + themeDisplay.getUserId(), param).then(function(response) {
             vm.userData = response.data
             vm.avatarURL = vm.userData['avatar']
+            if (vm.avatarURL.includes('img_id=0')) {
+              vm.avatarURL = ''
+            }
             vm.userNameLogin = vm.userData['userName']
+            vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin))
           }).catch(function (error) {
             vm.avatarURL = ''
           })
