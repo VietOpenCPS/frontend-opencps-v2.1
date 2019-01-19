@@ -11,10 +11,10 @@
       <div class="login-wrapper">
         <div class="login-input">
           <div class="ico ico-user">
-            <input type="text" placeholder="Tài khoản đăng nhập" name="_npmreactlogin_login">
+            <input type="text" placeholder="Tài khoản đăng nhập" v-model="userName">
           </div>
           <div class="ico ico-pass">
-            <input @keyup.enter="goToDangNhapPress" type="password" placeholder="Mật khẩu" name="_npmreactlogin_password">
+            <input @keyup.enter="goToDangNhapPress" type="password" placeholder="Mật khẩu" v-model="passWord">
           </div>
         </div>
         <div class="login-input">
@@ -67,7 +67,7 @@
             </v-icon>
           </v-chip>
           <v-list v-if="isShowUserMenu">
-            <v-list-tile>
+            <v-list-tile @click="doUserInfo">
               <v-list-tile-action>
                 <v-icon size="16">person</v-icon>
               </v-list-tile-action>
@@ -75,7 +75,7 @@
                 <v-list-tile-title>Thông tin tài khoản</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <v-list-tile>
+            <v-list-tile @click="doExitApp">
               <v-list-tile-action>
                 <v-icon size="16" color="red darken-3">exit_to_app</v-icon>
               </v-list-tile-action>
@@ -125,7 +125,9 @@
       notificationCount: 0,
       isShowUserMenu: false,
       toggle_exclusive: 0,
-      forgottenURLStr: ''
+      forgottenURLStr: '',
+      userName: '',
+      passWord: ''
     }),
     created() {
       let vm = this
@@ -188,9 +190,10 @@
         }
       },
       goToDangNhap() {
+        let vm = this
         axios.post('/o/v1/opencps/login', {}, {
           headers: {
-            'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+            'Authorization': 'BASIC ' + window.btoa(vm.userName + ":" + vm.passWord)
           }
         }).then(function (response) {
           if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha') {
@@ -218,10 +221,11 @@
         })
       },
       goToDangNhapPress(e) {
+        let vm = this
         if(e.keyCode == 13){
           axios.post('/o/v1/opencps/login', {}, {
             headers: {
-              'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+              'Authorization': 'BASIC ' + window.btoa(vm.userName + ":" + vm.passWord)
             }
           }).then(function (response) {
             console.log(response.data)
