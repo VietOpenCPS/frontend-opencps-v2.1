@@ -1,13 +1,8 @@
 <template>
-  <v-app id="app_login" style="
-          position: absolute;
-          width: 100%;
-          top: 0;
-          background: transparent;
-      ">
+  <v-app id="app_login">
       <div @click="showNoti"
       v-if="drawerLogin"
-      style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
+      style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;    z-index: 9999;"></div>
     <div v-if="drawer" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="!isSignedIn" style="
               position: relative;
