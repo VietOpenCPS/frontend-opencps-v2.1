@@ -41,7 +41,7 @@
     </div>
     <div v-else>
   
-      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;margin-top: 25px;">
+      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
         <v-badge color="red" v-if="notificationCount > 0">
           <span slot="badge">2</span>
           <v-btn @click="showNoti" icon class="mx-0 my-0">
@@ -152,59 +152,3 @@
     }
   }
 </script>
-
-<style scoped>
-article, .glass::before {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.glass {
-  position: relative;
-}
-
-.glass::before {
-  z-index: -1;
-  display: block;
-  position: absolute;
-  content: ' ';
-}
-
-.glass::before {
-  /* background-image: url('path/to/image.jpg'); Actual image for this demo is a data-uri, see below */
-  /* Prefix free isn't picking up this one */
-  -webkit-filter: blur(42px);
-  filter: blur(42px);
-  background-size: cover;
-  opacity: 0.5;
-}
-
-.glass {
-  background-color: white;
-}
-
-/* transformations */
-.glass.down {
-  transform: translateY(0%);
-}
-
-.glass.up, .glass.up::before {
-  transform: translateY(0) translateZ(0);
-}
-
-/* transitions */
-.glass, .glass::before {
-  transition: transform 0.5s ease-out;
-}
-.glass::before {
-  background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
-}
-.has-control-menu .login_wrap_app_panel {
-    margin-top: 80px;
-}
-.login_wrap_app_panel {
-    margin-top: 25px;
-}
-
-</style>
