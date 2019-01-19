@@ -93,15 +93,28 @@
       <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
           -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
           box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-          z-index: 999;
+          z-index: 9999;
         ">
         <article class="glass down">
-          <v-layout row wrap>
-            <v-flex xs12>
-              <v-btn block flat class="px-0">
+          <v-layout row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
+            <v-flex xs6 class="text-center">
+              <v-btn block small style="
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+">
                 Thông báo mới
               </v-btn>
-              <v-btn block flat class="px-0">
+            </v-flex>
+            <v-flex xs6 class="text-center">
+              <v-btn block small style="
+    background: #d0d0d0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+">
                 Đánh dấu đã đọc
               </v-btn>
             </v-flex>
