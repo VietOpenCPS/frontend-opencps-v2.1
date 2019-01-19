@@ -20,14 +20,14 @@
     </div>
     <div style="position: relative;" v-if="originality !== 1">
       <v-expansion-panel :value="[true]" class="expansion-pl">
-        <v-expansion-panel-content hide-actions :value="true">
+        <v-expansion-panel-content>
           <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </div>
     <div style="position: relative;" v-else>
       <v-expansion-panel :value="[true]" class="expansion-pl">
-        <v-expansion-panel-content hide-actions :value="true">
+        <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
@@ -45,7 +45,7 @@
     <!--  -->
     <div v-if="originality !== 1">
       <v-expansion-panel :value="[true]" class="expansion-pl">
-        <v-expansion-panel-content hide-actions :value="true">
+        <v-expansion-panel-content>
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             Tên hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
@@ -69,7 +69,7 @@
     <!--  -->
     <div style="position: relative;">
       <v-expansion-panel :value="[true]" class="expansion-pl">
-        <v-expansion-panel-content hide-actions :value="true">
+        <v-expansion-panel-content>
           <div slot="header" style="display: flex; align-items: center;">
             <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
             Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;

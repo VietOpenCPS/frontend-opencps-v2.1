@@ -18,7 +18,7 @@
       </div>
     </div>
     <v-expansion-panel :value="[true]" class="expansion-pl" v-if="dossierSelected.length > 0">
-      <v-expansion-panel-content hide-actions :value="true">
+      <v-expansion-panel-content>
         <!-- <div slot="header">
           <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
           HỒ SƠ XỬ LÝ &nbsp;&nbsp;&nbsp;&nbsp; 
