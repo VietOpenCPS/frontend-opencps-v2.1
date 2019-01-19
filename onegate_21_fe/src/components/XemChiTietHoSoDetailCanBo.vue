@@ -2210,7 +2210,7 @@ export default {
       let userArr = vm.$store.getters.getUsersNextAction
       let userLastAction = [{'userId': vm.thongTinChiTietHoSo.lastActionUserId ? vm.thongTinChiTietHoSo.lastActionUserId : ''}]
       let userCheckPermission = userArr.concat(userLastAction)
-      if (userCheckPermission.length > 0) {
+      if (userCheckPermission.length > 0 && currentUser !== undefined  && currentUser !== null) {
         let check = userCheckPermission.filter(function (item) {
           if (item !== undefined && item !== null) {
             return item['userId'].toString() === currentUser['userId'].toString()
