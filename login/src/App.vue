@@ -62,8 +62,8 @@
                 {{ userNameLogin.slice(0, 1).toUpperCase() }}
               </v-avatar>
             {{userNameLogin}}
-            <v-avatar class="accent white--text">
-                {{ data.item.slice(0, 1).toUpperCase() }}
+            <v-avatar class="white--text" :style="'background: #' + intToRGB(hashCode(userNameLogin))">
+                {{ userNameLogin.slice(0, 1).toUpperCase() }}
               </v-avatar>
             {{userNameLogin}}
             <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
@@ -267,6 +267,17 @@
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
           })
         }
+      },
+      hashCode (str) {
+        var hash = 0
+        for (var i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash)
+        }
+        return hash
+      },
+      intToRGB (i) {
+        var c = (i & 0x00FFFFFF).toString(16).toUpperCase()
+        return '00000'.substring(0, 6 - c.length) + c
       }
     }
   }
