@@ -4,7 +4,7 @@
       <div>
         <div style="position: relative;">
           <v-expansion-panel :value="[true]" class="expansion-pl">
-            <v-expansion-panel-content hide-actions :value="true">
+            <v-expansion-panel-content>
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
                 <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
@@ -205,7 +205,7 @@
           </div>
           <div style="position: relative;" v-if="originality !== 1">
             <v-expansion-panel :value="[true]" class="expansion-pl">
-              <v-expansion-panel-content hide-actions :value="true">
+              <v-expansion-panel-content>
                 <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
                 <v-card>
                   <v-card-text>

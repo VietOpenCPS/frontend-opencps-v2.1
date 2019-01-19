@@ -1,7 +1,7 @@
 <template>  
   <div class="phancong" style="background-color: white;width:100%">
     <v-expansion-panel :value="[true]" class="expansion-pl">
-      <v-expansion-panel-content hide-actions  :value="true">
+      <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
