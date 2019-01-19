@@ -1273,7 +1273,9 @@ export default {
         let userArr = vm.$store.getters.getUsersNextAction
         if (userArr.length > 0) {
           let check = userArr.filter(function (item) {
-            return item['userId'].toString() === currentUser['userId'].toString()
+            if (item !== undefined && currentUser !== undefined) {
+              return item['userId'].toString() === currentUser['userId'].toString()
+            }
           })
           if (check.length > 0) {
             checkValue = true
