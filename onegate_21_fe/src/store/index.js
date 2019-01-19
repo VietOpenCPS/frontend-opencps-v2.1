@@ -3264,6 +3264,7 @@ export const store = new Vuex.Store({
       })
     },
     loadingInitData (state) {
+      console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
       return state.initData
     },
     loadingDynamicBtn (state) {

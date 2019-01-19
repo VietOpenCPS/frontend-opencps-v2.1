@@ -781,9 +781,8 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
-      this.$store.dispatch('loadInitResource').then(function (result) {
-        return result.user
-      })
+      console.log('AAAAAAA: ', this.$store.getters.loadingInitData.user)
+      return this.$store.getters.loadingInitData.user
     },
     kysoSuccess () {
       return this.$store.getters.kysoSuccess
