@@ -1,4 +1,56 @@
-body .v-navigation-drawer--fixed {
+article, .glass::before {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .glass {
+    position: relative;
+  }
+  
+  .glass::before {
+    z-index: -1;
+    display: block;
+    position: absolute;
+    content: ' ';
+  }
+  
+  .glass::before {
+    /* background-image: url('path/to/image.jpg'); Actual image for this demo is a data-uri, see below */
+    /* Prefix free isn't picking up this one */
+    -webkit-filter: blur(42px);
+    filter: blur(42px);
+    background-size: cover;
+    opacity: 0.5;
+  }
+  
+  .glass {
+    background-color: white;
+  }
+  
+  /* transformations */
+  .glass.down {
+    transform: translateY(0%);
+  }
+  
+  .glass.up, .glass.up::before {
+    transform: translateY(0) translateZ(0);
+  }
+  
+  /* transitions */
+  .glass, .glass::before {
+    transition: transform 0.5s ease-out;
+  }
+  .glass::before {
+    background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
+  }
+  .has-control-menu .login_wrap_app_panel {
+      margin-top: 80px;
+  }
+  .login_wrap_app_panel {
+      margin-top: 25px;
+  }
+  body .v-navigation-drawer--fixed {
     position: absolute;
 }
 body .v-text-field {
@@ -226,4 +278,10 @@ body .v-chip--select-multi {
 }
 body .fade-transition-leave-to {
     display: none !important;
+}
+body .login_drawer {
+    position: fixed !important;
+}
+body .has-control-menu .login_drawer {
+    top: 55px;
 }
