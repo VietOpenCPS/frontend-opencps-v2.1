@@ -16,7 +16,6 @@ import axios from 'axios'
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 Vue.use(VueContentPlaceholders)
-Vue.use(Vuetify)
 Vue.config.productionTip = true
 
 Vue.mixin({
