@@ -109,6 +109,8 @@
       <v-navigation-drawer
         v-model="drawerLogin"
         fixed
+        right
+        hide-overlay
       >
 1313213
       </v-navigation-drawer>
