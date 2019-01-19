@@ -107,7 +107,7 @@
       </div>
       
       <v-navigation-drawer
-        v-model="drawer"
+        v-model="drawerLogin"
         temporary
         fixed
         clipped
@@ -117,7 +117,7 @@
         <v-list class="pa-1">
           <v-list-tile>
             <v-list-tile-content>
-              <v-btn-toggle style="width: 100%;" v-model="toggle_exclusive" mandatory>
+              <v-btn-toggle style="width: 100%;" mandatory>
                 <v-btn block flat class="px-0">
                   Hôm nay
                 </v-btn>
@@ -145,7 +145,7 @@
     data: () => ({
       isSignedIn: false,
       userNameLogin: '',
-      drawer: false,
+      drawerLogin: false,
       avatarURL: 'http://via.placeholder.com/350x150',
       notificationCount: 0,
       isShowUserMenu: false,
@@ -169,7 +169,7 @@
     methods: {
       showNoti () {
         let vm = this
-        vm.drawer = !vm.drawer
+        vm.drawerLogin = !vm.drawerLogin
       },
       doRegisterRedirect () {
       },
