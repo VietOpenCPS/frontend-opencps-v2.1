@@ -183,3 +183,23 @@ body .v-tabs__container--icons-and-text {
     background-color: #e7ecf7;
     border-color: #e7ecf7!important;
 }
+body .v-window__container--is-active {
+    height: auto !important;
+}
+body .v-expansion-panel__header {
+    padding: 8px 24px 8px 0;
+    min-height: 36px;
+}
+body .v-expansion-panel__header {
+    border-bottom: 1px solid #ddd !important;
+    box-shadow: none;
+}
+body .v-expansion-panel {
+    box-shadow: none;
+}
+body .v-input__slot {
+    margin-bottom: 5px;
+}
+body .form_alpaca .absolute__btn {
+    top: 5px;
+}

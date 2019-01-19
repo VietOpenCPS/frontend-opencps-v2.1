@@ -32,9 +32,9 @@
                 <v-menu offset-y style="position:relative !important;">
                   <span slot="activator" class="pr-2">
                     Thông tin người nộp
-                    <v-icon color="blue" size="22">arrow_drop_down</v-icon>
+                    <v-icon color="blue" size="22" style="position: absolute;right: -12px;top: -2px;">arrow_drop_down</v-icon>
                   </span>
-                  <v-list class="px-2 pt-1">
+                  <v-list class="px-3 py-2">
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Tên người nộp:</span>
                       <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 

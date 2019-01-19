@@ -43,7 +43,7 @@
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
-      <v-tabs icons-and-text class="mb-4" v-model="activeTab">
+      <v-tabs icons-and-text v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -330,7 +330,7 @@
         </v-tabs-items>
       </v-tabs>
       <!--  -->
-      <v-tabs icons-and-text class="mb-4" v-model="activeTab2">
+      <v-tabs icons-and-text v-model="activeTab2">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -451,7 +451,7 @@
           <v-tab-item value="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
-                <td class="text-xs-left px-2 py-2">
+                <td class="text-xs-left px-2 pt-2 pb-1">
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
                     : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
