@@ -58,7 +58,7 @@
             <v-avatar v-if="avatarURL !== ''">
               <img :src="avatarURL">
             </v-avatar>
-            <v-avatar v-else :style="{background: '#' + colorBG}">
+            <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
                 <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
             </v-avatar>
             {{userNameLogin}}
@@ -69,7 +69,7 @@
               expand_less
             </v-icon>
           </v-chip>
-          <v-list v-if="isShowUserMenu">
+          <v-list>
             <v-list-tile @click="doUserInfo">
               <v-list-tile-action>
                 <v-icon size="16">person</v-icon>
@@ -96,17 +96,20 @@
           z-index: 999;
         ">
         <article class="glass down">
-          <h1>Pelican</h1>
-          <p>Pel"i*can, n. Etym: [F. <em>pélican</em>, L. <em>pelicanus</em>, <em>pelecanus</em>, Gr. <em>paraçu</em>.] [Written also <em>pelecan</em>.]
-  
-          </p>
-          <p>1. (Zoöl.)
-  
-          </p>
-          <p>Defn: Any large webfooted bird of the genus of Pelecanus, of which about a dozen species are known. They have an enormous bill, to the lower edge of which is attached a pouch in which captured fishes are temporarily stored.
-  
-          </p>
-          <p>Note: The American white pelican (<em>Pelecanus erythrorhynchos</em>) and the brown species (<em>P. fuscus</em>) are abundant on the Florida coast in winter, but breed about the lakes in the Rocky Mountains and British America.</p>
+          <v-list class="pa-1">
+            <v-list-tile>
+              <v-list-tile-content>
+                <v-btn-toggle style="width: 100%;" v-model="toggle_exclusive" mandatory>
+                  <v-btn block flat class="px-0">
+                    Thông báo mới
+                  </v-btn>
+                  <v-btn block flat class="px-0">
+                    Đánh dấu đã đọc
+                  </v-btn>
+                </v-btn-toggle>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
         </article>
       </v-navigation-drawer>
     </div>
