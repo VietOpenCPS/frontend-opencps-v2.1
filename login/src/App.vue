@@ -111,6 +111,7 @@
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     data: () => ({
       isSignedIn: false,
@@ -120,6 +121,23 @@
       notificationCount: 0,
       isShowUserMenu: false,
       toggle_exclusive: 0
-    })
+    }),
+    created () {
+      let vm = this
+      vm.$nextTick(function () {
+        vm.isSignedIn = themeDisplay.isSignedIn()
+        vm.userNameLogin = themeDisplay.getUserName()
+        if (vm.isSignedIn) {
+          let param = {
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/users/' + themeDisplay.getUserId() + '/photo', param).then(function (response) {
+            vm.avatarURL = window.URL.createObjectURL(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }
+      })
+    }
   }
 </script>
