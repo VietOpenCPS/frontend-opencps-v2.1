@@ -781,7 +781,9 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
-      return this.$store.getters.loadingInitData.user
+      vm.$store.dispatch('loadInitResource').then(function (result) {
+        return result.user
+      })
     },
     kysoSuccess () {
       return this.$store.getters.kysoSuccess
@@ -2212,12 +2214,11 @@ export default {
       let userArr = vm.$store.getters.getUsersNextAction
       let userLastAction = [{'userId': vm.thongTinChiTietHoSo.lastActionUserId ? vm.thongTinChiTietHoSo.lastActionUserId : ''}]
       let userCheckPermission = userArr.concat(userLastAction)
-      if (userCheckPermission.length > 0 && currentUser !== undefined  && currentUser !== null) {
+      console.log('checkPemissionPhanCongLai: ', currentUser)
+      if (userCheckPermission.length > 0) {
         let check = userCheckPermission.filter(function (item) {
-          if (item !== undefined && item !== null) {
-            if (item !== undefined && currentUser !== undefined) {
-              return item['userId'].toString() === currentUser['userId'].toString()
-            }
+          if (item !== undefined && currentUser !== undefined) {
+            return item['userId'].toString() === currentUser['userId'].toString()
           }
         })
         if (check.length > 0) {
