@@ -111,6 +111,7 @@
         fixed
         right
         hide-overlay
+        temporary
       >
 1313213
       </v-navigation-drawer>
