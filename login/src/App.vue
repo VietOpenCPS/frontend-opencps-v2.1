@@ -58,8 +58,8 @@
             <v-avatar v-if="avatarURL !== ''">
               <img :src="avatarURL">
             </v-avatar>
-            <v-avatar v-else class="white--text" :style="'background: #' + colorBG">
-                {{ userNameLogin.slice(0, 1).toUpperCase() }}
+            <v-avatar v-else :style="{background: '#' + colorBG}">
+                <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
             </v-avatar>
             {{userNameLogin}}
             <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
