@@ -277,6 +277,6 @@ body .fade-transition-leave-to {
 body .login_drawer {
     position: fixed !important;
 }
-body .has-control-menu .login_drawer {
+body.has-control-menu .login_drawer {
     top: 55px;
 }

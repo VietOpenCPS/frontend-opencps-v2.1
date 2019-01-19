@@ -11,15 +11,15 @@
       <div class="login-wrapper">
         <div class="login-input">
           <div class="ico ico-user">
-            <input type="text" placeholder="Tài khoản đăng nhập" name="_LoginNotification_login">
+            <input type="text" placeholder="Tài khoản đăng nhập" name="_npmreactlogin_login">
           </div>
           <div class="ico ico-pass">
-            <input type="text" placeholder="Mật khẩu" name="_LoginNotification_password">
+            <input @keyup.enter="goToDangNhapPress" type="password" placeholder="Mật khẩu" name="_npmreactlogin_password">
           </div>
         </div>
         <div class="login-input">
           <div style="width: 100%;">
-            <a href="/forgotten-password" class="text-hover-blue" style="
+            <a :href="forgottenURLStr" class="text-hover-blue" style="
                     line-height: 30px;
                     font-size: 12px;
                     color: #005792;
@@ -31,8 +31,8 @@
                 width: 100%;
                 text-align: right;
               ">
-            <button type="button" class="btn-register">Đăng ký</button>
-            <button type="submit" class="btn-login">Đăng nhập</button>
+            <button type="button" class="btn-register" @click="goToDangKyPage">Đăng ký</button>
+            <button type="button" class="btn-login" @click="goToDangNhap">Đăng nhập</button>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
             </v-icon>
           </v-btn>
         </v-badge>
-        <v-btn @click="showNoti" v-else icon class="mx-0 my-0" style="margin-right: -10px !important">
+        <v-btn @click="showNoti" v-else icon class="mx-0 my-0">
           <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
             notifications
           </v-icon>
@@ -66,7 +66,7 @@
               expand_less
             </v-icon>
           </v-chip>
-          <v-list>
+          <v-list v-if="isShowUserMenu">
             <v-list-tile>
               <v-list-tile-action>
                 <v-icon size="16">person</v-icon>
@@ -111,6 +111,11 @@
 
 <script>
   import axios from 'axios'
+  import toastr from 'toastr'
+  toastr.options = {
+    'closeButton': true,
+    'timeOut': '15000'
+  }
   export default {
     data: () => ({
       isSignedIn: false,
@@ -119,13 +124,20 @@
       avatarURL: 'http://via.placeholder.com/350x150',
       notificationCount: 0,
       isShowUserMenu: false,
-      toggle_exclusive: 0
+      toggle_exclusive: 0,
+      forgottenURLStr: ''
     }),
     created() {
       let vm = this
       vm.$nextTick(function() {
         vm.isSignedIn = themeDisplay.isSignedIn()
         vm.userNameLogin = themeDisplay.getUserName()
+        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        if (redirectURL !== '') {
+          vm.forgottenURLStr = redirectURL + '/register/#/cap-lai-mat-khau'
+        } else {
+          vm.forgottenURLStr = themeDisplay.getURLHome() + '/register/#/cap-lai-mat-khau'
+        }
         if (vm.isSignedIn) {
           let param = {
             responseType: 'blob'
@@ -140,12 +152,103 @@
       showNoti() {
         let vm = this
         vm.drawerLogin = !vm.drawerLogin
-        console.log('do show Noti')
+        vm.isShowUserMenu = false
       },
-      doRegisterRedirect() {},
-      doUserInfo() {},
-      doExitApp() {
+      doRegisterRedirect () {
+        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        if (redirectURL !== '') {
+          window.location.href = redirectURL + '/register'
+        } else {
+          window.location.href = themeDisplay.getURLHome() + '/register'
+        }
+      },
+      doUserInfo () {
+        if (themeDisplay !== null && themeDisplay !== undefined) {
+          // eslint-disable-next-line
+          let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+          window.location.href = redirectURL + '/profile'
+        } else {
+          window.location.href = '/profile'
+        }
+      },
+      doExitApp () {
         window.location.href = '/c/portal/logout'
+      },
+      goToDangKyPage() {
+        if (themeDisplay !== null && themeDisplay !== undefined) {
+          // eslint-disable-next-line
+          let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+          if (redirectURL !== '') {
+            window.location.href = redirectURL + '/register'
+          } else {
+            window.location.href = themeDisplay.getURLHome() + '/register'
+          }
+        } else {
+          window.location.href = '/register'
+        }
+      },
+      goToDangNhap() {
+        axios.post('/o/v1/opencps/login', {}, {
+          headers: {
+            'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+          }
+        }).then(function (response) {
+          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha') {
+            if (response.data === 'pending') {
+              window.location.href = window.themeDisplay.getURLHome() +
+              "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                "&redirectURL=" + window.themeDisplay.getURLHome()
+            } else {
+              window.location.href = response.data
+            }
+          } else if (response.data === 'ok') {
+            window.location.href = window.themeDisplay.getURLHome()
+          } else if (response.data === 'captcha') {
+            let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            if (redirectURL !== '') {
+              window.location.href = redirectURL + '/register#/login'
+            } else {
+              window.location.href = themeDisplay.getURLHome() + '/register#/login'
+            }
+          } else {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+          }
+        }).catch(function (error) {
+          toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+        })
+      },
+      goToDangNhapPress(e) {
+        if(e.keyCode == 13){
+          axios.post('/o/v1/opencps/login', {}, {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(window.document.getElementById("_npmreactlogin_login").value + ":" + window.document.getElementById("_npmreactlogin_password").value)
+            }
+          }).then(function (response) {
+            console.log(response.data)
+            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha') {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              window.location.href = window.themeDisplay.getURLHome()
+            } else if (response.data === 'captcha') {
+              let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+              if (redirectURL !== '') {
+                window.location.href = redirectURL + '/register#/login'
+              } else {
+                window.location.href = themeDisplay.getURLHome() + '/register#/login'
+              }
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+            }
+          }).catch(function (error) {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+          })
+        }
       }
     }
   }
