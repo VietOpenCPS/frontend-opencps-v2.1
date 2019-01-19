@@ -106,35 +106,6 @@
         </v-menu>
       </div>
       
-      <v-navigation-drawer
-        v-model="drawerLogin"
-        temporary
-        fixed
-        clipped
-        right
-        hide-overlay
-      >
-        <v-list class="pa-1">
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-btn-toggle style="width: 100%;" mandatory>
-                <v-btn block flat class="px-0">
-                  Hôm nay
-                </v-btn>
-                <v-btn block flat class="px-0">
-                  Thông báo mới
-                </v-btn>
-              </v-btn-toggle>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-  
-        <v-list class="pt-0" dense>
-          <v-divider></v-divider>
-  
-        </v-list>
-      </v-navigation-drawer>
-
     </div>
   </v-app>
 </template>
@@ -170,6 +141,7 @@
       showNoti () {
         let vm = this
         vm.drawerLogin = !vm.drawerLogin
+        console.log('do show Noti')
       },
       doRegisterRedirect () {
       },
