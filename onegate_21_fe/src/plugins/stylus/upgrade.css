@@ -44,12 +44,7 @@ article, .glass::before {
   .glass::before {
     background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
   }
-  .has-control-menu .login_wrap_app_panel {
-      margin-top: 80px;
-  }
-  .login_wrap_app_panel {
-      margin-top: 25px;
-  }
+
   body .v-navigation-drawer--fixed {
     position: absolute;
 }
