@@ -52,7 +52,7 @@
             </v-icon>
           </v-btn>
         </v-badge>
-        <v-btn v-else icon class="mx-0 my-0" style="margin-right: -10px !important">
+        <v-btn @click="showNoti" v-else icon class="mx-0 my-0" style="margin-right: -10px !important">
             <v-icon
               size="20"
               color="blue darken-3"
@@ -106,6 +106,12 @@
         </v-menu>
       </div>
       
+      <v-navigation-drawer
+        v-model="drawerLogin"
+        fixed
+      >
+1313213
+      </v-navigation-drawer>
     </div>
   </v-app>
 </template>
