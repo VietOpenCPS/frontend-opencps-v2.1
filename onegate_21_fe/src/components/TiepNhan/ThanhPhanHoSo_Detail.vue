@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative;">
     <v-expansion-panel :value="[true]" class="expansion-pl">
-      <v-expansion-panel-content hide-actions value="1">
+      <v-expansion-panel-content hide-actions :value="true">
         <div slot="header">
           <div class="background-triangle-small"> IV.</div>
           KẾT QUẢ LIÊN THÔNG &nbsp;&nbsp;&nbsp;&nbsp; 

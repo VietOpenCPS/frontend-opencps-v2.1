@@ -18,7 +18,7 @@
       </div>
     </div>
     <v-expansion-panel :value="[true]" class="expansion-pl">
-      <v-expansion-panel-content hide-actions value="1">
+      <v-expansion-panel-content hide-actions :value="true">
         <!-- <div slot="header"><div class="background-triangle-small"> V. </div>LỆ PHÍ</div> -->
         <v-card>
           <v-card-text>
