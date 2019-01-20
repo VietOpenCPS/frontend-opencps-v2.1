@@ -1,12 +1,10 @@
 export const templateDefault = {
-    layout_view: {
-        template: `
-            abc 123
-        `,
-        data: () => ({
-          item: this.item
-        })
-      }
+    template: `
+        abc 123
+    `,
+    data: () => ({
+        item: this.item
+    })
 }
 export const testData = [
     {  
