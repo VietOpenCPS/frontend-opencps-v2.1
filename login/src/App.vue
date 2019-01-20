@@ -137,7 +137,14 @@
                     background: #ffffffb3;
                     border-bottom-left-radius: 8px;
                     border-bottom-right-radius: 8px;
-                ">131232312313
+                ">
+                <template-rendering
+                  v-for="(item, index) in testData"
+                  v-bind:key="index"
+                  :item="item"
+                  :layout_view="item['layout_view']"
+                  :template_default="templateDefault"
+                ></template-rendering>
               </div>
   
             </div>
@@ -151,11 +158,16 @@
 <script>
   import axios from 'axios'
   import toastr from 'toastr'
+  import TemplateRendering from './template_rendering.vue'
+  import { templateDefault, testData } from './DefaultTemplate.js'
   toastr.options = {
     'closeButton': true,
     'timeOut': '15000'
   }
   export default {
+    components: {
+      'template-rendering': TemplateRendering
+    },
     data: () => ({
       isSignedIn: false,
       userNameLogin: '',
@@ -168,7 +180,8 @@
       userName: '',
       passWord: '',
       userData: {},
-      colorBG: '009688'
+      colorBG: '009688',
+
     }),
     created() {
       let vm = this
