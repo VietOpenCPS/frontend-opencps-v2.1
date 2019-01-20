@@ -1,9 +1,9 @@
 export const templateDefault = {
     template: `
-        <div style="border-bottom: 1px solid #cfdbe8;"><p>abc</p><p>123</p></div>
+        <div><p>abc</p><p>123</p></div>
     `,
     data: () => ({
-        item: this.item
+        item: vm.item
     })
 }
 export const testData = [
