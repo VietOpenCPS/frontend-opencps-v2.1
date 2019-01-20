@@ -3,7 +3,9 @@ export const templateDefault = {
     <div><p>abc</p><p>123</p></div>
     `,
     data: () => ({
-        item:REPLACEDATA
+        item: {
+            dossierId: 1
+        }
     })
 }
 export const testData = [
