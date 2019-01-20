@@ -3,7 +3,9 @@ export const templateDefault = {
         abc 123
     `,
     data: () => ({
-        item: this.item
+        item: {
+            dossierId: 1
+        }
     })
 }
 export const testData = [
