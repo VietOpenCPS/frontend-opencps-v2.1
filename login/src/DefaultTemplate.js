@@ -7,25 +7,25 @@ export const templateDefault = {
                     color: #0072c2;
                     font-weight: bold;
                 ">
-                    {{item["data"]["Dossier"]["dossierId"]}}
+                    {{dossier["dossierId"]}}
                     <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px;color: #0072c2;">launch</i>
                 </a>
             </p>
             <p style="color: #90949c;">
             <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>&nbsp;
-                {{new Date(item["data"]["Dossier"]["createDate"]).toLocaleDateString('vi-VN')}}
+                {{new Date(dossier["createDate"]).toLocaleDateString('vi-VN')}}
             </p>
         </div>
     `,
     data: () => ({
-        item: {
-            
-        }
+        item: {},
+        dossier: {}
     }),
     created: function() {
         let vm = this
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
+            vm.dossier = eval(' ( ' + vm.item['data'] + ' ) ')['Dossier']
         }
         console.log(vm.item)
     }
