@@ -126,8 +126,10 @@
               <div style="
                     padding: 5px 10px;
                     background: #fff0;
+                    text-transform: uppercase;
+                    font-weight: bold;
                 ">
-                <v-icon>mail</v-icon>
+                <v-icon size="15" color="red accent-4">mail</v-icon>
                 Thông báo
               </div>
               <div style="
