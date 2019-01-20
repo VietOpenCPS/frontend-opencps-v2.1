@@ -1,6 +1,20 @@
 export const templateDefault = {
     template: `
-        <div><p>{{item["notificationText"]}}</p><p>123</p></div>
+        <div>
+            <p style="margin-bottom: 0px;">
+                {{item["notificationText"]}}
+                <a href="" style="
+                    color: #0072c2;
+                    font-weight: bold;
+                ">
+                    {{item["dossierId"]}}
+                    <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px;color: #0072c2;">launch</i>
+                </a>
+            </p>
+            <p style="color: #90949c;">
+                <v-icon size="15" color="blue">group_work</v-icon>&nbsp;{{new Date(item["createDate"]).toLocaleDateString('vi-VN')}}
+            </p>
+        </div>
     `,
     data: () => ({
         item: {

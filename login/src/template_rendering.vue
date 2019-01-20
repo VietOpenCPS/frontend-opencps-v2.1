@@ -28,7 +28,6 @@ export default {
     let created = '{}'
     let updated = '{}'
     let methods = '{}'
-    console.log('vm.item', vm.item)
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       Vue.component('my-dynamic-view', {
         template: vm.layout_view['template'],
