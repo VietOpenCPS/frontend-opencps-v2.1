@@ -11,8 +11,8 @@ export const templateDefault = {
                     <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px;color: #0072c2;">launch</i>
                 </a>
             </p>
-            <p style="color: #90949c;">
-            <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>&nbsp;
+            <p style="color: #90949c;font-size: 12px;">
+            <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
                 {{new Date(dossier["createDate"]).toLocaleDateString('vi-VN')}}
             </p>
         </div>
