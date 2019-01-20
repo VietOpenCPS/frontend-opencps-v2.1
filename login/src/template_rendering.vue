@@ -1,5 +1,5 @@
 <template>
-    <my-dynamic-view v-if="(layout_view !== null && layout_view !== undefined && layout_view !== 'undefined')"></my-dynamic-view>
+    <my-dynamic-view></my-dynamic-view>
 </template>
 
 <script>
