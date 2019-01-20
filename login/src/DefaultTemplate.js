@@ -3,8 +3,13 @@ export const templateDefault = {
         <div><p>abc</p><p>123</p></div>
     `,
     data: () => ({
-        item: vm.item
-    })
+        item: {
+            
+        }
+    }),
+    created: function() {
+        alert(123)
+    }
 }
 export const testData = [
     {  
