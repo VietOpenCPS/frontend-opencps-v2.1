@@ -281,3 +281,10 @@ body .login_drawer {
 body .has-control-menu .login_drawer {
     top: 55px;
 }
+body .notification_wrap > div {
+    border-bottom: 1px solid #d0d0d0;
+    margin-bottom: 5px;
+}
+body .notification_wrap > div:last-child {
+    border-bottom: none;
+}
