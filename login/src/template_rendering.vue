@@ -1,5 +1,5 @@
 <template>
-    <my-dynamic-view></my-dynamic-view>
+    <my-dynamic-view v-if="(template_default !== null && template_default !== undefined && template_default !== 'undefined')"></my-dynamic-view>
 </template>
 
 <script>
@@ -37,7 +37,7 @@ export default {
       methods = vm.layout_view['methods']
     } else if (vm.template_default !== null && vm.template_default !== undefined && vm.template_default !== 'undefined') {
       template = vm.template_default['template']
-      data = JSON.stringify(vm.template_default['data']).replace('item:REPLACEDATA', 'item: ' + JSON.stringify(vm.item))
+      data = vm.template_default['data']
       created = vm.template_default['created']
       updated = vm.template_default['updated']
       methods = vm.template_default['methods']
