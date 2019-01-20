@@ -132,7 +132,7 @@
                 <v-icon size="15" color="red accent-4">mail</v-icon>
                 Thông báo
               </div>
-              <div style="
+              <div class="notification_wrap" style="
                     padding: 5px 10px;
                     background: #ffffffb3;
                     border-bottom-left-radius: 8px;

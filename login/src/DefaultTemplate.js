@@ -8,7 +8,9 @@ export const templateDefault = {
         }
     }),
     created: function() {
-        alert(123)
+        let vm = this
+        console.log(vm)
+        console.log(vm.$parent)
     }
 }
 export const testData = [
