@@ -41,9 +41,12 @@ export default {
       updated = vm.template_default['updated']
       methods = vm.template_default['methods']
     }
-
-    console.log('vm.template', template)
+    console.log('data', data['item'])
+    data['item'] = {
+      dossierId: 123
+    }
     console.log('data', data)
+    console.log('data', data['item'])
     Vue.component('my-dynamic-view', {
       template: template,
       data: eval(' ( ' + data + ' ) '),
