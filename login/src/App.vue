@@ -146,7 +146,7 @@
                   :template_default="templateDefault"
                 ></template-rendering>
 
-                // {{testData}} // {{templateDefault}}
+                // {{testData}} // {{templateDefault}} // {{templateDefaultDDD}}
               </div>
   
             </div>
@@ -183,7 +183,7 @@
       passWord: '',
       userData: {},
       colorBG: '009688',
-
+      templateDefaultDDD: templateDefault
     }),
     created() {
       let vm = this
