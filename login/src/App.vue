@@ -145,6 +145,8 @@
                   :layout_view="item['layout_view']"
                   :template_default="templateDefault"
                 ></template-rendering>
+
+                // {{testData}} // {{templateDefault}}
               </div>
   
             </div>
