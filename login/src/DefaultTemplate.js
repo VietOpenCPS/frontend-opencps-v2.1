@@ -3,7 +3,7 @@ export const templateDefault = {
     <div><p>abc</p><p>123</p></div>
     `,
     data: () => ({
-        item: this.itemInput
+        item:REPLACEDATA
     })
 }
 export const testData = [
