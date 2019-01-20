@@ -30,26 +30,22 @@ export default {
     let methods = '{}'
     console.log('vm.item', vm.item)
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
-      template = vm.layout_view['template']
-      data = vm.layout_view['data']
-      created = vm.layout_view['created']
-      updated = vm.layout_view['updated']
-      methods = vm.layout_view['methods']
+      Vue.component('my-dynamic-view', {
+        template: vm.layout_view['template'],
+        data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
+        created: eval(' ( ' + vm.layout_view['created'] + ' ) '),
+        updated: eval(' ( ' + vm.layout_view['updated'] + ' ) '),
+        methods: vm.layout_view['methods']
+      })
     } else if (vm.template_default !== null && vm.template_default !== undefined && vm.template_default !== 'undefined') {
-      template = vm.template_default['template']
-      data = vm.template_default['data']
-      created = vm.template_default['created']
-      updated = vm.template_default['updated']
-      methods = vm.template_default['methods']
+      Vue.component('my-dynamic-view', {
+        template: vm.template_default['template'],
+        data: eval(' ( ' + vm.template_default['data'] + ' ) '),
+        created: eval(' ( ' + vm.template_default['created'] + ' ) '),
+        updated: eval(' ( ' + vm.template_default['updated'] + ' ) '),
+        methods: vm.template_default['methods']
+      })
     }
-    console.log('data', data)
-    Vue.component('my-dynamic-view', {
-      template: template,
-      data: eval(' ( ' + data + ' ) '),
-      created: eval(' ( ' + created + ' ) '),
-      updated: eval(' ( ' + updated + ' ) '),
-      methods: methods
-    })
   }
 }
 </script>

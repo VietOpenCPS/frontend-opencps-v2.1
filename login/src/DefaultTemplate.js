@@ -1,11 +1,9 @@
 export const templateDefault = {
     template: `
-    <div><p>abc</p><p>123</p></div>
+        <div style="border-bottom: 1px solid #cfdbe8;"><p>abc</p><p>123</p></div>
     `,
     data: () => ({
-        item: {
-            dossierId: 1
-        }
+        item: this.item
     })
 }
 export const testData = [
