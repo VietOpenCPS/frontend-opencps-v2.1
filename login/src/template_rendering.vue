@@ -28,8 +28,6 @@ export default {
     let created = '{}'
     let updated = '{}'
     let methods = '{}'
-    console.log('vm.layout_view', vm.layout_view)
-    console.log('vm.template_default', vm.template_default)
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       template = vm.layout_view['template']
       data = vm.layout_view['data']
@@ -43,6 +41,9 @@ export default {
       updated = vm.template_default['updated']
       methods = vm.template_default['methods']
     }
+
+    console.log('vm.template', template)
+    console.log('data', data)
     Vue.component('my-dynamic-view', {
       template: template,
       data: eval(' ( ' + data + ' ) '),
