@@ -28,6 +28,7 @@ export default {
     let created = '{}'
     let updated = '{}'
     let methods = '{}'
+    console.log('vm.item', vm.item)
     if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
       template = vm.layout_view['template']
       data = vm.layout_view['data']
@@ -36,17 +37,12 @@ export default {
       methods = vm.layout_view['methods']
     } else if (vm.template_default !== null && vm.template_default !== undefined && vm.template_default !== 'undefined') {
       template = vm.template_default['template']
-      data = vm.template_default['data']
+      data = vm.template_default['data'].replace('item:REPLACEDATA', 'item: ' + JSON.stringify(vm.item))
       created = vm.template_default['created']
       updated = vm.template_default['updated']
       methods = vm.template_default['methods']
     }
-    console.log('data', data['item'])
-    data['item'] = {
-      dossierId: 123
-    }
     console.log('data', data)
-    console.log('data', data['item'])
     Vue.component('my-dynamic-view', {
       template: template,
       data: eval(' ( ' + data + ' ) '),
