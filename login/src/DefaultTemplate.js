@@ -1,6 +1,6 @@
 export const templateDefault = {
     template: `
-        <div><p>abc</p><p>123</p></div>
+        <div><p>{{item["notificationText"]}}</p><p>123</p></div>
     `,
     data: () => ({
         item: {
@@ -9,8 +9,10 @@ export const templateDefault = {
     }),
     created: function() {
         let vm = this
-        console.log(vm)
-        console.log(vm.$parent)
+        if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
+            vm.item = vm.$parent.item
+        }
+        console.log(vm.item)
     }
 }
 export const testData = [
