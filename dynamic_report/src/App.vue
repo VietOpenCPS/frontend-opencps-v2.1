@@ -4,11 +4,66 @@
                   position: relative;
                   height: 50px;
               ">
-              123123 sf afs 
+              123123 17777
     </div>
     <div v-else>
   
-      <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary>
+      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
+        <v-badge color="red" v-if="notificationCount > 0">
+          <span slot="badge">2</span>
+          <v-btn @click="showNoti" icon class="mx-0 my-0">
+            <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
+              notifications_active
+            </v-icon>
+          </v-btn>
+        </v-badge>
+        <v-btn @click="showNoti" v-else icon class="mx-0 my-0">
+          <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
+            notifications
+          </v-icon>
+        </v-btn>
+        <v-menu offset-y :nudge-bottom="5">
+          <v-chip slot="activator" @click="isShowUserMenu = !isShowUserMenu">
+            <v-avatar v-if="avatarURL !== ''">
+              <img :src="avatarURL">
+            </v-avatar>
+            <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
+              <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
+            </v-avatar>
+            {{userNameLogin}}
+            <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
+              expand_more
+            </v-icon>
+            <v-icon v-else size="20" color="blue darken-3" class="swing animated">
+              expand_less
+            </v-icon>
+          </v-chip>
+          <v-list>
+            <v-list-tile @click="doUserInfo">
+              <v-list-tile-action>
+                <v-icon size="16">person</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Thông tin tài khoản</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile @click="doExitApp">
+              <v-list-tile-action>
+                <v-icon size="16" color="red darken-3">exit_to_app</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Đăng xuất</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+      </div>
+  
+      <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
+              -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+              box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+              z-index: 9999;
+            ">
         <article class="glass down">
           <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
             <v-flex xs6 class="text-center">
