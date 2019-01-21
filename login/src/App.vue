@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_login">
+  <v-app id="app_dynamic_report">
     <div @click="showNoti" v-if="drawerLogin" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;    z-index: 9999;"></div>
     <div v-if="drawer" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="!isSignedIn" style="
