@@ -1,55 +1,27 @@
 <template>
   <v-app id="app_dynamic_report">
-    <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
-            -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-            box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-            z-index: 9999;
-          ">
+    <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary>
       <article class="glass down">
-        <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
+        <v-layout class="px-3" row wrap>
           <v-flex xs6 class="text-center">
-            <v-btn block small style="
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-      border-top-left-radius: 8px;
-      border-bottom-left-radius: 8px;
-  ">
+            <v-btn block small>
               Thông báo mới
             </v-btn>
           </v-flex>
           <v-flex xs6 class="text-center">
-            <v-btn block small style="
-      background: #d0d0d0;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      border-top-right-radius: 8px;
-      border-bottom-right-radius: 8px;
-  ">
+            <v-btn block small>
               Đánh dấu đã đọc
             </v-btn>
           </v-flex>
         </v-layout>
         <div class="layout row wrap pl-3 pr-4" style="display: flex;">
-          <div class="flex xs12 mt-3" style="
-                background: #ffffff66;
-                border-radius: 8px;
-            ">
+          <div class="flex xs12 mt-3">
 
-            <div style="
-                  padding: 5px 10px;
-                  background: #fff0;
-                  text-transform: uppercase;
-                  font-weight: bold;
-              ">
+            <div>
               <v-icon size="15" color="red accent-4">mail</v-icon>
               Thông báo
             </div>
-            <div class="notification_wrap" style="
-                  padding: 5px 10px;
-                  background: #ffffffb3;
-                  border-bottom-left-radius: 8px;
-                  border-bottom-right-radius: 8px;
-              ">
+            <div class="notification_wrap">
             </div>
 
           </div>
@@ -57,65 +29,10 @@
       </article>
     </v-navigation-drawer>
     
-    <div v-if="!isSignedIn" style="
-                  position: relative;
-                  height: 50px;
-              ">
-              123123 17777 123 2132131 adsfdsfsdfa
+    <div v-if="!isSignedIn">
+              123123 17777 123 2132131 adsfdsfsdfa 111
     </div>
     <div v-else>
-  
-      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
-        <v-badge color="red" v-if="notificationCount > 0">
-          <span slot="badge">2</span>
-          <v-btn icon class="mx-0 my-0">
-            <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
-              notifications_active
-            </v-icon>
-          </v-btn>
-        </v-badge>
-        <v-btn v-else icon class="mx-0 my-0">
-          <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
-            notifications
-          </v-icon>
-        </v-btn>
-        <v-menu offset-y :nudge-bottom="5">
-          <v-chip slot="activator">
-            <v-avatar v-if="avatarURL !== ''">
-              <img :src="avatarURL">
-            </v-avatar>
-            <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
-              <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
-            </v-avatar>
-            {{userNameLogin}}
-            <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
-              expand_more
-            </v-icon>
-            <v-icon v-else size="20" color="blue darken-3" class="swing animated">
-              expand_less
-            </v-icon>
-          </v-chip>
-          <v-list>
-            <v-list-tile>
-              <v-list-tile-action>
-                <v-icon size="16">person</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>Thông tin tài khoản</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile>
-              <v-list-tile-action>
-                <v-icon size="16" color="red darken-3">exit_to_app</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>Đăng xuất</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
-      </div>
-  
       
     </div>
   </v-app>
