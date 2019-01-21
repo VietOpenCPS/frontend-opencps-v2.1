@@ -9,8 +9,16 @@
     <div v-else>
   
       <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
-        <v-btn icon class="mx-0 my-0">
-          <v-icon size="20" color="blue darken-3">
+        <v-badge color="red" v-if="notificationCount > 0">
+          <span slot="badge">2</span>
+          <v-btn icon class="mx-0 my-0">
+            <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
+              notifications_active
+            </v-icon>
+          </v-btn>
+        </v-badge>
+        <v-btn v-else icon class="mx-0 my-0">
+          <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
             notifications
           </v-icon>
         </v-btn>
@@ -112,18 +120,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import toastr from 'toastr'
-  import TemplateRendering from './template_rendering.vue'
-  import { templateDefault, testData } from './DefaultTemplate.js'
-  toastr.options = {
-    'closeButton': true,
-    'timeOut': '15000'
-  }
   export default {
-    components: {
-      'template-rendering': TemplateRendering
-    },
     data: () => ({
       isSignedIn: false,
       userNameLogin: '',
