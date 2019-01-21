@@ -30,4 +30,4 @@ new Vue({
     vm.$store.dispatch('loadInitResource')
   },
   render: function (h) { return h(App) }
-}).$mount('#app_dynamic_report')
+}).$mount('#app_login_hight_bee')
