@@ -1,7 +1,6 @@
 <template>
   <v-app id="app_dynamic_report" class="onegate__fe">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
     >
       <div class="drawer__filter px-2">
         <v-list dense style="padding: 0;" class="report_list">
@@ -170,7 +169,7 @@
       }
     },
     created () {
-    var vm = this
+      var vm = this
       vm.$nextTick(function () {
         if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
           vm.reportTypeFilter = vm.$route.query.reportType
