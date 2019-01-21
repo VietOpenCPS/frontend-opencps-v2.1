@@ -11,44 +11,6 @@
         </v-tab>
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition" style="overflow: visible!important">
           <v-tab-item value="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
-            <!-- Một cửa -->
-            <div class="px-4 pt-2">
-              <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
-                <p class="mb-2">
-                  <span>Chuyển đến bởi: </span>
-                  <b>&nbsp;{{thongTinChiTietHoSo.lastActionUser}}</b>
-                  <span v-if="thongTinChiTietHoSo.lastActionNote && thongTinChiTietHoSo.lastActionNote !== 'null'">
-                    <span> - Ý kiến: </span>
-                    <span style="color: #0b72ba">&nbsp;{{thongTinChiTietHoSo.lastActionNote}}</span>
-                  </span>
-                </p>
-                <v-layout wrap xs12 class="mb-0"> 
-                  <v-flex style="width: calc(100% - 100px)">
-                    <span>Người thực hiện: &nbsp;</span>
-                    <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
-                      <span v-for="(item, index) in usersNextAction" :key="item.userId">
-                        &nbsp;<b>{{item.userName}}</b><span v-if="index !== (usersNextAction.length - 1)">,</span>
-                      </span>
-                      <span v-if="stepOverdueNextAction"> - </span>
-                      <span :style="stepOverdueNextAction&&stepOverdueNextAction.indexOf('Quá hạn') < 0 ? 'color:green' : 'color:red'">
-                        {{stepOverdueNextAction}}
-                      </span>
-                    </span>
-                  </v-flex>
-                  <v-flex class="text-xs-right" style="width:100px">
-                    <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
-                      <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
-                    </v-btn>
-                  </v-flex>
-                </v-layout>
-              </div>
-              <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate && btnStateVisible">
-                <p class="mb-2">
-                  Hồ sơ đã hoàn thành quá trình xử lý
-                </p>
-              </div>
-            </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
               <v-expansion-panel :value="[true]" class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
