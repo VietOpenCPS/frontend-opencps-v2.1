@@ -219,26 +219,14 @@
             </v-expansion-panel>
           </v-tab-item>
           <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
-            <v-card>
-              <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
-            </v-card>
+            123
           </v-tab-item>
           <v-tab-item v-if="listLienThong.length>0" value="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
-            <v-card>
-              <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
-              <v-card-text v-else>
-                <v-flex xs12 class="text-xs-center">
-                  <span>Không có hồ sơ liên thông</span>
-                </v-flex>
-              </v-card-text>
-            </v-card>
+            123
           </v-tab-item>
           <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             13123
           </v-tab-item>
-          <!-- <v-tab-item id="tabs-7" :key="7" reverse-transition="fade-transition" transition="fade-transition">
-            <div id="mermaid_dossier" class="mermaid" style="padding: 15px;"></div>
-          </v-tab-item> -->
         </v-tabs-items>
       </v-tabs>
     </div>
