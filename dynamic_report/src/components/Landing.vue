@@ -1,6 +1,6 @@
 <template>
   <div>
-    123131 xxxxxx 111 12312312
+    123131 xxxxxx 111 12312312 1231 312 xxxxx 
     <v-layout wrap>
       <div>
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">

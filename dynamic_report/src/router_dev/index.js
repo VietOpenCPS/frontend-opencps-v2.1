@@ -7,7 +7,6 @@ import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
 import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/DetailForward'
-import DanhSachThuTuc from '@/components/DanhSachThuTuc'
 import NotFound from '@/components/NotFound'
 
 const routes = [
@@ -18,7 +17,6 @@ const routes = [
   { path: '/danh-sach-ho-so/:index/xu-ly-ho-so', name: 'XuLyHoSo', component: XuLyHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },
   { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', name: 'DetailForward', component: DetailForward, props: true },
-  { path: '/add-dvc/:serviceCode', name: 'DanhSachThuTuc', component: DanhSachThuTuc, props: true },
   { path: '*', name: 'NotFound', component: NotFound }
 ]
 
