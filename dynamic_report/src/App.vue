@@ -1,7 +1,15 @@
 <template>
   <v-app id="app_dynamic_report">
+    <div v-if="!isSignedIn" style="
+                  position: relative;
+                  height: 50px;
+              ">
+              123123 17777 123
+    </div>
+    <div v-else>
+  
       <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
-        sadfadsf
+        ccc
       </div>
   
       <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
@@ -10,63 +18,10 @@
               z-index: 9999;
             ">
         <article class="glass down">
-          <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-    ">
-                Thông báo mới
-              </v-btn>
-            </v-flex>
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        background: #d0d0d0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    ">
-                Đánh dấu đã đọc
-              </v-btn>
-            </v-flex>
-          </v-layout>
-          <div class="layout row wrap pl-3 pr-4" style="display: flex;">
-            <div class="flex xs12 mt-3" style="
-                  background: #ffffff66;
-                  border-radius: 8px;
-              ">
-  
-              <div style="
-                    padding: 5px 10px;
-                    background: #fff0;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                ">
-                <v-icon size="15" color="red accent-4">mail</v-icon>
-                Thông báo
-              </div>
-              <div class="notification_wrap" style="
-                    padding: 5px 10px;
-                    background: #ffffffb3;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
-                ">
-                <template-rendering
-                  v-for="(item, index) in testData"
-                  v-bind:key="index"
-                  :item="item"
-                  :layout_view="item['layout_view']"
-                  :template_default="templateDefault"
-                ></template-rendering>
-              </div>
-  
-            </div>
-          </div>
+          123123
         </article>
       </v-navigation-drawer>
+    </div>
   </v-app>
 </template>
 
