@@ -1,8 +1,6 @@
 <template>
   <div class="form-chitiet">
     
-    <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
-    <!--  -->
     <div>
       <v-tabs icons-and-text v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
