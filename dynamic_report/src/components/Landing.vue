@@ -1,13 +1,12 @@
 <template>
   <div>
-    qweqeqweqweqweqe
+    sadfsadfsaf
   </div>
 </template>
 
 <script>
 export default {
   props: ['index'],
-  data: () => ({
-  })
+  data: () => ({})
 }
 </script>
