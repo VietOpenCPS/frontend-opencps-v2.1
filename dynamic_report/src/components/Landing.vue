@@ -3,11 +3,7 @@
     à adf ádf ádf sdf
     <v-layout wrap>
       <div>
-        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">
-          <v-avatar v-if="item.key === 'deleted'"><v-icon size="16">delete</v-icon></v-avatar>
-          <v-avatar v-else>{{item.count}}</v-avatar>
-          {{item.title}}
-        </v-chip>
+        adf
       </div>
     </v-layout>
   </div>
