@@ -14,7 +14,7 @@
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
               <v-expansion-panel :value="[true]" class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  123
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
