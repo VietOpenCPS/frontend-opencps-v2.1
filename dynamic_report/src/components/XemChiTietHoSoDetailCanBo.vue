@@ -46,7 +46,13 @@
 
 <script>
 
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+
 export default {
+  props: ['index', 'id'],
+  components: {
+    'thanh-phan-ho-so': ThanhPhanHoSo
+  },
   data: () => ({})
 }
 </script>
