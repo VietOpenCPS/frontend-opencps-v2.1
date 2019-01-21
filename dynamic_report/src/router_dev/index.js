@@ -5,10 +5,8 @@ import TiepNhanHoSoDetail from '@/components/blacklist/TiepNhanHoSoDetail'
 import HoanThienBoSungHoSoDetail from '@/components/blacklist/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
-import LandingHome from '@/components/screens/Landing'
 
 const routes = [
-  { path: '/bao-cao/:index', name: 'LandingHome', component: LandingHome, props: true },
   { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
   { path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode', name: 'TiepNhanHoSoDetail', component: TiepNhanHoSoDetail, props: true },
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },

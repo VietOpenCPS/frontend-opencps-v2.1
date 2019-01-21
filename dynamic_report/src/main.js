@@ -46,21 +46,5 @@ Vue.mixin({
 new Vue({
   router,
   store,
-  beforeCreate () {
-    var vm = this
-    vm.$store.dispatch('loadInitResource')
-  },
-  created() {
-    var vm = this
-    vm.$nextTick(function() {
-      if (window.location.href.endsWith('#/')) {
-        let strQuery = ''
-        if (window.location.href.includes('/so-theo-doi')) {
-          strQuery = '?reportType=register'
-        }
-        vm.$router.push('/bao-cao/0' + strQuery)
-      }
-    })
-  },
   render: function (h) { return h(App) }
 }).$mount('#app_dynamic_report')

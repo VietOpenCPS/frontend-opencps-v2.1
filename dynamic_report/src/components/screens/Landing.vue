@@ -7,18 +7,6 @@
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
           <v-layout wrap class="chart__report">
             <v-flex class="px-2 text-right">
-              <!--
-              <v-btn flat class="mx-0 my-0" v-if="showConfig" v-on:click.native="doSaveConfig">
-                <v-icon>settings</v-icon> &nbsp;
-                Lưu thay đổi
-              </v-btn>
-              <vue-csv-downloader
-                :data="csvExport"
-                :fields="fields"
-                :downloadname="nameReport"
-              >
-              </vue-csv-downloader>
-              -->
               <v-btn flat class="mx-0 my-0" v-on:click.native="showGuilds = !showGuilds">
                 <v-icon>receipt</v-icon> &nbsp; Hướng dẫn PDF -> Excel
               </v-btn>
