@@ -1,22 +1,11 @@
 <template>
   <v-app id="app_dynamic_report">
-    <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}'
-    >
+    <v-navigation-drawer app clipped floating width="240">
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
       </content-placeholders>
       <v-list v-else class="py-0 nav_trang_thai_ho_so">
-        <v-list-group
-          v-for="(item, index) in trangThaiHoSoList"
-          v-model="item.active"
-          :key="index"
-          prepend-icon="description"
-          :append-icon="item.hasOwnProperty('items') ? '' : ''"
-          no-action
-          ref="listGroupCustom"
-        >
-        </v-list-group>
+       
       </v-list>
     </v-navigation-drawer>
     <v-content>
