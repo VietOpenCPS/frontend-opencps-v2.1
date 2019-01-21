@@ -1,9 +1,14 @@
 <template>
   <v-app id="app_dynamic_report">
-    
-      <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
-       12313123123
-      </div>
+    <div v-if="!isSignedIn" style="
+                  position: relative;
+                  height: 50px;
+              ">
+              111
+    </div>
+    <div v-else>
+  123123123
+    </div>
   
       <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
               -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
@@ -68,6 +73,7 @@
           </div>
         </article>
       </v-navigation-drawer>
+    </div>
   </v-app>
 </template>
 
