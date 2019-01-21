@@ -1,6 +1,6 @@
 <template>
   <div>
-    asd gsfg sfg sf xxx 131 313 123 123123dđ
+    la;fadlskf;a fl jf; adslfjs
     <v-layout wrap>
       <div>
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">

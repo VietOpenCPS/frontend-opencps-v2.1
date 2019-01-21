@@ -35,37 +35,6 @@ export default {
   data: () => ({
     initData: null,
     step: ''
-  }),
-  beforeCreate () {
-    var vm = this
-    vm.$nextTick(function () {
-      let currentQuery = vm.$router.history.current.query
-      if (currentQuery.hasOwnProperty('step')) {
-        vm.step = currentQuery.step
-      }
-      vm.$store.dispatch('loadInitResource').then(function (result) {
-        vm.initData = result
-        if (vm.initData !== null) {
-          
-        }
-      })
-    })
-  },
-  watch: {
-    '$route': function (newRoute, oldRoute) {
-      let vm = this
-      let query = newRoute.query
-      if (query.hasOwnProperty('step')) {
-        vm.step = query.step
-      }
-      // bổ sung cho chức năng tiếp nhận- thêm mới
-      vm.$store.dispatch('loadInitResource').then(function (result) {
-        vm.initData = result
-        if (vm.initData !== null) {
-          
-        }
-      })
-    }
-  }
+  })
 }
 </script>
