@@ -169,54 +169,7 @@
             <!--  -->
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
-              <v-expansion-panel-content :key="1">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> I.</div>
-                  Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                  <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-                </div>
-                <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="stateViewResult">
-              <v-expansion-panel-content :key="1">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> II.</div>
-                  Kết quả xử lý
-                </div>
-                <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
-              <v-expansion-panel-content :key="1">
-                <div slot="header" class="text-bold">
-                  <div class="background-triangle-small"> 
-                    <span v-if="stateViewResult">III</span>
-                    <span v-else>II</span>
-                  </div>
-                  Văn bản hành chính
-                </div>
-                <div v-for="(item, index) in documents" v-bind:key="index">
-                  <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
-                      <v-flex xs11>
-                        <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.documentName}}</div>
-                      </v-flex>
-                      <v-flex xs1 class="text-right">
-                        <v-tooltip top>
-                          <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
-                            <v-icon style="font-size: 14px;">visibility</v-icon>
-                          </v-btn>
-                          <span>Xem</span>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-layout>
-                  </v-card>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
+            123
           </v-tab-item>
           <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             123
