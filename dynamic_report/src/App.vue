@@ -112,31 +112,6 @@
       let vm = this
       vm.$nextTick(function() {
         vm.isSignedIn = themeDisplay.isSignedIn()
-        vm.userNameLogin = themeDisplay.getUserName()
-        vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin))
-        let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        if (redirectURL !== '') {
-          vm.forgottenURLStr = redirectURL + '/register/#/cap-lai-mat-khau'
-        } else {
-          vm.forgottenURLStr = themeDisplay.getURLHome() + '/register/#/cap-lai-mat-khau'
-        }
-        if (vm.isSignedIn) {
-          vm.userData = {}
-          let param = {
-            responseType: 'blob'
-          }
-          axios.get('/o/v1/opencps/users/' + themeDisplay.getUserId(), param).then(function(response) {
-            vm.userData = response.data
-            vm.avatarURL = vm.userData['avatar']
-            if (vm.avatarURL.includes('img_id=0')) {
-              vm.avatarURL = ''
-            }
-            vm.userNameLogin = vm.userData['userName']
-            vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin))
-          }).catch(function(error) {
-            vm.avatarURL = ''
-          })
-        }
       })
     },
     methods: {
