@@ -65,54 +65,7 @@
               z-index: 9999;
             ">
         <article class="glass down">
-          <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-    ">
-                Thông báo mới
-              </v-btn>
-            </v-flex>
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        background: #d0d0d0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    ">
-                Đánh dấu đã đọc
-              </v-btn>
-            </v-flex>
-          </v-layout>
-          <div class="layout row wrap pl-3 pr-4" style="display: flex;">
-            <div class="flex xs12 mt-3" style="
-                  background: #ffffff66;
-                  border-radius: 8px;
-              ">
-  
-              <div style="
-                    padding: 5px 10px;
-                    background: #fff0;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                ">
-                <v-icon size="15" color="red accent-4">mail</v-icon>
-                Thông báo
-              </div>
-              <div class="notification_wrap" style="
-                    padding: 5px 10px;
-                    background: #ffffffb3;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
-                ">
-              </div>
-  
-            </div>
-          </div>
+          12313123123
         </article>
       </v-navigation-drawer>
     </div>
