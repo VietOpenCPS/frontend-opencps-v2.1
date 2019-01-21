@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import ChamQuaHanDetail from './ChamQuaHanDetail.vue'
 // import ChuyenPhatKetQuaDetail from './ChuyenPhatKetQuaDetail.vue'
 // import FeeDetail from './FeeDetail.vue'
 import HoanThienBoSungHoSoDetail from './HoanThienBoSungHoSoDetail.vue'
@@ -23,7 +22,6 @@ import XemChiTietHoSoDetailCanBo from './XemChiTietHoSoDetailCanBo.vue'
 export default {
   props: ['id', 'formCode'],
   components: {
-    'cham-qua-han-detail': ChamQuaHanDetail,
     'hoan-thien-bo-sung-ho-so-detail': HoanThienBoSungHoSoDetail,
     'ho-so-lien-thong-detail': HoSoLienThongDetail,
     // 'ho-so-lien-thong-tinh-trang-xu-ly-detail': HoSoLienThongTinhTrangXuLyDetail,
