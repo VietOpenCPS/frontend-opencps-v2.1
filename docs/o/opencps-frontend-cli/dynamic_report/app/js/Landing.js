@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["Landing"],{"4d55":function(n,e,a){"use strict";a.r(e);var t=function(){var n=this,e=n.$createElement,a=n._self._c||e;return a("div",[n._v("\n  new roafsafd\n")])},i=[],o={props:["index"],data:()=>({})},s=o,d=a("2877"),l=Object(d["a"])(s,t,i,!1,null,null,null);l.options.__file="Landing.vue";e["default"]=l.exports}}]);
+//# sourceMappingURL=Landing.e3a13d4d.js.map
