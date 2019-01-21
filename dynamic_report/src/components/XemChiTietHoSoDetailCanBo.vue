@@ -68,6 +68,18 @@
                   </v-flex>
                 </v-layout>
               </div>
+              <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate && btnStateVisible">
+                <p class="mb-2">
+                  Hồ sơ đã hoàn thành quá trình xử lý
+                </p>
+              </div>
+            </div>
+            <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
+
+            </div>
+            <!-- Action button -->
+            <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
+              
             </div>
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
