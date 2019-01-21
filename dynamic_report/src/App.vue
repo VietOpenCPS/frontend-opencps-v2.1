@@ -1,39 +1,10 @@
 <template>
   <v-app id="app_dynamic_report">
-    <div @click="showNoti" v-if="drawerLogin" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;    z-index: 9999;"></div>
-    <div v-if="drawer" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="!isSignedIn" style="
                   position: relative;
                   height: 50px;
               ">
-      <div class="login-wrapper">
-        <div class="login-input">
-          <div class="ico ico-user">
-            <input type="text" placeholder="Tài khoản đăng nhập" v-model="userName">
-          </div>
-          <div class="ico ico-pass">
-            <input @keyup.enter="goToDangNhapPress" type="password" placeholder="Mật khẩu" v-model="passWord">
-          </div>
-        </div>
-        <div class="login-input">
-          <div style="width: 100%;">
-            <a :href="forgottenURLStr" class="text-hover-blue" style="
-                        line-height: 30px;
-                        font-size: 12px;
-                        color: #005792;
-                        text-decoration: underline;
-                        padding-left: 10px;
-                    ">Quên mật khẩu?</a>
-          </div>
-          <div style="
-                    width: 100%;
-                    text-align: right;
-                  ">
-            <button type="button" class="btn-register" @click="goToDangKyPage">Đăng ký</button>
-            <button type="button" class="btn-login" @click="goToDangNhap">Đăng nhập</button>
-          </div>
-        </div>
-      </div>
+              123123
     </div>
     <div v-else>
   
