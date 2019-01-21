@@ -82,6 +82,7 @@
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                     <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
@@ -175,8 +176,45 @@
 
 <script>
 
+import Comment from './Comment.vue'
+import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
+import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
+import TraKetQua from './form_xu_ly/TraKetQua.vue'
+import ThuPhi from './form_xu_ly/FeeDetail.vue'
+import ChiTietThanhToan from './ChiTietThanhToan.vue'
+import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
+import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
+import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
+import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import EditDate from './form_xu_ly/EditDate.vue'
+import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
+import HoSoLienThong from './HoSoLienThong.vue'
+import PhanCongLai from './form_xu_ly/PhanCongLai.vue'
+import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
+
 export default {
   props: ['index', 'id'],
+  components: {
+    'comment': Comment,
+    'thong-tin-co-ban-ho-so': ThongTinCoBanHoSo,
+    'phan-cong': PhanCong,
+    'tra-ket-qua': TraKetQua,
+    'thu-phi': ThuPhi,
+    'thanh-toan-dien-tu': ThucHienThanhToanDienTu,
+    'ky-duyet': KyDuyet,
+    'y-kien-can-bo': YkienCanBoThucHien,
+    'tai-lieu-ket-qua': TaoTaiLieuKetQua,
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'ngay-hen-tra': EditDate,
+    'thong-tin-buu-chinh': ThongTinBuuChinh,
+    'ngay-gia-han': ExtendDateEdit,
+    'chi-tiet-thanh-toan': ChiTietThanhToan,
+    'ho-so-lien-thong': HoSoLienThong,
+    'phan-cong-lai': PhanCongLai
+  },
   data: () => ({
     inputTypes: [1, 3],
     outputTypes: [2],
