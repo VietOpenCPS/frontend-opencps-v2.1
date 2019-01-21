@@ -100,7 +100,7 @@
       </div>
     </div>
     <v-content>
-      qfwe rư rưer ưerwerwr
+      qfwe rư rưer ưerwerwr 999
       <router-view></router-view>
       <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
