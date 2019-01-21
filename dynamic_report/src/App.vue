@@ -120,18 +120,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import toastr from 'toastr'
-  import TemplateRendering from './template_rendering.vue'
-  import { templateDefault, testData } from './DefaultTemplate.js'
-  toastr.options = {
-    'closeButton': true,
-    'timeOut': '15000'
-  }
   export default {
-    components: {
-      'template-rendering': TemplateRendering
-    },
     data: () => ({
       isSignedIn: false,
       userNameLogin: '',
