@@ -1,8 +1,72 @@
 <template>
   <div>
-    1231232 dsaf afd adf
+    99999
     <v-layout wrap class="menu_header_list pt-3 pb-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-     131231239999
+      <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
+      <v-layout wrap v-if="originality !== 1">
+        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listLinhVuc"
+            v-model="linhVucSelected"
+            label="Chọn lĩnh vực"
+            item-text="displayName"
+            item-value="domainCode"
+            return-object
+            :hide-selected="true"
+            @change="changeDomain"
+            clearable
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listThuTucHanhChinh"
+            v-model="thuTucHanhChinhSelected"
+            label="Chọn thủ tục hành chính"
+            item-text="displayName"
+            item-value="serviceConfigId"
+            return-object
+            :hide-selected="true"
+            @change="changeServiceConfigs"
+            clearable
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
+          <v-autocomplete
+            :items="listDichVu"
+            v-model="dichVuSelected"
+            label="Chọn dịch vụ"
+            item-text="optionName"
+            item-value="processOptionId"
+            return-object
+            :hide-selected="true"
+            @change="changeDichVuConfigs"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex xs12 sm3 class="pl-2 pr-2">
+          <div style="position:relative">
+            <v-text-field
+              label="Nhập mã hồ sơ"
+              v-model="dossierNoKey"
+              @keyup.enter="changeDossierNoKey"
+              append-icon="search"
+              box
+              @click:append="changeDossierNoKey"
+            ></v-text-field>
+            <!-- <v-icon v-if="dossierNoKey" color="primary" @click="clearDossierNoKey" class="hover-pointer" style="position:absolute;top:15px;right:0px">clear</v-icon> -->
+          </div>
+        </v-flex>
+      </v-layout>
+      <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
+          <v-avatar v-if="item.key === 'deleted'" style="background-color: #da0e0e;border-color: #da0e0e;color: #fff;"><v-icon size="16">delete</v-icon></v-avatar>
+          <v-avatar v-else style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
+          {{item.title}}
+        </v-chip>
+      </div>
     </v-layout>
   </div>
 </template>
