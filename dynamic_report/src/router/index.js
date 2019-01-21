@@ -10,12 +10,6 @@ const routes = [
     props: true
   },
   {
-    path: '/m/danh-sach-ho-so/:index',
-    name: 'LandingMobile',
-    component: () => import(/* webpackChunkName: "LandingMobile" */ '@/components/LandingMobile.vue'),
-    props: true
-  },
-  {
     path: '/tra-cuu-ho-so',
     name: 'TraCuuHoSo',
     component: () => import(/* webpackChunkName: "TraCuuHoSo" */ '@/components/TraCuuHoSo.vue'),
