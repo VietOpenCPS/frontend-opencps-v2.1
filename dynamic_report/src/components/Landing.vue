@@ -1,9 +1,13 @@
 <template>
   <div>
-    à adf ádf ádf sdf
+    123131
     <v-layout wrap>
       <div>
-        adf
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">
+          <v-avatar v-if="item.key === 'deleted'"><v-icon size="16">delete</v-icon></v-avatar>
+          <v-avatar v-else>{{item.count}}</v-avatar>
+          {{item.title}}
+        </v-chip>
       </div>
     </v-layout>
   </div>
