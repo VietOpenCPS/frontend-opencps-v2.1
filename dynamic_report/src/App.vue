@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_login_hight_bee" class="onegate__fe">
+  <v-app id="app_dynamic_report" class="onegate__fe">
     <v-navigation-drawer app clipped floating width="240"
       :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
     >
