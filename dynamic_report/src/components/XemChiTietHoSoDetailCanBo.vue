@@ -75,12 +75,98 @@
               </div>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
-
+              <v-expansion-panel :value="[true]" class="expansion-pl">
+                <v-expansion-panel-content hide-actions :key="1">
+                  <div slot="header">
+                    <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                    <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
+                    <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+                  </div>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
             </div>
             <!-- Action button -->
             <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              
+              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+                v-on:click.native="processPullBtnDetail(item, index)" 
+                :loading="loadingAction && index === btnIndex"
+                :disabled="loadingAction || item.enable === 2"
+                v-if="item.enable > 0 || (item['autoEvent'] === 'special' && thongTinChiTietHoSo['permission'].indexOf('write') >= 0)"
+              >
+                {{item.actionName}}
+                <span slot="loader">Loading...</span>
+              </v-btn>
+              <v-btn color="primary" class="ml-0 mr-2" v-for="(item, index) in btnPlugins" v-bind:key="index" 
+                v-on:click.native="processPullBtnplugin(item, index)" 
+                :loading="loadingPlugin"
+                :disabled="loadingPlugin"
+              >
+                {{item.pluginName}}
+                <span slot="loader">Loading...</span>
+              </v-btn>
+              <!-- Action rollBack -->
+              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
+                @click="rollBackDossier(true)"
+                :loading="loadingAction"
+                :disabled="loadingAction"
+              >
+                Quay lại bước trước
+                <span slot="loader">Loading...</span>
+              </v-btn> -->
+              <!-- Action special -->
+              <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
+                <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                <v-list>
+                  <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                  </v-list-tile>
+                  <!-- <v-list-tile v-for="(item, index) in btnDossierDynamics" :key="index" 
+                    @click="processPullBtnDetail(item, index)" 
+                    v-if="checkPemissionSpecialAction(null, currentUser, thongTinChiTietHoSo)"
+                    >
+                    <v-list-tile-title>{{ item.actionName }}</v-list-tile-title>
+                  </v-list-tile> -->
+                </v-list>
+              </v-menu>
             </div>
+            <content-placeholders v-if="loadingAction">
+              <content-placeholders-img />
+              <content-placeholders-heading />
+            </content-placeholders>
+            <!--  -->
+            <v-layout wrap v-if="dialogActionProcess && !loadingAction">
+              <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
+              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
+              <tai-lieu-ket-qua ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+              <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
+              <!-- thanh toán điện tử -->
+              <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
+              <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" :dataEsign="dataEsign" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
+              <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
+              <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
+              <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
+              <y-kien-can-bo ref="ykiencanbo" v-if="showYkienCanBoThucHien" :user_note="userNote" :configNote="configNote"></y-kien-can-bo>
+              <div class="px-4 pt-0 pb-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+                <v-btn color="primary" class="ml-0 mr-2" @click.native="processAction(dossierItemDialogPick, itemDialogPick, resultDialogPick, indexDialogPick, false)" v-if="dialogActionProcess"
+                  :loading="loadingActionProcess"
+                  :disabled="loadingActionProcess"
+                  >
+                  <v-icon>save</v-icon>&nbsp;
+                  Xác nhận
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+              </div>
+            </v-layout>
+            <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
+              {{alertObj.message}}
+            </v-alert>
+            <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <!-- <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn> -->
+              <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+            </div>
+            <!--  -->
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             123
