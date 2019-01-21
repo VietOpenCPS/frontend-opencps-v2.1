@@ -4,19 +4,51 @@
                   position: relative;
                   height: 50px;
               ">
-              dsf sdf sdf sdf s
+              123123 17777 123 2132131
     </div>
     <div v-else>
   
       <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
-        <v-badge color="red" v-if="notificationCount > 0">
-          <span slot="badge">2</span>
-          <v-btn icon class="mx-0 my-0">
-            <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
-              notifications_active
+        <v-btn icon class="mx-0 my-0">
+          <v-icon size="20" color="blue darken-3">
+            notifications
+          </v-icon>
+        </v-btn>
+        <v-menu offset-y :nudge-bottom="5">
+          <v-chip slot="activator">
+            <v-avatar v-if="avatarURL !== ''">
+              <img :src="avatarURL">
+            </v-avatar>
+            <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
+              <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
+            </v-avatar>
+            {{userNameLogin}}
+            <v-icon v-if="!isShowUserMenu" size="20" color="blue darken-3" class="swing animated">
+              expand_more
             </v-icon>
-          </v-btn>
-        </v-badge>
+            <v-icon v-else size="20" color="blue darken-3" class="swing animated">
+              expand_less
+            </v-icon>
+          </v-chip>
+          <v-list>
+            <v-list-tile>
+              <v-list-tile-action>
+                <v-icon size="16">person</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Thông tin tài khoản</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile>
+              <v-list-tile-action>
+                <v-icon size="16" color="red darken-3">exit_to_app</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Đăng xuất</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </div>
   
       <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
