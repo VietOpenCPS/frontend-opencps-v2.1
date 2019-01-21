@@ -1,13 +1,11 @@
 <template>
   <div>
-    99999 1313 123
-    <v-layout wrap class="menu_header_list pt-3 pb-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
-      <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
-        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
-        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
-          <v-avatar v-if="item.key === 'deleted'" style="background-color: #da0e0e;border-color: #da0e0e;color: #fff;"><v-icon size="16">delete</v-icon></v-avatar>
-          <v-avatar v-else style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
+    à adf ádf ádf sdf
+    <v-layout wrap>
+      <div>
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">
+          <v-avatar v-if="item.key === 'deleted'"><v-icon size="16">delete</v-icon></v-avatar>
+          <v-avatar v-else>{{item.count}}</v-avatar>
           {{item.title}}
         </v-chip>
       </div>
