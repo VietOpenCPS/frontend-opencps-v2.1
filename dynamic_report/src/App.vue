@@ -1,10 +1,67 @@
 <template>
   <v-app id="app_dynamic_report">
+    <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
+            -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+            box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+            z-index: 9999;
+          ">
+      <article class="glass down">
+        <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
+          <v-flex xs6 class="text-center">
+            <v-btn block small style="
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+  ">
+              Thông báo mới
+            </v-btn>
+          </v-flex>
+          <v-flex xs6 class="text-center">
+            <v-btn block small style="
+      background: #d0d0d0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+  ">
+              Đánh dấu đã đọc
+            </v-btn>
+          </v-flex>
+        </v-layout>
+        <div class="layout row wrap pl-3 pr-4" style="display: flex;">
+          <div class="flex xs12 mt-3" style="
+                background: #ffffff66;
+                border-radius: 8px;
+            ">
+
+            <div style="
+                  padding: 5px 10px;
+                  background: #fff0;
+                  text-transform: uppercase;
+                  font-weight: bold;
+              ">
+              <v-icon size="15" color="red accent-4">mail</v-icon>
+              Thông báo
+            </div>
+            <div class="notification_wrap" style="
+                  padding: 5px 10px;
+                  background: #ffffffb3;
+                  border-bottom-left-radius: 8px;
+                  border-bottom-right-radius: 8px;
+              ">
+            </div>
+
+          </div>
+        </div>
+      </article>
+    </v-navigation-drawer>
+    
     <div v-if="!isSignedIn" style="
                   position: relative;
                   height: 50px;
               ">
-              123123 17777 123 2132131
+              123123 17777 123 2132131 adsfdsfsdfa
     </div>
     <div v-else>
   
@@ -59,62 +116,7 @@
         </v-menu>
       </div>
   
-      <v-navigation-drawer class="login_drawer" v-model="drawerLogin" fixed right hide-overlay temporary style="
-              -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-              box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-              z-index: 9999;
-            ">
-        <article class="glass down">
-          <v-layout class="px-3" row wrap style="    display: -webkit-flex;    display: flex;    border-bottom: 1px solid #fff;">
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-    ">
-                Thông báo mới
-              </v-btn>
-            </v-flex>
-            <v-flex xs6 class="text-center">
-              <v-btn block small style="
-        background: #d0d0d0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    ">
-                Đánh dấu đã đọc
-              </v-btn>
-            </v-flex>
-          </v-layout>
-          <div class="layout row wrap pl-3 pr-4" style="display: flex;">
-            <div class="flex xs12 mt-3" style="
-                  background: #ffffff66;
-                  border-radius: 8px;
-              ">
-  
-              <div style="
-                    padding: 5px 10px;
-                    background: #fff0;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                ">
-                <v-icon size="15" color="red accent-4">mail</v-icon>
-                Thông báo
-              </div>
-              <div class="notification_wrap" style="
-                    padding: 5px 10px;
-                    background: #ffffffb3;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
-                ">
-              </div>
-  
-            </div>
-          </div>
-        </article>
-      </v-navigation-drawer>
+      
     </div>
   </v-app>
 </template>
