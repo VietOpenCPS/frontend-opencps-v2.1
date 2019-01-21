@@ -2,7 +2,7 @@ import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
 import App from './App.vue'
-import router_dynamic_report from './router_dynamic_report'
+import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.min.css'
@@ -23,7 +23,7 @@ Vue.mixin({
 })
 
 new Vue({
-  router_dynamic_report,
+  router,
   store,
   beforeCreate () {
     var vm = this

@@ -30,9 +30,9 @@ const routes = [
 
 Vue.use(Router)
 
-const router_dynamic_report = new Router({
+const router = new Router({
   // mode: 'history',
   routes
 })
 
-export default router_dynamic_report
+export default router
