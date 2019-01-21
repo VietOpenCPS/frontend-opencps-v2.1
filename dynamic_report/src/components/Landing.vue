@@ -1,7 +1,7 @@
 <template>
   <div>
+    1231232
     <div class="row-header no__hidden_class">
-      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-combobox
