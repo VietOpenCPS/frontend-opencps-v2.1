@@ -17,29 +17,7 @@
         </div>
       </div> 
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
-      <v-card>
-        <v-card-title class="headline">File đính kèm</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
-        <div v-if="dialogPDFLoading" style="
-            min-height: 600px;
-            text-align: center;
-            margin: auto;
-            padding: 25%;
-        ">
-          <v-progress-circular
-            :size="100"
-            :width="1"
-            color="primary"
-            indeterminate
-          ></v-progress-circular>
-        </div>
-        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
-        </iframe>
-      </v-card>
-    </v-dialog>
+    
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
@@ -473,75 +451,6 @@
         </v-tabs-items>
       </v-tabs>
     </div>
-    <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
-    <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
-      <v-card>
-        <v-card-title class="headline">
-          Chọn người thực hiện
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_reAsign = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
-        <v-card-text>
-          <phan-cong-lai ref="phanconglai" v-model="reAsignUsers" :type="1"></phan-cong-lai>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="mr-3" color="primary" @click="doReAsign()"
-          :loading="loadingAction"
-          :disabled="loadingAction">
-            <v-icon>how_to_reg</v-icon> &nbsp;
-            Phân công
-            <span slot="loader">Loading...</span>
-          </v-btn>
-          <v-btn class="mr-3" color="primary" @click.native="dialog_reAsign = false">
-            <v-icon>reply</v-icon> &nbsp;
-            Hủy
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialogPlugin" persistent :overlay="false" :max-width="800" style="overflow: hidden;" transition="dialog-transition">
-      <v-card>
-        <v-card-title class="px-0 py-0">
-          <v-toolbar dark color="primary" height="40">
-            <div class="text-bold" v-if="modelPlugin !== null && modelPlugin !== undefined">{{modelPlugin['pluginName']}}</div>
-            <v-spacer></v-spacer>
-            <v-toolbar-items>
-              <v-btn icon dark @click.native="dialogPlugin = false">
-                <v-icon>close</v-icon>
-              </v-btn>
-            </v-toolbar-items>
-          </v-toolbar>
-        </v-card-title>
-        <v-card-text class="pr-0 py-0">
-          <div v-if="modelPlugin === null" style="width: 100%; height: 400px;" class="text-xs-center center-all">
-            <v-progress-circular indeterminate v-bind:size="100" color="purple"></v-progress-circular>
-          </div>
-          <div v-else-if="modelPlugin.pending">
-            Hồ sơ chờ đồng bộ ...
-          </div>
-          <div v-else-if="modelPlugin['plugin']">
-            <div v-if="modelPlugin.pdf">
-              <div class="flex xs12 sm12 text-center">
-                <object id="dossierPDFViewPlugin" data="" width="100%" height="100%" v-if="!modelPlugin.no_pdf">
-                  <iframe :src="modelPlugin.url" width="100%" style="min-height: 500px !important; padding-left: 0;"> </iframe>
-                </object>
-                <div id="dossierPDFViewNotFound" class="text-center">{{ modelPlugin.no_pdf }}</div>
-              </div>
-            </div>
-
-            <div v-if="modelPlugin['html']">
-              <input type="hidden" id="dossierFilePartNo" class="dossierFilePartNo" name="">
-              <div id="alpacajs_form_plugin" class="expansion-panel__header"></div>
-              <div id="dossierAlpacaNotFound" class="text-center">{{ modelPlugin.no_html }}</div>
-            </div> 
-          </div>
-          <div v-else>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
