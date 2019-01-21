@@ -1,6 +1,6 @@
 <template>
   <div>
-    9816313910231203 99 9 99 99 9 9 99
+    9816313910231203 99 9 99 99 9 9 99 x11312312 31 31231
     <v-layout wrap>
       <div>
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index">
