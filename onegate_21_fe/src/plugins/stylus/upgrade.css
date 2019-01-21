@@ -287,3 +287,6 @@ body .notification_wrap > div {
 body .notification_wrap > div:last-child {
     border-bottom: none;
 }
+#react-root span {
+    background: transparent;
+}
