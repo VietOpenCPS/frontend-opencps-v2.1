@@ -21,6 +21,7 @@
       </div>
     </v-navigation-drawer>
     <v-content>
+      12312312
       <router-view></router-view>
     </v-content>
     <v-snackbar
