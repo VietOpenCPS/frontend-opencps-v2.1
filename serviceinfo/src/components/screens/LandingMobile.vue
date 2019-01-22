@@ -135,7 +135,7 @@
 
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
-import support from '../store/support.json'
+import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 import { isMobile } from 'mobile-device-detect'
 export default {
