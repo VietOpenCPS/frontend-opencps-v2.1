@@ -236,7 +236,7 @@
 
 <script>
 
-import Vue from 'vue/dist/vue.min.js'
+import Vue from 'vue'
 import { isMobile } from 'mobile-device-detect'
 export default {
   props: ['index'],
