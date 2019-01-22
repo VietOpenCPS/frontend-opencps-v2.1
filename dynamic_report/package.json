@@ -30,7 +30,16 @@
     "vue-draggable": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuetify": "^1.4.2",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "@inotom/vue-go-top": "^1.0.2",
+    "json-mapper-json": "^1.3.0",
+    "json2csv": "^3.0.0",
+    "jstoxml": "^1.4.4",
+    "pdfjs": "^2.1.0",
+    "pdfjs-dist": "^2.0.943",
+    "pdfmake": "^0.1.39",
+    "roboto-fontface": "*",
+    "vue-friendly-iframe": "^0.9.0"
   },
   "devDependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
