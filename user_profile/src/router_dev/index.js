@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import LandingUserProfile from '@/components/screens/Landing'
 
@@ -32,15 +33,7 @@ const routes = [
       requiresAuth: false
     }
   },
-  {
-    path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode',
-    name: 'DetailForward',
-    component: () => import(/* webpackChunkName: "DetailForward" */ '@/components/blacklist/DetailForward.vue'),
-    props: true,
-    meta: {
-      requiresAuth: false
-    }
-  },
+  { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', name: 'DetailForward', component: DetailForward, props: true },
   { path: '*', name: 'NotFound', component: NotFound }
 ]
 
