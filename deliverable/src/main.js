@@ -1,28 +1,12 @@
+import 'idempotent-babel-polyfill'
 import Vue from 'vue'
-import './stylus/app.styl'
-import './stylus/jexcel.css'
-import './stylus/ej2base.css'
-import './stylus/ej2upload.css'
-import App from './App'
-import router from './router'
+import './plugins/vuetify'
+import App from './App.vue'
+import router from './router_dev'
 import { store } from './store'
-import VueNativeSock from 'vue-native-websocket'
 import VueContentPlaceholders from 'vue-content-placeholders'
-import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 import axios from 'axios'
-import Vuetify from 'vuetify'
-
-Vue.use(Vuetify, {
-  theme: {
-    primary: '#212121',
-    secondary: '#424242',
-    accent: '#459fed',
-    error: '#ff8e8e',
-    info: '#2196F3',
-    success: '#4CAF50',
-    warning: '#FFC107'
-  }
-})
+import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
@@ -80,18 +64,17 @@ Vue.mixin({
 })
 
 new Vue({
-  el: '#app',
   router,
   store,
-  render: h => h(App),
   created() {
     var vm = this
     vm.$nextTick(function() {
+      vm.$store.dispatch('loadInitResource')
       if (window.location.href.endsWith('#/')) {
         vm.$router.push('/danh-sach-giay-to/0')
       }
       vm.$store.dispatch('getDeliverableTypes')
     })
-  }
-})
-
+  },
+  render: function (h) { return h(App) }
+}).$mount('#app_deliverable')

@@ -1,12 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import toastr from 'toastr'
 import axios from 'axios'
-import DeliverableTypes from './DeliverableTypes'
+import support from './support.json'
 import AdminConfig from './AdminConfig'
+import $ from 'jquery'
+import saveAs from 'file-saver'
+import DeliverableTypes from './DeliverableTypes'
 import Deliverable from './Deliverable'
 import DeliverableLogs from './DeliverableLogs'
-import saveAs from 'file-saver'
+// 
 
+Vue.use(toastr)
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
