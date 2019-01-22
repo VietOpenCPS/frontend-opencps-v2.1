@@ -10,13 +10,40 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
+    snackbarerror: false,
+    snackbarsocket: false,
+    refreshSocket: 0,
     initData: {},
-    loading: false,
-    index: 0
+    dataSocket: {},
+    pullCounter: 0,
+    tocken: '',
+    loginUser: [
+      {
+        'email': '',
+        'role': ''
+      }
+    ],
+    user: null,
+    socket: {
+      isConnected: false,
+      message: '',
+      reconnectError: false
+    },
+    endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
+    getDeliverableTypes: [],
+    getContentFile: '',
+    getContentFileSimple: [],
+    selected: ['dossierNo', 'delegateName', 'delegateAddress', 'delegateTelNo', 'receiveDate', 'dueDate'],
+    reportType: 'REPORT_01',
+    groupType: 'domain',
+    siteName: '',
+    itemsReports: support['trangThaiHoSoList']
   },
   actions: {
     loadInitResource ({commit, state}) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
           state.initData['groupId'] = window.themeDisplay.getScopeGroupId()
           state.initData['user'] = {
@@ -32,133 +59,38 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        resolve(state.initData)
+        let param = {
+          headers: {
+            groupId: state.initData['groupId']
+          }
+        }
+        axios.get('/o/v1/opencps/site/name', param).then(function (response) {
+          let serializable = response.data
+          state.siteName = serializable
+          console.log(state.siteName)
+          commit('setsiteName', serializable)
+          resolve(state.initData)
+        }).catch(function (error) {
+          console.log(error)
+        })
       })
     },
-    loadVoting ({commit, state}, data) {
+    getLevelList ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
-        store.dispatch('loadInitResource').then(function (result1) {
+        store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.votingApi + '/' + data.className + '/' + data.classPk, param).then(result => {
-            if (result.data) {
-              resolve(result.data.data)
-            } else {
-              resolve([])
-            }
-            commit('setLoading', false)
-          }).catch(xhr => {
-            reject(xhr)
-            commit('setLoading', false)
-          })
-        })
-      })
-    },
-    loadImageEmployee ({commit, state}, data) {
-      console.log(data)
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            },
-            responseType: 'blob'
-          }
-          axios.get('/o/rest/v2/users' + '/' + data.mappingUser.userId + '/photo', param).then(result => {
-            var url = window.URL.createObjectURL(result.data)
-            resolve(url)
-          }).catch(xhr => {
-            reject(xhr)
-          })
-        })
-      })
-    },
-    loadGovAgencys ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        commit('setLoading', true)
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            }
-          }
-          axios.get(support.initData.dictcollectionsApi + '/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
-            if (result.data) {
-              resolve(result.data.data)
-            } else {
-              resolve([])
-            }
-            commit('setLoading', false)
-          }).catch(xhr => {
-            reject(xhr)
-            commit('setLoading', false)
-          })
-        })
-      })
-    },
-    loadEmployees ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        commit('setLoading', true)
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            }
-          }
-          axios.get(support.initData.employeeApi + '/' + data.itemCode, param).then(result => {
-            if (result.data) {
-              resolve(result.data.data)
-            } else {
-              resolve([])
-            }
-            commit('setLoading', false)
-          }).catch(xhr => {
-            reject(xhr)
-            commit('setLoading', false)
-          })
-        })
-      })
-    },
-    getEmployee ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        commit('setLoading', true)
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            }
-          }
-          axios.get(support.initData.detailEmployeeApi + '/' + data.employeeId, param).then(result => {
-            resolve(result.data)
-            commit('setLoading', false)
-          }).catch(xhr => {
-            reject(xhr)
-            commit('setLoading', false)
-          })
-        })
-      })
-    },
-    checkPermisionVoting ({commit, state}, filter) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function () {
-          const config = {
-            headers: {
-              'groupId': state.initData.groupId
-            },
-            params: {
-              applicantIdNo: filter.applicantIdNo,
-              dossierNo: filter.dossierNo
-            }
-          }
-          // test local
-          axios.get('/o/rest/v2/votings/checkpermission', config).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/votings/checkpermission', config).then(function (response) {
+          axios.get('/o/rest/v2/serviceinfos/statistics/levels', param).then(function (response) {
             let serializable = response.data
-            resolve(serializable)
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
           }).catch(function (error) {
             console.log(error)
             reject(error)
@@ -166,44 +98,157 @@ export const store = new Vuex.Store({
         })
       })
     },
-    submitVoting ({commit, state}, data) {
+    getReportTotal ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result1) {
-          var params = new URLSearchParams()
-          const config = {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
             headers: {
-              'groupId': state.initData.groupId
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
             }
           }
-          if (data.comment) {
-            params.append('comment', data.comment)
+          axios.get('/o/rest/statistics?year=' + (new Date()).getFullYear() + '&domain=total&agency=total&month=0', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getAgencyReportLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Accept: 'application/json'
+            },
+            params: {
+              year: filter.year,
+              month: filter.month,
+              group: filter.group,
+              agency: filter['agency']
+            }
           }
-          params.append('selected', data.selected)
-          params.append('className', data.className)
-          params.append('classPk', data.classPk)
-          axios.post(support.initData.votingApi + '/' + data.votingId + '/results', params, config).then(result => {
-            resolve(result.data)
-          }).catch(xhr => {
-            reject(xhr)
+          if (filter['report']) {
+            param.params['domain'] = 'total'
+          }
+          if (filter['report'] === 'linemonth') {
+            param.params['domain'] = ''
+          }
+          axios.get('/o/rest/statistics', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve(null)
+            }
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    doStatisticReportPrint ({state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          axios({
+            method: 'PUT',
+            url: '/o/rest/v2_1/statistics/report/' + filter.document,
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob',
+            data: filter.data
+          }).then(function (response) {
+            console.log('serializable', response)
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            reject(error)
           })
         })
       })
     }
   },
   mutations: {
-    setIndex (state, payload) {
-      state.index = payload
-    },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setsnackbarerror (state, payload) {
+      state.snackbarerror = payload
+    },
+    setsnackbarsocket (state, payload) {
+      state.snackbarsocket = payload
+    },
+    setpullCounter (state, payload) {
+      state.pullCounter = payload
+    },
+    setdataSocket (state, payload) {
+      state.dataSocket = payload
+    },
+    setselected (state, payload) {
+      state.selected = payload
+    },
+    setreportType (state, payload) {
+      state.reportType = payload
+    },
+    setgroupType (state, payload) {
+      state.groupType = payload
+    },
+    setsiteName (state, payload) {
+      state.siteName = payload
+    },
+    setitemsReports (state, payload) {
+      state.itemsReports = payload
     }
   },
   getters: {
-    loading (state) {
-      return state.loading
+    getsnackbarerror (state) {
+      return state.snackbarerror
     },
-    index (state) {
-      return state.index
+    getsnackbarsocket (state) {
+      return state.snackbarsocket
+    },
+    getDeliverableTypes (state) {
+      return state.getDeliverableTypes
+    },
+    getContentFile (state) {
+      return state.getContentFile
+    },
+    getContentFileSimple (state) {
+      return state.getContentFileSimple
+    },
+    pullCounter (state) {
+      return state.pullCounter
+    },
+    dataSocket (state) {
+      return state.dataSocket
+    },
+    selected (state) {
+      return state.selected
+    },
+    reportType (state) {
+      return state.reportType
+    },
+    groupType (state) {
+      return state.groupType
+    },
+    siteName (state) {
+      return state.siteName
+    },
+    itemsReports (state) {
+      return state.itemsReports
     }
   }
 })
