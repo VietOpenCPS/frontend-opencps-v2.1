@@ -5,16 +5,14 @@ import TiepNhanHoSoDetail from '@/components/blacklist/TiepNhanHoSoDetail'
 import HoanThienBoSungHoSoDetail from '@/components/blacklist/HoanThienBoSungHoSoDetail'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
-import LandingServiceInfo from '@/components/screens/Landing'
-import LandingMobile from '@/components/screens/LandingMobile'
-import ChiTietThuTuc from '@/components/screens/ChiTietThuTuc'
-import ChiTietThuTucMobile from '@/components/screens/ChiTietThuTucMobile'
+import LandingVoting from '@/components/screens/Landing'
+import Employees from '@/components/screens/Employees'
+import EmployeeDetail from '@/components/screens/EmployeeDetail'
 
 const routes = [
-  { path: '/thu-tuc-hanh-chinh', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
-  { path: '/m/thu-tuc-hanh-chinh', name: 'LandingMobile', component: LandingMobile, props: true },
-  { path: '/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
-  { path: '/m/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTucMobile', component: ChiTietThuTucMobile, props: true },
+  { path: '/', component: LandingVoting, props: true },
+  { path: '/danh-sach-can-bo/:itemCode', component: Employees, props: true },
+  { path: '/danh-sach-can-bo/:itemCode/:id', component: EmployeeDetail, props: true },
   { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
   { path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode', name: 'TiepNhanHoSoDetail', component: TiepNhanHoSoDetail, props: true },
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },
