@@ -2,15 +2,17 @@
   <v-layout row wrap>
     <v-flex xs12>
       <img :src="chapchablob" alt="capcha">
-      <v-btn class="mt-5" flat icon v-on:click.native="makeImageCap">
-        <v-icon size="48">refresh</v-icon>
-      </v-btn>
     </v-flex>
-    <v-flex xs12 class="mt-2">
+    <v-flex xs10 class="mt-2">
       <v-text-field
         v-model="j_captcha_response"
         placeholder="Nhập captcha"
       ></v-text-field>
+    </v-flex>
+    <v-flex xs2 class="mt-2">
+      <v-btn flat icon v-on:click.native="makeImageCap">
+        <v-icon size="28">refresh</v-icon>
+      </v-btn>
     </v-flex>
   </v-layout>
 </template>

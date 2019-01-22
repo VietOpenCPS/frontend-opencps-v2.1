@@ -1,10 +1,12 @@
 <template>
   <div>
-    <v-layout wrap class="py-2">
+    <v-layout wrap class="py-2" style="
+    max-width: 1366px;
+">
       <v-flex xs12 sm8 class="px-3">
         <div class="bg-gif-register"></div>
       </v-flex>
-      <v-flex xs12 sm4 class="">
+      <v-flex xs12 sm4 class="px-3">
         <v-card>
           <nav class="toolbar theme--dark primary py-2" data-booted="true">
             <div class="toolbar__content"  style="justify-content: center">
@@ -13,7 +15,7 @@
           </nav>
           <v-form ref="form" v-model="valid" lazy-validation class="px-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
             <v-layout wrap>
-              <v-radio-group v-model="applicantType" row @change="changeApplicantType">
+              <v-radio-group class="radio_register_type" v-model="applicantType" row @change="changeApplicantType">
                 <v-radio label="Công dân" :value="true" class="ml-4"></v-radio>
                 <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
               </v-radio-group>
@@ -467,7 +469,7 @@ export default {
 </script>
 <style>
   .bg-gif-register {
-    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/register/img/bg-gif-register.gif') no-repeat center center;
+    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;
     padding-top: 77.961783%;
     background-size: contain;
   }
