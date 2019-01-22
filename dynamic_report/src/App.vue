@@ -1,7 +1,7 @@
 <template>
   <v-app id="app_dynamic_report">
     <v-navigation-drawer app clipped floating width="240">
-      <div class="drawer__filter px-2">
+      <div class="drawer__filter">
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile
             v-for="(item, indexItem) in itemsReports"
@@ -21,7 +21,6 @@
       </div>
     </v-navigation-drawer>
     <v-content>
-      12312312
       <router-view></router-view>
     </v-content>
     <v-snackbar
