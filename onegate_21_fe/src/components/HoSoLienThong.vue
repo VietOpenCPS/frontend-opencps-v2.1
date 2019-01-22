@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-expansion-panel :value="[true]" class="expansion-pl">
+    <v-expansion-panel :value="[true]" expand  class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
@@ -50,7 +50,7 @@
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <v-card flat v-else>
-                  <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+                  <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
                     <v-expansion-panel-content v-bind:value="true">
                       <div slot="header">
                         <div class="background-triangle-small"> 1.</div>
@@ -59,7 +59,7 @@
                       <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
                     </v-expansion-panel-content>
                   </v-expansion-panel>
-                  <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+                  <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
                     <v-expansion-panel-content v-bind:value="true">
                       <div slot="header">
                         <div class="background-triangle-small"> 2.</div>
@@ -72,7 +72,7 @@
               </template> -->
             </v-data-table>
             <div v-else>
-              <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+              <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
                 <v-expansion-panel-content v-bind:value="true">
                   <div slot="header">
                     <div class="background-triangle-small"> I.</div>
@@ -81,7 +81,7 @@
                   <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+              <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
                 <v-expansion-panel-content v-bind:value="true">
                   <div slot="header">
                     <div class="background-triangle-small"> II.</div>
@@ -101,7 +101,7 @@
         </v-card>
         <!--  -->
         <!-- <v-card v-for="(items, index) in hoSoLienThongItems" :key="items.dossierId" :class="index>0?'bdt-0':''" class="bdb-0">
-          <v-expansion-panel :value="[true]" expand class="expansion-p0">
+          <v-expansion-panel :value="[true]" expand  class="expansion-p0">
             <v-expansion-panel-content :value="index===0?true:false">
               <div slot="header" class="pl-3">
                 CƠ QUAN LIÊN THÔNG: <span style="font-weight:normal">{{items.govAgencyName}}</span>

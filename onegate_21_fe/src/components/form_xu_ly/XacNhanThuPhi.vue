@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel :value="[true]" class="expansion-pl">
+  <v-expansion-panel :value="[true]" expand  class="expansion-pl">
     <v-expansion-panel-content>
       <div slot="header">
         <div class="background-triangle-small"> 

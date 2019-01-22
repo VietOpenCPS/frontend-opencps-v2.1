@@ -1,6 +1,6 @@
 <template>
   <div class="taotailieuketqua" style="background-color: white;width:100%">
-    <v-expansion-panel :value="[true]" class="expansion-pl">
+    <v-expansion-panel :value="[true]" expand  class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
@@ -9,7 +9,7 @@
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
-            <v-expansion-panel :value="[true]" class="expaned__list__data">
+            <v-expansion-panel :value="[true]" expand  class="expaned__list__data">
               <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">

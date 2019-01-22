@@ -1,6 +1,6 @@
 <template>  
   <div style="background-color: white;width:100%">
-    <v-expansion-panel :value="[true]" v-if="type === 'overdue' || type === 'preoverdue'" class="expansion-pl">
+    <v-expansion-panel :value="[true]" expand  v-if="type === 'overdue' || type === 'preoverdue'" class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
           <span>Lý do chậm hạn trả</span><span style="color:red"> *</span>
@@ -23,7 +23,7 @@
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
-    <v-expansion-panel :value="[true]" class="expansion-pl">
+    <v-expansion-panel :value="[true]" expand  class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 

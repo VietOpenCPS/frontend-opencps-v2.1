@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel :value="[true]" expand>
+  <v-expansion-panel :value="[true]" expand >
     <v-expansion-panel-content>
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
       <v-card>
