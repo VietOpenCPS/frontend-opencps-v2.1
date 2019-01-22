@@ -291,3 +291,6 @@ body .notification_wrap > div:last-child {
 body #react-root .theme--light .v-list__tile__title {
     font-size: 13px ;
 }
+body #react-root .application--wrap {
+    background: transparent !important;
+}

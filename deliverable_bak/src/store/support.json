@@ -1,9 +1,0 @@
-{
-    "deliverableState": {
-        "state_0": "Không rõ",
-        "state_1": "Đang hiệu lực",
-        "state_2": "Hết hiệu lực",
-        "state_3": "Tạm dừng (đình chỉ)",
-        "state_4": "Đã bị thu hồi"
-    }
-}

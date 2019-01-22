@@ -1,0 +1,292 @@
+article, .glass::before {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .glass {
+    position: relative;
+  }
+  
+  .glass::before {
+    z-index: -1;
+    display: block;
+    position: absolute;
+    content: ' ';
+  }
+  
+  .glass::before {
+    /* background-image: url('path/to/image.jpg'); Actual image for this demo is a data-uri, see below */
+    /* Prefix free isn't picking up this one */
+    -webkit-filter: blur(42px);
+    filter: blur(42px);
+    background-size: cover;
+    opacity: 0.5;
+  }
+  
+  .glass {
+    background-color: white;
+  }
+  
+  /* transformations */
+  .glass.down {
+    transform: translateY(0%);
+  }
+  
+  .glass.up, .glass.up::before {
+    transform: translateY(0) translateZ(0);
+  }
+  
+  /* transitions */
+  .glass, .glass::before {
+    transition: transform 0.5s ease-out;
+  }
+  .glass::before {
+    background-image: url('http://hanhchinhcong.phutho.gov.vn/o/parent-opencps-vue/images/bg-home.jpg');
+  }
+
+  body .v-navigation-drawer--fixed {
+    position: absolute;
+}
+body .v-text-field {
+    padding-top: 0;
+    margin-top: 0;
+}
+body .v-list__tile,
+body .v-list__group__items--no-action .v-list__tile {
+    padding: 0;
+    padding-left: 0px;
+    height: 36px;
+    cursor: pointer;
+}
+body .v-navigation-drawer .v-list__tile:hover,
+body .list__tile--active {
+    background: #e1e2e1;
+}
+body .v-list__group__header--active {
+    background: #ececec;
+}
+body .v-navigation-drawer>.v-list:not(.v-list--dense) .v-list__tile,
+body .v-input,
+body .v-label {
+    font-size: 13px;
+}
+body .v-list__tile__title {
+    font-size: 12px;
+}
+body .v-list__group__header .v-list__group__header__append-icon,
+body .v-list__group__header .v-list__group__header__prepend-icon {
+    padding: 0 10px;
+}
+body .v-list__group__header--active .v-list__group__header__prepend-icon .v-icon {
+    font-size: 18px;
+}
+body .v-list__tile__action,
+body .v-list__tile__avatar,
+body .v-list__group__header .v-list__group__header__prepend-icon {
+    justify-content: center;
+    min-width: 32px;
+}
+body .v-btn:not(.v-btn--depressed):not(.v-btn--flat) {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+body .v-btn {
+    margin: 6px 4px;
+    height: 30px;
+    padding: 0 10px;
+    min-width: 30px;
+    text-transform: none;
+}
+
+body .v-text-field--box>.v-input__control>.v-input__slot,
+body .v-text-field--outline>.v-input__control>.v-input__slot {
+    min-height: 48px;
+}
+
+body .v-text-field--box input,
+body .v-text-field--outline input {
+    margin-top: 15px;
+}
+body .v-list {
+    padding: 0;
+}
+body .v-text-field--box .v-label,
+body .v-text-field--outline .v-label {
+    top: 21px;
+}
+body .v-text-field--box .v-label--active, 
+body .v-text-field--outline .v-label--active {
+    -webkit-transform: translateY(-15px) scale(.75);
+    transform: translateY(-15px) scale(.75);
+}
+body .header_tools .v-text-field--solo.v-text-field.v-text-field--enclosed .v-text-field__details,
+body .header_tools .v-text-field--solo .v-input__append-inner {
+    margin-bottom: 0;
+    display: none;
+}
+body .header_tools .v-text-field--solo.v-text-field.v-text-field--enclosed .v-input__slot {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+    background-color: transparent;
+}
+body .v-select.v-select--chips .v-select__selections {
+    min-height: 32px;
+}
+body .v-text-field.v-text-field--solo .v-input__control {
+    min-height: 32px;
+}
+body .v_data_table_check_all .v-input--selection-controls__ripple {
+    height: 32px;
+    width: 32px;
+    left: -8px;
+    top: -webkit-calc(50% - 17px);
+    top: calc(50% - 17px);
+    margin: 0;
+}
+body .v_data_table_check_all .v-input--selection-controls__input {
+    margin-right: 0;
+    padding-left: 3px;
+}
+
+body .v-icon {
+    font-size: 18px;
+}
+body table.v-table thead tr {
+    height: 42px;
+}
+body table.v-table tbody td:first-child,
+body table.v-table tbody td:not(:first-child),
+body table.v-table tbody th:first-child,
+body table.v-table tbody th:not(:first-child),
+body table.v-table thead td:first-child,
+body table.v-table thead td:not(:first-child),
+body table.v-table thead th:first-child,
+body table.v-table thead th:not(:first-child) {
+    padding: 2px 5px;
+}
+.application .theme--light.v-table thead th, .theme--light .v-table thead th {
+    color: rgba(0,0,0,.54);
+    border: 1px solid #d3d3d3;
+    border-bottom: 0;
+    font-weight: 700;
+}
+.application .theme--light.v-table tbody tr:not(:last-child), .theme--light .v-table tbody tr:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,.12);
+}
+
+table.v-table tbody td {
+    font-weight: 400;
+    font-size: 13px;
+    border-right: 1px solid #d3d3d3;
+    vertical-align: top;
+}
+
+table.v-table tbody tr:last-child {
+    border-bottom: 1px solid #d3d3d3;
+}
+body .v-navigation-drawer__border {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background-color: #ddd;
+}
+body .v-messages {
+    min-height: 0px;
+}
+body .v-text-field>.v-input__control>.v-input__slot:before {
+    border-style: solid;
+    border-width: thin 0 0 0;
+}
+body .menuable__content__active .v-list .v-list__tile {
+    padding: 0 16px;
+    font-size: 13px;
+    border-bottom: 1px dashed #ddd;
+}
+body .menuable__content__active .v-list > div:last-child .v-list__tile {
+  border-bottom: none;
+}
+body .v-menu__content {
+    min-width: 135px !important;
+}
+body .v-autocomplete.v-text-field--enclosed:not(.v-text-field--solo):not(.v-text-field--single-line) .v-select__slot>input {
+    margin-top: 0;
+}
+body .input-group--text-field-box:not(.input-group--textarea):not(.input-group--multi-line) label {
+    top: 21px;
+}
+body p {
+    margin-bottom: 5px;
+}
+body .application .theme--light.v-table thead th:first-child, 
+body .theme--light .v-table thead th:first-child {
+    border-left: none;
+}
+body .v-tabs__container--icons-and-text {
+    height: 42px;
+    background-color: #e7ecf7;
+    border-color: #e7ecf7!important;
+}
+body .v-window__container--is-active {
+    height: auto !important;
+}
+body .v-expansion-panel__header {
+    padding: 8px 24px 8px 0;
+    min-height: 36px;
+}
+body .v-expansion-panel__header {
+    border-bottom: 1px solid #ddd !important;
+    box-shadow: none;
+}
+body .v-expansion-panel {
+    box-shadow: none;
+}
+body .v-input__slot {
+    margin-bottom: 5px;
+}
+body .form_alpaca .absolute__btn {
+    top: 3px;
+}
+body .form_alpaca .absolute__btn .v-text-field.v-input--is-disabled>.v-input__control>.v-input__slot:before {
+    border: none !important;
+}
+body .absolute__btn.v-input--selection-controls {
+    margin-top: 6px;
+}
+body .list_history_style {
+    background: #fff;
+}
+body .v-window-item .table-bordered {
+    border-bottom: 0;
+}
+body .v-window {
+    background-color: #fff;
+}
+body .v-chip--select-multi {
+    margin: 0 5px;
+    background: #00204d !important;
+    color: #fff !important;
+    height: 25px;
+}
+body .fade-transition-leave-to {
+    display: none !important;
+}
+body .login_drawer {
+    position: fixed !important;
+}
+body.has-control-menu .login_drawer {
+    top: 55px;
+}
+body .notification_wrap > div {
+    border-bottom: 1px solid #d0d0d0;
+    margin-bottom: 5px;
+}
+body .notification_wrap > div:last-child {
+    border-bottom: none;
+}
+#react-root span {
+    background: transparent;
+}
