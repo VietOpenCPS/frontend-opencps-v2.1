@@ -1,0 +1,27 @@
+.bg-gif-register {
+    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;
+    padding-top: 77.961783%;
+    background-size: contain;
+}
+
+body .radio_register_type .v-input__control {
+    margin: 0 auto !important;
+    margin-top: 10px;
+}
+body #app_register .v-input--selection-controls {
+    margin-top: 0;
+}
+body #app_register .v-text-field--box input,
+body #app_register .v-text-field--outline input {
+    margin-top: 5px;
+}
+body #app_register .v-text-field--box>.v-input__control>.v-input__slot,
+body #app_register .v-text-field--outline>.v-input__control>.v-input__slot {
+    min-height: 36px;
+}
+body #app_register .v-text-field.v-text-field--enclosed .v-input__append-inner,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__append-outer,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-inner,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-outer {
+    margin-top: 8px;
+}

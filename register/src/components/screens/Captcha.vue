@@ -9,7 +9,7 @@
         placeholder="Nhập captcha"
       ></v-text-field>
     </v-flex>
-    <v-flex xs2 class="mt-2">
+    <v-flex xs2 class="mt-2 text-right pr-1">
       <v-btn flat icon v-on:click.native="makeImageCap">
         <v-icon size="28">refresh</v-icon>
       </v-btn>
