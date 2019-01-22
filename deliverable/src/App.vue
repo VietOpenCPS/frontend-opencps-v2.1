@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_dynamic_report">
+  <v-app id="app_deliverable">
     <v-navigation-drawer app clipped floating width="240">
       <div class="drawer__filter">
         <v-list dense style="padding: 0;" class="report_list">
