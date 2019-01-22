@@ -310,6 +310,7 @@
         })
       },
       doAddDVC () {
+        let vm = this
         vm.$router.push('/add-dvc/0')
       }
     }
