@@ -228,7 +228,7 @@
       pullNotificationCount () {
         let vm = this
         let param = {}
-        axios.get('/o/v1/opencps/users/count', param).then(function(response) {
+        axios.get('/o/rest/v2/notifications/count', param).then(function(response) {
           let serializable = response.data
           vm.notificationCount = serializable['total']
         }).catch(function(error) {
@@ -239,7 +239,7 @@
         let vm = this
         let param = {}
         vm.testData = []
-        axios.get('/o/v1/opencps/users', param).then(function(response) {
+        axios.get('/o/rest/v2/notifications', param).then(function(response) {
           let serializable = response.data
           vm.notificationCount = serializable['total']
           vm.testData = serializable['data']
