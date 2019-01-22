@@ -116,7 +116,7 @@
               </div>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
-              <v-expansion-panel :value="[true]" class="expansion-pl">
+              <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -210,7 +210,7 @@
             <!--  -->
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
@@ -220,7 +220,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="stateViewResult">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="stateViewResult">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
@@ -229,7 +229,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
@@ -381,7 +381,7 @@
           <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
-              <v-expansion-panel :value="[true]" class="expansion-pl">
+              <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> 
@@ -436,7 +436,7 @@
               </v-expansion-panel>
             </div>
             <div style="position: relative;" v-if="originality !== 1">
-              <v-expansion-panel :value="[true]" expand>
+              <v-expansion-panel :value="[true]" expand >
                 <v-expansion-panel-content>
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>

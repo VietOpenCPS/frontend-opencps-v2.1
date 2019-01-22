@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel :value="[true]" class="expansion-pl ext__form">
+  <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
     <v-expansion-panel-content>
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
       <!-- <span v-if="configNote && configNote.labelYKien">{{configNote.labelYKien}}</span> -->

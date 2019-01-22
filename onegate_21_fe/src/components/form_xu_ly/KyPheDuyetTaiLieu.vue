@@ -1,6 +1,6 @@
 <template>  
   <div class='phancong' style='background-color: white;width:100%'>
-    <v-expansion-panel :value="[true]" class='expansion-pl'>
+    <v-expansion-panel :value="[true]" expand  class='expansion-pl'>
       <v-expansion-panel-content hide-actions value='1'>
         <div slot='header' v-if="esignType !== '' && esignType !== 'digital'">
           <div class='background-triangle-small'> 
