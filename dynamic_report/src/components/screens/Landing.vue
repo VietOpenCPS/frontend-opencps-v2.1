@@ -1,6 +1,6 @@
 <template>
   <div>
-   ad ád ád ád ádas da d 1123131312312312312
+   1231 31 313
   </div>
 </template>
 
