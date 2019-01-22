@@ -1,23 +1,36 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Landing from '@/components/blacklist/Landing'
-import TiepNhanHoSoDetail from '@/components/blacklist/TiepNhanHoSoDetail'
-import HoanThienBoSungHoSoDetail from '@/components/blacklist/HoanThienBoSungHoSoDetail'
-import DetailForward from '@/components/blacklist/DetailForward'
-import NotFound from '@/components/NotFound'
 import LandingVoting from '@/components/screens/Landing'
-import Employees from '@/components/screens/Employees'
-import EmployeeDetail from '@/components/screens/EmployeeDetail'
 
 const routes = [
   { path: '/', component: LandingVoting, props: true },
-  { path: '/danh-sach-can-bo/:itemCode', component: Employees, props: true },
-  { path: '/danh-sach-can-bo/:itemCode/:id', component: EmployeeDetail, props: true },
-  { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
-  { path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode', name: 'TiepNhanHoSoDetail', component: TiepNhanHoSoDetail, props: true },
-  { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },
-  { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', name: 'DetailForward', component: DetailForward, props: true },
-  { path: '*', name: 'NotFound', component: NotFound }
+  {
+    path: '/danh-sach-can-bo/:itemCode',
+    name: 'Employees',
+    component: () => import(/* webpackChunkName: "Employees" */ '@/components/screens/Employees.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/danh-sach-can-bo/:itemCode/:id',
+    name: 'EmployeeDetail',
+    component: () => import(/* webpackChunkName: "EmployeeDetail" */ '@/components/screens/EmployeeDetail.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  }
 ]
 
 Vue.use(Router)
