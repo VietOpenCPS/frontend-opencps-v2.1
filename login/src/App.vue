@@ -117,7 +117,7 @@
               </v-btn>
             </v-flex>
           </v-layout>
-          <div class="layout row wrap pl-3 pr-4" style="display: flex;">
+          <div class="layout row wrap px-3" style="display: flex;">
             <div class="flex xs12 mt-3" style="
                   background: #ffffff66;
                   border-radius: 8px;

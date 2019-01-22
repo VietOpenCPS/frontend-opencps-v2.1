@@ -1,19 +1,21 @@
 export const templateDefault = {
     template: `
-        <div>
+        <div style="display: flex;cursor: pointer;">
+            <div class="v-avatar white--text" style="height: 36px;width: 36px;margin-right: 8px;margin-top: 3px;">
+                <img :src="item['avatar']" :alt="item['userName']">
+            </div>
             <p style="margin-bottom: 0px;">
-                {{item["notificationText"]}}
+                <strong>item["userName"]</strong> {{item["notificationText"]}}
                 <a href="" style="
                     color: #0072c2;
                     font-weight: bold;
                 ">
                     {{dossier["dossierId"]}}
-                    <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px;color: #0072c2;">launch</i>
                 </a>
-            </p>
-            <p style="color: #90949c;font-size: 12px;">
-            <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
-                {{new Date(item["notificationDate"]).toLocaleDateString('vi-VN')}}
+                <p style="color: #90949c;font-size: 11px;">
+                    <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
+                        {{new Date(item["notificationDate"]).toLocaleString('vi-VN')}}
+                </p>
             </p>
         </div>
     `,
