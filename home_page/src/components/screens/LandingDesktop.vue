@@ -145,7 +145,6 @@
 <script>
   
   import Vue from 'vue'
-  import support from '../../store/support.json'
   
   export default {
     props: [],
@@ -218,7 +217,6 @@
           console.log('dataReport1', dataReport1)
           vm.doProcessReport1(dataReport1)
         }).catch(function () {
-          // vm.doProcessReport1(support.fakeReport)
         })
         let filterPie = {
           year: vm.currentYear,
@@ -236,7 +234,6 @@
           console.log(agencyLists)
           vm.doProcessReport2(agencyLists)
         }).catch(function () {
-          vm.doProcessReport2(support.fakeReport2)
         })
         vm.daTiepNhan = 0
         vm.daGiaiQuyet = 0
