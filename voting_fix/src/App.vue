@@ -164,14 +164,12 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <go-top v-if="viewMobile" :size="42" bg-color="#0064c7"></go-top>
   </v-app>
 </template>
 
 <script>
   
   import { isMobile } from 'mobile-device-detect'
-  import GoTop from '@inotom/vue-go-top'
   export default {
     data: () => ({
       active: null,
@@ -182,9 +180,6 @@
       isDetail: false,
       text: ''
     }),
-    components: {
-      GoTop
-    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
