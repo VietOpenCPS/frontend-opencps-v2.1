@@ -142,7 +142,7 @@
                     >
                     </v-checkbox>
                   </v-flex>
-                  <p class="pt-2 input-group__icon-cb" @click="viewRules" style="color:blue"> Chi tiết</p>
+                  <p class="pt-2 input-group__icon-cb" @click="viewRules" style="color: #0072c2;font-weight: bold;padding-right: 10px;"> Chi tiết</p>
                 </v-layout>
               </v-flex>
             </v-layout>
