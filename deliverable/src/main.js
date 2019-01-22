@@ -7,6 +7,7 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
+import VueNativeSock from 'vue-native-websocket'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
