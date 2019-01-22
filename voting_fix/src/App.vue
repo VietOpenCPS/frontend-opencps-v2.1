@@ -1,10 +1,8 @@
 <template>
   <v-app id="app_voting">
     <v-navigation-drawer app clipped floating width="310" v-if="false">
-      12312313
     </v-navigation-drawer>
     <v-content>
-      768657656757
       <router-view></router-view>
     </v-content>
   </v-app>
