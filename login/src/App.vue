@@ -1,6 +1,6 @@
 <template>
   <v-app :data-app="false" id="app_login">
-    <div @click="showNoti" v-if="drawerLogin" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;    z-index: 9999;"></div>
+    <div @click="drawerLogin = false" v-if="drawerLogin" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;    z-index: 9999;"></div>
     <div v-if="drawer" style="position: fixed;width: 100%;height: 100vh;left: 0;top: 0;"></div>
     <div v-if="!isSignedIn" style="
                   position: relative;
@@ -39,14 +39,14 @@
   
       <div class="login_wrap_app_panel" style="text-align: right;max-width: 1366px;">
         <v-badge color="red" v-if="notificationCount > 0">
-          <span slot="badge">2</span>
+          <span slot="badge">{{ notificationCount > 5 ? "5+" : notificationCount }}</span>
           <v-btn @click="showNoti" icon class="mx-0 my-0">
             <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
               notifications_active
             </v-icon>
           </v-btn>
         </v-badge>
-        <v-btn @click="showNoti" v-else icon class="mx-0 my-0">
+        <v-btn v-else @click="showNoti" icon class="mx-0 my-0">
           <v-icon size="20" color="blue darken-3" class="swing animated" style="-webkit-animation: swing 0.8s infinite;animation: swing 0.8s infinite;">
             notifications
           </v-icon>
@@ -159,7 +159,7 @@
   import axios from 'axios'
   import toastr from 'toastr'
   import TemplateRendering from './template_rendering.vue'
-  import { templateDefault, testData } from './DefaultTemplate.js'
+  import { templateDefault } from './DefaultTemplate.js'
   toastr.options = {
     'closeButton': true,
     'timeOut': '15000'
@@ -182,7 +182,7 @@
       userData: {},
       colorBG: '009688',
       templateDefault: templateDefault,
-      testData: testData
+      testData: [],
     }),
     created() {
       let vm = this
@@ -198,6 +198,7 @@
         }
         if (vm.isSignedIn) {
           vm.userData = {}
+          vm.pullNotificationCount()
           let param = {
             responseType: 'blob'
           }
@@ -215,11 +216,40 @@
         }
       })
     },
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        if (vm.notificationCount < 5) {
+          vm.pullNotificationCount()
+        }
+      }
+    },
     methods: {
+      pullNotificationCount () {
+        let vm = this
+        let param = {}
+        axios.get('/o/v1/opencps/users/count', param).then(function(response) {
+          let serializable = response.data
+          vm.notificationCount = serializable['total']
+        }).catch(function(error) {
+          vm.notificationCount = 0
+        })
+      },
+      pullNotificationData () {
+        let vm = this
+        let param = {}
+        vm.testData = []
+        axios.get('/o/v1/opencps/users', param).then(function(response) {
+          let serializable = response.data
+          vm.notificationCount = serializable['total']
+          vm.testData = serializable['data']
+        }).catch(function(error) {
+        })
+      },
       showNoti() {
         let vm = this
         vm.drawerLogin = !vm.drawerLogin
-        vm.isShowUserMenu = false
+        vm.pullNotificationData()
       },
       doRegisterRedirect() {
         let redirectURL = themeDisplay.getLayoutRelativeURL().substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
