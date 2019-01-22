@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Landing from '@/components/Landing'
-import TiepNhanHoSoDetail from '@/components/TiepNhanHoSoDetail'
-import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'
-import DetailForward from '@/components/DetailForward'
+import Landing from '@/components/blacklist/Landing'
+import TiepNhanHoSoDetail from '@/components/blacklist/TiepNhanHoSoDetail'
+import HoanThienBoSungHoSoDetail from '@/components/blacklist/HoanThienBoSungHoSoDetail'
+import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 
 const routes = [
