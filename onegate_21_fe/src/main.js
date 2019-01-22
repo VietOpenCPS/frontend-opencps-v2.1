@@ -30,4 +30,4 @@ new Vue({
     vm.$store.dispatch('loadInitResource')
   },
   render: function (h) { return h(App) }
-}).$mount('#app_dvc')
+}).$mount('#app')
