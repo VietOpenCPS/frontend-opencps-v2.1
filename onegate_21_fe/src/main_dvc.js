@@ -1,7 +1,7 @@
 import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
-import App from './App.vue'
+import App from './App_dvc.vue'
 import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'

@@ -317,3 +317,16 @@ body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-inner,
 body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-outer {
     margin-top: 8px;
 }
+
+.pagination__navigation {
+    height: 30px;
+    border: 1px solid #ccc;
+    width: 30px;
+    margin: 0;
+    line-height: 10px;
+}
+
+.pagination__navigation--disabled {
+    opacity: .6;
+    pointer-events: none;
+}
