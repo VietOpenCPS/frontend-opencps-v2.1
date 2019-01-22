@@ -1,6 +1,6 @@
 <template>
-  <v-expansion-panel class="expansion-pl ext__form">
-    <v-expansion-panel-content hide-actions value="1">
+  <v-expansion-panel :value="[true]" expand>
+    <v-expansion-panel-content>
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Thông tin chung hồ sơ</div>
       <v-card>
         <v-card-text class="py-0">
@@ -32,9 +32,9 @@
                 <v-menu offset-y style="position:relative !important;">
                   <span slot="activator" class="pr-2">
                     Thông tin người nộp
-                    <v-icon color="blue" size="22">arrow_drop_down</v-icon>
+                    <v-icon color="blue" size="22" style="position: absolute;right: -12px;top: -2px;">arrow_drop_down</v-icon>
                   </span>
-                  <v-list class="px-2 pt-1">
+                  <v-list class="px-3 py-2">
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Tên người nộp:</span>
                       <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
@@ -178,6 +178,7 @@
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
+
 <script>
   export default {
     props: {
@@ -187,47 +188,46 @@
       }
     },
     watch: {
-      detailDossier (val) {
+      detailDossier(val) {
         console.log('watch', val)
         var vm = this
         vm.thongTinChiTietHoSo = val
       }
     },
-    components: {
-    },
+    components: {},
     data: () => ({
       thongTinChiTietHoSo: {},
       showContactDetail: false
     }),
     computed: {
-      loading () {
+      loading() {
         return this.$store.getters.loading
       },
-      originality () {
+      originality() {
         var vm = this
         return vm.getOriginality()
       }
     },
-    created () {
+    created() {
       var vm = this
       vm.thongTinChiTietHoSo = vm.detailDossier
     },
-    mounted () {
+    mounted() {
       var vm = this
       vm.thongTinChiTietHoSo = vm.detailDossier
     },
     methods: {
-      initData (data) {
+      initData(data) {
         var vm = this
         vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
           vm.thongTinChiTietHoSo = resultDossier
           console.log('thongTinChiTietHoSo', vm.thongTinChiTietHoSo)
         })
       },
-      goBack () {
+      goBack() {
         window.history.back()
       },
-      durationText (durationUnit, durationCount) {
+      durationText(durationUnit, durationCount) {
         var durationText
         if (durationUnit === 1 && durationCount > 8) {
           let day = Math.floor(durationCount / 8) + ' ngày'
@@ -247,7 +247,7 @@
       }
     },
     filters: {
-      dateTimeView (arg) {
+      dateTimeView(arg) {
         if (arg) {
           let value = new Date(arg)
           return `${value.getDate().toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()} | ${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`

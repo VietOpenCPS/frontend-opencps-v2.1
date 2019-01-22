@@ -1,7 +1,7 @@
 <template>
   <div class="taotailieuketqua" style="background-color: white;width:100%">
-    <v-expansion-panel class="expansion-pl">
-      <v-expansion-panel-content hide-actions value="1">
+    <v-expansion-panel :value="[true]" class="expansion-pl">
+      <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
@@ -9,7 +9,7 @@
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo">
-            <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.eForm}'>
+            <v-expansion-panel :value="[true]" class="expaned__list__data" :class='{"no_acction__event": !item.eForm}'>
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header" @click="stateView = false">
                   <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px;">

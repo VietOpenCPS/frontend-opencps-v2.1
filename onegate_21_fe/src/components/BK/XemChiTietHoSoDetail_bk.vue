@@ -94,7 +94,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Thành phần hồ sơ nộp vào</div>
             <div slot="header" class="text-right">Xem tài liệu</div>
@@ -111,7 +111,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Văn bản ban hành</div>
             <v-card>
@@ -124,7 +124,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Thành phần kết quả giải quyết</div>
             <div slot="header" class="text-right">Xem tài liệu</div>
@@ -141,7 +141,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Tiến độ giải quyết</div>
             <v-card>
@@ -154,7 +154,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Nhật ký hồ sơ</div>
             <v-card>
@@ -167,7 +167,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Hỏi đáp trực tuyến</div>
             <v-card>
@@ -180,7 +180,7 @@
         <content-placeholders class="mt-1" v-if="loading">
           <content-placeholders-text :lines="1" />
         </content-placeholders>
-        <v-expansion-panel expand v-else>
+        <v-expansion-panel :value="[true]" expand v-else>
           <v-expansion-panel-content key="1" value="false">
             <div slot="header">Trao đổi ý kiến trực tuyến</div>
             <v-card>

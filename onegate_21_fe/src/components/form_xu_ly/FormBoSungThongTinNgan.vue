@@ -1,7 +1,7 @@
 <template>
   <div style="width:100%">
-    <v-expansion-panel v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
-      <v-expansion-panel-content hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
+    <v-expansion-panel :value="[true]" v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
+      <v-expansion-panel-content v-for="(item, index) in formBuilder" v-bind:key="index">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
         {{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>
         </div>
@@ -79,7 +79,7 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <div v-if="type === 'dieuchinhdulieu'" class="ext__form px-3">
-      <div v-if="formBuilder.length > 0" class="mb-2" hide-actions value="1" v-for="(item, index) in formBuilder" v-bind:key="index">
+      <div v-if="formBuilder.length > 0" class="mb-2" hide-actions v-for="(item, index) in formBuilder" v-bind:key="index">
         <div class="py-1" style="border-bottom:1px solid #8a898942">
           <!-- <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> -->
           <span class="text-bold">{{index + 1}}. </span>{{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>

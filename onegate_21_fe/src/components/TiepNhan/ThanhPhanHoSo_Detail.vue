@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative;">
-    <v-expansion-panel class="expansion-pl">
-      <v-expansion-panel-content hide-actions value="1">
+    <v-expansion-panel :value="[true]" class="expansion-pl">
+      <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> IV.</div>
           KẾT QUẢ LIÊN THÔNG &nbsp;&nbsp;&nbsp;&nbsp; 
@@ -9,7 +9,7 @@
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplates" v-if="item.partType === 1" v-bind:key="item.partNo">
-            <v-expansion-panel class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
+            <v-expansion-panel :value="[true]" class="expaned__list__data" :class='{"no_acction__event": !item.hasForm}'>
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header">
                   <div style="width: calc(100% - 350px);display: flex;align-items: center;background: #fff;padding-left: 25px;">

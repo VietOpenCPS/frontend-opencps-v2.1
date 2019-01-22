@@ -155,6 +155,7 @@ export const store = new Vuex.Store({
             console.log(error)
           })
         }
+        commit('setInitData', state.initData)
         resolve(state.initData)
       })
     },
@@ -3290,6 +3291,7 @@ export const store = new Vuex.Store({
       })
     },
     loadingInitData (state) {
+      console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
       return state.initData
     },
     loadingDynamicBtn (state) {

@@ -100,7 +100,7 @@
             <v-card-text class="pt-0">
               <v-form ref="formAddQuestion" v-model="validForm" lazy-validation>
                 <v-layout wrap class="py-1 align-center row-list-style">
-                  <v-flex xs12 class="">
+                  <v-flex xs12>
                     <v-text-field
                       label="Mã câu hỏi"
                       box

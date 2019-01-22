@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-card>
-      <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
+        <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
               <v-icon size="18" color="white">star_rate</v-icon> 
@@ -53,8 +53,8 @@
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-expansion-panel class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="1">
+      <v-expansion-panel :value="[true]" class="expansion-pl">
+        <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
               <v-icon size="18" color="white">star_rate</v-icon> 
@@ -101,8 +101,8 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
       <!--  -->
-      <v-expansion-panel class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
-        <v-expansion-panel-content hide-actions value="1">
+      <v-expansion-panel :value="[true]" class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
+        <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
               <v-icon size="18" color="white">star_rate</v-icon> 

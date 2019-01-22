@@ -3,8 +3,8 @@
     <v-form v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
       <div>
         <div style="position: relative;">
-          <v-expansion-panel class="expansion-pl">
-            <v-expansion-panel-content hide-actions value="1">
+          <v-expansion-panel :value="[true]" class="expansion-pl">
+            <v-expansion-panel-content>
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
                 <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
@@ -198,14 +198,14 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-radio-group v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+            <v-radio-group class="mt-2" v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
               <v-radio label="Công dân" :value="true"></v-radio>
               <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
             </v-radio-group>
           </div>
           <div style="position: relative;" v-if="originality !== 1">
-            <v-expansion-panel class="expansion-pl">
-              <v-expansion-panel-content hide-actions value="1">
+            <v-expansion-panel :value="[true]" class="expansion-pl">
+              <v-expansion-panel-content>
                 <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
                 <v-card>
                   <v-card-text>
@@ -378,11 +378,11 @@
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <div class="absolute__btn" style="width: 150px;margin-top: 4px;">
+            <div class="absolute__btn" style="width: 200px;margin-top: 4px;">
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <v-checkbox
+              <v-checkbox class="mt-2"
               v-else
               label="Giống chủ hồ sơ"
               v-model="thongTinNguoiNopHoSo.sameUser"

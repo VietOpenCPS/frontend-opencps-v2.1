@@ -43,7 +43,7 @@
     <thong-tin-co-ban-ho-so ref="thong-tin-co-ban-ho-so" :detailDossier="thongTinChiTietHoSo"></thong-tin-co-ban-ho-so>
     <!--  -->
     <div>
-      <v-tabs icons-and-text class="mb-4" v-model="activeTab">
+      <v-tabs icons-and-text v-model="activeTab">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1" @click="getNextActions()"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -76,7 +76,7 @@
           </v-btn>
         </v-tab> -->
         <v-tabs-items v-model="activeTab" reverse-transition="fade-transition" transition="fade-transition" style="overflow: visible!important">
-          <v-tab-item id="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-1" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Một cửa -->
             <div class="px-4 pt-2">
               <div class="px-2 py-2" :style="{border: filterNextActionEnable(btnDossierDynamics) || (usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0) ?'1px solid #4caf50' : ''}" v-if="btnStateVisible && originality === 3 && !thongTinChiTietHoSo.finishDate">
@@ -116,8 +116,8 @@
               </div>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
+              <v-expansion-panel :value="[true]" class="expansion-pl">
+                <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
@@ -209,9 +209,9 @@
             </div>
             <!--  -->
           </v-tab-item>
-          <v-tab-item id="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel expand  class="expansion-pl ext__form">
-              <v-expansion-panel-content v-bind:value="true">
+          <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+              <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
                   Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
@@ -220,8 +220,8 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="stateViewResult">
-              <v-expansion-panel-content v-bind:value="true">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="stateViewResult">
+              <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
                   Kết quả xử lý
@@ -229,8 +229,8 @@
                 <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
-              <v-expansion-panel-content v-bind:value="true">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+              <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
                     <span v-if="stateViewResult">III</span>
@@ -259,12 +259,12 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-tab-item>
-          <v-tab-item id="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <chi-tiet-thanh-toan ref="thongtinthanhtoan" :payments="paymentDetail" :dossierDetail="thongTinChiTietHoSo"></chi-tiet-thanh-toan>
             </v-card>
           </v-tab-item>
-          <v-tab-item v-if="listLienThong.length>0" id="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item v-if="listLienThong.length>0" value="tabs-4" :key="4" reverse-transition="fade-transition" transition="fade-transition">
             <v-card>
               <ho-so-lien-thong v-if="listLienThong.length>0" :listLienThong="listLienThong" :dossierDetail="thongTinChiTietHoSo"></ho-so-lien-thong>
               <v-card-text v-else>
@@ -274,7 +274,7 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
-          <v-tab-item id="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-5" v-if="originality !== 1" :key="5" reverse-transition="fade-transition" transition="fade-transition">
             <v-flex xs12 style="height:42px">
               <v-radio-group class="absolute__btn pt-1" style="width: 350px" v-model="typeTienTrinh" row @change="changeTypeTienTrinh($event)">
                 <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
@@ -330,7 +330,7 @@
         </v-tabs-items>
       </v-tabs>
       <!--  -->
-      <v-tabs icons-and-text class="mb-4" v-model="activeTab2">
+      <v-tabs icons-and-text v-model="activeTab2">
         <v-tabs-slider color="primary"></v-tabs-slider>
         <v-tab :key="1" href="#tabs-1b" v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
@@ -349,7 +349,7 @@
         </v-tab>
         <v-tabs-items v-model="activeTab2" reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item v-if="originality === 1 && thongTinChiTietHoSo['dossierStatus'] === 'done'"
-          id="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
+          value="tabs-1b" :key="1" reverse-transition="fade-transition" transition="fade-transition">
             <div class="px-2 py-2">
               <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
                 <div class="text-bold">
@@ -378,11 +378,11 @@
               </div>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
+              <v-expansion-panel :value="[true]" class="expansion-pl">
+                <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> 
                       <v-icon size="18" color="white">star_rate</v-icon> 
@@ -436,8 +436,8 @@
               </v-expansion-panel>
             </div>
             <div style="position: relative;" v-if="originality !== 1">
-              <v-expansion-panel class="expansion-pl">
-                <v-expansion-panel-content hide-actions value="1">
+              <v-expansion-panel :value="[true]" expand>
+                <v-expansion-panel-content>
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                     Trao đổi nội bộ &nbsp;&nbsp;&nbsp;&nbsp; 
@@ -448,10 +448,10 @@
               </v-expansion-panel>
             </div>
           </v-tab-item>
-          <v-tab-item id="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-3b" :key="3" reverse-transition="fade-transition" transition="fade-transition">
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
-                <td class="text-xs-left px-2 py-2">
+                <td class="text-xs-left px-2 pt-2 pb-1">
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
                     : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
@@ -781,6 +781,7 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
+      console.log('AAAAAAA: ', this.$store.getters.loadingInitData.user)
       return this.$store.getters.loadingInitData.user
     },
     kysoSuccess () {
@@ -852,6 +853,7 @@ export default {
     initData (data) {
       var vm = this
       vm.dossierId = data
+      vm.activeTab2 = 'tabs-2b'
       vm.$store.dispatch('getDetailDossier', data).then(resultDossier => {
         vm.thongTinChiTietHoSo = resultDossier
         vm.loadThanhToan()
@@ -2183,7 +2185,9 @@ export default {
         let userArr = vm.$store.getters.getUsersNextAction
         if (userArr.length > 0) {
           let check = userArr.filter(function (item) {
-            return item['userId'].toString() === currentUser['userId'].toString()
+            if (item !== undefined && currentUser !== undefined) {
+              return item['userId'].toString() === currentUser['userId'].toString()
+            }
           })
           if (check.length > 0) {
             checkValue = true
@@ -2211,9 +2215,12 @@ export default {
       let userArr = vm.$store.getters.getUsersNextAction
       let userLastAction = [{'userId': vm.thongTinChiTietHoSo.lastActionUserId ? vm.thongTinChiTietHoSo.lastActionUserId : ''}]
       let userCheckPermission = userArr.concat(userLastAction)
+      console.log('checkPemissionPhanCongLai: ', currentUser)
       if (userCheckPermission.length > 0) {
         let check = userCheckPermission.filter(function (item) {
-          return item['userId'].toString() === currentUser['userId'].toString()
+          if (item !== undefined && currentUser !== undefined) {
+            return item['userId'].toString() === currentUser['userId'].toString()
+          }
         })
         if (check.length > 0) {
           checkValue = true
@@ -2263,8 +2270,12 @@ export default {
     getUser (roleItem) {
       let vm = this
       let roles = vm.$store.getters.getUser.role
+      if (!roles) {
+        return false
+      }
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
+
     },
     checkActionSpecial (btnAction) {
       var vm = this
@@ -2277,7 +2288,9 @@ export default {
             let userArr = vm.$store.getters.getUsersNextAction
             if (userArr.length > 0) {
               let check = userArr.filter(function (item) {
-                return item['userId'].toString() === vm.currentUser['userId'].toString()
+                if (item !== undefined && currentUser !== undefined) {
+                  return item['userId'].toString() === currentUser['userId'].toString()
+                }
               })
               if (check.length > 0) {
                 checkValue += 1
