@@ -4,7 +4,6 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
 import AdminConfig from './AdminConfig'
-import $ from 'jquery'
 import saveAs from 'file-saver'
 // 
 
