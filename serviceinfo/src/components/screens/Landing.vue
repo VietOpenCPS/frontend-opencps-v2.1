@@ -9,12 +9,13 @@
           class="select-border"
           :items="govAgencyList"
           v-model="govAgencySelected"
-          placeholder="Chọn cơ quan"
+          label="Chọn cơ quan"
           item-text="administrationName"
           item-value="administrationCode"
           :hide-selected="true"
           clearable
           @change="changeAdministration"
+          box
         ></v-select>
       </v-flex>
       <v-flex xs3 class="px-2 input-group--text-field-box">
@@ -22,12 +23,13 @@
           class="select-border"
           :items="domainListCurrent"
           v-model="domainSelected"
-          placeholder="Chọn lĩnh vực"
+          label="Chọn lĩnh vực"
           item-text="domainName"
           item-value="domainCode"
           :hide-selected="true"
           clearable
           @change="changeDomain"
+          box
         ></v-select>
       </v-flex>
       <v-flex xs3 class="px-2 input-group--text-field-box">
@@ -36,21 +38,23 @@
           :items="levelList"
           v-model="levelSelected"
           autocomplete
-          placeholder="Chọn mức độ"
+          label="Chọn mức độ"
           item-text="textLevel"
           item-value="level"
           :hide-selected="true"
           @change="changeLevel"
           clearable
+          box
         >
         </v-select>
       </v-flex>
       <v-flex xs3 class="pl-2 pr-2">
         <div style="position:relative">
           <v-text-field class="input-border input-search"
-            placeholder="Nhập tên thủ tục hành chính"
+            label="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
             @keyup.enter="filterServiceName()"
+            append-icon="search"
             box
           ></v-text-field>
         </div>
