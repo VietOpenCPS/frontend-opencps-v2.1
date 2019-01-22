@@ -1,36 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import NotFound from '@/components/NotFound'
 import LandingVoting from '@/components/screens/Landing'
+import Employees from '@/components/screens/Employees'
+import EmployeeDetail from '@/components/screens/EmployeeDetail'
 
 const routes = [
   { path: '/', component: LandingVoting, props: true },
-  {
-    path: '/danh-sach-can-bo/:itemCode',
-    name: 'Employees',
-    component: () => import(/* webpackChunkName: "Employees" */ '@/components/screens/Employees.vue'),
-    props: true,
-    meta: {
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/danh-sach-can-bo/:itemCode/:id',
-    name: 'EmployeeDetail',
-    component: () => import(/* webpackChunkName: "EmployeeDetail" */ '@/components/screens/EmployeeDetail.vue'),
-    props: true,
-    meta: {
-      requiresAuth: false
-    }
-  },
-  {
-    path: '*',
-    name: 'NotFound',
-    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
-    props: true,
-    meta: {
-      requiresAuth: false
-    }
-  }
+  { path: '/danh-sach-can-bo/:itemCode', component: Employees, props: true },
+  { path: '/danh-sach-can-bo/:itemCode/:id', component: EmployeeDetail, props: true },
+  { path: '*', name: 'NotFound', component: NotFound }
 ]
 
 Vue.use(Router)

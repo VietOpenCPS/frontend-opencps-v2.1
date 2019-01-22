@@ -1,11 +1,43 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Landing from '@/components/Landing'
-import NotFound from '@/components/NotFound'
 
 const routes = [
-  { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
-  { path: '*', name: 'NotFound', component: NotFound }
+  {
+    path: '/',
+    name: 'LandingVoting',
+    component: () => import(/* webpackChunkName: "LandingVoting" */ '@/components/screens/Landing.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/danh-sach-can-bo/:itemCode',
+    name: 'Employees',
+    component: () => import(/* webpackChunkName: "Employees" */ '@/components/screens/Employees.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/danh-sach-can-bo/:itemCode/:id',
+    name: 'EmployeeDetail',
+    component: () => import(/* webpackChunkName: "EmployeeDetail" */ '@/components/screens/EmployeeDetail.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  }
 ]
 
 Vue.use(Router)

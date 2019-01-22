@@ -1,18 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import NotFound from '@/components/NotFound'
 import LandingUserProfile from '@/components/screens/Landing'
 
 const routes = [
   { path: '/', component: LandingUserProfile, props: true },
-  {
-    path: '*',
-    name: 'NotFound',
-    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
-    props: true,
-    meta: {
-      requiresAuth: false
-    }
-  }
+  { path: '*', name: 'NotFound', component: NotFound }
 ]
 
 Vue.use(Router)
