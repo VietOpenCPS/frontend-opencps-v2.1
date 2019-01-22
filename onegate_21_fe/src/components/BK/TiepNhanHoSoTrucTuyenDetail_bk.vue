@@ -94,7 +94,7 @@
   </div>
 </template>
 <script>
-// import router from '@/router'
+// 
 // import * as utils from '../store/onegate_utils'
 
 export default {

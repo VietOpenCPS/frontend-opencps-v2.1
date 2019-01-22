@@ -1,15 +1,11 @@
 import 'idempotent-babel-polyfill'
 import Vue from 'vue'
-import './stylus/app.styl'
-import './stylus/jexcel.css'
-import './stylus/ej2base.css'
-import './stylus/ej2upload.css'
-import App from './App'
-import router from './router'
+import './plugins/vuetify'
+import App from './App.vue'
+import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
-import './plugins/vuetify'
 
 Vue.use(VueContentPlaceholders)
 
@@ -48,10 +44,8 @@ Vue.mixin({
 })
 
 new Vue({
-  el: '#app',
   router,
   store,
-  render: h => h(App),
   created() {
     var vm = this
     vm.$nextTick(function() {
@@ -64,6 +58,6 @@ new Vue({
         vm.$router.push('/bao-cao/0' + strQuery)
       }
     })
-  }
-})
-
+  },
+  render: function (h) { return h(App) }
+}).$mount('#app_dynamic_report')

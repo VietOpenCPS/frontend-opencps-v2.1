@@ -1,5 +1,11 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
+  <v-combobox
+          v-model="select"
+          :items="items"
+          label="Select a favorite activity or create a new one"
+          box
+        ></v-combobox>
   <div class="form-chitiet">
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
@@ -146,6 +152,13 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    select: 'Programming',
+        items: [
+          'Programming',
+          'Design',
+          'Vue',
+          'Vuetify'
+        ],
     doExportExcel: false,
     showGuilds: false,
     showPicker: true,

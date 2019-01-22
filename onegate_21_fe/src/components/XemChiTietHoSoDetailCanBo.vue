@@ -116,7 +116,7 @@
               </div>
             </div>
             <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
-              <v-expansion-panel :value="[true]" class="expansion-pl">
+              <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -210,7 +210,7 @@
             <!--  -->
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
@@ -220,7 +220,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="stateViewResult">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="stateViewResult">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
@@ -229,7 +229,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
@@ -381,7 +381,7 @@
           <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
-              <v-expansion-panel :value="[true]" class="expansion-pl">
+              <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
                   <div slot="header">
                     <div class="background-triangle-small"> 
@@ -436,7 +436,7 @@
               </v-expansion-panel>
             </div>
             <div style="position: relative;" v-if="originality !== 1">
-              <v-expansion-panel :value="[true]" expand>
+              <v-expansion-panel :value="[true]" expand >
                 <v-expansion-panel-content>
                   <div slot="header">
                     <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -546,7 +546,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 import $ from 'jquery'
 import toastr from 'toastr'
 // import '../store/jquery-comments'
@@ -1242,12 +1242,12 @@ export default {
       vm.itemAction = item
       vm.indexAction = index
       if (String(item.form) === 'UPDATE') {
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + vm.thongTinChiTietHoSo.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
       } else if (String(item.form) === 'ADD') {
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + vm.thongTinChiTietHoSo.dossierId,
           query: vm.$router.history.current.query
         })
@@ -1347,7 +1347,7 @@ export default {
       vm.loadingAction = true
       vm.$store.dispatch('doCopy', filter).then(function (result) {
         vm.loadingAction = false
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -1381,7 +1381,7 @@ export default {
       vm.$store.dispatch('doCancel', filter).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -1401,7 +1401,7 @@ export default {
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -1618,7 +1618,7 @@ export default {
             if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
               vm.printDocument = true
             }
-            router.push({
+            vm.$router.push({
               path: vm.$router.history.current.path,
               query: {
                 recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -1761,13 +1761,13 @@ export default {
               vm.printDocument = true
             }
             if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-              router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+              vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
             }
             vm.checkInput = 0
             vm.$store.commit('setCheckInput', 0)
             if (String(item.form) === 'ACTIONS') {
             } else {
-              router.push({
+              vm.$router.push({
                 path: vm.$router.history.current.path,
                 query: {
                   recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -1852,7 +1852,7 @@ export default {
         }
         vm.checkInput = 0
         vm.$store.commit('setCheckInput', 0)
-        router.push({
+        vm.$router.push({
           path: vm.$router.history.current.path,
           query: {
             recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

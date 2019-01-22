@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <v-expansion-panel :value="[true]" class="expansion-pl" v-if="dossierSelected.length > 0">
+    <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="dossierSelected.length > 0">
       <v-expansion-panel-content>
         <!-- <div slot="header">
           <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 // import $ from 'jquery'
 // import '../store/jquery-comments'
 import Comment from './Comment.vue'
@@ -481,7 +481,7 @@ export default {
       vm.$store.dispatch('doCopy', filter).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -499,7 +499,7 @@ export default {
         vm.$store.dispatch('doCancel', filter).then(function (result) {
           vm.loadingAction = false
           vm.indexAction = -1
-          router.push({
+          vm.$router.push({
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query
           })

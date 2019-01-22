@@ -9,7 +9,7 @@
       ></v-progress-circular>
       <p class="mt-4">đang tạo hồ sơ ...</p>
     </div>
-    <v-expansion-panel :value="[true]" v-if="String(serviceCode) === '0' && !selectOption" expand class="expand__select__gov">
+    <v-expansion-panel :value="[true]" expand  v-if="String(serviceCode) === '0' && !selectOption" expand class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
         <div slot='header' class="ml-3">
           <v-icon style="
@@ -22,7 +22,7 @@
         <v-card>
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <!-- Cap 2 -->
-            <v-expansion-panel :value="[true]" expand class="expand__select__domain">
+            <v-expansion-panel :value="[true]" expand  class="expand__select__domain">
               <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
                 <div slot='header' style="margin-left: 14px;">
                    <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-  import router from '@/router'
+  
   export default {
     props: ['serviceCode'],
     data: () => ({
@@ -165,7 +165,7 @@
               vm.$store.dispatch('postDossier', data).then(function (result) {
                 vm.loadingAction = false
                 vm.indexAction = -1
-                router.push({
+                vm.$router.push({
                   path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
                   query: vm.$router.history.current.query
                 })
@@ -198,7 +198,7 @@
           vm.$store.dispatch('postDossier', data).then(function (result) {
             vm.loadingAction = false
             vm.indexAction = -1
-            router.push({
+            vm.$router.push({
               path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
               query: vm.$router.history.current.query
             })
@@ -221,7 +221,7 @@
           vm.$store.dispatch('postDossier', data).then(function (result) {
             vm.loadingAction = false
             vm.indexAction = -1
-            router.push({
+            vm.$router.push({
               path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
               query: vm.$router.history.current.query
             })

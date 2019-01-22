@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import router from '@/router'
+  
   // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     props: {
@@ -81,7 +81,7 @@
         //   path: '/danh-sach-ho-so/' + currentParams.index,
         //   query: currentQuery
         // })
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + 0,
           query: {
             recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

@@ -82,7 +82,7 @@
 <script>
 // import $ from 'jquery'
 import TinyPagination from './pagging/hanghai_pagination.vue'
-import router from '@/router'
+
 export default {
   props: ['index', 'id'],
   components: {
@@ -250,7 +250,7 @@ export default {
     },
     doLoadingDataHoSo () {
       let vm = this
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       console.log(currentQuery)
       let filter = {
         queryParams: '/o/rest/v2/dossiers',

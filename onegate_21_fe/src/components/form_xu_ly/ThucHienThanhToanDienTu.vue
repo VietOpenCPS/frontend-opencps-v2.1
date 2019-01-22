@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%" class="payment-info">
-    <v-expansion-panel :value="[true]" class="expansion-pl">
+    <v-expansion-panel :value="[true]" expand  class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'

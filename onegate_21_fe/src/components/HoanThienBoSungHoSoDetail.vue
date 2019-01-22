@@ -15,7 +15,7 @@
       </div>
     </div>
     <!--  -->
-    <v-expansion-panel :value="[true]" expand class="expansion-p0">
+    <v-expansion-panel :value="[true]" expand  class="expansion-p0">
       <v-expansion-panel-content :value="true">
         <div slot="header">
           <div class="background-triangle-small">I. </div>THÔNG TIN HỒ SƠ
@@ -126,7 +126,7 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <!--  -->
-    <v-expansion-panel :value="[true]" expand class="expansion-p0" style="position: relative">
+    <v-expansion-panel :value="[true]" expand  class="expansion-p0" style="position: relative">
       <v-expansion-panel-content :value="true">
         <div slot="header">
           <div class="background-triangle-small">II. </div>THÀNH PHẦN HỒ SƠ
@@ -196,7 +196,7 @@
   </div>
 </template>
 <script>
-  import router from '@/router'
+  
   import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
   export default {
     props: ['index', 'id'],
@@ -288,7 +288,7 @@
           vm.loadingActionProcess = true
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             vm.visibleBtnNextAction = false
-            router.push({
+            vm.$router.push({
               path: vm.$router.history.current.path,
               query: {
                 recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

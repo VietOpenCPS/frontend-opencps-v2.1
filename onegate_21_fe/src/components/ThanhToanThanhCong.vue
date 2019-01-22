@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 import Vue from 'vue'
 export default {
   props: [],

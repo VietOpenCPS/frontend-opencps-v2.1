@@ -290,3 +290,43 @@ body .notification_wrap > div:last-child {
 #react-root span {
     background: transparent;
 }
+body #react-root .theme--light .v-list__tile__title {
+    font-size: 13px ;
+}
+body #react-root .application--wrap {
+    background: transparent !important;
+}
+body .radio_register_type .v-input__control {
+    margin: 0 auto !important;
+    margin-top: 10px;
+}
+body #app_register .v-input--selection-controls {
+    margin-top: 0;
+}
+body #app_register .v-text-field--box input,
+body #app_register .v-text-field--outline input {
+    margin-top: 5px;
+}
+body #app_register .v-text-field--box>.v-input__control>.v-input__slot,
+body #app_register .v-text-field--outline>.v-input__control>.v-input__slot {
+    min-height: 36px;
+}
+body #app_register .v-text-field.v-text-field--enclosed .v-input__append-inner,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__append-outer,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-inner,
+body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-outer {
+    margin-top: 8px;
+}
+
+.pagination__navigation {
+    height: 30px;
+    border: 1px solid #ccc;
+    width: 30px;
+    margin: 0;
+    line-height: 10px;
+}
+
+.pagination__navigation--disabled {
+    opacity: .6;
+    pointer-events: none;
+}

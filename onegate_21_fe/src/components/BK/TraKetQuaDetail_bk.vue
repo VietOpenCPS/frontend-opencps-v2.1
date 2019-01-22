@@ -17,7 +17,7 @@
         </div>
       </div> 
     </div>
-    <v-expansion-panel :value="[true]" expand class="expansion-p0">
+    <v-expansion-panel :value="[true]" expand  class="expansion-p0">
       <v-expansion-panel-content :value="true">
         <div slot="header">
           <div class="background-triangle-small">I. </div>THÔNG TIN HỒ SƠ
@@ -121,7 +121,7 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <!--  -->
-    <v-expansion-panel :value="[true]" expand class="expansion-p0 ex-table">
+    <v-expansion-panel :value="[true]" expand  class="expansion-p0 ex-table">
       <v-expansion-panel-content :value="true">
         <div slot="header">
           <div class="background-triangle-small"> II. </div>GIẤY TỜ TRẢ KẾT QUẢ

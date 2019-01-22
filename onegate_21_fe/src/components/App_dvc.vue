@@ -57,7 +57,7 @@
 </template>
 
 <script>
-  import router from '@/router'
+  
   export default {
     data: () => ({
       isCallBack: true,
@@ -81,7 +81,7 @@
           let currentParams = vm.$router.history.current.params
           if (!currentParams.hasOwnProperty('index')) {
             vm.trangThaiHoSoList[0]['active'] = true
-            router.push({
+            vm.$router.push({
               path: '/danh-sach-ho-so/0',
               query: {
                 q: vm.trangThaiHoSoList[0]['queryParams']
@@ -133,7 +133,7 @@
     methods: {
       toTableIndexing (item, index) {
         this.$store.commit('setIndex', index)
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -156,7 +156,7 @@
           }
         }
         this.currentStep = String(item.stepCode)
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

@@ -128,7 +128,7 @@
 </template>
 
 <script>
-  import router from '@/router'
+  
   import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
@@ -168,7 +168,7 @@
             let currentParams = vm.$router.history.current.params
             if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode') && route.name !== 'ThanhToanThanhCong') {
               vm.trangThaiHoSoList[0]['active'] = true
-              router.push({
+              vm.$router.push({
                 path: vm.pathLanding + '/0',
                 query: {
                   q: vm.trangThaiHoSoList[0]['queryParams']
@@ -227,7 +227,7 @@
       toTableIndexing (item, index) {
         let vm = this
         this.$store.commit('setIndex', index)
-        router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -251,7 +251,7 @@
           }
         }
         this.currentStep = String(item.stepCode)
-        router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -310,7 +310,8 @@
         })
       },
       doAddDVC () {
-        router.push('/add-dvc/0')
+        let vm = this
+        vm.$router.push('/add-dvc/0')
       }
     }
   }

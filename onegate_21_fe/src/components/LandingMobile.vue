@@ -590,7 +590,7 @@
 
 <script>
 import Vue from 'vue'
-import router from '@/router'
+
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
 import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
@@ -1316,7 +1316,7 @@ export default {
     doLoadingDataHoSo () {
       let vm = this
       vm.selected = []
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
@@ -1579,12 +1579,12 @@ export default {
         }
         // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
       } else if (String(item.form) === 'ADD') {
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
           query: vm.$router.history.current.query
         })
@@ -1774,7 +1774,7 @@ export default {
         if (vm.selectedDoAction.length === 1) {
           for (let key in vm.selectedDoAction) {
             let actionDossierItem = vm.selectedDoAction[key]
-            router.push({
+            vm.$router.push({
               path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + actionDossierItem['dossierId'],
               query: {
                 activeTab: 'tabs-1',
@@ -1793,7 +1793,7 @@ export default {
               let query = vm.$router.history.current.query
               query['dossiers'] = dossiersSelect
               query['actionActive'] = JSON.stringify(item)
-              router.push({
+              vm.$router.push({
                 path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
                 query: query
               })
@@ -1813,7 +1813,7 @@ export default {
       vm.$store.dispatch('doCopy', filter).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -1833,7 +1833,7 @@ export default {
         vm.$store.dispatch('doCancel', filter).then(function (result) {
           vm.loadingAction = false
           vm.indexAction = -1
-          router.push({
+          vm.$router.push({
             path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
             query: vm.$router.history.current.query
           })
@@ -1964,7 +1964,7 @@ export default {
           vm.$store.dispatch('deleteDossier', filter).then(function (result) {
             vm.dialogActionProcess = false
             vm.loadingActionProcess = false
-            router.push({
+            vm.$router.push({
               path: vm.$router.history.current.path,
               query: {
                 recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -1991,7 +1991,7 @@ export default {
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -2097,7 +2097,7 @@ export default {
                 if (vm.countSelected === vm.selectedDoAction.length && vm.statusFailed > 0 && vm.selectedDoAction.length > 1) {
                   vm.dialog_statusAction = true
                 } else if (vm.countSelected === vm.selectedDoAction.length && vm.statusFailed === 0) {
-                  router.push({
+                  vm.$router.push({
                     path: vm.$router.history.current.path,
                     query: {
                       recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -2107,7 +2107,7 @@ export default {
                   })
                 }
               } else {
-                router.push({
+                vm.$router.push({
                   path: vm.$router.history.current.path,
                   query: {
                     recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -2229,7 +2229,7 @@ export default {
         //     query['actionSpecial'] = true
         //   }
         // }
-        router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/chi-tiet-ho-so/' + dossierItem['dossierId'],
           query: query
         })
@@ -2258,7 +2258,7 @@ export default {
     viewDetail (item, indexItem) {
       console.log('permission: ', item.permission)
       if (item.permission !== null && item.permission !== '') {
-        router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
       }
     },
     keywordEventChange (data) {

@@ -1,9 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import toastr from 'toastr'
 import axios from 'axios'
-import saveAs from 'file-saver'
-// import support from './support.json'
+import support from './support.json'
 import AdminConfig from './AdminConfig'
+import saveAs from 'file-saver'
+// 
+
+Vue.use(toastr)
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({

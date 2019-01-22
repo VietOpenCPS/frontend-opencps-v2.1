@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 import Vue from 'vue'
 import $ from 'jquery'
 import VueDraggable from 'vue-draggable'

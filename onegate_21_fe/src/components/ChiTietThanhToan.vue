@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <v-expansion-panel :value="[true]" class="expansion-pl">
+      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
         <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -53,7 +53,7 @@
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-expansion-panel :value="[true]" class="expansion-pl">
+      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
         <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -101,7 +101,7 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
       <!--  -->
-      <v-expansion-panel :value="[true]" class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
+      <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="Number(payments.paymentStatus) >= 3">
         <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import router from '@/router'
+
 import Vue from 'vue'
 export default {
   props: {
