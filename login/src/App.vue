@@ -213,7 +213,7 @@
                       font-weight: bold;
                   "
                 >
-                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Thông báo mới
+                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Mới
               </div>    
                 <div
                   class="notification_wrap"
@@ -251,7 +251,7 @@
                       font-weight: bold;
                   "
                 >
-                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Thông báo trước đó
+                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Trước đó
               </div>    
                 <div
                   class="notification_wrap"
