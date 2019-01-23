@@ -231,7 +231,7 @@
                     :item="item"
                     :layout_view="item['layout_view']"
                     :template_default="templateDefault"
-                    @mark-as-read=""
+                    @mark-as-read="markReadEventId"
                   ></template-rendering>
                 </div>
               </div>
@@ -369,6 +369,7 @@ export default {
     },
     markReadEventId (configOBJ) {
       let vm = this
+      console.log('configOBJ', configOBJ)
       axios
       .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
