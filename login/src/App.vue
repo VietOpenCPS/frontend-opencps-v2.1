@@ -197,7 +197,7 @@
               >Đánh dấu đã đọc</v-btn>
             </v-flex>
           </v-layout>
-          <div class="layout row wrap px-3" style="display: flex;">
+          <div v-if="notificationCount > 0" class="layout row wrap px-3" style="display: flex;">
               <div
                 class="flex xs12 mt-3"
                 style="
@@ -235,7 +235,7 @@
                 </div>
               </div>
           </div>
-          <div v-if="notificationCount > 0" class="layout row wrap px-3" style="display: flex;">
+          <div class="layout row wrap px-3" style="display: flex;">
               <div
                 class="flex xs12 mt-3"
                 style="
