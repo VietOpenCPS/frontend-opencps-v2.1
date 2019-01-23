@@ -28,14 +28,15 @@ export const templateDefault = {
         let vm = this
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
-            vm.dossier = eval(' ( ' + vm.item['data'] + ' ) ')['Dossier']
+            console.log('vm.$parent.item', vm.item)
+            let temp = eval(' ( ' + vm.item['data'] + ' ) ')
+            vm.dossier = temp !== undefined ? temp['Dossier'] : {}
         }
-        console.log(vm.item)
     },
     methods: {
         doReadEvent (eventId) {
             let vm = this
-            vm.$parent.$parent.markReadEventId(eventId)
+            vm.$parent.$parent.$parent.markReadEventId(eventId)
         }
     }
 }
