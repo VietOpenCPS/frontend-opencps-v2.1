@@ -1,7 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
+// 
+
+Vue.use(toastr)
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({

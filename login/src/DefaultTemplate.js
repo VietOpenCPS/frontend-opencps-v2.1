@@ -1,19 +1,22 @@
 export const templateDefault = {
     template: `
-        <div>
+        <div @click="doReadEvent(item['eventId'])" style="display: flex;cursor: pointer;">
+            <div class="v-avatar white--text" style="height: 36px;width: 36px;margin-right: 8px;margin-top: 3px;">
+                <img :src="item['avatar']" :alt="item['userName']">
+            </div>
             <p style="margin-bottom: 0px;">
-                {{item["notificationText"]}}
+                <strong>{{item["userName"]}}</strong> {{item["notificationText"]}}
                 <a href="" style="
                     color: #0072c2;
                     font-weight: bold;
                 ">
                     {{dossier["dossierId"]}}
-                    <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px;color: #0072c2;">launch</i>
                 </a>
-            </p>
-            <p style="color: #90949c;font-size: 12px;">
-            <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
-                {{new Date(dossier["createDate"]).toLocaleDateString('vi-VN')}}
+                <br/>
+                <span style="color: rgb(90, 90, 90) !important;font-size: 11px;">
+                    <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
+                        {{new Date(item["notificationDate"]).toLocaleString('vi-VN')}}
+                </span>
             </p>
         </div>
     `,
@@ -25,9 +28,13 @@ export const templateDefault = {
         let vm = this
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
-            vm.dossier = eval(' ( ' + vm.item['data'] + ' ) ')['Dossier']
         }
-        console.log(vm.item)
+    },
+    methods: {
+        doReadEvent (eventId) {
+            let vm = this
+            vm.$parent.markReadEventId(eventId)
+        }
     }
 }
 export const testData = [

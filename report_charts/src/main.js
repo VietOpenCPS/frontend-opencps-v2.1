@@ -1,33 +1,19 @@
+import 'idempotent-babel-polyfill'
 import Vue from 'vue'
-import './stylus/app.styl'
-import './stylus/jexcel.css'
-import App from './App'
-import router from './router'
-import App2 from './App2'
+import './plugins/vuetify'
+import App from './App.vue'
+import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
-import Vuetify from 'vuetify'
 import VueApexCharts from 'vue-apexcharts'
 
 Vue.component('apexchart', VueApexCharts)
-
-Vue.use(Vuetify, {
-  theme: {
-    primary: '#212121',
-    secondary: '#424242',
-    accent: '#459fed',
-    error: '#ff8e8e',
-    info: '#2196F3',
-    success: '#4CAF50',
-    warning: '#FFC107'
-  }
-})
-
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
 
@@ -60,10 +46,8 @@ Vue.mixin({
 })
 
 new Vue({
-  el: '#app',
   router,
   store,
-  render: h => h(App),
   created() {
     var vm = this
     vm.$nextTick(function() {
@@ -71,21 +55,6 @@ new Vue({
         vm.$router.push('/bao-cao/0')
       }
     })
-  }
-})
-
-new Vue({
-  el: '#app2',
-  router,
-  store,
-  render: h => h(App2),
-  created() {
-    var vm = this
-    vm.$nextTick(function() {
-      if (window.location.href.endsWith('#/')) {
-        vm.$router.push('/bao-cao/0')
-      }
-    })
-  }
-})
-
+  },
+  render: function (h) { return h(App) }
+}).$mount('#app_report_charts')
