@@ -5,7 +5,7 @@ export const templateDefault = {
                 <img :src="item['avatar']" :alt="item['userName']">
             </div>
             <p style="margin-bottom: 0px;">
-                <strong>{{item["userName"]}}</strong> {{item["notificationText"]}}
+                <strong>{{item["userName"]}}</strong> {{item["title"]}}
                 <a href="" style="
                     color: #0072c2;
                     font-weight: bold;
