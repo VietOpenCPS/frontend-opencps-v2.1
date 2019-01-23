@@ -196,70 +196,79 @@
               >Đánh dấu đã đọc</v-btn>
             </v-flex>
           </v-layout>
-          <div class="layout row wrap px-3" style="display: flex;overflow: auto;height: 100vh;">
-            <div
-              class="flex xs12 mt-3"
-              style="
-                  background: #ffffff66;
-                  border-radius: 8px;
-              "
-            >
+          <div class="layout row wrap px-3" style="display: flex; overflow: auto; max-height: 300px;">
               <div
+                class="flex xs12 mt-3"
                 style="
-                    padding: 5px 10px;
-                    background: #fff0;
-                    text-transform: uppercase;
-                    font-weight: bold;
+                    background: #ffffff66;
+                    border-radius: 8px;
                 "
               >
+                <div
+                  style="
+                      padding: 5px 10px;
+                      background: #fff0;
+                      text-transform: uppercase;
+                      font-weight: bold;
+                  "
+                >
                 <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo mới
+              </div>    
+                <div
+                  class="notification_wrap"
+                  style="
+                      padding: 5px 10px;
+                      background: #ffffffb3;
+                      border-bottom-left-radius: 8px;
+                      border-bottom-right-radius: 8px;
+                  "
+                >
+                  <template-rendering
+                    v-for="(item, index) in testData"
+                    v-bind:key="index"
+                    :item="item"
+                    :layout_view="item['layout_view']"
+                    :template_default="templateDefault"
+                  ></template-rendering>
+                </div>
               </div>
+          </div>
+          <div class="layout row wrap px-3" style="display: flex; overflow: auto; max-height: 300px;">
               <div
-                class="notification_wrap"
+                class="flex xs12 mt-3"
                 style="
-                    padding: 5px 10px;
-                    background: #ffffffb3;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
+                    background: #ffffff66;
+                    border-radius: 8px;
                 "
               >
-                <template-rendering
-                  v-for="(item, index) in testData"
-                  v-bind:key="index"
-                  :item="item"
-                  :layout_view="item['layout_view']"
-                  :template_default="templateDefault"
-                ></template-rendering>
+                <div
+                  style="
+                      padding: 5px 10px;
+                      background: #fff0;
+                      text-transform: uppercase;
+                      font-weight: bold;
+                  "
+                >
+                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo trước đó
+              </div>    
+                <div
+                  class="notification_wrap"
+                  style="
+                      padding: 5px 10px;
+                      background: #ffffffb3;
+                      border-bottom-left-radius: 8px;
+                      border-bottom-right-radius: 8px;
+                  "
+                >
+                  <template-rendering
+                    v-for="(item, index) in testDataSeen"
+                    v-bind:key="index"
+                    :item="item"
+                    :layout_view="item['layout_view']"
+                    :template_default="templateDefault"
+                  ></template-rendering>
+                </div>
               </div>
-            </div>
-            <div
-                style="
-                    padding: 5px 10px;
-                    background: #fff0;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                "
-              >
-                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo đã đọc
-              </div>
-              <div
-                class="notification_wrap"
-                style="
-                    padding: 5px 10px;
-                    background: #ffffffb3;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
-                "
-              >
-                <template-rendering
-                  v-for="(item, index) in testDataSeen"
-                  v-bind:key="index"
-                  :item="item"
-                  :layout_view="item['layout_view']"
-                  :template_default="templateDefault"
-                ></template-rendering>
-              </div>
-            </div>
           </div>
         </article>
       </v-navigation-drawer>
@@ -348,7 +357,7 @@ export default {
       let vm = this;
       let param = {};
       axios
-        .get("/o/rest/v2/notifications/count", param)
+        .get("/o/rest/v2/notifications/count?archived=false", param)
         .then(function(response) {
           let serializable = response.data;
           vm.notificationCount = serializable["total"];
