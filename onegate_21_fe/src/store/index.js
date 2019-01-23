@@ -17,7 +17,7 @@ export const store = new Vuex.Store({
   state: {
     initData: support.initData,
     endPointApi: '/o/rest/v2',
-    // endPointApi: 'http://127.0.0.1:8081/api',
+    // endPointApi: 'http://127.0.0.1:8080/api',
     loading: false,
     loadingTable: false,
     loadingDynamicBtn: false,
@@ -1631,7 +1631,7 @@ export const store = new Vuex.Store({
             }
           }
           var listHistoryProcessing = []
-          // axios.get('http://127.0.0.1:8081/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8080/api/dossiers/dossierlogs/77602/logs', param).then(function (response) {
           axios.get(state.initData.dossierlogsApi + '/' + data.dossierId + '/logs', param).then(function (response) {
             var serializable = response.data
             for (var key in serializable.data) {
@@ -1705,7 +1705,7 @@ export const store = new Vuex.Store({
           },
           params: {}
         }
-        axios.get('http://127.0.0.1:8081/api/onegate/token', param).then(function (response) {
+        axios.get('http://127.0.0.1:8080/api/onegate/token', param).then(function (response) {
           resolve(response.data)
           // resolve('asa1wsasaaddsdsdscsfsfs1212121212')
         })
@@ -1986,7 +1986,7 @@ export const store = new Vuex.Store({
           var params = new URLSearchParams()
           // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
-          // axios.get('http://congtrinh0209:8081/api/stepconfigs/done/done_5', params, config).then(function (response) {
+          // axios.get('http://congtrinh0209:8080/api/stepconfigs/done/done_5', params, config).then(function (response) {
             let serializable = response.data.data
             let buttonConfig
             if (serializable[0].buttonConfig && serializable[0].buttonConfig.indexOf('{') >= 0) {
@@ -2596,7 +2596,7 @@ export const store = new Vuex.Store({
           commit('setLoadingGov', true)
           // test local
           axios.get(state.initData.serviceConfigByGovApi, param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/statistics/agencies', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8080/api/serviceinfos/statistics/agencies', param).then(function (response) {
             commit('setLoadingGov', false)
             let serializable = response.data
             if (serializable.govAgencies) {
@@ -2656,7 +2656,7 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8080/api/serviceinfos/' + data.serviceConfigId + '/processes', param).then(function (response) {
           axios.get(state.initData.getServiceConfigs + '/' + data.serviceConfigId + '/processes', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -2709,7 +2709,7 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get('http://127.0.0.1:8081/api/dictcollections/ADMINISTRATIVE_REGION/dictitems', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8080/api/dictcollections/ADMINISTRATIVE_REGION/dictitems', param).then(function (response) {
           axios.get('/o/rest/v2/dictcollections/VNPOST_CITY_CODE/dictitems', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
@@ -2950,7 +2950,7 @@ export const store = new Vuex.Store({
           }
           // test local
           axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
-          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+          // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
             let serializable = result.data
             if (serializable && serializable.data) {
               resolve(serializable.data)
@@ -2977,7 +2977,7 @@ export const store = new Vuex.Store({
           params.append('votingCode', data.votingCode ? data.votingCode : '')
           params.append('selected', data.selected)
           // test local
-          // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
+          // axios.post('http://127.0.0.1:8080/api/votings/' + data.votingId, params, config).then(result => {
           axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {

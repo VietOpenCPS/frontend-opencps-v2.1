@@ -7,10 +7,9 @@
       <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
       <v-layout wrap v-if="originality !== 1">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listLinhVuc"
             v-model="linhVucSelected"
-            autocomplete
             placeholder="Chọn lĩnh vực"
             item-text="displayName"
             item-value="domainCode"
@@ -18,13 +17,12 @@
             :hide-selected="true"
             @change="changeDomain"
             clearable
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listThuTucHanhChinh"
             v-model="thuTucHanhChinhSelected"
-            autocomplete
             placeholder="Chọn thủ tục hành chính"
             item-text="displayName"
             item-value="serviceConfigId"
@@ -32,20 +30,19 @@
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
-          <v-select
+          <v-autocomplete
             :items="listDichVu"
             v-model="dichVuSelected"
             placeholder="Chọn dịch vụ:"
-            autocomplete
             item-text="optionName"
             item-value="processOptionId"
             return-object
             :hide-selected="true"
             @change="changeDichVuConfigs"
-          ></v-select>
+          ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2">
           <div style="position:relative">
@@ -297,24 +294,22 @@
           <v-card-text class="pb-0 pt-4">
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
-                <v-select
+                <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  autocomplete
                   placeholder="chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
                   @change = "changeServiceConfigs"
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <v-select
+                <v-autocomplete
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  autocomplete
                   placeholder="chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
@@ -324,7 +319,7 @@
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change = "changeDichVuConfigs"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -482,11 +477,10 @@
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12 class="px-2 pb-3">
                 <div class="my-2">Thủ tục hành chính:</div>
-                <v-select
+                <v-autocomplete
                   class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
-                  autocomplete
                   placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
@@ -495,23 +489,22 @@
                   @change = "changeServiceConfigsGuide"
                   :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2">Dịch vụ:</div>
-                <v-select
+                <v-autocomplete
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
                   placeholder="Chọn dịch vụ"
-                  autocomplete
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2">Tên người làm thủ tục:</div>
@@ -2256,6 +2249,7 @@ export default {
       window.history.back()
     },
     viewDetail (item, indexItem) {
+      let vm = this
       console.log('permission: ', item.permission)
       if (item.permission !== null && item.permission !== '') {
         vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])

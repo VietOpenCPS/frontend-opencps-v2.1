@@ -19,16 +19,15 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-autocomplete
                   v-else
                   :items="postalServiceItems"
                   item-text="itemName"
                   item-value="itemCode"
                   v-model="dichVuChuyenPhatKetQua.postalServiceCode"
-                  autocomplete
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <!--  -->
               <!--  -->
@@ -100,16 +99,15 @@
                 <content-placeholders class="mt-1" v-if="loading">
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
-                <v-select
+                <v-autocomplete
                   v-else
                   :items="vnPostItems"
                   item-text="itemName"
                   item-value="itemCode"
                   v-model="dichVuChuyenPhatKetQua.postalCityCode"
-                  autocomplete
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
               <!-- <v-flex xs12 sm2>
                 <content-placeholders class="mt-1" v-if="loading">
@@ -176,12 +174,12 @@
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 400px; margin-top: 4px;">
+    <div class="absolute__btn" style="width: 350px; margin-top: 4px;">
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
       <!--  -->
-      <v-radio-group v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
+      <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
         <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
         <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
       </v-radio-group>

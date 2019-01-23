@@ -221,22 +221,22 @@
         </div> -->
       </div>
       <div v-if="!partTypes.includes(2)">
-        <v-layout class="mx-4" wrap>
-          <v-flex style="width:60px" class="my-0 py-2 text-bold" v-if="!onlyView || (onlyView && applicantNoteDossier)">Ghi chú:</v-flex>
-          <v-flex style="width:calc(100% - 80px)">
-            <div v-if="!onlyView" class="pl-2">
-              <v-text-field class="py-0"
+        <v-card>
+          <v-card-text>
+            <div v-if="!onlyView">
+              <v-textarea class="py-0"
+              box
               v-model="applicantNoteDossier"
-              multi-line
               rows="3"
               @input="changeApplicantNote"
-              ></v-text-field>
+              label="ghi chú..."
+              ></v-textarea>
             </div>
             <p class="my-0 py-2" v-if="onlyView && applicantNoteDossier">
               {{applicantNoteDossier}} 
             </p>
-          </v-flex>
-        </v-layout>
+          </v-card-text>
+        </v-card>
       </div>
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
