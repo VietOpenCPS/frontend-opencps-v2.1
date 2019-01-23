@@ -184,6 +184,7 @@
             </v-flex>
             <v-flex xs6 class="text-center">
               <v-btn
+                @click="markRead"
                 block
                 small
                 style="
@@ -196,7 +197,7 @@
               >Đánh dấu đã đọc</v-btn>
             </v-flex>
           </v-layout>
-          <div class="layout row wrap px-3" style="display: flex; overflow: auto; max-height: 300px;">
+          <div class="layout row wrap px-3" style="display: flex;">
               <div
                 class="flex xs12 mt-3"
                 style="
@@ -212,7 +213,7 @@
                       font-weight: bold;
                   "
                 >
-                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo mới
+                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Thông báo mới
               </div>    
                 <div
                   class="notification_wrap"
@@ -221,6 +222,7 @@
                       background: #ffffffb3;
                       border-bottom-left-radius: 8px;
                       border-bottom-right-radius: 8px;
+                      overflow: auto; max-height: 300px;
                   "
                 >
                   <template-rendering
@@ -233,7 +235,7 @@
                 </div>
               </div>
           </div>
-          <div class="layout row wrap px-3" style="display: flex; overflow: auto; max-height: 300px;">
+          <div v-if="notificationCount > 0" class="layout row wrap px-3" style="display: flex;">
               <div
                 class="flex xs12 mt-3"
                 style="
@@ -249,7 +251,7 @@
                       font-weight: bold;
                   "
                 >
-                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo trước đó
+                <v-icon size="15" color="red accent-4">mail</v-icon>&nbsp;Thông báo trước đó
               </div>    
                 <div
                   class="notification_wrap"
@@ -258,6 +260,7 @@
                       background: #ffffffb3;
                       border-bottom-left-radius: 8px;
                       border-bottom-right-radius: 8px;
+                      overflow: auto; max-height: 300px;
                   "
                 >
                   <template-rendering
@@ -353,6 +356,25 @@ export default {
     }
   },
   methods: {
+    markRead () {
+      let vm = this
+      for (let key in vm.testData) {
+        axios
+        .post("/o/rest/v2/notifications/" + vm.testData[key]['eventId'] + "/mark")
+        .then(function(response) {
+        })
+      }
+      vm.drawerLogin = false
+    },
+    markReadEventId (eventId) {
+      alert(eventId)
+      let vm = this
+      axios
+      .post("/o/rest/v2/notifications/" + eventId + "/mark")
+      .then(function(response) {
+        vm.pullNotificationData()
+      })
+    },
     pullNotificationCount() {
       let vm = this;
       let param = {};
@@ -549,5 +571,5 @@ export default {
       return "00000".substring(0, 6 - c.length) + c;
     }
   }
-};
+}
 </script>

@@ -1,6 +1,6 @@
 export const templateDefault = {
     template: `
-        <div style="display: flex;cursor: pointer;">
+        <div @click="doReadEvent(item['eventId'])" style="display: flex;cursor: pointer;">
             <div class="v-avatar white--text" style="height: 36px;width: 36px;margin-right: 8px;margin-top: 3px;">
                 <img :src="item['avatar']" :alt="item['userName']">
             </div>
@@ -31,6 +31,12 @@ export const templateDefault = {
             vm.dossier = eval(' ( ' + vm.item['data'] + ' ) ')['Dossier']
         }
         console.log(vm.item)
+    },
+    methods: {
+        doReadEvent (eventId) {
+            let vm = this
+            vm.$parent.$parent.markReadEventId(eventId)
+        }
     }
 }
 export const testData = [
