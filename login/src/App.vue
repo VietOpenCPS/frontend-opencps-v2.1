@@ -376,17 +376,17 @@ export default {
       .then(function(response) {
         //send redirect
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         } else {
-          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
       })
       .catch(function(error) {
         //send redirect
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         } else {
-          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
       })
     },
