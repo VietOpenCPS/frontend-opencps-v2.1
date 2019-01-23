@@ -30,7 +30,7 @@ export const templateDefault = {
             vm.item = vm.$parent.item
             if (vm.item.hasOwnProperty('data')) {
                 let dataObject = eval(' ( ' + vm.item + ' ) ')
-                vm.dossier = dataObject.hasOwnProperty('Dossier') ? dataObject['Dossier'] : {}
+                vm.dossier = dataObject['Dossier']
             }
         }
     },
