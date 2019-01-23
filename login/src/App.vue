@@ -68,6 +68,7 @@
         "
         >
           <button
+            @click="showNoti"
             type="button"
             class="mx-0 my-0 v-btn v-btn--icon theme--light"
             style="
