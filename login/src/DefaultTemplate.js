@@ -29,7 +29,7 @@ export const templateDefault = {
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
             if (vm.item.hasOwnProperty('data')) {
-                let dataObject = eval(' ( ' + vm.item + ' ) ')
+                let dataObject = eval(' ( ' + vm.item['data'] + ' ) ')
                 vm.dossier = dataObject['Dossier']
             }
         }
