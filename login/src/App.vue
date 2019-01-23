@@ -180,7 +180,7 @@
         border-top-left-radius: 8px;
         border-bottom-left-radius: 8px;
     "
-              >Thông báo mới</v-btn>
+              >Thông báo</v-btn>
             </v-flex>
             <v-flex xs6 class="text-center">
               <v-btn
@@ -212,7 +212,7 @@
                     font-weight: bold;
                 "
               >
-                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo
+                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo mới
               </div>
               <div
                 class="notification_wrap"
@@ -225,6 +225,34 @@
               >
                 <template-rendering
                   v-for="(item, index) in testData"
+                  v-bind:key="index"
+                  :item="item"
+                  :layout_view="item['layout_view']"
+                  :template_default="templateDefault"
+                ></template-rendering>
+              </div>
+            </div>
+            <div
+                style="
+                    padding: 5px 10px;
+                    background: #fff0;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                "
+              >
+                <v-icon size="15" color="red accent-4">mail</v-icon>Thông báo đã đọc
+              </div>
+              <div
+                class="notification_wrap"
+                style="
+                    padding: 5px 10px;
+                    background: #ffffffb3;
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                "
+              >
+                <template-rendering
+                  v-for="(item, index) in testDataSeen"
                   v-bind:key="index"
                   :item="item"
                   :layout_view="item['layout_view']"
@@ -266,7 +294,8 @@ export default {
     userData: {},
     colorBG: "009688",
     templateDefault: templateDefault,
-    testData: []
+    testData: [],
+    testDataSeen: []
   }),
   created() {
     let vm = this;
@@ -332,12 +361,19 @@ export default {
       let vm = this;
       let param = {};
       vm.testData = [];
+      vm.testDataSeen = []
       axios
-        .get("/o/rest/v2/notifications", param)
+        .get("/o/rest/v2/notifications?archived=false", param)
         .then(function(response) {
           let serializable = response.data;
           vm.notificationCount = serializable["total"];
           vm.testData = serializable["data"];
+        })
+        .catch(function(error) {});
+      axios
+        .get("/o/rest/v2/notifications?archived=true&start=0&end=10", param)
+        .then(function(response) {
+          vm.testDataSeen = response.data["data"];
         })
         .catch(function(error) {});
     },
