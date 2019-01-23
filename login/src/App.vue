@@ -370,7 +370,6 @@ export default {
     },
     markReadEventId (configOBJ) {
       let vm = this
-      console.log('configOBJ', configOBJ)
       axios
       .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
@@ -379,6 +378,7 @@ export default {
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
           urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
+        window.location.href = urlRedirect
         window.$(location).attr('href', urlRedirect)
         window.location.reload()
       })
@@ -388,6 +388,7 @@ export default {
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
           urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
+        window.location.href = urlRedirect
         window.$(location).attr('href',urlRedirect)
         window.location.reload()
       })
