@@ -9,8 +9,9 @@ export const templateDefault = {
                 <a href="" style="
                     color: #0072c2;
                     font-weight: bold;
+                    border-bottom: 1px dotted;
                 ">
-                    {{dossier["dossierId"]}}
+                    {{dossier["dossierNo"]}}
                 </a>
                 <br/>
                 <span style="color: rgb(90, 90, 90) !important;font-size: 11px;">
