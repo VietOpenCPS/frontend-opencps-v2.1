@@ -378,11 +378,8 @@ export default {
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
           urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        window.location.hash = urlRedirect
-        setTimeout(() => {
-          window.$(location).attr('href', urlRedirect)
-          window.location.reload(true)
-        }, 50)
+        window.location.href = urlRedirect
+        setTimeout(() => { window.location.reload(); }, 100)
       })
       .catch(function(error) {
         //send redirect
@@ -390,11 +387,8 @@ export default {
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
           urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        window.location.hash = urlRedirect
-        setTimeout(() => {
-          window.$(location).attr('href', urlRedirect)
-          window.location.reload(true)
-        }, 50)
+        window.location.href = urlRedirect
+        setTimeout(() => { window.location.reload(); }, 100)
       })
     },
     pullNotificationCount() {
