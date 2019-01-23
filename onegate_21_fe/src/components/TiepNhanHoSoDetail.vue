@@ -389,6 +389,7 @@ export default {
                 })
               }
             }).catch(function (xhr) {
+              toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }, 500)
@@ -522,6 +523,7 @@ export default {
           }).catch(rejectXhr => {
             vm.loadingAction = false
             console.log('rejectXhr==========', rejectXhr)
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }

@@ -466,11 +466,13 @@
     <v-dialog v-model="dialogAction" max-width="400" transition="fade-transition" persistent>
       <v-card>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-card-title class="headline">{{itemAction.title}}{{itemAction.tiltle}}</v-card-title>
-          <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogAction = false">
-            <v-icon>clear</v-icon>
-          </v-btn>
-          <v-progress-linear v-if="loadingAction" class="my-0" :indeterminate="true"></v-progress-linear>
+          <v-toolbar dark color="primary">
+            <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialogAction = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
           <v-card-text class="pb-0 pt-4">
             <v-layout wrap>
               <v-flex xs12 class="px-2 pb-3">
@@ -483,6 +485,7 @@
                   return-object
                   :hide-selected="true"
                   @change ="changeServiceConfigs"
+                  box
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
@@ -499,6 +502,7 @@
                   :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
                   @change="changeDichVuConfigs"
                   required
+                  box
                 ></v-autocomplete>
               </v-flex>
             </v-layout>
@@ -528,11 +532,13 @@
     <v-dialog v-model="dialogActionProcess" max-width="1000" transition="fade-transition" persistent>
       <v-card>
         <v-form ref="form" v-model="validProcess" lazy-validation>
-          <v-card-title class="headline">{{itemAction.actionName}}</v-card-title>
-          <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogActionProcess = false">
-            <v-icon>clear</v-icon>
-          </v-btn>
-          <v-progress-linear v-if="loadingActionProcess" class="my-0" :indeterminate="true"></v-progress-linear>
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>{{itemAction.actionName}}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialogActionProcess = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
           <v-card-text class="py-0 px-0">
             <v-layout wrap>
               <thong-tin-co-ban-ho-so v-if="dialogActionProcess" :detailDossier="thongtinhoso"></thong-tin-co-ban-ho-so>
@@ -570,10 +576,13 @@
     </v-dialog>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
       <v-card>
-        <v-card-title class="headline">{{itemAction.title}}{{itemAction.tiltle}}</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>{{itemAction.title}}{{itemAction.tiltle}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <div v-if="dialogPDFLoading" style="
             min-height: 600px;
             text-align: center;
@@ -593,12 +602,13 @@
     </v-dialog>
     <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Trạng thái xử lý
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Trạng thái xử lý</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="closeDialogStatusAction">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text style="max-height: 350px">
           <div v-for="(item, index) in selected" v-bind:key="item.dossierIdCTN">
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 
@@ -646,18 +656,20 @@
     </v-dialog>
     <v-dialog v-model="dialog_printGuide" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Thông tin phiếu hướng dẫn hoàn thiện hồ sơ
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_printGuide = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thông tin phiếu hướng dẫn hoàn thiện hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_printGuide = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text>
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12 class="px-2 pb-3">
                 <div class="my-2">Thủ tục hành chính:</div>
                 <v-autocomplete
+                  box
                   class="input-group--text-field-box"
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
@@ -674,6 +686,7 @@
               <v-flex xs12 class="px-2">
                 <div class="my-2">Dịch vụ:</div>
                 <v-autocomplete
+                  box
                   class="input-group--text-field-box"
                   :items="listDichVuGuide"
                   v-model="dichVuSelectedGuide"
@@ -743,12 +756,15 @@
     </v-dialog>
     <v-dialog v-model="dialog_extraForm" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Điều chỉnh dữ liệu mã hồ sơ: {{selectedDoAction.length > 0 ? selectedDoAction[selectedDoAction.length - 1]['dossierNo'] : ''}}
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_extraForm = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>
+            Điều chỉnh dữ liệu mã hồ sơ: {{selectedDoAction.length > 0 ? selectedDoAction[selectedDoAction.length - 1]['dossierNo'] : ''}}
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_extraForm = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text flat class="px-0">
           <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" :dossier_id="dossierIdSelected" :action_id="actionId" :type="'dieuchinhdulieu'"></form-bo-sung-thong-tin>
         </v-card-text>

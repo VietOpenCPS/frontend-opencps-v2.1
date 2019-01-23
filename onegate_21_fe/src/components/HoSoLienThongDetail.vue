@@ -13,16 +13,15 @@
                 <v-subheader class="pl-0">Cơ quan liên thông: </v-subheader>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-select
+                <v-autocomplete
                   v-bind:items="govAgencyItems"
                   v-model="govAgency"
                   item-text="itemName"
                   item-value="itemCode"
                   placeholder="Chọn cơ quan liên thông"
-                  autocomplete
                   return-object
                   hide-selected
-                ></v-select>
+                ></v-autocomplete>
               </v-flex>
             </v-layout>
           </v-card-text>

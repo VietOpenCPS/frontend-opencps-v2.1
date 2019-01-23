@@ -1,19 +1,25 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
-import NotFound from '@/components/NotFound'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'LandingUserProfile',
+    component: () => import(/* webpackChunkName: "LandingUserProfile" */ '@/components/screens/Landing.vue'),
     props: true,
     meta: {
-      requiresAuth: true
+      requiresAuth: false
     }
   },
-  { path: '*', name: 'NotFound', component: NotFound }
+  {
+    path: '*',
+    name: 'NotFound',
+    component: () => import(/* webpackChunkName: "NotFound" */ '@/components/NotFound.vue'),
+    props: true,
+    meta: {
+      requiresAuth: false
+    }
+  }
 ]
 
 Vue.use(Router)
@@ -21,15 +27,6 @@ Vue.use(Router)
 const router = new Router({
   // mode: 'history',
   routes
-})
-
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  if (requiresAuth && 1 === 0) {
-    next('/login')
-  } else {
-    next()
-  }
 })
 
 export default router

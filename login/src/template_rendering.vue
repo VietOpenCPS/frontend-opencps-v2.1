@@ -45,6 +45,11 @@ export default {
         methods: vm.template_default['methods']
       })
     }
+  },
+  methods: {
+    markReadEventId (eventId) {
+      alert(eventId)
+    }
   }
 }
 </script>

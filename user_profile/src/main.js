@@ -1,21 +1,19 @@
+import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
-import './stylus/app.styl'
-import './stylus/jexcel.css'
-import './stylus/ej2base.css'
-import './stylus/ej2upload.css'
-import App from './App'
-import router from './router'
+import App from './App.vue'
+import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
-import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 import axios from 'axios'
+import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
 
@@ -48,9 +46,7 @@ Vue.mixin({
 })
 
 new Vue({
-  el: '#app',
   router,
   store,
-  render: h => h(App)
-})
-
+  render: function (h) { return h(App) }
+}).$mount('#app_user_profile')

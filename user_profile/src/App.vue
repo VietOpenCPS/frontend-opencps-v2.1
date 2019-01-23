@@ -1,7 +1,9 @@
 <template>
-  <v-app id="app" :class='{"theme--dark": true, "close__drawer_bbat": !drawer}'>
+  <v-app id="app_user_profile" :class='{"theme--dark": true, "close__drawer_bbat": !drawer}'>
+    <v-navigation-drawer app clipped floating width="310" v-if="false">
+    </v-navigation-drawer>
     <v-content>
-        <router-view></router-view>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>

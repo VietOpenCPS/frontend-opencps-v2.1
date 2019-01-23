@@ -22,22 +22,17 @@
 
         </v-flex>
         <!-- <v-flex xs12 sm6 class="pl-4 pt-2 hidden-xs-and-down">Hạn mức: {{lePhi.request|currency}} đ</v-flex> -->
-        <v-flex xs12 sm2>
+        <v-flex xs12 sm12>
           <content-placeholders class="mt-1" v-if="loading">
             <content-placeholders-text :lines="1" />
           </content-placeholders>
-          <v-subheader v-else class="pl-0 text-right">Ghi chú: </v-subheader>
-        </v-flex>
-        <v-flex xs12 sm10>
-          <content-placeholders class="mt-1" v-if="loading">
-            <content-placeholders-text :lines="1" />
-          </content-placeholders>
-          <v-text-field
+          <v-textarea
             v-else
             v-model="lePhi.paymentNote"
-            multi-line
+            box
+            label="ghi chú ..."
             rows="2"
-          ></v-text-field>
+          ></v-textarea>
           <!-- <span v-else>{{lePhi.paymentNote}}</span> -->
         </v-flex>
       </v-layout>
