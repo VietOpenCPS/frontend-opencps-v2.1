@@ -5,17 +5,18 @@ export const templateDefault = {
                 <img :src="item['avatar']" :alt="item['userName']">
             </div>
             <p style="margin-bottom: 0px;">
-                <strong>item["userName"]</strong> {{item["notificationText"]}}
+                <strong>{{item["userName"]}}</strong> {{item["notificationText"]}}
                 <a href="" style="
                     color: #0072c2;
                     font-weight: bold;
                 ">
                     {{dossier["dossierId"]}}
                 </a>
-                <p style="color: #90949c;font-size: 11px;">
+                <br/>
+                <span style="color: rgb(90, 90, 90) !important;font-size: 11px;">
                     <i aria-hidden="true" class="v-icon material-icons theme--light" style="font-size: 15px; color: rgb(0, 114, 194);">event</i>
                         {{new Date(item["notificationDate"]).toLocaleString('vi-VN')}}
-                </p>
+                </span>
             </p>
         </div>
     `,
