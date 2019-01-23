@@ -309,11 +309,13 @@ export default {
       if (x) {
         item['dossierId'] = vm.dossierId
         vm.$store.dispatch('deletePaymentFile', item).then(resFile => {
+          toastr.clear()
           toastr.success('Xóa file thành công.')
           vm.paymentFile = ''
           vm.data_payment['paymentFile'] = vm.paymentFile
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         }).catch(reject => {
+          toastr.clear()
           toastr.error('Xóa file thất bại.')
         })
       }

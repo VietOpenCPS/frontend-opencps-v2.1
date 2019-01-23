@@ -1,10 +1,20 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12>
-      <img :src="chapchablob" alt="capcha">
+    <v-flex xs12 class="py-2" style="
+      display: flex;
+      align-items: center;
+      background: #dedede;
+      justify-content: center;
+    ">
+      <img :src="chapchablob" alt="capcha" style="border-radius: 5px">
+      <v-btn class="right ml-3" title="refresh" flat icon v-on:click.native="makeImageCap">
+        <v-icon color="primary" size="46">refresh</v-icon>
+      </v-btn>
+
     </v-flex>
     <v-flex xs10 class="mt-2">
       <v-text-field
+        box
         v-model="j_captcha_response"
         placeholder="Nhập captcha"
       ></v-text-field>

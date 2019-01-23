@@ -243,13 +243,13 @@
         </v-flex>
       </v-layout>
     </v-form>
-    <v-snackbar v-model="snackbarerror" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="2000" :top="true" :vertical="false" color="red darken-3">
+    <v-snackbar v-model="snackbarerror" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="5000" :top="true" :vertical="false" color="red darken-3">
       Yêu cầu thực hiện thất bại
       <v-btn icon @click="closeError()">
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
-    <v-snackbar v-model="snackbarsuccess" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="2000" :top="true" :vertical="false" color="success">
+    <v-snackbar v-model="snackbarsuccess" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="5000" :top="true" :vertical="false" color="success">
       Yêu cầu thực hiện thành công
       <v-btn icon @click="snackbarsuccess = !snackbarsuccess">
         <v-icon>clear</v-icon>
