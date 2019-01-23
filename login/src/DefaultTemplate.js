@@ -6,7 +6,7 @@ export const templateDefault = {
             </div>
             <p style="margin-bottom: 0px;">
                 <strong>{{item["userName"]}}</strong> {{item["title"]}}
-                <a href="" style="
+                <a href="javascript:;" style="
                     color: #0072c2;
                     font-weight: bold;
                     border-bottom: 1px dotted;
