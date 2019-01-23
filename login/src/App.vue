@@ -375,19 +375,21 @@ export default {
       .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
         //send redirect
+        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        } else {
-          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
+        window.$(location).attr('href', urlRedirect)
+        window.location.reload()
       })
       .catch(function(error) {
         //send redirect
+        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        } else {
-          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
+        window.$(location).attr('href',urlRedirect)
+        window.location.reload()
       })
     },
     pullNotificationCount() {
