@@ -380,6 +380,7 @@ export default {
         } else {
           window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
         }
+        window.location.reload(true)
       })
       .catch(function(error) {
         //send redirect
@@ -388,6 +389,7 @@ export default {
         } else {
           window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
         }
+        window.location.reload(true)
       })
     },
     pullNotificationCount() {
