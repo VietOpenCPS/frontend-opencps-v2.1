@@ -268,8 +268,9 @@
                     v-for="(item, index) in testDataSeen"
                     v-bind:key="index"
                     :item="item"
-                    :layout_view="item['layout_view']"
+                    :layout_view="item['notifyMessage']"
                     :template_default="templateDefault"
+                    @mark-as-read="markReadEventId"
                   ></template-rendering>
                 </div>
               </div>
