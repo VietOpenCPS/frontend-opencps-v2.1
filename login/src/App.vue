@@ -231,6 +231,7 @@
                     :item="item"
                     :layout_view="item['layout_view']"
                     :template_default="templateDefault"
+                    @mark-as-read=""
                   ></template-rendering>
                 </div>
               </div>
@@ -366,13 +367,25 @@ export default {
       }
       vm.drawerLogin = false
     },
-    markReadEventId (eventId) {
-      alert(eventId)
+    markReadEventId (configOBJ) {
       let vm = this
       axios
-      .post("/o/rest/v2/notifications/" + eventId + "/mark")
+      .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
-        vm.pullNotificationData()
+        //send redirect
+        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
+          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+        } else {
+          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+        }
+      })
+      .catch(function(error) {
+        //send redirect
+        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
+          window.location.href = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+        } else {
+          window.location.href = configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']
+        }
       })
     },
     pullNotificationCount() {

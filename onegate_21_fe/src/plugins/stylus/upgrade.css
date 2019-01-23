@@ -277,7 +277,7 @@ body .fade-transition-leave-to {
 body .login_drawer {
     position: fixed !important;
 }
-body.has-control-menu .login_drawer {
+body.controls-hidden .login_drawer {
     top: 55px;
 }
 body .notification_wrap > div {
@@ -329,4 +329,15 @@ body #app_register .v-text-field.v-text-field--enclosed .v-input__prepend-outer 
 .pagination__navigation--disabled {
     opacity: .6;
     pointer-events: none;
+}
+.notification_wrap > div:hover {
+    background-color: #d0d0d07d;
+}
+body .notification_wrap > div {
+    margin-bottom: 0 !important;
+    padding: 5px 8px;
+    min-height: 68px;
+}
+body .ctk-date-time-picker>div.datetimepicker {
+    height: auto;
 }

@@ -47,8 +47,15 @@ export default {
     }
   },
   methods: {
-    markReadEventId (eventId) {
-      alert(eventId)
+    markReadEventId (eventId, viewRootURI, dossierId, originality) {
+      let vm = this
+      let config = {
+        eventId: eventId,
+        viewRootURI: viewRootURI,
+        dossierId: dossierId,
+        originality: originality
+      }
+      vm.$emit('mark-as-read', config)
     }
   }
 }

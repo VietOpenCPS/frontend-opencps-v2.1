@@ -28,12 +28,16 @@ export const templateDefault = {
         let vm = this
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
+            if (vm.item.hasOwnProperty('data')) {
+                let dataObject = eval(' ( ' + vm.item + ' ) ')
+                vm.dossier = dataObject.hasOwnProperty('Dossier') ? dataObject['Dossier'] : {}
+            }
         }
     },
     methods: {
         doReadEvent (eventId) {
             let vm = this
-            vm.$parent.markReadEventId(eventId)
+            vm.$parent.markReadEventId(eventId, vm.item['viewRootURI'], vm.dossier['dossierId'], vm.dossier['originality'])
         }
     }
 }
