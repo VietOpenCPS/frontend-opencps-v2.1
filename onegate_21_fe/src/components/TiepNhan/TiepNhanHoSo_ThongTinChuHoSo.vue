@@ -98,17 +98,16 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-select
+                      <v-autocomplete
                       v-else
                       :items="citys"
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.cityCode"
                       @change="onChangeCity"
-                      autocomplete
                       :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                       required
-                      ></v-select>
+                      ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -120,17 +119,16 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-select
+                      <v-autocomplete
                       v-else
                       :items="districts"
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.districtCode"
                       @change="onChangeDistrict"
-                      autocomplete
                       :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                       required
-                      ></v-select>
+                      ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -142,17 +140,16 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-select
+                      <v-autocomplete
                       v-else
                       :items="wards"
                       item-text="itemName"
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.wardCode"
-                      autocomplete
                       @change="onChangeWard"
                       :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                       required
-                      ></v-select>
+                      ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -194,11 +191,11 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 380px;" v-if="originality !== 1">
+          <div class="absolute__btn" style="width: 350px;" v-if="originality !== 1">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-radio-group v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+            <v-radio-group class="mt-2" v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
               <v-radio label="Công dân" :value="true"></v-radio>
               <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
             </v-radio-group>
@@ -285,17 +282,16 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-select
+                        <v-autocomplete
                         v-else
                         :items="citys"
                         item-text="itemName"
                         item-value="itemCode"
                         @change="onChangeDelegateCity"
                         v-model="thongTinNguoiNopHoSo.delegateCityCode"
-                        autocomplete
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
-                        ></v-select>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -307,17 +303,16 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-select
+                        <v-autocomplete
                         v-else
                         :items="delegateDistricts"
                         item-text="itemName"
                         item-value="itemCode"
                         @change="onChangeDelegateDistrict"
                         v-model="thongTinNguoiNopHoSo.delegateDistrictCode"
-                        autocomplete
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
-                        ></v-select>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -329,16 +324,15 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-select
+                        <v-autocomplete
                         v-else
                         :items="delegateWards"
                         item-text="itemName"
                         item-value="itemCode"
                         v-model="thongTinNguoiNopHoSo.delegateWardCode"
-                        autocomplete
                         :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                         required
-                        ></v-select>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -378,11 +372,11 @@
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <div class="absolute__btn" style="width: 150px;margin-top: 4px;">
+            <div class="absolute__btn" style="width: 200px;margin-top: 4px;">
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <v-checkbox
+              <v-checkbox class="mt-1"
               v-else
               label="Giống chủ hồ sơ"
               v-model="thongTinNguoiNopHoSo.sameUser"
@@ -394,12 +388,13 @@
     </v-form>
     <v-dialog v-model="dialog_applicantInfos" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Thông tin doanh nghiệp
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_applicantInfos = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Thông tin doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_applicantInfos = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text class="py-1">
           <v-layout wrap class="py-1 align-center">
             <v-flex xs12 class="px-2">

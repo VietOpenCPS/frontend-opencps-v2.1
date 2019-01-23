@@ -107,12 +107,12 @@
               <v-flex style="width:70px" class="my-0 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
               <v-flex style="width:calc(100% - 80px)">
                 <div v-if="activeEdit == false" class="pl-2">
-                  <v-text-field class="py-0"
+                  <v-textarea class="py-0"
                   v-model="data_payment.paymentNote"
-                  multi-line
+                  row="2"
                   :readonly='activeEdit'
                   required
-                  ></v-text-field>
+                  ></v-textarea>
                 </div>
                 <p class="px-2 my-0 py-1" v-if="activeEdit||data_payment.paymentNote===''">
                   {{data_payment.paymentNote}} &nbsp;&nbsp;

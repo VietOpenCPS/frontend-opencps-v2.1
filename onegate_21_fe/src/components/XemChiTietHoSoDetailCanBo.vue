@@ -2115,9 +2115,11 @@ export default {
         Promise.all(arrAction).then(results => {
           vm.loadingVoting = false
           vm.loadVoting()
+          toastr.clear()
           toastr.success('Đánh giá của bạn được gửi thành công')
         }).catch(xhr => {
           vm.loadingVoting = false
+          toastr.clear()
           toastr.error('Gửi đánh giá không thành công')
         })
       }
