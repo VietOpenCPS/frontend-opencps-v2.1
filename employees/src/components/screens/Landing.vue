@@ -1,0 +1,355 @@
+<template>
+  <div>
+    <h3 class="py-3 ml-3 text-xs-center">
+      <span style="color:#065694">DANH SÁCH CÁN BỘ LÀM VIỆC TẠI TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</span>
+    </h3>
+    <v-toolbar height="40" color="primary" flat>
+      <v-toolbar-title class="white--text" style="font-size:14px">
+        I.	CÁN BỘ TRỰC THUỘC TRUNG TÂM
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-layout justify-center>
+      <v-flex xs12>
+        <v-card flat >
+          <v-container fluid grid-list-md>
+            <v-layout row wrap>
+              <v-flex
+                v-for="employee in employeeItems"
+                xs12 sm4 md2
+                :key="employee.employeeId"
+                v-if="employee.userType === 0"
+              >
+                <v-card color="#1a571b21">
+                  <v-flex style="text-align: center!important;">
+                    <img v-if="employee['photoFileEntryId']" :src="employee.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                    <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  </v-flex>
+                  <v-divider light></v-divider>
+                  <v-card-text class="py-2 px-1">
+                    <v-flex xs12 class="text-bold text-xs-center px-2"><span class="primary--text">{{employee.fullName}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span> {{employee.jobPosTitle}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span>{{employee.workingUnit}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span>{{employee.telNo}}</span></v-flex>
+                  </v-card-text>
+                  <v-divider light></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-tooltip top>
+                      <v-btn icon slot="activator" @click="showVoting(employee)">
+                        <v-icon color="green">star</v-icon>
+                      </v-btn>
+                      <span>Đánh giá</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <v-btn icon slot="activator">
+                        <v-icon color="orange">bookmark</v-icon>
+                      </v-btn>
+                      <span>Xem đánh giá</span>
+                    </v-tooltip>
+                  </v-card-actions>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <v-toolbar height="40" color="primary" flat>
+      <v-toolbar-title class="white--text" style="font-size:14px">
+        II.	 CÁN BỘ BIỆT PHÁI ĐẾN LÀM VIỆC TẠI TRUNG TÂM
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-layout justify-center>
+      <v-flex xs12>
+        <v-card flat >
+          <v-container fluid grid-list-md>
+            <v-layout row wrap>
+              <v-flex
+                v-for="employee in employeeItems"
+                xs12 sm4 md2
+                :key="employee.employeeId"
+                v-if="employee.userType === 1"
+              >
+                <v-card color="#1a571b21">
+                  <v-flex style="text-align: center!important;">
+                    <img v-if="employee['photoFileEntryId']" :src="employee.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                    <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  </v-flex>
+                  <v-divider light></v-divider>
+                  <v-card-text class="py-2 px-1">
+                    <v-flex xs12 class="text-bold text-xs-center px-2"><span class="primary--text">{{employee.fullName}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span> {{employee.jobPosTitle}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span>{{employee.workingUnit}}</span></v-flex>
+                    <v-flex xs12 class="px-2"><span>{{employee.telNo}}</span></v-flex>
+                  </v-card-text>
+                  <v-divider light></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-tooltip top>
+                      <v-btn icon slot="activator" @click="showVoting(employee)">
+                        <v-icon color="green">star</v-icon>
+                      </v-btn>
+                      <span>Đánh giá</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <v-btn icon slot="activator">
+                        <v-icon color="orange">bookmark</v-icon>
+                      </v-btn>
+                      <span>Xem đánh giá</span>
+                    </v-tooltip>
+                  </v-card-actions>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <v-dialog v-model="dialog_voting" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Đánh giá cán bộ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn icon dark @click="closeVoting">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs12 sm9 class="pl-4">
+              <v-card flat class="py-1" v-if="Array.isArray(votingItems) && votingItems.length > 0">
+                <div v-for="(item, index) in votingItems" :key="index">
+                  <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
+                  <div class="ml-4">
+                    <v-radio-group v-model="item.selected" column class="mt-1">
+                      <v-radio :label="itemChoise" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                      </v-radio>
+                    </v-radio-group>
+                  </div>
+                </div>
+              </v-card>
+              <div class="px-3" v-else>
+                <v-alert outline color="warning" icon="priority_high" :value="true">
+                  Không có câu hỏi đánh giá
+                </v-alert>
+              </div>
+              <v-flex xs12 sm12 class="mt-3">
+                <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary">
+                  <v-icon size="16">save</v-icon>&nbsp;
+                  Gửi kết quả đánh giá
+                </v-btn>
+                <v-btn @click="closeVoting" color="primary">
+                  <v-icon size="16">reply</v-icon>&nbsp;
+                  Quay lại 
+                </v-btn>
+              </v-flex>
+            </v-flex>
+            <v-flex xs12 sm3>
+              <v-card flat color="#1a571b21" width="225px" max-height="350">
+                <v-flex style="text-align: center!important;">
+                  <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                </v-flex>
+                <v-divider light></v-divider>
+                <v-card-text class="py-2 px-1">
+                  <v-flex xs12 class="text-bold text-xs-center px-2 pb-2"><span class="primary--text">{{employeeSelected.fullName}}</span></v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Chức vụ: </span>
+                    <span> {{employeeSelected.jobPosTitle}}</span>
+                  </v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Đơn vị: </span>
+                    <span>{{employeeSelected.workingUnit}}</span>
+                  </v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Điện thoại: </span>
+                    <span>{{employeeSelected.telNo}}</span>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
+      <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
+        <v-card>
+          <v-toolbar flat dark color="primary">
+              <v-toolbar-title>Nhập số CMND, mã hồ sơ</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="dialogShowApplicantIdNo = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
+          <v-card-text>
+            <v-layout row wrap>
+              <v-flex xs12 sm12>
+                <v-text-field
+                box
+                label="Số chứng minh thư nhân dân"
+                v-model="applicantIdNo"
+                :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12>
+                <v-text-field
+                box
+                label="Mã hồ sơ"
+                v-model="dossierNo"
+                :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 class="mb-3" v-if="showCaptcha">
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click.native="doVottingSubmit">Đồng ý</v-btn>
+            <v-btn color="green darken-1" flat @click.native="() => dialogShowApplicantIdNo = false">Quay lại</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+  </div>
+  
+</template>
+
+<script>
+
+import Vue from 'vue'
+import $ from 'jquery'
+import support from '../../store/support.json'
+import toastr from 'toastr'
+import Captcha from './Captcha.vue'
+// import Suggestions from 'v-suggestions'
+Vue.use(toastr)
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '10000000'
+}
+export default {
+  props: [],
+  components: {
+    'captcha': Captcha
+  },
+  data: () => ({
+    loading: false,
+    employeeItems: [],
+    dialog_voting: false,
+    dialogShowApplicantIdNo: false,
+    applicantIdNo: '',
+    dossierNo: '',
+    employeeSelected: '',
+    votingItems: [],
+    showCaptcha: false,
+    validFormVoting: false
+  }),
+  computed: {
+  },
+  created () {
+    var vm = this
+    vm.$nextTick(function () {
+      var vm = this
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      vm.$nextTick(function () {
+        vm.$store.dispatch('loadEmployees').then(result => {
+          vm.employeeItems = result
+          console.log(vm.employeeItems)
+        }).catch(xhr => {
+        })
+      })
+    })
+  },
+  updated () {
+    var vm = this
+    vm.$nextTick(function () {
+    })
+  },
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentParams = newRoute.params
+      let currentQuery = newRoute.query
+    }
+  },
+  methods: {
+    showVoting (item) {
+      let vm = this
+      vm.employeeSelected = item
+      vm.dialog_voting = true
+      vm.$store.dispatch('loadVoting', {
+        className: 'employee',
+        classPk: item.employeeId
+      }).then(result => {
+        vm.votingItems = result
+        console.log(vm.votingItems)
+      }).catch(xhr => {
+      })
+    },
+    closeVoting () {
+      let vm = this
+      vm.dialog_voting = false
+      vm.dialogShowApplicantIdNo = false
+    },
+    submitResultVoting: function () {
+      var vm = this
+      var isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+      if (isSigned) {
+        vm.doVottingResultSubmit()
+      } else {
+        vm.dialogShowApplicantIdNo = true
+      }
+    },
+    doVottingSubmit () {
+      var vm = this
+      if (!vm.$refs.formVoting.validate()) {
+        return
+      } else {
+        let filter = {
+          applicantIdNo: vm.applicantIdNo,
+          dossierNo: vm.dossierNo
+        }
+        vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
+          console.log('result', result)
+          if (result.hasPermission === true || result.hasPermission === 'true') {
+            vm.doVottingResultSubmit()
+          } else {
+            toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
+          }
+        }).catch(xhr => {
+          toastr.error('Lỗi hệ thống')
+        })
+      }
+    },
+    doVottingResultSubmit: function () {
+      var vm = this
+      let arrAction = []
+      for (var key in vm.votingItems) {
+        vm.votingItems[key]['className'] = 'employee'
+        vm.votingItems[key]['classPk'] = vm.employeeSelected['employeeId']
+        arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
+      }
+      Promise.all(arrAction).then(results => {
+        toastr.success('Gửi đánh giá thành công thành công')
+        vm.dialogShowApplicantIdNo = false
+        vm.dialog_voting = false
+      }).catch(xhr => {
+        toastr.error('Gửi đánh giá thất bại')
+        vm.dialogShowApplicantIdNo = false
+      })
+    },
+    goBack () {
+      var vm = this
+      vm.dialog_voting = false
+    }
+  }
+}
+</script>
