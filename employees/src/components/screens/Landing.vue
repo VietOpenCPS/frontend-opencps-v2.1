@@ -41,7 +41,7 @@
                       <span>Đánh giá</span>
                     </v-tooltip>
                     <v-tooltip top>
-                      <v-btn icon slot="activator">
+                      <v-btn icon slot="activator" @click="showVotingResult(employee)">
                         <v-icon color="orange">bookmark</v-icon>
                       </v-btn>
                       <span>Xem đánh giá</span>
@@ -92,7 +92,7 @@
                       <span>Đánh giá</span>
                     </v-tooltip>
                     <v-tooltip top>
-                      <v-btn icon slot="activator">
+                      <v-btn icon slot="activator" @click="showVotingResult(employee)">
                         <v-icon color="orange">bookmark</v-icon>
                       </v-btn>
                       <span>Xem đánh giá</span>
@@ -217,6 +217,82 @@
         </v-card>
       </v-form>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialog_voting_result" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Kết quả đánh giá cán bộ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn icon dark @click="closeVotingResult">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs12 sm9 class="pl-4">
+              <v-card flat class="py-1" v-if="Array.isArray(votingItems) && votingItems.length > 0">
+                <div v-for="(item, index) in votingItems" :key="index">
+                  <div class="text-bold primary--text">
+                    {{index + 1}}. {{ item.subject }}
+                    <i style="color:#ad1717"> (Số lượt đánh giá: {{item.answersCount}})</i>
+                  </div>
+                  <v-card flat class="pl-2">
+                    <v-card-text class="px-2 py-1 pr-0">
+                      <div v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                        <v-layout wrap class="mb-2">
+                          <div class="flex xs6 sm8 pr-2">{{itemChoise}} <span class="text-bold" :style="'color:' + barColor[indexChoise]">({{item.answers[indexChoise]}})</span> </div>
+                          <progress-bar v-if="item.answersCount > 0" class="flex xs6 sm4" size="16" :spacing="1" bar-transition="all 1s ease"
+                          :val="getPercent(item.answers, indexChoise)" :text="getPercent(item.answers, indexChoise) !== 0 ? getPercent(item.answers, indexChoise) + '%' : ''" 
+                          text-position="inside" bg-color="#e0e0e0" :bar-color="barColor[indexChoise]" text-fg-color="#fff" style="z-index:10000">
+                          </progress-bar>
+                        </v-layout>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </div>
+              </v-card>
+              <div class="px-3" v-else>
+                <v-alert outline color="warning" icon="priority_high" :value="true">
+                  Không có câu hỏi đánh giá
+                </v-alert>
+              </div>
+              <v-flex xs12 sm12 class="mt-3">
+                <v-btn @click="closeVotingResult" color="primary">
+                  <v-icon size="16">reply</v-icon>&nbsp;
+                  Quay lại 
+                </v-btn>
+              </v-flex>
+            </v-flex>
+            <v-flex xs12 sm3>
+              <v-card flat color="#1a571b21" width="225px" max-height="350">
+                <v-flex style="text-align: center!important;">
+                  <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                </v-flex>
+                <v-divider light></v-divider>
+                <v-card-text class="py-2 px-1">
+                  <v-flex xs12 class="text-bold text-xs-center px-2 pb-2"><span class="primary--text">{{employeeSelected.fullName}}</span></v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Chức vụ: </span>
+                    <span> {{employeeSelected.jobPosTitle}}</span>
+                  </v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Đơn vị: </span>
+                    <span>{{employeeSelected.workingUnit}}</span>
+                  </v-flex>
+                  <v-flex xs12 class="px-1 pb-2">
+                    <span class="text-bold"> Điện thoại: </span>
+                    <span>{{employeeSelected.telNo}}</span>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
   
 </template>
@@ -228,28 +304,32 @@ import $ from 'jquery'
 import support from '../../store/support.json'
 import toastr from 'toastr'
 import Captcha from './Captcha.vue'
-// import Suggestions from 'v-suggestions'
+import ProgressBar from 'vue-simple-progress'
+
 Vue.use(toastr)
 toastr.options = {
   'closeButton': true,
-  'timeOut': '10000000'
+  'timeOut': '5000'
 }
 export default {
   props: [],
   components: {
-    'captcha': Captcha
+    'captcha': Captcha,
+    ProgressBar
   },
   data: () => ({
     loading: false,
     employeeItems: [],
     dialog_voting: false,
+    dialog_voting_result: false,
     dialogShowApplicantIdNo: false,
     applicantIdNo: '',
     dossierNo: '',
     employeeSelected: '',
     votingItems: [],
     showCaptcha: false,
-    validFormVoting: false
+    validFormVoting: false,
+    barColor: ['#5cb85c', '#f0ad4e', '#d9534f', '#2e4fc8', '#2ec8bad9']
   }),
   computed: {
   },
@@ -294,10 +374,27 @@ export default {
       }).catch(xhr => {
       })
     },
+    showVotingResult (item) {
+      let vm = this
+      vm.employeeSelected = item
+      vm.dialog_voting_result = true
+      vm.$store.dispatch('loadVoting', {
+        className: 'employee',
+        classPk: item.employeeId
+      }).then(result => {
+        vm.votingItems = result
+        console.log(vm.votingItems)
+      }).catch(xhr => {
+      })
+    },
     closeVoting () {
       let vm = this
       vm.dialog_voting = false
       vm.dialogShowApplicantIdNo = false
+    },
+    closeVotingResult () {
+      let vm = this
+      vm.dialog_voting_result = false
     },
     submitResultVoting: function () {
       var vm = this
@@ -345,6 +442,15 @@ export default {
         toastr.error('Gửi đánh giá thất bại')
         vm.dialogShowApplicantIdNo = false
       })
+    },
+    getPercent (answers, index) {
+      let totalVoted = 0
+      let percent = 0
+      for (var i = 0; i < answers.length; i++) {
+        totalVoted += answers[i]
+      }
+      percent = ((answers[index] / totalVoted) * 100).toFixed(1)
+      return percent
     },
     goBack () {
       var vm = this

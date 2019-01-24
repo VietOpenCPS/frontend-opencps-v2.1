@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
+import { stat } from 'fs'
 // 
 
 Vue.use(toastr)
@@ -12,7 +13,9 @@ export const store = new Vuex.Store({
   state: {
     initData: {},
     loading: false,
-    index: 0
+    index: 0,
+    endPointApi: '/o/rest/v2'
+    // endPointApi: 'http://127.0.0.1:8081/api'
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -37,23 +40,23 @@ export const store = new Vuex.Store({
     },
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
+        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.votingApi + '/' + data.className + '/' + data.classPk, param).then(result => {
+          axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            commit('setLoading', false)
+            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            commit('setLoading', false)
+            // commit('setLoading', false)
           })
         })
       })
@@ -79,65 +82,65 @@ export const store = new Vuex.Store({
     },
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
+        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.dictcollectionsApi + '/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
+          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            commit('setLoading', false)
+            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            commit('setLoading', false)
+            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployees ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
+        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.employeeApi + '/' + data.itemCode, param).then(result => {
+          axios.get(state.endPointApi + '/employees/publish/' + data.itemCode, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            commit('setLoading', false)
+            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            commit('setLoading', false)
+            // commit('setLoading', false)
           })
         })
       })
     },
     getEmployee ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
+        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.detailEmployeeApi + '/' + data.employeeId, param).then(result => {
+          axios.get(state.initData + '/employees/' + data.employeeId, param).then(result => {
             resolve(result.data)
-            commit('setLoading', false)
+            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            commit('setLoading', false)
+            // commit('setLoading', false)
           })
         })
       })
@@ -154,9 +157,7 @@ export const store = new Vuex.Store({
               dossierNo: filter.dossierNo
             }
           }
-          // test local
-          axios.get('/o/rest/v2/votings/checkpermission', config).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/votings/checkpermission', config).then(function (response) {
+          axios.get(state.endPointApi + '/votings/checkpermission', config).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -181,7 +182,7 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('className', data.className)
           params.append('classPk', data.classPk)
-          axios.post(support.initData.votingApi + '/' + data.votingId + '/results', params, config).then(result => {
+          axios.post(state.endPointApi + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
             reject(xhr)
