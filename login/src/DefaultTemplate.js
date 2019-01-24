@@ -5,12 +5,13 @@ export const templateDefault = {
                 <img :src="item['avatar']" :alt="item['userName']">
             </div>
             <p style="margin-bottom: 0px;">
-                <strong>{{item["userName"]}}</strong> {{item["notificationText"]}}
-                <a href="" style="
+                <strong>{{item["userName"]}}</strong> {{item["title"]}}
+                <a href="javascript:;" style="
                     color: #0072c2;
                     font-weight: bold;
+                    border-bottom: 1px dotted;
                 ">
-                    {{dossier["dossierId"]}}
+                    {{dossier["dossierNo"]}}
                 </a>
                 <br/>
                 <span style="color: rgb(90, 90, 90) !important;font-size: 11px;">
@@ -28,12 +29,16 @@ export const templateDefault = {
         let vm = this
         if (vm.$parent.item !== undefined && vm.$parent.item !== null) {
             vm.item = vm.$parent.item
+            if (vm.item.hasOwnProperty('data')) {
+                let dataObject = eval(' ( ' + vm.item['data'] + ' ) ')
+                vm.dossier = dataObject['Dossier']
+            }
         }
     },
     methods: {
         doReadEvent (eventId) {
             let vm = this
-            vm.$parent.markReadEventId(eventId)
+            vm.$parent.markReadEventId(eventId, vm.item['viewRootURI'], vm.dossier['dossierId'], vm.dossier['originality'])
         }
     }
 }
