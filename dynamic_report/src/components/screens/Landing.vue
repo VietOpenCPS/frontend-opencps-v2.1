@@ -1168,10 +1168,10 @@ export default {
         tab_text = tab_text + '</body></html>';
 
         var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
-          type: 'text/plain;charset=utf-8;',
+          type: 'data:application/vnd.ms-excel;charset=utf-8;',
         })
-        window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
-        // saveAs(blob, new Date().getTime() + ".xls");
+        // window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
+        saveAs(blob, new Date().getTime() + ".xls");
       })
     },
     s2ab (s) {
