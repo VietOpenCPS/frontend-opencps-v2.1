@@ -136,7 +136,8 @@ import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
 const jsonMapper = require('json-mapper-json')
-import saveAs from 'file-saver'
+import { saveAs } from 'file-saver'
+var FileSaver = require('file-saver')
 
 export default {
   props: ['index'],
@@ -1122,6 +1123,10 @@ export default {
     },
     convertPDFToHTML (content) {
       let vm = this
+      alert(123)
+      var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+      FileSaver.saveAs(blob, "hello world.txt");
+      FileSaver.saveAs("https://httpbin.org/image", "image.jpg");
       console.log('convertPDFToHTML', content)
       window.PDFJS.getDocument(content).then(window.pdf_table_extractor).then(function (result) {
       console.log('result', result)
