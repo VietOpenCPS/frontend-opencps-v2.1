@@ -8,7 +8,6 @@ import VueContentPlaceholders from 'vue-content-placeholders'
 import VueDraggable from 'vue-draggable'
 import axios from 'axios'
 
-import 'toastr/build/toastr.css'
 Vue.use(VueContentPlaceholders)
 Vue.use(VueDraggable)
 

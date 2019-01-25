@@ -328,11 +328,15 @@
         }
         let query = vm.$router.history.current.query
         if (query.hasOwnProperty('pk')) {
+          let pk_type = 'number'
+          if (query.hasOwnProperty('pk_type')) {
+            pk_type = query['pk_type']
+          }
           vm.columnsDataFilter.push({
             key: query['col'],
             value_filter: query['pk'],
             compare: "=",
-            type: isNaN(query['pk']) ? 'text' : 'number'
+            type: pk_type
           })
         }
         vm.$socket.sendObj(

@@ -4,7 +4,7 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
 import AdminConfig from './AdminConfig'
-import saveAs from 'file-saver'
+var FileSaver = require('file-saver-fixed')
 // 
 
 Vue.use(toastr)
@@ -401,7 +401,7 @@ export const store = new Vuex.Store({
           }).then(function (response) {
             let serializable = response.data
             if (filter['download']) {
-              saveAs(serializable, new Date().getTime() + '.xls')
+              FileSaver.saveAs(serializable, new Date().getTime() + '.xls')
             } else {
               let file = window.URL.createObjectURL(serializable)
               resolve(file)

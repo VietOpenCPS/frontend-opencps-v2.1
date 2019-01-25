@@ -17,7 +17,6 @@
                 v-for="employee in employeeItems"
                 xs12 sm4 md2
                 :key="employee.employeeId"
-                v-if="employee.userType === 0"
               >
                 <v-card color="#1a571b21">
                   <v-flex style="text-align: center!important;">
@@ -36,13 +35,13 @@
                     <v-spacer></v-spacer>
                     <v-tooltip top>
                       <v-btn icon slot="activator" @click="showVoting(employee)">
-                        <v-icon color="green">star</v-icon>
+                        <v-icon color="green" size="22px">star</v-icon>
                       </v-btn>
                       <span>Đánh giá</span>
                     </v-tooltip>
-                    <v-tooltip top>
+                    <v-tooltip top class="ml-1">
                       <v-btn icon slot="activator" @click="showVotingResult(employee)">
-                        <v-icon color="orange">bookmark</v-icon>
+                        <v-icon color="orange" size="22px">bookmark</v-icon>
                       </v-btn>
                       <span>Xem đánh giá</span>
                     </v-tooltip>
@@ -87,13 +86,13 @@
                     <v-spacer></v-spacer>
                     <v-tooltip top>
                       <v-btn icon slot="activator" @click="showVoting(employee)">
-                        <v-icon color="green">star</v-icon>
+                        <v-icon color="green" size="22px">star</v-icon>
                       </v-btn>
                       <span>Đánh giá</span>
                     </v-tooltip>
-                    <v-tooltip top>
+                    <v-tooltip top class="ml-1">
                       <v-btn icon slot="activator" @click="showVotingResult(employee)">
-                        <v-icon color="orange">bookmark</v-icon>
+                        <v-icon color="orange" size="22px">bookmark</v-icon>
                       </v-btn>
                       <span>Xem đánh giá</span>
                     </v-tooltip>
@@ -118,67 +117,73 @@
         </v-toolbar>
         <v-card-text>
           <v-layout wrap>
-            <v-flex xs12 sm9 class="pl-4">
-              <v-card flat class="py-1" v-if="Array.isArray(votingItems) && votingItems.length > 0">
-                <div v-for="(item, index) in votingItems" :key="index">
-                  <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
-                  <div class="ml-4">
-                    <v-radio-group v-model="item.selected" column class="mt-1">
-                      <v-radio :label="itemChoise" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                      </v-radio>
-                    </v-radio-group>
+            <v-flex xs12 sm1></v-flex>
+            <v-flex xs12 sm10>
+              <v-layout wrap>
+                <v-flex xs12 sm9 class="pl-4">
+                  <v-card flat class="py-1" v-if="Array.isArray(votingItems) && votingItems.length > 0">
+                    <div v-for="(item, index) in votingItems" :key="index">
+                      <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
+                      <div class="ml-4">
+                        <v-radio-group v-model="item.selected" column class="mt-1">
+                          <v-radio :label="itemChoise" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                          </v-radio>
+                        </v-radio-group>
+                      </div>
+                    </div>
+                  </v-card>
+                  <div class="px-3" v-else>
+                    <v-alert outline color="warning" icon="priority_high" :value="true">
+                      Không có câu hỏi đánh giá
+                    </v-alert>
                   </div>
-                </div>
-              </v-card>
-              <div class="px-3" v-else>
-                <v-alert outline color="warning" icon="priority_high" :value="true">
-                  Không có câu hỏi đánh giá
-                </v-alert>
-              </div>
-              <v-flex xs12 sm12 class="mt-3">
-                <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary">
-                  <v-icon size="16">save</v-icon>&nbsp;
-                  Gửi kết quả đánh giá
-                </v-btn>
-                <v-btn @click="closeVoting" color="primary">
-                  <v-icon size="16">reply</v-icon>&nbsp;
-                  Quay lại 
-                </v-btn>
-              </v-flex>
-            </v-flex>
-            <v-flex xs12 sm3>
-              <v-card flat color="#1a571b21" width="225px" max-height="350">
-                <v-flex style="text-align: center!important;">
-                  <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
-                  <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  <v-flex xs12 sm12 class="mt-3">
+                    <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary">
+                      <v-icon size="16">save</v-icon>&nbsp;
+                      Gửi kết quả đánh giá
+                    </v-btn>
+                    <v-btn @click="closeVoting" color="primary">
+                      <v-icon size="16">reply</v-icon>&nbsp;
+                      Quay lại 
+                    </v-btn>
+                  </v-flex>
                 </v-flex>
-                <v-divider light></v-divider>
-                <v-card-text class="py-2 px-1">
-                  <v-flex xs12 class="text-bold text-xs-center px-2 pb-2"><span class="primary--text">{{employeeSelected.fullName}}</span></v-flex>
-                  <v-flex xs12 class="px-1 pb-2">
-                    <span class="text-bold"> Chức vụ: </span>
-                    <span> {{employeeSelected.jobPosTitle}}</span>
-                  </v-flex>
-                  <v-flex xs12 class="px-1 pb-2">
-                    <span class="text-bold"> Đơn vị: </span>
-                    <span>{{employeeSelected.workingUnit}}</span>
-                  </v-flex>
-                  <v-flex xs12 class="px-1 pb-2">
-                    <span class="text-bold"> Điện thoại: </span>
-                    <span>{{employeeSelected.telNo}}</span>
-                  </v-flex>
-                </v-card-text>
-              </v-card>
+                <v-flex xs12 sm3>
+                  <v-card flat color="#1a571b21" width="225px" max-height="350">
+                    <v-flex style="text-align: center!important;">
+                      <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                      <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
+                    </v-flex>
+                    <v-divider light></v-divider>
+                    <v-card-text class="py-2 px-1">
+                      <v-flex xs12 class="text-bold text-xs-center px-2 pb-2"><span class="primary--text">{{employeeSelected.fullName}}</span></v-flex>
+                      <v-flex xs12 class="px-1 pb-2">
+                        <span class="text-bold"> Chức vụ: </span>
+                        <span> {{employeeSelected.jobPosTitle}}</span>
+                      </v-flex>
+                      <v-flex xs12 class="px-1 pb-2">
+                        <span class="text-bold"> Đơn vị: </span>
+                        <span>{{employeeSelected.workingUnit}}</span>
+                      </v-flex>
+                      <v-flex xs12 class="px-1 pb-2">
+                        <span class="text-bold"> Điện thoại: </span>
+                        <span>{{employeeSelected.telNo}}</span>
+                      </v-flex>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
             </v-flex>
+            <v-flex xs12 sm1></v-flex>
           </v-layout>
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
+    <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="500">
       <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
         <v-card>
           <v-toolbar flat dark color="primary">
-              <v-toolbar-title>Nhập số CMND, mã hồ sơ</v-toolbar-title>
+              <v-toolbar-title>Nhập số CMND, mã hồ sơ để xác thực</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon dark @click.native="dialogShowApplicantIdNo = false">
                 <v-icon>close</v-icon>
