@@ -1169,8 +1169,9 @@ export default {
         tab_text = tab_text + '</body></html>';
 
         var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
-          type: 'application/octet-stream',
+          type: 'text/plain;charset=utf-8;',
         })
+        console.log('xxxx')
         saveAs(blob, new Date().getTime() + ".xls");
       })
     },
