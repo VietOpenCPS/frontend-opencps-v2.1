@@ -634,6 +634,11 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+
+              saveAs(new Blob([ new TextEncoder().encode( '12312312 12323' ) ], {
+                type: 'text/plain;charset=utf-8;',
+              }), new Date().getTime() + ".xls");
+              
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
