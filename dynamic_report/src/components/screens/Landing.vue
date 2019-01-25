@@ -137,7 +137,6 @@ import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
 const jsonMapper = require('json-mapper-json')
 import { saveAs } from 'file-saver'
-var FileSaver = require('file-saver')
 
 export default {
   props: ['index'],
@@ -1123,13 +1122,7 @@ export default {
     },
     convertPDFToHTML (content) {
       let vm = this
-      alert(123)
-      var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
-      FileSaver.saveAs(blob, "hello world.txt");
-      FileSaver.saveAs("https://httpbin.org/image", "image.jpg");
-      console.log('convertPDFToHTML', content)
       window.PDFJS.getDocument(content).then(window.pdf_table_extractor).then(function (result) {
-      console.log('result', result)
         let all_tables = [];
         let page_tables = result.pageTables.shift()
         all_tables = all_tables.concat(page_tables.tables);
@@ -1177,9 +1170,8 @@ export default {
         var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
           type: 'text/plain;charset=utf-8;',
         })
-        console.log('xxxx')
-        window.location.href = "data:text/csv;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
-        saveAs(blob, new Date().getTime() + ".xls");
+        window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
+        // saveAs(blob, new Date().getTime() + ".xls");
       })
     },
     s2ab (s) {
