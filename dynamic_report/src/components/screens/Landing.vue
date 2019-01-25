@@ -1121,7 +1121,9 @@ export default {
     },
     convertPDFToHTML (content) {
       let vm = this
+      console.log('convertPDFToHTML', content)
       window.PDFJS.getDocument(content).then(window.pdf_table_extractor).then(function (result) {
+      console.log('result', result)
         let all_tables = [];
         let page_tables = result.pageTables.shift()
         all_tables = all_tables.concat(page_tables.tables);
