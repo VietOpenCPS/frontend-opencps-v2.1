@@ -13,8 +13,8 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    // endPointApi: '/o/rest/v2',
-    endPointApi: 'http://127.0.0.1:8081/api',
+    endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
   },
   actions: {
     loadInitResource ({commit, state}) {

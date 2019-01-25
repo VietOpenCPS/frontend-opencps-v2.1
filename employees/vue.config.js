@@ -1,61 +1,26 @@
-var path = require('path')
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
-}
-
 module.exports = {
-  outputDir: path.resolve(__dirname, '../docs/o/opencps-frontend-cli-test/employees/app'),
+  runtimeCompiler: true,
+  chainWebpack: config => {
+    config.module.rule('images').use('url-loader')
+      .loader('file-loader') // replaces the url-loader
+      .tap(options => Object.assign(options, {
+        name: '../../docs/o/opencps-frontend-cli/employees/app/images/[name].[ext]'
+      }))
+    config.module.rule('svg').use('file-loader')
+      .tap(options => Object.assign(options, {
+        name: '../../docs/o/opencps-frontend-cli/employees/app/images/[name].[ext]'
+      }))
+  },
   css: {
     extract: {
-      filename: '[name].css',
-      chunkFilename: '[name].css'
-    },
+      filename: '../../docs/o/opencps-frontend-cli/employees/app/css/[name].css',
+      chunkFilename: '../../docs/o/opencps-frontend-cli/employees/app/css/[name].css'
+    }
   },
-  configureWebpack: config => {
-    if (process.env.NODE_ENV === 'production') {
-      return {
-        entry: {
-          'app': './src/main.js'
-        },
-        output: {
-          filename: '[name].js',
-          chunkFilename: '[name].js'
-        },
-        resolve: {
-          extensions: ['.js', '.vue', '.json']
-        },
-        module: {
-          rules: [
-            {
-              test: /\.(js|vue)$/,
-              loader: 'eslint-loader',
-              enforce: 'pre',
-              include: [resolve('src'), resolve('test')],
-              options: {
-                formatter: require('eslint-friendly-formatter')
-              }
-            },
-            {
-              test: /\.js$/,
-              loader: 'babel-loader',
-              include: [resolve('src'), resolve('test')]
-            },
-            {
-              test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-              loader: 'url-loader',
-              options: {
-                limit: 10000
-              }
-            }
-          ]
-        }
-      }
-    } else {
-      return {
-        entry: {
-          app: './src/main.js'
-        }
-      }
+  configureWebpack: {
+    output: {
+      filename: '../../docs/o/opencps-frontend-cli/employees/app/js/[name].js',
+      chunkFilename: '../../docs/o/opencps-frontend-cli/employees/app/js/[name].js'
     }
   }
 }

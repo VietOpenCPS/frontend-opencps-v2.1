@@ -254,7 +254,8 @@ toastr.options = {
 export default {
   props: ['itemCode'],
   components: {
-    ProgressBar
+    ProgressBar,
+    'captcha': Captcha
   },
   data: () => ({
     govAgencyName: {},
@@ -334,12 +335,12 @@ export default {
     showVotingResult (item) {
       let vm = this
       vm.employeeSelected = item
-      vm.dialog_voting_result = true
       vm.$store.dispatch('loadVoting', {
         className: 'employee',
         classPk: item.employeeId
       }).then(result => {
         vm.votingItems = result
+        vm.dialog_voting_result = true
         console.log(vm.votingItems)
       }).catch(xhr => {
       })
@@ -367,6 +368,15 @@ export default {
       if (!vm.$refs.formVoting.validate()) {
         return
       } else {
+        if (vm.$refs.captcha) {
+          if (!vm.$refs.captcha.checkValidCaptcha()) {
+            toastr.error('Mã captcha không đúng. Vui lòng kiểm tra lại')
+            return
+          }
+        } else {
+          vm.showCaptcha = true
+          return
+        }
         let filter = {
           applicantIdNo: vm.applicantIdNo,
           dossierNo: vm.dossierNo
@@ -395,6 +405,9 @@ export default {
         toastr.success('Gửi đánh giá thành công thành công')
         vm.dialogShowApplicantIdNo = false
         vm.dialog_voting = false
+        if (vm.$refs.captcha) {
+          vm.$refs.captcha.makeRandomString()
+        }
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
         vm.dialogShowApplicantIdNo = false

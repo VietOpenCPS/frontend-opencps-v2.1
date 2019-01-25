@@ -410,6 +410,15 @@ export default {
       if (!vm.$refs.formVoting.validate()) {
         return
       } else {
+        if (vm.$refs.captcha) {
+          if (!vm.$refs.captcha.checkValidCaptcha()) {
+            toastr.error('Mã captcha không đúng. Vui lòng kiểm tra lại')
+            return
+          }
+        } else {
+          vm.showCaptcha = true
+          return
+        }
         let filter = {
           applicantIdNo: vm.applicantIdNo,
           dossierNo: vm.dossierNo
@@ -438,6 +447,9 @@ export default {
         toastr.success('Gửi đánh giá thành công thành công')
         vm.dialogShowApplicantIdNo = false
         vm.dialog_voting = false
+        if (vm.$refs.captcha) {
+          vm.$refs.captcha.makeRandomString()
+        }
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
         vm.dialogShowApplicantIdNo = false
