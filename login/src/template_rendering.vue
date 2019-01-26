@@ -28,7 +28,7 @@ export default {
     let created = '{}'
     let updated = '{}'
     let methods = '{}'
-    if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined') {
+    if (vm.layout_view !== null && vm.layout_view !== undefined && vm.layout_view !== 'undefined' && vm.layout_view !== '') {
       Vue.component('my-dynamic-view', {
         template: vm.layout_view['template'],
         data: eval(' ( ' + vm.layout_view['data'] + ' ) '),
@@ -47,8 +47,15 @@ export default {
     }
   },
   methods: {
-    markReadEventId (eventId) {
-      alert(eventId)
+    markReadEventId (eventId, viewRootURI, dossierId, originality) {
+      let vm = this
+      let config = {
+        eventId: eventId,
+        viewRootURI: viewRootURI,
+        dossierId: dossierId,
+        originality: originality
+      }
+      vm.$emit('mark-as-read', config)
     }
   }
 }

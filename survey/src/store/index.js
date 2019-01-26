@@ -4,7 +4,6 @@ import toastr from 'toastr'
 import axios from 'axios'
 import support from './support.json'
 // 
-
 Vue.use(toastr)
 Vue.use(Vuex)
 
@@ -12,7 +11,9 @@ export const store = new Vuex.Store({
   state: {
     initData: {},
     loading: false,
-    index: 0
+    index: 0,
+    endPointApi: '/o/rest/v2'
+    // endPointApi: 'http://127.0.0.1:8081/api'
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -44,7 +45,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(support.initData.votingApi + '/' + data.className + '/' + data.classPk, param).then(result => {
+          axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
@@ -58,25 +59,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    loadImageEmployee ({commit, state}, data) {
-      console.log(data)
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            },
-            responseType: 'blob'
-          }
-          axios.get('/o/rest/v2/users' + '/' + data.mappingUser.userId + '/photo', param).then(result => {
-            var url = window.URL.createObjectURL(result.data)
-            resolve(url)
-          }).catch(xhr => {
-            reject(xhr)
-          })
-        })
-      })
-    },
+
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
@@ -181,7 +164,7 @@ export const store = new Vuex.Store({
           params.append('selected', data.selected)
           params.append('className', data.className)
           params.append('classPk', data.classPk)
-          axios.post(support.initData.votingApi + '/' + data.votingId + '/results', params, config).then(result => {
+          axios.post(state.endPointApi + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
             reject(xhr)
@@ -196,6 +179,9 @@ export const store = new Vuex.Store({
     },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setLoading (state, payload) {
+      state.loading = payload
     }
   },
   getters: {

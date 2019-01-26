@@ -1,11 +1,5 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
-  <v-combobox
-          v-model="select"
-          :items="items"
-          label="Select a favorite activity or create a new one"
-          box
-        ></v-combobox>
   <div class="form-chitiet">
     <div class="row-header">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
@@ -142,7 +136,7 @@ import DatetimePicker from './DatetimePicker.vue'
 import CsvDownload from './CsvDownload.vue'
 import { toXML } from 'jstoxml'
 const jsonMapper = require('json-mapper-json')
-import saveAs from 'file-saver'
+var FileSaver = require('file-saver-fixed')
 
 export default {
   props: ['index'],
@@ -152,13 +146,6 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
-    select: 'Programming',
-        items: [
-          'Programming',
-          'Design',
-          'Vue',
-          'Vuetify'
-        ],
     doExportExcel: false,
     showGuilds: false,
     showPicker: true,
@@ -647,6 +634,7 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+              
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -1127,7 +1115,7 @@ export default {
             var blob = new Blob([ new TextEncoder().encode( xmlToExport ) ], {
                 type: "text/plain;charset=utf-8;",
             })
-            saveAs(blob, new Date().getTime() + ".xml");
+            FileSaver.saveAs(blob, new Date().getTime() + ".xml");
           })
         }
       })
@@ -1138,19 +1126,19 @@ export default {
         let all_tables = [];
         let page_tables = result.pageTables.shift()
         all_tables = all_tables.concat(page_tables.tables);
-        let table_dom = $('<table></table>').attr('border', 1);
+        let table_dom = window.$('<table></table>').attr('border', 1);
         let tables = page_tables.tables;
         let merge_alias = page_tables.merge_alias;
         let merges = page_tables.merges;
 
         for (let r = 0; r < tables.length; r++) {
-          let tr_dom = $('<tr></tr>')
+          let tr_dom = window.$('<tr></tr>')
           for (let c = 0; c < tables[r].length; c++) {
             let r_c = [r, c].join('-')
             if (merge_alias[r_c]) {
               continue
             }
-            let td_dom = $('<td></td>');
+            let td_dom = window.$('<td></td>');
             if (merges[r_c]) {
               if (merges[r_c].width > 1) {
                 td_dom.attr('colspan', merges[r_c].width)
@@ -1180,9 +1168,10 @@ export default {
         tab_text = tab_text + '</body></html>';
 
         var blob = new Blob([ new TextEncoder().encode( tab_text ) ], {
-          type: 'application/octet-stream',
+          type: 'data:application/vnd.ms-excel;charset=utf-8;',
         })
-        saveAs(blob, new Date().getTime() + ".xls");
+        // window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
+        FileSaver.saveAs(blob, new Date().getTime() + ".xls");
       })
     },
     s2ab (s) {

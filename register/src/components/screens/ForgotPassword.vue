@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-layout wrap class="mt-4" style="max-width:550px;margin: 0 auto">
-      <nav class="toolbar theme--dark primary py-2" data-booted="true">
-        <div class="toolbar__content" style="justify-content: center">
-          <h4>CẤP LẠI MẬT KHẨU</h4>
+      <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
+        <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
+          <span class="text-bold">CẤP LẠI MẬT KHẨU</span>
         </div>
       </nav>
       <v-flex xs12>
@@ -86,7 +86,7 @@ export default {
         let filter = dataForm
         vm.$store.dispatch('confirmForgotPASS', filter).then(function (result) {
           vm.loading = false
-         vm.$router.push({
+          vm.$router.push({
             path: '/xac-thuc-cap-lai-mat-khau?active_user_id=' + vm.confirmCode
           })
         }).catch(function (reject) {

@@ -1,21 +1,21 @@
 <template>
   <div>
     <v-layout wrap class="py-2" style="
-    max-width: 1366px;
-">
+      max-width: 1366px;
+    ">
       <v-flex xs12 sm8 class="px-3">
         <div class="bg-gif-register"></div>
       </v-flex>
       <v-flex xs12 sm4 class="px-3">
         <v-card>
-          <nav class="toolbar theme--dark primary py-2" data-booted="true">
-            <div class="toolbar__content"  style="justify-content: center">
-              <span>ĐĂNG KÝ TÀI KHOẢN</span>
+          <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
+            <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
+              <span class="text-bold">ĐĂNG KÝ TÀI KHOẢN</span>
             </div>
           </nav>
           <v-form ref="form" v-model="valid" lazy-validation class="px-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
             <v-layout wrap>
-              <v-radio-group class="radio_register_type" v-model="applicantType" row @change="changeApplicantType">
+              <v-radio-group class="mt-2 radio_register_type" v-model="applicantType" row @change="changeApplicantType">
                 <v-radio label="Công dân" :value="true" class="ml-4"></v-radio>
                 <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
               </v-radio-group>
@@ -110,7 +110,7 @@
                   :rules="[rules.required, rules.passWord]"
                   :type="e1 ? 'password' : 'text'"
                   name="input-10-2"
-                  min="6"
+                  min="8"
                   v-model="passWord"
                   required
                 ></v-text-field>
@@ -124,7 +124,7 @@
                   :rules="[rules.required, v => v===passWord || 'Mật khẩu nhập lại không chính xác']"
                   :type="e2 ? 'password' : 'text'"
                   name="input-10-2"
-                  min="6"
+                  min="8"
                   v-model="rePassWord"
                   required
                 ></v-text-field>
@@ -164,7 +164,13 @@
 
     <v-dialog scrollable v-model="dialogRules" persistent max-width="600">
       <v-card>
-        <v-card-title class="headline">Điều khoản sử dụng</v-card-title>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Điều khoản sử dụng</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogRules = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text style="max-height: 600px" v-html="ruleContent"></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -176,12 +182,13 @@
     </v-dialog>
     <v-dialog v-model="dialog_applicantInfos" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Thông tin doanh nghiệp
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialog_applicantInfos = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>Thông tin doanh nghiệp</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_applicantInfos = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text class="py-1">
           <v-layout wrap class="py-1 align-center">
             <v-flex xs12 class="px-2">
@@ -274,8 +281,8 @@ export default {
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       passWord: (value) => {
-        const pattern = /^((?=.*\d)(?=.*[a-z])([0-9a-zA-Z@$!%*#?&]{6,}))$/
-        return pattern.test(value) || 'Gồm các ký tự 0-9, a-z và ít nhất 6 ký tự'
+        const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+        return pattern.test(value) || 'Mật khẩu ít nhất 8 ký tự và có chữ hoa, chữ thường'
       },
       taxCode: (value) => {
         if (value.length === 10) {

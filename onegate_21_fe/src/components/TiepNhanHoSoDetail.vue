@@ -53,13 +53,12 @@
           <div>
             <v-card>
               <v-card-text>
-                <v-text-field
+                <v-textarea
                   v-model="briefNote"
-                  multi-line
                   :rows="2"
                   box
                   label="nhập tên hồ sơ..."
-                ></v-text-field>
+                ></v-textarea>
               </v-card-text>
             </v-card>
           </div>

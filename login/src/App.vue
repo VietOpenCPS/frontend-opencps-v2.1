@@ -229,8 +229,9 @@
                     v-for="(item, index) in testData"
                     v-bind:key="index"
                     :item="item"
-                    :layout_view="item['layout_view']"
+                    :layout_view="item['notifyMessage']"
                     :template_default="templateDefault"
+                    @mark-as-read="markReadEventId"
                   ></template-rendering>
                 </div>
               </div>
@@ -267,8 +268,9 @@
                     v-for="(item, index) in testDataSeen"
                     v-bind:key="index"
                     :item="item"
-                    :layout_view="item['layout_view']"
+                    :layout_view="item['notifyMessage']"
                     :template_default="templateDefault"
+                    @mark-as-read="markReadEventId"
                   ></template-rendering>
                 </div>
               </div>
@@ -366,13 +368,35 @@ export default {
       }
       vm.drawerLogin = false
     },
-    markReadEventId (eventId) {
-      alert(eventId)
+    markReadEventId (configOBJ) {
       let vm = this
       axios
-      .post("/o/rest/v2/notifications/" + eventId + "/mark")
+      .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
-        vm.pullNotificationData()
+        //send redirect
+        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
+          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        }
+        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+          window.location.href = urlRedirect
+        } else {
+          window.location.href = urlRedirect
+          window.location.reload()
+        }
+      })
+      .catch(function(error) {
+        //send redirect
+        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
+          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        }
+        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+            window.location.href = urlRedirect
+          } else {
+            window.location.href = urlRedirect
+            window.location.reload()
+          }
       })
     },
     pullNotificationCount() {
