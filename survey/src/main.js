@@ -6,8 +6,11 @@ import router from './router_dev'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
+import VueDraggable from 'vue-draggable'
 
+import 'toastr/build/toastr.css'
 Vue.use(VueContentPlaceholders)
+Vue.use(VueDraggable)
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 

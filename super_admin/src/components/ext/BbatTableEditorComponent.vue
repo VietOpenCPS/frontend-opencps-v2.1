@@ -727,6 +727,7 @@
       showAccount (item) {
         let vm = this
         if (vm.detailData[0]['mappingUserId'] === 0) {
+          let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
           if (item['email'] === '') {
             alert('Cấp địa chỉ email trước khi tạo tài khoản.')
           } else {
@@ -735,7 +736,7 @@
               let postData = {
                 id: vm.id,
                 data: {
-                  email: vm.detailData[0]['email'],
+                  email: emailItem,
                   screenName: '',
                   exist: false
                 }

@@ -32,7 +32,7 @@
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-subheader v-if="!loading" style="float:left">
+            <v-subheader v-if="!loading && thongTinChungHoSo.durationCount" style="float:left">
               <span class="text-bold">
                 {{durationText(thongTinChungHoSo.durationUnit, thongTinChungHoSo.durationCount)}} làm việc
               </span>

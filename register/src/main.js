@@ -5,7 +5,7 @@ import App from './App.vue'
 import router from './router_dev'
 import { store } from './store'
 import axios from 'axios'
-
+import 'toastr/build/toastr.css'
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
 axios.defaults.withCredentials = true
