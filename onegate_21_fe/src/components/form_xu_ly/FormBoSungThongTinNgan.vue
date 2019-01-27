@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <v-expansion-panel :value="[true]" expand  v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
+    <v-expansion-panel :value="panel" expand  v-if="type !== 'dieuchinhdulieu' && formBuilder.length > 0" class="expansion-pl ext__form">
       <v-expansion-panel-content v-for="(item, index) in formBuilder" v-bind:key="index">
         <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
         {{item.fieldLabel}} <span v-if="item.required === true || item.required === 'true'" style="color:red"> *</span>
@@ -214,6 +214,7 @@
       date: null,
       dialog: false,
       formBuilder: [],
+      panel: [],
       valid: false,
       valid2: false,
       rulesValid: {
@@ -249,6 +250,10 @@
         }).catch(function () {
           vm.formBuilder = []
         })
+      },
+      formBuilder () {
+        let vm = this
+        vm.allExpand(vm.formBuilder)
       }
     },
     created () {
@@ -273,6 +278,10 @@
       })
     },
     methods: {
+      allExpand (arr) {
+        let vm = this
+        vm.panel = [...Array(arr).keys()].map(_ => true)
+      },
       openDialogCustom (item, fieldName) {
         let vm = this
         vm.dialog = true

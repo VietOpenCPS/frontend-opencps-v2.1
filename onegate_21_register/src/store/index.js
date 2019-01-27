@@ -281,6 +281,10 @@ export const store = new Vuex.Store({
               toastr.clear()
               toastr.error('Nhập sai mã Captcha')
               reject(response)
+            } else if (!response.data['userId']) {
+              toastr.clear()
+              toastr.error('Tài khoản không tồn tại trên hệ thống')
+              reject(response)
             } else {
               resolve(response.data)
             }

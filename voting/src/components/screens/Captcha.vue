@@ -1,24 +1,20 @@
 <template>
-  <v-layout row wrap>
-    <v-flex xs12>
-      <img :src="chapchablob" alt="capcha">
+  <div> 
+    <span>Kéo thả các ô vuông để cho đúng thứ tự</span> <br>
+    <v-flex xs12 sm12 class="text-xs-center">
+      <v-chip label style="background-color: #81D4FA;" text-color="white">
+        {{captcha}}
+      </v-chip>
     </v-flex>
-    <v-flex xs10 class="mt-2">
-      <v-text-field
-        v-model="j_captcha_response"
-        placeholder="Nhập captcha"
-      ></v-text-field>
-    </v-flex>
-    <v-flex xs2 class="mt-2 text-right pr-1">
-      <v-btn flat icon v-on:click.native="makeImageCap">
-        <v-icon size="28">refresh</v-icon>
-      </v-btn>
-    </v-flex>
-  </v-layout>
+    <div v-drag-and-drop:options="options" class="drag-wrapper text-xs-center mt-3">
+      <ul id="captcha">
+        <li class="item-captcha" v-for="(item, index) in arrCaptcha" :key="index" style="padding: 10px 15px; background-color: #81D4FA; margin-right: 2px; color: #fff; font-weight: bold;">{{item}}</li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
-
 import Vue from 'vue'
 import $ from 'jquery'
 export default {
@@ -26,8 +22,6 @@ export default {
   components: {
   },
   data: () => ({
-    j_captcha_response: '',
-    chapchablob: '',
     options: {},
     arrCaptcha: [],
     captcha: '',
@@ -45,20 +39,12 @@ export default {
   },
   created () {
     var vm = this
-    vm.makeImageCap()
+    vm.makeRandomString()
+    vm.shuffleArrCaptcha(vm.arrCaptcha)
   },
   watch: {
   },
   methods: {
-    makeImageCap () {
-      var vm = this
-      vm.chapchablob = ''
-      vm.$store.dispatch('makeImageCap').then(function (result) {
-        vm.chapchablob = result
-      }).catch(function (reject) {
-        vm.chapchablob = ''
-      })
-    },
     makeRandomString () {
       var vm = this
       var text = ''
