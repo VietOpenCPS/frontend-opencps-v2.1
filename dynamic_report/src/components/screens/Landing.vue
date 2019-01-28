@@ -577,7 +577,6 @@ export default {
                   style: 'tdStyle'
                 })
                 dataReportTotal += ' ],'
-                console.log('dataReportTotal', dataReportTotal)
               } else {
                 dataReportTotal += JSON.stringify([{
                   colSpan: colLeng + 1,
@@ -979,9 +978,7 @@ export default {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
-                  console.log('dataInputXXTT', dataInputXXTT)
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')))
-                  console.log('dataTextXXTT', dataTextXXTT)
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
@@ -1008,7 +1005,6 @@ export default {
               }
             }
           }
-          console.log('dataRowTotal: ', dataRowTotal)
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           dataToExportCSV
           let itemTotal = []
@@ -1184,7 +1180,7 @@ export default {
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="10" valign="top" width="167"><p align="center"><strong>TỔNG CỤC ĐBVN (UBND TỈNH ……)</strong><br>Cục QLĐB (Sở GTVT)…..<br><strong>-------</strong></p></td><td valign="top" width="275" colspan="10"><p align="center"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc <br>---------------</strong></p></td></tr></tbody></table><table></table>';
         tab_text = tab_text + '<table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="20" valign="top" width="167"><p align="center"><strong>TỔNG HỢP HỒ SƠ NỘP TRỰC TUYẾN THEO LĨNH VỰC</strong></p></td></td></tr></tbody></table><table></table>';
 
-        tab_text = tab_text + "<table border='1px' width='1366'>"
+        tab_text = tab_text + "<table border='1px' width='2366'>"
         tab_text = tab_text + table_dom[0].innerHTML
         
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="4" valign="top" width="167"><p align="left"><strong>Nơi nhận:</strong></p></td><td valign="top" width="275" colspan="16"><p align="right"><strong>THỦ TRƯỞNG ĐƠN VỊ</strong><br/>(Ký và ghi rõ họ tên)</p></td></tr></tbody></table><table></table>';
