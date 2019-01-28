@@ -557,12 +557,27 @@ export default {
                 csvGroup.push('')
               }
               dataToExportCSV.push(csvGroup)
-              dataReportTotal += JSON.stringify([{
-                colSpan: colLeng + 1,
-                text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
-                bold: true,
-                style: 'tdStyle'
-              }]) + ','
+              if (vm.doExportExcel) {
+                dataReportTotal += JSON.stringify([{
+                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  bold: true,
+                  style: 'tdStyle'
+                }]) + ','
+                for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+                  dataReportTotal += JSON.stringify([{
+                    text: '',
+                    bold: true,
+                    style: 'tdStyle'
+                  }]) + ','
+                }
+              } else {
+                dataReportTotal += JSON.stringify([{
+                  colSpan: colLeng + 1,
+                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  bold: true,
+                  style: 'tdStyle'
+                }]) + ','
+              }
             }
             /*
             vm.docDefinition['content'][2]['table']['body'].push([{
