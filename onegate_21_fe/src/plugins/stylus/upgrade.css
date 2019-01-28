@@ -389,9 +389,7 @@ body .file-preview .e-file-select-wrap {
 .e-css.e-btn {
     opacity: 0;
 }
-.text-xs-right {
-    text-align: right;
-}
+
 body .v-select.v-text-field--enclosed:not(.v-text-field--single-line) .v-select__selections {
     padding-top: 16px;
 }
@@ -456,4 +454,57 @@ body .wrap_report .v-card__text > .v-list {
 
 body .report__table {
     max-width: 100%;
+}
+body #app .theme--light.v-subheader {
+    color: rgb(31, 31, 31);
+    height: 32px;
+    font-size: 13px;
+    float: right;
+}
+body .help-block.alpaca-message {
+    display: none;
+}
+body .help-block.alpaca-message {
+    display: none;
+}
+body .alpaca-field .alpaca-field-select select {
+    min-width: 100px;
+}
+
+body .alpaca-field .alpaca-field-select {
+    position: relative;
+}
+body .alpaca-field .alpaca-field-select:before {
+        content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    border: 1px dashed #70706c;
+    height: 0;
+    background-color: transparent;
+}
+body .alpaca-field .alpaca-field-select:after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        border: 1px dashed #fdfdf6;
+        height: 0;
+        background-color: transparent;
+}
+body .alpaca-field p {
+    min-height: 25px;
+}
+
+body .absolute__btn.group__thanh_phan .theme--light.v-text-field>.v-input__control>.v-input__slot:before {
+    display: none !important;
+}
+
+body .v-expansion-panel__body .card__text__gov:last-child {
+    border-bottom: none !important;
+}
+body #app_user_profile .text-xs-right {
+    float: right;
 }
