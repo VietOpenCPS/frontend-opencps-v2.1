@@ -563,6 +563,7 @@ export default {
                   bold: true,
                   style: 'tdStyle'
                 }]) + ','
+                console.log('colLeng', colLeng)
                 for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
                   dataReportTotal += JSON.stringify([{
                     text: '',
@@ -570,6 +571,7 @@ export default {
                     style: 'tdStyle'
                   }]) + ','
                 }
+                console.log('dataReportTotal', dataReportTotal)
               } else {
                 dataReportTotal += JSON.stringify([{
                   colSpan: colLeng + 1,
