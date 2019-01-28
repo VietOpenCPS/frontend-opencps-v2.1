@@ -565,11 +565,11 @@ export default {
                   style: 'tdStyle'
                 }) + ','
                 for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
-                  dataReportTotal += JSON.stringify([{
+                  dataReportTotal += JSON.stringify({
                     text: '',
                     bold: true,
                     style: 'tdStyle'
-                  }]) + ','
+                  }) + ','
                 }
                 dataReportTotal += JSON.stringify({
                   text: '',
