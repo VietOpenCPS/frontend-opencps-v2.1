@@ -558,12 +558,12 @@ export default {
               }
               dataToExportCSV.push(csvGroup)
               if (vm.doExportExcel) {
-                dataReportTotal += JSON.stringify([{
+                dataReportTotal += '[ '
+                dataReportTotal += JSON.stringify({
                   text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
                   bold: true,
                   style: 'tdStyle'
-                }]) + ','
-                console.log('colLeng', colLeng)
+                }) + ','
                 for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
                   dataReportTotal += JSON.stringify([{
                     text: '',
@@ -571,6 +571,12 @@ export default {
                     style: 'tdStyle'
                   }]) + ','
                 }
+                dataReportTotal += JSON.stringify({
+                  text: '',
+                  bold: true,
+                  style: 'tdStyle'
+                })
+                dataReportTotal += ' ],'
                 console.log('dataReportTotal', dataReportTotal)
               } else {
                 dataReportTotal += JSON.stringify([{
