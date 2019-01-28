@@ -90,6 +90,7 @@ export default {
           vm.loading = false
         }).catch(function (reject) {
           vm.loading = false
+          vm.$refs.captcha.makeImageCap()
         })
       }
     }

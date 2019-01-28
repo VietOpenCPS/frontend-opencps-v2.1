@@ -244,6 +244,8 @@
             for (let key in vm.formBuilder) {
               if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                 vm.formBuilder[key]['value'] = ''
+              } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
+                vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
               }
             }
           }
@@ -270,8 +272,11 @@
               for (let key in vm.formBuilder) {
                 if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = ''
+                } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
+                  vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
                 }
               }
+              vm.allExpand(vm.formBuilder)
             }
           })
         }

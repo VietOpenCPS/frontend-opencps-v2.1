@@ -268,9 +268,11 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/users/' + data.confirmCode + '/forgot', param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.confirmCode + '/forgot?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
               toastr.error('Nhập sai mã Captcha')
               reject(xhr)
             } else if (!response.data['userId']) {
+              toastr.clear()
               toastr.error('Tài khoản không tồn tại trên hệ thống')
               reject(xhr)
             } else {
@@ -279,7 +281,7 @@ export const store = new Vuex.Store({
             // toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
             reject(xhr)
-            toastr.error('Yêu cầu thất bại. Vui lòng thử lại')
+            // toastr.error('Yêu cầu thất bại. Vui lòng thử lại')
           })
         })
       })
@@ -296,14 +298,22 @@ export const store = new Vuex.Store({
           // axios.get('http://127.0.0.1:8081/api/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode, param).then(function (response) {
           axios.get('/o/rest/v2/users/' + data.userCode + '/forgot/confirm/' + data.confirmCode + '?j_captcha_response=' + data['j_captcha_response'], param).then(function (response) {
             resolve(response.data)
-            toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
-            setTimeout(function () {
-              let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-              window.open(redirectURL, '_self')
-            }, 500)
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã bảo mật không chính xác. Vui lòng kiểm tra lại.')
+              reject(xhr)
+            } else {
+              resolve(response.data)
+              toastr.clear()
+              toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
+              setTimeout(function () {
+                let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+                window.open(redirectURL, '_self')
+              }, 500)
+            }
           }).catch(function (xhr) {
             reject(xhr)
-            toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
+            // toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
           })
         })
       })

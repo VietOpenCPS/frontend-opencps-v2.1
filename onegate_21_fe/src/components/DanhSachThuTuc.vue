@@ -9,7 +9,7 @@
       ></v-progress-circular>
       <p class="mt-4">đang tạo hồ sơ ...</p>
     </div>
-    <v-expansion-panel :value="[true]" expand  v-if="String(serviceCode) === '0' && !selectOption" expand class="expand__select__gov">
+    <v-expansion-panel :value="[true]" expand  v-if="String(serviceCode) === '0' && !selectOption" class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
         <div slot='header' class="ml-3">
           <v-icon style="
