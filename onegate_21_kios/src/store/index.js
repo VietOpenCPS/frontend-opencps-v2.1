@@ -9,8 +9,10 @@ Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
     initData: support.initData,
-    endPoint: '/o/rest/v2',
-    // endPoint: 'http://127.0.0.1:8081/api',
+    // endPoint: '/o/rest/v2',
+    endPoint: 'http://127.0.0.1:8081/api',
+    originality: '',
+    groupIdSite: '',
     totalEmployee: 0,
     filterDossierKey: {
       dossierNo: '',
@@ -102,7 +104,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId
             },
             params: {
               step: '300,310,400',
@@ -111,13 +113,13 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          // axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
-            reject(error)
+            reject([])
           })
         })
       })
@@ -605,6 +607,12 @@ export const store = new Vuex.Store({
     },
     setFullScreen (state, payload) {
       state.fullScreen = payload
+    },
+    setOriginality (state, payload) {
+      state.originality = payload
+    },
+    setGroupid (state, payload) {
+      state.groupIdSite = payload
     }
   },
   getters: {
@@ -631,6 +639,12 @@ export const store = new Vuex.Store({
     },
     getFullScreen (state) {
       return state.fullScreen
+    },
+    getOriginality (state) {
+      return state.originality
+    },
+    getGroupid (state, payload) {
+      return state.groupIdSite
     }
   }
 })
