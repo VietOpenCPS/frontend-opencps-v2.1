@@ -508,3 +508,11 @@ body .v-expansion-panel__body .card__text__gov:last-child {
 body #app_user_profile .text-xs-right {
     float: right;
 }
+body .absolute__btn_panel {
+    position: absolute;
+}
+
+body .v-dialog .v-toolbar .v-toolbar__content {
+    height: 40px !important;
+    background-color: #00204a;
+}
