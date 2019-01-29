@@ -4,7 +4,7 @@
       max-width: 1366px;
     ">
       <v-flex xs12 sm8 class="px-3">
-        <div class="bg-gif-register"></div>
+        <div class="bg-gif-register" style="background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;padding-top: 77.961783%;background-size: contain;"></div>
       </v-flex>
       <v-flex xs12 sm4 class="px-3">
         <v-card>

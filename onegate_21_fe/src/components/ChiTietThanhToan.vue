@@ -156,11 +156,14 @@
     </v-card>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
-        <v-card-title class="headline" v-if="!activePrintPay">File đính kèm</v-card-title>
-        <v-card-title class="headline" v-else>In biên lai thanh toán</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title v-if="!activePrintPay">File đính kèm</v-toolbar-title>
+          <v-toolbar-title v-else>In biên lai thanh toán</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <div v-if="dialogPDFLoading" style="
           min-height: 600px;
           text-align: center;
