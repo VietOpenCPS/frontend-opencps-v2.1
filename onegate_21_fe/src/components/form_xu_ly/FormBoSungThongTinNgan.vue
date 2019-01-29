@@ -86,7 +86,7 @@
         </div>
         <v-form ref="form" v-model="valid2" lazy-validation>
           <v-layout wrap>
-            <v-flex xs12 class="px-3">
+            <v-flex xs12 class="px-3 mt-2">
               <v-text-field v-if="item.fieldType === 'textarea'"
                 box
                 :id="item.fieldName"
@@ -244,6 +244,8 @@
             for (let key in vm.formBuilder) {
               if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                 vm.formBuilder[key]['value'] = ''
+              } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
+                vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
               }
             }
           }
@@ -270,8 +272,11 @@
               for (let key in vm.formBuilder) {
                 if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
                   vm.formBuilder[key]['value'] = ''
+                } else if (vm.formBuilder[key]['fieldType'] === 'date' && vm.formBuilder[key]['value'] && !isNaN(new Date(vm.formBuilder[key]['value']).getTime())) {
+                  vm.formBuilder[key]['value'] = new Date(vm.formBuilder[key]['value'])
                 }
               }
+              vm.allExpand(vm.formBuilder)
             }
           })
         }
@@ -280,7 +285,7 @@
     methods: {
       allExpand (arr) {
         let vm = this
-        vm.panel = [...Array(arr).keys()].map(_ => true)
+        vm.panel = [...Array(arr.length).keys()].map(_ => true)
       },
       openDialogCustom (item, fieldName) {
         let vm = this
