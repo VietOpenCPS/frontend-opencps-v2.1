@@ -69,7 +69,7 @@
                   </div>
                 </div>
                 <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
-                  <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
+                  <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
                         <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
@@ -79,8 +79,23 @@
                         </span>
                         <span>Bản khai trực tuyến</span>
                       </v-tooltip>
+                      <v-progress-circular
+                      :width="2"
+                      :size="25"
+                      color="green"
+                      indeterminate
+                      v-if="progressUploadPart === itemFileView.dossierFileId"
+                      ></v-progress-circular>
+                      <v-tooltip top v-if="!onlyView && !progressUploadPart" class="ml-2">
+                        <v-btn slot="activator" icon class="mx-0 my-0" @click="attachToDossier(itemFileView, index)">
+                          <v-badge>
+                            <v-icon size="16" color="orange darken-3">cloud_download</v-icon>
+                          </v-badge>
+                        </v-btn>
+                        <span>Sử dụng giấy tờ này</span>
+                      </v-tooltip>
                     </div>
-                    <div v-else :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                    <div v-else :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
                         <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
                           <v-icon style="color: #0d71bb" v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
@@ -88,6 +103,21 @@
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
                         <span>Đính kèm</span>
+                      </v-tooltip>
+                      <v-progress-circular
+                      :width="2"
+                      :size="25"
+                      color="green"
+                      indeterminate
+                      v-if="progressUploadPart === itemFileView.dossierFileId"
+                      ></v-progress-circular>
+                      <v-tooltip top v-if="!onlyView && !progressUploadPart" class="ml-2">
+                        <v-btn slot="activator" icon class="mx-0 my-0" @click="attachToDossier(itemFileView, index)">
+                          <v-badge>
+                            <v-icon size="16" color="orange darken-3">cloud_download</v-icon>
+                          </v-badge>
+                        </v-btn>
+                        <span>Sử dụng giấy tờ này</span>
                       </v-tooltip>
                     </div>
                   </div>
@@ -196,29 +226,6 @@
             </v-flex>
           </v-layout>
         </div>
-        <!-- <div v-if="item.partNo === partView && stateView">
-          <v-layout row wrap>
-            <v-flex xs12 sm12>
-              <div v-for="(itemFileView, index) in fileViews" :key="index">
-                <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 15px;">
-                  <span @click="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;" v-if="!stateEdit">
-                    <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                    <v-icon v-else>attach_file</v-icon>
-                    {{itemFileView.displayName}}
-                  </span>
-                  <v-text-field
-                    v-model="itemFileView.displayName"
-                    v-if="itemFileView.dossierFileId === dossierFileIdView && stateEdit"
-                    @change="changeDisplayName(itemFileView, index)"
-                  ></v-text-field>
-                  <v-btn icon ripple @click="deleteSingleFile(itemFileView, index)" class="mx-0 my-0" v-if="!onlyView">
-                    <v-icon style="color: red">delete_outline</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </v-flex>
-          </v-layout>
-        </div> -->
       </div>
       <div v-if="!partTypes.includes(2)">
         <v-card>
@@ -988,6 +995,25 @@ export default {
           toastr.clear()
           toastr.error('File dữ liệu không tồn tại')
         }
+      }
+    },
+    attachToDossier (file, index) {
+      let vm = this
+      console.log(file, index)
+      file['dossierId'] = vm.thongTinHoSo.dossierId
+      if (file.partType !== 3) {
+        vm.progressUploadPart = file.dossierFileId
+        vm.$store.dispatch('copyFile', file).then(function (result) {
+          vm.progressUploadPart = ''
+          vm.dossierTemplateItems[index]['passRequired'] = true
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
+        }).catch(function (xhr) {
+          vm.progressUploadPart = ''
+          toastr.error('Đính kèm tài liệu thất bại')
+        })
       }
     },
     viewGiayToDaNop (data) {
