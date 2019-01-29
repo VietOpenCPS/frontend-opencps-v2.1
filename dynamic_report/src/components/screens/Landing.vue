@@ -557,12 +557,34 @@ export default {
                 csvGroup.push('')
               }
               dataToExportCSV.push(csvGroup)
-              dataReportTotal += JSON.stringify([{
-                colSpan: colLeng + 1,
-                text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
-                bold: true,
-                style: 'tdStyle'
-              }]) + ','
+              if (vm.doExportExcel) {
+                dataReportTotal += '[ '
+                dataReportTotal += JSON.stringify({
+                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  bold: true,
+                  style: 'tdStyle'
+                }) + ','
+                for (let csvIndexXXX = 0; csvIndexXXX < colLeng - 1; csvIndexXXX ++) {
+                  dataReportTotal += JSON.stringify({
+                    text: '',
+                    bold: true,
+                    style: 'tdStyle'
+                  }) + ','
+                }
+                dataReportTotal += JSON.stringify({
+                  text: '',
+                  bold: true,
+                  style: 'tdStyle'
+                })
+                dataReportTotal += ' ],'
+              } else {
+                dataReportTotal += JSON.stringify([{
+                  colSpan: colLeng + 1,
+                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  bold: true,
+                  style: 'tdStyle'
+                }]) + ','
+              }
             }
             /*
             vm.docDefinition['content'][2]['table']['body'].push([{
@@ -956,9 +978,7 @@ export default {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
-                  console.log('dataInputXXTT', dataInputXXTT)
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')))
-                  console.log('dataTextXXTT', dataTextXXTT)
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
@@ -985,7 +1005,6 @@ export default {
               }
             }
           }
-          console.log('dataRowTotal: ', dataRowTotal)
           vm.dataReportXX += JSON.stringify(dataRowTotal)
           dataToExportCSV
           let itemTotal = []
@@ -1124,35 +1143,37 @@ export default {
       let vm = this
       window.PDFJS.getDocument(content).then(window.pdf_table_extractor).then(function (result) {
         let all_tables = [];
-        let page_tables = result.pageTables.shift()
-        all_tables = all_tables.concat(page_tables.tables);
         let table_dom = window.$('<table></table>').attr('border', 1);
-        let tables = page_tables.tables;
-        let merge_alias = page_tables.merge_alias;
-        let merges = page_tables.merges;
-
-        for (let r = 0; r < tables.length; r++) {
-          let tr_dom = window.$('<tr></tr>')
-          for (let c = 0; c < tables[r].length; c++) {
-            let r_c = [r, c].join('-')
-            if (merge_alias[r_c]) {
-              continue
-            }
-            let td_dom = window.$('<td></td>');
-            if (merges[r_c]) {
-              if (merges[r_c].width > 1) {
-                td_dom.attr('colspan', merges[r_c].width)
+        // let page_tables = result.pageTables.shift()
+        for (let tableIndexXXX in result.pageTables) {
+          let page_tables = result.pageTables[tableIndexXXX]
+          all_tables = all_tables.concat(page_tables.tables);
+          let tables = page_tables.tables;
+          let merge_alias = page_tables.merge_alias;
+          let merges = page_tables.merges;
+          for (let r = 0; r < tables.length; r++) {
+            let tr_dom = window.$('<tr></tr>')
+            for (let c = 0; c < tables[r].length; c++) {
+              let r_c = [r, c].join('-')
+              if (merge_alias[r_c]) {
+                continue
               }
-              if (merges[r_c].height > 1) {
-                td_dom.attr('rowspan', merges[r_c].height)
+              let td_dom = window.$('<td></td>');
+              if (merges[r_c]) {
+                if (merges[r_c].width > 1) {
+                  td_dom.attr('colspan', merges[r_c].width)
+                }
+                if (merges[r_c].height > 1) {
+                  td_dom.attr('rowspan', merges[r_c].height)
+                }
               }
+              td_dom.html(tables[r][c].replace(/\n/ig, '<br/>').replace(/↵/ig, '<br/>'))
+              tr_dom.append(td_dom)
             }
-            td_dom.html(tables[r][c].replace(/\n/ig, '<br/>').replace(/↵/ig, '<br/>'))
-            tr_dom.append(td_dom)
+            table_dom.append(tr_dom)
           }
-          table_dom.append(tr_dom)
         }
-         var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">'
+        var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">'
         tab_text = tab_text + '<head><meta http-equiv="content-type" content="text/html; charset=UTF-8"/><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
         tab_text = tab_text + '<x:Name>Test Sheet</x:Name>'
         tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
@@ -1161,7 +1182,7 @@ export default {
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="10" valign="top" width="167"><p align="center"><strong>TỔNG CỤC ĐBVN (UBND TỈNH ……)</strong><br>Cục QLĐB (Sở GTVT)…..<br><strong>-------</strong></p></td><td valign="top" width="275" colspan="10"><p align="center"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc <br>---------------</strong></p></td></tr></tbody></table><table></table>';
         tab_text = tab_text + '<table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="20" valign="top" width="167"><p align="center"><strong>TỔNG HỢP HỒ SƠ NỘP TRỰC TUYẾN THEO LĨNH VỰC</strong></p></td></td></tr></tbody></table><table></table>';
 
-        tab_text = tab_text + "<table border='1px'>"
+        tab_text = tab_text + "<table border='1px' width='1366px'>"
         tab_text = tab_text + table_dom[0].innerHTML
         
         tab_text = tab_text + '<table></table><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td colspan="4" valign="top" width="167"><p align="left"><strong>Nơi nhận:</strong></p></td><td valign="top" width="275" colspan="16"><p align="right"><strong>THỦ TRƯỞNG ĐƠN VỊ</strong><br/>(Ký và ghi rõ họ tên)</p></td></tr></tbody></table><table></table>';

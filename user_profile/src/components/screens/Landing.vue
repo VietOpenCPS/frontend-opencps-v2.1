@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-3 grid-list">
       <v-layout class="user_profile" wrap style="
             max-width: 1300px;
@@ -255,7 +255,7 @@
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
-  </v-app>
+  </div>
 </template>
 
 <script>

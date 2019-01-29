@@ -70,7 +70,7 @@
                 </div>
                 <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
                   <div v-for="(itemFileView, index) in dossierFilesApplicant" :key="index" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
-                    <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                    <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
                         <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
                           <i style="color: #0d71bb; font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
@@ -241,11 +241,13 @@
       <v-dialog v-model="dialogAddOtherTemp" max-width="400" transition="fade-transition" persistent>
         <v-card>
           <v-form ref="form" v-model="valid" lazy-validation>
-            <v-card-title class="headline">Tên giấy tờ</v-card-title>
-            <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="cancelDialog">
-              <v-icon>clear</v-icon>
-            </v-btn>
-            <v-progress-linear v-if="loadingAddOther" class="my-0" :indeterminate="true"></v-progress-linear>
+            <v-toolbar dark color="primary">
+              <v-toolbar-title>Tên giấy tờ</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="cancelDialog">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
             <v-card-text class="pb-0 pt-4">
               <v-layout wrap>
                 <v-flex xs12 class="px-2 pb-3 fix__label">
@@ -280,13 +282,16 @@
     </div> -->
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
-        <v-card-title class="headline">
-          <span v-if="pdfEform">Bản khai trực tuyến</span>
-          <span v-else>File đính kèm</span>
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>
+            <span v-if="pdfEform">Bản khai trực tuyến</span>
+            <span v-else>File đính kèm</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <div v-if="dialogPDFLoading" style="
             min-height: 600px;
             text-align: center;
