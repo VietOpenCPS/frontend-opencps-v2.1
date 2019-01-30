@@ -26,7 +26,8 @@ export const store = new Vuex.Store({
     activeDetailService: false,
     applicantIdNoSearch: '',
     dossierNoSearch: '',
-    fullScreen: false
+    fullScreen: false,
+    drawer: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -609,6 +610,9 @@ export const store = new Vuex.Store({
     },
     setDossierNoSearch (state, payload) {
       state.dossierNoSearch = payload
+    },
+    setdrawer (state, payload) {
+      state.drawer = payload
     }
   },
   getters: {
@@ -632,6 +636,9 @@ export const store = new Vuex.Store({
     },
     getDossierNoSearch (state) {
       return state.dossierNoSearch
+    },
+    getdrawer (state) {
+      return state.drawer
     }
   }
 })

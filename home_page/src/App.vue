@@ -1,17 +1,7 @@
 <template>
   <v-app id="app_home_page">
     <v-navigation-drawer app clipped floating width="310" v-model="drawer">
-      <div class="text-center">
-        <v-btn-toggle v-model="toggle_exclusive" mandatory class="mt-2" style="width: 100%">
-          <v-btn flat style="width: 50%" to="/m">
-            Mobile
-          </v-btn>
-          <v-btn flat style="width: 50%" to="/">
-            Desktop
-          </v-btn>
-        </v-btn-toggle>
-      </div>
-      <div class="mx-3 mt-3"><v-btn to="/" block color="primary" dark>Trang chủ</v-btn></div>
+      <div class="mx-3 mt-3"><v-btn @click="goToHomePage" block color="primary" dark>Trang chủ</v-btn></div>
       <div class="tab-item">
         <div class="left">
           <a href="javascript:;" @click="goPage('dangnhap')">
@@ -48,6 +38,7 @@
       </div>
     </v-navigation-drawer>
     <v-content>
+      {{isMobile}}///
       <router-view></router-view>
     </v-content>
     <v-fab-transition>
@@ -59,7 +50,7 @@
       fixed
       top
       right
-      v-on:click.native="drawer = !drawer"
+      v-on:click.native="toogleDrw"
     >
       <v-icon>menu</v-icon>
     </v-btn>
@@ -72,7 +63,6 @@
   import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
-      drawer: false,
       hidden: false,
       toggle_exclusive: 0,
       workingUnitList: [],
@@ -82,6 +72,9 @@
     computed: {
       fullScreen () {
         return this.$store.getters.getFullScreen
+      },
+      drawer () {
+        return this.$store.getters.getdrawer
       }
     },
     watch: {
@@ -93,6 +86,13 @@
       }
     },
     methods: {
+      toogleDrw () {
+        var vm = this
+        vm.$store.commit('setdrawer', !vm.drawer)
+      },
+      goToHomePage () {
+        window.location.href = '/'
+      },
       goPage (page) {
         var vm = this
         vm.$store.commit('setActiveDetailService', false)
