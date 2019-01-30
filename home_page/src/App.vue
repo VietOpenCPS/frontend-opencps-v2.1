@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_home_page">
-    <v-navigation-drawer app clipped floating width="310" v-model="drawer" v-if="isMobile">
+    <v-navigation-drawer app clipped floating width="310" v-model="drawer">
       <div class="text-center">
         <v-btn-toggle v-model="toggle_exclusive" mandatory class="mt-2" style="width: 100%">
           <v-btn flat style="width: 50%" to="/m">
