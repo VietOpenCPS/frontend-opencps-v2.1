@@ -38,11 +38,12 @@
       </div>
     </v-navigation-drawer>
     <v-content>
-      {{isMobile}}///
+      {{ism}}///
       <router-view></router-view>
     </v-content>
     <v-fab-transition>
     <v-btn
+      v-if="ism"
       color="pink"
       fab
       dark
@@ -75,6 +76,9 @@
       },
       drawer () {
         return this.$store.getters.getdrawer
+      },
+      ism () {
+        return this.$store.getters.getism
       }
     },
     watch: {

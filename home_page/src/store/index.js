@@ -27,7 +27,8 @@ export const store = new Vuex.Store({
     applicantIdNoSearch: '',
     dossierNoSearch: '',
     fullScreen: false,
-    drawer: false
+    drawer: false,
+    ism: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -613,6 +614,9 @@ export const store = new Vuex.Store({
     },
     setdrawer (state, payload) {
       state.drawer = payload
+    },
+    setism (state, payload) {
+      state.ism = payload
     }
   },
   getters: {
@@ -639,6 +643,9 @@ export const store = new Vuex.Store({
     },
     getdrawer (state) {
       return state.drawer
+    },
+    getism (state) {
+      return state.ism
     }
   }
 })

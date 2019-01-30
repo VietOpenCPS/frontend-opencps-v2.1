@@ -55,6 +55,7 @@ new Vue({
     let vm = this
     vm.$nextTick(function () {
       if (isMobile) {
+        vm.$store.commit('setism', true)
         vm.$router.push('/m')
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
@@ -63,6 +64,7 @@ new Vue({
         $('.mWrapper > footer > .container > .right').css('width', '100%')
         $('body').css('min-width', 'unset')
       } else {
+        vm.$store.commit('setism', false)
         $('.mWrapper > header').css('display', 'block')
         $('.mWrapper > footer').css('display', 'block')
         $('.mWrapper > nav').css('display', 'block')
