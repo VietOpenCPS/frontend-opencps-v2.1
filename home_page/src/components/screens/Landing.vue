@@ -159,8 +159,8 @@
       let vm = this
       vm.$nextTick(function () {
         $('.mWrapper > header').css('display', 'none')
-        $('.mWrapper > footer').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
+        $('.mWrapper > footer').css('padding-bottom', '150px')
         $('.mWrapper > footer > .container > .left').css('width', '100%')
         $('.mWrapper > footer > .container > .right').css('width', '100%')
         $('body').css('min-width', 'unset')

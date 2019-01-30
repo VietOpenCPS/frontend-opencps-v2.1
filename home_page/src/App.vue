@@ -52,7 +52,6 @@
     </v-content>
     <v-fab-transition>
     <v-btn
-      v-if="isMobile"
       color="pink"
       fab
       dark
