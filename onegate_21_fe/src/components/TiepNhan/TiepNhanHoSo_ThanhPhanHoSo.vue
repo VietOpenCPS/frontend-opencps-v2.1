@@ -820,7 +820,11 @@ export default {
     loadAlpcaForm (data) {
       var vm = this
       //
-      vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+      if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
+        vm.currentFormView = ''
+      } else {
+        vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+      }
       vm.pstEl = vm.endEl = 0
       setTimeout(function () {
         if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
