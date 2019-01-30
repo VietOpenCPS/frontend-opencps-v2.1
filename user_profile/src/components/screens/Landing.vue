@@ -35,27 +35,47 @@
                   outline
                   v-if="changePassWordFail"
                 >
-                  Vui lòng kiểm tra lại mật khẩu cũ, mật khẩu yêu cầu 8 ký tự và có chữ hoa chữ thường.
+                  Mật khẩu cũ không chính xác. Vui lòng kiểm tra lại.
                 </v-alert>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field type="password" v-model="oldPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                <v-text-field v-model="oldPassWord" box
+                :append-icon="e3 ? 'visibility' : 'visibility_off'"
+                :append-icon-cb="() => (e3 = !e3)"
+                :type="e3 ? 'password' : 'text'"
+                name="input-10-2"
+                :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required
+              >
                   <template slot="label">Mật khẩu cũ <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field type="password" v-model="newPassWord" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v!==oldPassWord || 'Mật khẩu mới trùng mật khẩu cũ']" required>
+                <v-text-field v-model="newPassWord" box 
+                :rules="[rules.required, rules.passWord, v => v!==oldPassWord || 'Mật khẩu mới trùng mật khẩu cũ']"
+                :append-icon="e1 ? 'visibility' : 'visibility_off'"
+                :append-icon-cb="() => (e1 = !e1)"
+                :type="e1 ? 'password' : 'text'"
+                name="input-10-2"
+                min="8"
+                required>
                   <template slot="label">Mật khẩu mới <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm3></v-flex>
               <v-flex xs12 sm6>
-                <v-text-field type="password" v-model="newPassWordConfirm" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc', v => v===newPassWord || 'Mật khẩu nhập lại không chính xác']" required>
+                <v-text-field v-model="newPassWordConfirm" box 
+                :rules="[rules.required, v => v===newPassWord || 'Mật khẩu nhập lại không chính xác']"
+                :append-icon="e2 ? 'visibility' : 'visibility_off'"
+                :append-icon-cb="() => (e2 = !e2)"
+                :type="e2 ? 'password' : 'text'"
+                name="input-10-2"
+                min="8"
+                required>
                   <template slot="label">Nhập lại mật khẩu mới <span class="red--text darken-3">*</span></template>
                 </v-text-field>
               </v-flex>
@@ -300,7 +320,17 @@
         'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantEsignCert',
         'remove_api': '',
         'class_name': 'org.opencps.usermgt.model.ApplicantEsignCert'
-      }
+      },
+      rules: {
+        required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+        passWord: (value) => {
+          const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+          return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
+        }
+      },
+      e1: true,
+      e2: true,
+      e3: true
     }),
     watch: {
       ngayCap(val) {
@@ -450,6 +480,7 @@
               vm.changePassWordFail = true
             } else {
               vm.snackbarsuccess = true
+              vm.state = 1
             }
           }).catch(function () {
             vm.loading = false
