@@ -61,6 +61,7 @@ new Vue({
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer > .container > .left').css('width', '100%')
         $('.mWrapper > footer > .container > .right').css('width', '100%')
+        $('body').css('min-width', 'unset')
       } else {
         $('.mWrapper > header').css('display', 'block')
         $('.mWrapper > footer').css('display', 'block')

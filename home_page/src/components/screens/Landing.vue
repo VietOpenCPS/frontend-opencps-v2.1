@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="row-1 py-0">
-      <div class="container layout wrap py-0">
-        <div class="left flex xs12">
+    <div class="row-1">
+      <div class="container">
+        <div class="left">
           <div class="about">
             <p>Giới thiệu</p>
             <span>Hệ thống Dịch vụ công trực tuyến Tỉnh Phú Thọ<br>
@@ -35,7 +35,7 @@
   
         </div>
   
-        <div class="right flex xs12">
+        <div class="right">
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
@@ -65,15 +65,15 @@
   
     <div style="clear: both;">
       
-      <div class="container" style="width: 350px;">
-        <div class="chart-progress" style="width: 350px;" v-if="showReport1">
+      <div class="container">
+        <div class="chart-progress" v-if="showReport1">
           <apexchart type="line" height="525"
             :options="chartOptions" 
             :series="seriesChart" 
           ></apexchart>
         </div>
   
-        <div class="chart-result" style="width: 350px;" v-if="showReport2">
+        <div class="chart-result" v-if="showReport2">
           <apexchart type="donut" 
             :options="donutOptions"
             :series="donutChart"
@@ -153,6 +153,12 @@
     created () {
       let vm = this
       vm.$nextTick(function () {
+        $('.mWrapper > header').css('display', 'none')
+        $('.mWrapper > footer').css('display', 'none')
+        $('.mWrapper > nav').css('display', 'none')
+        $('.mWrapper > footer > .container > .left').css('width', '100%')
+        $('.mWrapper > footer > .container > .right').css('width', '100%')
+        $('body').css('min-width', 'unset')
         vm.doStaticsReport1()
       })
     },
