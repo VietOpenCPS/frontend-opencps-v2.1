@@ -65,15 +65,15 @@
   
     <div style="clear: both;">
       
-      <div class="container">
-        <div class="chart-progress" v-if="showReport1">
+      <div class="container" style="width: 350px;">
+        <div class="chart-progress" style="width: 350px;" v-if="showReport1">
           <apexchart type="line" height="525"
             :options="chartOptions" 
             :series="seriesChart" 
           ></apexchart>
         </div>
   
-        <div class="chart-result" v-if="showReport2">
+        <div class="chart-result" style="width: 350px;" v-if="showReport2">
           <apexchart type="donut" 
             :options="donutOptions"
             :series="donutChart"
