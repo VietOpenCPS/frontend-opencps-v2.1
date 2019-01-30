@@ -53,7 +53,6 @@
     <v-fab-transition>
     <v-btn
       v-if="isMobile"
-      v-show="!hidden"
       color="pink"
       fab
       dark

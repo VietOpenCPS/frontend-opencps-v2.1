@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="row-1">
+    <div class="row-1" style="    background-size: cover !important;    padding-top: 0 !important;
+    padding-bottom: 175px !important;">
       <div class="container">
         <div class="left">
           <div class="about">
@@ -35,7 +36,9 @@
   
         </div>
   
-        <div class="right">
+        <div class="right" style="
+    width: 100%;
+">
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
@@ -59,7 +62,9 @@
       </div>
     </div>
 
-    <div class="row-3">
+    <div class="row-3" style="
+    clear: both;
+">
       <div class="sub-text px-2">Công dân, Doanh nghiệp khai thác Dịch vụ công trực tuyến tại Cổng Dịch vụ công trực tuyến hoặc khai thác trực tiếp tại Trung tâm Phục vụ Hành chính công</div>
     </div>
   
