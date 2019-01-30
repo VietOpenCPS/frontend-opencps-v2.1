@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="row-1">
-      <div class="container">
-        <div class="left">
+    <div class="row-1 py-0">
+      <div class="container layout wrap py-0">
+        <div class="left flex xs12">
           <div class="about">
             <p>Giới thiệu</p>
             <span>Hệ thống Dịch vụ công trực tuyến Tỉnh Phú Thọ<br>
@@ -35,7 +35,7 @@
   
         </div>
   
-        <div class="right">
+        <div class="right flex xs12">
           <div class="head">TÌNH HÌNH XỬ LÝ HỒ SƠ</div>
   
           <div class="body">
