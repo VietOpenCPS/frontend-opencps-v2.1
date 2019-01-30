@@ -200,7 +200,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: data['groupId'] ? data['groupId'] : state.initData.groupId
             }
           }
           axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
