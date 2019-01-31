@@ -38,7 +38,6 @@
       </div>
     </v-navigation-drawer>
     <v-content>
-      {{ism}}///
       <router-view></router-view>
     </v-content>
     <v-fab-transition>

@@ -516,6 +516,7 @@ export default {
           vm.totalTTHC = totalXXX
         })
         vm.showTableTotal = false
+        vm.itemTotal = null
         vm.$store.dispatch('getReportTotal').then(function (result) {
           let agencyListsTotal = result
           for (let key in agencyListsTotal) {
@@ -526,7 +527,9 @@ export default {
               break
             }
           }
-          
+          if (vm.itemTotal === null) {
+            vm.showTableTotal = false
+          }
         })
       }
     })
