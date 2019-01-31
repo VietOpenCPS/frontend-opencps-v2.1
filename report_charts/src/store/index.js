@@ -98,7 +98,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getReportTotal ({commit, state}, filter) {
+    getReportTotal ({commit, state}, year) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -107,7 +107,7 @@ export const store = new Vuex.Store({
               Accept: 'application/json'
             }
           }
-          axios.get('/o/rest/statistics?year=' + (new Date()).getFullYear() + '&domain=total&agency=total&month=0', param).then(function (response) {
+          axios.get('/o/rest/statistics?year=' + year + '&domain=total&agency=total&month=0', param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
