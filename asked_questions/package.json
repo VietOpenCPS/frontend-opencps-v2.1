@@ -12,6 +12,7 @@
     "axios": "^0.18.0",
     "idempotent-babel-polyfill": "^7.0.0",
     "jquery": "^3.3.1",
+    "mobile-device-detect": "^0.2.3",
     "toastr": "^2.1.4",
     "vue": "^2.5.9",
     "vue-content-placeholders": "^0.2.1",

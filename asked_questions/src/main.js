@@ -8,7 +8,7 @@ import axios from 'axios'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import 'toastr/build/toastr.css'
 // import VueTrumbowyg from 'vue-trumbowyg'
-import 'trumbowyg/dist/ui/trumbowyg.css'
+// import 'trumbowyg/dist/ui/trumbowyg.css'
 
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 

@@ -19,6 +19,8 @@ export const store = new Vuex.Store({
     questionList: [],
     activeAddQuestion: false,
     activeGetQuestion: false,
+    questionPage: 1,
+    totalQuestion: 0,
     user: {
       'role': ''
     },
@@ -46,24 +48,60 @@ export const store = new Vuex.Store({
         if (state['user'].role === '') {
           store.dispatch('getRoleUser').then(function (result) {
             state['user'].role = result
+            commit('setInitData', state.initData)
+            resolve(state.initData)
           }).catch(function (error) {
             state['user'].role = ['default']
+            commit('setInitData', state.initData)
+            resolve(state.initData)
             console.log(error)
           })
+        } else {
+          commit('setInitData', state.initData)
+          resolve(state.initData)
         }
-        commit('setInitData', state.initData)
-        resolve(state.initData)
       })
     },
     getQuestions ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          let param
+          let admin = false
+          let roles = state['user'].role
+          if (!roles) {
+            admin = false
+          } else {
+            let roleExits = roles.findIndex(item => item === 'Administrator')
+            if (roleExits >= 0) {
+              admin = true
+            }
+          }
+          if (admin) {
+            param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              },
+              params: {
+                start: state.questionPage * 10 - 10,
+                end: state.questionPage * 10
+              }
+            }
+          } else {
+            param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              },
+              params: {
+                start: state.questionPage * 10 - 10,
+                end: state.questionPage * 10,
+                publish: 1
+              }
             }
           }
           axios.get(state.endPointApi + '/faq/questions', param).then(function (response) {
+            if (response.data && response.data['total']) {
+              commit('setTotalQuestion', response.data['total'])
+            }
             if (response.data && response.data['data']) {
               resolve(response.data['data'])
             } else {
@@ -192,6 +230,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    deleteQuestion ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          var url = state.endPointApi + '/faq/questions/' + filter['questionId']
+          axios.delete(url, param).then(response => {
+            resolve(response)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getAnswers ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -275,6 +332,12 @@ export const store = new Vuex.Store({
     },
     setActiveGetQuestion (state, payload) {
       state.activeGetQuestion = payload
+    },
+    setQuestionPage (state, payload) {
+      state.questionPage = payload
+    },
+    setTotalQuestion (state, payload) {
+      state.totalQuestion = payload
     }
   },
   getters: {
@@ -286,6 +349,12 @@ export const store = new Vuex.Store({
     },
     getQuestionList (state) {
       return state.questionList
+    },
+    getQuestionPage (state) {
+      return state.questionPage
+    },
+    getTotalQuestion (state) {
+      return state.totalQuestion
     },
     getActiveAddQuestion (state) {
       return state.activeAddQuestion

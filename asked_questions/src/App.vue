@@ -15,13 +15,13 @@
           </v-list-tile-action>
           <v-list-tile-content>
             <v-badge color="blue" right class="mt-1">
-              <span slot="badge">{{questionList.length}}</span>
+              <span slot="badge">{{totalQuestion}}</span>
               <span class="mr-2">Danh sách câu hỏi</span>
             </v-badge>
           </v-list-tile-content>
         </v-list-tile>
         <v-divider></v-divider>
-        <v-list-tile @click="getQuestionList" v-if="getUser('Administrator')">
+        <!-- <v-list-tile @click="getQuestionList" v-if="getUser('Administrator')">
           <v-list-tile-action class="ml-3">
             <v-icon color="green">question_answer</v-icon>
           </v-list-tile-action>
@@ -32,7 +32,7 @@
             </v-badge>
           </v-list-tile-content>
         </v-list-tile>
-        <v-divider v-if="getUser('Administrator')"></v-divider>
+        <v-divider v-if="getUser('Administrator')"></v-divider> -->
       </v-list>
     </v-navigation-drawer>
     <v-content>
@@ -61,6 +61,9 @@
       },
       activeGetQuestion () {
         return this.$store.getters.getActiveGetQuestion
+      },
+      totalQuestion () {
+        return this.$store.getters.getTotalQuestion
       }
     },
     created () {

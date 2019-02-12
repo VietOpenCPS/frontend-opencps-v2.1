@@ -16,27 +16,27 @@
               :key="indexQuestion">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
                 <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)" >
-                  <span class="text-bold primary--text">Câu hỏi {{indexQuestion+1}}. </span>
+                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}. </span>
                   <!-- <span class="text-bold">{{itemQuestion.content}}</span> -->
                   <div class="ml-2 mt-2" v-html="itemQuestion.content"></div>
                   <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:50px;top:0">
                     <v-tooltip top class="mr-1">
-                      <v-btn title="Thêm câu trả lời" class="my-0" icon slot="activator" style="margin-top:-8px!important"
+                      <v-btn title="Thêm câu trả lời" class="my-0" icon slot="activator" style="margin-top:-10px!important"
                        @click="addAnswer($event, itemQuestion, indexQuestion)">
                         <v-icon color="blue" size="24px">add</v-icon>
                       </v-btn>
                       <span>Thêm câu trả lời</span>
                     </v-tooltip>
-                    <!-- <v-tooltip top class="ml-2">
-                      <v-btn icon slot="activator" @click.native="deleteQuestion(itemQuestion)">
-                        <v-icon color="orange">bookmark</v-icon>
-                      </v-btn>
-                      <span>Xóa câu hỏi</span>
-                    </v-tooltip> -->
                     <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublic(itemQuestion, indexQuestion)"
                       label="Công khai"
                       v-model="itemQuestion['publish']"
                     ></v-checkbox>
+                    <v-tooltip top class="ml-2">
+                      <v-btn icon slot="activator" @click.stop="deleteQuestion(itemQuestion)" style="margin-top:-8px!important">
+                        <v-icon color="red">delete</v-icon>
+                      </v-btn>
+                      <span>Xóa câu hỏi</span>
+                    </v-tooltip>
                   </div>
                 </div>
                 <div v-if="loadingAnswer">
@@ -45,8 +45,8 @@
                   </content-placeholders>
                 </div>
                 <div v-else>
-                  <v-card flat v-if="answerList.length > 0">
-                    <div class="ml-3 my-1">
+                  <v-card flat v-if="answerList.length > 0" style="background-color:#e9e9e945">
+                    <div class="ml-3 py-1">
                       <i class="green--text text-bold">Trả lời: </i>
                     </div>
                     <v-card-text class="my-0 py-0">
@@ -59,7 +59,7 @@
                         >
                           <div>
                             <div style="position:relative">
-                              <span class="text-bold">Câu trả lời {{indexAnswer + 1}}. </span>
+                              <span class="text-bold">Câu trả lời {{ indexAnswer + 1}}. </span>
                               <!-- <span>{{ itemAnswer.content }}</span> -->
                               <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
                               <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
@@ -134,6 +134,12 @@
             </v-alert>
           </div>
         </v-card>
+        <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
+        </div>
       </v-flex>
       <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
         <div id="contentQuestion">
@@ -205,6 +211,7 @@ import $ from 'jquery'
 import support from '../../store/support.json'
 import toastr from 'toastr'
 import Captcha from './Captcha.vue'
+import TinyPagination from './Pagination.vue'
 import { VueEditor, Quill } from 'vue2-editor'
 Vue.use(toastr)
 
@@ -216,7 +223,8 @@ export default {
   props: [],
   components: {
     'captcha': Captcha,
-    VueEditor
+    VueEditor,
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
     answerList: [],
@@ -269,6 +277,15 @@ export default {
     },
     activeAddQuestion () {
       return this.$store.getters.getActiveAddQuestion
+    },
+    activeGetQuestion () {
+      return this.$store.getters.getActiveGetQuestion
+    },
+    questionPage () {
+      return this.$store.getters.getQuestionPage
+    },
+    totalQuestion () {
+      return this.$store.getters.getTotalQuestion
     }
   },
   created () {
@@ -315,6 +332,11 @@ export default {
         console.log(reject)
       })
     },
+    paggingData (config) {
+      let vm = this
+      vm.$store.commit('setQuestionPage', config.page)
+      vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+    },
     submitAddQuestion () {
       let vm = this
       if (!vm.$refs.captcha) {
@@ -327,7 +349,7 @@ export default {
             content: vm.content,
             fullname: vm.fullName,
             email: vm.contactEmail,
-            publish: 1,
+            publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
@@ -372,7 +394,19 @@ export default {
       }
     },
     deleteQuestion (item) {
-      console.log(item)
+      let vm = this
+      let x = confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')
+      if (x) {
+        let filter = {
+          questionId: item['questionId']
+        }
+        vm.$store.dispatch('deleteQuestion', filter).then(function (result) {
+          toastr.success('Xóa câu hỏi thành công')
+          vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+        }).catch(function (reject) {
+          console.log(reject)
+        })
+      }
     },
     changePublic (item, index) {
       let vm = this
@@ -441,16 +475,19 @@ export default {
     },
     deleteAnswer (item) {
       let vm = this
-      let filter = {
-        questionId: item['questionId'],
-        answerId: item['answerId']
+      let x = confirm('Bạn có chắc chắn xóa câu trả lời này?')
+      if (x) {
+        let filter = {
+          questionId: item['questionId'],
+          answerId: item['answerId']
+        }
+        vm.$store.dispatch('deleteAnswer', filter).then(function (result) {
+          toastr.success('Xóa câu trả lời thành công')
+          vm.getAnswerList(item)
+        }).catch(function (reject) {
+          console.log(reject)
+        })
       }
-      vm.$store.dispatch('deleteAnswer', filter).then(function (result) {
-        toastr.success('Xóa câu trả lời thành công')
-        vm.getAnswerList(item)
-      }).catch(function (reject) {
-        console.log(reject)
-      })
     },
     getPublic (val) {
       if (val === 1) {
@@ -480,10 +517,6 @@ export default {
   }
 }
 </script>
-<style>
-  .bg-gif-register {
-    background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;
-    padding-top: 77.961783%;
-    background-size: contain;
-  }
+<style scoped>
+  
 </style>
