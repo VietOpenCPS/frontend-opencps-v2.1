@@ -148,7 +148,7 @@ export default {
         groupId: ''
       }
       let groupIds = vm.groupIdArr.length
-      console.log('groupIds', groupIds)
+      console.log('groupIds', vm.groupIdArr)
       if (groupIds > 0) {
         let count = 0
         for (var key = 0; key < groupIds; key++) {
@@ -176,7 +176,9 @@ export default {
         vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
           vm.loading = false
           if (result.data) {
-            vm.dossierList.concat(result.data)
+            vm.dossierList = vm.dossierList.concat(result.data)
+            vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+            console.log('dosierLisst', vm.dossierList)
           }
         }).catch(reject => {
           vm.loading = false

@@ -9,8 +9,8 @@ Vue.use(toastr)
 export const store = new Vuex.Store({
   state: {
     initData: support.initData,
-    // endPoint: '/o/rest/v2',
-    endPoint: 'http://127.0.0.1:8081/api',
+    endPoint: '/o/rest/v2',
+    // endPoint: 'http://127.0.0.1:8081/api',
     originality: '',
     groupIdSite: '',
     totalEmployee: 0,
@@ -113,8 +113,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
-          axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -136,9 +136,7 @@ export const store = new Vuex.Store({
               toReceiveDate: filter.toDate
             }
           }
-          // test local
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
