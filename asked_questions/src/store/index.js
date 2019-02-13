@@ -17,6 +17,7 @@ export const store = new Vuex.Store({
     loading: false,
     index: 0,
     questionList: [],
+    questionDetail: '',
     activeAddQuestion: false,
     activeGetQuestion: false,
     questionPage: 1,
@@ -327,6 +328,9 @@ export const store = new Vuex.Store({
     setQuestionList (state, payload) {
       state.questionList = payload
     },
+    setQuestionDetail (state, payload) {
+      state.questionDetail = payload
+    },
     setActiveAddQuestion (state, payload) {
       state.activeAddQuestion = payload
     },
@@ -349,6 +353,9 @@ export const store = new Vuex.Store({
     },
     getQuestionList (state) {
       return state.questionList
+    },
+    getQuestionDetail (state) {
+      return state.questionDetail
     },
     getQuestionPage (state) {
       return state.questionPage

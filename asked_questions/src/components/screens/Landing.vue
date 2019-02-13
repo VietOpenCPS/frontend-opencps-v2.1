@@ -5,7 +5,8 @@
         <h3 v-if="getUser('Administrator')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
         <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
       </v-flex>
-      <v-flex xs12 sm12>
+      <!-- template cũ -->
+      <!-- <v-flex xs12 sm12>
         <content-placeholders v-if="loading" class="mt-3">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
@@ -17,7 +18,6 @@
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
                 <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)" >
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}. </span>
-                  <!-- <span class="text-bold">{{itemQuestion.content}}</span> -->
                   <div class="ml-2 mt-2" v-html="itemQuestion.content"></div>
                   <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:50px;top:0">
                     <v-tooltip top class="mr-1">
@@ -60,7 +60,6 @@
                           <div>
                             <div style="position:relative">
                               <span class="text-bold">Câu trả lời {{ indexAnswer + 1}}. </span>
-                              <!-- <span>{{ itemAnswer.content }}</span> -->
                               <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
                               <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
                                 <v-tooltip top class="mr-2">
@@ -94,11 +93,6 @@
                   </div>
                   <div class="px-3 pt-3">
                     <v-flex xs12 sm12 style="margin:0 auto">
-                      <!-- <v-textarea v-model="contentAnswer" box 
-                      label="Nội dung câu trả lời" rows="4"
-                      :rules="[rules.required]"
-                      required
-                      ></v-textarea> -->
                       <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
                     </v-flex>
                     <div>
@@ -134,7 +128,7 @@
             </v-alert>
           </div>
         </v-card>
-        <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+        <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-2" style="position: relative;">
           <div class="flex pagging-table px-2"> 
             <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
               @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -148,11 +142,6 @@
         </div>
         <div class="mx-1 my-2">
           <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
-          <!-- <v-textarea v-model="content" box 
-          label="Nội dung câu hỏi" rows="4"
-          :rules="[rules.required]"
-          required
-          ></v-textarea> -->
         </div>
         <div class="mx-2">
           <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
@@ -199,7 +188,125 @@
             </div>
           </v-form>
         </div>
+      </v-flex> -->
+      <!-- end -->
+
+      <!-- template mới -->
+      <v-layout justify-center v-if="totalQuestion > 0">
+        <v-flex xs12>
+          <v-card flat>
+            <v-container fluid grid-list-md>
+              <v-layout row wrap>
+                <v-flex
+                  v-for="(itemQuestion, indexQuestion) in questionList"
+                  xs12 sm4 md3
+                  :key="itemQuestion.questionId"
+                >
+                  <v-card style="cursor:pointer" flat color="#1a571b21" @click="viewDetail(itemQuestion)">
+                    <v-flex class="white--text py-2" style="background:#2196f3;font-size:12px">
+                      <span>{{itemQuestion.fullname}}</span>
+                      <span class="right">{{splitDate(itemQuestion.createDate)}}</span>
+                    </v-flex>
+                    <v-divider light></v-divider>
+                    <v-card-text style="height:120px;overflow:hidden;text-overflow:ellipsis" class="mb-2 py-2 px-1" v-html="itemQuestion.content">
+                    </v-card-text>
+                    <v-divider light></v-divider>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-tooltip top>
+                        <v-btn icon slot="activator" @click="addAnswer(itemQuestion)">
+                          <v-icon color="green" size="22px">announcement</v-icon>
+                        </v-btn>
+                        <span>Trả lời</span>
+                      </v-tooltip>
+                      <v-tooltip top class="ml-1" v-if="getUser('Administrator')">
+                        <v-btn icon slot="activator" @click.stop="changePublic(itemQuestion, indexQuestion)">
+                          <v-icon v-if="itemQuestion.publish === 1" color="blue" size="22px">visibility</v-icon>
+                          <v-icon v-else color="dark" size="22px">visibility_off</v-icon>
+                        </v-btn>
+                        <span v-if="itemQuestion.publish === 1">Bỏ công khai</span>
+                        <span v-else>Công khai</span>
+                      </v-tooltip>
+                      <v-tooltip top class="ml-1" v-if="getUser('Administrator')">
+                        <v-btn icon slot="activator" @click.stop="deleteQuestion(itemQuestion)">
+                          <v-icon color="red" size="22px">delete</v-icon>
+                        </v-btn>
+                        <span>Xóa</span>
+                      </v-tooltip>
+                    </v-card-actions>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <div v-if="totalQuestion > 0" class="text-xs-right layout wrap px-3 mt-2" style="position: relative;">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </v-card>
+        </v-flex>
+      </v-layout>
+      <div class="px-3 py-2" v-else style="width:!00%;max-width:960px;margin:0 auto">
+        <v-alert outline color="warning" icon="priority_high" :value="true">
+          Không có câu hỏi nào
+        </v-alert>
+      </div>
+      <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
+        <div id="contentQuestion">
+          <span><v-icon class="blue--text">contact_support</v-icon> </span>
+          <span class="text-bold primary--text">TẠO CÂU HỎI:</span>
+        </div>
+        <v-card flat class="mx-1 my-2">
+          <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
+        </v-card>
+        <div class="mx-2">
+          <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
+            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
+              <v-text-field
+                box
+                label="Họ tên"
+                v-model="fullName"
+                :rules="[rules.required]"
+                name="input-10-2"
+                min="6"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
+              <v-text-field
+                box
+                label="Thư điện tử"
+                v-model="contactEmail"
+                :rules="[rules.required, rules.email]"
+                name="input-10-2"
+                min="6"
+                required
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
+              <captcha ref="captcha"></captcha>
+            </v-flex>
+            <div class="text-xs-center my-2">
+              <v-btn color="primary"
+                :loading="loading"
+                :disabled="loading"
+                @click="submitAddQuestion"
+              >
+                <v-icon>how_to_reg</v-icon>&nbsp;
+                Gửi câu hỏi
+              </v-btn>
+              <v-btn color="primary"
+                @click="cancelAddQuestion"
+              >
+                <v-icon>clear</v-icon>&nbsp;
+                Hủy
+              </v-btn>
+            </div>
+          </v-form>
+        </div>
       </v-flex>
+      <!-- end -->
     </v-layout>
   </div>
 </template>
@@ -292,6 +399,16 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      if (newQuery.hasOwnProperty('crtQ')) {
+        vm.$store.commit('setActiveAddQuestion', true)
+        setTimeout (function () {
+          let elmnt = document.getElementById("contentQuestion")
+          elmnt.scrollIntoView()
+        }, 300)
+      }
+      vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
     })
   },
   updated () {
@@ -337,6 +454,13 @@ export default {
       vm.$store.commit('setQuestionPage', config.page)
       vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
     },
+    viewDetail (item) {
+      let vm = this
+      vm.$store.commit('setQuestionDetail', item)
+      vm.$router.push({
+        path: '/' + item.questionId
+      })
+    },
     submitAddQuestion () {
       let vm = this
       if (!vm.$refs.captcha) {
@@ -362,15 +486,12 @@ export default {
         }
       }
     },
-    addAnswer (event, item, index) {
+    addAnswer (item) {
       let vm = this
-      console.log(item)
-      if (vm.openQuestion === index) {
-        event.stopPropagation()
-        vm.questionSelected = index
-      } else {
-        vm.questionSelected = index
-      }
+      vm.$store.commit('setQuestionDetail', item)
+      vm.$router.push({
+        path: '/' + item.questionId
+      })
     },
     cancelAddQuestion () {
       let vm = this
@@ -410,12 +531,6 @@ export default {
     },
     changePublic (item, index) {
       let vm = this
-      console.log(item, index)
-      if (vm.questionList[index]['publish'] === 1) {
-        vm.questionList[index]['publish'] = 0
-      } else {
-        vm.questionList[index]['publish'] = 1
-      }
       let list = vm.questionList
       vm.$store.commit('setQuestionList', list)
       let filter = {
@@ -425,6 +540,11 @@ export default {
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
+        if (vm.questionList[index]['publish'] === 1) {
+          vm.questionList[index]['publish'] = 0
+        } else {
+          vm.questionList[index]['publish'] = 1
+        }
       }).catch(function (reject) {
         console.log(reject)
       })
@@ -504,6 +624,13 @@ export default {
       }
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
+    },
+    splitDate (createDate) {
+      if (createDate) {
+        return createDate.split(' ')[0]
+      } else {
+        return ''
+      }
     }
   },
   filters: {

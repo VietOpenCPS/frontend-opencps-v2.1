@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_asked_questions" >
-    <v-navigation-drawer app clipped floating width="250" >
+    <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
       <div class="mx-2 mb-2">
         <v-btn class="mx-0" block color="primary" v-on:click.native="addQuestion()"
         >
@@ -9,7 +9,7 @@
         </v-btn>
       </div>
       <v-list class="pt-0">
-        <v-list-tile @click="getQuestionList">
+        <v-list-tile @click="viewList">
           <v-list-tile-action class="ml-3">
             <v-icon color="primary">dashboard</v-icon>
           </v-list-tile-action>
@@ -35,7 +35,11 @@
         <v-divider v-if="getUser('Administrator')"></v-divider> -->
       </v-list>
     </v-navigation-drawer>
-    <v-content>
+    <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1200px;margin: 0 auto' : ''">
+      <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
+        <v-icon>near_me</v-icon>&nbsp;
+        Gửi câu hỏi
+      </v-btn>
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -71,8 +75,6 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        console.log('current', current)
-        console.log('newQuery', newQuery)
         vm.getQuestionList()
       })
     },
@@ -114,11 +116,22 @@
       },
       addQuestion () {
         let vm = this
-        vm.$store.commit('setActiveAddQuestion', true)
-        setTimeout (function () {
-          let elmnt = document.getElementById("contentQuestion")
-          elmnt.scrollIntoView()
-        }, 300)
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        if (current['name'] === 'Landing') {
+          vm.$store.commit('setActiveAddQuestion', true)
+          setTimeout (function () {
+            let elmnt = document.getElementById("contentQuestion")
+            elmnt.scrollIntoView()
+          }, 300)
+        } else {
+          vm.$router.push({
+            path: '/',
+            query: {
+              crtQ: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+            }
+          })
+        }
       },
       getUser (roleItem) {
         let vm = this
@@ -128,6 +141,12 @@
         }
         let roleExits = roles.findIndex(item => item === roleItem)
         return (roleExits >= 0)
+      },
+      viewList () {
+        let vm = this
+        vm.$router.push({
+          path: '/'
+        })
       }
     }
   }
