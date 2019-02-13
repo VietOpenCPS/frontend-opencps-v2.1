@@ -92,6 +92,7 @@
       var vm = this
       vm.$nextTick(function() {
         if (this.pk) {
+          this.className = this.pickItem['class_name']
           this.loadImageComponent()
         }
       })
@@ -113,6 +114,7 @@
           saveUrl: this.pickItem['upload_api'] + '/' + this.pk,
           removeUrl: this.pickItem['remove_api'] + '/' + this.pk,
         }
+        this.className = this.pickItem['class_name']
         this.loadImageComponent()
       }
     },
