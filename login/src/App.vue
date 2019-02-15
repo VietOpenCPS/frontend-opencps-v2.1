@@ -16,7 +16,7 @@
       <div class="login-wrapper">
         <div class="login-input">
           <div class="ico ico-user">
-            <input type="text" placeholder="Tài khoản đăng nhập" v-model="userName">
+            <input type="text" placeholder="Địa chỉ email đăng nhập" v-model="userName">
           </div>
           <div class="ico ico-pass">
             <input
