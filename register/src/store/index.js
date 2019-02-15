@@ -181,6 +181,13 @@ export const store = new Vuex.Store({
           // test local
           // axios.post('http://127.0.0.1:8081/api/applicants', dataPostApplicant, configs).then(function (response) {
           axios.post('/o/rest/v2/applicants/withcaptcha', dataPostApplicant, configs).then(function (response) {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject(xhr)
+            } else {
+              resolve(response.data)
+            }
             toastr.success('Đăng ký thành công')
             resolve(response.data)
           }).catch(function (errorRes, response) {
@@ -251,7 +258,7 @@ export const store = new Vuex.Store({
             toastr.success('Xác thực thành công')
           }).catch(function (xhr) {
             reject(xhr)
-            toastr.error('Xác thực thất bại. Vui lòng thử lại')
+            toastr.error('Mã pin không chính xác. Vui lòng kiểm tra lại')
           })
         })
       })

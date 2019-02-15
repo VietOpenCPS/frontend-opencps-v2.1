@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-layout class="mt-4" wrap style="max-width:550px;margin: 0 auto">
-      <nav class="toolbar theme--dark primary py-2" data-booted="true">
-        <div class="toolbar__content"  style="justify-content: center">
-          <h4>XÁC THỰC TÀI KHOẢN</h4>
+      <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
+        <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
+          <span class="text-bold">XÁC THỰC TÀI KHOẢN</span>
         </div>
       </nav>
       <v-flex xs12>
