@@ -340,7 +340,9 @@
             ĐÁNH GIÁ
           </v-btn>
         </v-tab>
-        <v-tab :key="2" href="#tabs-2b">
+        <v-tab :key="2" href="#tabs-2b" 
+          v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+        >
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             TRAO ĐỔI
           </v-btn>
@@ -381,7 +383,9 @@
               </div>
             </div>
           </v-tab-item>
-          <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition">
+          <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
+            v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
+          >
             <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
               <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -871,6 +875,10 @@ export default {
         if (vm.originality === 1 && resultDossier['dossierStatus'] === 'done') {
           vm.activeTab2 = 'tabs-1b'
           vm.loadVoting()
+        }
+        if (vm.originality === 1 && resultDossier['dossierStatus'] === 'new') {
+          vm.activeTab2 = 'tabs-3b'
+          vm.loadDossierLogs()
         }
         vm.runComment()
         vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {

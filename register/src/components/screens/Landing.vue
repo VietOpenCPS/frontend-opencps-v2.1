@@ -21,7 +21,7 @@
               </v-radio-group>
               <v-flex xs12>
                 <div style="position:relative">
-                  <span>{{applicantType ? 'Họ và tên' : 'Tên tổ chức, doanh nghiệp'}}</span> <span style="color:red">(*)</span>
+                  <span>{{applicantType ? 'Họ và tên ' : 'Tên tổ chức, doanh nghiệp '}}</span> <span style="color:red">(*)</span>
                   <v-tooltip left v-if="!applicantType && bussinessExits" style="position:absolute;top:-5px;right:-3px">
                     <v-btn slot="activator" class="my-0" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:26px!important;height:26px!important"
                     >
@@ -31,7 +31,7 @@
                   </v-tooltip>
                 </div>
                 <v-text-field
-                  :placeholder="applicantType ? 'Họ và tên' : 'Tên tổ chức, doanh nghiệp'"
+                  :placeholder="applicantType ? 'Họ và tên ' : 'Tên tổ chức, doanh nghiệp '"
                   v-model="applicantName"
                   box
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
@@ -41,9 +41,9 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <div><span>{{applicantType ? 'Số CMND/ Hộ chiếu' : 'Mã số thuế'}}</span> <span style="color:red">(*)</span></div>
+                <div><span>{{applicantType ? 'Số CMND/ Hộ chiếu ' : 'Mã số thuế '}}</span> <span style="color:red">(*)</span></div>
                 <v-text-field
-                  :placeholder="applicantType ? 'Số CMND/ Hộ chiếu' : 'Mã số thuế'"
+                  :placeholder="applicantType ? 'Số CMND/ Hộ chiếu ' : 'Mã số thuế '"
                   v-model="applicantIdNo"
                   box
                   :rules="applicantType ? [rules.required, rules.credit] : [rules.required, rules.taxCode]"
@@ -98,6 +98,7 @@
                 <v-text-field
                   placeholder="Số điện thoại"
                   v-model="contactTelNo"
+                  :rules="[rules.telNo]"
                   box
                 ></v-text-field>
               </v-flex>
@@ -280,9 +281,13 @@ export default {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
+      telNo: (value) => {
+        const pattern = /^(([0-9]{0,}))$/
+        return pattern.test(value) || 'Gồm các ký tự 0-9'
+      },
       passWord: (value) => {
-        const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])([0-9a-zA-Z@$!%*#?&]{8,}))$/
-        return pattern.test(value) || 'Mật khẩu ít nhất 8 ký tự và có chữ hoa, chữ thường'
+        const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+        return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
       },
       taxCode: (value) => {
         if (value.length === 10) {
@@ -364,10 +369,12 @@ export default {
             let filter = dataForm
             vm.$store.dispatch('postApplicant', filter).then(function (result) {
               vm.loading = false
-             vm.$router.push({
+              vm.$refs.captcha.makeImageCap()
+              vm.$router.push({
                 path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
               })
             }).catch(function (reject) {
+              vm.$refs.captcha.makeImageCap()
               vm.loading = false
             })
           }

@@ -78,7 +78,7 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
-        console.log('current', current)
+        vm.$store.commit('setGroupid', newQuery.hasOwnProperty('groupIds') ? newQuery['groupIds'] : '')
         $('.mWrapper > header').css('display', 'none')
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
@@ -100,6 +100,9 @@
     computed: {
       fullScreen () {
         return this.$store.getters.getFullScreen
+      },
+      groupIds () {
+        return this.$store.getters.getGroupid
       }
     },
     mounted () {
@@ -115,7 +118,9 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        console.log('currentQuery', currentQuery)
         console.log('newRoute', newRoute)
+        vm.$store.commit('setGroupid', currentQuery.hasOwnProperty('groupIds') ? currentQuery['groupIds'] : '')
         if (!currentQuery.hasOwnProperty('secretKey')) {
           // vm.setInterval()
           vm.isKios = true
@@ -166,7 +171,11 @@
           queryString = '/danh-gia-cldv'
         }
         vm.$router.push({
-          path: queryString
+          path: queryString,
+          query: {
+            groupIds: vm.groupIds,
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
         })
       }
     }
