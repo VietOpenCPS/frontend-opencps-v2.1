@@ -14,7 +14,7 @@
               >
                 <v-card color="#1a571b21">
                   <v-flex style="text-align: center!important;">
-                    <img v-if="employee['photoFileEntryId']" :src="employee.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
                     <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                   </v-flex>
                   <v-divider light></v-divider>
@@ -48,7 +48,7 @@
       </v-flex>
     </v-layout>
 
-        <v-dialog v-model="dialog_voting" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog_voting" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>Đánh giá cán bộ</v-toolbar-title>
@@ -92,7 +92,7 @@
             <v-flex xs12 sm3>
               <v-card flat color="#1a571b21" width="225px" max-height="350">
                 <v-flex style="text-align: center!important;">
-                  <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                 </v-flex>
                 <v-divider light></v-divider>
@@ -211,7 +211,7 @@
             <v-flex xs12 sm3>
               <v-card flat color="#1a571b21" width="225px" max-height="350">
                 <v-flex style="text-align: center!important;">
-                  <img v-if="employeeSelected['photoFileEntryId']" :src="employeeSelected.photoFileEntryId" style="width: 150px;height: 200px;object-fit: contain;"/>
+                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                 </v-flex>
                 <v-divider light></v-divider>
@@ -280,7 +280,6 @@ export default {
   },
   created () {
     var vm = this
-    console.log('landing---------', vm.itemCode)
     let currentQuery = vm.$router.history.current.query
     if (currentQuery.hasOwnProperty('itemName')) {
       vm.itemName = currentQuery.itemName
@@ -290,24 +289,36 @@ export default {
         itemCode: vm.itemCode
       }).then(result => {
         vm.employeeItems = result
-        // if (vm.employeeItems.length > 0) {
-        //   for (var i = 0; i < vm.employeeItems.length; i++) {
-        //     vm.getImageUsers(i, vm.employeeItems[i])
-        //   }
-        // }
-        console.log(vm.employeeItems)
       }).catch(xhr => {
       })
     })
   },
   watch: {
+    employeeItems () {
+      let vm = this
+      if (vm.employeeItems && vm.employeeItems.length > 0) {
+        for (let key in vm.employeeItems) {
+          vm.getAvatar(vm.employeeItems[key], key)
+        }
+      }
+    }
   },
   methods: {
-    getImageUsers (key, item) {
-      var vm = this
-      vm.$store.dispatch('loadImageEmployee', item).then(result => {
-        item['imageUrl'] = result
-      }).catch(xhr => {
+    getAvatar (item, key) {
+      let vm = this
+      let filter = {
+        employeeId: item.employeeId
+      }
+      vm.$store.dispatch('loadImageEmployee', filter).then(function (data) {
+        if (data !== '' && data !== null) {
+          let portalURL = ''
+          if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+            portalURL = window.themeDisplay.getPortalURL()
+          }
+          vm.employeeItems[key]['imgSrc'] = portalURL + data
+        }
+      }).catch(function (data) {
+        vm.employeeItems[key]['imgSrc'] = ''
       })
     },
     viewVotings (item, index) {
