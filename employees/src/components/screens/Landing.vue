@@ -346,8 +346,18 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.$nextTick(function () {
+        let sortEmployee = function (employeeList) {
+          function compare(a, b) {
+            if (a.employeeNo < b.employeeNo)
+              return -1
+            if (a.employeeNo > b.employeeNo)
+              return 1
+            return 0
+          }
+          return employeeList.sort(compare)
+        }
         vm.$store.dispatch('loadEmployees').then(result => {
-          vm.employeeItems = result
+          vm.employeeItems = sortEmployee(result)
         }).catch(xhr => {
         })
       })
