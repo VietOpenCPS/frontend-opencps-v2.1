@@ -164,7 +164,7 @@
                       </v-flex>
                       <v-flex xs12 class="px-1 pb-2">
                         <span class="text-bold"> Đơn vị: </span>
-                        <span>{{employeeSelected.workingUnit}}</span>
+                        <span>{{employeeSelected.workingUnitName}}</span>
                       </v-flex>
                       <v-flex xs12 class="px-1 pb-2">
                         <span class="text-bold"> Điện thoại: </span>
