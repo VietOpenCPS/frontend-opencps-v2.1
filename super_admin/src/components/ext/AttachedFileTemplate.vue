@@ -1,10 +1,12 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12 class="control-section uploader customdroparea">
+    <v-flex xs12 style="position:relative" class="control-section uploader customdroparea">
       <div class="control_wrapper">
         <div class="sample_wrapper">
             <div id="dropArea">
-                <span id="drop" class="droparea"> Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
+                <span id="drop" class="droparea" style="display: none;" > Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
+                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+                </ejs-uploader>
                 <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code === 'opencps_serviceinfo'">
                   <ul class="e-upload-files">
                     <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
@@ -111,8 +113,6 @@
                     </li>
                   </ul>
                 </div>
-                <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
-                </ejs-uploader>
             </div>
         </div>
       </div>

@@ -516,7 +516,8 @@ export default {
           vm.totalTTHC = totalXXX
         })
         vm.showTableTotal = false
-        vm.$store.dispatch('getReportTotal').then(function (result) {
+        vm.itemTotal = null
+        vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
           let agencyListsTotal = result
           for (let key in agencyListsTotal) {
             let currentData = agencyListsTotal[key]
@@ -526,7 +527,9 @@ export default {
               break
             }
           }
-          
+          if (vm.itemTotal === null) {
+            vm.showTableTotal = false
+          }
         })
       }
     })
@@ -741,6 +744,22 @@ export default {
     changeYear (item) {
       let vm = this
       vm.year = item
+      vm.showTableTotal = false
+      vm.itemTotal = null
+      vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
+        let agencyListsTotal = result
+        for (let key in agencyListsTotal) {
+          let currentData = agencyListsTotal[key]
+          if (currentData.domainName === '' && currentData.domainName === '') {
+            vm.itemTotal = currentData
+            vm.showTableTotal = true
+            break
+          }
+        }
+        if (vm.itemTotal === null) {
+          vm.showTableTotal = false
+        }
+      })
       vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {

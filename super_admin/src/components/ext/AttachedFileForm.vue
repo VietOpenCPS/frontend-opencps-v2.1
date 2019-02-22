@@ -1,14 +1,9 @@
 <template>
   <v-layout row wrap class="text-center" style="position: relative;">
-    <v-flex xs12 class="control-section file-preview py-0">
+    <v-flex xs12 style="position:relative" class="control-section uploader file-preview py-0">
       <div class="control_wrapper">
         <div id="dropAreaForm">
-          <span id="drop" class="droparea" style="
-              padding: 15px;
-              display: block;
-              border: 1px dashed rgb(148, 148, 148);
-              margin-top: 15px;
-          "> Kéo thả tệp tin hoặc <a href="javascript:;" id="browseForm" style="
+          <span id="drop" class="droparea" style="display: none;" > Kéo thả tệp tin hoặc <a href="javascript:;" id="browseForm" style="
               right: 20px;
               color: #0064c7;
               position: absolute;

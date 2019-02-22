@@ -328,6 +328,8 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let paramSearch = {
+            start: 0,
+            end: 1,
             agency: filter.agency ? filter.agency : '',
             service: filter.service ? filter.service : '',
             template: filter.template ? filter.template : '',

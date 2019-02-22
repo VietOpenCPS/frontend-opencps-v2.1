@@ -26,7 +26,9 @@ export const store = new Vuex.Store({
     activeDetailService: false,
     applicantIdNoSearch: '',
     dossierNoSearch: '',
-    fullScreen: false
+    fullScreen: false,
+    drawer: false,
+    ism: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -153,27 +155,54 @@ export const store = new Vuex.Store({
     goSignIn ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          console.log('filter login', filter)
-          axios.post('/o/gate/v2/login', {}, {
-            headers: {
-              'Authorization': 'BASIC ' + window.btoa(filter.applicantName + ':' + filter.password)
-            }
-          }).then(function (response) {
-            if (response.data !== '' && response.data !== 'ok') {
-              if (response.data === 'pending') {
-                window.location.href = window.themeDisplay.getURLHome() +
-                '/register#/xac-thuc-tai-khoan?active_user_id=' + window.themeDisplay.getUserId() +
-                  '&redirectURL=' + window.themeDisplay.getURLHome()
-              } else {
-                window.location.href = response.data
+          axios
+          .post(
+            "/o/v1/opencps/login",
+            {},
+            {
+              headers: {
+                Authorization:
+                  "BASIC " + window.btoa(filter.applicantName + ':' + filter.password)
               }
-            } else if (response.data === 'ok') {
-              window.location.href = window.themeDisplay.getURLHome()
-            } else {
-              toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác', { autoClose: 2000 })
             }
-          }).catch(function () {
-            toastr.error('Tên đăng nhập hoặc mật khẩu không chính xác', { autoClose: 2000 })
+          )
+          .then(function(response) {
+            if (
+              response.data !== "" &&
+              response.data !== "ok" &&
+              response.data !== "captcha"
+            ) {
+              if (response.data === "pending") {
+                window.location.href =
+                  window.themeDisplay.getURLHome() +
+                  "/register#/xac-thuc-tai-khoan?active_user_id=" +
+                  window.themeDisplay.getUserId() +
+                  "&redirectURL=" +
+                  window.themeDisplay.getURLHome();
+              } else {
+                window.location.href = response.data;
+              }
+            } else if (response.data === "ok") {
+              window.location.href = window.themeDisplay.getURLHome();
+            } else if (response.data === "captcha") {
+              let redirectURL = themeDisplay
+                .getLayoutRelativeURL()
+                .substring(
+                  0,
+                  themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
+                );
+              if (redirectURL !== "") {
+                window.location.href = redirectURL + "/register#/login";
+              } else {
+                window.location.href =
+                  themeDisplay.getURLHome() + "/register#/login";
+              }
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+            }
+          })
+          .catch(function(error) {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
           })
         })
       })
@@ -609,6 +638,12 @@ export const store = new Vuex.Store({
     },
     setDossierNoSearch (state, payload) {
       state.dossierNoSearch = payload
+    },
+    setdrawer (state, payload) {
+      state.drawer = payload
+    },
+    setism (state, payload) {
+      state.ism = payload
     }
   },
   getters: {
@@ -632,6 +667,12 @@ export const store = new Vuex.Store({
     },
     getDossierNoSearch (state) {
       return state.dossierNoSearch
+    },
+    getdrawer (state) {
+      return state.drawer
+    },
+    getism (state) {
+      return state.ism
     }
   }
 })

@@ -181,6 +181,12 @@ export default {
   computed: {
     filterDossierKey () {
       return this.$store.getters.getFilterDossierKey
+    },
+    groupIds () {
+      return this.$store.getters.getGroupid
+    },
+    groupIdArr () {
+      return this.getGroupIdArr(this.groupIds)
     }
   },
   created () {
@@ -301,55 +307,71 @@ export default {
         vm.validateTracuu = false
       }
     },
-    showMore () {
-      var vm = this
-      vm.hosoDatasPage += 1
-      vm.loadingTable = true
-      let currentQuery = router.history.current.query
-      var filter = null
-      filter = {
-        page: vm.hosoDatasPage,
-        dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
-        applicantName: currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '',
-        applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
-      }
-      vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
-        vm.loadingTable = false
-        let dossierMore = result.data
-        vm.dossierList = vm.dossierList.concat(dossierMore)
-      }).catch(reject => {
-        vm.loadingTable = false
-      })
-    },
     doLoadingDataHoSo () {
       let vm = this
       vm.dossierList = []
       vm.loadingTable = true
       let currentQuery = router.history.current.query
       var filter = null
-      filter = {
-        page: currentQuery.page ? currentQuery.page : 1,
-        dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
-        applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
-        secretCode: vm.filterDossierKey.secretCode
-      }
-      vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
-        vm.hosoDatasPage = currentQuery.page ? currentQuery.page : 1
-        vm.loadingTable = false
-        if (result.data) {
-          vm.dossierList = result.data
-          vm.dossierItemTotal = result.total
-          vm.totalPages = Number(result.total)
-        } else {
-          vm.dossierList = []
-          vm.dossierItemTotal = 0
+      let groupIds = vm.groupIdArr.length
+      console.log('groupIds', groupIds)
+      if (groupIds > 0) {
+        let totalRecord = 0
+        let count = 0
+        for (var key = 0; key < groupIds; key++) {
+          filter = {
+            page: currentQuery.page ? currentQuery.page : 1,
+            dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
+            applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+            secretCode: vm.filterDossierKey.secretCode,
+            groupId: vm.groupIdArr[key]
+          }
+          vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+            vm.hosoDatasPage = currentQuery.page ? currentQuery.page : 1
+            count += 1
+            totalRecord = (result.total > totalRecord) ? result.total : totalRecord
+            if (result.data) {
+              vm.dossierList = vm.dossierList.concat(result.data)
+            }
+            if (count === groupIds) {
+              vm.loadingTable = false
+              vm.dossierItemTotal = totalRecord
+              vm.totalPages = Number(totalRecord)
+            }
+          }).catch(reject => {
+            count += 1
+            if (count === groupIds) {
+              vm.loadingTable = false
+              vm.dossierItemTotal = totalRecord
+              vm.totalPages = Number(totalRecord)
+            }
+          })
         }
-      }).catch(reject => {
-        vm.loadingTable = false
-        vm.dossierList = []
-        vm.totalPages = 0
-        vm.dossierItemTotal = 0
-      })
+      } else {
+        filter = {
+          page: currentQuery.page ? currentQuery.page : 1,
+          dossierNo: currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '',
+          applicantIdNo: currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '',
+          secretCode: vm.filterDossierKey.secretCode
+        }
+        vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+          vm.hosoDatasPage = currentQuery.page ? currentQuery.page : 1
+          vm.loadingTable = false
+          if (result.data) {
+            vm.dossierList = result.data
+            vm.dossierItemTotal = result.total
+            vm.totalPages = Number(result.total)
+          } else {
+            vm.dossierList = []
+            vm.dossierItemTotal = 0
+          }
+        }).catch(reject => {
+          vm.loadingTable = false
+          vm.dossierList = []
+          vm.totalPages = 0
+          vm.dossierItemTotal = 0
+        })
+      }
     },
     viewDetail (item) {
       var vm = this
@@ -389,6 +411,13 @@ export default {
         })
       } else {
         vm.validPass = false
+      }
+    },
+    getGroupIdArr (groupIds) {
+      if (groupIds) {
+        return groupIds.split(',')
+      } else {
+        return []
       }
     },
     paggingData (config) {
