@@ -995,7 +995,10 @@ export default {
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
+                console.log('keyMappingXXTT: ', keyMappingXXTT)
+                console.log('currentConfigXXTT: ', currentConfigXXTT)
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
+                  console.log('replate: ', currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT'))
                   dataTextXXTT = Math.round(eval(currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')))
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '

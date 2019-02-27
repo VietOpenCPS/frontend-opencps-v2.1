@@ -20,6 +20,8 @@
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=4243424243241111243" rel="stylesheet" type="text/css">
 	<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=6564464123" rel="stylesheet" type="text/css">
 
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/chunk-vendors.css?t=211232123214" rel="stylesheet">
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123214" rel="stylesheet">
 	<!-- Mainly scripts -->
 	<script>
         window.__define = window.define;
@@ -91,11 +93,13 @@
 			<a href="${site_default_url}" class="logo align-middle">
 				<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 				<div class="text-logo">
-					${site_name}
-					<span>HỆ THỐNG MỘT CỬA ĐIỆN TỬ VÀ DỊCH VỤ CÔNG TRỰC TUYẾN</span>
+					<span>${site_name}</span>
+					Cổng dịch vụ công trực tuyến
 				</div>
 			</a>
-			<div id="react-root" style="float: right;width: 100%;"></div>
+			<div id="react-root" style="float: right;width: 100%;height: 71px;">
+				<div id="app_login"></div>
+			</div>
 		</div>
 	</header>
 		
@@ -126,10 +130,9 @@
 	            	Cổng dịch vụ công trực tuyến
 	            	<span>${sitename}</span>
 	            </div>
-	            <div>Chịu trách nhiệm chính: ${main_responsibility}</div>
 	        </div>
 	        <div class="contact">
-	            <p>Địa chỉ: <b>${address}</b></p>
+	            <p>Địa chỉ cơ quan: <b>${address}</b></p>
 	            <p>Điện thoại: <b>${phone}</b></p>
 	            <p>Email: <b>${email}</b></p>
 	        </div>
@@ -139,7 +142,8 @@
 </div>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/bundle.js?t=65722572255"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/app.js"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/chunk-vendors.js"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />

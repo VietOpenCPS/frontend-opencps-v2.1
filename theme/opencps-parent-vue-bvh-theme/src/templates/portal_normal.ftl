@@ -22,6 +22,9 @@
 	
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=123122111991223" rel="stylesheet" type="text/css">
 
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/chunk-vendors.css?t=211232123214" rel="stylesheet">
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123214" rel="stylesheet">
+	
 	<#if permissionChecker.isOmniadmin()>
 		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=123122111299123" rel="stylesheet" type="text/css">
 	</#if>
@@ -80,13 +83,15 @@
 				<a href="${site_default_url}">
 					<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 					<div class="text-logo">
-						Cổng dịch vụ công trực tuyến
 						<span>${site_name}</span>
+						Cổng dịch vụ công trực tuyến
 					</div>
 				</a>
 			</div>
 			
-			<div id="react-root" style="float: right;width: 100%;"></div>
+			<div id="react-root" style="float: right;width: 100%;height: 71px;">
+				<div id="app_login"></div>
+			</div>
 
 		</div>
 	</header>
@@ -106,10 +111,9 @@
 	            	Cổng dịch vụ công trực tuyến
 	            	<span>${sitename}</span>
 	            </div>
-	            <div>Chịu trách nhiệm chính: ${main_responsibility}</div>
 	        </div>
 	        <div class="contact">
-	            <p>Địa chỉ: <b>${address}</b></p>
+	            <p>Địa chỉ cơ quan: <b>${address}</b></p>
 	            <p>Điện thoại: <b>${phone}</b></p>
 	            <p>Email: <b>${email}</b></p>
 	        </div>
@@ -118,7 +122,8 @@
 	</footer>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=1231231"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/app.js"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/chunk-vendors.js"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />

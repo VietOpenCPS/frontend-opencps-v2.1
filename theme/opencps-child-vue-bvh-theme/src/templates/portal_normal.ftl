@@ -20,6 +20,8 @@
 	
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=12312211199123" rel="stylesheet" type="text/css">
 
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/chunk-vendors.css?t=211232123214" rel="stylesheet">
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123214" rel="stylesheet">
 	<#if permissionChecker.isOmniadmin()>
 		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=12312211199123" rel="stylesheet" type="text/css">
 	</#if>
@@ -82,7 +84,9 @@
 				</a>
 			</div>
 			
-			<div id="react-root" style="float: right;width: 100%;"></div>
+			<div id="react-root" style="float: right;width: 100%;height: 71px;">
+				<div id="app_login"></div>
+			</div>
 
 		</div>
 	</header>
@@ -113,7 +117,8 @@
 </div>
 
 <!-- inject:js -->
-	<script type="text/javascript" src="${themeDisplay.getPathThemeRoot()}/js/login.js?t=123"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/app.js"></script>
+	<script type="text/javascript" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/login/app/js/chunk-vendors.js"></script>
 	<#if permissionChecker.isOmniadmin()>
 		<@liferay_util["include"] page=body_bottom_include />
 		<@liferay_util["include"] page=bottom_include />
