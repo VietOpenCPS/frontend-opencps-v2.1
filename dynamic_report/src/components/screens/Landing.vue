@@ -997,10 +997,10 @@ export default {
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   console.log('dataInputXXTT: ', dataInputXXTT)
-                  console.log('dataInputXXTT.releaseCount: ', dataInputXXTT["releaseCount"])
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
                   console.log('replate: ', calu)
-                  console.log('eval(calu): ', eval(calu))
+                  console.log('eval(calu): ', eval('dataInputXXTT["releaseCount"]'))
+                  console.log('eval(calu2): ', eval('dataInputXXTT["releaseCount"] === 0 ? 100 : (dataInputXXTT["ontimeCount"] + dataInputXXTT["betimesCount"]) * 100 / dataInputXXTT["releaseCount"]'))
                   dataTextXXTT = Math.round(eval(calu))
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
