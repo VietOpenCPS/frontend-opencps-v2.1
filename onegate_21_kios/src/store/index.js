@@ -129,7 +129,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: filter['groupId'] ? filter['groupId'] : state.initData.groupId
             },
             params: {
               fromReceiveDate: filter.fromDate,

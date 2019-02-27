@@ -345,8 +345,8 @@
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
-            vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.EmployeeAvatar'
-            vm.item['class_name'] = 'org.opencps.usermgt.model.EmployeeAvatar'
+            vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
+            vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
           }
           if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
             vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])

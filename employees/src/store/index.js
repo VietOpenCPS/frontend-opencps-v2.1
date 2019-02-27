@@ -79,6 +79,29 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getImageComponent ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+          // axios.get(state.endPointApi + '/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'], param).then(function (response) {
+          //   let seriable = response.data
+          //   resolve(seriable.img)
+          // }).catch(function (xhr) {
+          //   reject(xhr)
+          // })
+        })
+      })
+    },
     loadEmployees ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         // commit('setLoading', true)
@@ -90,7 +113,13 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/employees', param).then(result => {
             if (result.data) {
-              resolve(result.data.data)
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                }
+              }
+              resolve(employees)
             } else {
               resolve([])
             }

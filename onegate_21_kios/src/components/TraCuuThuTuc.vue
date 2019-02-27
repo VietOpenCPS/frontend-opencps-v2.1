@@ -203,6 +203,7 @@ export default {
     listThuTuc: [],
     govAgencyList: [],
     govAgencySelected: {},
+    groupIdSelected: '',
     serviceItemTotal: 0,
     pageListLinhVuc: 1,
     pageListThuTuc: 1,
@@ -243,6 +244,13 @@ export default {
   computed: {
     activeDetailService () {
       return this.$store.getters.getActiveDetailService
+    },
+    groupIds () {
+      return this.$store.getters.getGroupid
+    },
+    groupIdArr () {
+      console.log('groupIds', this.getGroupIdArr(this.groupIds))
+      return this.getGroupIdArr(this.groupIds)
     }
   },
   created () {
@@ -254,47 +262,66 @@ export default {
       let newQuery = current.query
       vm.loading = true
       vm.listThuTuc = []
-      vm.$store.dispatch('getGovAgency').then(function (result) {
-        vm.loading = false
-        vm.govAgencyList = result
-        if (vm.govAgencyList.length > 0) {
-          // vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
-          $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
-          vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
-          vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-          vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
-          if (vm.govAgencySelected) {
-            vm.loading = true
-            let filter = {
-              page: newQuery.page ? newQuery.page : 1,
-              administrationCode: vm.govAgencySelected
-            }
-            vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
-              vm.loading = false
-              if (result.data) {
-                vm.listLinhVuc = result.data
-                vm.totalPaggingLinhVuc = Number(result.total)
-              } else {
-                vm.listLinhVuc = []
-                vm.totalPaggingLinhVuc = 0
-              }
-              vm.pageListLinhVuc = Number(newQuery.page) ? Number(newQuery.page) : 1
-              if (vm.govAgencySelected && vm.linhVucSelected) {
-                vm.doLoadingThuTuc()
-              }
-            }).catch(reject => {
-              vm.listLinhVuc = []
-              vm.totalPaggingLinhVuc = 0
-              vm.loading = false
-            })
+      let groupIds = vm.groupIdArr.length
+      if (groupIds > 0) {
+        let count = 0
+        for (var key = 0; key < groupIds; key++) {
+          let filter = {
+            groupId: vm.groupIdArr[key]
           }
+          console.log('filter', filter)
+          vm.$store.dispatch('getGovAgency', filter).then(function (result) {
+            count += 1
+            result[0] = Object.assign(result[0], {groupId: vm.groupIdArr[key]})
+            vm.govAgencyList = vm.govAgencyList.concat(result)
+            if (count === groupIds) {
+              vm.loading = false
+              if (vm.govAgencyList.length > 0) {
+                $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+                vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
+                vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+                vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+                if (groupIds === 1) {
+                  vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                }
+                vm.filterGovagency()
+              }
+            }
+          }).catch(reject => {
+            if (count === groupIds) {
+              vm.loading = false
+              if (vm.govAgencyList.length > 0) {
+                $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+                vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
+                vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+                vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+                if (groupIds === 1) {
+                  vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                  console.log('govAgencySelected', vm.govAgencySelected)
+                }
+                vm.filterGovagency()
+              }
+            }
+          })
         }
-      }).catch(reject => {
-        vm.loading = false
-      })
-      // vm.$store.dispatch('getLevelLists').then(function (result) {
-      //   vm.listMucDo = result
-      // })
+      } else {
+        let filter = {
+          groupId: ''
+        }
+        vm.$store.dispatch('getGovAgency', filter).then(function (result) {
+          vm.govAgencyList = result
+          vm.loading = false
+          if (vm.govAgencyList.length > 0) {
+            $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+            vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
+            vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+            vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+            vm.filterGovagency()
+          }
+        }).catch(reject => {
+          vm.loading = false
+        })
+      }
     })
   },
   watch: {
@@ -402,8 +429,43 @@ export default {
         vm.serviceItemTotal = 0
       })
     },
+    filterGovagency () {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      if (vm.govAgencySelected) {
+        vm.loading = true
+        let filter = {
+          page: newQuery.page ? newQuery.page : 1,
+          administrationCode: vm.govAgencySelected
+        }
+        vm.$store.dispatch('getDomainListsPublic', filter).then(function (result) {
+          vm.loading = false
+          if (result.data) {
+            vm.listLinhVuc = result.data
+            vm.totalPaggingLinhVuc = Number(result.total)
+          } else {
+            vm.listLinhVuc = []
+            vm.totalPaggingLinhVuc = 0
+          }
+          vm.pageListLinhVuc = Number(newQuery.page) ? Number(newQuery.page) : 1
+          if (vm.govAgencySelected && vm.linhVucSelected) {
+            vm.doLoadingThuTuc()
+          }
+        }).catch(reject => {
+          vm.listLinhVuc = []
+          vm.totalPaggingLinhVuc = 0
+          vm.loading = false
+        })
+      }
+    },
     changeAdministration () {
       var vm = this
+      console.log('vm.groupIdSelected', vm.govAgencyList, vm.govAgencySelected)
+      vm.groupIdSelected = vm.govAgencyList.filter(function (item) {
+        return item['administrationCode'] === vm.govAgencySelected
+      })[0]['groupId']
+      console.log('vm.groupIdSelected', vm.groupIdSelected)
       vm.showListThuTuc = false
       vm.listLinhVuc = []
       vm.linhVucSelected = ''
@@ -472,6 +534,13 @@ export default {
       vm.$router.push({
         path: current.path + queryString
       })
+    },
+    getGroupIdArr (groupIds) {
+      if (groupIds) {
+        return groupIds.split(',')
+      } else {
+        return []
+      }
     },
     paggingData (config) {
       let vm = this

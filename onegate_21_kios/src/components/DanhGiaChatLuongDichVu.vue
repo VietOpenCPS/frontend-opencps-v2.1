@@ -13,7 +13,7 @@
     <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.itemName}}</v-btn>
+          <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
         </v-flex>
       </v-layout>
     </div>
@@ -50,6 +50,15 @@ export default {
       useKbEvents: false
     }
   }),
+  computed: {
+    groupIds () {
+      return this.$store.getters.getGroupid
+    },
+    groupIdArr () {
+      console.log('groupIds', this.getGroupIdArr(this.groupIds))
+      return this.getGroupIdArr(this.groupIds)
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
@@ -57,18 +66,69 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+      //
+      // if (vm.govAgencySelected) {
+      //   vm.detailActive = true
+      //   if (vm.govAgencyList.length === 0) {
+      //     vm.$store.dispatch('getGovAgency').then(function (result) {
+      //       vm.govAgencyList = result
+      //     }).catch(reject => {})
+      //   }
+      // } else {
+      //   vm.detailActive = false
+      //   vm.$store.dispatch('getGovAgency').then(function (result) {
+      //     vm.govAgencyList = result
+      //   }).catch(reject => {})
+      // }
+      //
+      let groupIds = vm.groupIdArr.length
       if (vm.govAgencySelected) {
         vm.detailActive = true
-        if (vm.govAgencyList.length === 0) {
-          vm.$store.dispatch('getGovAgencyDictItem').then(function (result) {
-            vm.govAgencyList = result
-          }).catch(reject => {})
-        }
       } else {
         vm.detailActive = false
-        vm.$store.dispatch('getGovAgencyDictItem').then(function (result) {
+      }
+      if (groupIds > 0) {
+        let count = 0
+        for (var key = 0; key < groupIds; key++) {
+          let filter = {
+            groupId: vm.groupIdArr[key]
+          }
+          console.log('filter', filter)
+          vm.$store.dispatch('getGovAgency', filter).then(function (result) {
+            count += 1
+            result[0] = Object.assign(result[0], {groupId: vm.groupIdArr[key]})
+            vm.govAgencyList = vm.govAgencyList.concat(result)
+            if (count === groupIds) {
+              if (vm.govAgencyList.length > 0) {
+                vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+                if (groupIds === 1) {
+                  vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                }
+              }
+            }
+          }).catch(reject => {
+            if (count === groupIds) {
+              if (vm.govAgencyList.length > 0) {
+                vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+                if (groupIds === 1) {
+                  vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                  console.log('govAgencySelected', vm.govAgencySelected)
+                }
+              }
+            }
+          })
+        }
+      } else {
+        let filter = {
+          groupId: ''
+        }
+        vm.$store.dispatch('getGovAgency', filter).then(function (result) {
           vm.govAgencyList = result
-        }).catch(reject => {})
+          if (vm.govAgencyList.length > 0) {
+            vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+          }
+        }).catch(reject => {
+        })
       }
     })
   },
@@ -93,11 +153,11 @@ export default {
   methods: {
     votingDetail (item) {
       var vm = this
-      vm.govAgencySelected = item.itemCode
+      vm.govAgencySelected = item.administrationCode
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['administration'] = item.itemCode
+      newQuery['administration'] = item.administrationCode
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'
@@ -114,13 +174,20 @@ export default {
       var vm = this
       if (arg) {
         let value = vm.govAgencyList.filter(function (item) {
-          return item.itemCode.toString() === arg.toString()
+          return item.administrationCode.toString() === arg.toString()
         })
         if (value.length > 0) {
-          return value[0].itemName
+          return value[0].administrationName
         }
       } else {
         return ''
+      }
+    },
+    getGroupIdArr (groupIds) {
+      if (groupIds) {
+        return groupIds.split(',')
+      } else {
+        return []
       }
     },
     paggingData (config) {
