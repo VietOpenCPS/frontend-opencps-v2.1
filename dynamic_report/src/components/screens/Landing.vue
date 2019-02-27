@@ -990,19 +990,18 @@ export default {
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
-              let dataInputXXTT = ''
-              dataInputXXTT = resultDataTotal[keyXXTT]
               for (let keyMappingXXTT in vm.itemsReportsConfig) {
                 let dataTextXXTT = ''
                 let currentConfigXXTT = vm.itemsReportsConfig[keyMappingXXTT]
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
+                  var dataInputXXTT = resultDataTotal[keyXXTT]
                   console.log('dataInputXXTT: ', dataInputXXTT)
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
                   console.log('replate: ', calu)
                   let dkmssss = {abc:1}
                   console.log('dkmssss: ', dkmssss)
                   console.log('dkmssss abc: ', eval('( dkmssss["abc"] )'))
-                  console.log('eval(calu): ', eval('( dataInputXXTT["releaseCount"] )'))
+                  console.log('eval(calu): ', eval('( dataInputXXTT["betimesCount"] )'))
                   console.log('eval(calu2): ', eval('( dataInputXXTT["releaseCount"] === 0 ? 100 : (dataInputXXTT["ontimeCount"] + dataInputXXTT["betimesCount"]) * 100 / dataInputXXTT["releaseCount"] )'))
                   dataTextXXTT = Math.round(eval(calu))
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
