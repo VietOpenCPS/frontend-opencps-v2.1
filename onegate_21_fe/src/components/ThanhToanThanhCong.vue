@@ -14,8 +14,11 @@
       </div>
       <div>
         <div class="mx-2 my-3">
-          <v-alert outline :value="true" type="success">
+          <v-alert v-if="statusDeal" outline :value="true" type="success">
             Giao dịch thanh toán thành công
+          </v-alert>
+          <v-alert v-else outline :value="true" type="error">
+            Giao dịch thực hiện thất bại. {{keypayStatusText}}
           </v-alert>
         </div>
         <v-card class="mx-2">
@@ -44,15 +47,15 @@
                       <td><span class="text-bold">Tổng tiền</span></td>
                       <td><span>{{currency(dossierDetail.paymentAmount)}} VNĐ</span></td>
                     </tr>
-                    <tr>
+                    <tr v-if="statusDeal">
                       <td><span class="text-bold">Mã giao dịch trực tuyến</span></td>
                       <td><span>{{dossierDetail.transId}}</span></td>
                     </tr>
-                    <tr>
+                    <tr v-if="statusDeal">
                       <td><span class="text-bold">Mã tra cứu trên cổng thanh toán</span></td>
                       <td><span>{{dossierDetail.goodCode}}</span></td>
                     </tr>
-                    <tr>
+                    <tr v-if="statusDeal">
                       <td><span class="text-bold">Cổng thanh toán</span></td>
                       <td><span>{{dossierDetail.paymentPortal}}</span></td>
                     </tr>
@@ -76,6 +79,8 @@ export default {
   data: () => ({
     loading: true,
     loadingAction: false,
+    statusDeal: false,
+    keypayStatusText: '',
     dossierDetail: {
       serviceName: '',
       dossierNo: '',
@@ -85,6 +90,53 @@ export default {
       transId: '',
       goodCode: '',
       paymentPortal: ''
+    },
+    keypayStatusCode: {
+      "00": "Thành công",
+      "01": "Đại lý không tồn tại trong hệ thống",
+      "02": "Chuỗi mã hóa không hợp lệ",
+      "03": "Mã giao dịch đại lý không hợp lệ",
+      "04": "Không tìm thấy giao dịch trong hệ thống",
+      "05": "Mã dịch vụ không hợp lệ",
+      "06": "Lỗi xác nhận giao dịch: giao dịch đã được xác nhận (thành công/ không thành công trước đó và không thể xác nhận lại)",
+      "07": "Mã quốc gia không hợp lệ",
+      "08": "Không nhận được thông điệp trả về từ Ngân Hàng",
+      "09": "Mô tả đơn hàng không hợp lệ",
+      "10": "Mã đơn hàng không hợp lệ",
+      "11": "Số tiền không hợp lệ",
+      "12": "Phí vận chuyển không hợp lệ",
+      "13": "Thuế không hợp lệ",
+      "14": "Đại lý chưa được cấu hình phí",
+      "15": "Sai mã Ngân hàng",
+      "16": "Số tiền thanh toán của Đại lý không nằm trong khoảng cho phép",
+      "17": "Tài khoản không đủ tiền",
+      "18": "Khách hàng đã Hủy giao dịch",
+      "19": "Thời gian thanh toán không hợp lệ",
+      "20": "Kiểu nhận mã OTP không hợp lệ",
+      "21": "Mã OTP sai",
+      "25": "Nhập sai thông tin chủ thẻ lần 1",
+      "26": "Nhập sai thông tin chủ thẻ lần 2",
+      "27": "Nhập sai thông tin chủ thẻ lần 3",
+      "30": "Phiên bản không hợp lệ",
+      "31": "Mã lệnh không hợp lệ",
+      "32": "Loại tiền tệ không hợp lệ",
+      "33": "Ngôn ngữ không hợp lệ",
+      "34": "Thông tin thêm (desc 1) không hợp lệ",
+      "35": "Thông tin thêm (desc 2) không hợp lệ",
+      "36": "Thông tin thêm (desc 3) không hợp lệ",
+      "37": "Thông tin thêm (desc 4) không hợp lệ",
+      "38": "Thông tin thêm (desc 5) không hợp lệ",
+      "39": "Chuỗi trả về - Return URL không hợp lệ",
+      "40": "Loại thẻ không hợp lệ",
+      "41": "Thẻ nghi vấn (thẻ đánh mất, hot card)",
+      "54": "Thẻ hết hạn",
+      "57": "Chưa đăng ký dịch vụ thanh toán trực tuyến",
+      "61": "Quá hạn mức giao dịch trong ngày",
+      "62": "Thẻ bị khóa",
+      "65": "Quá hạn mức 1 lần giao dịch",
+      "97": "Ngân hàng chưa sẵn sàng",
+      "98": "Giao dịch không",
+      "99": "Lỗi hệ thống"
     }
   }),
   computed: {},
@@ -93,10 +145,17 @@ export default {
     vm.$nextTick(function () {
       var vm = this
       let query = vm.$router.history.current.query
+      let responseCode = query.hasOwnProperty('response_code') ? query.response_code : ''
       let dossierId = query.hasOwnProperty('dossierId') ? query.dossierId : ''
       let referenceUidQuery = query.hasOwnProperty('referenceUid') ? query.referenceUid : ''
       let actionCode = query.hasOwnProperty('actionCode') ? query.actionCode : ''
       if (dossierId) {
+        if (responseCode === '00') {
+          vm.statusDeal = true
+        } else {
+          vm.statusDeal = false
+          vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
+        }
         vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
           vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
