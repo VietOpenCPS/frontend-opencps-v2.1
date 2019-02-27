@@ -386,7 +386,6 @@
           <v-tab-item value="tabs-2b" :key="2" reverse-transition="fade-transition" transition="fade-transition"
             v-if="(originality === 1 && thongTinChiTietHoSo['dossierStatus'] !== 'new') || originality === 3"
           >
-            <!-- Trao đổi thảo luận -->
             <div v-if="thongTinChiTietHoSo.online && !thongTinChiTietHoSo.originDossierNo">
               <v-expansion-panel :value="[true]" expand  class="expansion-pl">
                 <v-expansion-panel-content hide-actions :key="1">
