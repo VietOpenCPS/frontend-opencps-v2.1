@@ -114,6 +114,12 @@ export default {
   computed: {
     fullScreen () {
       return this.$store.getters.getFullScreen
+    },
+    groupIds () {
+      return this.$store.getters.getGroupid
+    },
+    groupIdArr () {
+      return this.getGroupIdArr(this.groupIds)
     }
   },
   created () {
@@ -137,26 +143,60 @@ export default {
       let vm = this
       vm.dossierList = []
       vm.loading = true
-      var filter = {
-        fromDate: vm.fromDate(),
-        toDate: vm.fromDate()
-      }
-      vm.$store.dispatch('loadingDataHoSoTN', filter).then(function (result) {
-        vm.loading = false
-        if (result.data) {
-          vm.dossierList = result.data
-          vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
-        } else {
-          vm.dossierList = []
+      let groupIds = vm.groupIdArr.length
+      if (groupIds > 0) {
+        let count = 0
+        for (var key = 0; key < groupIds; key++) {
+          let filter = {
+            fromDate: vm.fromDate(),
+            toDate: vm.fromDate(),
+            groupId: vm.groupIdArr[key]
+          }
+          console.log('filter', filter)
+          vm.$store.dispatch('loadingDataHoSoTN', filter).then(function (result) {
+            count += 1
+            if (result.data) {
+              vm.dossierList = vm.dossierList.concat(result.data)
+            }
+            if (count === groupIds) {
+              console.log('dossierList', vm.dossierList)
+              vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+              vm.loading = false
+            }
+          }).catch(reject => {
+            count += 1
+            if (count === groupIds) {
+              vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+              vm.loading = false
+            }
+          })
         }
-      }).catch(reject => {
-        vm.loading = false
-        vm.dossierList = []
-      })
+      } else {
+        let filter = {
+          fromDate: vm.fromDate(),
+          toDate: vm.fromDate()
+        }
+        vm.$store.dispatch('loadingDataHoSoTN', filter).then(function (result) {
+          vm.loading = false
+          if (result.data) {
+            vm.dossierList = result.data
+            vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+          }
+        }).catch(reject => {
+          vm.loading = false
+        })
+      }
     },
     changeScreen () {
       var vm = this
       vm.$store.commit('setFullScreen', !vm.fullScreen)
+    },
+    getGroupIdArr (groupIds) {
+      if (groupIds) {
+        return groupIds.split(',')
+      } else {
+        return []
+      }
     },
     fromDate () {
       let value = new Date()
