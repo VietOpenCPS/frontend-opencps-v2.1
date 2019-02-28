@@ -329,23 +329,25 @@ export default {
       if (vm.isSignedIn) {
         vm.userData = {};
         vm.pullNotificationCount();
-        let param = {
-          responseType: "blob"
-        };
-        axios
-          .get("/o/v1/opencps/users/" + themeDisplay.getUserId(), param)
-          .then(function(response) {
-            vm.userData = response.data;
-            vm.avatarURL = vm.userData["avatar"];
-            if (vm.avatarURL.includes("img_id=0")) {
+        setTimeout(() => {
+          let param = {
+            responseType: "blob"
+          };
+          axios
+            .get("/o/v1/opencps/users/" + themeDisplay.getUserId(), param)
+            .then(function(response) {
+              vm.userData = response.data;
+              vm.avatarURL = vm.userData["avatar"];
+              if (vm.avatarURL.includes("img_id=0")) {
+                vm.avatarURL = "";
+              }
+              vm.userNameLogin = vm.userData["userName"];
+              vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
+            })
+            .catch(function(error) {
               vm.avatarURL = "";
-            }
-            vm.userNameLogin = vm.userData["userName"];
-            vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
-          })
-          .catch(function(error) {
-            vm.avatarURL = "";
-          });
+            });
+        }, 1000);
       }
     });
   },

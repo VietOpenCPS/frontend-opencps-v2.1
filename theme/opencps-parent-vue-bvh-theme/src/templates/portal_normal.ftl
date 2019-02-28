@@ -23,7 +23,7 @@
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=123122111991223" rel="stylesheet" type="text/css">
 
 	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/chunk-vendors.css?t=211232123214" rel="stylesheet">
-	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123214" rel="stylesheet">
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123211312312334" rel="stylesheet">
 	
 	<#if permissionChecker.isOmniadmin()>
 		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=123122111299123" rel="stylesheet" type="text/css">
@@ -83,7 +83,7 @@
 				<a href="${site_default_url}">
 					<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 					<div class="text-logo">
-						<span>${site_name}</span>
+						<span>Bộ văn hoá, thể thao và du lịch</span>
 						Cổng dịch vụ công trực tuyến
 					</div>
 				</a>
