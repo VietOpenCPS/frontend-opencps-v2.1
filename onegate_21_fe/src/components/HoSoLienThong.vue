@@ -34,13 +34,10 @@
                   <td class="text-xs-left" width="25%">
                     {{ props.item.govAgencyName }}
                   </td>
-                  <td class="text-xs-left" width="10%">
-                    {{ props.item.submitDate }}
+                  <td class="text-xs-left" width="15%">
+                    {{ props.item.createDate }}
                   </td>
-                  <td class="text-xs-left" width="10%">
-                    {{ props.item.receiveDate }}
-                  </td>
-                  <td class="text-xs-left" width="10%">
+                  <td class="text-xs-left" width="15%">
                     {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
                   </td>
                 </tr>
@@ -209,12 +206,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Ngày gửi',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Ngày tiếp nhận',
+        text: 'Ngày gửi liên thông',
         align: 'center',
         sortable: false
       },
