@@ -9,11 +9,11 @@
         </div>
         <v-card>
           <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
-            <v-expansion-panel :value="[true]" expand  class="expaned__list__data">
-              <v-expansion-panel-content hide-actions :value="currentFormView === 'formAlpaca' + item.partNo + id ? true : false">
+            <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
+              <v-expansion-panel-content hide-actions>
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                    <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
+                    <div class="mr-2" @click="loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                       <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                       <div class="header__tphs">
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
@@ -227,7 +227,6 @@
                 }
               })
             }
-            console.log('creataaaaaa', vm.createFiles)
           })
 
           // vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
@@ -412,8 +411,29 @@
       },
       loadAlpcaForm (data) {
         var vm = this
+        var fileFind = vm.dossierFilesItems.find(itemFile => {
+          return itemFile.dossierPartNo === data.partNo && itemFile.eForm
+        })
+        if (fileFind) {
+          fileFind['id'] = vm.id
+          vm.$store.dispatch('loadAlpcaForm', fileFind)
+        } else {
+          vm.createFiles.forEach(val => {
+            if (val.eForm && data.partNo === val.partNo) {
+              val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
+              vm.showAlpacaJSFORM(val)
+            }
+          })
+        }
+      },
+      loadAlpcaFormClick (data) {
+        var vm = this
         //
-        vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+        if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
+          vm.currentFormView = ''
+        } else {
+          vm.currentFormView = 'formAlpaca' + data.partNo + vm.id
+        }
         vm.pstEl = vm.endEl = 0
         setTimeout(function () {
           if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
@@ -423,7 +443,7 @@
               vm.pstFixed = $(window).scrollTop()
             })
           }
-        }, 500)
+        }, 300)
         //
         var fileFind = vm.dossierFilesItems.find(itemFile => {
           return itemFile.dossierPartNo === data.partNo && itemFile.eForm

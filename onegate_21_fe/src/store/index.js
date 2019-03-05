@@ -23,7 +23,7 @@ export const store = new Vuex.Store({
     loadingDynamicBtn: false,
     loadingGov: false,
     validFileUpload: false,
-    fileTypeTPHS: ['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc', 'xls', 'xlsx', 'txt', 'rtf'],
+    fileTypeAllowDefault: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf,PDF,DOC,DOCX,XLS,XLSX,PNG,JPEG,TXT,RTF',
     fileTypePAYMENT: ['png', 'jpg', 'jpeg'],
     error: null,
     user: {
@@ -506,7 +506,7 @@ export const store = new Vuex.Store({
                 let partTip = {
                   tip: string,
                   maxSize: 10,
-                  extensions: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf'
+                  extensions: state.fileTypeAllowDefault
                 }
                 return partTip
               }
@@ -542,7 +542,7 @@ export const store = new Vuex.Store({
                 let partTip = {
                   tip: string,
                   maxSize: 10,
-                  extensions: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf'
+                  extensions: state.fileTypeAllowDefault
                 }
                 return partTip
               }
