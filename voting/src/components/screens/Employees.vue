@@ -14,7 +14,7 @@
               >
                 <v-card color="#1a571b21">
                   <v-flex style="text-align: center!important;">
-                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                     <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                   </v-flex>
                   <v-divider light></v-divider>
@@ -92,7 +92,7 @@
             <v-flex xs12 sm3>
               <v-card flat color="#1a571b21" width="225px" max-height="350">
                 <v-flex style="text-align: center!important;">
-                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                 </v-flex>
                 <v-divider light></v-divider>
@@ -211,7 +211,7 @@
             <v-flex xs12 sm3>
               <v-card flat color="#1a571b21" width="225px" max-height="350">
                 <v-flex style="text-align: center!important;">
-                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                 </v-flex>
                 <v-divider light></v-divider>
@@ -223,7 +223,7 @@
                   </v-flex>
                   <v-flex xs12 class="px-1 pb-2">
                     <span class="text-bold"> Đơn vị: </span>
-                    <span>{{employeeSelected.workingUnit}}</span>
+                    <span>{{itemName}}</span>
                   </v-flex>
                   <v-flex xs12 class="px-1 pb-2">
                     <span class="text-bold"> Điện thoại: </span>
@@ -285,10 +285,20 @@ export default {
       vm.itemName = currentQuery.itemName
     }
     vm.$nextTick(function () {
+      let sortEmployee = function (employeeList) {
+        function compare(a, b) {
+          if (a.employeeNo < b.employeeNo)
+            return -1
+          if (a.employeeNo > b.employeeNo)
+            return 1
+          return 0
+        }
+        return employeeList.sort(compare)
+      }
       vm.$store.dispatch('loadEmployees', {
         itemCode: vm.itemCode
       }).then(result => {
-        vm.employeeItems = result
+        vm.employeeItems = sortEmployee(result)
       }).catch(xhr => {
       })
     })

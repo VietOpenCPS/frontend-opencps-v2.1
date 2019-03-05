@@ -94,6 +94,22 @@
                       <span>Tải xuống</span>
                     </v-tooltip>
                   </v-flex>
+                  <!-- thông tin tra cứu keypay -->
+                  <!-- <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right">Mã giao dịch: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm3>
+                    <p class="pt-2 mb-0">{{transId}}</p>
+                  </v-flex>
+                  <v-flex xs12 sm7></v-flex>
+                  <v-flex xs12 sm2>
+                    <v-subheader class="pl-0 text-right">Mã đơn hàng: </v-subheader>
+                  </v-flex>
+                  <v-flex xs12 sm3>
+                    <p class="pt-2 mb-0">{{goodCode}}</p>
+                  </v-flex>
+                  <v-flex xs12 sm7></v-flex> -->
+                  <!--  -->
                 </v-layout>
               </v-layout>
             </v-card-text>
@@ -118,26 +134,27 @@
                 <v-flex xs12 sm3>
                   <p class="pt-2 mb-0">{{payments.invoiceTemplateNo}}</p>
                 </v-flex>
-                <v-flex xs12 sm2>
+                <!-- <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Ký hiệu hóa đơn : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
                   <p class="pt-2 mb-0">{{payments.invoiceIssueNo}}</p>
                 </v-flex>
-                <v-flex xs12 sm2></v-flex>
+                <v-flex xs12 sm2></v-flex> -->
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Số hóa đơn trên hệ thống : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
                   <p class="pt-2 mb-0">{{getEinvoiceNo(payments.einvoice)}}</p>
                 </v-flex>
+                <v-flex xs12 sm2></v-flex>
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Mã tra cứu trên hệ thống : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
                   <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
                 </v-flex>
-                <v-flex xs12 sm2></v-flex>
+                <v-flex xs12 sm7></v-flex>
                 <v-flex xs12 sm12 class="mb-3">
                   <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 
@@ -205,7 +222,9 @@ export default {
     paymentFile: '',
     dialogPDF: false,
     dialogPDFLoading: true,
-    activePrintPay: false
+    activePrintPay: false,
+    transId: '',
+    goodCode: ''
   }),
   computed: {
     paymentFileName () {
@@ -227,9 +246,22 @@ export default {
     dossierDetail (val) {
       var vm = this
       let filter = vm.dossierDetail
-      console.log('filterFile', filter)
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
+        // lấy thông tin tra cứu trên keypay
+        let jsonParse = function (string) {
+          try {
+            JSON.parse(string)
+            return JSON.parse(string)
+          } catch (e) {
+            return ''
+          }
+        }
+        let paymentProfile = jsonParse(vm.paymentFile['epaymentProfile'])
+        if (paymentProfile && paymentProfile['keypayUrl']) {
+          vm.transId = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('merchant_trans_id') >= 0})[0].split('=')[1]
+          vm.goodCode = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('good_code') >= 0})[0].split('=')[1]
+        }
       })
     }
   },

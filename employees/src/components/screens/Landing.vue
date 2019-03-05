@@ -21,7 +21,7 @@
               >
                 <v-card color="#1a571b21">
                   <v-flex style="text-align: center!important;">
-                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                     <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                   </v-flex>
                   <v-divider light></v-divider>
@@ -72,7 +72,7 @@
               >
                 <v-card color="#1a571b21">
                   <v-flex style="text-align: center!important;">
-                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                    <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                     <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                   </v-flex>
                   <v-divider light></v-divider>
@@ -152,7 +152,7 @@
                 <v-flex xs12 sm3>
                   <v-card flat color="#1a571b21" width="225px" max-height="350">
                     <v-flex style="text-align: center!important;">
-                      <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                      <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                       <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                     </v-flex>
                     <v-divider light></v-divider>
@@ -274,7 +274,7 @@
             <v-flex xs12 sm3>
               <v-card flat color="#1a571b21" width="225px" max-height="350">
                 <v-flex style="text-align: center!important;">
-                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;"></div>
+                  <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'" style="width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="width: 150px;height: 200px;object-fit: contain;"/>
                 </v-flex>
                 <v-divider light></v-divider>
