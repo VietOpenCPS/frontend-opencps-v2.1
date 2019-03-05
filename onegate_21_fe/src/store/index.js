@@ -287,6 +287,7 @@ export const store = new Vuex.Store({
           let paramSearch = {
             start: filter.page * 15 - 15,
             end: filter.page * 15,
+            order: filter.order ? filter.order : '',
             agency: filter.agency ? filter.agency : '',
             service: filter.service ? filter.service : '',
             template: filter.template ? filter.template : '',
@@ -299,7 +300,8 @@ export const store = new Vuex.Store({
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
-            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
           }
           if (filter['originality']) {
             paramSearch['originality'] = filter.originality

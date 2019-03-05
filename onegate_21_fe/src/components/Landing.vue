@@ -1551,6 +1551,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
             template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
@@ -1563,6 +1564,7 @@ export default {
             top: currentQuery.hasOwnProperty('top') ? currentQuery.top : '',
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
+            paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         } else {
@@ -1572,6 +1574,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
             template: currentQuery.hasOwnProperty('template') ? currentQuery.template : vm.templateNo,
@@ -1585,6 +1588,7 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
+            paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
           }
         }
