@@ -5,31 +5,31 @@
       <div class="tab-item">
         <div class="left">
           <a href="javascript:;" @click="goPage('dangnhap')">
-            <p class="icon pl-1 pr-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-sign.png"></p>
+            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-sign.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Đăng nhập</span>
             </p>
           </a>
           <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
-            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-document.png"></p>
+            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-document.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Kết quả hồ sơ</span>
             </p>
           </a>
           <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-search-50.png"></p>
+            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-search-50.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Tra cứu hồ sơ</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('tracuuthutuc')">
-            <p class="icon px-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-search-dc-50.png"></p>
+            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-search-dc-50.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Tra cứu thủ tục</span>
             </p>
           </a>
           <a href="javascript:;" @click="goPage('danhgia')">
-            <p class="icon pl-1 pr-2"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-evaluation.png"></p>
+            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-evaluation.png"></p>
             <p class="ml-2 my-0">
               <span class="text-bold">Đánh giá</span>
             </p>
