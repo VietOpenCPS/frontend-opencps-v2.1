@@ -307,6 +307,10 @@ export const store = new Vuex.Store({
             resolve(response.data)
             if (response['status'] !== undefined && response['status'] === 203) {
               toastr.clear()
+              toastr.error('Mã captcha không chính xác. Vui lòng nhập lại.')
+              reject(xhr)
+            } else if (response['status'] !== undefined && response['status'] === 403) {
+              toastr.clear()
               toastr.error('Mã bảo mật không chính xác. Vui lòng kiểm tra lại.')
               reject(xhr)
             } else {
