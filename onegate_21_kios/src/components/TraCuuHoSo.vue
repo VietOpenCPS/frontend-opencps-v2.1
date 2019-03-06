@@ -2,10 +2,13 @@
   <div class="py-0 kios-item">
     <div>
       <v-card class="pb-2">
-        <h4 class="pt-2 ml-2">
+        <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
+          {{agencies[0]['administrationName']}}
+        </h4>
+        <h4 class="py-2 ml-2">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
-        <v-layout wrap class="mt-3 px-0 py-0">
+        <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
               <v-flex xs6 class="pl-2 pr-3">
@@ -141,6 +144,7 @@ export default {
     applicantNameKey: '',
     applicantIdNoKey: '',
     dossierList: [],
+    agencies: [],
     dossierItemTotal: 0,
     hosoDatasPage: 1,
     totalPages: 0,
@@ -193,6 +197,9 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
+      vm.$store.dispatch('agencies').then(function (result) {
+        vm.agencies = result
+      })
       vm.$store.commit('setFullScreen', false)
       let current = vm.$router.history.current
       let newQuery = current.query
