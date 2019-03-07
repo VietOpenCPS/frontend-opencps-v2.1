@@ -221,11 +221,12 @@ export const store = new Vuex.Store({
               'Accept': 'application/json'
             }
           }
+          let endPoint = postData['type'] === 'applicant' ? '/o/rest/v2/applicants/' :  '/o/rest/v2/employees/'
           var dataPostProcess = new URLSearchParams()
           dataPostProcess.append('email', postData['data']['email'])
           dataPostProcess.append('screenName', '')
           dataPostProcess.append('exist', false)
-          axios.post('/o/rest/v2/employees/' + postData['id'] + '/account', dataPostProcess, param).then(function (response) {
+          axios.post(endPoint + postData['id'] + '/account', dataPostProcess, param).then(function (response) {
             let seriable = response.data
             resolve(seriable)
           }).catch(function (errorRes) {
