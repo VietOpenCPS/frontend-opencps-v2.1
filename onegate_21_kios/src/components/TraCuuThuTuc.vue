@@ -269,7 +269,6 @@ export default {
           let filter = {
             groupId: vm.groupIdArr[key]
           }
-          console.log('filter', filter)
           vm.$store.dispatch('getGovAgency', filter).then(function (result) {
             count += 1
             result[0] = Object.assign(result[0], {groupId: vm.groupIdArr[key]})
@@ -283,6 +282,7 @@ export default {
                 vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
                 if (groupIds === 1) {
                   vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                  console.log('govAgencySelected', vm.govAgencySelected)
                 }
                 vm.filterGovagency()
               }
@@ -316,6 +316,9 @@ export default {
             vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
             vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
             vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+            if (vm.govAgencyList.length === 1) {
+              vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+            }
             vm.filterGovagency()
           }
         }).catch(reject => {

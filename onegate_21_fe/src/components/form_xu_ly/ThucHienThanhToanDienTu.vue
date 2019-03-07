@@ -268,7 +268,7 @@ export default {
       data['partTip'] = {
         tip: '',
         maxSize: 10,
-        extensions: 'jpg,png,jpeg'
+        extensions: 'jpg,png,jpeg,JPG,PNG,JPEG'
       }
       let file = $('#paymentFile1')[0].files[0]
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {

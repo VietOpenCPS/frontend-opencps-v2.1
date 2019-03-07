@@ -103,6 +103,7 @@ export default {
                 vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
                 if (groupIds === 1) {
                   vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+                  vm.detailActive = true
                 }
               }
             }
@@ -112,7 +113,7 @@ export default {
                 vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
                 if (groupIds === 1) {
                   vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
-                  console.log('govAgencySelected', vm.govAgencySelected)
+                  vm.detailActive = true
                 }
               }
             }
@@ -126,6 +127,10 @@ export default {
           vm.govAgencyList = result
           if (vm.govAgencyList.length > 0) {
             vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+            if (vm.govAgencyList.length === 1) {
+              vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+              vm.detailActive = true
+            }
           }
         }).catch(reject => {
         })

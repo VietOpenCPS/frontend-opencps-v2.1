@@ -6,7 +6,10 @@
       </content-placeholders>
       <v-card v-else>
         <div style="background-color: #ffffff">
-          <h4 class="py-3 ml-3">
+          <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
+            {{agencies[0]['administrationName']}}
+          </h4>
+          <h4 class="py-2 ml-3">
             <span style="color:#065694">DANH SÁCH HỒ SƠ TIẾP NHẬN NGÀY {{fromDate()}} 
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
@@ -74,6 +77,7 @@ export default {
     loading: false,
     loadingAction: false,
     dossierList: [],
+    agencies: [],
     totalPages: 0,
     pagination: {
       rowsPerPage: 5,
@@ -126,6 +130,9 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       vm.$store.commit('setFullScreen', false)
+      vm.$store.dispatch('agencies').then(function (result) {
+        vm.agencies = result
+      })
       vm.doLoadingDataHoSo()
       setInterval(function () {
         vm.doLoadingDataHoSo()

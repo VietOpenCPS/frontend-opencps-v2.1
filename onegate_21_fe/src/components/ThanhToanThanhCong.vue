@@ -52,7 +52,7 @@
                       <td><span>{{dossierDetail.transId}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
-                      <td><span class="text-bold">Mã tra cứu trên cổng thanh toán</span></td>
+                      <td><span class="text-bold">Mã đơn hàng</span></td>
                       <td><span>{{dossierDetail.goodCode}}</span></td>
                     </tr>
                     <tr v-if="statusDeal">
@@ -168,19 +168,26 @@ export default {
             dossierId: resultDossier.dossierId,
             referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
           }
-          vm.$store.dispatch('putPayments', filter).then(result => {
-            vm.dossierDetail['paymentFee'] = result.paymentFee
-            if (actionCode) {
-              let fiter2 = {
-                dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
-                actionCode: actionCode
+          if (vm.statusDeal === true) {
+            vm.$store.dispatch('putPayments', filter).then(result => {
+              vm.dossierDetail['paymentFee'] = result.paymentFee
+              if (actionCode) {
+                let fiter2 = {
+                  dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
+                  actionCode: actionCode
+                }
+                vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
+                }).catch(function () {
+                })
               }
-              vm.$store.dispatch('processDossierRouter', fiter2).then(function (result) {
-              }).catch(function () {
-              })
-            }
-          }).catch(reject => {
-          })
+            }).catch(reject => {
+            })
+          } else {
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.dossierDetail['paymentFee'] = result.paymentFee
+            }).catch(reject => {
+            })
+          }
         })
       }
     })

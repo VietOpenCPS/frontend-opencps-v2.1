@@ -86,7 +86,7 @@
           v-model="data[item.model]"
         ></v-switch>
         <div v-if="item.hasOwnProperty('alongside')" v-for="(itemChild, indexChild) in item['alongside']" v-bind:key="indexChild">
-        <v-subheader class="px-0" v-if="itemChild.type === 'ricktext'">{{itemChild['label']}}</v-subheader>
+          <v-subheader class="px-0" v-if="itemChild.type === 'ricktext'">{{itemChild['label']}}</v-subheader>
           <trumbowyg v-if="itemChild.type === 'ricktext'" v-model="data[itemChild.model]" :config="config"></trumbowyg>
           <attached-file-avatar :class="itemChild['class_component']" v-if="itemChild.type === 'avatar'" :pk="data[itemChild.model]" :pick-item="itemChild"></attached-file-avatar>
           <datetime-picker :class="itemChild['class_component']" v-if="itemChild.type === 'date'" v-model="data[itemChild.model]" :item="itemChild" :data-value="data[itemChild.model]"></datetime-picker>
@@ -728,12 +728,15 @@
         let vm = this
         if (vm.detailData[0]['mappingUserId'] === 0) {
           let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
+          let typeUser = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee'
           if (item['email'] === '') {
             alert('Cấp địa chỉ email trước khi tạo tài khoản.')
           } else {
-            var result = confirm('Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?');
+            let textNotify = (typeUser === 'applicant') ? 'Bạn có muốn cấp tài khoản sử dụng cho công dân, doanh nghiệp này?' : 'Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?'
+            var result = confirm(textNotify)
             if (result) {
               let postData = {
+                type: typeUser,
                 id: vm.id,
                 data: {
                   email: emailItem,

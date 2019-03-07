@@ -2,11 +2,11 @@
   <div>
     <v-card>
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
-        <v-expansion-panel expand :value="[currentFormView === 'formAlpaca' + item.partNo + id ? true : false]" class="expaned__list__data">
+        <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;">
@@ -818,6 +818,24 @@ export default {
       }
     },
     loadAlpcaForm (data) {
+      var vm = this
+      //
+      var fileFind = vm.dossierFilesItems.find(itemFile => {
+        return itemFile.dossierPartNo === data.partNo && itemFile.eForm
+      })
+      if (fileFind) {
+        fileFind['id'] = vm.id
+        vm.$store.dispatch('loadAlpcaForm', fileFind)
+      } else {
+        vm.dossierTemplateItems.forEach(val => {
+          if (val.hasForm && data.partNo === val.partNo) {
+            val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
+            vm.showAlpacaJSFORM(val)
+          }
+        })
+      }
+    },
+    loadAlpcaFormClick (data) {
       var vm = this
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
