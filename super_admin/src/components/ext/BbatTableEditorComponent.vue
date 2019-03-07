@@ -726,7 +726,10 @@
       },
       showAccount (item) {
         let vm = this
-        if (vm.detailData[0]['mappingUserId'] === 0) {
+        if (
+          (vm.detailData[0]['mappingUserId'] === 0) ||
+          (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant' && vm.detailData[0]['mappingUserId'] !== 0 && vm.detailData[0]['activationCode'])
+        ) {
           let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
           let typeUser = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee'
           if (item['email'] === '') {
