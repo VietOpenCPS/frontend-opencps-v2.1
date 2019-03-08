@@ -294,7 +294,7 @@
           </v-list-tile>
         </v-list>
       </v-menu>
-
+      
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'CHANGE_DATA_DOSSIER'}, 0, true)" 
         v-if="getUser('Administrator_data') && currentQueryState['status'] !== 'deleted'"
@@ -308,7 +308,6 @@
       >
         DELETE
       </v-btn>
-      
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'RESTORE_DOSSIER'}, 0, true)" 
         v-if="getUser('Administrator_data') && currentQueryState.hasOwnProperty('status') && currentQueryState['status'] === 'deleted'"

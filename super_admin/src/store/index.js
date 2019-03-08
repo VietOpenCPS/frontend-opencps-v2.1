@@ -81,6 +81,12 @@ export const store = new Vuex.Store({
             link: '/table/import/tool_import',
             code: 'import',
             text: 'Import'
+          },
+          {
+            icon: 'import_export',
+            link: '/table/export/tool_export',
+            code: 'export',
+            text: 'Export'
           }
         ]
       },
@@ -158,6 +164,29 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function (xhr) {
           reject(xhr)
+        })
+      })
+    },
+    doExportData ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            responseType: 'blob'
+          }
+          let formData = new URLSearchParams()
+          axios.post('/o/rest/v2/backupDatas/backup', formData, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              saveAs(serializable, 'DataExport.zip')
+            }
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            reject(error)
+          })
         })
       })
     },
