@@ -1057,6 +1057,7 @@ export default {
     },
     doCreateReport(isExportExcel) {
       let vm = this
+      vm.showGuilds = false
       if (vm.$refs.form.validate()) {
         vm.doExportExcel = isExportExcel
         vm.showConfig = false
