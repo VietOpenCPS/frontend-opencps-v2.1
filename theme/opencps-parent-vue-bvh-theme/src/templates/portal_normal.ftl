@@ -23,7 +23,7 @@
 	<link href="${themeDisplay.getPathThemeRoot()}/css/main.css?t=123122111991223" rel="stylesheet" type="text/css">
 
 	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/chunk-vendors.css?t=211232123214" rel="stylesheet">
-	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=212123123211312312334" rel="stylesheet">
+	<link type="text/css" href="${themeDisplay.getPathThemeRoot()}/css/upgrade.css?t=21212318823211312312334" rel="stylesheet">
 	
 	<#if permissionChecker.isOmniadmin()>
 		<link href="${themeDisplay.getPathThemeRoot()}/css/clay_overide.css?t=123122111299123" rel="stylesheet" type="text/css">
@@ -137,6 +137,39 @@
 		global: true
 	});
 </script>
+
+<style>
+
+body .v-dialog .v-toolbar .v-toolbar__content {
+    height: 40px !important;
+    background-color: #004983;
+}
+body .primary {
+    background-color: #004983 !important;
+    border-color: #004983 !important;
+}
+body .accent--text {
+    color: #004983 !important;
+    caret-color: #004983 !important;
+}
+
+#app_register .radio_register_type .v-label {
+    margin-bottom: 0;
+}
+
+#app_register .layout > .flex.xs12 > .layout.row.wrap { 
+    margin: 0;
+}
+
+body #app_login .v-badge .v-icon {
+    color: #ffffff !important;
+}
+
+#app_login .login-wrapper .login-input a {
+    color: #ffffff !important;
+}
+
+</style>
 
 </body>
 
