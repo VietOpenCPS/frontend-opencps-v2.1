@@ -81,6 +81,12 @@ export const store = new Vuex.Store({
             link: '/table/import/tool_import',
             code: 'import',
             text: 'Import'
+          },
+          {
+            icon: 'import_export',
+            link: '/table/export/tool_export',
+            code: 'export',
+            text: 'Export'
           }
         ]
       },
@@ -158,6 +164,29 @@ export const store = new Vuex.Store({
           resolve(response.data)
         }).catch(function (xhr) {
           reject(xhr)
+        })
+      })
+    },
+    doExportData ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            responseType: 'blob'
+          }
+          let formData = new URLSearchParams()
+          axios.post('/o/rest/v2/backupDatas/backup', formData, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              saveAs(serializable, 'DataExport.zip')
+            }
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            reject(error)
+          })
         })
       })
     },
@@ -254,6 +283,25 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             reject(xhr)
             commit('setsnackbarerror', true)
+          })
+        })
+      })
+    },
+    getUserDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          let endPoint = filter['type'] === 'applicant' ? '/o/rest/v2/applicants/' :  '/o/rest/v2/employees/'
+          axios.get(endPoint + filter['id'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (errorRes) {
+            reject(errorRes)
           })
         })
       })

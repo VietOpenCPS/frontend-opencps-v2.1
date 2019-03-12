@@ -40,6 +40,7 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import axios from 'axios'
 import support from '../../store/support.json'
 export default {
   props: [],
@@ -47,7 +48,9 @@ export default {
   data: () => ({
     loading: false,
     valid: false,
-    pinCode: ''
+    pinCode: '',
+    userName: '',
+    passWord: ''
   }),
   computed: {
   },
@@ -81,17 +84,59 @@ export default {
         let filter = dataForm
         vm.$store.dispatch('confirmPIN', filter).then(function (result) {
           vm.loading = false
-          setTimeout(function () {
-            $('input[name=_npmreactlogin_login]').val(result.email)
-            $('input[name=_npmreactlogin_password]').val(result.token)
-            $('.action-btn-login-input button.btn-login').click()
-            // $('form[name=login_form] #input_action').val('confirm_account')
-            // $('form[name=login_form]').submit()
-          }, 2000)
+          $('.login-input input[type=text]').val('')
+          $('.login-input input[type=password]').val('')
+          $('.login-input input[type=text]').val(result.email)
+          $('.login-input input[type=password]').val(result.token)
+          vm.userName = result.email
+          vm.passWord = result.token
+          vm.goToDangNhap()
         }).catch(function (reject) {
           vm.loading = false
         })
       }
+    },
+    goToDangNhap() {
+      let vm = this;
+      axios.post('/o/v1/opencps/login', {}, {
+        headers: {
+          Authorization: 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord)
+        }
+      }).then(function(response) {
+        if (
+          response.data !== '' &&
+          response.data !== 'ok' &&
+          response.data !== 'captcha'
+        ) {
+          if (response.data === 'pending') {
+            window.location.href =
+              window.themeDisplay.getURLHome() +
+              '/register#/xac-thuc-tai-khoan?active_user_id=' +
+              window.themeDisplay.getUserId() +
+              '&redirectURL=' +
+              window.themeDisplay.getURLHome();
+          } else {
+            window.location.href = response.data;
+          }
+        } else if (response.data === 'ok') {
+          window.location.href = window.themeDisplay.getURLHome();
+        } else if (response.data === 'captcha') {
+          let redirectURL = themeDisplay
+            .getLayoutRelativeURL()
+            .substring(
+              0,
+              themeDisplay.getLayoutRelativeURL().lastIndexOf('/')
+            );
+          if (redirectURL !== '') {
+            window.location.href = redirectURL + '/register#/login'
+          } else {
+            window.location.href = themeDisplay.getURLHome() + '/register#/login'
+          }
+        } else {
+        }
+      })
+      .catch(function(error) {
+      })
     }
   }
 }

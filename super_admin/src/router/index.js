@@ -69,6 +69,15 @@ const routes = [
         }
       },
       {
+        path: '/table/:tableName/tool_export',
+        name: 'Export',
+        component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/export.vue'),
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/table/:tableName/flowchart/:id',
         name: 'FlowChartView',
         component: () => import(/* webpackChunkName: "Home" */ '@/components/screens/FlowChartView.vue'),
