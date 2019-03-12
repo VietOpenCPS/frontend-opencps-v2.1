@@ -244,7 +244,7 @@ export default {
             vm.feeTong = feeAmount + serviceAmount
             vm.totalFee = feeAmount + serviceAmount - advanceAmount
           }
-          if (vm.payments.requestPayment === 5 && vm.detailDossier.stepCode === 620) {
+          if (vm.payments.requestPayment === 5 && vm.detailDossier['stepCode'] === 620) {
             let filter = vm.detailDossier
             vm.$store.dispatch('getPaymentFiles', filter).then(result => {
               vm.paymentFile = result

@@ -1,11 +1,10 @@
 {
-  "name": "dynamic_report",
+  "name": "serviceinfos",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build:dvc": "vue-cli-service build src/main_dvc.js",
-    "build:motcua": "vue-cli-service build src/main.js",
+    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -29,13 +28,14 @@
     "roboto-fontface": "*",
     "moment": "^2.22.2",
     "vue-friendly-iframe": "^0.9.0",
-    "mobile-device-detect": "^0.2.3"
+    "mobile-device-detect": "^0.2.3",
+    "babel-plugin-transform-remove-console": "^6.9.4"
   },
   "devDependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",
-    "@vue/cli-service": "^3.0.5",
+    "@vue/cli-service": "^3.3.1",
     "babel-eslint": "^10.0.1",
     "babel-plugin-transform-imports": "^1.5.0",
     "eslint": "^5.8.0",

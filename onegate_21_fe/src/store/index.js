@@ -23,7 +23,7 @@ export const store = new Vuex.Store({
     loadingDynamicBtn: false,
     loadingGov: false,
     validFileUpload: false,
-    fileTypeAllowDefault: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf,PDF,DOC,DOCX,XLS,XLSX,PNG,JPEG,TXT,RTF',
+    fileTypeAllowDefault: 'pdf,doc,docx,xls,xlsx,png,jpg,jpeg,txt,rtf',
     fileTypePAYMENT: ['png', 'jpg', 'jpeg'],
     error: null,
     user: {
@@ -3012,7 +3012,7 @@ export const store = new Vuex.Store({
     validFileUpload ({commit, state}, data) {
       let getFileType = data.file.name ? data.file.name.split('.') : ''
       let fileType = getFileType ? getFileType[getFileType.length - 1] : ''
-      let fileTypeAllow = data.partTip['extensions'] ? data.partTip['extensions'].split(",") : ''
+      let fileTypeAllow = data.partTip['extensions'] ? (data.partTip['extensions'] + ',' + data.partTip['extensions'].toUpperCase()).split(',') : ''
       let fileSizeAllow = data.partTip['maxSize']
       let fileTypeInput = fileTypeAllow ? fileTypeAllow.filter(function (item) {
         return item === fileType

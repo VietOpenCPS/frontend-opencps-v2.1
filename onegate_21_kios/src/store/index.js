@@ -215,6 +215,33 @@ export const store = new Vuex.Store({
         })
       })
     },
+    agencies ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let groupIdCurrent = ''
+          let groupIdArr = []
+          let groupIds = state.groupIdSite
+          if (groupIds) {
+            groupIdArr = groupIds.split(',')
+          }
+          if (groupIdArr.length === 0) {
+            groupIdCurrent = window.themeDisplay.getScopeGroupId()
+          }
+          if (groupIdArr.length === 1) {
+            groupIdCurrent = groupIdArr[0]
+          }
+          let filter = {
+            groupId: groupIdCurrent
+          }
+          store.dispatch('getGovAgency', filter).then(function (result) {
+            console.log('agencies', result)
+            resolve(result)
+          }).catch(reject => {
+            resolve([])
+          })
+        })
+      })
+    },
     getGovAgencyDictItem ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
