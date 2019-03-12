@@ -732,7 +732,7 @@
         ) {
           let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
           let typeUser = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee'
-          let = {
+          let filterDetaiUser = {
             type: (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee',
             id: vm.id
           }
