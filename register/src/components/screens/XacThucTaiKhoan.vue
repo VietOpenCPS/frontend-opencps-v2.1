@@ -40,6 +40,7 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import axios from 'axios'
 import support from '../../store/support.json'
 export default {
   props: [],
@@ -47,7 +48,9 @@ export default {
   data: () => ({
     loading: false,
     valid: false,
-    pinCode: ''
+    pinCode: '',
+    userName: '',
+    passWord: ''
   }),
   computed: {
   },
@@ -83,15 +86,57 @@ export default {
           vm.loading = false
           $('.login-input input[type=text]').val('')
           $('.login-input input[type=password]').val('')
-          setTimeout(function () {
-            $('.login-input input[type=text]').val(result.email)
-            $('.login-input input[type=password]').val(result.token)
-            $('.login-input button.btn-login').click()
-          }, 1000)
+          $('.login-input input[type=text]').val(result.email)
+          $('.login-input input[type=password]').val(result.token)
+          vm.userName = result.email
+          vm.passWord = result.token
+          vm.goToDangNhap()
         }).catch(function (reject) {
           vm.loading = false
         })
       }
+    },
+    goToDangNhap() {
+      let vm = this;
+      axios.post('/o/v1/opencps/login', {}, {
+        headers: {
+          Authorization: 'BASIC ' + window.btoa(vm.userName + ':' + vm.passWord)
+        }
+      }).then(function(response) {
+        if (
+          response.data !== '' &&
+          response.data !== 'ok' &&
+          response.data !== 'captcha'
+        ) {
+          if (response.data === 'pending') {
+            window.location.href =
+              window.themeDisplay.getURLHome() +
+              '/register#/xac-thuc-tai-khoan?active_user_id=' +
+              window.themeDisplay.getUserId() +
+              '&redirectURL=' +
+              window.themeDisplay.getURLHome();
+          } else {
+            window.location.href = response.data;
+          }
+        } else if (response.data === 'ok') {
+          window.location.href = window.themeDisplay.getURLHome();
+        } else if (response.data === 'captcha') {
+          let redirectURL = themeDisplay
+            .getLayoutRelativeURL()
+            .substring(
+              0,
+              themeDisplay.getLayoutRelativeURL().lastIndexOf('/')
+            );
+          if (redirectURL !== '') {
+            window.location.href = redirectURL + '/register#/login'
+          } else {
+            window.location.href = themeDisplay.getURLHome() + '/register#/login'
+          }
+        } else {
+        }
+      })
+      .catch(function(error) {
+      })
     }
   }
 }

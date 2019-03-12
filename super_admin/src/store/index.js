@@ -287,6 +287,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getUserDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Accept': 'application/json'
+            }
+          }
+          let endPoint = filter['type'] === 'applicant' ? '/o/rest/v2/applicants/' :  '/o/rest/v2/employees/'
+          axios.get(endPoint + filter['id'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (errorRes) {
+            reject(errorRes)
+          })
+        })
+      })
+    },
     getImageComponent ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function () {

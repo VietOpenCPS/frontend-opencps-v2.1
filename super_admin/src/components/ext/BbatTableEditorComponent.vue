@@ -732,35 +732,45 @@
         ) {
           let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
           let typeUser = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee'
-          if (item['email'] === '') {
-            alert('Cấp địa chỉ email trước khi tạo tài khoản.')
-          } else {
-            let textNotify = (typeUser === 'applicant') ? 'Bạn có muốn cấp tài khoản sử dụng cho công dân, doanh nghiệp này?' : 'Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?'
-            var result = confirm(textNotify)
-            if (result) {
-              let postData = {
-                type: typeUser,
-                id: vm.id,
-                data: {
-                  email: emailItem,
-                  screenName: '',
-                  exist: false
+          let = {
+            type: (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee',
+            id: vm.id
+          }
+          vm.$store.dispatch('getUserDetail', filterDetaiUser).then(function (data) {
+            if (!data['mappingUser'] || 
+              (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant' && data['mappingUser'] && vm.detailData[0]['activationCode'])
+            ) {
+              if (item['email'] === '') {
+                alert('Cấp địa chỉ email trước khi tạo tài khoản.')
+              } else {
+                let textNotify = (typeUser === 'applicant') ? 'Bạn có muốn cấp tài khoản sử dụng cho công dân, doanh nghiệp này?' : 'Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?'
+                var result = confirm(textNotify)
+                if (result) {
+                  let postData = {
+                    type: typeUser,
+                    id: vm.id,
+                    data: {
+                      email: emailItem,
+                      screenName: '',
+                      exist: false
+                    }
+                  }
+                  vm.$store.dispatch('createUserAccount', postData).then(function (data) {
+                    vm.screenLogin = data['screenName']
+                    vm.emailLogin = data['email']
+                    vm.deactiveAccountFlag = data['deactiveAccountFlag']
+                    if (vm.deactiveAccountFlag === 0) {
+                      vm.deactiveAccountFlagBoolean = true
+                    } else {
+                      vm.deactiveAccountFlagBoolean = false
+                    }
+                    vm.layoutNameDynamic = item['label']
+                    vm.rightAccount = !vm.rightAccount
+                  })
                 }
               }
-              vm.$store.dispatch('createUserAccount', postData).then(function (data) {
-                vm.screenLogin = data['screenName']
-                vm.emailLogin = data['email']
-                vm.deactiveAccountFlag = data['deactiveAccountFlag']
-                if (vm.deactiveAccountFlag === 0) {
-                  vm.deactiveAccountFlagBoolean = true
-                } else {
-                  vm.deactiveAccountFlagBoolean = false
-                }
-                vm.layoutNameDynamic = item['label']
-                vm.rightAccount = !vm.rightAccount
-              })
             }
-          }
+          })
         } else {
           vm.$store.dispatch('getUserAccount', vm.detailData[0]['mappingUserId']).then(function (data) {
             vm.screenLogin = data['screenName']
