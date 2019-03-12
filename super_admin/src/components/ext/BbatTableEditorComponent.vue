@@ -121,7 +121,7 @@
             :multiple="item['multiple']"
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
@@ -136,7 +136,7 @@
             :multiple="item['multiple']"
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
@@ -145,7 +145,7 @@
             box
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
@@ -154,7 +154,7 @@
             box
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
           <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>

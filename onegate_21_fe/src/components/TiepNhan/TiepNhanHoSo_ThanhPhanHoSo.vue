@@ -60,7 +60,7 @@
                   <div v-if="itemFileView.eForm && onlyView" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
-                      {{itemFileView.referenceUid + '.pdf'}} - 
+                      {{itemFileView.dossierPartNo + '.pdf'}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
                   </div>
@@ -234,7 +234,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2)">
+      <div v-if="!partTypes.includes(2) && originality === 3">
         <v-card>
           <v-card-text>
             <div v-if="!onlyView">
@@ -246,9 +246,13 @@
               label="ghi chú..."
               ></v-textarea>
             </div>
-            <p class="my-0 py-2" v-if="onlyView && applicantNoteDossier">
-              {{applicantNoteDossier}} 
-            </p>
+            <v-text-field
+              v-if="onlyView && applicantNoteDossier"
+              v-model="applicantNoteDossier"
+              label="ghi chú ..."
+              readonly
+              box
+            ></v-text-field>
           </v-card-text>
         </v-card>
       </div>
@@ -486,7 +490,7 @@ export default {
     initData (data) {
       var vm = this
       vm.thongTinHoSo = data
-      vm.applicantNoteDossier = data['applicantNote']
+      vm.applicantNoteDossier = data['applicantNote'] && data['applicantNote'].indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
         vm.sampleCount = data['sampleCount']

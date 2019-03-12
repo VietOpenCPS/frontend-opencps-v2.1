@@ -81,13 +81,13 @@ export default {
         let filter = dataForm
         vm.$store.dispatch('confirmPIN', filter).then(function (result) {
           vm.loading = false
+          $('.login-input input[type=text]').val('')
+          $('.login-input input[type=password]').val('')
           setTimeout(function () {
-            $('input[name=_npmreactlogin_login]').val(result.email)
-            $('input[name=_npmreactlogin_password]').val(result.token)
-            $('.action-btn-login-input button.btn-login').click()
-            // $('form[name=login_form] #input_action').val('confirm_account')
-            // $('form[name=login_form]').submit()
-          }, 2000)
+            $('.login-input input[type=text]').val(result.email)
+            $('.login-input input[type=password]').val(result.token)
+            $('.login-input button.btn-login').click()
+          }, 1000)
         }).catch(function (reject) {
           vm.loading = false
         })

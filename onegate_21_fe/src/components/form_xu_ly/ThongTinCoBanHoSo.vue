@@ -160,7 +160,7 @@
               </div> -->
             </v-flex>
             <v-flex xs12 sm4 v-else>
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba">Ghi chú:</div>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">Ghi chú:</div>
               <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">
                 <v-tooltip top>
                   <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
