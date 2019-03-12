@@ -769,6 +769,12 @@
                   })
                 }
               }
+            } else {
+              vm.screenLogin = data['mappingUser']['screenName']
+              vm.emailLogin = emailItem
+              vm.deactiveAccountFlagBoolean = false
+              vm.layoutNameDynamic = item['label']
+              vm.rightAccount = !vm.rightAccount
             }
           })
         } else {
