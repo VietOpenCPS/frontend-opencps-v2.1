@@ -2083,8 +2083,7 @@ export default {
     loadThanhToan () {
       var vm = this
       let filter = {
-        dossierId: vm.dossierId,
-        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+        dossierId: vm.thongTinChiTietHoSo.referenceUid
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result

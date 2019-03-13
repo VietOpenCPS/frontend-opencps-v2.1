@@ -45,7 +45,7 @@
                 <v-flex style="width:100px" class="my-0 pl-3 py-1"><span class="red--text">* </span>&nbsp;Ghi chú:</v-flex>
                 <v-flex style="width:calc(100% - 100px)">
                   <p class="px-2 my-0 py-1">
-                    {{payments.paymentNote ? payments.paymentNote : ''}} &nbsp;&nbsp;
+                    {{ePaymentProfile['paymentNote'] ? ePaymentProfile['paymentNote'] : ''}} &nbsp;&nbsp;
                   </p>
                 </v-flex>
               </v-layout>
@@ -76,13 +76,13 @@
                     <v-subheader class="pl-0 text-right">Hình thức thanh toán: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm3>
-                    <p class="pt-2 mb-0">{{payments.paymentMethod}}</p>
+                    <p class="pt-2 mb-0">{{payments['paymentMethod']}}</p>
                   </v-flex>
                   <v-flex xs12 sm7></v-flex>
-                  <v-flex xs12 sm2 v-if="paymentFile">
+                  <v-flex xs12 sm2 v-if="paymentFile && payments['paymentMethod'] === 'Chuyển khoản'">
                     <v-subheader class="pl-0 text-right">Chứng từ kèm theo: </v-subheader>
                   </v-flex>
-                  <v-flex xs12 sm10 v-if="paymentFile" >
+                  <v-flex xs12 sm10 v-if="paymentFile && payments['paymentMethod'] === 'Chuyển khoản'" >
                     <span v-on:click.stop="viewFile()" style="cursor: pointer;">
                       <v-icon>attach_file</v-icon>
                       {{paymentFileName}}
@@ -95,20 +95,20 @@
                     </v-tooltip>
                   </v-flex>
                   <!-- thông tin tra cứu keypay -->
-                  <!-- <v-flex xs12 sm2>
+                  <v-flex xs12 sm2 v-if="payments['paymentMethod'] === 'Keypay'">
                     <v-subheader class="pl-0 text-right">Mã giao dịch: </v-subheader>
                   </v-flex>
-                  <v-flex xs12 sm3>
+                  <v-flex xs12 sm3 v-if="payments['paymentMethod'] === 'Keypay'">
                     <p class="pt-2 mb-0">{{transId}}</p>
                   </v-flex>
-                  <v-flex xs12 sm7></v-flex>
-                  <v-flex xs12 sm2>
+                  <v-flex xs12 sm7 v-if="payments['paymentMethod'] === 'Keypay'"></v-flex>
+                  <v-flex xs12 sm2 v-if="payments['paymentMethod'] === 'Keypay'">
                     <v-subheader class="pl-0 text-right">Mã đơn hàng: </v-subheader>
                   </v-flex>
-                  <v-flex xs12 sm3>
+                  <v-flex xs12 sm3 v-if="payments['paymentMethod'] === 'Keypay'">
                     <p class="pt-2 mb-0">{{goodCode}}</p>
                   </v-flex>
-                  <v-flex xs12 sm7></v-flex> -->
+                  <v-flex xs12 sm7 v-if="payments['paymentMethod'] === 'Keypay'"></v-flex>
                   <!--  -->
                 </v-layout>
               </v-layout>
@@ -233,6 +233,10 @@ export default {
     originality () {
       var vm = this
       return vm.getOriginality()
+    },
+    ePaymentProfile () {
+      let vm = this
+      return vm.getEPaymentProfile(vm.payments['epaymentProfile'])
     }
   },
   created () {
@@ -248,21 +252,19 @@ export default {
       let filter = vm.dossierDetail
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
-        // lấy thông tin tra cứu trên keypay
-        let jsonParse = function (string) {
-          try {
-            JSON.parse(string)
-            return JSON.parse(string)
-          } catch (e) {
-            return ''
-          }
-        }
-        let paymentProfile = jsonParse(vm.paymentFile['epaymentProfile'])
-        if (paymentProfile && paymentProfile['keypayUrl']) {
-          vm.transId = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('merchant_trans_id') >= 0})[0].split('=')[1]
-          vm.goodCode = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('good_code') >= 0})[0].split('=')[1]
-        }
       })
+    },
+    payments (val) {
+      // lấy thông tin tra cứu trên keypay
+      let vm = this
+      if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
+        vm.payments.paymentMethod = 'Keypay'
+      }
+      let paymentProfile = vm.getEPaymentProfile(val.epaymentProfile)
+      if (paymentProfile && paymentProfile['keypayUrl']) {
+        vm.transId = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('merchant_trans_id') >= 0})[0].split('=')[1]
+        vm.goodCode = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('good_code') >= 0})[0].split('=')[1]
+      }
     }
   },
   methods: {
@@ -286,6 +288,18 @@ export default {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPreview').src = result
       })
+    },
+    getEPaymentProfile (paymentProfile) {
+      if (paymentProfile) {
+        try {
+          JSON.parse(paymentProfile)
+          return JSON.parse(paymentProfile)
+        } catch (e) {
+          return ''
+        }
+      } else {
+        return ''
+      }
     },
     downloadPaymentFile (item) {
       let vm = this

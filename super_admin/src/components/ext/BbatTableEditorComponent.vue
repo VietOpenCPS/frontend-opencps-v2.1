@@ -369,6 +369,7 @@
         snackbarsuccess: false,
         pickItem: {},
         layoutNameDynamic: '',
+        mappingUserIdCurrent: '',
         screenLogin: '',
         emailLogin: '',
         password: '',
@@ -689,7 +690,7 @@
         var result = confirm('Bạn có muốn đổi mật khẩu?');
         if (result) {
           let postData = {
-            id: vm.detailData[0]['mappingUserId'],
+            id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
             data: {
               password: vm.password
             }
@@ -709,7 +710,7 @@
         var result = confirm(labelStatus)
         if (result) {
           let postData = {
-            id: vm.detailData[0]['mappingUserId'],
+            id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
             data: {
               locked: !dataLock
             }
@@ -756,8 +757,11 @@
                     }
                   }
                   vm.$store.dispatch('createUserAccount', postData).then(function (data) {
-                    vm.screenLogin = data['screenName']
-                    vm.emailLogin = data['email']
+                    vm.$store.dispatch('getUserDetail', filterDetaiUser).then(function (data) {
+                      vm.mappingUserIdCurrent = data['mappingUser']['userId']
+                      vm.screenLogin = data['mappingUser']['screenName']
+                      vm.emailLogin = emailItem
+                    })
                     vm.deactiveAccountFlag = data['deactiveAccountFlag']
                     if (vm.deactiveAccountFlag === 0) {
                       vm.deactiveAccountFlagBoolean = true
