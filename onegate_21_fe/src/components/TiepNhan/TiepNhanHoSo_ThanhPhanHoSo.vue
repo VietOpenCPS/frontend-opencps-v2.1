@@ -56,8 +56,15 @@
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa ý kiến</span>
                 </v-tooltip>
-                <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo && !itemFileView.eForm">
-                  <div :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
+                  <div v-if="itemFileView.eForm && onlyView" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                      <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
+                      {{itemFileView.dossierPartNo + '.pdf'}} - 
+                      <i>{{itemFileView.modifiedDate}}</i>
+                    </span>
+                  </div>
+                  <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <v-icon v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                       {{itemFileView.displayName}} - 
@@ -227,7 +234,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2)">
+      <div v-if="!partTypes.includes(2) && originality === 3">
         <v-card>
           <v-card-text>
             <div v-if="!onlyView">
@@ -239,9 +246,13 @@
               label="ghi chú..."
               ></v-textarea>
             </div>
-            <p class="my-0 py-2" v-if="onlyView && applicantNoteDossier">
-              {{applicantNoteDossier}} 
-            </p>
+            <v-text-field
+              v-if="onlyView && applicantNoteDossier"
+              v-model="applicantNoteDossier"
+              label="ghi chú ..."
+              readonly
+              box
+            ></v-text-field>
           </v-card-text>
         </v-card>
       </div>
@@ -291,8 +302,8 @@
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>
-            <span v-if="pdfEform">Bản khai trực tuyến</span>
-            <span v-else>File đính kèm</span>
+            <span v-if="pdfEform">Tài liệu khai trực tuyến</span>
+            <span v-else>Tài liệu đính kèm</span>
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogPDF = false">
@@ -479,7 +490,7 @@ export default {
     initData (data) {
       var vm = this
       vm.thongTinHoSo = data
-      vm.applicantNoteDossier = data['applicantNote']
+      vm.applicantNoteDossier = data['applicantNote'] && data['applicantNote'].indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
         vm.sampleCount = data['sampleCount']
@@ -996,7 +1007,7 @@ export default {
       if (data.fileSize === 0) {
         return
       }
-      if (data['hasForm']) {
+      if (data['eForm']) {
         vm.pdfEform = true
       } else {
         vm.pdfEform = false
@@ -1043,7 +1054,7 @@ export default {
       if (data.fileSize === 0) {
         return
       }
-      if (data['hasForm']) {
+      if (data['eForm']) {
         vm.pdfEform = true
       } else {
         vm.pdfEform = false

@@ -214,6 +214,8 @@
                   path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
                 })
               }
+            } else {
+              alert('Yêu cầu thực hiện thất bại.')
             }
           } 
         }
@@ -273,6 +275,8 @@
                 path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
               })
             }
+          } else {
+            alert('Yêu cầu thực hiện thất bại')
           }
         }
         setTimeout(() => {

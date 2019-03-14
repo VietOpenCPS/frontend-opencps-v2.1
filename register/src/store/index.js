@@ -309,10 +309,6 @@ export const store = new Vuex.Store({
               toastr.clear()
               toastr.error('Mã captcha không chính xác. Vui lòng nhập lại.')
               reject(xhr)
-            } else if (response['status'] !== undefined && response['status'] === 403) {
-              toastr.clear()
-              toastr.error('Mã bảo mật không chính xác. Vui lòng kiểm tra lại.')
-              reject(xhr)
             } else {
               resolve(response.data)
               toastr.clear()
@@ -322,8 +318,13 @@ export const store = new Vuex.Store({
                 window.open(redirectURL, '_self')
               }, 500)
             }
-          }).catch(function (xhr) {
-            reject(xhr)
+          }).catch(function (errorRes) {
+            let response = errorRes.response
+            if (response['status'] !== undefined && response['status'] === 403) {
+              toastr.clear()
+              toastr.error('Mã bảo mật không chính xác. Vui lòng kiểm tra lại.')
+            }
+            reject(errorRes)
             // toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
           })
         })

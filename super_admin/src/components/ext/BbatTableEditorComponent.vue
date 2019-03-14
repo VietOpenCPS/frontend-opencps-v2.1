@@ -121,7 +121,7 @@
             :multiple="item['multiple']"
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
           <v-autocomplete :class="itemChild['class_component']" v-if="itemChild.type === 'selects' && !itemChild.hasOwnProperty('datasource_key')"
             v-model="data[itemChild.model]"
@@ -136,7 +136,7 @@
             :multiple="item['multiple']"
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
           <v-text-field :class="itemChild['class_component']" v-if="itemChild.type === 'text-fields'"
             v-model="data[itemChild.model]"
@@ -145,7 +145,7 @@
             box
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-text-field>
           <v-textarea :class="itemChild['class_component']" v-if="itemChild.type === 'textarea'"
             v-model="data[itemChild.model]"
@@ -154,7 +154,7 @@
             box
             clearable
           >
-            <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+            <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-textarea>
           <v-subheader class="px-0" v-if="itemChild.type === 'codemirror'">{{itemChild['label']}}</v-subheader>
           <codemirror v-if="itemChild.type === 'codemirror'" v-model="data[itemChild.model]" :options="cmOptions"></codemirror>
@@ -726,38 +726,57 @@
       },
       showAccount (item) {
         let vm = this
-        if (vm.detailData[0]['mappingUserId'] === 0) {
+        if (
+          (vm.detailData[0]['mappingUserId'] === 0) ||
+          (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant' && vm.detailData[0]['mappingUserId'] !== 0 && vm.detailData[0]['activationCode'])
+        ) {
           let emailItem = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? vm.detailData[0]['contactEmail'] : vm.detailData[0]['email']
           let typeUser = (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee'
-          if (item['email'] === '') {
-            alert('Cấp địa chỉ email trước khi tạo tài khoản.')
-          } else {
-            let textNotify = (typeUser === 'applicant') ? 'Bạn có muốn cấp tài khoản sử dụng cho công dân, doanh nghiệp này?' : 'Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?'
-            var result = confirm(textNotify)
-            if (result) {
-              let postData = {
-                type: typeUser,
-                id: vm.id,
-                data: {
-                  email: emailItem,
-                  screenName: '',
-                  exist: false
+          let filterDetaiUser = {
+            type: (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant') ? 'applicant' : 'employee',
+            id: vm.id
+          }
+          vm.$store.dispatch('getUserDetail', filterDetaiUser).then(function (data) {
+            if (!data['mappingUser'] || 
+              (vm.detailData[0]['modelClassName'] === 'org.opencps.usermgt.model.Applicant' && data['mappingUser'] && vm.detailData[0]['activationCode'])
+            ) {
+              if (item['email'] === '') {
+                alert('Cấp địa chỉ email trước khi tạo tài khoản.')
+              } else {
+                let textNotify = (typeUser === 'applicant') ? 'Bạn có muốn cấp tài khoản sử dụng cho công dân, doanh nghiệp này?' : 'Bạn có muốn cấp tài khoản sử dụng cho nhân sự này?'
+                var result = confirm(textNotify)
+                if (result) {
+                  let postData = {
+                    type: typeUser,
+                    id: vm.id,
+                    data: {
+                      email: emailItem,
+                      screenName: '',
+                      exist: false
+                    }
+                  }
+                  vm.$store.dispatch('createUserAccount', postData).then(function (data) {
+                    vm.screenLogin = data['screenName']
+                    vm.emailLogin = data['email']
+                    vm.deactiveAccountFlag = data['deactiveAccountFlag']
+                    if (vm.deactiveAccountFlag === 0) {
+                      vm.deactiveAccountFlagBoolean = true
+                    } else {
+                      vm.deactiveAccountFlagBoolean = false
+                    }
+                    vm.layoutNameDynamic = item['label']
+                    vm.rightAccount = !vm.rightAccount
+                  })
                 }
               }
-              vm.$store.dispatch('createUserAccount', postData).then(function (data) {
-                vm.screenLogin = data['screenName']
-                vm.emailLogin = data['email']
-                vm.deactiveAccountFlag = data['deactiveAccountFlag']
-                if (vm.deactiveAccountFlag === 0) {
-                  vm.deactiveAccountFlagBoolean = true
-                } else {
-                  vm.deactiveAccountFlagBoolean = false
-                }
-                vm.layoutNameDynamic = item['label']
-                vm.rightAccount = !vm.rightAccount
-              })
+            } else {
+              vm.screenLogin = data['mappingUser']['screenName']
+              vm.emailLogin = emailItem
+              vm.deactiveAccountFlagBoolean = false
+              vm.layoutNameDynamic = item['label']
+              vm.rightAccount = !vm.rightAccount
             }
-          }
+          })
         } else {
           vm.$store.dispatch('getUserAccount', vm.detailData[0]['mappingUserId']).then(function (data) {
             vm.screenLogin = data['screenName']
