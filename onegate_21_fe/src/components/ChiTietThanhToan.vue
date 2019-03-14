@@ -348,10 +348,10 @@ export default {
         return 'Yêu cầu quyết toán phí'
       } else if (code === 3 || code === '3') {
         return 'Báo đã nộp phí trực tuyến'
-      } else if (code === 3 || code === '4') {
+      } else if (code === 4 || code === '4') {
         return 'Yêu cầu nộp lại phí trực tuyến'
       } else if (code === 5 || code === '5') {
-        return 'Xác nhận hoàn thành thu phí'
+        return 'Đã hoàn thành thu phí'
       } else {
         return ''
       }
