@@ -11,7 +11,7 @@
     </div>
     <v-expansion-panel :value="[true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ,true, true ,true, true,true, true,true, true,true, true]" expand  v-if="String(serviceCode) === '0' && !selectOption" class="expand__select__gov">
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencies' :key='index'>
-        <div slot='header' class="ml-3">
+        <div slot='header' class="ml-3 text-bold">
           <v-icon style="
             font-size: 14px;
             margin-top: -4px;
@@ -23,8 +23,8 @@
           <v-card-text class='grey lighten-3 px-0 py-0'>
             <!-- Cap 2 -->
             <v-expansion-panel :value="[true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ,true, true ,true, true,true, true,true, true,true, true]" expand  class="expand__select__domain">
-              <v-expansion-panel-content v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
-                <div slot='header' style="margin-left: 14px;">
+              <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
+                <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
                    <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
                    <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
                 </div>

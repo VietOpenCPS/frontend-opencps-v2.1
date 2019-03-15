@@ -938,7 +938,7 @@ export default {
           stepType: data
         }
         vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          if (resultActions.data) {
+          if (resultActions.data && resultActions.data.length !== 0) {
             let resultTemp = resultActions.data
             for (var i = 0; i < resultTemp.length; i++) {
               if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
@@ -950,6 +950,24 @@ export default {
               }
             }
             vm.dossierActions = resultTemp
+          } else {
+            if (vm.thongTinChiTietHoSo['submissionNote']) {
+              try {
+                JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
+                let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
+                for (var i = 0; i < resultTemp.length; i++) {
+                  if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                    if (!Array.isArray(resultTemp[i]['actions'])) {
+                      let arrActionsTemp = []
+                      arrActionsTemp.push(resultTemp[i]['actions'])
+                      resultTemp[i]['actions'] = arrActionsTemp
+                    }
+                  }
+                }
+                vm.dossierActions = resultTemp
+              } catch (e) {
+              }
+            }
           }
         })
       }
