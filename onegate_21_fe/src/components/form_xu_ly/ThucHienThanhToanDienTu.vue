@@ -6,7 +6,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span>{{paymentProfile.paymentFee}}</span>
+          <span>{{getEPaymentProfile(paymentProfile.epaymentProfile).paymentFee}}</span>
         </div>
         <v-card>
           <v-card-text class="px-4 pb-1">
@@ -301,7 +301,12 @@ export default {
     },
     getEPaymentProfile (paymentProfile) {
       if (paymentProfile) {
-        return JSON.parse(paymentProfile)
+        try {
+          JSON.parse(paymentProfile)
+          return JSON.parse(paymentProfile)
+        } catch (e) {
+          return ''
+        }
       } else {
         return ''
       }

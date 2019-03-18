@@ -15,15 +15,15 @@
     <v-card class="px-2 mx-1" style="overflow: hidden;">
       <v-card-text v-if="exportLoading">
         <v-flex xs12 sm12>
-          <v-flex color="primary" class="text-xs-center">
+          <v-flex color="blue" class="text-xs-center">
             <span>Đang thực hiện export dữ liệu ...</span>
           </v-flex>
-          <v-progress-linear :indeterminate="true"></v-progress-linear>
+          <v-progress-linear color="blue" :indeterminate="true"></v-progress-linear>
         </v-flex>
       </v-card-text>
       <v-btn
         v-else
-        color="primary"
+        color="blue"
         class="white--text"
         @click="exportData()"
       >

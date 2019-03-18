@@ -2521,9 +2521,10 @@ export default {
     },
     viewDetail (item, indexItem) {
       let vm = this
-      console.log('permission: ', item.permission)
-      if (item.permission !== null && item.permission !== '') {
+      if (item.permission) {
        vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      } else {
+        alert('Bạn không có quyền thao tác với hồ sơ này.')
       }
     },
     keywordEventChange (data) {

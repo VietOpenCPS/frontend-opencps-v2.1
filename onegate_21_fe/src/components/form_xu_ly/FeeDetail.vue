@@ -148,10 +148,13 @@
     </v-expansion-panel>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
-        <v-card-title class="headline">File đính kèm</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>File đính kèm</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <div v-if="dialogPDFLoading" style="
           min-height: 600px;
           text-align: center;
@@ -218,11 +221,11 @@ export default {
     vm.data_payment = vm.payments
     if (vm.payments) {
       setTimeout(function () {
-        let feeAmount = vm.payments.feeAmount ? Number(vm.payments.feeAmount.toString().replace(/\./g, '')) : 0
+        let feeAmount = typeof(vm.payments.feeAmount) === 'number' ? Number(vm.payments.feeAmount) : Number(vm.payments.feeAmount.toString().replace(/\./g, ''))
         // let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
         if (vm.payments.requestPayment === 1) {
           // let advanceAmount = vm.payments.advanceAmount ? Number(vm.payments.advanceAmount.toString().replace(/\./g, '')) : 0
-          let serviceAmount = Number(vm.payments.serviceAmount)
+          let serviceAmount = typeof(vm.payments.serviceAmount) === 'number' ? Number(vm.payments.serviceAmount) : Number(vm.payments.serviceAmount.toString().replace(/\./g, ''))
           vm.feeTong = feeAmount + serviceAmount
           vm.totalFee = feeAmount + serviceAmount
         } else if (vm.payments.requestPayment === 2) {
@@ -254,7 +257,7 @@ export default {
         if (vm.totalFee < 0) {
           vm.totalFee = 0
         }
-      }, 200)
+      }, 300)
     }
   },
   computed: {
@@ -281,6 +284,7 @@ export default {
   methods: {
     changeFee () {
       var vm = this
+      console.log('changeFee')
       let val = vm.data_payment
       let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
       if (val.requestPayment === 1) {
@@ -288,6 +292,7 @@ export default {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         vm.feeTong = feeAmount + serviceAmount
         vm.totalFee = feeAmount + serviceAmount
+        console.log('changeFee', vm.feeTong, vm.totalFee)
       } else if (val.requestPayment === 2) {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0
