@@ -101,7 +101,7 @@
     </div>
     <v-content>
       <router-view></router-view>
-      <v-alert v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
+      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
     </v-content>

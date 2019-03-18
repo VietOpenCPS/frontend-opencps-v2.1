@@ -168,9 +168,15 @@ export default {
             dossierId: resultDossier.dossierId,
             referenceUid: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
           }
+          let filterPayment = {
+            dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery
+          }
           if (vm.statusDeal === true) {
             vm.$store.dispatch('putPayments', filter).then(result => {
-              vm.dossierDetail['paymentFee'] = result.paymentFee
+              vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
+                vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
+              }).catch(reject => {
+              })
               if (actionCode) {
                 let fiter2 = {
                   dossierId: !referenceUidQuery ? resultDossier.referenceUid : referenceUidQuery,
@@ -183,8 +189,8 @@ export default {
             }).catch(reject => {
             })
           } else {
-            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
-              vm.dossierDetail['paymentFee'] = result.paymentFee
+            vm.$store.dispatch('loadDossierPayments', filterPayment).then(result => {
+              vm.dossierDetail['paymentFee'] = vm.getEPaymentProfile(result.epaymentProfile).paymentFee
             }).catch(reject => {
             })
           }
@@ -205,6 +211,18 @@ export default {
       let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
       let url = redirectURL + '/dich-vu-cong#/'
       window.open(url, '_self')
+    },
+    getEPaymentProfile (paymentProfile) {
+      if (paymentProfile) {
+        try {
+          JSON.parse(paymentProfile)
+          return JSON.parse(paymentProfile)
+        } catch (e) {
+          return ''
+        }
+      } else {
+        return ''
+      }
     }
   }
 }

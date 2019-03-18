@@ -298,18 +298,28 @@
       <v-card>
         <v-card-title primary-title class="pt-2">
           <v-layout row wrap>
-            <v-flex xs12>
-              <v-text-field
-                v-model="password"
-                type="password"
-                label="Mật khẩu mới" 
-                box 
-              >
-              </v-text-field>
+            <v-flex xs12 class="px-0">
+              <v-form ref="form_2" v-model="valid2" lazy-validation>
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="password"
+                    box
+                    :append-icon="e1 ? 'visibility' : 'visibility_off'"
+                    :append-icon-cb="() => (e1 = !e1)"
+                    :rules="[rules.required, rules.passWord]"
+                    :type="e1 ? 'password' : 'text'"
+                    name="input-10-2"
+                    min="8"
+                  >
+                    <template slot="label">Mật khẩu mới <span class="red--text darken-3">*</span></template>
+                  </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-btn block color="blue darken-3" dark v-on:click.native="doChangePassWord()">Xác nhận</v-btn>
+                </v-flex>
+              </v-form>
             </v-flex>
-            <v-flex xs12>
-              <v-btn block color="blue darken-3" dark v-on:click.native="doChangePassWord()">Xác nhận</v-btn>
-            </v-flex>
+            
             <v-flex xs12>
               <v-switch
                 label="Kích hoạt tài khoản"
@@ -369,6 +379,7 @@
         snackbarsuccess: false,
         pickItem: {},
         layoutNameDynamic: '',
+        mappingUserIdCurrent: '',
         screenLogin: '',
         emailLogin: '',
         password: '',
@@ -377,6 +388,7 @@
         pullOk: true,
         pullCounter: 0,
         valid: true,
+        valid2: true,
         loading: false,
         data: {},
         dataSocket: {},
@@ -388,6 +400,7 @@
           lineNumbers: true,
           line: true,
         },
+        e1: true,
         rules: {
           required: value => !!value || 'Bắt buộc phải nhập.',
           number: value => {
@@ -397,6 +410,10 @@
           email: value => {
             const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             return pattern.test(value) || 'Sai định dạng thư điện tử.'
+          },
+          passWord: (value) => {
+            const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+            return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
           }
         }
       }
@@ -686,18 +703,20 @@
       },
       doChangePassWord () {
         let vm = this
-        var result = confirm('Bạn có muốn đổi mật khẩu?');
-        if (result) {
-          let postData = {
-            id: vm.detailData[0]['mappingUserId'],
-            data: {
-              password: vm.password
+        if (vm.$refs.form_2.validate()) {
+          var result = confirm('Bạn có muốn đổi mật khẩu?');
+          if (result) {
+            let postData = {
+              id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
+              data: {
+                password: vm.password
+              }
             }
+            vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
+              vm.snackbarsuccess = true
+              console.log(data)
+            })
           }
-          vm.$store.dispatch('changePassUserAccount', postData).then(function (data) {
-            vm.snackbarsuccess = true
-            console.log(data)
-          })
         }
       },
       doChangeStatusAccount (dataLock) {
@@ -709,7 +728,7 @@
         var result = confirm(labelStatus)
         if (result) {
           let postData = {
-            id: vm.detailData[0]['mappingUserId'],
+            id: vm.detailData[0]['mappingUserId'] ? vm.detailData[0]['mappingUserId'] : vm.mappingUserIdCurrent,
             data: {
               locked: !dataLock
             }
@@ -756,8 +775,11 @@
                     }
                   }
                   vm.$store.dispatch('createUserAccount', postData).then(function (data) {
-                    vm.screenLogin = data['screenName']
-                    vm.emailLogin = data['email']
+                    vm.$store.dispatch('getUserDetail', filterDetaiUser).then(function (data) {
+                      vm.mappingUserIdCurrent = data['mappingUser']['userId']
+                      vm.screenLogin = data['mappingUser']['screenName']
+                      vm.emailLogin = emailItem
+                    })
                     vm.deactiveAccountFlag = data['deactiveAccountFlag']
                     if (vm.deactiveAccountFlag === 0) {
                       vm.deactiveAccountFlagBoolean = true

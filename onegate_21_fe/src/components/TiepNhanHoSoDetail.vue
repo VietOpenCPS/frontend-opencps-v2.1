@@ -257,14 +257,8 @@ export default {
                 vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
                 if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
-                // if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 2 && resAction.payment.requestPayment !== '2') {
-                  // add thanh toán điện tử
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
-                  // current
-                  /* vm.showThuPhi = true
-                  vm.payments = resAction.payment */
-                  //
                 }
                 // call initData thong tin chung ho so
                 if (vm.$refs.thongtinchunghoso) {

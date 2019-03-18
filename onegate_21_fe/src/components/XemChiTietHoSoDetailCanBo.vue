@@ -104,9 +104,10 @@
                       </span>
                     </span>
                   </v-flex>
-                  <v-flex class="text-xs-right" style="width:100px">
+                  <v-flex v-if="showReasign" class="text-xs-right" style="width:100px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')">Phân công lại</span>
+                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">Phân công lại</span>
+                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new'">Ủy quyền</span>
                       <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>
@@ -636,6 +637,7 @@ export default {
     payments: '',
     dossierActions: [],
     reAsignUsers: [],
+    showReasign: false,
     itemselect: '',
     dossierSyncs: [],
     stepModel: null,
@@ -682,63 +684,67 @@ export default {
     btnPlugins: [],
     loadingPlugin: false,
     listDossierFiles: [],
-    headers: [{
-      text: '#',
-      align: 'center',
-      sortable: false
-    },
-    {
-      text: 'Vai trò',
-      align: 'center',
-      sortable: false,
-      class: 'vaitro_column'
-    }, {
-      text: 'Công việc',
-      align: 'center',
-      sortable: false,
-      class: 'congviec_column'
-    }, {
-      text: 'Thời hạn quy định',
-      align: 'center',
-      sortable: false,
-      class: 'thoihanquydinh_column'
-    }, {
-      text: 'Ngày bắt đầu',
-      align: 'center',
-      sortable: false,
-      class: 'ngaybatdau_column'
-    }, {
-      text: 'Người thực hiện',
-      align: 'center',
-      sortable: false,
-      class: 'nguoithuchien_column'
-    }, {
-      text: 'Kết quả',
-      align: 'center',
-      sortable: false,
-      class: 'ketqua_column'
-    }],
-    headerSyncs: [{
-      text: 'Nhật kí hồ sơ',
-      align: 'center',
-      sortable: false,
-      class: 'nhatki_column'
-    }, {
-      text: 'Trao đổi trực tuyến',
-      align: 'center',
-      sortable: false,
-      class: 'traodoitructuyen_column'
-    }],
-    filterDossierActionItems: [{
-      text: 'Tất cả',
-      value: ''
-    }, {
-      text: 'Có thao tác thực hiện',
-      value: '1'
-    }, {
-      text: 'Không thao tác thực hiện',
-      value: '2'
-    }],
+    headers: [
+      {
+        text: '#',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Vai trò',
+        align: 'center',
+        sortable: false,
+        class: 'vaitro_column'
+      }, {
+        text: 'Công việc',
+        align: 'center',
+        sortable: false,
+        class: 'congviec_column'
+      }, {
+        text: 'Thời hạn quy định',
+        align: 'center',
+        sortable: false,
+        class: 'thoihanquydinh_column'
+      }, {
+        text: 'Ngày bắt đầu',
+        align: 'center',
+        sortable: false,
+        class: 'ngaybatdau_column'
+      }, {
+        text: 'Người thực hiện',
+        align: 'center',
+        sortable: false,
+        class: 'nguoithuchien_column'
+      }, {
+        text: 'Kết quả',
+        align: 'center',
+        sortable: false,
+        class: 'ketqua_column'
+      }
+    ],
+    headerSyncs: [
+      {
+        text: 'Nhật kí hồ sơ',
+        align: 'center',
+        sortable: false,
+        class: 'nhatki_column'
+      }, {
+        text: 'Trao đổi trực tuyến',
+        align: 'center',
+        sortable: false,
+        class: 'traodoitructuyen_column'
+      }],
+      filterDossierActionItems: [{
+        text: 'Tất cả',
+        value: ''
+      }, {
+        text: 'Có thao tác thực hiện',
+        value: '1'
+      }, {
+        text: 'Không thao tác thực hiện',
+        value: '2'
+      }
+    ],
     filterDossierAction: null,
     filterDossierSyncItems: [{
       text: 'Tất cả',
@@ -746,7 +752,8 @@ export default {
     }, {
       text: 'Thông tin trao đổi',
       value: '2'
-    }],
+    }
+    ],
     filterDossierSync: null,
     messageChat: '',
     isCallBack: true,
@@ -788,7 +795,6 @@ export default {
       return this.$store.getters.getStepOverdueNextAction
     },
     currentUser () {
-      console.log('AAAAAAA: ', this.$store.getters.loadingInitData.user)
       return this.$store.getters.loadingInitData.user
     },
     kysoSuccess () {
@@ -819,21 +825,6 @@ export default {
   updated () {
     var vm = this
     vm.$nextTick(function () {
-      // let currentParams = vm.$router.history.current.params
-      // let currentQuery = vm.$router.history.current.query
-      // if (currentParams.hasOwnProperty('activeTab') && vm.isCallBack) {
-      //   vm.isCallBack = false
-      //   vm.btnDossierDynamics = []
-      //   vm.btnIndex = -1
-      //   vm.activeTab = currentQuery.activeTab
-      //   vm.btnIndex = currentQuery['btnIndex']
-      //   if (currentQuery.hasOwnProperty('actionSpecial') && currentQuery['actionSpecial'] !== null && currentQuery['actionSpecial'] !== undefined && currentQuery['actionSpecial'] !== 'undefined') {
-      //     vm.actionSpecial = currentQuery['actionSpecial']
-      //   }
-      //   vm.thongTinChiTietHoSo['dossierId'] = vm.id
-      //   vm.btnStateVisible = true
-      //   vm.getNextActions()
-      // }
     })
   },
   watch: {
@@ -947,7 +938,7 @@ export default {
           stepType: data
         }
         vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
-          if (resultActions.data) {
+          if (resultActions.data && resultActions.data.length !== 0) {
             let resultTemp = resultActions.data
             for (var i = 0; i < resultTemp.length; i++) {
               if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
@@ -959,6 +950,24 @@ export default {
               }
             }
             vm.dossierActions = resultTemp
+          } else {
+            if (vm.thongTinChiTietHoSo['submissionNote']) {
+              try {
+                JSON.parse(vm.thongTinChiTietHoSo['submissionNote'])
+                let resultTemp = JSON.parse(vm.thongTinChiTietHoSo['submissionNote']).data
+                for (var i = 0; i < resultTemp.length; i++) {
+                  if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                    if (!Array.isArray(resultTemp[i]['actions'])) {
+                      let arrActionsTemp = []
+                      arrActionsTemp.push(resultTemp[i]['actions'])
+                      resultTemp[i]['actions'] = arrActionsTemp
+                    }
+                  }
+                }
+                vm.dossierActions = resultTemp
+              } catch (e) {
+              }
+            }
           }
         })
       }
@@ -1877,14 +1886,6 @@ export default {
       })
     },
     getNextActions () {
-      // var vm = this
-      // let params = {
-      //   dossierId: vm.thongTinChiTietHoSo.dossierId
-      // }
-      // vm.$store.dispatch('loadProcessStep', params).then(resultNextActions => {
-      //   console.log('resultNextActions++++++++++++', resultNextActions)
-      //   vm.nextActions = resultNextActions
-      // })
       let vm = this
       let query = vm.$router.history.current.query
       let filter = {
@@ -1926,7 +1927,6 @@ export default {
             }
           }
         }
-        // console.log('vm.checkInput======', vm.getCheckInput)
         vm.checkInput = vm.getCheckInput
         if (vm.getCheckInput !== null && vm.getCheckInput !== undefined) {
           if (vm.checkInput !== 0) {
@@ -1935,9 +1935,8 @@ export default {
             }, 300)
           }
         }
-        // setTimeout(function () {
-        //   vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
-        // }, 300)
+        // lấy danh sách user reAsign
+        vm.loadUserReAsign()
       })
       vm.$store.dispatch('loadPlugins', {
         dossierId: vm.thongTinChiTietHoSo.dossierId
@@ -2083,8 +2082,7 @@ export default {
     loadThanhToan () {
       var vm = this
       let filter = {
-        dossierId: vm.dossierId,
-        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+        dossierId: vm.thongTinChiTietHoSo.referenceUid
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
@@ -2226,7 +2224,6 @@ export default {
       let userArr = vm.$store.getters.getUsersNextAction
       let userLastAction = [{'userId': vm.thongTinChiTietHoSo.lastActionUserId ? vm.thongTinChiTietHoSo.lastActionUserId : ''}]
       let userCheckPermission = userArr.concat(userLastAction)
-      console.log('checkPemissionPhanCongLai: ', currentUser)
       if (userCheckPermission.length > 0) {
         let check = userCheckPermission.filter(function (item) {
           if (item !== undefined && currentUser !== undefined) {
@@ -2245,9 +2242,23 @@ export default {
     },
     reAsign () {
       let vm = this
+      vm.dialog_reAsign = true
+    },
+    loadUserReAsign () {
+      let vm = this
       vm.$store.dispatch('getDossierUserAsign', vm.thongTinChiTietHoSo.dossierId).then(function(result) {
-        vm.reAsignUsers = result
-        vm.dialog_reAsign = true
+        if (result.length > 0) {
+          vm.reAsignUsers = result.filter(function (item) {
+            return Number(item['userId']) !== Number(vm.currentUser['userId'])
+          })
+        }
+        vm.showReasign = true
+        if (vm.reAsignUsers.length === 0) {
+          vm.showReasign = false
+        }
+        if (vm.usersNextAction.length === 1 && vm.reAsignUsers.length === 1 && Number(vm.reAsignUsers[0]['userId']) === Number(vm.usersNextAction[0]['userId'])) {
+          vm.showReasign = false
+        }
       })
     },
     doReAsign () {

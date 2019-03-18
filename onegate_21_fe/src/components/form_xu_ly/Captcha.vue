@@ -7,7 +7,7 @@
       </v-chip>
     </v-flex>
     <div v-drag-and-drop:options="options" class="drag-wrapper text-xs-center mt-3">
-      <ul id="captcha">
+      <ul id="captcha" class="captcha-wrap">
         <li class="item-captcha" v-for="(item, index) in arrCaptcha" :key="index" style="padding: 10px 15px; background-color: #81D4FA; margin-right: 2px; color: #fff; font-weight: bold;">{{item}}</li>
       </ul>
     </div>
@@ -25,7 +25,9 @@ export default {
   components: {
   },
   data: () => ({
-    options: {},
+    options: {
+      dropzoneSelector: 'ul.captcha-wrap',
+    },
     arrCaptcha: [],
     captcha: '',
     currentlyDragging: null,
