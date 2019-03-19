@@ -441,9 +441,14 @@ export default {
       })
     },
     createDossier (item) {
-      let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-      let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-      window.open(url, '_self')
+      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+      if (isSigned) {
+        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+        window.open(url, '_self')
+      } else {
+        alert('Vui lòng đăng nhập để thực hiện')
+      }
     },
     viewGuide (item) {
       var vm = this
