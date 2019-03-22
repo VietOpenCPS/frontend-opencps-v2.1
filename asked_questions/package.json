@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build:dvc": "vue-cli-service build src/main_dvc.js",
-    "build:motcua": "vue-cli-service build src/main.js",
+    "build": "vue-cli-service build src/main.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -13,6 +12,8 @@
     "idempotent-babel-polyfill": "^7.0.0",
     "jquery": "^3.3.1",
     "mobile-device-detect": "^0.2.3",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
     "toastr": "^2.1.4",
     "vue": "^2.5.9",
     "vue-content-placeholders": "^0.2.1",
@@ -25,7 +26,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",
-    "@vue/cli-service": "^3.0.5",
+    "@vue/cli-service": "^3.5.1",
     "babel-eslint": "^10.0.1",
     "babel-plugin-transform-imports": "^1.5.0",
     "eslint": "^5.8.0",

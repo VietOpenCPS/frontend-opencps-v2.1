@@ -11,9 +11,8 @@
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;">
                       <span slot="activator">
-                        {{item.partName}}&nbsp; 
-                        <span v-if="item.required" style="color: red"> (*) </span>
-                        &nbsp;&nbsp;
+                        {{item.partName}}
+                        <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
