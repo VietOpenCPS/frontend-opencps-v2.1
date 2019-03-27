@@ -356,31 +356,27 @@ export default {
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        // if (vm.$refs.captcha.checkValidCaptcha()) {
-          let passValid = false
-          if (!vm.validBussinessInfos) {
-            let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
-            if (x) {
-              passValid = true
-            }
-          } else { passValid = true }
-          if (passValid) {
-            vm.loading = true
-            let filter = dataForm
-            vm.$store.dispatch('postApplicant', filter).then(function (result) {
-              vm.loading = false
-              vm.$refs.captcha.makeImageCap()
-              vm.$router.push({
-                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
-              })
-            }).catch(function (reject) {
-              vm.$refs.captcha.makeImageCap()
-              vm.loading = false
-            })
+        let passValid = false
+        if (!vm.validBussinessInfos) {
+          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
+          if (x) {
+            passValid = true
           }
-        // } else {
-        //   toastr.error('Mã captcha không chính xác')
-        // }
+        } else { passValid = true }
+        if (passValid) {
+          vm.loading = true
+          let filter = dataForm
+          vm.$store.dispatch('postApplicant', filter).then(function (result) {
+            vm.loading = false
+            vm.$refs.captcha.makeImageCap()
+            vm.$router.push({
+              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+            })
+          }).catch(function (reject) {
+            vm.$refs.captcha.makeImageCap()
+            vm.loading = false
+          })
+        }
       }
     },
     changeApplicantType () {

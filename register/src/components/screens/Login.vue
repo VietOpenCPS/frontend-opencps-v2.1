@@ -11,7 +11,7 @@
           <v-flex xs12>
             <v-text-field
               box
-              placeholder="Tài khoản đăng nhập"
+              placeholder="Địa chỉ email đăng nhập"
               v-model="npmreactlogin_login"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
@@ -27,19 +27,25 @@
               required
             ></v-text-field>
           </v-flex>
-          <v-flex xs12>
-            <img :src="chapchablob" alt="capcha">
+          <v-flex class="py-2" xs12 style="
+            display: flex;
+            align-items: center;
+            background: #dedede;
+            justify-content: center;
+          ">
+            <img :src="chapchablob" alt="capcha" style="border-radius: 5px;">
             <v-btn flat icon v-on:click.native="makeImageCap">
-              <v-icon size="48">refresh</v-icon>
+              <v-icon color="primary" size="32">refresh</v-icon>
             </v-btn>
           </v-flex>
-          <v-flex xs12 class="mt-2">
+          <v-flex xs12 class="mt-2 text-xs-center">
             <v-text-field
+              box
               v-model="j_captcha_response"
               placeholder="Nhập captcha"
             ></v-text-field>
           </v-flex>
-          <div class="my-2">
+          <div class="my-2 text-xs-center">
             <v-btn color="primary"
               :loading="loading"
               :disabled="loading"
