@@ -38,6 +38,23 @@ export const templateDefault = {
     methods: {
         doReadEvent (eventId) {
             let vm = this
+            /*
+            axios
+            .get('o/rest/v2/dossiers/' + vm.dossier['referenceUid'] + '/urlSiteInfo')
+            .then(function(response) {
+              let data = response.data;
+              let configOBJ = {
+                eventId: eventId,
+                viewRootURI: data['url'],
+                dossierId: data['dossierId'],
+                originality: dossier['originality']
+              }
+              vm.$parent.markReadEventId(configOBJ)
+            })
+            .catch(function(error) {
+              vm.avatarURL = "";
+            });
+            */
             vm.$parent.markReadEventId(eventId, vm.item['viewRootURI'], vm.dossier['dossierId'], vm.dossier['originality'])
         }
     }

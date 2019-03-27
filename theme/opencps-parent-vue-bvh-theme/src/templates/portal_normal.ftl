@@ -83,7 +83,7 @@
 				<a href="${site_default_url}">
 					<img src="${themeDisplay.getPathThemeRoot()}/images/logo.png">
 					<div class="text-logo">
-						<span>Bộ văn hoá, thể thao và du lịch</span>
+						<span>Bộ văn HÓA, thể thao và du lịch</span>
 						Cổng dịch vụ công trực tuyến
 					</div>
 				</a>
@@ -118,7 +118,8 @@
 	            <p>Email: <b>${email}</b></p>
 	        </div>
 	    </div>
-	    <div class="text-center last">${copyright}</div>
+	    <div class="text-center last">Phát triển bởi Tập đoàn Công nghệ <a href="https://www.cmc.com.vn/vi" target="_blank"> CMC </a>
+						trên nền <a href="https://opencps.vn" target="_blank"> OpenCPS </a></div>
 	</footer>
 
 <!-- inject:js -->
