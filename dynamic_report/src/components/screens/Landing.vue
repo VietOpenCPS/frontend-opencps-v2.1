@@ -614,8 +614,18 @@ export default {
                     alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
                   }
                   let ddStr = ' '
-                  if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
-                    ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                  let currentConfig = vm.itemsReportsConfig[keyVal]
+
+                  if (currentConfig.hasOwnProperty('calculator')) {
+                    if (isNaN(eval(currentConfig['calculator']))) {
+                      ddStr = eval(currentConfig['calculator'])
+                    } else {
+                      ddStr = Math.round(eval(currentConfig['calculator']))
+                    }
+                  } else {
+                    if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                    }
                   }
                   dataToExportCSVItem.push(ddStr)
                   dataRow.push({
