@@ -617,10 +617,11 @@ export default {
                   let currentConfig = vm.itemsReportsConfig[keyVal]
 
                   if (currentConfig.hasOwnProperty('calculator')) {
-                    if (isNaN(eval(currentConfig['calculator']))) {
-                      ddStr = eval(currentConfig['calculator'])
+                    let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
+                    if (isNaN(eval(calu))) {
+                      ddStr = eval(calu)
                     } else {
-                      ddStr = Math.round(eval(currentConfig['calculator']))
+                      ddStr = Math.round(eval(calu))
                     }
                   } else {
                     if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
