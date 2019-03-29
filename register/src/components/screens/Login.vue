@@ -27,8 +27,15 @@
               required
             ></v-text-field>
           </v-flex>
+          <v-flex xs12 class="text-xs-left">
+            <div style="display:inline-block">
+              <a :href="getPassword" style="line-height: 30px; font-size: 12px; color: blue; text-decoration: underline;">
+              Quên mật khẩu?
+              </a>
+            </div>
+          </v-flex>
           <v-flex class="py-2" xs12 style="
-            display: flex;
+            display: none;
             align-items: center;
             background: #dedede;
             justify-content: center;
@@ -38,7 +45,7 @@
               <v-icon color="primary" size="32">refresh</v-icon>
             </v-btn>
           </v-flex>
-          <v-flex xs12 class="mt-2 text-xs-center">
+          <v-flex xs12 class="mt-2 text-xs-center" style="display: none;">
             <v-text-field
               box
               v-model="j_captcha_response"
@@ -73,6 +80,7 @@ export default {
     npmreactlogin_login: '',
     npmreactlogin_password: '',
     j_captcha_response: '',
+    getPassword: '',
     chapchablob: '',
     loading: false,
     valid: false,
@@ -84,6 +92,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      vm.getPassword = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/cap-lai-mat-khau' : ''
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.makeImageCap()

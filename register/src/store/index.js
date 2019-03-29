@@ -128,7 +128,7 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostApplicant = new URLSearchParams()
-        dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+        // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
         axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
           console.log(response.data)
           if (response.data !== '' && response.data !== 'ok') {

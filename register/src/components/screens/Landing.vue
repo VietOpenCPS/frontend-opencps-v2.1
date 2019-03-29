@@ -85,10 +85,10 @@
                 <div>Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   box
+                  type="tel"
                   placeholder="Thư điện tử"
                   v-model="contactEmail"
                   :rules="[rules.required, rules.email]"
-                  name="input-10-2"
                   min="6"
                   required
                 ></v-text-field>
@@ -100,6 +100,8 @@
                   v-model="contactTelNo"
                   :rules="[rules.telNo]"
                   box
+                  readonly
+                  onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');}"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -110,7 +112,6 @@
                   :append-icon-cb="() => (e1 = !e1)"
                   :rules="[rules.required, rules.passWord]"
                   :type="e1 ? 'password' : 'text'"
-                  name="input-10-2"
                   min="8"
                   v-model="passWord"
                   required

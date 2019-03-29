@@ -120,18 +120,25 @@ export const store = new Vuex.Store({
     getServiceLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            administration: filter.administration ? filter.administration : '',
+            keyword: filter.keyword ? filter.keyword : '',
+            level: filter.level ? filter.level : 0,
+            domain: filter.domain ? filter.domain : '',
+            sort: ''
+          }
+          if (filter.domain) {
+            paramGet.sort = "siblingSearch"
+          } else {
+            paramGet.sort = "siblingDomain"
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
             },
-            params: {
-              start: filter.page * 15 - 15,
-              end: filter.page * 15,
-              administration: filter.administration ? filter.administration : '',
-              keyword: filter.keyword ? filter.keyword : '',
-              level: filter.level ? filter.level : 0,
-              domain: filter.domain ? filter.domain : ''
-            }
+            params: paramGet
           }
           axios.get(state.endPoint + '/serviceinfos', param).then(function (response) {
             let serializable = response.data
