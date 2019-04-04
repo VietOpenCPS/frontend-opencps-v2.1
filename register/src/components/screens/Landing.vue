@@ -85,10 +85,10 @@
                 <div>Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   box
+                  type="tel"
                   placeholder="Thư điện tử"
                   v-model="contactEmail"
                   :rules="[rules.required, rules.email]"
-                  name="input-10-2"
                   min="6"
                   required
                 ></v-text-field>
@@ -100,6 +100,8 @@
                   v-model="contactTelNo"
                   :rules="[rules.telNo]"
                   box
+                  readonly
+                  onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');}"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -110,7 +112,6 @@
                   :append-icon-cb="() => (e1 = !e1)"
                   :rules="[rules.required, rules.passWord]"
                   :type="e1 ? 'password' : 'text'"
-                  name="input-10-2"
                   min="8"
                   v-model="passWord"
                   required
@@ -356,31 +357,27 @@ export default {
       }
       console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && vm.agreeRules) {
-        // if (vm.$refs.captcha.checkValidCaptcha()) {
-          let passValid = false
-          if (!vm.validBussinessInfos) {
-            let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
-            if (x) {
-              passValid = true
-            }
-          } else { passValid = true }
-          if (passValid) {
-            vm.loading = true
-            let filter = dataForm
-            vm.$store.dispatch('postApplicant', filter).then(function (result) {
-              vm.loading = false
-              vm.$refs.captcha.makeImageCap()
-              vm.$router.push({
-                path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
-              })
-            }).catch(function (reject) {
-              vm.$refs.captcha.makeImageCap()
-              vm.loading = false
-            })
+        let passValid = false
+        if (!vm.validBussinessInfos) {
+          let x = confirm(vm.messageCheckApplicant + ' Bạn có muốn tiếp tục?')
+          if (x) {
+            passValid = true
           }
-        // } else {
-        //   toastr.error('Mã captcha không chính xác')
-        // }
+        } else { passValid = true }
+        if (passValid) {
+          vm.loading = true
+          let filter = dataForm
+          vm.$store.dispatch('postApplicant', filter).then(function (result) {
+            vm.loading = false
+            vm.$refs.captcha.makeImageCap()
+            vm.$router.push({
+              path: '/xac-thuc-tai-khoan?active_user_id=' + result.applicantId
+            })
+          }).catch(function (reject) {
+            vm.$refs.captcha.makeImageCap()
+            vm.loading = false
+          })
+        }
       }
     },
     changeApplicantType () {

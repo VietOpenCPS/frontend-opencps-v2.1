@@ -298,7 +298,7 @@
         if (dossierFiles.length !== 0) {
           createFiles.forEach(template => {
             var itemFind = dossierFiles.find(file => {
-              return template.partNo === file.dossierPartNo && file.eForm
+              return template.partNo === file.dossierPartNo && file.eForm && file.fileSize !== 0
             })
             if (itemFind) {
               template['daKhai'] = true
@@ -343,7 +343,7 @@
         var vm = this
         console.log('itemSave', item)
         var fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+          return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize !== 0
         })
         if (fileFind) {
           fileFind['dossierId'] = vm.detailDossier.dossierId

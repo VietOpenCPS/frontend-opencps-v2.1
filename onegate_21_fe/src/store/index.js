@@ -2783,6 +2783,9 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              sort: 'siblingSearch'
             }
           }
           axios.get('/o/rest/v2/serviceinfos/statistics/agencies', param).then(function (response) {
@@ -2864,6 +2867,9 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              sort: 'siblingSearch'
             }
           }
           axios.get(state.endPointApi + '/serviceinfos/statistics/domains', param).then(function (response) {

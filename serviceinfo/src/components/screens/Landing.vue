@@ -71,7 +71,7 @@
         class="table-landing table-bordered"
       >
         <template slot="items" slot-scope="props">
-          <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer">
+          <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
             <td class="text-xs-center">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
@@ -125,13 +125,13 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small slot="activator" color="primary" 
+                <v-btn small slot="activator" color="primary" class="my-1"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
                 >
                   Nộp hồ sơ
                 </v-btn>
-                <v-btn small slot="activator" color="primary" 
+                <v-btn small slot="activator" color="primary" class="my-1"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
                 >

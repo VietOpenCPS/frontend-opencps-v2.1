@@ -16,9 +16,9 @@
             style="border:1px solid #0072bc;border-radius:3px;color:#0072bc"
           >
             Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i v-if="getUser('Administrator')"> ({{questionDetail.email}})</i>
-            <span> - Ngày {{questionDetail.createDate}}</span>
+            <span style="color:#993131"> (Ngày {{questionDetail.createDate}})</span>
           </div>
-          <div class="ml-3">
+          <div class="ml-3 mt-3">
             <div class="py-1">
               <span class="primary--text text-bold">NỘI DUNG HỎI: </span>
             </div>
@@ -29,11 +29,16 @@
               <content-placeholders-text :lines="10" />
             </content-placeholders>
           </div>
-          <div v-else>
+          <div v-else class="mt-4">
             <div class="ml-3 my-1 py-1">
               <span class="primary--text text-bold">CƠ QUAN HÀNH CHÍNH TRẢ LỜI: </span>
             </div>
-            <v-card flat v-if="answerList.length > 0">
+            <v-card flat v-if="answerList.length = 1 && !getUser('Administrator')">
+              <v-card-text class="px-3 py-1">
+                <div class="ml-2 mt-1 mb-3" v-html="answerList[0].content"></div>
+              </v-card-text>
+            </v-card>
+            <v-card flat v-if="answerList.length > 1">
               <v-card-text class="px-3 py-1">
                 <div
                   class="my-2 px-2 py-2"
@@ -60,7 +65,7 @@
                 </div>
               </v-card-text>
             </v-card>
-            <div class="px-3 py-2" v-else>
+            <div class="px-3 py-2" v-if="answerList.length === 0">
               <v-alert outline color="warning" icon="priority_high" :value="true">
                 Chưa có câu trả lời nào
               </v-alert>

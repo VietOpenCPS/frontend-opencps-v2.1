@@ -92,7 +92,7 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small color="primary" class="mx-2 my-2" 
+                <v-btn small color="primary" class="mx-3 my-2" 
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
@@ -123,7 +123,7 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small color="primary" class="mx-2 my-2" 
+                <v-btn small color="primary" class="mx-3 my-2" 
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
@@ -164,7 +164,7 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small color="primary" class="mx-2 my-2" 
+                <v-btn small color="primary" class="mx-3 my-2" 
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
@@ -195,7 +195,7 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small color="primary" class="mx-2 my-2" 
+                <v-btn small color="primary" class="mx-3 my-2" 
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
@@ -262,9 +262,14 @@ export default {
   watch: {},
   methods: {
     createDossier (item) {
-      let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-      let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-      window.open(url, '_self')
+      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+      if (isSigned) {
+        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+        window.open(url, '_self')
+      } else {
+        alert('Vui lòng đăng nhập để thực hiện')
+      }
     },
     viewGuide (item) {
       var vm = this
