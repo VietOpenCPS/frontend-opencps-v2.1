@@ -203,12 +203,13 @@
                   :key="itemQuestion.questionId"
                 >
                   <v-card style="cursor:pointer" flat color="#1a571b21" @click="viewDetail(itemQuestion)">
-                    <v-flex class="white--text py-2" style="background:#2196f3;font-size:12px">
-                      <span>{{itemQuestion.fullname}}</span>
+                    <v-flex class="white--text py-3"  style="background:#2196f3;font-size:12px">
+                      <span class="text-bold">{{itemQuestion.fullname}}</span>
                       <span class="right">{{splitDate(itemQuestion.createDate)}}</span>
                     </v-flex>
                     <v-divider light></v-divider>
-                    <v-card-text style="height:120px;overflow:hidden;text-overflow:ellipsis" class="mb-2 py-2 px-1" v-html="itemQuestion.content">
+                    <v-card-text class="py-1 px-2 mb-2" style="height:150px;">
+                      <p class="content-question" v-html="itemQuestion.content"></p>
                     </v-card-text>
                     <v-divider light></v-divider>
                     <v-card-actions>
@@ -238,7 +239,7 @@
                 </v-flex>
               </v-layout>
             </v-container>
-            <div v-if="totalQuestion > 0" class="text-xs-right layout wrap px-3 mt-2" style="position: relative;">
+            <div v-if="totalQuestion > 10" class="text-xs-right layout wrap px-3 mt-2" style="position: relative;">
               <div class="flex pagging-table px-2"> 
                 <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
                   @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -247,15 +248,15 @@
           </v-card>
         </v-flex>
       </v-layout>
-      <div class="px-3 py-2" v-else style="width:!00%;max-width:960px;margin:0 auto">
+      <div class="px-3 py-2" v-else style="width:100%;max-width:960px;margin:0 auto">
         <v-alert outline color="warning" icon="priority_high" :value="true">
           Không có câu hỏi nào
         </v-alert>
       </div>
-      <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
+      <v-flex xs12 sm12 class="mx-0 mt-4" v-if="activeAddQuestion">
         <div id="contentQuestion">
           <span><v-icon class="blue--text">contact_support</v-icon> </span>
-          <span class="text-bold primary--text">TẠO CÂU HỎI:</span>
+          <span class="text-bold primary--text">NỘI DUNG CÂU HỎI:</span>
         </div>
         <v-card flat class="mx-1 my-2">
           <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
@@ -644,6 +645,21 @@ export default {
   }
 }
 </script>
-<style scoped>
-  
+<style lang="scss">
+  $font-size: 14px;
+  $line-height: 1.5;
+  $lines-to-show: 7;
+  .content-question {
+    text-align: justify;
+    display: block;
+    display: -webkit-box;
+    height: $font-size*$line-height*$lines-to-show;
+    margin: 0 auto;
+    font-size: $font-size;
+    line-height: $line-height;
+    -webkit-line-clamp: $lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>

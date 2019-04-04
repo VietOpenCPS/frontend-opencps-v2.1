@@ -157,7 +157,8 @@
                     label="Ngày sinh"
                     @blur="ngayCap = parseDate(user['employeeBirthDate'])"
                   ></v-text-field>
-                  <v-date-picker v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
+                  <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
+                  v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4>
@@ -263,24 +264,18 @@
         </v-flex>
       </v-layout>
     </v-form>
-    <v-snackbar v-model="snackbarerror" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="5000" :top="true" :vertical="false" color="red darken-3">
-      Yêu cầu thực hiện thất bại
-      <v-btn icon @click="closeError()">
-        <v-icon>clear</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar v-model="snackbarsuccess" :bottom="false" :left="false" :multi-line="false" :right="true" :timeout="5000" :top="true" :vertical="false" color="success">
-      Yêu cầu thực hiện thành công
-      <v-btn icon @click="snackbarsuccess = !snackbarsuccess">
-        <v-icon>clear</v-icon>
-      </v-btn>
-    </v-snackbar>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue'
   import AttachedFileAvatar from '../ext/AttachedFileAvatar.vue'
-  
+  import toastr from 'toastr'
+  Vue.use(toastr)
+  toastr.options = {
+    'closeButton': true,
+    'timeOut': '5000'
+  }
   export default {
     components: {
       AttachedFileAvatar
@@ -336,6 +331,9 @@
       ngayCap(val) {
         this.toDateFormatted = this.formatDate(val)
         this.user['applicantIdDate'] = this.toDateFormatted
+      },
+      menuBirthDate (val) {
+        val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
       }
     },
     created() {
@@ -365,7 +363,7 @@
           vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
             vm.cityItems = result.data
           })
-          if (vm.user['applicantDistrictCode'] !== '') {
+          if (vm.user['applicantDistrictCode']) {
             vm.$store.dispatch('loadDictItems', {
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
@@ -374,7 +372,7 @@
               vm.districtItems = resultDistricts.data
             })
           }
-          if (vm.user['applicantWardCode'] !== '') {
+          if (vm.user['applicantWardCode']) {
             vm.$store.dispatch('loadDictItems', {
               collectionCode: 'ADMINISTRATIVE_REGION',
               level: 1,
@@ -448,10 +446,13 @@
         if (vm.$refs.form.validate()) {
           vm.loading = true
           vm.$store.dispatch('putUser', vm.user).then(function () {
-            vm.snackbarsuccess = true
             vm.loading = false
+            toastr.clear()
+            toastr.success('Yêu cầu thực hiện thành công')
           }).catch(function () {
             vm.loading = false
+            toastr.clear()
+            toastr.error('Yêu cầu thực hiện thất bại')
           })
         }
       },
@@ -489,9 +490,19 @@
       },
       parseDateInput (dateInput) {
         if (dateInput) {
-          let date = new Date(dateInput)
-          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+          let date = ''
+          if (isNaN(dateInput)) {
+            date = new Date(dateInput)
+          } else {
+            date = new Date(Number(dateInput))
+          }
+          let dateFormated = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+          return dateFormated
         }
+      },
+      getMaxdate () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       },
       itemCodeNumber (code) {
         if (code && code.indexOf('0') !== 0) {

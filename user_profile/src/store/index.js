@@ -125,9 +125,9 @@ export const store = new Vuex.Store({
           if (filter['employeeBirthDate']) {
             let [dayInput, monthInput, yearInput] = filter['employeeBirthDate'].split('/')
             let newDate = `${yearInput}-${monthInput.padStart(2, '0')}-${dayInput.padStart(2, '0')}`
-            date = new Date(newDate).getTime() ? new Date(newDate).getTime() : ''
+            date = new Date(newDate).getTime()
           }
-          dataPutUser.append('birthdate', date ? date : '')
+          dataPutUser.append('birthdate', filter['employeeBirthDate'] ? filter['employeeBirthDate'] : '')
         } else if (filter['className'] === 'org.opencps.usermgt.model.Applicant') {
           url = '/o/rest/v2/applicants/' + filter['classPK']
           dataPutUser.append('applicantName', filter['applicantName'])

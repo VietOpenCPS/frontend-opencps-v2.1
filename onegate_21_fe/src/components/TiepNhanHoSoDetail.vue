@@ -34,7 +34,7 @@
           </div>
           <v-layout row wrap>
             <v-flex xs12 sm12>
-              <div class="ml-3 mr-3" v-html="thongTinChiTietHoSo.dossierNote"></div>
+              <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
             </v-flex>
           </v-layout>
         </v-expansion-panel-content>
