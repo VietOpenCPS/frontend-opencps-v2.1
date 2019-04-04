@@ -56,10 +56,10 @@
                   <span>Chỉnh sửa ý kiến</span>
                 </v-tooltip>
                 <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
-                  <div v-if="itemFileView.eForm && onlyView" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
+                  <div v-if="itemFileView.eForm && onlyView && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
-                      {{itemFileView.dossierPartNo + '.pdf'}} - 
+                      {{itemFileView.dossierTemplateNo + '.pdf'}} - 
                       <i>{{itemFileView.modifiedDate}}</i>
                     </span>
                   </div>
@@ -74,13 +74,13 @@
                     </v-btn>
                   </div>
                 </div>
-                <div class="mr-3 my-1 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;border:1px solid #f3ae75">
+                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow-y:scroll;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
-                    <div v-if="itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
+                    <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
-                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
+                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="" style="cursor: pointer;">
                           <i style="color: #0d71bb; font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
-                          {{itemFileView.referenceUid}}.{{itemFileView.fileType}} - 
+                          {{itemFileView.dossierTemplateNo ? itemFileView.dossierTemplateNo : itemFileView.referenceUid}}.{{itemFileView.fileType}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
                         <span>Bản khai trực tuyến</span>
@@ -103,7 +103,7 @@
                     </div>
                     <div v-else :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
-                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="ml-3" style="cursor: pointer;">
+                        <span slot="activator" v-on:click.stop="viewGiayToDaNop(itemFileView)" class="" style="cursor: pointer;">
                           <v-icon style="color: #0d71bb" v-if="itemFileView.fileSize !== 0">attach_file</v-icon>
                           {{itemFileView.displayName}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
@@ -127,6 +127,11 @@
                       </v-tooltip>
                     </div>
                   </div>
+                  <v-btn class="mx-0 my-0" flat icon color="red" style="position:absolute;right:0px;top:0px"
+                  @click.stop="showFilesApplicant(item.partNo)"
+                  >
+                    <v-icon>clear</v-icon>
+                  </v-btn>
                 </div>
               </div>
             </div>
@@ -515,14 +520,9 @@ export default {
             fileTemplates.push(values[3].fileTemplates)
           }
         }
-        // console.log('dossierTemplates++++++', dossierTemplates)
-        // console.log('dossierMarks++++++', dossierMarks)
-        // console.log('dossierFiles++++++', dossierFiles)
         var dossierTemplateItems = vm.mergeDossierTemplateVsDossierFiles(dossierTemplates, dossierFiles)
-        // console.log('dossierTemplateItems++++++MERGER++++file', dossierTemplateItems)
         dossierTemplateItems = vm.mergeDossierTemplateVsDossierMark(dossierTemplateItems, dossierMarks)
         dossierTemplateItems = vm.mergeDossierTemplateVsFileTemplates(dossierTemplateItems, fileTemplates)
-        // console.log('dossierTemplateItems++++++MERGE++++mark', dossierTemplateItems)
         vm.dossierFilesItems = dossierFiles
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
@@ -538,14 +538,12 @@ export default {
             }
           })
           vm.dossierTemplateItems = dossierTemplateKQ
-          console.log('dossierTemplateItems555', vm.dossierTemplateItems)
         }
         vm.changeStateViewResult()
         setTimeout(function (argument) {
           vm.genAllAlpacaForm(dossierFiles, dossierTemplateItems)
           vm.recountFileTemplates()
         }, 500)
-        console.log('dossierTemplateItems', vm.dossierTemplateItems)
         let fileTemplateNoArr = []
         for (let key in vm.dossierTemplateItems) {
           if (vm.dossierTemplateItems[key]['fileTemplateNo']) {
@@ -554,7 +552,6 @@ export default {
         }
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
-          console.log('fileTemplateNoString', vm.fileTemplateNoString)
           if (vm.applicantId && !vm.onlyView) {
             vm.getDossierFileApplicants(vm.applicantId, vm.fileTemplateNoString)
           }
@@ -625,7 +622,7 @@ export default {
           template['daKhai'] = false
           template['passRequired'] = false
           var itemFind = dossierFiles.find(file => {
-            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed
+            return template.partNo === file.dossierPartNo && vm.partTypes.includes(template.partType) && file.eForm && !file.removed && file.fileSize !== 0
           })
           if (itemFind) {
             template['daKhai'] = true
@@ -730,7 +727,7 @@ export default {
     saveAlpacaForm (item, index) {
       var vm = this
       var fileFind = vm.dossierFilesItems.find(itemFile => {
-        return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+        return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1338,7 +1335,6 @@ export default {
     },
     showFilesApplicant (partNo) {
       let vm = this
-      console.log($('#fileApplicant-' + partNo).is(':visible'))
       if ($('#fileApplicant-' + partNo).is(':visible')) {
         $('#fileApplicant-' + partNo).hide()
       } else {

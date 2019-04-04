@@ -143,8 +143,8 @@
                 <span class="pr-2">Trạng thái: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0">Ghi chú:</div>
-              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0">
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">Ghi chú:</div>
+              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0&&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
                 <v-tooltip top>
                   <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
                   <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
