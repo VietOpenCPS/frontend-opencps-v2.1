@@ -9,9 +9,9 @@
         <v-tab key="tab-2" ripple class="primary--text">
           Lĩnh vực
         </v-tab>
-        <v-tab key="tab-3" ripple class="primary--text">
+        <!-- <v-tab key="tab-3" ripple class="primary--text">
           Mức độ
-        </v-tab>
+        </v-tab> -->
         <v-tab-item key="tab-1" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
           <v-card>
             <v-list class="pt-0">
