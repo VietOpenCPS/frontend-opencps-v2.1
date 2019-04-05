@@ -252,7 +252,12 @@ export default {
           vm.domainListCurrent = result
         })
       } else {
-        vm.domainListCurrent = vm.domainList
+        let filterDomain = {
+          agencyCode: ''
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
       }
       vm.doLoadingThuTuc()
     })
@@ -288,16 +293,6 @@ export default {
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     }
-    // domainList (val) {
-    //   var vm = this
-    //   if (vm.govAgencySelected) {
-    //     vm.domainListCurrent = val.filter(function (itemLinhVuc) {
-    //       return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
-    //     })
-    //   } else {
-    //     vm.domainListCurrent = val
-    //   }
-    // }
   },
   methods: {
     changeAdministration () {

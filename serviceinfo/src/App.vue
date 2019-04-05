@@ -102,6 +102,7 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.$store.dispatch('getGovAgency').then(function (result) {
+          vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           vm.menuServiceInfos[0].children = result
           vm.$store.commit('setAgencyList', result)
           if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
@@ -132,10 +133,12 @@
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.menuServiceInfos[1].children = result
           vm.$store.commit('setDomainList', result)
+          vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
         })
         vm.$store.dispatch('getLevelList').then(function (result) {
           vm.menuServiceInfos[2].children = result
           vm.$store.commit('setLevelList', result)
+          vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
         })
       })
     },
