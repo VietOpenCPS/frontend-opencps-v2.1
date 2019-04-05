@@ -1,166 +1,32 @@
 <template>
   <v-app id="app_serviceinfo">
     <v-navigation-drawer app clipped floating width="310" v-if="!viewMobile">
-      <v-tabs v-model="active" class="service__info__menu">
-        <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab key="tab-1" ripple class="primary--text">
-          Cơ quan quản lý
-        </v-tab>
-        <v-tab key="tab-2" ripple class="primary--text">
-          Lĩnh vực
-        </v-tab>
-        <!-- <v-tab key="tab-3" ripple class="primary--text">
-          Mức độ
-        </v-tab> -->
-        <v-tab-item key="tab-1" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card>
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in govAgencyList" :key="item.administrationCode"
-                :class="{'list__tile--active': String(currentAgency) === String(item.administrationCode)}"
-                @click="filterAgency(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentAgency) === String(item.administrationCode)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title style="width: calc(100% - 45px)" :title="item.administrationName" v-text="item.administrationName"></v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item key="tab-2" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card>
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in domainList" :key="item.domainCode"
-                :class="{'list__tile--active': String(currentDomain) === String(item.domainCode)}"
-                @click="filterDomain(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentDomain) === String(item.domainCode)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title v-text="item.domainName" style="width: calc(100% - 45px)" :title="item.domainName"></v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item key="tab-3" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card>
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in levelList" :key="item.level"
-                :class="{'list__tile--active': String(currentLevel) === String(item.level)}"
-                @click="filterLevel(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentLevel) === String(item.level)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-        </v-tab-item>
-      </v-tabs>
+      <v-list class="py-0">
+        <v-list-group
+          v-for="(item, index) in menuServiceInfos"
+          :key="index"
+          prepend-icon="description"
+          :value="index === activeTab"
+        >
+          <v-list-tile slot="activator">
+            <v-list-tile-title>{{item.name}}</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
+            <v-list-tile-action>
+              <v-icon color="primary" 
+                v-if="String(currentAgency) === String(item1[item.mappingCode])||String(currentDomain) === String(item1[item.mappingCode])||String(currentLevel) === String(item1[item.mappingCode])"
+              >play_arrow</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content @click="filterAction(index, item1)">
+              <v-list-tile-title v-text="item1[item.mappingName]" style="width: calc(100% - 45px)" :title="item1[item.mappingName]"></v-list-tile-title>
+              <span class="status__counter" style="color:#0b72ba">
+                {{item1[item.mappingCount]}}
+              </span>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list-group>
+      </v-list>
     </v-navigation-drawer>
-    <div v-if="viewMobile && !isDetail">
-      <div class="row-header mb-2 py-1" style="background-color: #070f52">
-        <div class="ml-2 text-bold white--text"> <span>THỦ TỤC HÀNH CHÍNH</span> </div>
-        <div class="layout row wrap header_tools row-blue">
-          <div class="flex text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
-              <v-icon size="18">reply</v-icon> &nbsp; Quay lại
-            </v-btn>
-          </div>
-        </div> 
-      </div>
-      <v-tabs v-model="active" class="service__info__menu">
-        <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab key="tab-1" ripple class="primary--text">
-          Cơ quan quản lý
-        </v-tab>
-        <v-tab key="tab-2" ripple class="primary--text">
-          Lĩnh vực
-        </v-tab>
-        <v-tab key="tab-3" ripple class="primary--text">
-          Mức độ
-        </v-tab>
-        <v-tab-item key="tab-1" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in govAgencyList" :key="item.administrationCode"
-                :class="{'list__tile--active': String(currentAgency) === String(item.administrationCode)}"
-                @click="filterAgency(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentAgency) === String(item.administrationCode)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title v-text="item.administrationName"></v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
-        </v-tab-item>
-        <v-tab-item key="tab-2" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in domainList" :key="item.domainCode"
-                :class="{'list__tile--active': String(currentDomain) === String(item.domainCode)}"
-                @click="filterDomain(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentDomain) === String(item.domainCode)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title v-text="item.domainName"></v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
-        </v-tab-item>
-        <v-tab-item key="tab-3" class="list-coquan" transition="fade-transition" reverse-transition="fade-transition">
-          <v-card style="max-height:200px;overflow:hidden;overflow-y:scroll">
-            <v-list class="pt-0">
-              <v-list-tile v-for="item in levelList" :key="item.level"
-                :class="{'list__tile--active': String(currentLevel) === String(item.level)}"
-                @click="filterLevel(item)"
-              >
-                <v-list-tile-action>
-                  <v-icon color="primary" v-if="String(currentLevel) === String(item.level)">play_arrow</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
-                  <span class="status__counter" style="color:#0b72ba">
-                    {{item.count}}
-                  </span>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-          <v-divider class="mx-0" inset style="background-color:#0072c0a1;width:100%"></v-divider>
-        </v-tab-item>
-      </v-tabs>
-    </div>
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -175,12 +41,39 @@
   export default {
     data: () => ({
       active: null,
+      activeTab: 0,
       pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
       currentDomain: '',
       currentLevel: '',
       isDetail: false,
-      text: ''
+      text: '',
+      menuServiceInfos: [
+        {
+          id: 1,
+          name: 'CƠ QUAN QUẢN LÝ',
+          mappingName: 'administrationName',
+          mappingCode: 'administrationCode',
+          mappingCount: 'count',
+          children: []
+        },
+        {
+          id: 2,
+          name: 'LĨNH VỰC',
+          mappingName: 'domainName',
+          mappingCode: 'domainCode',
+          mappingCount: 'count',
+          children: []
+        },
+        {
+          id: 3,
+          name: 'MỨC ĐỘ',
+          mappingName: 'levelName',
+          mappingCode: 'level',
+          mappingCount: 'count',
+          children: []
+        }
+      ],
     }),
     components: {
       GoTop
@@ -204,14 +97,12 @@
     },
     created () {
       var vm = this
-      console.log('isMobile', isMobile)
       vm.$nextTick(function () {
         vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh' : '/thu-tuc-hanh-chinh'
         let current = vm.$router.history.current
         let newQuery = current.query
-        console.log('current', current)
-        console.log('newQuery', newQuery)
         vm.$store.dispatch('getGovAgency').then(function (result) {
+          vm.menuServiceInfos[0].children = result
           vm.$store.commit('setAgencyList', result)
           if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
           (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
@@ -239,9 +130,11 @@
           agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.menuServiceInfos[1].children = result
           vm.$store.commit('setDomainList', result)
         })
         vm.$store.dispatch('getLevelList').then(function (result) {
+          vm.menuServiceInfos[2].children = result
           vm.$store.commit('setLevelList', result)
         })
       })
@@ -262,6 +155,16 @@
       }
     },
     methods: {
+      filterAction (index, item1) {
+        let vm = this
+        if (index === 0) {
+          vm.filterAgency(item1)
+        } else if (index === 1) {
+          vm.filterDomain(item1)
+        } else if (index === 2) {
+          vm.filterLevel(item1)
+        }
+      },
       filterAgency (item) {
         var vm = this
         vm.currentAgency = item.administrationCode

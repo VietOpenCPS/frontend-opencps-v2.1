@@ -39,7 +39,7 @@
           v-model="levelSelected"
           autocomplete
           label="Chọn mức độ"
-          item-text="textLevel"
+          item-text="levelName"
           item-value="level"
           :hide-selected="true"
           @change="changeLevel"
@@ -251,6 +251,8 @@ export default {
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
         })
+      } else {
+        vm.domainListCurrent = vm.domainList
       }
       vm.doLoadingThuTuc()
     })
