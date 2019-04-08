@@ -37,6 +37,7 @@
               v-model="npmreactlogin_login"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
+              @keyup.enter="submitConfirmLogin"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
@@ -47,6 +48,7 @@
               :type="'password'"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
+              @keyup.enter="submitConfirmLogin"
             ></v-text-field>
           </v-flex>
           <v-flex xs12 class="text-xs-left">
@@ -147,7 +149,9 @@ export default {
         npmreactlogin_password: vm.npmreactlogin_password,
         j_captcha_response: vm.j_captcha_response
       }
-      vm.$store.dispatch('goToDangNhap', filter)
+      if (vm.npmreactlogin_login && vm.npmreactlogin_password) {
+        vm.$store.dispatch('goToDangNhap', filter)
+      }
     },
     doLogOut () {
       window.location.href = "/c/portal/logout";
