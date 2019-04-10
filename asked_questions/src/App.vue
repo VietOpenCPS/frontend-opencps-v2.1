@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_asked_questions" >
+  <v-app id="app_asked_questions" style="background: #fff !important">
     <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
       <div class="mx-2 mb-2">
         <v-btn class="mx-0" block color="primary" v-on:click.native="addQuestion()"
@@ -36,10 +36,10 @@
       </v-list>
     </v-navigation-drawer>
     <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1200px;margin: 0 auto' : ''">
-      <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
+      <!-- <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
         <v-icon>near_me</v-icon>&nbsp;
         Gửi câu hỏi
-      </v-btn>
+      </v-btn> -->
       <router-view></router-view>
     </v-content>
   </v-app>

@@ -1,24 +1,24 @@
 <template>
   <div>
-    <v-layout row wrap class="mb-3">
-      <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
+    <v-layout row wrap class="px-3 py-3">
+      <!-- <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
         <h3 v-if="getUser('Administrator')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
         <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
-      </v-flex>
+      </v-flex> -->
       <!-- template cũ -->
-      <!-- <v-flex xs12 sm12>
+      <v-flex xs12 sm7 class="pr-3">
         <content-placeholders v-if="loading" class="mt-3">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
-        <v-card v-else>
+        <div v-else>
           <div v-if="questionList.length > 0">
-            <v-expansion-panel >
-              <v-expansion-panel-content v-for="(itemQuestion, indexQuestion) in questionList"
-              :key="indexQuestion">
+            <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
+              :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px">
+              <v-expansion-panel-content style="border-radius:5px">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
-                <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)" >
-                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}. </span>
-                  <div class="ml-2 mt-2" v-html="itemQuestion.content"></div>
+                <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
+                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}: </span>
+                  <div class="ml-2 primary--text" v-html="itemQuestion.content"></div>
                   <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:50px;top:0">
                     <v-tooltip top class="mr-1">
                       <v-btn title="Thêm câu trả lời" class="my-0" icon slot="activator" style="margin-top:-10px!important"
@@ -45,34 +45,31 @@
                   </content-placeholders>
                 </div>
                 <div v-else>
-                  <v-card flat v-if="answerList.length > 0" style="background-color:#e9e9e945">
+                  <v-card flat v-if="answerList.length > 0">
                     <div class="ml-3 py-1">
-                      <i class="green--text text-bold">Trả lời: </i>
+                      <span class="primary--text text-bold">Trả lời: </span>
                     </div>
                     <v-card-text class="my-0 py-0">
-                      <div>
-                        <div
-                          class="mb-2 px-2"
-                          style="border:1px solid #dedede;border-radius:3px"
-                          v-for="(itemAnswer, indexAnswer) in answerList"
-                          :key="indexAnswer"
-                        >
-                          <div>
-                            <div style="position:relative">
-                              <span class="text-bold">Câu trả lời {{ indexAnswer + 1}}. </span>
-                              <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
-                              <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
-                                <v-tooltip top class="mr-2">
-                                  <v-btn slot="activator" icon ripple @click="deleteAnswer(itemAnswer)" style="margin-top:-3px!important">
-                                    <v-icon color="red lighten-1">delete</v-icon>
-                                  </v-btn>
-                                  <span>Xóa</span>
-                                </v-tooltip>
-                                <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
-                                  label="Công khai"
-                                  v-model="itemAnswer['publish']"
-                                ></v-checkbox>
-                              </div>
+                      <div
+                        class="mb-2"
+                        v-for="(itemAnswer, indexAnswer) in answerList"
+                        :key="indexAnswer"
+                      >
+                        <div>
+                          <div style="position:relative">
+                            <!-- <span class="text-bold">Câu trả lời {{ indexAnswer + 1}}. </span> -->
+                            <div class="ml-2" v-html="itemAnswer.content"></div>
+                            <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
+                              <v-tooltip top class="mr-2">
+                                <v-btn slot="activator" icon ripple @click="deleteAnswer(itemAnswer)" style="margin-top:-3px!important">
+                                  <v-icon color="red lighten-1">delete</v-icon>
+                                </v-btn>
+                                <span>Xóa</span>
+                              </v-tooltip>
+                              <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
+                                label="Công khai"
+                                v-model="itemAnswer['publish']"
+                              ></v-checkbox>
                             </div>
                           </div>
                         </div>
@@ -127,13 +124,101 @@
               Không có câu hỏi nào
             </v-alert>
           </div>
-        </v-card>
-        <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-2" style="position: relative;">
+        </div>
+        <!-- <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-2" style="position: relative;">
           <div class="flex pagging-table px-2"> 
             <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
               @tiny:change-page="paggingData" ></tiny-pagination> 
           </div>
-        </div>
+        </div> -->
+      </v-flex>
+      <v-flex xs12 sm5>
+        <v-card flat style="border: 1px solid #ddd;border-top: 0">
+          <!-- <v-toolbar
+            height="46"
+            color="primary"
+            dark
+            flat
+          >
+            <v-toolbar-title style="font-size:14px">TIẾP NHẬN Ý KIẾN</v-toolbar-title>
+          </v-toolbar> -->
+          <v-flex xs12>
+            <div class="white--text px-2 py-2" style="background: #001f4d">
+              TIẾP NHẬN Ý KIẾN
+            </div>
+          </v-flex>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-layout wrap class="px-2 mt-2 pb-3">
+              <v-flex xs12>
+                <div class="mb-1">Họ và tên người gửi <span style="color:red">(*)</span></div>
+                <v-text-field
+                  box
+                  placeholder="Ghi rõ họ tên"
+                  v-model="fullName"
+                  :rules="[rules.required]"
+                  min="6"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Địa chỉ</div>
+                <v-text-field
+                  box
+                  placeholder="Ghi rõ số nhà, tên đường, quận/ huyện, tỉnh thành."
+                  v-model="address"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6 class="pr-1">
+                <div class="mb-1">Số điện thoại</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập số điện thoại"
+                  v-model="telNo"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6 class="pl-1">
+                <div class="mb-1">Thư điện tử</div>
+                <v-text-field
+                  placeholder="Nhập thư điện tử"
+                  box
+                  v-model="contactEmail"
+                  :rules="contactEmail ? [rules.email] : []"
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Tiêu đề</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập tiêu đề"
+                  v-model="titleQuestion"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Nội dung câu hỏi</div>
+                <v-textarea
+                  box
+                  row="5"
+                  placeholder="Nhập nội dung câu hỏi"
+                  v-model="content"
+                ></v-textarea>
+              </v-flex>
+              <v-flex xs12 v-if="captchaActive" style="margin:0 auto">
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+              <v-flex xs12>
+                <v-btn color="primary"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitAddQuestion"
+                >
+                  Gửi ý kiến
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card>
       </v-flex>
       <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
         <div id="contentQuestion">
@@ -170,7 +255,7 @@
             <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
               <captcha ref="captcha"></captcha>
             </v-flex>
-            <div class="text-xs-center my-2">
+            <!-- <div class="text-xs-center my-2">
               <v-btn color="primary"
                 :loading="loading"
                 :disabled="loading"
@@ -185,14 +270,14 @@
                 <v-icon>clear</v-icon>&nbsp;
                 Hủy
               </v-btn>
-            </div>
+            </div> -->
           </v-form>
         </div>
-      </v-flex> -->
+      </v-flex>
       <!-- end -->
 
       <!-- template mới -->
-      <v-layout justify-center v-if="totalQuestion > 0">
+      <!-- <v-layout justify-center v-if="totalQuestion > 0">
         <v-flex xs12>
           <v-card flat>
             <v-container fluid grid-list-md>
@@ -306,7 +391,7 @@
             </div>
           </v-form>
         </div>
-      </v-flex>
+      </v-flex> -->
       <!-- end -->
     </v-layout>
   </div>
@@ -343,8 +428,11 @@ export default {
     captchaActive: false,
     valid: false,
     validAnswer: false,
+    telNo: '',
+    address: '',
     contactEmail: '',
     fullName: '',
+    titleQuestion: '',
     questionSelected: '',
     openQuestion: '',
     publishAnswer: false,
@@ -478,7 +566,7 @@ export default {
             j_captcha_response: vm.$refs.captcha.j_captcha_response
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
-            toastr.success('Thêm câu hỏi thành công')
+            toastr.success('Hệ thống đã tiếp nhận ý kiến của bạn. Xin cảm ơn')
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {
@@ -645,7 +733,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   $font-size: 14px;
   $line-height: 1.5;
   $lines-to-show: 7;

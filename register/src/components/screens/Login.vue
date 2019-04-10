@@ -37,6 +37,7 @@
               v-model="npmreactlogin_login"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
+              prepend-inner-icon="contact_mail"
               @keyup.enter="submitConfirmLogin"
             ></v-text-field>
           </v-flex>
@@ -48,12 +49,13 @@
               :type="'password'"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
+              prepend-inner-icon="vpn_key"
               @keyup.enter="submitConfirmLogin"
             ></v-text-field>
           </v-flex>
           <v-flex xs12 class="text-xs-left">
             <div style="display:inline-block">
-              <a :href="getPassword" style="line-height: 30px; font-size: 12px; color: blue; text-decoration: underline;">
+              <a :href="getPassword" style="line-height: 30px; font-size: 12px; color: #27279b; text-decoration: underline;">
               Quên mật khẩu?
               </a>
             </div>
