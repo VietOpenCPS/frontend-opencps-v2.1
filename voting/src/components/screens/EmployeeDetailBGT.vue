@@ -7,43 +7,60 @@
       indeterminate
     ></v-progress-circular>
   </div>
-  <div v-else class="pt-2" style="height: 100%; background-color: #ffff;">
+  <div v-else class="px-2 pt-2" style="height: 100%; background-color: #ffff;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-layout row wrap>
-        <v-flex xs12 md2>
+        <v-flex xs12 sm1 lg2>
         </v-flex>
-        <v-flex xs12 md8>
+        <v-flex xs12 sm10 lg8>
           <v-layout row wrap>
             <v-flex xs12 sm12>
               <v-layout wrap class="px-2">
-                <v-flex xs4 sm2 style="text-align: center!important;background: #ddd">
+                <v-flex xs4 sm3 class="mt-1" style="text-align: center!important;max-height: 200px">
                   <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'"
-                  style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;">
+                  style="width: 100%;max-width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;">
                   </div>
                   <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" 
-                  style="max-width: 100px;height: 150px;object-fit: contain;opacity:0.6"/>
+                  style="width: 100%;max-width: 150px;height: 200px;object-fit: contain;opacity:0.6;background: #ddd"/>
                 </v-flex>
-                <v-flex class="pl-2" xs8 style="word-wrap: break-word;">
+                <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">
                   <div class="text-bold primary--text" style="font-size:1.5em">{{employeeSelected.fullName}}</div>
-                  <div class="primary--text mb-2">{{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}</div>
-                  <div >Email: {{employeeSelected.email}}</div>
-                  <star-rating class="mt-2" read-only :rating="3.5" :increment="0.5" :max-rating="5" :show-rating="false" :star-size="30"></star-rating>
-                  <div class="text-bold primary--text">50 lượt đánh giá</div>
+                  <div class="primary--text">{{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}</div>
+                  <div class="mb-2">Email: {{employeeSelected.email}}</div>
+                  <!--  -->
+                  <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
+                    <star-rating class="mt-2" read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
+                    <div class="text-bold primary--text">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
+                  </div>
+                  <!--  -->
+                  <div v-if="!isMobile">
+                    <div v-for="(item, index) in votingItems" :key="index" >
+                      <div class="text-bold primary--text">* {{ item.subject }}</div>
+                      <div class="ml-3">
+                        <v-radio-group class="mt-2" v-model="item.selected" height="10" row>
+                          <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                          </v-radio>
+                        </v-radio-group>
+                      </div>
+                    </div>
+                  </div>
                 </v-flex>
               </v-layout>
-              <div class="px-2 mt-3" v-for="(item, index) in votingItems" :key="index">
-                <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
-                <div class="ml-3">
-                  <v-radio-group v-model="item.selected" height="10" row>
-                    <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    </v-radio>
-                  </v-radio-group>
+              <div v-if="isMobile">
+                <div class="px-2 mt-3" v-for="(item, index) in votingItems" :key="index" >
+                  <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
+                  <div class="ml-3">
+                    <v-radio-group v-model="item.selected" height="10" row>
+                      <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                      </v-radio>
+                    </v-radio-group>
+                  </div>
                 </div>
               </div>
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex xs12 md2>
+        <v-flex xs12 sm1 lg2>
         </v-flex>
         <v-flex xs12 sm12 class="text-xs-center my-3">
           <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">
@@ -122,7 +139,8 @@ export default {
     votingDialog_hidden_loading: false,
     validFormVoting: false,
     showCaptcha: false,
-    dialogShowApplicantIdNo: false
+    dialogShowApplicantIdNo: false,
+    isMobile: false
   }),
   computed: {
     loading () {
@@ -132,33 +150,54 @@ export default {
       return this.$store.getters.employeeSelected
     }
   },
+  beforeDestroy () {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    this.onResize()
+    window.addEventListener('resize', this.onResize, { passive: true })
+  },
   created () {
     var vm = this
     let currentQuery = vm.$router.history.current.query
     vm.$nextTick(function () {
-      vm.$store.dispatch('loadVoting', {
-        className: 'employee',
-        classPk: vm.id
-      }).then(result => {
-        vm.votingItems = result
-        console.log(vm.votingItems)
-      }).catch(xhr => {
-      })
+      vm.getVotingEmployee()
     })
   },
   watch: {
   },
   methods: {
-    showVoting () {
-        let vm = this
-        vm.$store.dispatch('loadVoting', {
-            className: 'employee',
-            classPk: vm.id
-        }).then(result => {
-            vm.votingItems = result
-            console.log(vm.votingItems)
-        }).catch(xhr => {
-        })
+    getVotingEmployee () {
+      let vm = this
+      vm.$store.dispatch('loadVoting', {
+        className: 'employee',
+        classPk: vm.id
+      }).then(result => {
+        vm.votingItems = result
+        vm.getScoreVoting(vm.votingItems)
+      }).catch(xhr => {
+      })
+    },
+    getScoreVoting (votingItems) {
+      let vm = this
+      if (votingItems && votingItems.length > 0) {
+        let totalVoting = 0
+        let totalScore = 0
+        let lengthQuestion = votingItems.length
+        let lengthAnswer = votingItems[0]['answers'].length
+        for (var i = 0; i < lengthQuestion; i++) {
+          totalVoting += votingItems[i]['answersCount']
+          for (var j = 0; j < lengthAnswer; j++) {
+            totalScore += votingItems[i]['answers'][j] * (lengthAnswer - j)
+          }
+        }
+        if (totalVoting > 0) {
+          vm.employeeSelected['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
+          vm.employeeSelected['totalVoting'] = Number(totalVoting)
+        }
+      }
     },
     submitResultVoting: function () {
       var vm = this
@@ -200,15 +239,14 @@ export default {
       }
       Promise.all(arrAction).then(results => {
         toastr.success('Gửi đánh giá thành công thành công')
-        vm.dialogShowApplicantIdNo = false
-        vm.dialog_voting = false
-        if (vm.$refs.captcha) {
-          vm.$refs.captcha.makeRandomString()
-        }
+        vm.getVotingEmployee()
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
-        vm.dialogShowApplicantIdNo = false
       })
+    },
+    onResize () {
+      let vm = this
+      vm.isMobile = window.innerWidth < 600
     },
     goBack () {
       var vm = this

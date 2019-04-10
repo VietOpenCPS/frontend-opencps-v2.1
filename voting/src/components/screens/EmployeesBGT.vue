@@ -10,6 +10,7 @@
                 v-for="employee in employeeItems"
                 xs12 sm6 md4 lg3
                 :key="employee.employeeId"
+                class="px-2 py-2"
               >
                 <v-card color="#1a571b21" @click="viewDetailEmployee(employee)">
                   <v-card-text class="py-2 px-1" style="overflow:hidden">
@@ -33,7 +34,7 @@
                         <span class="text-bold">Đánh giá:</span>
                       </v-flex>
                       <v-flex>
-                        <star-rating read-only :rating="3.5" :increment="0.5" :max-rating="5" :show-rating="false" :star-size="30"></star-rating>
+                        <star-rating read-only :rating="employee['score'] ? employee['score'] : 0" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30"></star-rating>
                       </v-flex>
                     </v-layout>
                     <v-layout wrap class="px-3">
@@ -41,7 +42,7 @@
                         <span class="text-bold">Kết quả:</span>
                       </v-flex>
                       <v-flex>
-                        <span class="text-bold primary--text">50 lượt đánh giá</span>
+                        <span class="text-bold primary--text">{{employee['totalVoting'] ?employee['totalVoting'] : 0}} lượt đánh giá</span>
                       </v-flex>
                     </v-layout>
                   </div>
@@ -49,7 +50,7 @@
               </v-flex>
             </v-layout>
           </v-container>
-          <div class="text-xs-center pt-2 pb-3" style="width: 100%; max-width:350px; margin: 0 auto">
+          <div v-if="employeeItems.length > numberPerPage" class="text-xs-center pt-2 pb-3" style="width: 100%; max-width:350px; margin: 0 auto">
             <v-pagination
               @input="changePage"
               v-model="employeePage"
@@ -141,6 +142,7 @@ export default {
         if (vm.employeeItems && vm.employeeItems.length > 0) {
           for (let key in vm.employeeItems) {
             vm.getAvatar(vm.employeeItems[key], key)
+            vm.getVotingEmployee(vm.employeeItems[key], key)
           }
         }
       }).catch(xhr => {
@@ -175,14 +177,35 @@ export default {
         }
       })
     },
-    getPercent (answers, index) {
-      let totalVoted = 0
-      let percent = 0
-      for (var i = 0; i < answers.length; i++) {
-        totalVoted += answers[i]
+    getVotingEmployee (item, key) {
+      let vm = this
+      vm.$store.dispatch('loadVoting', {
+        className: 'employee',
+        classPk: item.employeeId
+      }).then(result => {
+        let votingItems = result
+        vm.getScoreVoting(votingItems, key)
+      }).catch(xhr => {
+      })
+    },
+    getScoreVoting (votingItems, key) {
+      let vm = this
+      if (votingItems && votingItems.length > 0) {
+        let totalVoting = 0
+        let totalScore = 0
+        let lengthQuestion = votingItems.length
+        let lengthAnswer = votingItems[0]['answers'].length
+        for (var i = 0; i < lengthQuestion; i++) {
+          totalVoting += votingItems[i]['answersCount']
+          for (var j = 0; j < lengthAnswer; j++) {
+            totalScore += votingItems[i]['answers'][j] * (lengthAnswer - j)
+          }
+        }
+        if (totalVoting > 0) {
+          vm.employeeItems[key]['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
+          vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
+        }
       }
-      percent = ((answers[index] / totalVoted) * 100).toFixed(1)
-      return percent
     },
     changePage () {
       let vm = this

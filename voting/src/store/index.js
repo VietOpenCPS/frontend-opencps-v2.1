@@ -2,9 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
-import support from './support.json'
-import { stat } from 'fs'
-// 
 
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -14,8 +11,8 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    // endPointApi: '/o/rest/v2'
-    endPointApi: 'http://127.0.0.1:8081/api',
+    endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
     employeeSelected: ''
   },
   actions: {
@@ -150,6 +147,8 @@ export const store = new Vuex.Store({
               if (employees && employees.length > 0) {
                 for (let key in employees) {
                   employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
                 }
               }
               let dataOutput = [result.data.total, employees]

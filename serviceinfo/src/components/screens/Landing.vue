@@ -116,8 +116,8 @@
               </content-placeholders>
               <div v-else>
                 <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
-                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="props.item.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -125,13 +125,13 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small slot="activator" color="primary" class="my-1"
+                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
                 >
                   Nộp hồ sơ
                 </v-btn>
-                <v-btn small slot="activator" color="primary" class="my-1"
+                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
                 >

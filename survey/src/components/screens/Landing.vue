@@ -6,7 +6,7 @@
       </v-flex> -->
       <v-flex xs12 sm1>
       </v-flex>
-      <v-flex xs12 sm7 v-if="votingItems.length > 0">
+      <v-flex xs12 sm8 v-if="votingItems.length > 0">
         <v-layout row wrap>
           <v-flex xs12 sm12 class="mb-4 px-2">
             <div class="primary--text text-bold">
@@ -21,7 +21,7 @@
                 <div class="flex px-3 py-1" style="height:32px;max-width:100px;background-color: #001f4d;transform: skew(-25deg)">
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
-                <div class="flex primary--text pl-3" style="max-width:calc(100% - 100px)">
+                <div class="flex primary--text pl-3 pr-2" style="max-width:calc(100% - 100px)">
                   {{ item.subject }}
                 </div>
               </v-layout>
