@@ -25,12 +25,14 @@
                 </v-flex>
                 <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">
                   <div class="text-bold primary--text" style="font-size:1.5em">{{employeeSelected.fullName}}</div>
-                  <div class="primary--text">{{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}</div>
+                  <div class="primary--text" v-if="employeeSelected.jobPosTitle || employeeSelected.workingUnitName">
+                    {{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}
+                  </div>
                   <div class="mb-2">Email: {{employeeSelected.email}}</div>
                   <!--  -->
                   <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
                     <star-rating class="mt-2" read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
-                    <div class="text-bold primary--text">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
+                    <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
                   </div>
                   <!--  -->
                   <div v-if="!isMobile">
@@ -38,7 +40,8 @@
                       <div class="text-bold primary--text">* {{ item.subject }}</div>
                       <div class="ml-3">
                         <v-radio-group class="mt-2" v-model="item.selected" height="10" row>
-                          <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                          <v-radio height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                            <div :class="item.selected === indexChoise + 1 ? 'primary--text' : 'black--text'" slot="label">{{itemChoise}}</div>
                           </v-radio>
                         </v-radio-group>
                       </div>
@@ -238,7 +241,7 @@ export default {
         arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
       }
       Promise.all(arrAction).then(results => {
-        toastr.success('Gửi đánh giá thành công thành công')
+        toastr.success('Gửi đánh giá thành công')
         vm.getVotingEmployee()
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')

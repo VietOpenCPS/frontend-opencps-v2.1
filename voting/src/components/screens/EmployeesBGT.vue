@@ -3,7 +3,7 @@
     <v-layout justify-center>
       <v-flex xs12>
         <v-card flat >
-          <h2 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h2>
+          <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
           <v-container fluid grid-list-md>
             <v-layout row wrap>
               <v-flex
@@ -12,7 +12,7 @@
                 :key="employee.employeeId"
                 class="px-2 py-2"
               >
-                <v-card color="#1a571b21" @click="viewDetailEmployee(employee)">
+                <v-card flat hover color="#1a571b21" @click="viewDetailEmployee(employee)" style="box-shadow: none;">
                   <v-card-text class="py-2 px-1" style="overflow:hidden">
                     <v-layout wrap>
                       <v-flex xs4 style="text-align: center!important;">
@@ -27,7 +27,7 @@
                       </v-flex>
                     </v-layout>
                   </v-card-text>
-                  <v-divider light></v-divider>
+                  <v-divider light class="my-0"></v-divider>
                   <div class="py-2">
                     <v-layout wrap class="px-3">
                       <v-flex class="pt-2" style='max-width:100px'>
@@ -50,7 +50,7 @@
               </v-flex>
             </v-layout>
           </v-container>
-          <div v-if="employeeItems.length > numberPerPage" class="text-xs-center pt-2 pb-3" style="width: 100%; max-width:350px; margin: 0 auto">
+          <div v-if="totalEmployee > numberPerPage" class="text-xs-center pt-2 pb-3" style="width: 100%; max-width:350px; margin: 0 auto">
             <v-pagination
               @input="changePage"
               v-model="employeePage"
@@ -98,7 +98,7 @@ export default {
     lengthPage: 0,
     totalEmployee: 0,
     employeePage: 1,
-    numberPerPage: 6
+    numberPerPage: 10
   }),
   computed: {
     loading () {
@@ -137,6 +137,7 @@ export default {
         end: vm.employeePage * vm.numberPerPage,
       }
       vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+        vm.totalEmployee = result[0]
         vm.employeeItems = sortEmployee(result[1])     
         vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
         if (vm.employeeItems && vm.employeeItems.length > 0) {

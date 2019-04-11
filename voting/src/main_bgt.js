@@ -6,6 +6,7 @@ import router from './router_dev_bgt'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import VueDraggable from 'vue-draggable'
+import 'vuetify/dist/vuetify.min.css'
 import axios from 'axios'
 
 Vue.use(VueContentPlaceholders)
