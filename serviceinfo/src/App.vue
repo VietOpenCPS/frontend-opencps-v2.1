@@ -14,7 +14,8 @@
           <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
             <v-list-tile-action>
               <v-icon color="primary" 
-                v-if="String(currentAgency) === String(item1[item.mappingCode])||String(currentDomain) === String(item1[item.mappingCode])||String(currentLevel) === String(item1[item.mappingCode])"
+                v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
+                || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
               >play_arrow</v-icon>
             </v-list-tile-action>
             <v-list-tile-content @click="filterAction(index, item1)">
@@ -46,6 +47,7 @@
       currentAgency: '',
       currentDomain: '',
       currentLevel: '',
+      currentMethod: '',
       isDetail: false,
       text: '',
       menuServiceInfos: [
@@ -72,6 +74,27 @@
           mappingCode: 'level',
           mappingCount: 'count',
           children: []
+        },
+        {
+          id: 4,
+          name: 'HÌNH THỨC NỘP',
+          mappingName: 'methodName',
+          mappingCode: 'methodCode',
+          mappingCount: 'count',
+          children: [
+            {
+              methodName: 'Nộp trực tiếp',
+              methodCode: 'MC',
+              count: 0,
+              level: '2'
+            },
+            {
+              methodName: 'Nộp trực tuyến',
+              methodCode: 'DVC',
+              count: 0,
+              level: '3,4'
+            }
+          ]
         }
       ],
     }),
@@ -140,6 +163,7 @@
           vm.$store.commit('setLevelList', result)
           vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
         })
+        vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
       })
     },
     watch: {
@@ -155,6 +179,23 @@
         vm.currentAgency = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
+        vm.currentMethod = currentQuery.hasOwnProperty('level') && String(currentQuery.level) === '2' ? 'MC' : currentQuery.hasOwnProperty('level') && String(currentQuery.level === '3,4') ? 'DVC' : ''
+      },
+      levelList (list) {
+        let vm = this
+        let dossierMc = 0
+        let dossierDvc = 0
+        if (Array.isArray(list) && list.length > 0) {
+          for (let index in list) {
+            if (Number(list[index]['level']) > 2) {
+              dossierDvc += Number(list[index]['count'])
+            } else {
+              dossierMc += Number(list[index]['count'])
+            }
+          }
+          vm.menuServiceInfos[3]['children'][0]['count'] = dossierMc
+          vm.menuServiceInfos[3]['children'][1]['count'] = dossierDvc
+        }
       }
     },
     methods: {
@@ -166,6 +207,8 @@
           vm.filterDomain(item1)
         } else if (index === 2) {
           vm.filterLevel(item1)
+        } else if (index === 3) {
+          vm.filterMethod(item1)
         }
       },
       filterAgency (item) {
@@ -214,6 +257,29 @@
       },
       filterLevel (item) {
         var vm = this
+        vm.currentLevel = item.level
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['domain'] = ''
+        newQuery['agency'] = ''
+        newQuery['level'] = item.level
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      filterMethod (item) {
+        var vm = this
+        console.log('itemMethod', item)
         vm.currentLevel = item.level
         let current = vm.$router.history.current
         let newQuery = current.query

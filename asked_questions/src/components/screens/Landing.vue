@@ -179,11 +179,11 @@
           >
             <v-toolbar-title style="font-size:14px">TIẾP NHẬN Ý KIẾN</v-toolbar-title>
           </v-toolbar> -->
-          <v-flex xs12>
-            <div v-if="getUser('Administrator')" class="white--text px-2 py-2 text-xs-center text-bold" style="background: #001f4d">
+          <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
+            <div v-if="getUser('Administrator')" class="head-title">
               TẠO CÂU HỎI
             </div>
-            <div v-if="!getUser('Administrator')" class="white--text px-2 py-2 text-xs-center text-bold" style="background: #001f4d">
+            <div v-if="!getUser('Administrator')" class="head-title">
               TIẾP NHẬN Ý KIẾN
             </div>
           </v-flex>
