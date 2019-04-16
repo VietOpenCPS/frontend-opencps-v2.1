@@ -2,10 +2,10 @@
   <div>
     <v-layout row wrap class="mb-3">
       <v-card flat style="width:100%">
-        <v-btn v-if="getUser('Administrator')" @click.native="toAnswer()" round color="primary" dark style="position:absolute;top:0px;right:10px;z-index:101">
+        <!-- <v-btn v-if="getUser('Administrator')" @click.native="toAnswer()" round color="primary" dark style="position:absolute;top:0px;right:10px;z-index:101">
           <v-icon>add</v-icon>&nbsp;
           Thêm câu trả lời
-        </v-btn>
+        </v-btn> -->
         <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
           <h3 v-if="getUser('Administrator')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
           <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
@@ -15,12 +15,16 @@
             class="mx-3 mb-2 px-2 py-2"
             style="border:1px solid #0072bc;border-radius:3px;color:#0072bc"
           >
-            Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i v-if="getUser('Administrator')"> ({{questionDetail.email}})</i>
-            <span style="color:#993131"> (Ngày {{questionDetail.createDate}})</span>
+            <p>
+              Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
+            </p>
+            <p>
+              Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
+            </p>
           </div>
           <div class="ml-3 mt-3">
             <div class="py-1">
-              <span class="primary--text text-bold">NỘI DUNG HỎI: </span>
+              <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
             </div>
             <div class="mx-2 mt-2" v-html="questionDetail.content"></div>
           </div>
@@ -31,11 +35,11 @@
           </div>
           <div v-else class="mt-4">
             <div class="ml-3 my-1 py-1">
-              <span class="primary--text text-bold">CƠ QUAN HÀNH CHÍNH TRẢ LỜI: </span>
+              <span class="primary--text text-bold">TRẢ LỜI: </span>
             </div>
-            <v-card flat v-if="answerList.length = 1 && !getUser('Administrator')">
+            <v-card flat v-if="answerList.length = 1">
               <v-card-text class="px-3 py-1">
-                <div class="ml-2 mt-1 mb-3" v-html="answerList[0].content"></div>
+                <div class="ml-2 mt-1 mb-3" v-html="answerList[0] ? answerList[0].content : ''"></div>
               </v-card-text>
             </v-card>
             <v-card flat v-if="answerList.length > 1">
@@ -75,7 +79,7 @@
           <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator')">
             <div class="mx-3">
               <span class="mr-2"><v-icon class="blue--text">announcement</v-icon> </span>
-              <span class="text-bold primary--text">THÊM CÂU TRẢ LỜI:</span>
+              <span class="text-bold primary--text">NỘI DUNG TRẢ LỜI:</span>
             </div>
             <div class="px-2 pt-3">
               <v-flex xs12 sm12 style="margin:0 auto">
@@ -95,6 +99,10 @@
                 >
                   <v-icon>how_to_reg</v-icon>&nbsp;
                   Gửi câu trả lời
+                </v-btn>
+                <v-btn @click="goBack" color="primary">
+                  <v-icon>reply</v-icon>&nbsp;
+                  Quay lại
                 </v-btn>
               </div>
             </div>
@@ -182,6 +190,36 @@ export default {
   },
   data: () => ({
     answerList: [],
+    answersDefault: [
+      {
+        createDate: "30/01/2019 17:27:20",
+        modifiedDate: "30/01/2019 17:27:20",
+        publish: 1,
+        questionId: 101,
+        userName: "",
+        answerId: 101,
+        content: `<p>Nộp hồ sơ của công dân có 2 hình thức:</p>
+          <ol>
+          <li>Nộp hồ sơ trực tiếp tại Trung tâm Hành Chính Công của Bộ GTVT</li>
+          <li>Đăng ký tài khoản và nộp hồ sơ trên trang web</li>
+        </ol>`
+      },
+      {
+        createDate: "30/01/2019 17:27:20",
+        modifiedDate: "30/01/2019 17:27:20",
+        publish: 1,
+        questionId: 102,
+        userName: "",
+        answerId: 102,
+        content: `<p>Có 4 hình thức tra cứu hồ sơ cụ thể như sau:</p>
+          <ol>
+          <li>Trên trang web nhập mã hồ sơ</li>
+          <li>Đối với hồ sơ dịch vụ công trực tuyến tra cứu bằng cách đăng nhập tài khoản của cá nhân/ đơn vị đã nộp hồ sơ để tra cứu</li>
+          <li>Gọi tới số điện thoại 1900 0318</li>
+          <li>ABC &lt;khoảng cách&gt; &lt;Mã số hồ sơ&gt; gửi về tổng đài 9001</li>
+        </ol>`
+      }
+    ],
     content: '',
     contentAnswer: '',
     loadingAnswer: false,
@@ -243,6 +281,9 @@ export default {
     },
     totalQuestion () {
       return this.$store.getters.getTotalQuestion
+    },
+    indexQuestion () {
+      return this.$store.getters.getIndexQuestion
     }
   },
   created () {
@@ -274,7 +315,6 @@ export default {
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
         vm.loadingAnswer = false
-        console.log(result)
         if (Array.isArray(result)) {
           vm.answerList = result
         } else {
@@ -282,7 +322,8 @@ export default {
         }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log(reject)
+        console.log('2222', [vm.answersDefault[vm.indexQuestion]])
+        vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },
     submitAddQuestion () {
@@ -416,7 +457,6 @@ export default {
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
         vm.loadingAnswer = false
-        console.log(result)
         if (Array.isArray(result)) {
           vm.answerList = result
         } else {
@@ -424,7 +464,8 @@ export default {
         }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log(reject)
+        console.log('1111', [vm.answersDefault[vm.indexQuestion]])
+        vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },
     deleteAnswer (item) {
@@ -458,6 +499,9 @@ export default {
       }
       let roleExits = roles.findIndex(item => item === roleItem)
       return (roleExits >= 0)
+    },
+    goBack () {
+      window.history.back()
     }
   },
   filters: {

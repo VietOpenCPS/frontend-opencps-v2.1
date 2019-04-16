@@ -39,7 +39,7 @@
           v-model="levelSelected"
           autocomplete
           label="Chọn mức độ"
-          item-text="textLevel"
+          item-text="levelName"
           item-value="level"
           :hide-selected="true"
           @change="changeLevel"
@@ -103,11 +103,13 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
-                <span>
-                  <v-chip class="mx-0 my-0 mt-1" small disabled label :color="getColor(props.item.maxLevel)" text-color="white" >
+                <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
+                style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
+                <!-- <span>
+                  <v-chip style="min-width: 110px;" class="mx-0 my-0 mt-1" small disabled label :color="getColor(props.item.maxLevel)" text-color="white" >
                     Mức độ {{props.item.maxLevel}}
                   </v-chip>
-                </span>
+                </span> -->
               </div>
             </td>
             <td class="text-xs-center">
@@ -116,8 +118,8 @@
               </content-placeholders>
               <div v-else>
                 <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
-                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="props.item.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -125,13 +127,13 @@
                     </v-list-tile>
                   </v-list>
                 </v-menu>
-                <v-btn small slot="activator" color="primary" class="my-1"
+                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
                   @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
                 >
                   Nộp hồ sơ
                 </v-btn>
-                <v-btn small slot="activator" color="primary" class="my-1"
+                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
                 >
@@ -242,11 +244,18 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
         let filterDomain = {
           agencyCode: currentQuery['agency']
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
+      } else {
+        let filterDomain = {
+          agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
@@ -282,20 +291,10 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     }
-    // domainList (val) {
-    //   var vm = this
-    //   if (vm.govAgencySelected) {
-    //     vm.domainListCurrent = val.filter(function (itemLinhVuc) {
-    //       return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
-    //     })
-    //   } else {
-    //     vm.domainListCurrent = val
-    //   }
-    // }
   },
   methods: {
     changeAdministration () {

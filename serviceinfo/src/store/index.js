@@ -104,7 +104,7 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               for (let key in dataReturn) {
-                dataReturn[key]['textLevel'] = 'Mức độ ' + dataReturn[key].level
+                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
               }
               resolve(dataReturn)
             } else {

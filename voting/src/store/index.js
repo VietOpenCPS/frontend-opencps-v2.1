@@ -2,9 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
-import support from './support.json'
-import { stat } from 'fs'
-// 
 
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -14,8 +11,9 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    endPointApi: '/o/rest/v2'
-    // endPointApi: 'http://127.0.0.1:8081/api'
+    endPointApi: '/o/rest/v2',
+    // endPointApi: 'http://127.0.0.1:8081/api',
+    employeeSelected: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -130,6 +128,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadEmployeesMotcua ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start,
+              end: filter.end
+            }
+          }
+          axios.get(state.endPointApi + '/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+            // commit('setLoading', false)
+          }).catch(xhr => {
+            reject(xhr)
+            // commit('setLoading', false)
+          })
+        })
+      })
+    },
     getEmployee ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         // commit('setLoading', true)
@@ -201,6 +235,9 @@ export const store = new Vuex.Store({
     },
     setInitData (state, payload) {
       state.initData = payload
+    },
+    setEmployeeSelected (state, payload) {
+      state.employeeSelected = payload
     }
   },
   getters: {
@@ -209,6 +246,9 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
+    },
+    employeeSelected (state) {
+      return state.employeeSelected
     }
   }
 })
