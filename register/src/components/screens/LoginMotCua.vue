@@ -40,7 +40,9 @@
         </div>
       </nav> -->
       <v-flex xs12 v-if="!isSigned">
-        <div class="text-bold primary--text" style="font-size: 2em">ĐĂNG NHẬP</div>
+        <nav>
+          <div class="text-bold primary--text">ĐĂNG NHẬP</div>
+        </nav>
       </v-flex>
       <v-flex xs12 v-if="!isSigned">
         <v-form ref="form" v-model="valid" lazy-validation class="mt-2">
@@ -87,7 +89,7 @@
                 <div class="primary--text" slot="label">Ghi nhớ tài khoản</div>
               </v-checkbox>
             </div>
-            <div class="d-inline-block primary--text right" style="margin-top:8px;font-size: 12px;cursor: pointer;">
+            <div class="d-inline-block primary--text right" style="cursor: pointer;">
               <p @click="getPassword" >
               Quên mật khẩu?
               </p>
@@ -115,7 +117,7 @@
       </v-flex>
     </v-layout>
     <div class="footer_login">
-      <p class="site-name">&#169; Trung tâm Công nghệ thông tin Bộ Giao thông Vận tải</p> 
+      <p class="site-name">&#169; Trung tâm Công nghệ thông tin - Bộ GTVT</p> 
       <p class="info-wrapper"> 
         <span>Địa chỉ: 80 Trần Hưng Đạo, Hoàn kiếm, Hà Nội</span> <br>
         <span>Hotline: 1900 0318 - Điện thoại: (024) 3.822.2979 - Fax: (024) 3.822.1066</span> <br>

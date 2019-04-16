@@ -1197,7 +1197,7 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && (dossierItem['stepCode'] === 610 || dossierItem['stepCode'] === 611)) {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
