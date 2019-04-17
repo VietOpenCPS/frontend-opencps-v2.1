@@ -105,7 +105,7 @@
       </v-flex>
     </v-layout>
     <div>
-      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/dynamic_report/assets/hdsd.pdf"></vue-friendly-iframe>
+      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/dynamic_report/app/assets/hdsd_bvh.pdf"></vue-friendly-iframe>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== ''" :src="pdfBlob"></vue-friendly-iframe>
       <div class="mx-2" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
