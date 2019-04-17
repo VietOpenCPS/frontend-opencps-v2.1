@@ -13,52 +13,36 @@
         <div v-else>
           <div v-if="questionList.length > 0">
             <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
-              :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px">
+              :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px;position:relative;">
+              <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:9999">
+                <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
+                  <v-icon>settings</v-icon>
+                </v-btn>
+                <v-list>
+                  <v-list-tile @click.stop="addAnswer(itemQuestion, indexQuestion)">
+                    <v-list-tile-title><v-icon color="primary" size="16px">notes</v-icon>&nbsp; Chi tiết</v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="addAnswer(itemQuestion, indexQuestion)">
+                      <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-title @click.stop="changePublic(itemQuestion, indexQuestion)">
+                      <v-icon color="primary" size="16px">{{ itemQuestion.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
+                      {{ itemQuestion.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
+                    </v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile @click.stop="deleteQuestion(itemQuestion)">
+                    <v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
               <v-expansion-panel-content style="border-radius:5px">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
                 <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}: </span>
                   <div class="ml-2 primary--text" v-html="itemQuestion.content"></div>
-                  <!-- <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:50px;top:0">
-                    <v-tooltip top class="mr-1">
-                      <v-btn title="Thêm câu trả lời" class="my-0" icon slot="activator" style="margin-top:-10px!important"
-                       @click="addAnswer($event, itemQuestion, indexQuestion)">
-                        <v-icon color="blue" size="24px">add</v-icon>
-                      </v-btn>
-                      <span>Thêm câu trả lời</span>
-                    </v-tooltip>
-                    <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublic(itemQuestion, indexQuestion)"
-                      label="Công khai"
-                      v-model="itemQuestion['publish']"
-                    ></v-checkbox>
-                    <v-tooltip top class="ml-2">
-                      <v-btn icon slot="activator" @click.stop="deleteQuestion(itemQuestion)" style="margin-top:-8px!important">
-                        <v-icon color="red">delete</v-icon>
-                      </v-btn>
-                      <span>Xóa câu hỏi</span>
-                    </v-tooltip>
-                  </div> -->
-                  <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:25px;top:5px">
-                    <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
-                      <v-icon>settings</v-icon>
-                    </v-btn>
-                    <v-list>
-                      <v-list-tile>
-                        <v-list-tile-title @click.stop="addAnswer(itemQuestion, indexQuestion)">
-                          <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
-                        </v-list-tile-title>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-title @click.stop="changePublic(itemQuestion, indexQuestion)">
-                          <v-icon color="primary" size="16px">{{ itemQuestion.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
-                          {{ itemQuestion.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
-                        </v-list-tile-title>
-                      </v-list-tile>
-                      <v-list-tile @click.stop="deleteQuestion(itemQuestion)">
-                        <v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
                 </div>
                 <div v-if="loadingAnswer">
                   <content-placeholders v-if="loading" class="mt-3">
@@ -646,7 +630,8 @@ export default {
             j_captcha_response: vm.$refs.captcha.j_captcha_response
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
-            toastr.success('Hệ thống đã tiếp nhận ý kiến của bạn. Xin cảm ơn')
+            toastr.success('Hệ thống đã tiếp nhận ý kiến của bạn')
+            vm.$refs.captcha.makeImageCap()
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {
@@ -705,8 +690,7 @@ export default {
       vm.$store.commit('setQuestionList', list)
       let filter = {
         questionId: item['questionId'],
-        publish: vm.questionList[index]['publish'],
-        content: vm.questionList[index]['content']
+        publish: vm.questionList[index]['publish'] === 1 ? 0 : 1
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
@@ -722,20 +706,18 @@ export default {
     changePublicAnswer (item, index) {
       let vm = this
       console.log(item, index)
-      if (vm.answerList[index]['publish'] === 1) {
-        vm.answerList[index]['publish'] = 0
-      } else {
-        vm.answerList[index]['publish'] = 1
-      }
-
       let filter = {
         questionId: item['questionId'],
         answerId: item['answerId'],
-        publish: vm.answerList[index]['publish'],
-        content: vm.answerList[index]['content']
+        publish: vm.answerList[index]['publish'] === 1 ? 0 : 1
       }
       vm.$store.dispatch('putAnswer', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
+        if (vm.answerList[index]['publish'] === 1) {
+          vm.answerList[index]['publish'] = 0
+        } else {
+          vm.answerList[index]['publish'] = 1
+        }
       }).catch(function (reject) {
         console.log(reject)
       })

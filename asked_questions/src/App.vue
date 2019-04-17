@@ -16,7 +16,7 @@
         <v-divider></v-divider>
       </v-list>
     </v-navigation-drawer> -->
-    <v-content style="width: 100%;max-width: 1200px;margin: 0 auto">
+    <v-content style="width: 100%;max-width: 1300px;margin: 0 auto">
       <!-- <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
         <v-icon>near_me</v-icon>&nbsp;
         Gửi câu hỏi

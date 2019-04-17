@@ -22,24 +22,50 @@
               Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
             </p>
           </div>
-          <div class="ml-3 mt-3">
+          <div class="mx-3 mt-3">
             <div class="py-1">
               <span class="primary--text text-bold">NỘI DUNG CÂU HỎI: </span>
             </div>
-            <div class="mx-2 mt-2" v-html="questionDetail.content"></div>
+            <div
+              class="my-2 px-2 py-2"
+              style="border:1px solid #dedede;border-radius:3px"
+            >
+              <div v-html="questionDetail.content"></div>
+            </div>
           </div>
           <div v-if="loadingAnswer">
             <content-placeholders v-if="loading" class="mt-3">
               <content-placeholders-text :lines="10" />
             </content-placeholders>
           </div>
-          <div v-else class="mt-4">
+          <div v-else class="mt-3">
             <div class="ml-3 my-1 py-1">
               <span class="primary--text text-bold">TRẢ LỜI: </span>
             </div>
-            <v-card flat v-if="answerList.length = 1">
+            <v-card flat v-if="answerList.length === 1">
               <v-card-text class="px-3 py-1">
-                <div class="ml-2 mt-1 mb-3" v-html="answerList[0] ? answerList[0].content : ''"></div>
+                <!-- <div class="ml-2 mt-1 mb-3" v-html="answerList[0] ? answerList[0].content : ''"></div> -->
+                <div
+                  class="my-2 px-2 py-2"
+                  style="border:1px solid #dedede;border-radius:3px"
+                >
+                  <div style="position:relative">
+                    <i><span class="text-bold">Ngày {{answerList[0].createDate}}</i>
+                    <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
+                    <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
+                      <v-tooltip top class="mr-2">
+                        <v-btn slot="activator" icon ripple @click="deleteAnswer(answerList[0])" style="margin-top:-3px!important">
+                          <v-icon color="red lighten-1">delete</v-icon>
+                        </v-btn>
+                        <span>Xóa</span>
+                      </v-tooltip>
+                      <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
+                        label="Công khai"
+                        v-model="answerList[0]['publish']"
+                      ></v-checkbox>
+                    </div>
+                  </div>
+                </div>
               </v-card-text>
             </v-card>
             <v-card flat v-if="answerList.length > 1">
@@ -464,7 +490,6 @@ export default {
         }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log('1111', [vm.answersDefault[vm.indexQuestion]])
         vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },
