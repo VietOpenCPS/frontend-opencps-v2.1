@@ -18,7 +18,7 @@
           <v-flex xs12 sm12>
             <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
               <v-layout wrap class="text-bold">
-                <div class="flex px-3 py-1" style="height:32px;max-width:100px;background-color: #001f4d;transform: skew(-25deg)">
+                <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #0052A3;transform: skew(-25deg)">
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
                 <div class="flex primary--text pl-3 pr-2" style="max-width:calc(100% - 100px)">
@@ -37,7 +37,7 @@
               <captcha ref="captcha"></captcha>
             </v-flex>
             <v-flex xs12 sm12 class="text-xs-left mt-2">
-              <v-btn class="white--text" @click="doVottingResultSubmit" color="#001f4d" :loading="btnLoading" :disabled="btnLoading">
+              <v-btn class="white--text" @click="doVottingResultSubmit" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
                 <v-icon>save</v-icon>&nbsp;
                 Gửi đánh giá
               </v-btn>
@@ -264,8 +264,13 @@ export default {
         let votingPercent = []
         let totalAnswer = 0
         for (var i = votingItems[0]['answers'].length - 1; i >= 0; i--) {
+          // let result = {
+          //   name: 'Điểm ' + (i + 1),
+          //   count: 0,
+          //   percent: 0
+          // }
           let result = {
-            name: 'Điểm ' + (i + 1),
+            name: 'Điểm ' + (i),
             count: 0,
             percent: 0
           }

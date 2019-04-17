@@ -57,7 +57,7 @@
                   v-model="briefNote"
                   :rows="2"
                   box
-                  label="nhập tên hồ sơ..."
+                  label="Nhập tên hồ sơ..."
                 ></v-textarea>
               </v-card-text>
             </v-card>
@@ -113,8 +113,8 @@
           <v-icon>save</v-icon>
         </v-btn>
       </v-tab> -->
-      <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0" 
+      <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+        <v-btn flat class="" 
           :loading="loadingAction"
           :disabled="loadingAction"
         >
@@ -123,8 +123,8 @@
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
-      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0"
+      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
+        <v-btn flat class=""
           :loading="loadingAction"
           :disabled="loadingAction"
         >
@@ -133,8 +133,8 @@
           <span slot="loader">Loading...</span>
         </v-btn>
       </v-tab>
-      <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1"> 
-        <v-btn flat class="px-0 py-0 mx-0 my-0"
+      <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
+        <v-btn flat class=""
           :loading="loadingAction"
           :disabled="loadingAction"
         >
@@ -155,8 +155,8 @@
           <v-icon>send</v-icon>
         </v-btn>
       </v-tab> -->
-      <v-tab href="#tab-5" @click="goBack">
-        <v-btn flat class="px-0 py-0 mx-0 my-0"
+      <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+        <v-btn flat class=""
           :loading="loadingAction"
           :disabled="loadingAction"
         >

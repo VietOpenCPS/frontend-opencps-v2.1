@@ -9,21 +9,24 @@
                 <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
-                    <v-tooltip top style="max-width: 100% !important;">
+                    <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
                       <span slot="activator">
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
+                    <span v-else>{{item.partName}}</span>
                     <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
                     </v-tooltip>
-                    <v-tooltip top v-if="item.hasForm && !item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
+                    <!-- <v-tooltip top v-if="item.hasForm && !item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
-                    </v-tooltip>
+                    </v-tooltip> -->
+                    &nbsp;&nbsp;
+                    <span v-if="item.hasForm">(Bản khai trực tuyến)</span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
                       <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -214,7 +217,7 @@
               <v-tooltip left v-else-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
-                    <v-icon size="16" color="primary">cloud_upload</v-icon>
+                    <v-icon size="18" style="font-weight: bold;" color="primary">arrow_upward</v-icon>
                   </v-badge>
                 </v-btn>
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
@@ -253,7 +256,7 @@
             <v-text-field
               v-if="onlyView && applicantNoteDossier"
               v-model="applicantNoteDossier"
-              label="ghi chú ..."
+              label="Ghi chú ..."
               readonly
               box
             ></v-text-field>

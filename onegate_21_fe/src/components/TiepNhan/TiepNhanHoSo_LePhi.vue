@@ -30,7 +30,7 @@
             v-else
             v-model="lePhi.paymentNote"
             box
-            label="ghi chú ..."
+            label="Ghi chú ..."
             rows="2"
           ></v-textarea>
           <!-- <span v-else>{{lePhi.paymentNote}}</span> -->
