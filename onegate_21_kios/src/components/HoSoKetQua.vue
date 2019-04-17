@@ -15,7 +15,7 @@
             </span>
           </h4>
           <div class="mt-3"> 
-            <v-flex xs12 sm4 class="mb-3 right">
+            <v-flex xs12 sm4 class="mb-3 right" v-if="dossierList.length > 0">
               <div class="input-border input-group input-group--placeholder input-group--text-field">
                 <div class="input-group__input">
                   <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ" type="text">

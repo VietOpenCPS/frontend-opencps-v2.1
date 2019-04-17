@@ -103,9 +103,9 @@
         <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
           <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
-        <div class="virtual-keyboard" v-if="visible">
+        <!-- <div class="virtual-keyboard" v-if="visible">
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
-        </div>
+        </div> -->
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>

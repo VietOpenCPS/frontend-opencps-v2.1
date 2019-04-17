@@ -35,9 +35,9 @@
           <p class="mb-1"> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
         </div>
       </v-layout>
-      <div class="virtual-keyboard" v-if="visible">
+      <!-- <div class="virtual-keyboard" v-if="visible">
         <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
-      </div>
+      </div> -->
     </v-card>
 
     <v-dialog v-model="dialogError" persistent max-width="290">

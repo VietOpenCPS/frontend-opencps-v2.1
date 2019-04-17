@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_serviceinfo">
+  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="310" v-if="!viewMobile">
       <v-list class="py-0">
         <v-list-group
@@ -13,7 +13,7 @@
           </v-list-tile>
           <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
             <v-list-tile-action>
-              <v-icon color="primary" 
+              <v-icon color="#00aeef" 
                 v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
                 || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
               >play_arrow</v-icon>

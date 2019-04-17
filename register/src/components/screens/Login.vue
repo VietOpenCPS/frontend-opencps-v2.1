@@ -74,16 +74,16 @@
             </v-layout>
             <v-flex xs12 class="text-xs-left text-xs-center">
               <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
-                :loading="loading"
-                :disabled="loading"
+                :loading="loadingLogin"
+                :disabled="loadingLogin"
                 @click="submitConfirmLogin"
               >
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 Đăng nhập
               </v-btn>
               <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
-                :loading="loading"
-                :disabled="loading"
+                :loading="loadingLogin"
+                :disabled="loadingLogin"
                 @click="goBack"
               >
                 <v-icon>reply</v-icon>&nbsp;
@@ -134,6 +134,9 @@ export default {
     isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
   }),
   computed: {
+    loadingLogin () {
+      return this.$store.getters.loading
+    }
   },
   created () {
     var vm = this

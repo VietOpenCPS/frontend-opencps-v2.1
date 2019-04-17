@@ -1,10 +1,10 @@
 <template>
-  <v-app class="onegate__fe">
+  <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
       :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
     >
-      <div class="mx-2">
-        <v-btn block color="primary" v-on:click.native="doAddDVC()"
+      <div class="">
+        <v-btn class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="doAddDVC()"
           :loading="loadingGov"
           :disabled="loadingGov"
         >

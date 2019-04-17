@@ -1554,14 +1554,9 @@ header img {
 header p {
 	margin-bottom: 0;
 }
-header span {
-	color: #005792;
-}
 .kios-content-wrapper {
-	height: -webkit-calc(100vh - 72px);	
-	height: calc(100vh - 72px);
 	overflow: hidden;
-	padding: 15px;
+    padding: 0px;
 }
 .tab-item {
 	display: -webkit-box;
@@ -1629,11 +1624,11 @@ header span {
 	font-size: 16px !important;
 }
 .tab-item .left a:nth-child(1) {
-    background-color: #20959a;
+    background-color: #005792;
     margin: 0 0 8px 0;
 }
 .tab-item .left a:nth-child(1):hover {
-	background-color: #29bec4;
+	background-color: #0090ff;
 }
 .tab-item .left a:nth-child(2) {
     background-color: #ca7828;
@@ -1651,11 +1646,11 @@ header span {
     background-color: #10cf53;
 }
 .tab-item .left a:nth-child(4) {
-	background-color: #005792;
+	background-color: #20959a;
 	margin: 0 0 8px 0;
 }
 .tab-item .left a:nth-child(4):hover {
-	background-color: #0090ff;
+	background-color: #29bec4;
 }
 .tab-item .left a:nth-child(5) {
 	background-color: #cdbe1c;
@@ -1677,6 +1672,14 @@ header span {
 }
 .tabs__items {
     overflow: hidden !important
+}
+.jumbotron {
+    background: #ffffff;
+    margin: 0px !important;
+    padding: 0px !important
+}
+.carousel {
+    box-shadow: none;
 }
 @media screen and (min-width: 500px) {
 	.detailQR_desktop {

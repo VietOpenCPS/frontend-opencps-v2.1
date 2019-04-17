@@ -172,9 +172,9 @@
     <div class="mt-4" v-if="!loading && activeDetailService">
       <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
     </div>
-    <div class="virtual-keyboard" v-if="visible">
+    <!-- <div class="virtual-keyboard" v-if="visible">
       <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
-    </div>
+    </div> -->
   </div>
 </template>
 

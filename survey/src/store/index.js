@@ -47,7 +47,11 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPointApi + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
-              resolve(result.data.data)
+              let dataVoting = result.data.data
+              for (let i = 0; i < dataVoting.length; i++) {
+                dataVoting[i]['answerPercent'] = []
+              }
+              resolve(dataVoting)
             } else {
               resolve([])
             }

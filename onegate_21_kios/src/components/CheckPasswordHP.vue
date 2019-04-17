@@ -1,6 +1,9 @@
 <template>
-  <div class="py-0" style="width: 80%; margin:auto">
-    <v-card>
+  <div class="py-0">
+    <v-card style="min-height: 100vh;">
+      <h4 class="pt-2 ml-2">
+        <span style="color:#065694">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ </span>
+      </h4>
       <v-layout wrap class="wrap-password px-0 py-0">
         <div style="width: calc(100% - 150px)">
           <v-layout wrap class="text-xs-center">
