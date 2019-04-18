@@ -414,8 +414,8 @@
                                 </div>
                               </div>
                               <div class="timeline-body">
-                                <span v-if="item.syncType === 2">{{item.actionName}} </span>
-                                <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">:</span>
+                                <span v-if="item.syncType === 2">Cán bộ trả lời</span>
+                                <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">: </span>
                                 <span v-if="item.actionNote && item.actionNote !== 'null'" style="color: #0b72ba">{{ item.actionNote }}</span>
                               </div>
                             </div>

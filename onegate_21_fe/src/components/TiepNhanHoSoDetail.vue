@@ -57,7 +57,7 @@
                   v-model="briefNote"
                   :rows="2"
                   box
-                  label="Nhập tên hồ sơ..."
+                  label="Nhập tên hồ sơ"
                 ></v-textarea>
               </v-card-text>
             </v-card>

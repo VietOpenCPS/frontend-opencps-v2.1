@@ -9,7 +9,7 @@
       <v-flex xs12 sm9 v-if="votingItems.length > 0">
         <v-layout row wrap>
           <v-flex xs12 sm12 class="mb-4 px-2">
-            <div class="primary--text text-bold">
+            <div class="text-bold" style="color:#0054a6">
               Phiếu đánh giá dạng điện tử dành cho cá nhân, tổ chức được cung cấp trên Cổng dịch vụ công cấp bộ, cấp tỉnh,
               Cổng thông tin điện tử của cơ quan, đơn vị để cá nhân, tổ chức thực hiện đánh giá trực tuyến; đồng thời tích hợp ý kiến góp ý, 
               phản ánh và kết quả xử lý với Hệ thống thông tin một cửa điện tử cấp bộ, cấp tỉnh.
@@ -18,17 +18,17 @@
           <v-flex xs12 sm12>
             <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
               <v-layout wrap class="text-bold">
-                <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #0052A3;transform: skew(-25deg)">
+                <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #0054a6;transform: skew(-25deg)">
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
-                <div class="flex primary--text pl-3 pr-2" style="max-width:calc(100% - 100px)">
+                <div class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#0054a6">
                   {{ item.subject }}
                 </div>
               </v-layout>
               <div class="ml-4">
                 <v-radio-group v-model="item.selected" column class="mt-1">
                   <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    <div :class="item.selected === indexChoise + 1 ? 'primary--text' : 'black--text'" slot="label">{{itemChoise}}</div>
+                    <div :style="item.selected === indexChoise + 1 ? 'color:#0054a6' : 'color:black'" slot="label">{{itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>

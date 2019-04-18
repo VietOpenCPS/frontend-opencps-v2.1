@@ -88,7 +88,7 @@
                   <v-tooltip top v-else-if="progressUploadPart + id !== item.partNo + id">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                       <v-badge>
-                        <v-icon size="16" color="primary">cloud_upload</v-icon>
+                        <v-icon size="30" color="#004b94">cloud_upload</v-icon>
                       </v-badge>
                     </v-btn>
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>

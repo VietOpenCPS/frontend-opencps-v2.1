@@ -6,7 +6,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="!onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
@@ -16,7 +16,7 @@
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
-                    <span v-else>{{item.partName}}</span>
+                    <span v-else>{{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span></span>
                     <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
@@ -26,7 +26,7 @@
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip> -->
                     &nbsp;&nbsp;
-                    <span v-if="item.hasForm">(Bản khai trực tuyến)</span>
+                    <span v-if="item.hasForm && !onlyView" style="color:#004b94">(Bản khai trực tuyến)</span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
                       <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -186,11 +186,11 @@
             </v-flex>
             <v-flex :style="{width: '20px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
-                <v-icon slot="activator" size="16" class="mx-0" color="primary">done</v-icon>
+                <v-icon slot="activator" size="30" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>
               </v-tooltip>
               <v-tooltip top v-else-if="item.fileCheck === 2">
-                <v-icon slot="activator" size="16" class="mx-0" color="primary">close</v-icon>
+                <v-icon slot="activator" size="30" class="mx-0" color="primary">close</v-icon>
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
@@ -217,7 +217,7 @@
               <v-tooltip left v-else-if="progressUploadPart !== item.partNo && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                   <v-badge>
-                    <v-icon size="18" style="font-weight: bold;" color="primary">arrow_upward</v-icon>
+                    <v-icon size="30" style="font-weight: bold;" color="#004b94">cloud_upload</v-icon>
                   </v-badge>
                 </v-btn>
                 <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
@@ -250,13 +250,13 @@
               v-model="applicantNoteDossier"
               rows="3"
               @input="changeApplicantNote"
-              label="ghi chú..."
+              label="Ghi chú"
               ></v-textarea>
             </div>
             <v-text-field
               v-if="onlyView && applicantNoteDossier"
               v-model="applicantNoteDossier"
-              label="Ghi chú ..."
+              label="Ghi chú"
               readonly
               box
             ></v-text-field>
@@ -309,7 +309,7 @@
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>
-            <span v-if="pdfEform">Tài liệu khai trực tuyến</span>
+            <span v-if="pdfEform">Bản in đã khai trực tuyến</span>
             <span v-else>Tài liệu đính kèm</span>
           </v-toolbar-title>
           <v-spacer></v-spacer>
@@ -933,6 +933,11 @@ export default {
           } else {
             vm.$store.dispatch('viewFile', file).then(result => {
               vm.dialogPDFLoading = false
+              if (file['eForm']) {
+                vm.pdfEform = true
+              } else {
+                vm.pdfEform = false
+              }
               document.getElementById('dialogPDFPreview' + vm.id).src = result
             })
           }

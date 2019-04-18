@@ -56,7 +56,8 @@
       interVal: '',
       loading: true,
       isKios: true,
-      wrapStyle: true
+      wrapStyle: true,
+      isMobile: false
     }),
     created () {
       var vm = this
@@ -80,6 +81,15 @@
           vm.wrapStyle = true
         }
       })
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
     },
     computed: {
       fullScreen () {
@@ -119,6 +129,10 @@
       }
     },
     methods: {
+      onResize () {
+        let vm = this
+        vm.isMobile = window.innerWidth < 600
+      },
       backKiosHome () {
         var vm = this
         this.interVal = setInterval(() => {

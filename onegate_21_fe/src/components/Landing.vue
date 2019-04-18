@@ -478,7 +478,7 @@
                 <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  placeholder="chọn thủ tục hành chính"
+                  placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object

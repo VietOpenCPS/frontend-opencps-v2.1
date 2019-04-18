@@ -14,7 +14,7 @@
           <div v-if="questionList.length > 0">
             <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
               :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px;position:relative;">
-              <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:9999">
+              <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
                 <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                   <v-icon>settings</v-icon>
                 </v-btn>
@@ -87,7 +87,7 @@
                                     {{ itemAnswer.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                                   </v-list-tile-title>
                                 </v-list-tile>
-                                <v-list-tile @click.stop="deleteAnswer(itemAnswer)">
+                                <v-list-tile @click.stop="deleteAnswer(itemAnswer, itemQuestion, indexQuestion)">
                                   <v-list-tile-title><v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>Xóa</v-list-tile-title>
                                 </v-list-tile>
                               </v-list>
@@ -690,7 +690,10 @@ export default {
       vm.$store.commit('setQuestionList', list)
       let filter = {
         questionId: item['questionId'],
-        publish: vm.questionList[index]['publish'] === 1 ? 0 : 1
+        publish: vm.questionList[index]['publish'] === 1 ? 0 : 1,
+        content: item['content'],
+        email: item['email'],
+        fullname: item['fullname']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
@@ -709,7 +712,8 @@ export default {
       let filter = {
         questionId: item['questionId'],
         answerId: item['answerId'],
-        publish: vm.answerList[index]['publish'] === 1 ? 0 : 1
+        publish: vm.answerList[index]['publish'] === 1 ? 0 : 1,
+        content: item['content'],
       }
       vm.$store.dispatch('putAnswer', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
@@ -725,37 +729,17 @@ export default {
     editAnswer (item) {
       console.log(item)
     },
-    getAnswerList (item) {
-      let vm = this
-      vm.loadingAnswer = true
-      vm.answerList = []
-      let filter = {
-        questionId: item.questionId
-      }
-      vm.$store.dispatch('getAnswers', filter).then(function (result) {
-        vm.loadingAnswer = false
-        console.log(result)
-        if (Array.isArray(result)) {
-          vm.answerList = result
-        } else {
-          vm.answerList = [result]
-        }
-      }).catch(function (reject) {
-        vm.loadingAnswer = false
-        console.log(reject)
-      })
-    },
-    deleteAnswer (item) {
+    deleteAnswer (itemAnswer, itemQuestion, indexQuestion) {
       let vm = this
       let x = confirm('Bạn có chắc chắn xóa câu trả lời này?')
       if (x) {
         let filter = {
-          questionId: item['questionId'],
-          answerId: item['answerId']
+          questionId: itemAnswer['questionId'],
+          answerId: itemAnswer['answerId']
         }
         vm.$store.dispatch('deleteAnswer', filter).then(function (result) {
           toastr.success('Xóa câu trả lời thành công')
-          vm.getAnswerList(item)
+          vm.getAnswers(itemQuestion, indexQuestion)
         }).catch(function (reject) {
           console.log(reject)
         })
