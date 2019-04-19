@@ -1,6 +1,6 @@
 <template>
-  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;">
-    <v-navigation-drawer app clipped floating width="310" v-if="!viewMobile">
+  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;max-width:1300px">
+    <v-navigation-drawer app clipped floating width="265" v-if="!viewMobile">
       <v-list class="py-0">
         <v-list-group
           v-for="(item, index) in menuServiceInfos"

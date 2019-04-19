@@ -4,7 +4,7 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <v-card v-else>
+      <v-card flat v-else>
         <div style="background-color: #ffffff">
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
@@ -15,10 +15,10 @@
             </span>
           </h4>
           <div class="mt-3"> 
-            <v-flex xs12 sm4 class="mb-3 right" v-if="dossierList.length > 0">
+            <v-flex xs12 sm6 class="mb-3 right" v-if="dossierList.length > 0">
               <div class="input-border input-group input-group--placeholder input-group--text-field">
                 <div class="input-group__input">
-                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ" type="text">
+                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
                   <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
                 </div>
               </div>
@@ -209,22 +209,17 @@ export default {
         fromDate: vm.fromDate(),
         toDate: vm.fromDate(),
         groupId: '',
-        dossierNo: $('#dossierNoKey').val()
+        keyword: $('#dossierNoKey').val()
       }
-      if ($('#dossierNoKey').val()) {
-        vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
-          vm.loading = false
-          if (result.data) {
-            vm.dossierList = vm.dossierList.concat(result.data)
-            vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
-          }
-        }).catch(reject => {
-          vm.loading = false
-        })
-        $('#dossierNoKey').value = $('#dossierNoKey').val()
-      } else {
+      vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false
-      }
+        if (result.data) {
+          vm.dossierList = vm.dossierList.concat(result.data)
+          vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+        }
+      }).catch(reject => {
+        vm.loading = false
+      })
     },
     getGroupIdArr (groupIds) {
       if (groupIds) {

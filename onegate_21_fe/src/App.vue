@@ -282,7 +282,7 @@
                 let countParent = 0
                 for (let countKey in vm.counterData) {
                   if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
-                    let countParent = vm.counterData[countKey].totalCount
+                    countParent = vm.counterData[countKey].totalCount
                     break
                   }
                 }

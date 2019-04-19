@@ -52,6 +52,8 @@
   export default {
     data: () => ({
       workingUnitList: [],
+      govAgencyList: [],
+      isDvc: true,
       currentIndex: 0,
       interVal: '',
       loading: true,
@@ -80,6 +82,10 @@
         } else {
           vm.wrapStyle = true
         }
+        vm.$store.dispatch('getGovAgency').then(function (result) {
+          vm.govAgencyList = result
+          vm.isDvc = vm.govAgencyList.length > 1
+        }).catch(reject => {})
       })
     },
     beforeDestroy () {
@@ -88,6 +94,10 @@
       }
     },
     mounted () {
+      let vm = this
+      vm.$nextTick(function () {
+        $('#navigation').css('display', 'none')
+      })
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
     },
@@ -98,12 +108,6 @@
       groupIds () {
         return this.$store.getters.getGroupid
       }
-    },
-    mounted () {
-      var vm = this
-      vm.$nextTick(function () {
-        $('#navigation').css('display', 'none')
-      })
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -164,15 +168,11 @@
         } else if (page === 'tracuuthutuc') {
           queryString = '/tra-cuu-thu-tuc'
         } else if (page === 'danhgia') {
-          let index = window.location.href.indexOf('kios#/')
-          let path = window.location.href.slice(0, index)
-          window.location.href = path + 'danh-gia-can-bo'
-          return
+          queryString = vm.isDvc ? '/danh-gia-can-bo' : '/danh-sach-can-bo'
         }
         vm.$router.push({
           path: queryString,
           query: {
-            groupIds: vm.groupIds,
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })

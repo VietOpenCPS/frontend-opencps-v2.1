@@ -340,7 +340,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <th width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -374,7 +374,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <td width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"

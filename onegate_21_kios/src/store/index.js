@@ -20,6 +20,7 @@ export const store = new Vuex.Store({
       secretCode: ''
     },
     workingUnitSelect: null,
+    employeeSelected: '',
     loading: false,
     dossierDetail: {},
     index: 0,
@@ -84,12 +85,12 @@ export const store = new Vuex.Store({
               step: '300,310,400',
               fromReleaseDate: filter.fromDate ? filter.fromDate : '',
               toReleaseDate: filter.toDate ? filter.toDate : '',
-              dossierNo: filter.dossierNo ? filter.dossierNo : ''
+              keyword: filter.keyword ? filter.keyword : ''
             }
           }
           // test local
-          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
-          // axios.get('http://127.0.0.1:8081/api/dossiers', param).then(function (response) {
+          // axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          axios.get(state.endPoint + '/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -109,7 +110,7 @@ export const store = new Vuex.Store({
             params: {
               fromReceiveDate: filter.fromDate,
               toReceiveDate: filter.toDate,
-              dossierNo: filter.dossierNo ? filter.dossierNo : ''
+              keyword: filter.keyword ? filter.keyword : ''
             }
           }
           axios.get(state.endPoint + '/dossiers', param).then(function (response) {
@@ -174,7 +175,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: data['groupId'] ? data['groupId'] : state.initData.groupId
+              groupId: state.initData.groupId
             }
           }
           axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
@@ -427,28 +428,93 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadEmployees ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start,
+              end: filter.end
+            }
+          }
+          axios.get(state.endPoint + '/employees/publish/' + filter.agencyCode, param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadEmployeesMotcua ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start,
+              end: filter.end
+            }
+          }
+          axios.get(state.endPointApi + '/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+            // commit('setLoading', false)
+          }).catch(xhr => {
+            reject(xhr)
+            // commit('setLoading', false)
+          })
+        })
+      })
+    },
     // voting
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          // test local
-          axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
-          // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
+          axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            commit('setLoading', false)
           })
         })
       })
@@ -473,6 +539,7 @@ export const store = new Vuex.Store({
           axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
+            toastr.clear()
             toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
           })
@@ -588,6 +655,9 @@ export const store = new Vuex.Store({
         secretCode: payload.secretCode ? payload.secretCode : ''
       }
     },
+    setEmployeeSelected (state, payload) {
+      state.employeeSelected = payload
+    },
     setTotalEmployee (state, payload) {
       state.totalEmployee = payload
     },
@@ -643,6 +713,9 @@ export const store = new Vuex.Store({
     },
     getOriginality (state) {
       return state.originality
+    },
+    employeeSelected (state) {
+      return state.employeeSelected
     },
     getGroupid (state, payload) {
       return state.groupIdSite

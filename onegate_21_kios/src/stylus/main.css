@@ -1256,7 +1256,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .back-btn {
     width: 40px !important;
     height: 40px !important;
-    position: absolute;
+    position: absolute !important;
     top: 0;
     right: 0;
 }
@@ -1284,10 +1284,11 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     left: 50%;
     transform: translateX(-50%);
 }
-.list-domain .list__tile {
+.list-domain .v-list__tile {
     height: 42px;
     cursor: pointer;
     color: #0b72ba;
+    margin-left: 15px;
     border-bottom: 1px solid #d3d3d3
 }
 .menu__content .list>div .list__tile {
@@ -1339,6 +1340,9 @@ table > thead > tr > th.column {
 .kios-item * {
     font-size: 16px !important;
     line-height: 26px
+}
+.tiny-pagination li {
+    border: none !important
 }
 @media screen and (min-width: 1600px) {
 	.kios-home .custom-row {
@@ -1494,7 +1498,6 @@ table > thead > tr > th.column {
     border: 1px solid #d3d3d3;
 }
 .wrap-scroll-domain::-webkit-scrollbar {
-    border-right: 0px;
     border-top: 0px;
     border-bottom: 0px
 }
@@ -1504,7 +1507,7 @@ table > thead > tr > th.column {
 .wrap-scroll::-webkit-scrollbar-thumb {
 	border-radius: 0px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #2980b98f;
+    background-color: #005792;
 }
 .wrap-scroll::-webkit-scrollbar-button {
     background-size: 100%;
@@ -1581,7 +1584,7 @@ header p {
 }
 .tab-item .right .right-content {
     position: relative;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
     width: 100%;
     height: 100%;
 }

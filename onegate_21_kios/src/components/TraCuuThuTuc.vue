@@ -1,12 +1,12 @@
 <template>
-  <div class="px-2 py-0 kios-item">
+  <div class="mx-2 py-0 kios-item">
     <h4 class="pt-2 ml-2">
       <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
     <v-layout wrap class="mt-2">
       <v-flex xs4 class="pl-2 pr-2">
         <v-select
-          class="select-border"
+          box
           :items="govAgencyList"
           v-model="govAgencySelected"
           placeholder="Chọn cơ quan"
@@ -14,11 +14,14 @@
           item-value="administrationCode"
           :hide-selected="true"
           @change="changeAdministration"
+          color="primary"
+          clearable
+          height="48"
         ></v-select>
       </v-flex>
       <v-flex xs4 class="pl-2 pr-2">
         <v-select
-          class="select-border"
+          box
           :items="listLinhVuc"
           v-model="linhVucSelected"
           placeholder="Chọn lĩnh vực"
@@ -26,56 +29,26 @@
           item-value="domainCode"
           :hide-selected="true"
           @change="changeDomain"
+          color="primary"
+          clearable
+          height="48"
         ></v-select>
       </v-flex>
-      <!-- <v-flex xs3 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
-          :items="listMucDo"
-          v-model="levelSelected"
-          autocomplete
-          placeholder="Chọn mức độ"
-          item-text="levelName"
-          item-value="level"
-          :hide-selected="true"
-          @change="changeLevel"
-          clearable
-        >
-          <template slot="item" slot-scope="data">
-            <template>
-              <v-list-tile-content>
-                <v-list-tile-title >Mức độ {{data.item.level}}</v-list-tile-title>
-              </v-list-tile-content>
-            </template>
-          </template>
-        </v-select>
-      </v-flex> -->
       <v-flex xs4 class="pl-2 pr-2">
-        <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-          <div class="input-group__input">
-            <input id="serviceNameKey" class="kios-input" data-layout="normal" @keyup.enter="filterServiceinfos('keyword')" @focus="show" aria-label="Tên thủ tục" placeholder="Nhấn để nhập tên thủ tục" type="text">
-            <i aria-hidden="true" @click="filterServiceinfos('keyword')" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
-          </div>
-        </div>
+        <v-text-field class="input-border input-search"
+          label="Nhập tên thủ tục hành chính"
+          v-model="serviceNameKey"
+          @keyup.enter="filterServiceinfos('keyword')"
+          @click:append="filterServiceinfos('keyword')"
+          append-icon="search"
+          box
+        ></v-text-field>
       </v-flex>
     </v-layout>
-    <!-- <div class="text-center" style="width: 130px">
-      <v-btn color="primary"
-        :loading="loading"
-        :disabled="loading"
-        @click="filterServiceinfos('filter')"
-        style="height:34px;width:110px;margin-top:17px"
-      >
-        <v-icon size="18">search</v-icon>
-        &nbsp;
-        Tra Cứu
-        <span slot="loader">Loading...</span>
-      </v-btn>
-    </div> -->
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
     </content-placeholders>
-    <div class="mt-4" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
+    <div class="mt-4 ml-1" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
       <v-layout class="wrap">
         <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
           <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
@@ -276,7 +249,7 @@ export default {
             if (count === groupIds) {
               vm.loading = false
               if (vm.govAgencyList.length > 0) {
-                $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+                vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
                 vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
                 vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
                 vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
@@ -291,7 +264,7 @@ export default {
             if (count === groupIds) {
               vm.loading = false
               if (vm.govAgencyList.length > 0) {
-                $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+                vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
                 vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
                 vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
                 vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
@@ -312,7 +285,7 @@ export default {
           vm.govAgencyList = result
           vm.loading = false
           if (vm.govAgencyList.length > 0) {
-            $('#serviceNameKey').val(newQuery.hasOwnProperty('keyword') ? newQuery.keyword : '')
+            vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
             vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
             vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
             vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
@@ -333,8 +306,7 @@ export default {
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
-      // vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
-      $('#serviceNameKey').val(currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '')
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
       vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       if (vm.govAgencySelected && !vm.linhVucSelected) {
@@ -359,7 +331,7 @@ export default {
           vm.totalPaggingLinhVuc = 0
         })
       }
-      if (vm.linhVucSelected || $('#serviceNameKey').val() !== '') {
+      if (vm.linhVucSelected || vm.serviceNameKey !== '') {
         vm.doLoadingThuTuc()
         vm.showListThuTuc = true
       }
@@ -373,18 +345,17 @@ export default {
   methods: {
     filterServiceinfos (type) {
       var vm = this
-      if (type === 'keyword' && $('#serviceNameKey').val() !== '') {
+      if (type === 'keyword' && vm.serviceNameKey !== '') {
         vm.showListThuTuc = true
       }
       vm.visible = false
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      // newQuery['keyword'] = vm.serviceNameKey ? vm.serviceNameKey : ''
       if (newQuery.hasOwnProperty('detail')) {
         newQuery['detail'] = ''
       }
-      newQuery['keyword'] = $('#serviceNameKey').val()
+      newQuery['keyword'] = vm.serviceNameKey
       newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
       newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
       newQuery['administration'] = vm.govAgencySelected ? vm.govAgencySelected : ''

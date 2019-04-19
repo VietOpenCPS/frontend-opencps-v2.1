@@ -6,7 +6,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="!onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">

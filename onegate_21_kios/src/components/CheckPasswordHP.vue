@@ -1,9 +1,9 @@
 <template>
   <div class="py-0">
     <v-card style="min-height: 100vh;">
-      <h4 class="pt-2 ml-2">
+      <h3 class="pt-2 ml-2">
         <span style="color:#065694">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ </span>
-      </h4>
+      </h3>
       <v-layout wrap class="wrap-password px-0 py-0">
         <div style="width: calc(100% - 150px)">
           <v-layout wrap class="text-xs-center">
@@ -20,7 +20,7 @@
             </v-flex>
           </v-layout>
         </div>
-        <div class="text-center" style="width: 150px;margin-top:12px">
+        <div class="text-center" style="width: 150px;">
           <v-btn color="primary"
             :loading="loadingTable"
             :disabled="loadingTable"

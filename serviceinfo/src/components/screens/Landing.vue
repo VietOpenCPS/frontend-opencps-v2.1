@@ -1,10 +1,34 @@
 <template>
   <div class="list-thu-tuc">
-    <div class="row-header">
-      <div class="background-triangle-big"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
+    <div class="row-header no__hidden_class">
+      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
+        <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+      </div>
+      <div class="layout row wrap header_tools row-blue">
+        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field
+            v-model="serviceNameKey"
+            placeholder="Tìm kiếm theo tên thủ tục, mã thủ tục ..."
+            solo
+            chips
+            multiple
+            deletable-chips
+            item-value="value"
+            item-text="text"
+            @keyup.enter="filterServiceName"
+            content-class="adv__search__select"
+            return-object
+          ></v-text-field>
+        </div>
+        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
+            <v-icon size="16">search</v-icon>
+          </v-btn>
+        </div>
+      </div> 
     </div>
     <v-layout wrap class="white py-2">
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs4 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="govAgencyList"
@@ -16,9 +40,10 @@
           clearable
           @change="changeAdministration"
           box
+          height="36"
         ></v-select>
       </v-flex>
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs4 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="domainListCurrent"
@@ -30,9 +55,10 @@
           clearable
           @change="changeDomain"
           box
+          height="36"
         ></v-select>
       </v-flex>
-      <v-flex xs3 class="px-2 input-group--text-field-box">
+      <v-flex xs4 class="px-2 input-group--text-field-box">
         <v-select
           class="select-border"
           :items="levelList"
@@ -45,10 +71,11 @@
           @change="changeLevel"
           clearable
           box
+          height="36"
         >
         </v-select>
       </v-flex>
-      <v-flex xs3 class="pl-2 pr-2">
+      <!-- <v-flex xs3 class="pl-2 pr-2">
         <div style="position:relative">
           <v-text-field class="input-border input-search"
             label="Nhập tên thủ tục hành chính"
@@ -56,9 +83,10 @@
             @keyup.enter="filterServiceName()"
             append-icon="search"
             box
+            height="36"
           ></v-text-field>
         </div>
-      </v-flex>
+      </v-flex> -->
     </v-layout>
     <content-placeholders class="mt-3" v-if="loading">
       <content-placeholders-text :lines="10" />
@@ -88,7 +116,15 @@
                 <span>{{props.item.serviceName}}</span>
               </div>
             </td>
-            <td class="text-xs-left" style="min-width: 150px">
+            <td class="text-xs-left" style="min-width: 135px;">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.serviceCode}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" style="min-width: 135px">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -105,11 +141,6 @@
               <div v-else>
                 <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
                 style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
-                <!-- <span>
-                  <v-chip style="min-width: 110px;" class="mx-0 my-0 mt-1" small disabled label :color="getColor(props.item.maxLevel)" text-color="white" >
-                    Mức độ {{props.item.maxLevel}}
-                  </v-chip>
-                </span> -->
               </div>
             </td>
             <td class="text-xs-center">
@@ -119,7 +150,7 @@
               <div v-else>
                 <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
                   <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ</v-btn>
-                  <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Xem hướng dẫn</v-btn>
+                  <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
                   <v-list v-if="props.item.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -137,7 +168,7 @@
                   v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
                 >
-                  Xem hướng dẫn
+                  Hướng dẫn
                 </v-btn>
               </div>
             </td>
@@ -204,6 +235,11 @@ export default {
       },
       {
         text: 'Tên thủ tục',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã thủ tục',
         align: 'center',
         sortable: false
       },

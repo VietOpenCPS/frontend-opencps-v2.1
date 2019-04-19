@@ -88,7 +88,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
                 >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -106,7 +106,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
-                  Xem hướng dẫn
+                  Hướng dẫn
                 </v-btn>
               </v-card>
             </v-tab-item>
@@ -119,7 +119,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
                 >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -137,7 +137,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
-                  Xem hướng dẫn
+                  Hướng dẫn
                 </v-btn>
               </v-card>
             </v-tab-item>
@@ -160,7 +160,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
                 >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -178,7 +178,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
-                  Xem hướng dẫn
+                  Hướng dẫn
                 </v-btn>
               </v-card>
             </v-tab-item>
@@ -191,7 +191,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length > 1"
                 >
                   <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
-                  <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                  <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                   <v-list v-if="serviceDetail.serviceConfigs">
                     <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
                       <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
@@ -209,7 +209,7 @@
                   v-if="serviceDetail.serviceConfigs && serviceConfigs(serviceDetail.serviceConfigs).length === 1 && Number(serviceConfigs(serviceDetail.serviceConfigs)[0]['serviceLevel']) <= 2"
                   @click="viewGuide(serviceConfigs(serviceDetail.serviceConfigs)[0])"
                 >
-                  Xem hướng dẫn
+                  Hướng dẫn
                 </v-btn>
               </v-card>
             </v-tab-item>

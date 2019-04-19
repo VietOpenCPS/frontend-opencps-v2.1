@@ -17,7 +17,7 @@
             </v-flex>
           </v-layout>
         </div>
-        <div class="text-center" style="width: 150px;margin-top:12px">
+        <div class="text-center" style="width: 150px;">
           <v-btn color="primary"
             :loading="loadingTable"
             :disabled="loadingTable"

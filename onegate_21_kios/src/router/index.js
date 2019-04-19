@@ -8,6 +8,7 @@ import ChiTietHoSoHomePage from '@/components/ChiTietHoSoHomePage'
 import TraCuuThuTuc from '@/components/TraCuuThuTuc'
 import ChiTietThuTuc from '@/components/ChiTietThuTuc'
 import DanhGiaCanBo from '@/components/DanhGiaCanBo'
+import ChiTietDanhGiaCanBo from '@/components/ChiTietDanhGiaCanBo'
 import DanhGiaChatLuongDichVu from '@/components/DanhGiaChatLuongDichVu'
 import HoSoKetQua from '@/components/HoSoKetQua'
 import HoSoTiepNhan from '@/components/HoSoTiepNhan'
@@ -25,6 +26,7 @@ const routes = [
   { path: '/tra-cuu-thu-tuc', name: 'TraCuuThuTuc', component: TraCuuThuTuc, props: false },
   { path: '/tra-cuu-thu-tuc/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
   { path: '/danh-gia-can-bo', name: 'DanhGiaCanBo', component: DanhGiaCanBo, props: false },
+  { path: '/danh-sach-can-bo/:id', component: ChiTietDanhGiaCanBo, props: true },
   { path: '/danh-gia-cldv', name: 'DanhGiaChatLuongDichVu', component: DanhGiaChatLuongDichVu, props: false },
   { path: '/ho-so-co-ket-qua', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
   { path: '/tiep-nhan-ho-so', name: 'HoSoTiepNhan', component: HoSoTiepNhan, props: false },

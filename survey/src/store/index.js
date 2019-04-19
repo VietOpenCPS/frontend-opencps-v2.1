@@ -50,6 +50,7 @@ export const store = new Vuex.Store({
               let dataVoting = result.data.data
               for (let i = 0; i < dataVoting.length; i++) {
                 dataVoting[i]['answerPercent'] = []
+                dataVoting[i]['averageScore'] = 0
               }
               resolve(dataVoting)
             } else {

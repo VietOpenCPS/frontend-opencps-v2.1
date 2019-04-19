@@ -1,157 +1,276 @@
 <template>
-  <div class="py-0 kios-item" style="width: 80%;margin: auto">
-    <div>
-      <content-placeholders class="mt-3" v-if="loading">
-        <content-placeholders-text :lines="10" />
-      </content-placeholders>
-      <v-card v-else>
-        <div class="table-dossier" style="background-color: #ffffff">
-          <h4 class="py-3 ml-3 text-xs-center">
-            <span style="color:#065694">DANH SÁCH CÁN BỘ LÀM VIỆC TẠI TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG</span>
-          </h4>
-          <div class="dossierList" style="border-left:1px solid #dedede">
-            <div class="wrap-list">
-              <div class="text-bold px-2 py-2 td" style="background-color: #dede;">
-                I.	CÁN BỘ TRỰC THUỘC TRUNG TÂM
-              </div>
-              <!-- <v-layout class="wrap" v-for="(item, index) in employeeList"
-              :key="index" v-if="item.userType === '0'">
-                <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
-                  <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
-                </v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 200px"><span>{{item.fullName}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width:calc(100% - 850px)">
-                  <span> {{item.jobPos}}</span>
-                </v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.workingUnit}}</span></v-flex>
-                <v-flex class="px-2 py-2 td text-xs-center" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
-              </v-layout> -->
-              <v-container fluid grid-list-sm class="px-2">
-                <v-layout wrap>
-                  <v-flex xs12 sm3 md4 class="mb-2"
-                  v-for="(item, index) in employeeList" :key="index" v-if="item.userType === '0'"
-                  >
-                    <v-card flat color="#e9e9ff" width="100%" height="100%">
-                      <v-card-title primary-title>
-                        <v-flex class="px-2 py-2 td">
-                          <img style="width: 150px;height: 150px;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
+  <div>
+    <v-layout justify-center>
+      <v-flex xs12>
+        <v-card flat >
+          <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
+          <h3 class="text-xs-center pb-2" style="color:green" v-if="agencyName">{{agencyName}}</h3>
+          <div v-if="employeeItems.length > 0">
+            <v-container fluid grid-list-md>
+              <v-layout row wrap>
+                <v-flex
+                  v-for="employee in employeeItems"
+                  xs12 sm6 md4 lg3
+                  :key="employee.employeeId"
+                  class="px-2 py-2"
+                >
+                  <v-card flat hover color="#1a571b21" style="box-shadow: none;">
+                    <v-card-text class="py-2 px-1" @click.stop="viewDetailEmployee(employee)" style="overflow:hidden">
+                      <v-layout wrap>
+                        <v-flex xs4 style="text-align: center!important;">
+                          <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;"></div>
+                          <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                         </v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.fullName}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span> {{item.jobPos}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.workingUnit}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.telNo}}</span></v-flex>
-                      </v-card-title>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-              <!--  -->
-              <div class="text-bold px-2 py-2 td" style="background-color: #dede;">
-                II.	 CÁN BỘ BIỆT PHÁI ĐẾN LÀM VIỆC TẠI TRUNG TÂM
-              </div>
-              <!-- <v-layout class="wrap" v-for="(item, index) in employeeList"
-              :key="index" v-if="item.userType === '1'">
-                <v-flex class="px-2 py-2 td" style="width: 150px;height:150px">
-                  <img style="width: 100%;height: 100%;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
-                </v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 200px"><span>{{item.fullName}}</span></v-flex>
-                <v-flex class="px-2 py-2 td" style="width:calc(100% - 850px)">
-                  <span> {{item.jobPos}}</span>
-                </v-flex>
-                <v-flex class="px-2 py-2 td" style="width: 250px"><span>{{item.workingUnit}}</span></v-flex>
-                <v-flex class="px-2 py-2 td text-xs-center" style="width: 150px"><span>{{item.telNo}}</span></v-flex>
-              </v-layout> -->
-              <v-container fluid grid-list-sm class="px-2">
-                <v-layout wrap>
-                  <v-flex xs12 sm3 md4 class="mb-2"
-                  v-for="(item, index) in employeeList" :key="index" v-if="item.userType === '1'"
-                  >
-                    <v-card flat color="#e9e9ff" width="100%" height="100%">
-                      <v-card-title primary-title>
-                        <v-flex class="px-2 py-2 td">
-                          <img style="width: 150px;height: 150px;object-fit: contain" :src="'https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/image' + item.userId +'.png'">
+                        <v-flex xs8 style="word-wrap: break-word;">
+                          <div class="primary--text">{{employee.jobPosTitle}}</div>
+                          <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
+                          <div>{{employee.workingUnitName}}</div>
+                          <div >Email: {{employee.email}}</div>
                         </v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.fullName}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span> {{item.jobPos}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.workingUnit}}</span></v-flex>
-                        <v-flex class="px-2 py-2"><span>{{item.telNo}}</span></v-flex>
-                      </v-card-title>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-              </v-container>
+                      </v-layout>
+                    </v-card-text>
+                    <v-divider light class="my-0"></v-divider>
+                    <div class="py-2" @click.stop="viewDetailEmployee(employee)">
+                      <v-layout wrap class="px-3">
+                        <v-flex class="pt-2" style='max-width:100px'>
+                          <span class="text-bold">Đánh giá:</span>
+                        </v-flex>
+                        <v-flex>
+                          <star-rating read-only :rating="employee['score'] ? employee['score'] : 0" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30"></star-rating>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout wrap class="px-3">
+                        <v-flex style='max-width:100px'>
+                          <span class="text-bold">Kết quả:</span>
+                        </v-flex>
+                        <v-flex>
+                          <span class="text-bold primary--text">{{employee['totalVoting'] ?employee['totalVoting'] : 0}} lượt đánh giá</span>
+                        </v-flex>
+                      </v-layout>
+                    </div>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <div v-if="totalEmployee > numberPerPage" class="text-xs-center pt-2 pb-3" style="width: 100%; max-width:350px; margin: 0 auto">
+              <v-pagination
+                @input="changePage"
+                v-model="employeePage"
+                :length="lengthPage"
+                circle
+              ></v-pagination>
             </div>
           </div>
-          <!-- <v-container fluid grid-list-sm class="px-2">
-            <v-layout wrap>
-              <v-flex xs12 sm6 v-for="(item, index) in dossierList" :key="index" class="mb-2">
-                <v-card flat color="#e9e9ff" width="100%" height="100%">
-                  <v-card-title primary-title>
-                    <v-flex class="xs12 sm12 pb-1">
-                      <span class="pr-2 text-bold">Mã hồ sơ: </span>
-                      <span class="pl-0"> {{item.dossierNo}}</span>
-                    </v-flex>
-                    <v-flex class="xs12 sm12 pb-1">
-                      <span class="pr-2 text-bold">Chủ hồ sơ: </span>
-                      <span class="pl-0"> {{item.applicantName}}</span>
-                    </v-flex>
-                    <v-flex class="xs12 sm12 pb-1">
-                      <span class="pr-2 text-bold">Ngày nộp: </span>
-                      <span class="pl-0"> {{item.receiveDate}}</span>
-                    </v-flex>
-                    <v-flex class="xs12 sm12 pb-1">
-                      <span class="pr-2 text-bold">Ngày có kết quả: </span>
-                      <span class="pl-0"> {{item.releaseDate}}</span>
-                    </v-flex>
-                  </v-card-title>
-                </v-card>
-              </v-flex>
-            </v-layout>
-          </v-container> -->
-        </div>
-        <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
-          <v-icon v-if="fullScreen" dark>home</v-icon>
-        </v-btn>
-      </v-card>
-    </div>
+          <div v-else>
+            <v-alert class="mt-3 mx-3" :value="true" outline color="blue" icon="priority_high">
+              Không có danh sách cán bộ
+            </v-alert>
+          </div>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <v-btn class="back-btn" @click="changeScreen" fab color="primary">
+      <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
+      <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
+    </v-btn>
   </div>
 </template>
 
 <script>
-import router from '@/router'
-import Vue from 'vue/dist/vue.min.js'
-import $ from 'jquery'
+
+import Vue from 'vue'
+import toastr from 'toastr'
+import Captcha from './Captcha.vue'
+import StarRating from 'vue-star-rating'
+import TinyPagination from './Pagination1.vue'
+Vue.use(toastr)
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '5000'
+}
 export default {
-  props: [],
-  components: {},
+  props: ['itemCode'],
+  components: {
+    StarRating,
+    'captcha': Captcha,
+    'tiny-pagination': TinyPagination
+  },
   data: () => ({
-    loading: false,
-    loadingAction: false,
-    employeeList: []
+    itemName: '',
+    employeeItems: [],
+    btnLoading: false,
+    dialog_voting: false,
+    dialog_voting_result: false,
+    dialogShowApplicantIdNo: false,
+    applicantIdNo: '',
+    agencyName: '',
+    dossierNo: '',
+    employeeSelected: '',
+    votingItems: [],
+    lengthPage: 0,
+    totalEmployee: 0,
+    employeePage: 1,
+    numberPerPage: 10
   }),
   computed: {
+    loading () {
+      return this.$store.getters.loading
+    },
     fullScreen () {
       return this.$store.getters.getFullScreen
     }
   },
   created () {
     let vm = this
+    let currentQuery = vm.$router.history.current.query
+    vm.agencyName = currentQuery.hasOwnProperty('agencyName') ? currentQuery.agencyName : ''
     vm.$nextTick(function () {
-      vm.$store.commit('setFullScreen', true)
-      vm.$store.dispatch('loadInitResource').then(result => {
-        console.log('result', result)
-        vm.employeeList = result.dataEmployee
-      })
+      vm.employeePage = currentQuery.hasOwnProperty('page') ? Number(currentQuery.page) : 1
+      vm.getEmployee()
     })
   },
-  watch: {},
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      vm.getEmployee()
+    }
+  },
   methods: {
     changeScreen () {
       var vm = this
       vm.$store.commit('setFullScreen', !vm.fullScreen)
     },
-    goHome () {
-      window.history.back()
+    getEmployee () {
+      let vm = this
+      let sortEmployee = function (employeeList) {
+        function compare (a, b) {
+          if (a.employeeNo < b.employeeNo) {
+            return -1
+          } else if (a.employeeNo > b.employeeNo) {
+            return 1
+          } else {
+            return 0
+          }
+        }
+        return employeeList.sort(compare)
+      }
+      let filter = {
+        start: vm.employeePage * vm.numberPerPage - vm.numberPerPage,
+        end: vm.employeePage * vm.numberPerPage,
+        agencyCode: ''
+      }
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      if (newQuery.hasOwnProperty('agencyCode')) {
+        filter.agencyCode = newQuery.agencyCode
+        vm.$store.dispatch('loadEmployees', filter).then(result => {
+          vm.totalEmployee = result[0]
+          vm.employeeItems = sortEmployee(result[1])
+          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+          if (vm.employeeItems && vm.employeeItems.length > 0) {
+            for (let key in vm.employeeItems) {
+              vm.getAvatar(vm.employeeItems[key], key)
+              vm.getVotingEmployee(vm.employeeItems[key], key)
+            }
+          }
+        }).catch(xhr => {
+          vm.totalThuTuc = 0
+          vm.thutucPage = 1
+        })
+      } else {
+        vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+          vm.totalEmployee = result[0]
+          vm.employeeItems = sortEmployee(result[1])
+          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+          if (vm.employeeItems && vm.employeeItems.length > 0) {
+            for (let key in vm.employeeItems) {
+              vm.getAvatar(vm.employeeItems[key], key)
+              vm.getVotingEmployee(vm.employeeItems[key], key)
+            }
+          }
+        }).catch(xhr => {
+          vm.totalThuTuc = 0
+          vm.thutucPage = 1
+        })
+      }
+    },
+    getAvatar (item, key) {
+      let vm = this
+      let filter = {
+        employeeId: item.employeeId
+      }
+      vm.$store.dispatch('loadImageEmployee', filter).then(function (data) {
+        if (data !== '' && data !== null) {
+          let portalURL = ''
+          if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
+            portalURL = window.themeDisplay.getPortalURL()
+          }
+          vm.employeeItems[key]['imgSrc'] = portalURL + data
+        }
+      }).catch(function (data) {
+        vm.employeeItems[key]['imgSrc'] = ''
+      })
+    },
+    viewDetailEmployee (item) {
+      var vm = this
+      console.log('item', item)
+      vm.$store.commit('setEmployeeSelected', item)
+      vm.$router.push({
+        path: '/danh-sach-can-bo/' + item.employeeId,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
+    getVotingEmployee (item, key) {
+      let vm = this
+      vm.$store.dispatch('loadVoting', {
+        className: 'employee',
+        classPk: item.employeeId
+      }).then(result => {
+        let votingItems = result
+        vm.getScoreVoting(votingItems, key)
+      }).catch(xhr => {
+      })
+    },
+    getScoreVoting (votingItems, key) {
+      let vm = this
+      if (votingItems && votingItems.length > 0) {
+        let totalVoting = 0
+        let totalScore = 0
+        let lengthQuestion = votingItems.length
+        let lengthAnswer = votingItems[0]['answers'].length
+        for (var i = 0; i < lengthQuestion; i++) {
+          totalVoting += votingItems[i]['answersCount']
+          for (var j = 0; j < lengthAnswer; j++) {
+            totalScore += votingItems[i]['answers'][j] * (lengthAnswer - j)
+          }
+        }
+        if (totalVoting > 0) {
+          vm.employeeItems[key]['score'] = Number(((totalScore * 5) / (totalVoting * lengthAnswer)).toFixed(1))
+          vm.employeeItems[key]['totalVoting'] = Number(totalVoting)
+        }
+      }
+    },
+    changePage () {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['page'] = ''
+      for (let key in newQuery) {
+        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      queryString += 'page=' + vm.employeePage
+      vm.$router.push({
+        path: current.path + queryString
+      })
+    },
+    goBack () {
+      var vm = this
+      vm.dialog_voting = false
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card class="pb-2">
+      <v-card flat class="pb-2">
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
           {{agencies[0]['administrationName']}}
         </h4>
@@ -30,7 +30,7 @@
               </v-flex>
             </v-layout>
           </div>
-          <div class="text-right" style="width: 150px;margin-top:12px">
+          <div class="text-right" style="width: 150px">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"

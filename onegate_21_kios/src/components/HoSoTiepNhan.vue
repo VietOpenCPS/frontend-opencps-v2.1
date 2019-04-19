@@ -4,7 +4,7 @@
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
-      <v-card v-else class="mb-0">
+      <v-card flat v-else class="mb-0">
         <div style="background-color: #ffffff">
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
@@ -15,10 +15,10 @@
             </span>
           </h4>
           <div class="mt-3"> 
-            <v-flex xs12 sm4 class="mb-3 right">
+            <v-flex xs12 sm6 class="mb-3 right">
               <div class="input-border input-group input-group--placeholder input-group--text-field">
                 <div class="input-group__input">
-                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ" type="text">
+                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
                   <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
                 </div>
               </div>
@@ -36,6 +36,7 @@
                 :pagination.sync="pagination"
                 hide-actions
                 class="table-bordered"
+                light
                 >
                   <template slot="items" slot-scope="props">
                     <tr v-bind:class="{'active': props.index%2==1}">
@@ -211,7 +212,7 @@ export default {
         fromDate: vm.fromDate(),
         toDate: vm.fromDate(),
         groupId: '',
-        dossierNo: $('#dossierNoKey').val()
+        keyword: $('#dossierNoKey').val()
       }
       vm.$store.dispatch('loadingDataHoSoTN', filter).then(function (result) {
         vm.loading = false
