@@ -1,19 +1,20 @@
 <template>
   <div class="px-2 py-0 kios-item">
-    <content-placeholders class="mt-3" v-if="loading">
-      <content-placeholders-text :lines="10" />
-    </content-placeholders>
-    <h4 class="pt-2 ml-2" v-if="!detailActive">
-      <span style="color:#065694">CHỌN ĐƠN VỊ </span>
-    </h4>
-    <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
-      <v-layout class="wrap">
-        <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
-        </v-flex>
-      </v-layout>
-    </div>
-    <!-- <chi-tiet-danh-gia v-if="detailActive" :administration="govAgencySelected"></chi-tiet-danh-gia> -->
+    <v-card flat>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
+      <h4 class="pt-2 ml-2" v-if="!detailActive">
+        <span style="color:#065694">CHỌN ĐƠN VỊ </span>
+      </h4>
+      <div class="mt-4" v-if="!loading && !detailActive" :class="visible ? 'overlayActive': ''">
+        <v-layout class="wrap">
+          <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+            <v-btn outline flat color="primary" class="kios-btn btn-select" @click="votingDetail(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
+          </v-flex>
+        </v-layout>
+      </div>
+    </v-card>
     <v-btn class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>

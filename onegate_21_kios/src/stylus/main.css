@@ -1681,7 +1681,7 @@ header p {
     margin: 0px !important;
     padding: 0px !important
 }
-.carousel {
+.v-carousel {
     box-shadow: none;
 }
 @media screen and (min-width: 500px) {

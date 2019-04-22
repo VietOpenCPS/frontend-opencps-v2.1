@@ -2,7 +2,7 @@
   <div>
     <v-layout justify-center>
       <v-flex xs12>
-        <v-card flat >
+        <v-card flat class="pb-3">
           <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
           <h3 class="text-xs-center pb-2" style="color:green" v-if="agencyName">{{agencyName}}</h3>
           <div v-if="employeeItems.length > 0">
@@ -62,7 +62,7 @@
             </div>
           </div>
           <div v-else>
-            <v-alert class="mt-3 mx-3" :value="true" outline color="blue" icon="priority_high">
+            <v-alert class="mt-4 mx-3" :value="true" outline color="blue" icon="priority_high">
               Không có danh sách cán bộ
             </v-alert>
           </div>
@@ -213,7 +213,6 @@ export default {
     },
     viewDetailEmployee (item) {
       var vm = this
-      console.log('item', item)
       vm.$store.commit('setEmployeeSelected', item)
       vm.$router.push({
         path: '/danh-sach-can-bo/' + item.employeeId,
@@ -269,8 +268,7 @@ export default {
       })
     },
     goBack () {
-      var vm = this
-      vm.dialog_voting = false
+      window.history.back()
     }
   }
 }

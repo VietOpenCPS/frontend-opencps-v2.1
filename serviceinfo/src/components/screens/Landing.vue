@@ -28,52 +28,48 @@
       </div> 
     </div>
     <v-layout wrap class="white py-2">
-      <v-flex xs4 class="px-2 input-group--text-field-box">
-        <v-select
+      <v-flex xs4 class="px-2">
+        <v-autocomplete
           class="select-border"
           :items="govAgencyList"
           v-model="govAgencySelected"
-          label="Chọn cơ quan"
+          placeholder="Chọn cơ quan"
           item-text="administrationName"
           item-value="administrationCode"
           :hide-selected="true"
           clearable
           @change="changeAdministration"
           box
-          height="36"
-        ></v-select>
+        ></v-autocomplete>
       </v-flex>
-      <v-flex xs4 class="px-2 input-group--text-field-box">
-        <v-select
+      <v-flex xs4 class="px-2">
+        <v-autocomplete
           class="select-border"
           :items="domainListCurrent"
           v-model="domainSelected"
-          label="Chọn lĩnh vực"
+          placeholder="Chọn lĩnh vực"
           item-text="domainName"
           item-value="domainCode"
           :hide-selected="true"
           clearable
           @change="changeDomain"
           box
-          height="36"
-        ></v-select>
+        ></v-autocomplete>
       </v-flex>
-      <v-flex xs4 class="px-2 input-group--text-field-box">
-        <v-select
+      <v-flex xs4 class="px-2">
+        <v-autocomplete
           class="select-border"
           :items="levelList"
           v-model="levelSelected"
-          autocomplete
-          label="Chọn mức độ"
+          placeholder="Chọn mức độ"
           item-text="levelName"
           item-value="level"
           :hide-selected="true"
           @change="changeLevel"
           clearable
           box
-          height="36"
         >
-        </v-select>
+        </v-autocomplete>
       </v-flex>
       <!-- <v-flex xs3 class="pl-2 pr-2">
         <div style="position:relative">
@@ -280,7 +276,7 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
         let filterDomain = {
@@ -327,7 +323,7 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     }

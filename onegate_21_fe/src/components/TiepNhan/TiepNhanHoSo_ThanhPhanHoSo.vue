@@ -6,7 +6,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="onlyView && item.hasForm ? loadAlpcaFormClick(item) : ''" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
@@ -243,8 +243,8 @@
       </div>
       <div v-if="!partTypes.includes(2) && originality === 3">
         <v-card>
-          <v-card-text>
-            <div v-if="!onlyView">
+          <v-card-text class="py-0">
+            <div v-if="!onlyView" class="my-2">
               <v-textarea class="py-0"
               box
               v-model="applicantNoteDossier"
@@ -253,7 +253,7 @@
               label="Ghi chú"
               ></v-textarea>
             </div>
-            <v-text-field
+            <v-text-field class="my-2"
               v-if="onlyView && applicantNoteDossier"
               v-model="applicantNoteDossier"
               label="Ghi chú"

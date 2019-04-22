@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0 kios-item">
+  <div class="py-0 kios-item pr-3">
     <div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
@@ -9,58 +9,60 @@
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
           </h4>
-          <h4 class="py-2 ml-3">
+          <h4 class="py-2 ml-3 text-xs-center">
             <span style="color:#065694">DANH SÁCH HỒ SƠ TIẾP NHẬN NGÀY {{fromDate()}} 
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
           </h4>
-          <div class="mt-3"> 
-            <v-flex xs12 sm6 class="mb-3 right">
-              <div class="input-border input-group input-group--placeholder input-group--text-field">
-                <div class="input-group__input">
-                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
-                  <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+          <div class="py-3"> 
+            <div v-if="dossierList.length > 0">
+              <v-flex xs12 sm6 class="mb-3 right">
+                <div class="input-border input-group input-group--placeholder input-group--text-field">
+                  <div class="input-group__input">
+                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
+                    <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+                  </div>
                 </div>
-              </div>
-            </v-flex>
-            <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
-              <v-carousel-item
-                v-for="i in totalPages"
-                :key="i"
-                transition="fade"
-                reverse-transition="fade"
-              >
-                <v-data-table
-                :headers="headerTable"
-                :items="dossierList"
-                :pagination.sync="pagination"
-                hide-actions
-                class="table-bordered"
-                light
+              </v-flex>
+              <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)">
+                <v-carousel-item
+                  v-for="i in totalPages"
+                  :key="i"
+                  transition="fade"
+                  reverse-transition="fade"
                 >
-                  <template slot="items" slot-scope="props">
-                    <tr v-bind:class="{'active': props.index%2==1}">
-                      <td class="text-xs-center">
-                        <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
-                      </td>
-                      <td class="text-xs-left">
-                        <span>{{props.item.dossierNo}}</span><br>
-                      </td>
-                      <td class="text-xs-left" >
-                        <span>{{props.item.applicantName}}</span>
-                      </td>
-                      <td class="text-xs-left">
-                        <span v-if="props.item.online">{{props.item.submitDate}}</span>
-                        <span v-else>{{props.item.receiveDate}}</span>
-                      </td>
-                      <td class="text-xs-left">
-                        <span>{{props.item.receiveDate}}</span>
-                      </td>
-                    </tr>
-                  </template>
-                </v-data-table>
-              </v-carousel-item>
-            </v-carousel>
+                  <v-data-table
+                  :headers="headerTable"
+                  :items="dossierList"
+                  :pagination.sync="pagination"
+                  hide-actions
+                  class="table-bordered"
+                  light
+                  >
+                    <template slot="items" slot-scope="props">
+                      <tr v-bind:class="{'active': props.index%2==1}">
+                        <td class="text-xs-center">
+                          <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                        </td>
+                        <td class="text-xs-left">
+                          <span>{{props.item.dossierNo}}</span><br>
+                        </td>
+                        <td class="text-xs-left" >
+                          <span>{{props.item.applicantName}}</span>
+                        </td>
+                        <td class="text-xs-left">
+                          <span v-if="props.item.online">{{props.item.submitDate}}</span>
+                          <span v-else>{{props.item.receiveDate}}</span>
+                        </td>
+                        <td class="text-xs-left">
+                          <span>{{props.item.receiveDate}}</span>
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-carousel-item>
+              </v-carousel>
+            </div>
             <v-flex xs12 v-else>
               <v-alert class="mt-3 mx-3" :value="true" outline color="blue" icon="priority_high">
                 Không có hồ sơ tiếp nhận ngày {{fromDate()}}

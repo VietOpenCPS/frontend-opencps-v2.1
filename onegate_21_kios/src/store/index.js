@@ -475,7 +475,7 @@ export const store = new Vuex.Store({
               end: filter.end
             }
           }
-          axios.get(state.endPointApi + '/employees', param).then(result => {
+          axios.get(state.endPoint + '/employees', param).then(result => {
             if (result.data) {
               let employees = result.data.data
               if (employees && employees.length > 0) {
@@ -498,9 +498,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadImageEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/v1/opencps/users/avatar/org.opencps.usermgt.model.Employee/' + filter['employeeId'], param).then(function (response) {
+            let seriable = response.data
+            resolve(seriable)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     // voting
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -513,8 +531,10 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
+            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
+            // commit('setLoading', false)
           })
         })
       })

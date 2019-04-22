@@ -1,153 +1,155 @@
 <template>
-  <div class="mx-2 py-0 kios-item">
-    <h4 class="pt-2 ml-2">
-      <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
-    </h4>
-    <v-layout wrap class="mt-2">
-      <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          box
-          :items="govAgencyList"
-          v-model="govAgencySelected"
-          placeholder="Chọn cơ quan"
-          item-text="administrationName"
-          item-value="administrationCode"
-          :hide-selected="true"
-          @change="changeAdministration"
-          color="primary"
-          clearable
-          height="48"
-        ></v-select>
-      </v-flex>
-      <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          box
-          :items="listLinhVuc"
-          v-model="linhVucSelected"
-          placeholder="Chọn lĩnh vực"
-          item-text="domainName"
-          item-value="domainCode"
-          :hide-selected="true"
-          @change="changeDomain"
-          color="primary"
-          clearable
-          height="48"
-        ></v-select>
-      </v-flex>
-      <v-flex xs4 class="pl-2 pr-2">
-        <v-text-field class="input-border input-search"
-          label="Nhập tên thủ tục hành chính"
-          v-model="serviceNameKey"
-          @keyup.enter="filterServiceinfos('keyword')"
-          @click:append="filterServiceinfos('keyword')"
-          append-icon="search"
-          box
-        ></v-text-field>
-      </v-flex>
-    </v-layout>
-    <content-placeholders class="mt-3" v-if="loading">
-      <content-placeholders-text :lines="10" />
-    </content-placeholders>
-    <div class="mt-4 ml-1" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
-      <v-layout class="wrap">
-        <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
-          <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
+  <div class="py-0 kios-item pr-3">
+    <v-card flat>
+      <h4 class="pt-2 ml-2">
+        <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
+      </h4>
+      <v-layout wrap class="mt-2">
+        <v-flex xs4 class="pl-2 pr-2">
+          <v-select
+            box
+            :items="govAgencyList"
+            v-model="govAgencySelected"
+            placeholder="Chọn cơ quan"
+            item-text="administrationName"
+            item-value="administrationCode"
+            :hide-selected="true"
+            @change="changeAdministration"
+            color="primary"
+            clearable
+            height="48"
+          ></v-select>
+        </v-flex>
+        <v-flex xs4 class="pl-2 pr-2">
+          <v-select
+            box
+            :items="listLinhVuc"
+            v-model="linhVucSelected"
+            placeholder="Chọn lĩnh vực"
+            item-text="domainName"
+            item-value="domainCode"
+            :hide-selected="true"
+            @change="changeDomain"
+            color="primary"
+            clearable
+            height="48"
+          ></v-select>
+        </v-flex>
+        <v-flex xs4 class="pl-2 pr-2">
+          <v-text-field class="input-border input-search"
+            label="Nhập tên thủ tục hành chính"
+            v-model="serviceNameKey"
+            @keyup.enter="filterServiceinfos('keyword')"
+            @click:append="filterServiceinfos('keyword')"
+            append-icon="search"
+            box
+          ></v-text-field>
         </v-flex>
       </v-layout>
-    </div>
-    <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
-      <!-- danh sách lĩnh vực -->
-      <div class="wrap-scroll wrap-scroll-domain list-domain">
-        <v-list class="py-0">
-          <template v-for="(item, index) in listLinhVuc" >
-            <v-list-tile :key="index" @click="filterDomain(item)">
-              <v-list-tile-content>
-                <v-list-tile-title v-html="item.domainName"></v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </template>
-        </v-list>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
+      <div class="mt-4 ml-1" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
+        <v-layout class="wrap">
+          <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+            <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
+          </v-flex>
+        </v-layout>
       </div>
-      <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
-        <div class="flex pagging-table px-2"> 
-          <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
-            @tiny:change-page="paggingData" ></tiny-pagination> 
+      <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+        <!-- danh sách lĩnh vực -->
+        <div class="wrap-scroll wrap-scroll-domain list-domain">
+          <v-list class="py-0">
+            <template v-for="(item, index) in listLinhVuc" >
+              <v-list-tile :key="index" @click="filterDomain(item)">
+                <v-list-tile-content>
+                  <v-list-tile-title v-html="item.domainName"></v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </template>
+          </v-list>
+        </div>
+        <div v-if="totalPaggingLinhVuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="totalPaggingLinhVuc" :page="pageListLinhVuc" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
         </div>
       </div>
-    </div>
-    <!-- danh sách thủ tục -->
-    <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
-      <div class="wrap-scroll wrap-scroll-tableservice">
-        <v-data-table
-          :headers="headersTable"
-          :items="listThuTuc"
-          hide-actions
-          class="table-bordered table-thu-tuc ml-2"
-        >
-          <template slot="items" slot-scope="props">
-            <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
-                </div>
-              </td>
-              <td class="text-xs-left" >
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>{{props.item.serviceName}}</span>
-                </div>
-              </td>
-              <td class="text-xs-left">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <span>{{props.item.domainName}}</span>
-                  </span>
-                </div>
-              </td>
-              <td class="text-xs-center">
-                <content-placeholders v-if="loading">
-                  <content-placeholders-text :lines="1" />
-                </content-placeholders>
-                <div v-else>
-                  <span>
-                    <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
-                      Mức độ {{props.item.maxLevel}}
-                    </v-chip>
-                    <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </template>
-          <template slot="no-data">
-            <div class="text-xs-center mt-2">
-              Không có thủ tục nào được tìm thấy
-            </div>
-          </template>
-        </v-data-table>
-      </div>
-      <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
-        <div class="flex pagging-table px-2">
-          <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
-            @tiny:change-page="paggingData" ></tiny-pagination> 
+      <!-- danh sách thủ tục -->
+      <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
+        <div class="wrap-scroll wrap-scroll-tableservice">
+          <v-data-table
+            :headers="headersTable"
+            :items="listThuTuc"
+            hide-actions
+            class="table-bordered table-thu-tuc ml-2"
+          >
+            <template slot="items" slot-scope="props">
+              <tr v-bind:class="{'active': props.index%2==1}" @click="viewDetail(props.item)">
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
+                  </div>
+                </td>
+                <td class="text-xs-left" >
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.serviceName}}</span>
+                  </div>
+                </td>
+                <td class="text-xs-left">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <span>{{props.item.domainName}}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="text-xs-center">
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>
+                      <v-chip class="mx-0 my-0" label :color="getColor(props.item.maxLevel)" text-color="white" style="height:25px">
+                        Mức độ {{props.item.maxLevel}}
+                      </v-chip>
+                      <!-- <span :style="getColor(props.item.maxLevel)">Mức độ {{props.item.maxLevel}}</span> -->
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template slot="no-data">
+              <div class="text-xs-center mt-2">
+                Không có thủ tục nào được tìm thấy
+              </div>
+            </template>
+          </v-data-table>
+        </div>
+        <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table px-2">
+            <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
         </div>
       </div>
-    </div>
-    <!-- chi tiết thủ tục -->
-    <div class="mt-4" v-if="!loading && activeDetailService">
-      <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
-    </div>
-    <!-- <div class="virtual-keyboard" v-if="visible">
-      <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
-    </div> -->
+      <!-- chi tiết thủ tục -->
+      <div class="mt-4" v-if="!loading && activeDetailService">
+        <chi-tiet-thu-tuc :index="serviceId"></chi-tiet-thu-tuc>
+      </div>
+      <!-- <div class="virtual-keyboard" v-if="visible">
+        <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
+      </div> -->
+    </v-card>
   </div>
 </template>
 

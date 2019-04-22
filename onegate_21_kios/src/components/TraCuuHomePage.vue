@@ -1,7 +1,7 @@
 <template>
   <div class="py-0" >
-    <div style="min-height: 100vh;">
-      <v-card flat class="pb-2" style="border: none">
+    <div>
+      <v-card flat class="pb-2" style="border: none;min-height: 100vh">
         <h3 class="pt-2 ml-2">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h3>

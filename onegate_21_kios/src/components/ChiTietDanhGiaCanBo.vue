@@ -10,7 +10,7 @@
   <div v-else class="px-2 pt-2" style="height: 100%; background-color: #ffff;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-container align-center row wrap>
-        <v-flex xs12 sm10 lg8>
+        <v-flex xs12 sm10 lg10>
           <v-layout row wrap>
             <v-flex xs12 sm12>
               <v-layout wrap class="px-2">
@@ -29,7 +29,7 @@
                   <div class="mb-2">Email: {{employeeSelected.email}}</div>
                   <!--  -->
                   <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
-                    <star-rating class="mt-2" read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
+                    <star-rating read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
                     <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
                   </div>
                   <!--  -->
@@ -245,6 +245,7 @@ export default {
       }
       Promise.all(arrAction).then(results => {
         toastr.success('Gửi đánh giá thành công')
+        vm.dialogShowApplicantIdNo = false
         vm.getVotingEmployee()
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
@@ -259,13 +260,7 @@ export default {
       vm.$store.commit('setFullScreen', !vm.fullScreen)
     },
     goBack () {
-      var vm = this
-      vm.$router.push({
-        path: '/',
-        query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      window.history.back()
     }
   },
   filters: {

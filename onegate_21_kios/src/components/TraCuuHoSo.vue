@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0 kios-item">
+  <div class="py-0 kios-item pr-3">
     <div>
       <v-card flat class="pb-2">
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">

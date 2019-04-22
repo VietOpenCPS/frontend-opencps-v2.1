@@ -1,44 +1,63 @@
 <template>
   <div class="py-0">
     <v-card style="min-height: 100vh;">
-      <h3 class="pt-2 ml-2">
-        <span style="color:#065694">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ </span>
-      </h3>
-      <v-layout wrap class="wrap-password px-0 py-0">
-        <div style="width: calc(100% - 150px)">
-          <v-layout wrap class="text-xs-center">
-            <v-flex xs12 class="pr-2">
-              <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                <div class="input-group__input">
-                  <input id="passCheck" class="kios-input" data-layout="normal" @keyup.enter="submitPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
-                  <i @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                </div>
-                <div class="mt-2" v-if="!validPass">
-                  <div class="input-group__messages" style="color:red">* Mã tra cứu là bắt buộc</div>
-                </div>
-              </div>
-            </v-flex>
-          </v-layout>
+      <v-flex xs12 class="text-xs-center" >
+        <div class="d-inline-block mt-4" style="width:100%;max-width: 650px">
+          <nav class="toolbar primary py-2" data-booted="true">
+            <div class="toolbar__content white--text"  style="justify-content: center">
+              <h3>NHẬP MÃ TRA CỨU</h3>
+            </div>
+          </nav>
+          <v-flex xs12 v-if="!isSigned" class="px-2 pb-2" style="border: 1px solid #dddddd;">
+            <v-form ref="form" v-model="valid" lazy-validation class="mt-2">
+              <v-flex xs12 class="mt-3">
+                <v-text-field
+                  box
+                  placeholder="Mã tra cứu"
+                  v-model="secretKey"
+                  prepend-inner-icon="vpn_key"
+                  @keyup.enter="submitPass"
+                  height="42"
+                  :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <!-- <v-flex xs12 class="">
+                <v-text-field
+                  box
+                  placeholder="Số CMTND/ Hộ chiếu"
+                  v-model="applicantIdNo"
+                  prepend-inner-icon="credit_card"
+                  @keyup.enter="submitPass"
+                  height="42"
+                ></v-text-field>
+              </v-flex> -->
+              <v-layout wrap xs12 class="text-xs-left">
+                <div class="flex red--text" style="width:10px">(*) </div>
+                <div class="flex" style="width:calc(100% - 30px)">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
+              </v-layout>
+              <v-flex xs12 class="text-xs-left text-xs-center mt-2">
+                <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitPass"
+                >
+                  <v-icon>search</v-icon>&nbsp;
+                  Tra cứu
+                </v-btn>
+                <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="goBack"
+                >
+                  <v-icon>reply</v-icon>&nbsp;
+                  Quay lại
+                </v-btn>
+              </v-flex>
+            </v-form>
+          </v-flex>
         </div>
-        <div class="text-center" style="width: 150px;">
-          <v-btn color="primary"
-            :loading="loadingTable"
-            :disabled="loadingTable"
-            @click="submitPass"
-            class="kios-btn"
-          >
-            <v-icon size="20">search</v-icon>
-            &nbsp;
-            Tra Cứu
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </div>
-        <div class="text-center text-bold mt-3" style="color:#065694">
-          <p class="mb-1">Mã tra cứu là dãy số gồm 4 ký tự được in trên</p>
-          <p class="mb-1">GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ, </p>
-          <P>NỘI DUNG EMAIL THÔNG BÁO TIẾP NHẬN HỒ SƠ</P>
-        </div>
-      </v-layout>
+      </v-flex>
     </v-card>
 
     <v-dialog v-model="dialogError" persistent max-width="290">
@@ -51,9 +70,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-btn class="back-btn" @click="goBack" fab color="primary">
+    <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
-    </v-btn>
+    </v-btn> -->
   </div>
 </template>
 
@@ -71,7 +90,7 @@ export default {
     loadingAction: false,
     dialogError: false,
     valid: false,
-    passCheck: '',
+    secretKey: '',
     validPass: true,
     targetCheckPass: ''
   }),
@@ -96,9 +115,6 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       vm.$store.commit('setFullScreen', true)
-      let inputs = document.querySelectorAll('input')
-      inputs[0].focus()
-      $('#passCheck').val('')
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.targetCheckPass = newQuery['target']
@@ -123,7 +139,7 @@ export default {
     },
     submitPass () {
       var vm = this
-      if ($('#passCheck').val() !== '') {
+      if (vm.$refs.form.validate()) {
         vm.validPass = true
         if (vm.targetCheckPass === 'tracuuhoso') {
           let payload = {
@@ -149,16 +165,13 @@ export default {
             }
           })
         } else {
-          console.log('vm.dossierDetail', vm.dossierDetail)
           let filter = {
-            password: $('#passCheck').val(),
+            password: vm.secretKey,
             dossierId: vm.dossierDetail.dossierId
           }
           vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
             vm.loading = false
-            vm.dialogCheckPass = false
             if (result.status && result.status.toString() === '203') {
-              // vm.dialogError = true
               toastr.error('Mã tra cứu không chính xác. Vui lòng thử lại.')
             } else if (result.status && result.status.toString() === '200') {
               vm.clearDialog()
@@ -169,7 +182,6 @@ export default {
               })
             }
           }).catch(function (reject) {
-            vm.dialogCheckPass = false
             vm.loading = false
             toastr.error('Lỗi hệ thống')
             console.log('reject', reject)
@@ -183,7 +195,6 @@ export default {
     viewDetail (item) {
       var vm = this
       vm.dossierDetail = item
-      vm.dialogCheckPass = true
       // router.push('/tra-cuu-ho-so/' + item.dossierId)
     },
     clearDialog () {
