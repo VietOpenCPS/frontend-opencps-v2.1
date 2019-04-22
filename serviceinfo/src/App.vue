@@ -5,7 +5,7 @@
         <v-list-group
           v-for="(item, index) in menuServiceInfos"
           :key="index"
-          prepend-icon="description"
+          :prepend-icon="item.icon"
           :value="index === activeTab"
         >
           <v-list-tile slot="activator">
@@ -57,7 +57,8 @@
           mappingName: 'administrationName',
           mappingCode: 'administrationCode',
           mappingCount: 'count',
-          children: []
+          children: [],
+          icon: 'account_balance'
         },
         {
           id: 2,
@@ -65,7 +66,8 @@
           mappingName: 'domainName',
           mappingCode: 'domainCode',
           mappingCount: 'count',
-          children: []
+          children: [],
+          icon: 'domain'
         },
         {
           id: 3,
@@ -73,7 +75,8 @@
           mappingName: 'levelName',
           mappingCode: 'level',
           mappingCount: 'count',
-          children: []
+          children: [],
+          icon: 'sort'
         },
         {
           id: 4,
@@ -94,7 +97,8 @@
               count: 0,
               level: '3,4'
             }
-          ]
+          ],
+          icon: 'playlist_add'
         }
       ],
     }),

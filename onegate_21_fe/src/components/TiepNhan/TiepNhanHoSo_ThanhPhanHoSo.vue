@@ -26,7 +26,7 @@
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip> -->
                     &nbsp;&nbsp;
-                    <span v-if="item.hasForm && !onlyView" style="color:#004b94">(Bản khai trực tuyến)</span>
+                    <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
                       <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -184,7 +184,7 @@
                 @change="changeFileCheck($event, index)"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: '20px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
+            <v-flex :style="{width: '40px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
                 <v-icon slot="activator" size="30" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>

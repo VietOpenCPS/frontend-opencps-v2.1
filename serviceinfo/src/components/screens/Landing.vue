@@ -104,20 +104,20 @@
                 <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
               </div>
             </td>
-            <td class="text-xs-left" @click="viewDetail(props.item)">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{props.item.serviceName}}</span>
-              </div>
-            </td>
             <td class="text-xs-left" style="min-width: 135px;">
               <content-placeholders v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <div v-else>
                 <span>{{props.item.serviceCode}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left" @click="viewDetail(props.item)">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.serviceName}}</span>
               </div>
             </td>
             <td class="text-xs-left" style="min-width: 135px">
@@ -230,12 +230,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Tên thủ tục',
+        text: 'Mã thủ tục',
         align: 'center',
         sortable: false
       },
       {
-        text: 'Mã thủ tục',
+        text: 'Tên thủ tục',
         align: 'center',
         sortable: false
       },

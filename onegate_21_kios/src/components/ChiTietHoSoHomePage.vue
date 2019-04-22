@@ -6,13 +6,13 @@
     <div v-else>
       <v-layout class="wrap">
         <v-flex class="pr-2 pb-2">
-          <span class="text-bold">{{dossierDetail.serviceName}}</span>
+          <span class="text-bold">Tên thủ tục: {{dossierDetail.serviceName}}</span>
         </v-flex>
       </v-layout>
       <div class="mt-2">
         <v-tabs
           v-model="active"
-          color="cyan"
+          color="#0a72ba"
           dark
           slider-color="yellow"
         >
@@ -24,40 +24,6 @@
           <v-tab-item key="1">
             <v-card >
               <v-card-text class="px-0 py-0">
-                <!-- <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> I.</div>
-                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>
-                    <div v-for="(item, index) in tailieuNop" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel expand  class="expansion-pl ext__form">
-                  <v-expansion-panel-content v-bind:value="true">
-                    <div slot="header" class="text-bold">
-                      <div class="background-triangle-small"> II.</div>
-                      Kết quả xử lý
-                    </div>
-                    <div v-for="(item, index) in tailieuKeyQua" :key="index" style="align-items: center;min-height: 38px;background: #fff; padding-left: 15px;border-top: 1px solid rgb(221, 221, 221)">
-                      <div class="mr-2" style="min-width: 18px; display: flex; min-height: 38px;">
-                        <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                        <div class="header__tphs">
-                          {{item.partName}} <span v-if="item.required" style="color: red">&nbsp; (*) </span>
-                          &nbsp;&nbsp;
-                        </div>
-                      </div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel> -->
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
                     <div class="xs12 sm12 pb-1">
@@ -155,7 +121,7 @@
           </v-tab-item>
           <v-tab-item key="3">
             <v-card>
-              <v-card-text class="px-0 py-0">
+              <v-card-text class="px-2 py-2">
                 <div>
                   <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" >
                     <div class="text-bold">
@@ -203,9 +169,6 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
-        <v-icon dark>arrow_back</v-icon>
-      </v-btn>
     </div>
   </div>
 </template>

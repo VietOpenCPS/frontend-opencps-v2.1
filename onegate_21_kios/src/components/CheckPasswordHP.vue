@@ -1,60 +1,61 @@
 <template>
   <div class="py-0">
     <v-card style="min-height: 100vh;">
+      <h2 class="pt-2 mx-2 text-xs-center">
+        <span style="color:#065694">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ</span>
+      </h2>
       <v-flex xs12 class="text-xs-center" >
-        <div class="d-inline-block mt-4" style="width:100%;max-width: 650px">
-          <nav class="toolbar primary py-2" data-booted="true">
-            <div class="toolbar__content white--text"  style="justify-content: center">
-              <h3>NHẬP MÃ TRA CỨU</h3>
-            </div>
-          </nav>
-          <v-flex xs12 v-if="!isSigned" class="px-2 pb-2" style="border: 1px solid #dddddd;">
-            <v-form ref="form" v-model="valid" lazy-validation class="mt-2">
-              <v-flex xs12 class="mt-3">
-                <v-text-field
-                  box
-                  placeholder="Mã tra cứu"
-                  v-model="secretKey"
-                  prepend-inner-icon="vpn_key"
-                  @keyup.enter="submitPass"
-                  height="42"
-                  :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <!-- <v-flex xs12 class="">
-                <v-text-field
-                  box
-                  placeholder="Số CMTND/ Hộ chiếu"
-                  v-model="applicantIdNo"
-                  prepend-inner-icon="credit_card"
-                  @keyup.enter="submitPass"
-                  height="42"
-                ></v-text-field>
-              </v-flex> -->
-              <v-layout wrap xs12 class="text-xs-left">
-                <div class="flex red--text" style="width:10px">(*) </div>
-                <div class="flex" style="width:calc(100% - 30px)">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
-              </v-layout>
-              <v-flex xs12 class="text-xs-left text-xs-center mt-2">
-                <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="submitPass"
-                >
-                  <v-icon>search</v-icon>&nbsp;
-                  Tra cứu
-                </v-btn>
-                <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="goBack"
-                >
-                  <v-icon>reply</v-icon>&nbsp;
-                  Quay lại
-                </v-btn>
-              </v-flex>
-            </v-form>
+        <div class="d-inline-block mt-4" style="width:100%;max-width: 700px">
+          <v-flex xs12 class="px-2 pb-2">
+            <v-card class="px-3 py-3" color="#002c46b3" flat style="max-width:700px;margin: 0 auto;border: 1px solid #dddddd">
+              <v-form ref="form" v-model="valid" lazy-validation class="mt-2">
+                <v-flex xs12 class="mt-3">
+                  <v-text-field
+                    solo
+                    placeholder="Mã tra cứu"
+                    v-model="secretKey"
+                    prepend-inner-icon="vpn_key"
+                    @keyup.enter="submitPass"
+                    height="42"
+                    :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <!-- <v-flex xs12 class="">
+                  <v-text-field
+                    solo
+                    placeholder="Số CMTND/ Hộ chiếu"
+                    v-model="applicantIdNo"
+                    prepend-inner-icon="credit_card"
+                    @keyup.enter="submitPass"
+                    height="42"
+                  ></v-text-field>
+                </v-flex> -->
+                <v-layout wrap xs12 class="text-xs-left">
+                  <!-- <div class="flex red--text" style="width:10px">(*) </div> -->
+                  <div class="flex white--text" style="width:calc(100% - 30px)">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
+                </v-layout>
+                <v-flex xs12 class="text-xs-left text-xs-center mt-2">
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                    :loading="loading"
+                    :disabled="loading"
+                    @click="submitPass"
+                  >
+                    <v-icon>search</v-icon>&nbsp;
+                    Tra cứu
+                  </v-btn>
+                  <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                    :loading="loading"
+                    :disabled="loading"
+                    @click="goBack"
+                  >
+                    <v-icon>reply</v-icon>&nbsp;
+                    Quay lại
+                  </v-btn>
+                </v-flex>
+              </v-form>
+            </v-card>
+            
           </v-flex>
         </div>
       </v-flex>
@@ -70,9 +71,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
-      <v-icon dark>arrow_back</v-icon>
-    </v-btn> -->
   </div>
 </template>
 

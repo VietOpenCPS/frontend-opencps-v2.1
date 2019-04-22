@@ -60,17 +60,18 @@
             <v-card-text class="px-2 py-1 pr-0">
               <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
               <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
-              <v-layout wrap class="my-2">
-                <div v-for="(item, index) in votingItems" :key="index" class="flex xs12 sm6 white--text mb-2">
-                  <div :class="index%2 ? 'right' : ''">
+              <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                <v-layout row justify-center>
+                  <v-flex xs7 class="text-xs-center">
                     <span>Chỉ số {{index + 1}}: </span>
-                    <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' điểm' : 'Chưa có đánh giá'}}</span>
-                  </div>
-                </div>
-              </v-layout>
+                    <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                  </v-flex>
+                </v-layout>
+              </v-flex>
             </v-card-text>
           </v-card>
-          <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
+          <!-- Thống kê chi tiết các chỉ số. Sử dụng sau -->
+          <!-- <v-card v-for="(item, index) in votingItems" :key="index" color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
             <v-card-text class="px-2 py-1 pr-0">
               <div class="text-xs-center white--text text-bold">Kết quả đánh giá Chỉ số {{index + 1}}</div>
               <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
@@ -85,7 +86,7 @@
                 </v-layout>
               </div>
             </v-card-text>
-          </v-card>
+          </v-card> -->
         </div>
       </v-flex>
       <v-flex xs12 sm1>

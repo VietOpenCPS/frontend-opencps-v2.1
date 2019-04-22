@@ -42,11 +42,20 @@ export default {
   },
   created () {
     var vm = this
-    console.log('landing---------')
     vm.$nextTick(function () {
+      let viewListEmployee = function (item) {
+        vm.$router.push({
+          path: '/danh-gia-can-bo/' + item.itemCode,
+          query: {
+            itemName: item.itemName
+          }
+        })
+      }
       vm.$store.dispatch('loadGovAgencys', {}).then(result => {
         vm.govAgencys = result
-        console.log(vm.govAgencys)
+        if (vm.govAgencys.length === 1) {
+          viewListEmployee(vm.govAgencys[0])
+        }
       }).catch(xhr => {
       })
     })
@@ -56,7 +65,7 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: '/danh-sach-can-bo/' + item.itemCode,
+        path: item.itemCode + '/danh-sach-can-bo',
         query: {
           itemName: item.itemName
         }

@@ -78,7 +78,6 @@ export const store = new Vuex.Store({
     },
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -91,17 +90,14 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployees ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -114,23 +110,23 @@ export const store = new Vuex.Store({
               if (employees && employees.length > 0) {
                 for (let key in employees) {
                   employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
                 }
               }
-              resolve(employees)
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployeesMotcua ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
@@ -156,10 +152,8 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
