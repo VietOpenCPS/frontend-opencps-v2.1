@@ -5,28 +5,44 @@
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
           {{agencies[0]['administrationName']}}
         </h4>
-        <h4 class="py-2 ml-2">
+        <h4 class="py-2 ml-2 text-xs-center">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">
             <v-layout wrap>
               <v-flex xs6 class="pl-2 pr-3">
-                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <!-- <label>Mã số hồ sơ</label> -->
+                <!-- <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <div class="input-group__input">
                     <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
                     <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
-                </div>
+                </div> -->
+
+                <v-text-field class="input-border input-search"
+                  label="Mã hồ sơ"
+                  v-model="dossierNoKey"
+                  @keyup.enter="filterDossier"
+                  @click:append="filterDossier"
+                  append-icon="search"
+                  box
+                ></v-text-field>
               </v-flex>
               <v-flex xs6 class="pl-3 pr-2">
-                <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
+                <!-- <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
                   <div class="input-group__input">
                     <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                     <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
                   </div>
-                </div>
+                </div> -->
+                <v-text-field class="input-border input-search"
+                  label="Số CMND/ hộ chiếu"
+                  v-model="applicantIdNoKey"
+                  @keyup.enter="filterDossier"
+                  @click:append="filterDossier"
+                  append-icon="search"
+                  box
+                ></v-text-field>
               </v-flex>
             </v-layout>
           </div>
@@ -203,15 +219,11 @@ export default {
       vm.$store.commit('setFullScreen', false)
       let current = vm.$router.history.current
       let newQuery = current.query
-      $('#dossierNoKey').val(newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : '')
-      $('#applicantIdNoKey').val(newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : '')
-      if (!newQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
-        let inputs = document.querySelectorAll('input')
-        inputs[0].focus()
-      }
+      vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
+      vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if (($('#dossierNoKey').val() !== '' || $('#applicantIdNoKey').val() !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
+      if ((vm.dossierNoKey !== '' || vm.applicantIdNoKey !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
@@ -230,11 +242,11 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      $('#dossierNoKey').val(currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : '')
-      $('#applicantIdNoKey').val(currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : '')
+      vm.dossierNoKey = currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : ''
+      vm.applicantIdNoKey = currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
       // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
       vm.hosoDatasPage = 1
-      if (($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
+      if ((vm.dossierNoKey || vm.applicantIdNoKey) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
         vm.validateTracuu = true
         vm.doLoadingDataHoSo()
       } else {
@@ -246,7 +258,7 @@ export default {
       } else {
         vm.activeDetailDossier = false
       }
-      if (!currentQuery.hasOwnProperty('detail') && $('#dossierNoKey').val() === '') {
+      if (!currentQuery.hasOwnProperty('detail') && vm.dossierNoKey === '') {
         let inputs = document.querySelectorAll('input')
         inputs[0].focus()
       }
@@ -259,10 +271,10 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
-      newQuery['dossierNo'] = $('#dossierNoKey').val()
-      vm.$store.commit('setDossierNoSearch', $('#dossierNoKey').val())
-      newQuery['applicantIdNo'] = $('#applicantIdNoKey').val()
-      vm.$store.commit('setApplicantIdNoSearch', $('#applicantIdNoKey').val())
+      newQuery['dossierNo'] = vm.dossierNoKey
+      vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
+      newQuery['applicantIdNo'] = vm.applicantIdNoKey
+      vm.$store.commit('setApplicantIdNoSearch', vm.applicantIdNoKey)
       newQuery['applicantName'] = $('#applicantNameKey').val()
       newQuery['detail'] = ''
       for (let key in newQuery) {
@@ -270,7 +282,7 @@ export default {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val() || $('#applicantNameKey').val()) {
+      if (vm.dossierNoKey || vm.applicantIdNoKey || $('#applicantNameKey').val()) {
         vm.validateTracuu = true
         vm.$router.push({
           path: current.path + queryString,
@@ -297,12 +309,12 @@ export default {
     confirmPass () {
       var vm = this
       let payload = {
-        dossierNo: $('#dossierNoKey').val(),
-        applicantIdNo: $('#applicantIdNoKey').val(),
+        dossierNo: vm.dossierNoKey,
+        applicantIdNo: vm.applicantIdNoKey,
         secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
       }
       vm.$store.commit('setFilterDossierKey', payload)
-      if ($('#dossierNoKey').val() || $('#applicantIdNoKey').val()) {
+      if (vm.dossierNoKey || vm.applicantIdNoKey) {
         vm.validateTracuu = true
         vm.$router.push({
           path: '/ma-truy-cap',

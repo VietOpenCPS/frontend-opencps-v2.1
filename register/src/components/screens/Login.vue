@@ -26,7 +26,7 @@
       <v-flex v-if="!isSigned" xs12>
         <nav class="toolbar theme--dark primary py-2" data-booted="true">
           <div class="toolbar__content"  style="justify-content: center">
-            <h4>ĐĂNG NHẬP</h4>
+            <h4 class="white--text">ĐĂNG NHẬP</h4>
           </div>
         </nav>
         <v-flex xs12 v-if="!isSigned" class="px-2 pb-2" style="border: 1px solid #dddddd;">
@@ -40,7 +40,6 @@
                 required
                 prepend-inner-icon="person_outline"
                 @keyup.enter="submitConfirmLogin"
-                autofocus
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="">

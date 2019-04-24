@@ -10,7 +10,7 @@
             box
             :items="govAgencyList"
             v-model="govAgencySelected"
-            placeholder="Chọn cơ quan"
+            label="Cơ quan"
             item-text="administrationName"
             item-value="administrationCode"
             :hide-selected="true"
@@ -25,7 +25,7 @@
             box
             :items="listLinhVuc"
             v-model="linhVucSelected"
-            placeholder="Chọn lĩnh vực"
+            label="Lĩnh vực"
             item-text="domainName"
             item-value="domainCode"
             :hide-selected="true"
@@ -56,7 +56,7 @@
           </v-flex>
         </v-layout>
       </div>
-      <div class="mt-4 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
+      <div class="mt-4 pb-2 mx-2" v-if="!loading && !activeDetailService && !showListThuTuc && listLinhVuc && govAgencySelected && !linhVucSelected && listLinhVuc.length > 0" :class="visible ? 'overlayActive': ''">
         <!-- danh sách lĩnh vực -->
         <div class="wrap-scroll wrap-scroll-domain list-domain">
           <v-list class="py-0">

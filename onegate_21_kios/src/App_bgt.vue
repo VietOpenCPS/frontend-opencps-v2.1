@@ -168,7 +168,11 @@
         } else if (page === 'tracuuthutuc') {
           queryString = '/tra-cuu-thu-tuc'
         } else if (page === 'danhgia') {
-          queryString = vm.isDvc ? '/danh-gia-can-bo' : '/danh-sach-can-bo'
+          if (vm.isDvc) {
+            queryString = '/danh-gia-can-bo'
+          } else {
+            queryString = '/danh-sach-can-bo?agencyCode=' + vm.govAgencyList[0].administrationCode + '&agencyName=' + vm.govAgencyList[0].administrationName
+          }
         }
         vm.$router.push({
           path: queryString,

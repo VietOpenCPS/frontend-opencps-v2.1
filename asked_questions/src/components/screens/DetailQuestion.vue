@@ -50,10 +50,16 @@
                   style="border:1px solid #dedede;border-radius:3px"
                 >
                   <div style="position:relative">
-                    <i><span class="text-bold">Ngày {{answerList[0].createDate}}</i>
+                    <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
                     <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
                     <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
-                      <v-tooltip top class="mr-2">
+                      <v-tooltip top>
+                        <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
+                          <v-icon color="primary">edit</v-icon>
+                        </v-btn>
+                        <span>Sửa</span>
+                      </v-tooltip>
+                      <v-tooltip top class="mr-3">
                         <v-btn slot="activator" icon ripple @click="deleteAnswer(answerList[0])" style="margin-top:-3px!important">
                           <v-icon color="red lighten-1">delete</v-icon>
                         </v-btn>
@@ -80,7 +86,13 @@
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
                     <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
                     <div v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
-                      <v-tooltip top class="mr-2">
+                      <v-tooltip top >
+                        <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
+                          <v-icon color="primary">edit</v-icon>
+                        </v-btn>
+                        <span>Sửa</span>
+                      </v-tooltip>
+                      <v-tooltip top class="mr-3">
                         <v-btn slot="activator" icon ripple @click="deleteAnswer(itemAnswer)" style="margin-top:-3px!important">
                           <v-icon color="red lighten-1">delete</v-icon>
                         </v-btn>
@@ -111,83 +123,43 @@
               <v-flex xs12 sm12 style="margin:0 auto">
                 <vue-editor v-model="contentAnswer" :editorToolbar="customToolbar"></vue-editor>
               </v-flex>
-              <div>
+              <div v-if="!activeEdit">
                 <v-checkbox class="mt-0"
                   label="Công khai"
                   v-model="publishAnswer"
                 ></v-checkbox>
               </div>
               <div class="text-xs-center my-3">
-                <v-btn color="primary"
+                <!-- Thêm mới -->
+                <v-btn v-if="!activeEdit" color="primary"
                   :loading="loading"
                   :disabled="loading"
                   @click="submitAddAnswer"
                 >
-                  <v-icon>how_to_reg</v-icon>&nbsp;
+                  <v-icon>library_add</v-icon>&nbsp;
                   Gửi câu trả lời
                 </v-btn>
-                <v-btn @click="goBack" color="primary">
+                <v-btn v-if="!activeEdit" @click="goBack" color="primary">
                   <v-icon>reply</v-icon>&nbsp;
                   Quay lại
+                </v-btn>
+                <!-- Sửa -->
+                <v-btn v-if="activeEdit" color="primary"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="submitEditAnswer"
+                >
+                  <v-icon>spellcheck</v-icon>&nbsp;
+                  Cập nhật câu trả lời
+                </v-btn>
+                <v-btn v-if="activeEdit" @click="cancelEdit" color="primary">
+                  <v-icon>clear</v-icon>&nbsp;
+                  Hủy
                 </v-btn>
               </div>
             </div>
           </div>
         </v-flex>
-        <!-- <v-flex xs12 sm12 class="mx-3 mt-4" v-if="activeAddQuestion">
-          <div id="contentQuestion">
-            <span><v-icon class="blue--text">contact_support</v-icon> </span>
-            <span class="text-bold primary--text">Tạo câu hỏi:</span>
-          </div>
-          <div class="mx-1 my-2">
-            <vue-editor v-model="content" :editorToolbar="customToolbar"></vue-editor>
-          </div>
-          <div class="mx-2">
-            <v-form ref="form" v-model="valid" lazy-validation class="px-3 pt-3">
-              <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-                <v-text-field
-                  box
-                  label="Họ tên"
-                  v-model="fullName"
-                  :rules="[rules.required]"
-                  name="input-10-2"
-                  min="6"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 class="text-xs-center" style="margin:0 auto">
-                <v-text-field
-                  box
-                  label="Thư điện tử"
-                  v-model="contactEmail"
-                  :rules="[rules.required, rules.email]"
-                  name="input-10-2"
-                  min="6"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 v-if="captchaActive" style="margin:0 auto">
-                <captcha ref="captcha"></captcha>
-              </v-flex>
-              <div class="text-xs-center my-2">
-                <v-btn color="primary"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="submitAddQuestion"
-                >
-                  <v-icon>how_to_reg</v-icon>&nbsp;
-                  Gửi câu hỏi
-                </v-btn>
-                <v-btn color="primary"
-                  @click="cancelAddQuestion"
-                >
-                  <v-icon>clear</v-icon>&nbsp;
-                  Hủy
-                </v-btn>
-              </div>
-            </v-form>
-          </div>
-        </v-flex> -->
       </v-card>
       
     </v-layout>
@@ -246,6 +218,8 @@ export default {
         </ol>`
       }
     ],
+    answerSelected: '',
+    activeEdit: false,
     content: '',
     contentAnswer: '',
     loadingAnswer: false,
@@ -379,7 +353,6 @@ export default {
     },
     addAnswer (event, item, index) {
       let vm = this
-      console.log(item)
       if (vm.openQuestion === index) {
         event.stopPropagation()
         vm.questionSelected = index
@@ -403,6 +376,24 @@ export default {
           toastr.success('Thêm câu trả lời thành công')
           vm.getAnswers()
           vm.contentAnswer = ''
+        }).catch(function (reject) {
+          console.log(reject)
+        })
+      }
+    },
+    submitEditAnswer () {
+      let vm = this
+      if (vm.contentAnswer && vm.answerSelected) {
+        let filter = {
+          questionId: vm.answerSelected.questionId,
+          answerId: vm.answerSelected.answerId,
+          content: vm.contentAnswer,
+          publish: vm.answerSelected.publish ? 1 : 0
+        }
+        vm.$store.dispatch('putAnswer', filter).then(function (result) {
+          toastr.success('Cập nhật câu trả lời thành công')
+          vm.getAnswers()
+          vm.cancelEdit()
         }).catch(function (reject) {
           console.log(reject)
         })
@@ -472,7 +463,20 @@ export default {
       }, 300)
     },
     editAnswer (item) {
-      console.log(item)
+      let vm = this
+      vm.activeEdit = true
+      vm.answerSelected = item
+      vm.contentAnswer = item.content
+      setTimeout (function () {
+        let elmnt = document.getElementById("contentAnswer")
+        elmnt.scrollIntoView()
+      }, 300)
+    },
+    cancelEdit () {
+      let vm = this
+      vm.activeEdit = false
+      vm.answerSelected = ''
+      vm.contentAnswer = ''
     },
     getAnswerList () {
       let vm = this

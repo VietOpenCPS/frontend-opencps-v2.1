@@ -512,7 +512,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
-              <v-icon>undo</v-icon>&nbsp;
+              <v-icon>reply</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -565,7 +565,7 @@
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
-            <v-icon>undo</v-icon>&nbsp;
+            <v-icon>reply</v-icon>&nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
             </v-btn>

@@ -14,13 +14,24 @@
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
           </h4>
-          <div class="py-3"> 
-            <v-flex xs12 sm6 class="mb-3 right" v-if="dossierList.length > 0">
-              <div class="input-border input-group input-group--placeholder input-group--text-field">
+          <div class="py-3 mx-3"> 
+            <v-flex xs12 class="mb-3 text-xs-right">
+              <!-- <div class="d-inline-block input-border input-group input-group--placeholder input-group--text-field" style="width:50%">
                 <div class="input-group__input">
                   <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
                   <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
                 </div>
+              </div> -->
+              <div class="d-inline-block" style="width:50%">
+                <v-text-field class="input-border input-search"
+                  label="Mã hồ sơ/ tên chủ hồ sơ"
+                  v-model="dossierNoKey"
+                  @keyup.enter="searchKeyword"
+                  @click:append="searchKeyword"
+                  append-icon="search"
+                  box
+                  clearable
+                ></v-text-field>
               </div>
             </v-flex>
             <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
@@ -36,6 +47,7 @@
                 :pagination.sync="pagination"
                 hide-actions
                 class="table-bordered"
+                light
                 >
                   <template slot="items" slot-scope="props">
                     <tr v-bind:class="{'active': props.index%2==1}">
@@ -60,7 +72,7 @@
               </v-carousel-item>
             </v-carousel>
             <v-flex xs12 v-else>
-              <v-alert class="mt-3 mx-3" :value="true" outline color="blue" icon="priority_high">
+              <v-alert class="mt-3" :value="true" outline color="blue" icon="priority_high">
                 Không có hồ sơ có kết quả ngày {{fromDate()}}
               </v-alert>
             </v-flex>
@@ -148,7 +160,15 @@ export default {
       }, 1800000)
     })
   },
-  watch: {},
+  watch: {
+    '$route': function (newRoute, oldRoute) {
+      let vm = this
+      let currentQuery = newRoute.query
+      let keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.dossierNoKey = keyword
+      vm.searchDossier()
+    }
+  },
   methods: {
     changeItem (event) {
       let vm = this
@@ -201,6 +221,16 @@ export default {
         })
       }
     },
+    searchKeyword () {
+      let vm = this
+      let keyword = vm.dossierNoKey !== null && vm.dossierNoKey !== 'null' ? vm.dossierNoKey : ''
+      vm.$router.push({
+        path: '/tiep-nhan-ho-so?keyword=' + keyword,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     searchDossier () {
       let vm = this
       vm.dossierList = []
@@ -209,7 +239,7 @@ export default {
         fromDate: vm.fromDate(),
         toDate: vm.fromDate(),
         groupId: '',
-        keyword: $('#dossierNoKey').val()
+        keyword: vm.dossierNoKey
       }
       vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
         vm.loading = false

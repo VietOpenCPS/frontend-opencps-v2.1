@@ -6,7 +6,7 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? loadAlpcaFormClick(item) : ''" style="min-width: 18px; display: flex;">
+                <div class="mr-2" @click="onlyView && item.hasForm ? '' : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
                   <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
@@ -143,10 +143,19 @@
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
-                      <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
-                      v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
-                      <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
-                      <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
+                      <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" 
+                      v-if="item.hasForm && !onlyView && checkInput !== 1">
+                        <v-icon color="white">save</v-icon>&nbsp;
+                        Lưu lại
+                      </v-btn>
+                      <v-btn color="primary" @click.stop="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">
+                        <v-icon color="white">print</v-icon>&nbsp;
+                        In
+                      </v-btn>
+                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">
+                        <v-icon color="white">delete</v-icon>&nbsp;
+                        Xóa
+                      </v-btn>
                     </div>
                     <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
@@ -186,15 +195,15 @@
             </v-flex>
             <v-flex :style="{width: '40px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
-                <v-icon slot="activator" size="30" class="mx-0" color="primary">done</v-icon>
+                <v-icon slot="activator" size="24" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>
               </v-tooltip>
               <v-tooltip top v-else-if="item.fileCheck === 2">
-                <v-icon slot="activator" size="30" class="mx-0" color="primary">close</v-icon>
+                <v-icon slot="activator" size="24" class="mx-0" color="primary">close</v-icon>
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '90px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+            <v-flex :style="{width: !onlyView ? '120px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
               <input
               type="file"
               style="display: none"
@@ -214,19 +223,28 @@
               indeterminate
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
-              <v-tooltip left v-else-if="progressUploadPart !== item.partNo && !onlyView">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && !onlyView & item.hasForm">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                   <v-badge>
-                    <v-icon size="30" style="font-weight: bold;" color="#004b94">cloud_upload</v-icon>
+                    <v-icon size="24" color="#004b94">edit</v-icon>
                   </v-badge>
                 </v-btn>
-                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
-                <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
+                <span>Khai trực tuyến</span>
+              </v-tooltip>
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                  <v-badge>
+                    <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
+                <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
               <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
-                    <v-icon size="16" color="orange darken-3">warning</v-icon>
+                    <v-icon size="24" color="orange darken-3">file_copy</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>

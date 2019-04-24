@@ -1488,6 +1488,7 @@ export default {
         })
       }
     },
+    // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
       var validPhanCong = true
@@ -1566,9 +1567,6 @@ export default {
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
-        // console.log('dueDateEdit', date)
-        // filter['dueDate'] = date ? date : ''
-        // filter['receiveDate'] = vm.receiveDateEdit ? vm.receiveDateEdit : ''
         let payload = {
           'dueDate': date,
           'receiveDate': vm.receiveDateEdit
@@ -1642,6 +1640,7 @@ export default {
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
       vm.loadingActionProcess = true
+      // case confirm Thao tác từ trang danh sách hồ sơ
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x && vm.validateAction) {
@@ -1677,7 +1676,9 @@ export default {
         } else {
           return false
         }
-      } else if (vm.validateAction) {
+      }
+      // case Thao tác trong chi tiết hồ sơ
+      else if (vm.validateAction) {
         if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined') {
           var valid = vm.$refs.thanhphanhoso.validDossierTemplate()
           if (!valid) {
@@ -1687,6 +1688,7 @@ export default {
           }
         }
         vm.loadingActionProcess = true
+        // tách riêng case sử dụng ký số
         if (vm.showKyPheDuyetTaiLieu) {
           if (useKySo) {
             let filter = {
@@ -1748,6 +1750,7 @@ export default {
                 }
               } else {
                 var paymentsOut = ''
+                // check phí = 0 => show cảnh báo
                 if (vm.showThuPhi) {
                   paymentsOut = {
                     requestPayment: vm.payments['requestPayment'],
@@ -1788,6 +1791,7 @@ export default {
             })
           }
         } else {
+          // case không sử dụng ký số
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             if (vm.checkInput === 2 || vm.checkInput === '2') {
               vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {

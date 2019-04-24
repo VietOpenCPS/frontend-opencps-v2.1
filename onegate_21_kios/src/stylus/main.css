@@ -1288,7 +1288,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     height: 42px;
     cursor: pointer;
     color: #0b72ba;
-    margin-left: 15px;
+    padding-left: 15px;
     border-bottom: 1px solid #d3d3d3
 }
 .menu__content .list>div .list__tile {

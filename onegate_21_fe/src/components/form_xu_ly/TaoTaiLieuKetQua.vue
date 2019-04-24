@@ -54,10 +54,19 @@
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
                         <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px;z-index:101' : ''">
-                          <v-btn color="primary" @click="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
-                          v-if="item.eForm">Lưu lại</v-btn>
-                          <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
-                          <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
+                          <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
+                          v-if="item.eForm">
+                            <v-icon color="white">save</v-icon>&nbsp;
+                            Lưu lại
+                          </v-btn>
+                          <v-btn color="primary" @click.stop="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">
+                            <v-icon color="white">print</v-icon>&nbsp;
+                            In
+                          </v-btn>
+                          <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">
+                            <v-icon color="white">delete</v-icon>&nbsp;
+                            Xóa
+                          </v-btn>
                         </div>
                         <div :id="'formAlpaca' + item.partNo + id"></div>
                       </v-flex>
@@ -71,7 +80,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-layout row wrap v-else>
-                <v-flex style="width: 50px;">
+                <v-flex style="width: 100px;">
                   <input
                   type="file"
                   style="display: none"
@@ -85,14 +94,22 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <v-tooltip top v-else-if="progressUploadPart + id !== item.partNo + id">
-                    <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.hasForm">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                       <v-badge>
-                        <v-icon size="30" color="#004b94">cloud_upload</v-icon>
+                        <v-icon size="24" color="#004b94">edit</v-icon>
                       </v-badge>
                     </v-btn>
-                    <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
-                    <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
+                    <span>Khai trực tuyến</span>
+                  </v-tooltip>
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                      <v-badge>
+                        <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                      </v-badge>
+                    </v-btn>
+                    <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
+                    <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
                   <!-- <v-tooltip top>
                     <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">

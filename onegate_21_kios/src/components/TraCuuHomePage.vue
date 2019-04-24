@@ -1,7 +1,7 @@
 <template>
   <div class="py-0" >
     <div>
-      <v-card flat class="pb-2" style="border: none;min-height: 100vh">
+      <v-card flat class="pb-2" style="border: none;min-height: 100vh;">
         <h2 class="pt-2 mx-2 text-xs-center">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h2>
@@ -51,83 +51,84 @@
             </v-card>
           </v-flex>
         </v-layout>
-        <v-flex class="my-3 mx-3">
-          <v-toolbar height="42" color="#0b72ba" dark flat>
-            <v-toolbar-title v-if="!activeDetailDossier" style="font-size: 16px !important;">Kết quả tìm kiếm <span>: {{dossierList.length}} hồ sơ</span></v-toolbar-title>
-            <v-toolbar-title v-else style="font-size: 16px !important;">Thông tin chi tiết hồ sơ</v-toolbar-title>
-          </v-toolbar>
-        </v-flex>
-        <div class="mx-3 mt-4" v-if="validateTracuu === true && !activeDetailDossier" style="position:relative">
-          <v-data-table
-          :headers="headersTable"
-          :items="dossierList"
-          hide-actions
-          id="tracuuhoso"
-          class="table-landing table-bordered"
-          >
-            <template slot="items" slot-scope="props">
-              <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer" @click="viewDetail(props.item)">
-                <td class="text-xs-center py-3" width="50px">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.index + 1}}</span><br>
-                  </div>
-                </td>
-                <td class="text-xs-left py-3">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.dossierNo}}</span><br>
-                  </div>
-                </td>
-                <td class="text-xs-left py-3" >
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.applicantName}}</span>
-                  </div>
-                </td>
-                <td class="text-xs-left py-3">
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>
-                      <span>{{props.item.receiveDate}}</span>
-                    </span>
-                  </div>
-                </td>
-                <td class="text-xs-left py-3" >
-                  <content-placeholders v-if="loadingTable">
-                    <content-placeholders-text :lines="1" />
-                  </content-placeholders>
-                  <div v-else>
-                    <span>{{props.item.dossierStatusText}}</span>
-                  </div>
-                </td>
-              </tr>
-            </template>
-            <template slot="no-data">
-              <div class="text-xs-center mt-2">
-                Không có hồ sơ nào được tìm thấy
+        <div style="max-width:1300px;margin:0 auto">
+          <v-flex class="my-3 mx-3">
+            <v-toolbar height="42" color="#0b72ba" dark flat>
+              <v-toolbar-title v-if="!activeDetailDossier" style="font-size: 16px !important;">Kết quả tìm kiếm <span>: {{dossierList.length}} hồ sơ</span></v-toolbar-title>
+              <v-toolbar-title v-else style="font-size: 16px !important;">Thông tin chi tiết hồ sơ</v-toolbar-title>
+            </v-toolbar>
+          </v-flex>
+          <div class="mx-3 mt-4" v-if="validateTracuu === true && !activeDetailDossier" style="position:relative">
+            <v-data-table
+            :headers="headersTable"
+            :items="dossierList"
+            hide-actions
+            id="tracuuhoso"
+            class="table-landing table-bordered"
+            >
+              <template slot="items" slot-scope="props">
+                <tr v-bind:class="{'active': props.index%2==1}" class="hover-pointer" @click="viewDetail(props.item)">
+                  <td class="text-xs-center py-3" width="50px">
+                    <content-placeholders v-if="loadingTable">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.index + 1}}</span><br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-3">
+                    <content-placeholders v-if="loadingTable">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.dossierNo}}</span><br>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-3" >
+                    <content-placeholders v-if="loadingTable">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.applicantName}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-3">
+                    <content-placeholders v-if="loadingTable">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>
+                        <span>{{props.item.receiveDate}}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-3" >
+                    <content-placeholders v-if="loadingTable">
+                      <content-placeholders-text :lines="1" />
+                    </content-placeholders>
+                    <div v-else>
+                      <span>{{props.item.dossierStatusText}}</span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+              <template slot="no-data">
+                <div class="text-xs-center mt-2">
+                  Không có hồ sơ nào được tìm thấy
+                </div>
+              </template>
+            </v-data-table>
+            <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+              <div class="flex pagging-table px-2">
+                <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
               </div>
-            </template>
-          </v-data-table>
-          <div v-if="totalPages > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
-            <div class="flex pagging-table px-2">
-              <tiny-pagination :total="totalPages" :page="hosoDatasPage" custom-class="custom-tiny-class" 
-                @tiny:change-page="paggingData" ></tiny-pagination> 
             </div>
           </div>
+          <div class="mx-3 mt-3" v-if="validateTracuu === true && activeDetailDossier">
+            <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
+          </div>
         </div>
-        <div class="mx-3 mt-3" v-if="validateTracuu === true && activeDetailDossier">
-          <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
-        </div>
-        
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
