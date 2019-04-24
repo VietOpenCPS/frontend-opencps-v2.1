@@ -1,6 +1,62 @@
 <template>
   <v-app>
-    <v-content>
+    <v-btn v-if="isMobile"
+      class="elevation-0"
+      color="grey"
+      dark
+      fab
+      fixed
+      style="top: 50px;
+      right:0px;border-radius: 6px;
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+      background-color: #002c46d4!important;"
+      top
+      right
+      @click.stop="drawer = !drawer"
+    >
+      <v-icon>view_list</v-icon>
+    </v-btn>
+    <v-navigation-drawer
+      style="background: #002c46d4"
+      v-if="isMobile"
+      v-model="drawer"
+      absolute
+      dark
+      temporary
+    >
+      <v-img
+        :src="image"
+        height="100%"
+      >
+        <v-layout
+          class="fill-height"
+          tag="v-list"
+          column
+        >
+          <v-list-tile
+            v-for="(item, index) in kiosItems"
+            :key="index"
+            @click="goPage(item.route, index)"
+            :class="active === index ? 'active_drawer' : ''"
+            avatar
+            class="v-list-item"
+          >
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-title
+              v-text="item.text"
+            />
+          </v-list-tile>
+        </v-layout>
+      </v-img>
+    </v-navigation-drawer>
+    <v-content v-if="isMobile">
+      <router-view></router-view>
+    </v-content>
+    
+    <v-content v-else>
       <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
         <div :class="isKios ? 'tab-item' : ''">
           <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
@@ -59,7 +115,36 @@
       loading: true,
       isKios: true,
       wrapStyle: true,
-      isMobile: false
+      isMobile: false,
+      drawer: null,
+      active: 0,
+      kiosItems: [
+        {
+          route: 'ketquahoso',
+          icon: 'library_books',
+          text: 'Hồ sơ đã có kết quả'
+        },
+        {
+          route: 'tiepnhanhoso',
+          icon: 'move_to_inbox',
+          text: 'Hồ sơ đã tiếp nhận'
+        },
+        {
+          route: 'tracuuhoso',
+          icon: 'search',
+          text: 'Tra cứu hồ sơ'
+        },
+        {
+          route: 'tracuuthutuc',
+          icon: 'pageview',
+          text: 'Tra cứu thủ tục'
+        },
+        {
+          route: 'danhgia',
+          icon: 'stars',
+          text: 'Đánh giá cán bộ'
+        }
+      ]
     }),
     created () {
       var vm = this
@@ -114,16 +199,11 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
-        console.log('currentQuery', currentQuery)
-        console.log('newRoute', newRoute)
         vm.$store.commit('setGroupid', currentQuery.hasOwnProperty('groupIds') ? currentQuery['groupIds'] : '')
         if (!currentQuery.hasOwnProperty('secretKey')) {
-          // vm.setInterval()
           vm.isKios = true
-          // console.log('isKios')
         } else {
           vm.isKios = false
-          // console.log('NOT Kios')
         }
         if (newRoute['path'] && newRoute['path'] === '/tra-cuu-ho-so-homepage') {
           vm.wrapStyle = false
@@ -135,7 +215,8 @@
     methods: {
       onResize () {
         let vm = this
-        vm.isMobile = window.innerWidth < 600
+        vm.isMobile = window.innerWidth < 1020
+        vm.$store.commit('setIsMobile', vm.isMobile)
       },
       backKiosHome () {
         var vm = this
@@ -155,8 +236,9 @@
           vm.setInterval()
         }
       },
-      goPage (page) {
+      goPage (page, index) {
         var vm = this
+        vm.active = index
         vm.$store.commit('setActiveDetailService', false)
         let queryString
         if (page === 'ketquahoso') {

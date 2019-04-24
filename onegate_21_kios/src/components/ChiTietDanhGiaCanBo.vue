@@ -112,7 +112,7 @@
         </v-form>
       </v-dialog>
     </v-form>
-    <v-btn class="back-btn" @click="changeScreen" fab color="primary">
+    <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn>
@@ -142,8 +142,7 @@ export default {
     votingDialog_hidden_loading: false,
     validFormVoting: false,
     showCaptcha: false,
-    dialogShowApplicantIdNo: false,
-    isMobile: false
+    dialogShowApplicantIdNo: false
   }),
   computed: {
     loading () {
@@ -154,6 +153,9 @@ export default {
     },
     fullScreen () {
       return this.$store.getters.getFullScreen
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   beforeDestroy () {

@@ -5,7 +5,7 @@
         <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
       </h4>
       <v-layout wrap class="mt-2">
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs12 sm6 md4 class="pl-2 pr-2">
           <v-select
             box
             :items="govAgencyList"
@@ -20,7 +20,7 @@
             height="48"
           ></v-select>
         </v-flex>
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs12 sm6 md4 class="pl-2 pr-2">
           <v-select
             box
             :items="listLinhVuc"
@@ -35,7 +35,7 @@
             height="48"
           ></v-select>
         </v-flex>
-        <v-flex xs4 class="pl-2 pr-2">
+        <v-flex xs12 sm12 md4 class="pl-2 pr-2">
           <v-text-field class="input-border input-search"
             label="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
@@ -51,7 +51,7 @@
       </content-placeholders>
       <div class="mt-4 ml-1" v-if="!loading && !activeDetailService && !showListThuTuc && govAgencyList && !govAgencySelected && govAgencyList.length > 0" :class="visible ? 'overlayActive': ''">
         <v-layout class="wrap">
-          <v-flex xs6 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
+          <v-flex xs12 sm4 class="pr-3" v-for="(item, index) in govAgencyList" :key="index">
             <v-btn outline flat color="primary" class="btn-select" @click="filterAdministration(item)" style="width:100%;background-color:#b3d4fc5c!important">{{item.administrationName}}</v-btn>
           </v-flex>
         </v-layout>

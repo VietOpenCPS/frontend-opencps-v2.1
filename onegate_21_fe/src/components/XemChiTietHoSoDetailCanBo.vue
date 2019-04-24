@@ -1618,9 +1618,9 @@ export default {
         }
         filter['userNote'] = note
       }
-      // if (vm.showTaoTaiLieuKetQua) {
-      //   validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
-      // }
+      if (vm.showTaoTaiLieuKetQua) {
+        validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
+      }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
         if (resultTmp.required) {
@@ -1632,7 +1632,7 @@ export default {
           }
         }
       }
-      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung && validCreateFiles) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1714,7 +1714,6 @@ export default {
                     let counterSave = 0
                     for (let i = 0; i < lengthFiles; i++) {
                       let fileDetail = fileArr[i]
-                      // <---------
                       var fileFind = vm.listDossierFiles.find(itemFile => {
                         return itemFile.dossierPartNo === fileDetail.partNo
                       })

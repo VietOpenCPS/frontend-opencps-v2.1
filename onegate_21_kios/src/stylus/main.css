@@ -1244,7 +1244,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     height: auto !important;
     min-height: 38px;
 }
-.btn-select .btn__content {
+.btn-select .v-btn__content {
     white-space: normal !important;
     padding-left: 8px !important;
     padding-right: 8px !important
@@ -1683,6 +1683,17 @@ header p {
 }
 .v-carousel {
     box-shadow: none;
+}
+.v-navigation-drawer .v-list .v-list-item {
+    margin: 10px 15px 0;
+}
+.v-navigation-drawer .v-list .v-list-item .v-list__tile {
+    border-radius: 5px
+}
+.v-navigation-drawer .v-list .active_drawer .v-list__tile {
+    background-color: #4caf50 !important;
+    color: white !important;
+    border-radius: 5px
 }
 @media screen and (min-width: 500px) {
 	.detailQR_desktop {

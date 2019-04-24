@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0 kios-item pr-3">
+  <div class="py-0 kios-item" :class="!isMobile ? 'pr-3' : ''">
     <div>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
@@ -9,20 +9,14 @@
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
           </h4>
-          <h4 class="py-2 ml-3 text-xs-center">
+          <h4 class="py-2 mx-3 text-xs-center">
             <span style="color:#065694">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ NGÀY {{fromDate()}} 
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
           </h4>
           <div class="py-3 mx-3"> 
-            <v-flex xs12 class="mb-3 text-xs-right">
-              <!-- <div class="d-inline-block input-border input-group input-group--placeholder input-group--text-field" style="width:50%">
-                <div class="input-group__input">
-                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ/ tên chủ hồ sơ" type="text">
-                  <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
-                </div>
-              </div> -->
-              <div class="d-inline-block" style="width:50%">
+            <v-layout wrap class="mb-3">
+              <v-flex xs12 sm6 right>
                 <v-text-field class="input-border input-search"
                   label="Mã hồ sơ/ tên chủ hồ sơ"
                   v-model="dossierNoKey"
@@ -32,8 +26,8 @@
                   box
                   clearable
                 ></v-text-field>
-              </div>
-            </v-flex>
+              </v-flex>
+            </v-layout>
             <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
               <v-carousel-item
                 v-for="i in totalPages"
@@ -78,7 +72,7 @@
             </v-flex>
           </div>
         </div>
-        <v-btn class="back-btn" @click="changeScreen" fab color="primary">
+        <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
           <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn>
@@ -145,6 +139,9 @@ export default {
     },
     groupIdArr () {
       return this.getGroupIdArr(this.groupIds)
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {

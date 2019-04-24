@@ -69,7 +69,7 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-btn class="back-btn" @click="changeScreen" fab color="primary">
+    <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn>
@@ -118,6 +118,9 @@ export default {
     },
     fullScreen () {
       return this.$store.getters.getFullScreen
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {

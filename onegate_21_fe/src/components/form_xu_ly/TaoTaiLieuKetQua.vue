@@ -20,12 +20,15 @@
                         &nbsp;&nbsp;
                         <v-tooltip top v-if="item.eForm && item.daKhai">
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
-                          <span>Biểu mẫu trực tuyến (Đã khai)</span>
+                          <span>Đã khai</span>
                         </v-tooltip>
                         <v-tooltip top v-if="item.eForm && !item.daKhai">
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
-                          <span>Biểu mẫu trực tuyến (Chưa khai)</span>
+                          <span>Chưa khai</span>
                         </v-tooltip>
+                        &nbsp;&nbsp;
+                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
+                        &nbsp;&nbsp;
                         <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
                           <v-badge v-on:click.stop="downloadFileTemplate(item, index)">
                             <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -94,7 +97,7 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.hasForm">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                       <v-badge>
                         <v-icon size="24" color="#004b94">edit</v-icon>
@@ -240,17 +243,12 @@
                   return template.partNo === part.partNo
                 })
                 if (itemFind) {
+                  template['required'] = itemFind['required']
                   template['partTip'] = itemFind['partTip']
                 }
               })
             }
           })
-
-          // vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-          //   vm.dossierFilesItems = resFiles
-          //   vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
-          // }).catch(reject => {
-          // })
         }
       })
     },
