@@ -2522,7 +2522,7 @@ export default {
     viewDetail (item, indexItem) {
       let vm = this
       if (vm.menuType === 3) {
-        if (item.dossierStatus === 'done' || item.dossierStatus === 'unresolved') {
+        if (item.dossierStatus === 'done' || item.dossierStatus === 'unresolved' || item.dossierStatus === 'releasing') {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         } else {
           if (item.permission) {
