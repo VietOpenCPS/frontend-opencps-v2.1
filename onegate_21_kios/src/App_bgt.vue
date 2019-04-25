@@ -1,12 +1,12 @@
 <template>
   <v-app>
-    <v-btn v-if="isMobile"
+    <v-btn v-if="isMobile" 
       class="elevation-0"
       color="grey"
       dark
       fab
       fixed
-      style="top: 50px;
+      style="top: 70px;width:56px;height:56px;
       right:0px;border-radius: 6px;
       border-bottom-right-radius: 0;
       border-top-right-radius: 0;
@@ -15,13 +15,12 @@
       right
       @click.stop="drawer = !drawer"
     >
-      <v-icon>view_list</v-icon>
+      <v-icon size="32">list</v-icon>
     </v-btn>
     <v-navigation-drawer
-      style="background: #002c46d4"
+      style="background: #002c46d4;position:fixed;top:0px;left:0px"
       v-if="isMobile"
       v-model="drawer"
-      absolute
       dark
       temporary
     >
@@ -42,10 +41,10 @@
             avatar
             class="v-list-item"
           >
-            <v-list-tile-action>
-              <v-icon>{{ item.icon }}</v-icon>
+            <v-list-tile-action class="mx-2">
+              <v-icon size="26">{{ item.icon }}</v-icon>
             </v-list-tile-action>
-            <v-list-tile-title
+            <v-list-tile-title style="font-size: 16px"
               v-text="item.text"
             />
           </v-list-tile>
@@ -99,14 +98,20 @@
         </div>
       </section>
     </v-content>
+    <v-btn v-if="enableToTop" fab fixed dark bottom right color="#002c46d4" style="width:56px;height:56px;"
+      @click="$vuetify.goTo(0)">
+      <v-icon dark size="40">keyboard_arrow_up</v-icon>
+    </v-btn>
   </v-app>
 </template>
 
 <script>
   import router from '@/router'
   import $ from 'jquery'
+  import GoTop from '@inotom/vue-go-top'
   export default {
     data: () => ({
+      enableToTop: false,
       workingUnitList: [],
       govAgencyList: [],
       isDvc: true,
@@ -146,14 +151,19 @@
         }
       ]
     }),
+    components: {
+      GoTop
+    },
     created () {
       var vm = this
       vm.$nextTick(function () {
-        let vm = this
+        $(window).scroll(function () {
+          vm.enableToTop = $(window).scrollTop() > 200
+        })
+        $('#navigation').css('display', 'none')
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.$store.commit('setGroupid', newQuery.hasOwnProperty('groupIds') ? newQuery['groupIds'] : '')
-        $('#navigation').css('display', 'none')
         if (!newQuery.hasOwnProperty('secretKey')) {
           // vm.setInterval()
           vm.isKios = true

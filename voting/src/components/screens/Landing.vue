@@ -65,7 +65,7 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: item.itemCode + '/danh-sach-can-bo',
+        path: '/danh-gia-can-bo/' + item.itemCode,
         query: {
           itemName: item.itemName
         }

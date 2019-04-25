@@ -102,6 +102,10 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: data.start,
+              end: data.end
             }
           }
           axios.get(state.endPointApi + '/employees/publish/' + data.itemCode, param).then(result => {

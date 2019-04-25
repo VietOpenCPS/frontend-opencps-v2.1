@@ -16,7 +16,7 @@
           </h4>
           <div class="py-3 mx-3"> 
             <v-layout wrap class="mb-3">
-              <v-flex xs12 sm6 right>
+              <v-flex xs12 sm6 offset-sm6>
                 <v-text-field class="input-border input-search"
                   label="Mã hồ sơ/ tên chủ hồ sơ"
                   v-model="dossierNoKey"

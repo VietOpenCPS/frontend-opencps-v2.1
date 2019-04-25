@@ -9,16 +9,9 @@
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
-          <div style="width: calc(100% - 150px)">
+          <div :style="!isMobile ? 'width: calc(100% - 150px)' : ''">
             <v-layout wrap>
-              <v-flex xs6 class="pl-2 pr-3">
-                <!-- <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <div class="input-group__input">
-                    <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số hồ sơ" placeholder="Nhấn để nhập mã số hồ sơ" type="text">
-                    <i v-if="visible" @click="clear('dossierNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                  </div>
-                </div> -->
-
+              <v-flex xs12 md6 class="px-2">
                 <v-text-field class="input-border input-search"
                   label="Mã hồ sơ"
                   v-model="dossierNoKey"
@@ -28,13 +21,7 @@
                   box
                 ></v-text-field>
               </v-flex>
-              <v-flex xs6 class="pl-3 pr-2">
-                <!-- <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                  <div class="input-group__input">
-                    <input id="applicantIdNoKey" class="kios-input" data-layout="normal" @keyup.enter="filterDossier" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
-                    <i v-if="visible" @click="clear('applicantIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                  </div>
-                </div> -->
+              <v-flex xs12 md6 class="px-2">
                 <v-text-field class="input-border input-search"
                   label="Số CMND/ hộ chiếu"
                   v-model="applicantIdNoKey"
@@ -46,7 +33,7 @@
               </v-flex>
             </v-layout>
           </div>
-          <div class="text-right" style="width: 150px">
+          <div class="text-right" :style="!isMobile ? 'width: 150px' : 'width: 100%'">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
@@ -207,6 +194,9 @@ export default {
     },
     groupIdArr () {
       return this.getGroupIdArr(this.groupIds)
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {

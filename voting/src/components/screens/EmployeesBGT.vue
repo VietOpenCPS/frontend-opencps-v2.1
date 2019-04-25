@@ -58,6 +58,11 @@
               circle
             ></v-pagination>
           </div>
+          <div v-if="!totalEmployee">
+            <v-alert class="mt-4 mx-3" :value="true" outline color="blue" icon="priority_high">
+              Không có danh sách cán bộ
+            </v-alert>
+          </div>
         </v-card>
       </v-flex>
     </v-layout>
@@ -224,8 +229,7 @@ export default {
       })
     },
     goBack () {
-      var vm = this
-      vm.dialog_voting = false
+      window.history.back()
     }
   }
 }

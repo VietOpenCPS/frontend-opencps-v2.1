@@ -1692,6 +1692,7 @@ header p {
 }
 .v-navigation-drawer .v-list .active_drawer .v-list__tile {
     background-color: #4caf50 !important;
+    height: 42px !important;
     color: white !important;
     border-radius: 5px
 }
