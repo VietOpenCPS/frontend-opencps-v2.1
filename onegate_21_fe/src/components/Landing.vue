@@ -2521,11 +2521,24 @@ export default {
     },
     viewDetail (item, indexItem) {
       let vm = this
-      if (item.permission) {
-       vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      if (vm.menuType === 3) {
+        if (item.dossierStatus === 'done' || item.dossierStatus === 'unresolved' || item.dossierStatus === 'releasing') {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        } else {
+          if (item.permission) {
+            vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+          } else {
+            alert('Bạn không có quyền thao tác với hồ sơ này.')
+          }
+        }
       } else {
-        alert('Bạn không có quyền thao tác với hồ sơ này.')
+        if (item.permission) {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        } else {
+          alert('Bạn không có quyền thao tác với hồ sơ này.')
+        }
       }
+      // phục vụ khi import hồ sơ không lấy được quyền thao tác -> không check quyền với hs đã hoàn thành và từ chối.
     },
     keywordEventChange (data) {
       let vm = this

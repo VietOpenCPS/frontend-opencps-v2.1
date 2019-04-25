@@ -519,6 +519,7 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
+          vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
@@ -739,6 +740,7 @@ export default {
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
+          vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
           let totalText = 'Tổng số'
