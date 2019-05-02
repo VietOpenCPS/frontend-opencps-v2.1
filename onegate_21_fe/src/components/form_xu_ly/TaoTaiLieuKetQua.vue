@@ -13,8 +13,8 @@
               <v-expansion-panel-content hide-actions>
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                    <div class="mr-2" @click="loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
-                      <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
+                    <div class="mr-2" @click="loadAlpcaFormClick(item)" style="min-width: 20px; display: flex;">
+                      <div class="header__tphs" style="min-width: 20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                       <div class="header__tphs">
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                         &nbsp;&nbsp;

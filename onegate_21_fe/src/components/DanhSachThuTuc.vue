@@ -40,17 +40,17 @@
                         <span>Mức {{itemServiceConfig.level}}</span>
                       </v-flex>
                       <v-flex xs12 sm2 class="text-xs-center">
-                        <v-menu left>
-                        <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
-                            Chọn
-                          </v-btn>
-                          <v-list v-if="serviceOptions.length > 1">
-                            <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                            @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
-                            <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                          </v-list-tile>
-                        </v-list>
-                      </v-menu>
+                        <v-menu left offset-x>
+                          <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
+                              Chọn
+                            </v-btn>
+                            <v-list v-if="serviceOptions.length > 1">
+                              <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                              @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
+                              <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                            </v-list-tile>
+                          </v-list>
+                        </v-menu>
                       </v-flex>
                     </v-layout>
                   </v-card-text>
@@ -62,12 +62,9 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <!-- Chọn processOption -->
-    <div v-if="selectOption">
+    <!-- <div v-if="selectOption">
       <div class="row-header">
         <div class="background-triangle-big"> <span>THÊM MỚI HỒ SƠ</span> </div>
-        <!-- <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="serviceOptionsProcess[0].serviceName">
-          {{thongTinChiTietHoSo.serviceName}}
-        </div> -->
         <div class="layout row wrap header_tools row-blue">
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -91,7 +88,7 @@
           </v-list-tile>
         </template>
       </v-list>
-    </div>
+    </div> -->
   </div>
 </template>
 

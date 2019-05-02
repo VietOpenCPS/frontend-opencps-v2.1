@@ -6,8 +6,8 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? '' : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
-                  <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
+                <div class="mr-2" @click="onlyView && item.hasForm ? '' : loadAlpcaFormClick(item)" style="min-width: 20px; display: flex;">
+                  <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
                       <span slot="activator">
@@ -244,7 +244,7 @@
               <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
-                    <v-icon size="24" color="orange darken-3">file_copy</v-icon>
+                    <v-icon size="24" color="orange darken-3">folder</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>

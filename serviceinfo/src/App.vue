@@ -77,29 +77,29 @@
           mappingCount: 'count',
           children: [],
           icon: 'sort'
-        },
-        {
-          id: 4,
-          name: 'HÌNH THỨC NỘP',
-          mappingName: 'methodName',
-          mappingCode: 'methodCode',
-          mappingCount: 'count',
-          children: [
-            {
-              methodName: 'Nộp trực tiếp',
-              methodCode: 'MC',
-              count: 0,
-              level: '2'
-            },
-            {
-              methodName: 'Nộp trực tuyến',
-              methodCode: 'DVC',
-              count: 0,
-              level: '3,4'
-            }
-          ],
-          icon: 'playlist_add'
         }
+        // {
+        //   id: 4,
+        //   name: 'HÌNH THỨC NỘP',
+        //   mappingName: 'methodName',
+        //   mappingCode: 'methodCode',
+        //   mappingCount: 'count',
+        //   children: [
+        //     {
+        //       methodName: 'Nộp trực tiếp',
+        //       methodCode: 'MC',
+        //       count: 0,
+        //       level: '2'
+        //     },
+        //     {
+        //       methodName: 'Nộp trực tuyến',
+        //       methodCode: 'DVC',
+        //       count: 0,
+        //       level: '3,4'
+        //     }
+        //   ],
+        //   icon: 'playlist_add'
+        // }
       ],
     }),
     components: {

@@ -127,7 +127,7 @@
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                     <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="true" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
@@ -237,8 +237,8 @@
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
-                    <span v-if="stateViewResult">III</span>
-                    <span v-else>II</span>
+                    <span v-if="stateViewResult">III.</span>
+                    <span v-else>II.</span>
                   </div>
                   Văn bản hành chính
                 </div>
@@ -361,7 +361,7 @@
                 <div class="text-bold">
                   {{index + 1}}.&nbsp; {{ item.subject }}
                 </div>
-                <v-radio-group class="ml-3 pt-2" v-model="item.selected" column>
+                <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
                   <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                 </v-radio-group>
                 <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -401,7 +401,8 @@
                     <v-card-text class="px-0 py-0 pr-3">
                       <v-flex xs12>
                         <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
-                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index" v-if="item.syncType !==0 && item.infoType !== 0">
+                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index"
+                            v-if="item.syncType !==0 && item.infoType !== 0 && item.actionNote && item.actionNote !== 'null'">
                             <div class="timeline-badge" :class="item.syncType === 2 ? 'primary' : 'warning'">
                               <v-icon color="grey lighten-4" size="20">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
                             </div>

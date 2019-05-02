@@ -9,7 +9,7 @@
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
-          <div :style="!isMobile ? 'width: calc(100% - 150px)' : ''">
+          <div :style="!isMobile ? 'width: calc(100% - 150px)' : 'width: 100%'">
             <v-layout wrap>
               <v-flex xs12 md6 class="px-2">
                 <v-text-field class="input-border input-search"

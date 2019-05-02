@@ -226,13 +226,11 @@ export const store = new Vuex.Store({
                   if (Array.isArray(current.steps) && current.steps.length > 1) {
                     menuDetail['items'] = current.steps
                   }
-                  // if (current.steps.length > 1) {
-                  //   menuDetail['items'] = current.steps
-                  // } else {
-                  //   let stepsItems = []
-                  //   stepsItems.push(current.steps)
-                  //   menuDetail['items'] = stepsItems
-                  // }
+                  if (current.steps && !Array.isArray(current.steps)) {
+                    let stepsItems = []
+                    stepsItems.push(current.steps)
+                    menuDetail['items'] = stepsItems
+                  }
                 }
                 menuData.push(menuDetail)
               }

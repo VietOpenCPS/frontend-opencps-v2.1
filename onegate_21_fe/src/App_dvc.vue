@@ -7,7 +7,9 @@
         <v-btn class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="doAddDVC()"
           :loading="loadingGov"
           :disabled="loadingGov"
+          style="height:36px"
         >
+          <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới hồ sơ
           <span slot="loader">Loading...</span>
         </v-btn>
@@ -37,7 +39,7 @@
               </span>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile v-for="subItem in item.items" :key="subItem.stepCode"
+          <v-list-tile v-if="item.items && item.items.length > 1" v-for="subItem in item.items" :key="subItem.stepCode"
             v-on:click.native="filterSteps(subItem, index)"
             :class="{'list__tile--active': String(currentStep) === String(subItem.stepCode)}"
             >
