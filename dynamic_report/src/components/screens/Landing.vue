@@ -105,7 +105,7 @@
       </v-flex>
     </v-layout>
     <div>
-      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/dynamic_report/assets/hdsd.pdf"></vue-friendly-iframe>
+      <vue-friendly-iframe v-if="showGuilds" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/dynamic_report/app/assets/hdsd_bvh.pdf"></vue-friendly-iframe>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== ''" :src="pdfBlob"></vue-friendly-iframe>
       <div class="mx-2" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
@@ -519,6 +519,7 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
+          vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
@@ -750,6 +751,7 @@ export default {
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
+          vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
           let totalText = 'Tổng số'

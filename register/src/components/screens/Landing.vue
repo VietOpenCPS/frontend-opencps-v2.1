@@ -287,7 +287,7 @@ export default {
         return pattern.test(value) || 'Gồm các ký tự 0-9'
       },
       passWord: (value) => {
-        const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
+        const pattern = /^((?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
         return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
       },
       taxCode: (value) => {
