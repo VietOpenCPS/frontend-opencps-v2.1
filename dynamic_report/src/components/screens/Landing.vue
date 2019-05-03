@@ -615,8 +615,19 @@ export default {
                     alignmentConfig = vm.itemsReportsConfig[keyVal]['align']
                   }
                   let ddStr = ' '
-                  if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
-                    ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                  let currentConfig = vm.itemsReportsConfig[keyVal]
+
+                  if (currentConfig.hasOwnProperty('calculator')) {
+                    let calu = currentConfig['calculator'].replace(/dataInput/g, 'dossierObj')
+                    if (isNaN(eval(calu))) {
+                      ddStr = eval(calu)
+                    } else {
+                      ddStr = Math.round(eval(calu))
+                    }
+                  } else {
+                    if (dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== undefined && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== null && dossierObj[vm.itemsReportsConfig[keyVal]['value']] !== '') {
+                      ddStr = dossierObj[vm.itemsReportsConfig[keyVal]['value']]
+                    }
                   }
                   dataToExportCSVItem.push(ddStr)
                   dataRow.push({
@@ -898,7 +909,11 @@ export default {
                 let dataText = ' '
                 let preff = currentConfig.hasOwnProperty('prefix') ? currentConfig['prefix'] : ''
                 if (currentConfig.hasOwnProperty('calculator')) {
-                  dataText = Math.round(eval(currentConfig['calculator']))
+                  if (isNaN(eval(currentConfig['calculator']))) {
+                    dataText = eval(currentConfig['calculator'])
+                  } else {
+                    dataText = Math.round(eval(currentConfig['calculator']))
+                  }
                 } else {
                   if (resultData[key][currentConfig['value']] !== undefined && resultData[key][currentConfig['value']] !== null) {
                     if (currentConfig.hasOwnProperty('subValue') && resultData[key][subKey] !== '') {
@@ -980,7 +995,11 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  dataTextXXTT = Math.round(eval(calu))
+                  if (isNaN(eval(calu))) {
+                    dataTextXXTT = eval(calu)
+                  } else {
+                    dataTextXXTT = Math.round(eval(calu))
+                  }
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
@@ -998,7 +1017,11 @@ export default {
                 if (currentConfigXXTT.hasOwnProperty('calculator')) {
                   var dataInputXXTT = resultDataTotal[keyXXTT]
                   let calu = currentConfigXXTT['calculator'].replace(/dataInput/g, 'dataInputXXTT')
-                  dataTextXXTT = Math.round(eval(calu))
+                  if (isNaN(eval(calu))) {
+                    dataTextXXTT = eval(calu)
+                  } else {
+                    dataTextXXTT = Math.round(eval(calu))
+                  }
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
