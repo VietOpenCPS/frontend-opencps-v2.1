@@ -1541,17 +1541,17 @@ export default {
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
         let valid = vm.$refs.epayment.validPayment()
-        let paymentProfile = vm.$store.getters.getPaymentProfile
-        if (paymentProfile && paymentProfile['paymentFile'] && valid) {
+        let paymentData = vm.$store.getters.getPaymentProfile
+        if (paymentData && paymentData['paymentFile'] && valid) {
           validThanhToanDienTu = true
           filter['payment'] = {
             requestPayment: 3,
-            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : 0,
-            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : 0,
-            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : 0,
-            paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
-            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : 0,
-            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : 0
+            advanceAmount: paymentData.advanceAmount ? paymentData.advanceAmount : 0,
+            feeAmount: paymentData.feeAmount ? paymentData.feeAmount : 0,
+            paymentAmount: paymentData.paymentAmount ? paymentData.paymentAmount : 0,
+            paymentNote: paymentData.paymentNote ? paymentData.paymentNote : '',
+            serviceAmount: paymentData.serviceAmount ? paymentData.serviceAmount : 0,
+            shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0
           }
           let paymentsOut = filter['payment']
           let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
@@ -2118,7 +2118,6 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
-        // console.log('paymentProfile', vm.paymentProfile)
       }).catch(reject => {
       })
     },

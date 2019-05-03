@@ -86,7 +86,6 @@
                 Đăng nhập
               </v-btn>
               <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
-                :loading="loadingLogin"
                 :disabled="loadingLogin"
                 @click="goBack"
               >

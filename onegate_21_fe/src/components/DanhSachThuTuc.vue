@@ -41,11 +41,13 @@
                       </v-flex>
                       <v-flex xs12 sm2 class="text-xs-center">
                         <v-menu left offset-x>
-                          <v-btn flat class="mx-0 my-0" slot="activator" small @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)">
-                              Chọn
-                            </v-btn>
-                            <v-list v-if="serviceOptions.length > 1">
-                              <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                          <v-btn flat class="mx-0 my-0" slot="activator" small 
+                            @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)"
+                          >
+                            Chọn
+                          </v-btn>
+                          <v-list v-if="serviceOptions.length > 1">
+                            <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
                               @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
                               <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                             </v-list-tile>
@@ -98,7 +100,36 @@
     props: ['serviceCode'],
     data: () => ({
       govAgencies: [],
-      serviceOptions: [],
+      serviceOptions: [
+        {
+          "processOptionId": 9990,
+          "seqOrder": 1,
+          "autoSelect": "",
+          "instructionNote": "",
+          "submissionNote": "",
+          "dossierTemplateId": 2226,
+          "templateNo": "MAU_VPB01_A",
+          "templateName": "Cấp Giấy phép kinh doanh vận tải đa phương thức quốc tế",
+          "serviceProcessId": 1407,
+          "processNo": "QT_DVC_VPB",
+          "processName": "Quy trình cổng dịch vụ công Văn phòng bộ",
+          "optionName": "Đối với doanh nghiệp, hợp tác xã, doanh nghiệp nước ngoài đầu tư tại Việt Nam"
+        },
+        {
+          "processOptionId": 9991,
+          "seqOrder": 1,
+          "autoSelect": "",
+          "instructionNote": "",
+          "submissionNote": "",
+          "dossierTemplateId": 2227,
+          "templateNo": "MAU_VPB01_B",
+          "templateName": "Cấp Giấy phép kinh doanh vận tải đa phương thức quốc tế",
+          "serviceProcessId": 1407,
+          "processNo": "QT_DVC_VPB",
+          "processName": "Quy trình cổng dịch vụ công Văn phòng bộ",
+          "optionName": "Đối với doanh nghiệp của các quốc gia là thành viên Hiệp định khung ASEAN về vận tải đa phương thức hoặc là doanh nghiệp của quốc gia đã ký điều ước quốc tế với Việt Nam về vận tải đa phương thức"
+        }
+      ],
       serviceConfigSelect: '',
       serviceInfoIdSelect: '',
       serviceOptionsProcess: [],
@@ -147,6 +178,7 @@
         vm.govAgencyCodeSelect = govAgencyCode
         vm.serviceInfoIdSelect = item.serviceInfoId
         vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
+          vm.serviceOptions = result
           if (result.length === 1) {
             vm.selectOption = false
             vm.$store.dispatch('getServiceInfo', {
@@ -169,10 +201,11 @@
               })
             })
           } else {
-            vm.serviceOptions = result
             vm.serviceOptionsProcess = result
             vm.selectOption = true
           }
+        }).catch(result => {
+          vm.serviceOptions = []
         })
       },
       selectServiceOption (item, govAgencyCode, itemServiceConfig) {

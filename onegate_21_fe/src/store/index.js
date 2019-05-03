@@ -784,37 +784,32 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          console.log('run')
-          if (data > 0) {
-            commit('setLoading', true)
-            axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
-              let thongTinNguoiNop = {
-                delegateName: response.data.delegateName,
-                delegateCityCode: response.data.delegateCityCode,
-                delegateAddress: response.data.delegateAddress,
-                delegateDistrictCode: response.data.delegateDistrictCode,
-                delegateWardCode: response.data.delegateWardCode,
-                delegateEmail: response.data.delegateEmail,
-                delegateTelNo: response.data.delegateTelNo,
-                delegateIdNo: response.data.delegateIdNo
-              }
-              resolve(response.data)
-              commit('setLoading', false)
-              commit('setDossier', response.data)
-              commit('setThongTinChuHoSo', response.data)
-              commit('setLePhi', response.data)
-              commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
-              commit('setThongTinChungHoSo', response.data)
-              commit('setDichVuChuyenPhatKetQua', response.data)
-            }, error => {
-              commit('setLoading', false)
-              reject(error)
-            }).catch(function (xhr) {
-              console.log(xhr)
-            })
-          } else {
-            resolve()
-          }
+          commit('setLoading', true)
+          axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
+            let thongTinNguoiNop = {
+              delegateName: response.data.delegateName,
+              delegateCityCode: response.data.delegateCityCode,
+              delegateAddress: response.data.delegateAddress,
+              delegateDistrictCode: response.data.delegateDistrictCode,
+              delegateWardCode: response.data.delegateWardCode,
+              delegateEmail: response.data.delegateEmail,
+              delegateTelNo: response.data.delegateTelNo,
+              delegateIdNo: response.data.delegateIdNo
+            }
+            resolve(response.data)
+            commit('setLoading', false)
+            commit('setDossier', response.data)
+            commit('setThongTinChuHoSo', response.data)
+            commit('setLePhi', response.data)
+            commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
+            commit('setThongTinChungHoSo', response.data)
+            commit('setDichVuChuyenPhatKetQua', response.data)
+          }, error => {
+            commit('setLoading', false)
+            reject(error)
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
         })
       })
     },
