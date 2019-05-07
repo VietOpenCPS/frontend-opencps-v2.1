@@ -6,10 +6,14 @@
           v-for="(item, index) in menuServiceInfos"
           :key="index"
           :prepend-icon="item.icon"
+          :append-icon="item.mappingCode === 'all' ? '' : 'expand_less'"
           :value="index === activeTab"
         >
-          <v-list-tile slot="activator">
+          <v-list-tile slot="activator" @click="item.mappingCode === 'all' ? filterAll() : activeAll = false ">
             <v-list-tile-title>{{item.name}}</v-list-tile-title>
+            <span v-if="item.mappingCode === 'all'" class="status__counter" style="color:#0b72ba!important">
+              {{countAllService}}
+            </span>
           </v-list-tile>
           <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
             <v-list-tile-action>
@@ -42,12 +46,14 @@
   export default {
     data: () => ({
       active: null,
+      activeAll: false,
       activeTab: 0,
       pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
       currentDomain: '',
       currentLevel: '',
       currentMethod: '',
+      countAllService: 0,
       isDetail: false,
       text: '',
       menuServiceInfos: [
@@ -77,7 +83,16 @@
           mappingCount: 'count',
           children: [],
           icon: 'sort'
-        }
+        },
+        {
+          id: 4,
+          name: 'TẤT CẢ THỦ TỤC',
+          mappingName: 'all',
+          mappingCode: 'all',
+          mappingCount: 'count',
+          children: [],
+          icon: 'select_all'
+        },
         // {
         //   id: 4,
         //   name: 'HÌNH THỨC NỘP',
@@ -168,6 +183,8 @@
           vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
         })
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
+        vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
+        vm.getCountAll()
       })
     },
     watch: {
@@ -184,6 +201,7 @@
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
         vm.currentMethod = currentQuery.hasOwnProperty('level') && String(currentQuery.level) === '2' ? 'MC' : currentQuery.hasOwnProperty('level') && String(currentQuery.level === '3,4') ? 'DVC' : ''
+        vm.activeAll = currentQuery.hasOwnProperty('all') && currentQuery['all']
       },
       levelList (list) {
         let vm = this
@@ -213,6 +231,8 @@
           vm.filterLevel(item1)
         } else if (index === 3) {
           vm.filterMethod(item1)
+        } else if (index === 5) {
+          vm.filterAll()
         }
       },
       filterAgency (item) {
@@ -225,6 +245,7 @@
         newQuery['agency'] = item.administrationCode
         newQuery['domain'] = ''
         newQuery['level'] = ''
+        newQuery['all'] = false
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -247,6 +268,7 @@
         newQuery['domain'] = item.domainCode
         newQuery['agency'] = ''
         newQuery['level'] = ''
+        newQuery['all'] = false
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -268,6 +290,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -283,7 +306,6 @@
       },
       filterMethod (item) {
         var vm = this
-        console.log('itemMethod', item)
         vm.currentLevel = item.level
         let current = vm.$router.history.current
         let newQuery = current.query
@@ -291,6 +313,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -302,6 +325,43 @@
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
+        })
+      },
+      filterAll () {
+        var vm = this
+        vm.activeAll = true
+        vm.currentLevel = ''
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['domain'] = ''
+        newQuery['agency'] = ''
+        newQuery['level'] = ''
+        newQuery['all'] = true
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      getCountAll () {
+        let vm = this
+        let filter = {
+          page: 1
+        }
+        vm.$store.dispatch('getServiceLists', filter).then(function (result) {
+          if (result.data) {
+            vm.countAllService = result.total
+            console.log('countAllService', vm.countAllService)
+          }
+        }).catch(reject => {
         })
       },
       goBack () {

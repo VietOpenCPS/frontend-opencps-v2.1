@@ -127,7 +127,7 @@
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                     <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="true" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="checkInput === 2 ? false : true" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
@@ -151,12 +151,12 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Action rollBack -->
-              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
+              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="rollbackable"
                 @click="rollBackDossier(true)"
                 :loading="loadingAction"
                 :disabled="loadingAction"
               >
-                Quay lại bước trước
+                Trả lại bước trước
                 <span slot="loader">Loading...</span>
               </v-btn> -->
               <!-- Action special -->
@@ -207,8 +207,8 @@
             <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
               {{alertObj.message}}
             </v-alert>
-            <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <!-- <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn> -->
+            <div v-if="rollbackable || printDocument" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!--  -->
@@ -244,10 +244,10 @@
                 </div>
                 <div v-for="(item, index) in documents" v-bind:key="index">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="px-4 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.documentName}}</div>
+                        <div style="margin-left: 20px;">{{item.documentName}}</div>
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
@@ -1467,7 +1467,7 @@ export default {
         vm.alertObj = {
           icon: 'error',
           color: 'error',
-          message: 'Rút lại hồ sơ không thành công!'
+          message: 'Trả lại bước trước không thành công!'
         }
         vm.btnStateVisible = false
       })
@@ -1481,12 +1481,15 @@ export default {
       if (isSpecial) {
         vm.doActionSpecial(result)
       } else {
-        vm.$store.dispatch('postAction', result).then(function (result) {
-          vm.getNextActions()
-          vm.rollbackable = false
-          vm.btnStateVisible = true
-        }).catch(function (reject) {
-        })
+        let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+        if (x) {
+          let fiter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId
+          }
+          vm.$store.dispatch('rollBack', fiter).then(function (result) {
+          }).catch(function () {
+          })
+        }
       }
     },
     // Hàm xử lý Actions

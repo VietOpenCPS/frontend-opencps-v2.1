@@ -22,7 +22,7 @@
               <div class="ml-4">
                 <v-radio-group v-model="item.selected" column class="mt-1">
                   <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    <div :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
+                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>

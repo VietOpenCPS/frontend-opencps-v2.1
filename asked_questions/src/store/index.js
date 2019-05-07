@@ -125,7 +125,7 @@ export const store = new Vuex.Store({
           } else {
             param = {
               headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
               },
               params: {
                 start: state.questionPage * 10 - 10,
@@ -309,7 +309,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
             }
           }
           axios.get(state.endPointApi + '/faq/questions/' + filter.questionId + '/answers', param).then(function (response) {

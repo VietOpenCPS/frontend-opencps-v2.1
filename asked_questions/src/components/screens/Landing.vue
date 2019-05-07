@@ -2,6 +2,9 @@
   <div>
     <v-layout row wrap class="px-3 py-3" id="contentFaq">
       <v-flex xs12 sm7 class="pr-3">
+        <h3 class="text-bold mb-3" style="color:#034687">
+          NHỮNG CÂU HỎI THƯỜNG GẶP
+        </h3>
         <content-placeholders v-if="loading" class="mt-3">
           <content-placeholders-text :lines="10" />
         </content-placeholders>
@@ -35,9 +38,9 @@
               </v-menu>
               <v-expansion-panel-content style="border-radius:5px">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
-                <div class="ml-3" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
+                <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}: </span>
-                  <div class="ml-2 primary--text" v-html="itemQuestion.content"></div>
+                  <div class="primary--text" v-html="itemQuestion.content"></div>
                 </div>
                 <div v-if="loadingAnswer">
                   <content-placeholders v-if="loading" class="mt-3">
@@ -46,10 +49,10 @@
                 </div>
                 <div v-else>
                   <v-card flat v-if="itemQuestion['answers'].length > 0">
-                    <div class="ml-3 py-1">
+                    <div class="ml-2 py-1">
                       <span class="primary--text text-bold">Trả lời: </span>
                     </div>
-                    <v-card-text class="my-0 py-0">
+                    <v-card-text class="mx-2 my-0 py-0">
                       <div
                         class="mb-2"
                         v-for="(itemAnswer, indexAnswer) in itemQuestion['answers']"
@@ -57,7 +60,7 @@
                       >
                         <div>
                           <div style="position:relative">
-                            <div class="ml-3" v-html="itemAnswer.content"></div>
+                            <div class="" v-html="itemAnswer.content"></div>
                             <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:10px;top:0">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
@@ -106,14 +109,28 @@
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
           <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
             <div v-if="getUser('Administrator')" class="head-title">
-              TẠO CÂU HỎI
+              ĐẶT CÂU HỎI
             </div>
             <div v-if="!getUser('Administrator')" class="head-title">
-              GỬI CÂU HỎI
+              ĐẶT CÂU HỎI
             </div>
           </v-flex>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-layout wrap class="px-2 mt-2 pb-3">
+              <!-- <v-flex xs12>
+                <div class="mb-1">Cơ quan tiếp nhận <span style="color:red">(*)</span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="agencyList"
+                  v-model="agencySelected"
+                  placeholder="Chọn cơ quan tiếp nhận câu hỏi"
+                  item-text="agencyName"
+                  item-value="groupId"
+                  return-object
+                  :hide-selected="true"
+                  box
+                ></v-autocomplete>
+              </v-flex> -->
               <v-flex xs12>
                 <div class="mb-1">Họ và tên người gửi <span style="color:red">(*)</span></div>
                 <v-text-field
@@ -253,6 +270,44 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    agencyList: [
+      {
+        agencyName: 'Cơ quan Bộ Giao thông vận tải',
+        agencyCode: 'BGTVT_VPB',
+        groupId: '63785'
+      },
+      {
+        agencyName: 'Tổng Cục Đường bộ Việt Nam',
+        agencyCode: 'BGTVT_DB',
+        groupId: '35243'
+      },
+      {
+        agencyName: 'Cục Đường sắt Việt Nam',
+        agencyCode: 'CDSVN',
+        groupId: '35219'
+      },
+      {
+        agencyName: 'Cục Đường thủy nội địa Việt Nam',
+        agencyCode: 'BGTVT_DTND',
+        groupId: '53152'
+      },
+      {
+        agencyName: 'Cục Hàng hải Việt Nam',
+        agencyCode: 'BGTVT_HH',
+        groupId: '51801'
+      },
+      {
+        agencyName: 'Cục Hàng không Việt Nam',
+        agencyCode: 'BGTVT_HK',
+        groupId: '51883'
+      },
+      {
+        agencyName: 'Cục Đăng kiểm Việt Nam',
+        agencyCode: 'BGTVT_DK',
+        groupId: '53084'
+      }
+    ],
+    agencySelected: '',
     answerList: [],
     content: '',
     contentAnswer: '',
@@ -356,14 +411,6 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (newQuery.hasOwnProperty('crtQ')) {
-        vm.$store.commit('setActiveAddQuestion', true)
-        setTimeout (function () {
-          let elmnt = document.getElementById("contentQuestion")
-          elmnt.scrollIntoView()
-        }, 300)
-      }
-      vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
     })
   },
   updated () {
@@ -426,9 +473,9 @@ export default {
         vm.captchaActive = true
         return
       } else if (vm.content) {
-        console.log('content', vm.content)
         if (vm.$refs.form.validate()) {
           let filter = {
+            // groupId: vm.agencySelected.groupId,
             content: vm.content,
             fullname: vm.fullName,
             email: vm.contactEmail,

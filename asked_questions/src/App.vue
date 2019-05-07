@@ -29,6 +29,43 @@
 <script>
   export default {
     data: () => ({
+      agencyList: [
+        {
+          agencyName: 'Cơ quan Bộ Giao thông vận tải',
+          agencyCode: 'BGTVT_VPB',
+          groupId: '63785'
+        },
+        {
+          agencyName: 'Tổng Cục Đường bộ Việt Nam',
+          agencyCode: 'BGTVT_DB',
+          groupId: '35243'
+        },
+        {
+          agencyName: 'Cục Đường sắt Việt Nam',
+          agencyCode: 'CDSVN',
+          groupId: '35219'
+        },
+        {
+          agencyName: 'Cục Đường thủy nội địa Việt Nam',
+          agencyCode: 'BGTVT_DTND',
+          groupId: '53152'
+        },
+        {
+          agencyName: 'Cục Hàng hải Việt Nam',
+          agencyCode: 'BGTVT_HH',
+          groupId: '51801'
+        },
+        {
+          agencyName: 'Cục Hàng không Việt Nam',
+          agencyCode: 'BGTVT_HK',
+          groupId: '51883'
+        },
+        {
+          agencyName: 'Cục Đăng kiểm Việt Nam',
+          agencyCode: 'BGTVT_DK',
+          groupId: '53084'
+        }
+      ]
     }),
     computed: {
       loading () {

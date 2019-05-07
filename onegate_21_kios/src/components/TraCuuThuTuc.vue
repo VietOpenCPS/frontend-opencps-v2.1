@@ -420,6 +420,10 @@ export default {
           if (result.data) {
             vm.listLinhVuc = result.data
             vm.totalPaggingLinhVuc = Number(result.total)
+            if (vm.listLinhVuc.length === 1) {
+              vm.linhVucSelected = vm.listLinhVuc[0].domainCode
+              vm.changeDomain()
+            }
           } else {
             vm.listLinhVuc = []
             vm.totalPaggingLinhVuc = 0
