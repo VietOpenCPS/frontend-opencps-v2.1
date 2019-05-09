@@ -14,7 +14,7 @@
             </v-list-tile-action>
 
             <v-list-tile-content>
-              <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
+              <v-list-tile-title :title="item.reportName">{{ item.reportName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>

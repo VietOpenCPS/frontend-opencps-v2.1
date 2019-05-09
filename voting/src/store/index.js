@@ -84,7 +84,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
+          axios.get(state.endPointApi + '/serviceinfos/statistics/agencies?sort=siblingSearch', param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {

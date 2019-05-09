@@ -13,7 +13,7 @@
               <span style="cursor: pointer;">{{item.itemName}}</span>
             </v-chip> -->
             <v-btn outline flat color="primary" class="btn-select" @click="viewListEmployee(item)" style="width:100%;height:auto;min-height:38px;background-color:#b3d4fc5c!important">
-              <span style="white-space: normal">{{item.itemName}}</span>
+              <span style="white-space: normal">{{item.administrationName}}</span>
             </v-btn>
           </v-flex>
         </v-layout>
@@ -45,9 +45,9 @@ export default {
     vm.$nextTick(function () {
       let viewListEmployee = function (item) {
         vm.$router.push({
-          path: '/danh-gia-can-bo/' + item.itemCode,
+          path: '/danh-gia-can-bo/' + item.administrationCode,
           query: {
-            itemName: item.itemName
+            itemName: item.administrationName
           }
         })
       }
@@ -65,9 +65,9 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: '/danh-gia-can-bo/' + item.itemCode,
+        path: '/danh-gia-can-bo/' + item.administrationCode,
         query: {
-          itemName: item.itemName
+          itemName: item.administrationName
         }
       })
     }

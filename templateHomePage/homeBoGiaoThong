@@ -1,0 +1,554 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<div class="container2">
+  <div class="logo">
+  <img src="/o/kiemthuduongbo-theme/images/logo2.png">
+</div>
+<div class="block">
+  <div class="block1">
+    <div class="tinhhinh">
+      <p class="tinhhinhtext">TÌNH HÌNH XỬ LÝ HỒ SƠ NĂM 2019</p>
+    </div>
+    <div class="gachduoi">
+      
+    </div>
+    <div>
+      <div class="datiepnhan">
+        <p style="color: white">ĐÃ TIẾP NHẬN</p>
+      </div>
+      <div class="dagiaiquyet">
+        <p style="color: white">ĐÃ GIẢI QUYẾT</p>
+      </div>
+    </div>
+    <div>
+      <span class="tiepnhan" id="tiepnhan">
+      </span>
+      <span class="giaiquyet" id="giaiquyet">
+      </span>
+    </div>
+    <div>
+      <div class="hoso1">
+        <p style="color: white; margin-top:8px;">HỒ SƠ</p>
+      </div>
+      <div class="hoso2">
+        <p style="color: white; margin-top:8px;">HỒ SƠ</p>
+      </div>
+    </div>
+    <div class="tongso">
+      <span class="tongsoo" id="tongso">
+      </span>
+    </div>
+    <div class="tronghan">
+      <p class="tronghann">Trong hạn
+      </p>
+    </div>
+  </div>
+  <div class="block2">
+    <div class="block21">
+      <div class="tracuu">
+        <p class="tracuuu">
+          TRA CỨU HỒ SƠ
+        </p>
+      </div>
+      <div class="search">
+        <div class="search-wrapper">
+          <input id="keyword" name="keyword" placeholder="Tra cứu theo mã số tiếp nhận" type="text"> <input name="secretKey" type="hidden" value="OPENCPSV2"><button type="button" onclick="window.location.href='/web/cong-dich-vu-cong/kios#/tra-cuu-ho-so-homepage?keyword=' + document.getElementById('keyword').value "><i class="fa fa-search"></i></button><a href="/web/cong-dich-vu-cong/dich-vu-cong"></a>
+        </div>
+      </div>
+      <div class="detracuu">
+        Để tra cứu thông tin hồ sơ bằng SMS, soạn tin theo cú pháp
+      </div>
+      <div class="abc">
+        ABC &lt;khoảng cách&gt; &lt;Mã số hồ sơ&gt; gửi về tổng đài 9001
+      </div>
+      <div class="luuy">
+        (Lưu ý: Cước phí nhắn tin 1000 đồng/ tin nhắn)
+      </div>
+    </div>
+    <div class="block22">
+      <div class="nophoso">
+        <p class="nophosoo">
+          NỘP HỒ SƠ TRỰC TUYẾN
+        </p>
+      </div>
+      <div class="button">
+        <a href="/web/cong-dich-vu-cong/register#/login-dichvucong" class="btn-login btn-hp"><span>ĐĂNG NHẬP</span></a>
+
+        <a href="/web/cong-dich-vu-cong/register#/" class="btn-register btn-hp"><span>ĐĂNG KÝ</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="block3">
+    <div>
+      <!--<div class="tongsohoso">-->
+      <!--  <p class="tongsohosoo">-->
+      <!--    TỔNG SỐ HỒ SƠ<br>TIẾP NHẬN THEO<br>LĨNH VỰC<br>NĂM 2019-->
+      <!--  </p>-->
+      <!--</div>-->
+      <div class="tongsohoso">
+        <p class="tongsohosoo">TỔNG SỐ HỒ SƠ TIẾP NHẬN THEO<br>LĨNH VỰC NĂM 2019</p>
+      </div>
+      <div class="gachduoitongso">
+      </div>
+      <div class="bieudo">
+        <div id="piechart" class="bieudoo"></div>
+      </div>
+    </div>
+    <div class="chuthich">
+      <div class="layout row wrap" id="notiReport" style="margin-left:0"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+///////////// CSS
+
+body.home-theme #content {
+    min-height: -webkit-calc(100vh - 105px);
+    min-height: calc(100vh - 105px);
+    display: -webkit-box;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.logo img{
+  display: block;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 100%;
+}
+
+.block {
+  display: flex;
+}
+
+.block1 {
+  height: 300px;
+  width: 361px;
+  margin-top: 90px;
+  background-color: rgba(0,44,70,0.7);
+}
+
+.block2 {
+  margin-left: 31px;
+  margin-top: 90px;
+  width: 549px;
+}
+
+.block21 {
+  width: 100%;
+  height: 176px;
+  background-color: rgba(0,44,70,0.7);
+}
+
+.block22 {
+  width: 100%;
+  height: 110px;
+  margin-top: 14px;
+  background-color: rgba(0,44,70,0.7);
+}
+
+.block3 {
+  height: 300px;
+  width: 308px;
+  margin-top: 90px;
+  margin-left: 32px;
+  background-color: rgba(0,44,70,0.7);
+}
+
+.container2{
+  width: 1300px;
+  margin: auto;
+}
+
+.container2 p{
+  margin-bottom: 0;
+}
+
+.tinhhinh {
+  margin-left: 60px;
+  margin-top: 18px;
+}
+
+.tinhhinhtext {
+  color: rgb(109,207,246);
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+.gachduoi {
+  margin-top: 15px;
+  margin-left: 20px;
+  height: 1px;
+  background-color: rgb(109,207,246);
+  width: 323px;
+}
+.gachduoitongso {
+  margin-top: 5px;
+  margin-left: 20px;
+  height: 1px;
+  background-color: rgb(109,207,246);
+  width: 268px;
+}
+.datiepnhan{
+  float: left;
+  text-align: center;
+  width: 50%;
+  margin-top: 25px;
+  font-size: 10pt;
+  display: inline-block;
+}
+
+.dagiaiquyet{
+  float: right;
+  text-align: center;
+  width: 50%;
+  margin-top: 25px;
+  font-size: 10pt;
+  display: inline-block;
+}
+
+.tiepnhan {
+  color: white;
+  font-size: 25pt;
+  margin-top: 8px;
+  display: inline-block;
+  float: left;
+  width: 50%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.giaiquyet {
+  color: white;
+  font-size: 25pt;
+  margin-top: 8px;
+  text-align: center;
+  display: inline-block;
+  float: right;
+  width: 50%;
+  font-weight: bold;
+}
+
+.hoso1{
+  float: left;
+  text-align: center;
+  width: 50%;
+  font-size: 10pt;
+  display: inline-block;
+}
+
+.hoso2{
+  float: right;
+  text-align: center;
+  width: 50%;
+  font-size: 10pt;
+  display: inline-block;
+}
+
+.tongso {
+  margin-top: 125px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tongsoo {
+  font-size: 25pt;
+  color: white;
+  font-weight: bold;
+}
+
+.tronghan {
+  text-align: center;
+}
+
+.tronghann {
+  font-size: 10pt;
+  color: white;
+}
+
+.nophoso{
+  text-align: center;
+  padding-top: 10px;
+}
+
+.nophosoo{
+  color: white;
+  font-weight: bold;
+}
+
+.button{
+  text-align: center;
+  margin-top: 16px;
+}
+
+.btn-hp {
+  display: inline-block;
+  position: relative;
+  padding: 10px 35px;
+  background-color: #00aeef;
+  color: white;
+  font-weight: bold;
+}
+.btn-hp:before {
+  content: "";
+  position: absolute;
+  width: 124px;
+  height: 100%;
+  background-color: #00aeef;
+  left: 57px;
+  top: 0;
+  display: block;
+  -webkit-transform: skew(-30deg);
+  transform: skew(-30deg);
+}
+.btn-hp span {
+   position: relative;
+   z-index: 1;
+}
+
+.btn-register{
+   margin-left: 69px;
+   background-color: #f26522;
+   padding-right: 55px;
+}
+
+.btn-register:before {
+   left: auto;
+   right: 51px;
+   width: 124px;
+   height: 100%;
+   background-color: #f26522;
+}
+
+.tracuu{
+  text-align: center;
+  padding-top: 10px;
+}
+
+.tracuuu{
+  color: white;
+  font-weight: bold;
+}
+
+.search {
+  margin-top: 16px;
+  position: relative;
+  margin: auto;
+  width: 514px;
+}
+
+.search-wrapper input {
+  width: 514px;
+  text-align: left;
+  height: 38px;
+  border-radius: 6px;
+  background: white;
+  margin-top: 16px;
+  padding-left: 10px;
+}
+
+.search-wrapper button{
+  position: absolute;
+  font-size: 20px;
+  right: 0;
+  top: 0;
+  width: 38px;
+  height: 38px;
+  line-height: 69px;
+  color: rgb(109,207,246);
+}
+
+.detracuu{
+  text-align: center;
+  font-size: 12pt;
+  margin-top: 10px;
+  font-weight: bold;
+  color: rgb(109,207,246);
+}
+
+.abc{
+  text-align: center;
+  font-size: 11pt;
+  color: white;
+}
+
+.luuy{
+  text-align: center;
+  font-size: 10pt;
+  color: #cccccc;
+}
+
+.tongsohoso{
+  margin-left: 35px;
+  margin-top: 8px;
+  font-weight: bold;
+  display: inline-block;
+  color: white;
+}
+
+.tongsohosoo {
+  color: rgb(109,207,246);
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: center;
+}
+
+.bieudo{
+  display: inline-block;
+  margin-top: -30px;
+  margin-left: -50px;
+  margin-bottom: 5px;
+}
+
+.chuthich {
+  margin-top: -45px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.tron {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.textchuthich {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 10pt;
+  color: white;
+}
+
+////// JSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs
+
+var portalUrl = window.themeDisplay.getPortalURL();
+if (window.themeDisplay.isSignedIn() && window.location.href === portalUrl + '/web/cong-dich-vu-cong') {
+  window.location.href = portalUrl + '/web/cong-dich-vu-cong/dich-vu-cong'
+}
+
+// Data report2
+var yearReport = (new Date()).getFullYear()
+var colorLabel = ['#3366cc','#da3912','#ff9900','#980098','#0099c6','#dd4477','#66aa00','#b82e2e','#316395','#994499','#1b418e'];
+var dataReportDomain = [
+  ['total', 'total'],
+  ['BGTVT_DB', 0],
+  ['BGTVT_DS', 0],
+  ['BGTVT_DB',  0],
+  ['BGTVT_DTND', 0],
+  ['BGTVT_HH', 0],
+  ['BGTVT_HK', 0],
+  ['BGTVT_LVK', 0]
+];
+var dataPie = [
+  ['total', 'total'],
+  ['Đăng kiểm', 0],
+  ['Đường sắt', 0],
+  ['Đường bộ',  0],
+  ['Đường thủy nội địa', 0],
+  ['Hàng hải', 0],
+  ['Hàng không', 0],
+  ['Lĩnh vực khác', 0]
+];
+var totalCount = 0
+var getBlock3 = function(){
+  $.ajax({
+    url: '/o/rest/statistics?domain=&agency=total&month=0&group=&year=' + yearReport,
+    dataType: 'json',
+    type: 'GET',
+    async: false,
+    headers: {
+      'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId(): ''
+    },
+    success: function (result) {
+      var length = dataPie.length
+  		if (result.data) {
+  			$(result.data).each(function(index, item){
+  			  if (item.domainCode) {
+  			    totalCount += item.receivedCount
+    			  for (var i = 0; i < length; i++) {
+    			    if (dataReportDomain[i][0] == item.domainCode) {
+    			      dataPie[i][1] = item.receivedCount
+    			    }
+    			  }
+  			  }
+  			});
+  		}
+  		if (totalCount === 0) {
+			  dataPie[length - 1][1] = 1
+			}
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      renderNotiReport()
+    },
+    error: function (xhr) {
+      if (totalCount === 0) {
+			  dataPie[dataPie.length - 1][1] = 1
+			}
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      renderNotiReport()
+    }
+  })
+
+}
+getBlock3();
+function drawChart() {
+
+  var data = google.visualization.arrayToDataTable(dataPie);
+
+  var options = {
+    backgroundColor: 'transparent',
+    legend: 'none',
+    colors: colorLabel
+  };
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+    chart.draw(data, options);
+  }
+function renderNotiReport () {
+  var htmlNotiReport = ""
+  for (var i = 1; i <= dataPie.length - 1; i++) {
+  	htmlNotiReport += '<div class="flex xs6" style="width:50%;margin-top: 3px;"><span style="width: 11px; height: 11px;font-size: 11px; background: '+ colorLabel[i-1] + '; border-radius: 50%; display: inline-block;"></span><span style="padding-left: 10px;color:white;font-size: 10pt">' + dataPie[i][0] + '</span></div>'
+  }
+  $('#notiReport').html(htmlNotiReport)
+}
+
+// Data report1
+var block1;
+$('#tongso').html("0%")
+$('#tiepnhan').html("0");
+$('#giaiquyet').html("0");
+var getBlock1 = function(){
+  $.ajax({
+    url: '/o/rest/statistics?domain=total&agency=total&month=0&year=' + yearReport,
+    dataType: 'json',
+    type: 'GET',
+    async: false,
+    headers: {
+      'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId(): ''
+    },
+    success: function (result) {
+      if (result.data) {
+        block1 = result.data;
+        console.log(block1)
+        $('#tongso').html(block1[0].ontimePercentage+"%")
+        $('#tiepnhan').html(block1[0].receivedCount);
+        $('#giaiquyet').html(block1[0].releaseCount);
+      }
+    },
+    error: function (xhr) {
+      
+    }
+  })
+
+}
+getBlock1();
+
+
+// <---------

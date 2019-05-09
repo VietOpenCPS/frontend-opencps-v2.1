@@ -150,16 +150,6 @@
                 {{item.pluginName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
-              <!-- Action rollBack -->
-              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="rollbackable"
-                @click="rollBackDossier(true)"
-                :loading="loadingAction"
-                :disabled="loadingAction"
-              >
-                Trả lại bước trước
-                <span slot="loader">Loading...</span>
-              </v-btn> -->
-              <!-- Action special -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                 <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
@@ -233,7 +223,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
@@ -480,6 +470,7 @@
         </v-tabs-items>
       </v-tabs>
     </div>
+    <!-- plugin ký số -->
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
     <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
       <v-card>

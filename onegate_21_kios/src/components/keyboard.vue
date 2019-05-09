@@ -45,15 +45,15 @@ export default {
             'space': {key: ' ', text: 'Space', width: 100},
             'enter': {key: '\r\n', text: 'Enter', width: 80, classes: 'control'},
             'backspace': {func: 'backspace', text: 'Xóa', classes: 'control backspace', width: 65},
-            'accept': {func: 'accept', text: 'Đóng', classes: 'control featured'},
+            'accept': {func: 'accept', text: 'Đóng', classes: 'control featured', width: 30},
             'next': {func: 'next', text: 'Next', classes: 'control featured'}
           },
 
           default: [
             'q w e r t y u i o p {backspace}',
-            'a s d f g h j k l {enter}',
-            '{caps} z x c v b n m {shiftl}',
-            '{next} {space} , . {accept}'
+            'a s d f g h j k l : ; {enter}',
+            '{caps} z x c v b n m , . {shiftl}',
+            '{next} {space} {accept}'
           ],
           shifted: [
             '1 2 3 4 5 6 7 8 9 0 {backspace}',
@@ -291,7 +291,6 @@ export default {
             text = this.insertChar(caret, text, addChar)
           }
         }
-
         // if (this.currentKeySet === 'shifted') this.changeKeySet('default')
       }
       this.input.value = text
