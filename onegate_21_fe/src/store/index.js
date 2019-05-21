@@ -866,7 +866,7 @@ export const store = new Vuex.Store({
           if (response.headers['content-disposition']) {
             commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
           } else {
-            commit('setPaymentFileName', 'file báo thanh toán')
+            commit('setPaymentFileName', 'payment_file')
           }
         }).catch(function (xhr) {
           console.log(xhr)
@@ -2382,7 +2382,8 @@ export const store = new Vuex.Store({
             applicantAddress: filter.applicantAddress ? filter.applicantAddress : '',
             applicantEmail: filter.applicantEmail ? filter.applicantEmail : '',
             applicantTelNo: filter.applicantTelNo ? filter.applicantTelNo : '',
-            employeeName: filter.employeeName ? filter.employeeName : ''
+            govAgencyCode: filter.govAgencyCode ? filter.govAgencyCode : '',
+            govAgencyName: filter.govAgencyName ? filter.govAgencyName : ''
           }
           if (filter.reportType) {
             paramGet['reportType'] = filter.reportType

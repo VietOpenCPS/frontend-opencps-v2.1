@@ -70,8 +70,8 @@
       </v-flex>
     </v-layout>
     <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
-      <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
-      <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
+      <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
+      <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn>
   </div>
 </template>

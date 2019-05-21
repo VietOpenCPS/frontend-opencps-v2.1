@@ -243,16 +243,12 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
-      let query = vm.$router.history.current.query
     })
   },
   watch: {
     dossierDetail (val) {
       var vm = this
-      let filter = vm.dossierDetail
-      vm.$store.dispatch('getPaymentFiles', filter).then(result => {
-        vm.paymentFile = result
-      })
+      vm.getPaymentFiles()
     },
     payments (val) {
       // lấy thông tin tra cứu trên keypay
@@ -268,6 +264,13 @@ export default {
     }
   },
   methods: {
+    getPaymentFiles () {
+      let vm = this
+      let filter = vm.dossierDetail
+      vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+        vm.paymentFile = result
+      })
+    },
     currency (value) {
       if (value) {
         let moneyCur = (value / 1).toFixed(0).replace('.', ',')

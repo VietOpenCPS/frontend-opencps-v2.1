@@ -203,7 +203,7 @@ export const store = new Vuex.Store({
             groupIdArr = groupIds.split(',')
           }
           if (groupIdArr.length === 0) {
-            groupIdCurrent = window.themeDisplay.getScopeGroupId()
+            groupIdCurrent = window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
           }
           if (groupIdArr.length === 1) {
             groupIdCurrent = groupIdArr[0]

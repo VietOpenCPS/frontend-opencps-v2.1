@@ -10,7 +10,7 @@
   <div v-else class="px-2 pt-2" style="height: 100%; background-color: #ffff;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-container align-center row wrap>
-        <v-flex xs12 sm10 lg10>
+        <v-flex xs12 lg10>
           <v-layout row wrap>
             <v-flex xs12 sm12>
               <v-layout wrap class="px-2">
@@ -72,7 +72,7 @@
         </v-flex>
       </v-container>
       <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
-        <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
+        <v-form v-model="validFormVoting" ref="formVoting" lazy-validation class="dialog-submit-voting">
           <v-card>
             <v-toolbar flat dark color="primary">
                 <v-toolbar-title>Nhập số CMND, mã hồ sơ</v-toolbar-title>
@@ -84,22 +84,32 @@
             <v-card-text>
               <v-layout row wrap>
                 <v-flex xs12 sm12>
-                  <v-text-field
+                  <!-- <v-text-field
                   box
                   label="Số chứng minh thư nhân dân"
                   v-model="applicantIdNo"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
-                  ></v-text-field>
+                  ></v-text-field> -->
+                  <div class="input-custom">
+                    <input id="applicantIdNo" type="text" @focus="show" required="required" />
+                    <span class="bar"></span>
+                    <label for="applicantIdNo">Số CMND/ Hộ chiếu</label>
+                  </div>
                 </v-flex>
-                <v-flex xs12 sm12>
-                  <v-text-field
+                <v-flex xs12 sm12 class="mt-3">
+                  <!-- <v-text-field
                   box
                   label="Mã hồ sơ"
                   v-model="dossierNo"
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
-                  ></v-text-field>
+                  ></v-text-field> -->
+                  <div class="input-custom">
+                    <input id="dossierNo" type="text" @focus="show" required="required" />
+                    <span class="bar"></span>
+                    <label for="dossierNo">Mã hồ sơ</label>
+                  </div>
                 </v-flex>
               </v-layout>
             </v-card-text>
@@ -116,6 +126,12 @@
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn>
+    <div class="virtual-keyboard" v-if="visible && !isMobile">
+      <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
+        <v-icon color="#fff">clear</v-icon>
+      </v-btn>
+      <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
+    </div>
   </div>
 </template>
 
@@ -123,11 +139,14 @@
 
 import Vue from 'vue'
 import toastr from 'toastr'
+import $ from 'jquery'
 import Captcha from './Captcha.vue'
 import StarRating from 'vue-star-rating'
+import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: ['id'],
   components: {
+    'vue-touch-keyboard': VueTouchKeyBoard,
     'captcha': Captcha,
     StarRating
   },
@@ -142,7 +161,14 @@ export default {
     votingDialog_hidden_loading: false,
     validFormVoting: false,
     showCaptcha: false,
-    dialogShowApplicantIdNo: false
+    dialogShowApplicantIdNo: false,
+    visible: false,
+    layout: 'normal',
+    input: null,
+    options: {
+      useKbEvents: true,
+      preventClickEvent: false
+    }
   }),
   computed: {
     loading () {
@@ -157,15 +183,6 @@ export default {
     isMobile () {
       return this.$store.getters.getIsMobile
     }
-  },
-  beforeDestroy () {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('resize', this.onResize, { passive: true })
-    }
-  },
-  mounted () {
-    this.onResize()
-    window.addEventListener('resize', this.onResize, { passive: true })
   },
   created () {
     var vm = this
@@ -218,8 +235,10 @@ export default {
     },
     doVottingSubmit () {
       var vm = this
-      if (!vm.$refs.formVoting.validate()) {
-        return
+      vm.applicantIdNo = $('#applicantIdNo').val()
+      vm.dossierNo = $('#dossierNo').val()
+      if (!vm.dossierNo || !vm.dossierNo) {
+        toastr.error('Vui lòng điền đầy đủ thông tin xác thực')
       } else {
         let filter = {
           applicantIdNo: vm.applicantIdNo,
@@ -253,16 +272,36 @@ export default {
         toastr.error('Gửi đánh giá thất bại')
       })
     },
-    onResize () {
-      let vm = this
-      vm.isMobile = window.innerWidth < 600
-    },
     changeScreen () {
       var vm = this
       vm.$store.commit('setFullScreen', !vm.fullScreen)
     },
     goBack () {
       window.history.back()
+    },
+    //
+    show (e) {
+      this.validPass = true
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+      this.bindClick('search')
+    },
+    bindClick (type) {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .enter').unbind('click')
+        if (type === 'search') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.doVottingSubmit()
+          })
+        } else if (type === 'view') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.submitViewDetail()
+          })
+        }
+      }, 300)
     }
   },
   filters: {

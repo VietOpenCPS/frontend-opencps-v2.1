@@ -225,7 +225,7 @@
     methods: {
       onResize () {
         let vm = this
-        vm.isMobile = window.innerWidth < 1020
+        vm.isMobile = window.innerWidth < 1024
         vm.$store.commit('setIsMobile', vm.isMobile)
       },
       backKiosHome () {

@@ -593,7 +593,7 @@
         return
       },
       checkStyle (item) {
-        return 'calc(100% - ' + 50 + 'px)'
+        return 'calc(100% - ' + 140 + 'px)'
       },
       downloadFileTemplate (item, index) {
         var vm = this

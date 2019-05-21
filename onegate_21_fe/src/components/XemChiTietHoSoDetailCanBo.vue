@@ -305,7 +305,12 @@
                     <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
                   </div>
                   <div v-if="props.item.statusText">
-                    <span style="color: green">{{props.item.statusText}}</span>
+                    <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved'">
+                      {{props.item.statusText.replace("Đang thực hiện:", "")}}
+                    </span>
+                    <span style="color: green" v-else>
+                      {{props.item.statusText}}
+                    </span>
                   </div>
                 </td>
               </template>
@@ -1139,7 +1144,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes') || result.hasOwnProperty('preoverdue'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -2112,6 +2117,7 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
+        vm.$refs.thongtinthanhtoan.getPaymentFiles()
       }).catch(reject => {
       })
     },

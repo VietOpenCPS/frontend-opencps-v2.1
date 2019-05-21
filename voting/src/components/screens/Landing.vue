@@ -13,7 +13,7 @@
               <span style="cursor: pointer;">{{item.itemName}}</span>
             </v-chip> -->
             <v-btn outline flat color="primary" class="btn-select" @click="viewListEmployee(item)" style="width:100%;height:auto;min-height:38px;background-color:#b3d4fc5c!important">
-              <span style="white-space: normal">{{item.administrationName}}</span>
+              <span style="white-space: normal">{{item.itemName}}</span>
             </v-btn>
           </v-flex>
         </v-layout>
@@ -27,6 +27,7 @@
 <script>
 
 import Vue from 'vue'
+import axios from 'axios'
 export default {
   props: ['index'],
   components: {
@@ -45,16 +46,46 @@ export default {
     vm.$nextTick(function () {
       let viewListEmployee = function (item) {
         vm.$router.push({
-          path: '/danh-gia-can-bo/' + item.administrationCode,
+          path: '/danh-gia-can-bo/' + item.itemCode,
           query: {
-            itemName: item.administrationName
+            itemName: item.itemName
           }
         })
       }
       vm.$store.dispatch('loadGovAgencys', {}).then(result => {
-        vm.govAgencys = result
-        if (vm.govAgencys.length === 1) {
-          viewListEmployee(vm.govAgencys[0])
+        let agencyList = result
+        let agencyLength = agencyList.length
+        if (agencyLength > 1) {
+          let count = 0
+          for (let i = 0; i < agencyLength; i++) {
+            let param = {
+              headers: {
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              },
+              params: {
+                start: 0,
+                end: 1
+              }
+            }
+            axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {
+              count += 1
+              if (result.data.data) {
+                vm.govAgencys.push(agencyList[i])
+              }
+              if (count === agencyLength) {
+                if (vm.govAgencys.length === 1) {
+                  viewListEmployee(vm.govAgencys[0])
+                }
+              }
+            }).catch(xhr => {
+              count += 1
+              if (count === agencyLength) {
+                if (vm.govAgencys.length === 1) {
+                  viewListEmployee(vm.govAgencys[0])
+                }
+              }
+            })
+          }
         }
       }).catch(xhr => {
       })
@@ -65,9 +96,9 @@ export default {
   methods: {
     viewListEmployee (item) {
      this.$router.push({
-        path: '/danh-gia-can-bo/' + item.administrationCode,
+        path: '/danh-gia-can-bo/' + item.itemCode,
         query: {
-          itemName: item.administrationName
+          itemName: item.itemName
         }
       })
     }

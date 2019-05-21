@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;max-width:1300px">
+  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;max-width:1300px;margin:0 auto">
     <v-navigation-drawer app clipped floating width="265" v-if="!viewMobile">
       <v-list class="py-0">
         <v-list-group

@@ -1,10 +1,7 @@
 <template>
-  <div class="py-0 kios-item" :class="!isMobile ? 'pr-3' : ''">
+  <div class="py-0 kios-item">
     <div>
-      <content-placeholders class="mt-3" v-if="loading">
-        <content-placeholders-text :lines="10" />
-      </content-placeholders>
-      <v-card flat v-else>
+      <v-card flat>
         <div style="background-color: #ffffff">
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
@@ -17,7 +14,7 @@
           <div class="py-3 mx-3"> 
             <v-layout wrap class="mb-3">
               <v-flex xs12 sm6 offset-sm6>
-                <v-text-field class="input-border input-search"
+                <!-- <v-text-field class="input-border input-search"
                   label="Mã hồ sơ/ tên chủ hồ sơ"
                   v-model="dossierNoKey"
                   @keyup.enter="searchKeyword"
@@ -25,58 +22,75 @@
                   append-icon="search"
                   box
                   clearable
-                ></v-text-field>
+                ></v-text-field> -->
+                <div class="input-custom">
+                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="searchKeyword" required="required" />
+                  <span class="bar"></span>
+                  <label for="dossierNoKey">Mã hồ sơ, tên chủ hồ sơ</label>
+                  <v-icon class="icon-prepend text-bold" size="18" @click="searchKeyword">search</v-icon>
+                </div>
               </v-flex>
             </v-layout>
-            <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
-              <v-carousel-item
-                v-for="i in totalPages"
-                :key="i"
-                transition="fade"
-                reverse-transition="fade"
-              >
-                <v-data-table
-                :headers="headerTable"
-                :items="dossierList"
-                :pagination.sync="pagination"
-                hide-actions
-                class="table-bordered"
-                light
+            <content-placeholders class="mt-3" v-if="loading">
+              <content-placeholders-text :lines="10" />
+            </content-placeholders>
+            <div v-else>
+              <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
+                <v-carousel-item
+                  v-for="i in totalPages"
+                  :key="i"
+                  transition="fade"
+                  reverse-transition="fade"
                 >
-                  <template slot="items" slot-scope="props">
-                    <tr v-bind:class="{'active': props.index%2==1}">
-                      <td class="text-xs-center">
-                        <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
-                      </td>
-                      <td class="text-xs-left">
-                        <span>{{props.item.dossierNo}}</span><br>
-                      </td>
-                      <td class="text-xs-left" >
-                        <span>{{props.item.applicantName}}</span>
-                      </td>
-                      <td class="text-xs-left">
-                        <span>{{props.item.receiveDate}}</span>
-                      </td>
-                      <td class="text-xs-left">
-                        <span>{{props.item.releaseDate}}</span>
-                      </td>
-                    </tr>
-                  </template>
-                </v-data-table>
-              </v-carousel-item>
-            </v-carousel>
-            <v-flex xs12 v-else>
-              <v-alert class="mt-3" :value="true" outline color="blue" icon="priority_high">
-                Không có hồ sơ có kết quả ngày {{fromDate()}}
-              </v-alert>
-            </v-flex>
+                  <v-data-table
+                  :headers="headerTable"
+                  :items="dossierList"
+                  :pagination.sync="pagination"
+                  hide-actions
+                  class="table-bordered"
+                  light
+                  >
+                    <template slot="items" slot-scope="props">
+                      <tr v-bind:class="{'active': props.index%2==1}">
+                        <td class="text-xs-center">
+                          <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span><br>
+                        </td>
+                        <td class="text-xs-left">
+                          <span>{{props.item.dossierNo}}</span><br>
+                        </td>
+                        <td class="text-xs-left" >
+                          <span>{{props.item.applicantName}}</span>
+                        </td>
+                        <td class="text-xs-left">
+                          <span>{{props.item.receiveDate}}</span>
+                        </td>
+                        <td class="text-xs-left">
+                          <span>{{props.item.releaseDate}}</span>
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-carousel-item>
+              </v-carousel>
+              <v-flex xs12 v-else>
+                <v-alert class="mt-3" :value="true" outline color="blue" icon="priority_high">
+                  Không có hồ sơ có kết quả ngày {{fromDate()}}
+                </v-alert>
+              </v-flex>
+            </div>
           </div>
         </div>
         <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
-          <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
-          <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
+          <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
+          <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn>
       </v-card>
+      <div class="virtual-keyboard" v-if="visible && !isMobile">
+        <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
+          <v-icon color="#fff">clear</v-icon>
+        </v-btn>
+        <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
+      </div>
     </div>
   </div>
 </template>
@@ -85,12 +99,16 @@
 import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
+import VueTouchKeyBoard from './keyboard.vue'
 export default {
   props: [],
-  components: {},
+  components: {
+    'vue-touch-keyboard': VueTouchKeyBoard
+  },
   data: () => ({
     loading: false,
     loadingAction: false,
+    dossierNoKey: '',
     agencies: [],
     dossierList: [],
     totalPages: 0,
@@ -128,7 +146,14 @@ export default {
         sortable: false,
         width: '130px'
       }
-    ]
+    ],
+    visible: false,
+    layout: 'normal',
+    input: null,
+    options: {
+      useKbEvents: true,
+      preventClickEvent: false
+    }
   }),
   computed: {
     fullScreen () {
@@ -147,6 +172,10 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      vm.dossierNoKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
+      $('#dossierNoKey').val(vm.dossierNoKey)
       vm.$store.commit('setFullScreen', false)
       vm.$store.dispatch('agencies').then(function (result) {
         vm.agencies = result
@@ -163,6 +192,7 @@ export default {
       let currentQuery = newRoute.query
       let keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.dossierNoKey = keyword
+      $('#dossierNoKey').val(vm.dossierNoKey)
       vm.searchDossier()
     }
   },
@@ -178,10 +208,10 @@ export default {
       let filter = {
         fromDate: vm.fromDate(),
         toDate: vm.fromDate(),
-        groupId: ''
+        groupId: '',
+        keyword: vm.dossierNoKey
       }
       let groupIds = vm.groupIdArr.length
-      console.log('groupIds', vm.groupIdArr)
       if (groupIds > 0) {
         let count = 0
         for (var key = 0; key < groupIds; key++) {
@@ -220,9 +250,11 @@ export default {
     },
     searchKeyword () {
       let vm = this
+      vm.visible = false
+      vm.dossierNoKey = $('#dossierNoKey').val()
       let keyword = vm.dossierNoKey !== null && vm.dossierNoKey !== 'null' ? vm.dossierNoKey : ''
       vm.$router.push({
-        path: '/tiep-nhan-ho-so?keyword=' + keyword,
+        path: '/ho-so-co-ket-qua?keyword=' + keyword,
         query: {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
@@ -266,6 +298,30 @@ export default {
     toDate () {
       let value = new Date((new Date()).getTime() + 86400000)
       return `${(value.getDate()).toString().padStart(2, '0')}/${(value.getMonth() + 1).toString().padStart(2, '0')}/${value.getFullYear()}`
+    },
+    //
+    show (e) {
+      this.validPass = true
+      this.input = e.target
+      if (!this.visible) {
+        this.visible = true
+      }
+      this.bindClick('search')
+    },
+    bindClick (type) {
+      var vm = this
+      setTimeout(function () {
+        $('.keyboard .enter').unbind('click')
+        if (type === 'search') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.searchKeyword()
+          })
+        } else if (type === 'view') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.submitViewDetail()
+          })
+        }
+      }, 300)
     }
   }
 }

@@ -1358,10 +1358,11 @@ table > thead > tr > th.column {
 /* style vitual keyboard */
 .virtual-keyboard {
     z-index: 10000;
-    background-color: #1b4771;
-    width: calc(100% - 350px);
+    background-color: #000000;
+    width: 100%;
     position: fixed;
     bottom: 0px;
+    left: 0;
 }
 .virtual-keyboard .vue-touch-keyboard {
     width: 85% !important;
@@ -1369,8 +1370,9 @@ table > thead > tr > th.column {
     left: 50%;
     transform: translateX(-50%);
     border-radius: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-width: 900px;
 }
 .validDanhGiaCLDV {
     z-index: 10000;
@@ -1380,7 +1382,8 @@ table > thead > tr > th.column {
     bottom: 272px;
 }
 .vue-touch-keyboard .keyboard .key {
-    font-size: 25px !important
+    font-size: 25px !important;
+    border-radius: 5px
 }
 .vue-touch-keyboard .keyboard .key.backspace {
     background-size: 18px;
@@ -1405,14 +1408,13 @@ table > thead > tr > th.column {
 .vue-touch-keyboard .keyboard .key {
     width: 60px;
     height: 60px; 
-    background-color: #fff;
+    background-color: #383533;
     cursor: pointer;
-    border-radius: 5px;
     padding-top: 15px;
     overflow: hidden;
     vertical-align: middle;
-    border: 1px solid #ccc;
-    color: #000;
+    border: 1px solid #383533;
+    color: #fff;
     text-align: center;
     white-space: nowrap;
     user-select: none;
@@ -1428,21 +1430,25 @@ table > thead > tr > th.column {
     flex: 20;
 }
 .vue-touch-keyboard .keyboard .key.control {
-    color: #000;
-    background-color: #fff;
+    color: #ccc;
+    background-color: #1e1b18;
     width: 100px;
 }
 .vue-touch-keyboard .keyboard .key.featured {
-    color: #000;
+    color: #ccc;
+    background-color: #1e1b18;
     width: 100px;
+}
+.vue-touch-keyboard .keyboard .key.emty {
+    visibility: hidden !important;
 }
 .vue-touch-keyboard .keyboard .key:hover {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }
 .vue-touch-keyboard .keyboard .key:active {
     transform: scale(0.98);
-    color: #000;
-    background-color: #fff;
+    color: #ccc;
+    background-color: #1e1b18;
 }
 .vue-touch-keyboard .keyboard .key.activated {
     color: #000;
@@ -1550,10 +1556,7 @@ header a {
 header a div>p{
     color: #00204f
 }
-header img {
-	width: 50px;
-	margin-right: 10px;
-}
+
 header p {
 	margin-bottom: 0;
 }
@@ -1712,3 +1715,74 @@ header p {
 		display: none;
     }
 }
+.dialog-submit-voting {
+    position: absolute;
+    top: 15px
+}
+/*  */
+.input-custom {
+    position: relative;
+}
+.input-custom input, .input-custom textarea {
+    background: #0000000f;
+    color: black;
+    padding: 20px 12px 3px 12px;
+    display: block;
+    width: 100%;
+    border: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: 1px solid #0000008a;
+}
+.input-custom input:focus, .input-custom textarea:focus {
+  outline: none;
+}
+.input-custom input:focus ~ label, .input-custom textarea:focus ~ label {
+  font-size: 12px;
+  color: #1976d2;
+}
+.input-custom input:focus ~ .bar:before, .input-custom textarea:focus ~ .bar:before {
+  width: 100%;
+}
+.input-custom input[type=password] {
+  letter-spacing: 0.3em;
+}
+.input-custom label {
+  color: #0000008a;
+  font-size: 16px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 12px;
+  top: 15px;
+  transition: 300ms ease all;
+}
+.input-custom input:focus ~ label, .input-custom input:valid ~ label, .input-custom textarea:focus ~ label, .input-custom textarea:valid ~ label {
+  top: 0px;
+  font-size: 11px !important
+}
+.input-custom .bar {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.input-custom .bar:before {
+  content: "";
+  height: 1.5px;
+  width: 0;
+  bottom: 0px;
+  position: absolute;
+  background: #1976d2;
+  transition: 300ms ease all;
+  left: 0%;
+}
+.input-custom .icon-prepend {
+    position: absolute;
+    cursor: pointer;
+    right: 12px;
+    bottom: 10px;
+}
+.input-custom input:focus ~ .icon-prepend, .input-custom textarea:focus ~ .icon-prepend {
+    color: #1976d2;
+}
+

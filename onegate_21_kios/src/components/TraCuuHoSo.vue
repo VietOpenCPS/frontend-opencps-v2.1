@@ -1,5 +1,5 @@
 <template>
-  <div class="py-0 kios-item pr-3">
+  <div class="py-0 kios-item">
     <div>
       <v-card flat class="pb-2">
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
@@ -9,36 +9,37 @@
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
-          <div :style="!isMobile ? 'width: calc(100% - 150px)' : 'width: 100%'">
+          <div :style="!isMobile ? 'width: calc(100% - 120px)' : 'width: 100%'">
             <v-layout wrap>
               <v-flex xs12 md6 class="px-2">
-                <v-text-field class="input-border input-search"
+                <!-- <v-text-field class="input-border input-search"
                   label="Mã hồ sơ"
                   v-model="dossierNoKey"
                   @keyup.enter="filterDossier"
                   @click:append="filterDossier"
-                  append-icon="search"
                   box
-                ></v-text-field>
+                ></v-text-field> -->
+                <div class="input-custom">
+                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                  <span class="bar"></span>
+                  <label for="dossierNoKey">Mã hồ sơ</label>
+                </div>
               </v-flex>
-              <v-flex xs12 md6 class="px-2">
-                <v-text-field class="input-border input-search"
-                  label="Số CMND/ hộ chiếu"
-                  v-model="applicantIdNoKey"
-                  @keyup.enter="filterDossier"
-                  @click:append="filterDossier"
-                  append-icon="search"
-                  box
-                ></v-text-field>
+              <v-flex xs12 md6 class="px-2" :class="isMobile ? 'mt-3' : ''">
+                <div class="input-custom">
+                  <input id="applicantIdNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                  <span class="bar"></span>
+                  <label for="applicantIdNoKey">Số CMND/ hộ chiếu</label>
+                </div>
               </v-flex>
             </v-layout>
           </div>
-          <div class="text-right" :style="!isMobile ? 'width: 150px' : 'width: 100%'">
+          <div class="text-right px-2" :style="!isMobile ? 'width: 120px' : 'width: 100%'">
             <v-btn color="primary"
               :loading="loadingTable"
               :disabled="loadingTable"
               @click="filterDossier"
-              class="kios-btn"
+              class="kios-btn mx-0"
             >
               <v-icon size="18">search</v-icon>
               &nbsp;
@@ -106,9 +107,16 @@
         <div class="mx-2 mt-3" v-if="validateTracuu === true && activeDetailDossier">
           <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
         </div>
-        <div class="virtual-keyboard" v-if="visible">
+        <div class="virtual-keyboard" v-if="visible && !isMobile">
+          <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
+            <v-icon color="#fff">clear</v-icon>
+          </v-btn>
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
+        <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+          <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
+          <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
+        </v-btn>
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
@@ -197,6 +205,9 @@ export default {
     },
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    fullScreen () {
+      return this.$store.getters.getFullScreen
     }
   },
   created () {
@@ -211,6 +222,8 @@ export default {
       let newQuery = current.query
       vm.dossierNoKey = newQuery.hasOwnProperty('dossierNo') ? newQuery.dossierNo : ''
       vm.applicantIdNoKey = newQuery.hasOwnProperty('applicantIdNo') ? newQuery.applicantIdNo : ''
+      $('#dossierNoKey').val(vm.dossierNoKey)
+      $('#applicantIdNoKey').val(vm.applicantIdNoKey)
       // $('#applicantNameKey').val(newQuery.hasOwnProperty('applicantName') ? newQuery.applicantName : '')
       vm.hosoDatasPage = 1
       if ((vm.dossierNoKey !== '' || vm.applicantIdNoKey !== '') && !newQuery.hasOwnProperty('detail') && !newQuery['detail']) {
@@ -234,7 +247,8 @@ export default {
       let currentQuery = newRoute.query
       vm.dossierNoKey = currentQuery.hasOwnProperty('dossierNo') ? currentQuery.dossierNo : ''
       vm.applicantIdNoKey = currentQuery.hasOwnProperty('applicantIdNo') ? currentQuery.applicantIdNo : ''
-      // $('#applicantNameKey').val(currentQuery.hasOwnProperty('applicantName') ? currentQuery.applicantName : '')
+      $('#dossierNoKey').val(vm.dossierNoKey)
+      $('#applicantIdNoKey').val(vm.applicantIdNoKey)
       vm.hosoDatasPage = 1
       if ((vm.dossierNoKey || vm.applicantIdNoKey) && !currentQuery.hasOwnProperty('detail') && !currentQuery['detail']) {
         vm.validateTracuu = true
@@ -248,10 +262,10 @@ export default {
       } else {
         vm.activeDetailDossier = false
       }
-      if (!currentQuery.hasOwnProperty('detail') && vm.dossierNoKey === '') {
-        let inputs = document.querySelectorAll('input')
-        inputs[0].focus()
-      }
+      // if (!currentQuery.hasOwnProperty('detail') && vm.dossierNoKey === '') {
+      //   let inputs = document.querySelectorAll('input')
+      //   inputs[0].focus()
+      // }
     }
   },
   methods: {
@@ -261,18 +275,19 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
+      vm.dossierNoKey = $('#dossierNoKey').val()
+      vm.applicantIdNoKey = $('#applicantIdNoKey').val()
       newQuery['dossierNo'] = vm.dossierNoKey
-      vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
       newQuery['applicantIdNo'] = vm.applicantIdNoKey
+      vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
       vm.$store.commit('setApplicantIdNoSearch', vm.applicantIdNoKey)
-      newQuery['applicantName'] = $('#applicantNameKey').val()
       newQuery['detail'] = ''
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
           queryString += key + '=' + newQuery[key] + '&'
         }
       }
-      if (vm.dossierNoKey || vm.applicantIdNoKey || $('#applicantNameKey').val()) {
+      if (vm.dossierNoKey || vm.applicantIdNoKey) {
         vm.validateTracuu = true
         vm.$router.push({
           path: current.path + queryString,
@@ -284,18 +299,6 @@ export default {
         vm.validateTracuu = false
       }
     },
-    // setFilterKey () {
-    //   var vm = this
-    //   setTimeout(function () {
-    //     let payload = {
-    //       dossierNo: $('#dossierNoKey').val(),
-    //       applicantIdNo: $('#applicantIdNoKey').val(),
-    //       secretCode: vm.filterDossierKey.secretCode ? vm.filterDossierKey.secretCode : ''
-    //     }
-    //     vm.$store.commit('setFilterDossierKey', payload)
-    //     console.log('payloadFilter', vm.$store.getters.getFilterDossierKey)
-    //   }, 200)
-    // },
     confirmPass () {
       var vm = this
       let payload = {
@@ -323,7 +326,6 @@ export default {
       let currentQuery = router.history.current.query
       var filter = null
       let groupIds = vm.groupIdArr.length
-      console.log('groupIds', groupIds)
       if (groupIds > 0) {
         let totalRecord = 0
         let count = 0
@@ -399,7 +401,6 @@ export default {
         vm.validPass = true
         vm.loading = true
         let filter = {
-          // password: vm.passCheck ? vm.passCheck : '',
           password: $('#passCheck').val(),
           dossierId: vm.dossierDetail.dossierId
         }
@@ -429,6 +430,10 @@ export default {
         return []
       }
     },
+    changeScreen () {
+      var vm = this
+      vm.$store.commit('setFullScreen', !vm.fullScreen)
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -451,12 +456,6 @@ export default {
       this.visible = false
     },
     //
-    clear (id) {
-      $(`#${id}`).val('')
-    },
-    accept (text) {
-      this.hide()
-    },
     show (e) {
       this.validPass = true
       this.input = e.target
@@ -473,36 +472,16 @@ export default {
       }
       this.bindClick('view')
     },
-    hide () {
-      this.visible = false
-    },
-    next () {
-      let inputs = document.querySelectorAll('input')
-      let found = false
-      let arr1 = []
-      arr1.forEach.call(inputs, (item, i) => {
-        if (!found && item === this.input && i < inputs.length - 1) {
-          found = true
-          this.$nextTick(() => {
-            inputs[i + 1].focus()
-          })
-        }
-      })
-      if (!found) {
-        this.input.blur()
-        this.hide()
-      }
-    },
     bindClick (type) {
       var vm = this
       setTimeout(function () {
-        $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
+        $('.keyboard .enter').unbind('click')
         if (type === 'search') {
-          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
+          $('.keyboard .enter').bind('click', function () {
             vm.filterDossier()
           })
         } else if (type === 'view') {
-          $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
+          $('.keyboard .enter').bind('click', function () {
             vm.submitViewDetail()
           })
         }

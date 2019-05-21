@@ -665,7 +665,7 @@
         <v-card-text>
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
-              <v-flex xs12 class="px-2 pb-3">
+              <v-flex xs12 class="px-2">
                 <div class="my-2">Thủ tục hành chính:</div>
                 <v-autocomplete
                   box
@@ -1923,6 +1923,10 @@ export default {
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
+        if (vm.selectedDoAction.length === 0) {
+          alert('Chọn hồ sơ để thực hiện')
+          return
+        }
         let filter = {
           document: item.document,
           'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
@@ -1963,7 +1967,8 @@ export default {
           applicantAddress: vm.applicantAddressGuide,
           applicantEmail: vm.applicantEmailGuide,
           applicantTelNo: vm.applicantTelNoGuide,
-          // employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
+          govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
+          govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
           typeCode: 'DOC_03'
         }
         if (type === 'doc') {
