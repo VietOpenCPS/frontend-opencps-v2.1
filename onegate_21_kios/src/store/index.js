@@ -90,8 +90,8 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          // axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
-          axios.get(state.endPoint + '/dossiers', param).then(function (response) {
+          axios.get(state.endPoint + '/dossiers/publish/searchDossiers', param).then(function (response) {
+          // axios.get(state.endPoint + '/dossiers', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

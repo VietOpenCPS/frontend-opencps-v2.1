@@ -17,7 +17,8 @@ export const store = new Vuex.Store({
     index: 0,
     agencyList: [],
     domainList: [],
-    levelList: []
+    levelList: [],
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -184,6 +185,9 @@ export const store = new Vuex.Store({
     },
     setLevelList (state, payload) {
       state.levelList = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
     }
   },
   getters: {
@@ -201,6 +205,9 @@ export const store = new Vuex.Store({
     },
     getLevelList (state) {
       return state.levelList
+    },
+    getIsMobile (state) {
+      return state.isMobile
     }
   }
 })

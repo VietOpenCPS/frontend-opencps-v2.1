@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout row wrap class="mb-3">
+    <v-layout wrap class="mb-3">
       <v-card flat style="width:100%">
         <!-- <v-btn v-if="getUser('Administrator')" @click.native="toAnswer()" round color="primary" dark style="position:absolute;top:0px;right:10px;z-index:101">
           <v-icon>add</v-icon>&nbsp;
@@ -30,7 +30,7 @@
               class="my-2 px-2 py-2"
               style="border:1px solid #dedede;border-radius:3px"
             >
-              <div v-html="questionDetail.content"></div>
+              <div v-html="questionDetail.content.split('&&')[0]"></div>
             </div>
           </div>
           <div v-if="loadingAnswer">
@@ -308,6 +308,8 @@ export default {
   methods: {
     getAnswers () {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       vm.loadingAnswer = true
       vm.answerList = []
       let filter = {
@@ -320,9 +322,11 @@ export default {
         } else {
           vm.answerList = [result]
         }
+        if (newQuery.hasOwnProperty('editAnswer')) {
+          vm.editAnswer(vm.answerList[newQuery.editAnswer])
+        }
       }).catch(function (reject) {
         vm.loadingAnswer = false
-        console.log('2222', [vm.answersDefault[vm.indexQuestion]])
         vm.answerList = vm.answersDefault[vm.indexQuestion] ? [vm.answersDefault[vm.indexQuestion]] : []
       })
     },

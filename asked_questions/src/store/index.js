@@ -57,6 +57,8 @@ export const store = new Vuex.Store({
     activeGetQuestion: false,
     questionPage: 1,
     totalQuestion: 0,
+    agencyFilter: '',
+    keywordFilter: '',
     user: {
       'role': ''
     },
@@ -118,8 +120,8 @@ export const store = new Vuex.Store({
                 groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
               },
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10
+                // start: state.questionPage * 20 - 20,
+                // end: state.questionPage * 20
               }
             }
           } else {
@@ -128,8 +130,8 @@ export const store = new Vuex.Store({
                 groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
               },
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10,
+                // start: state.questionPage * 20 - 20,
+                // end: state.questionPage * 20,
                 publish: 1
               }
             }
@@ -391,6 +393,12 @@ export const store = new Vuex.Store({
     setActiveGetQuestion (state, payload) {
       state.activeGetQuestion = payload
     },
+    setAgencyFilter (state, payload) {
+      state.agencyFilter = payload
+    },
+    setKeywordFilter (state, payload) {
+      state.keywordFilter = payload
+    },
     setQuestionPage (state, payload) {
       state.questionPage = payload
     },
@@ -431,6 +439,12 @@ export const store = new Vuex.Store({
     },
     getUser (state) {
       return state.user
-    }
+    },
+    getAgencyFilter (state, payload) {
+      return state.agencyFilter
+    },
+    getKeywordFilter (state, payload) {
+      return state.keywordFilter
+    },
   }
 })

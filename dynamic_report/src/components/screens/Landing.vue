@@ -239,48 +239,125 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      // setTimeout(() => {
-      //   vm.bindDataReportConfig()
-      // }, 500)
+      setTimeout(() => {
+        vm.showErrorData = false
+        vm.showCSVDownload = false
+        vm.agencyLists = []
+        vm.api = ''
+        vm.filters = []
+        vm.customize = false
+        vm.data = {}
+        vm.groupBy = []
+        vm.itemsReportsConfig = []
+        vm.dataReportXX = ''
+        vm.buttons = []
+        vm.buttonsVal = ''
+        vm.buttonsShow = false
+        vm.exportXML = false
+        if (vm.itemsReports[vm.index]) {
+          vm.nameReport = vm.itemsReports[vm.index]['reportName']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+            vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+            vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+            vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+            vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+            let defaultValGroup = vm.groupBy[0]['key']
+            for (let keyGroup in vm.groupBy) {
+              if (vm.groupBy[keyGroup]['selected']) {
+                defaultValGroup = vm.groupBy[keyGroup]['key']
+                break
+              }
+            }
+            vm.groupByVal = defaultValGroup
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            if (vm.agencyLists.length > 0) {
+              let defaultVal = vm.agencyLists[0]['value']
+              for (let key in vm.agencyLists) {
+                if (vm.agencyLists[key]['selected']) {
+                  defaultVal = vm.agencyLists[key]['value']
+                  break
+                }
+              }
+              vm.govAgency = defaultVal
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+            vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+            vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+          }
+          for (let key in vm.filters) {
+            if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+            vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+            if (vm.buttons.length > 0) {
+              setTimeout(() => {
+                vm.buttonsShow = true
+              }, 100)
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+            vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+          }
+          vm.report1Def = {}
+          for (let key in vm.itemsReportsConfig) {
+            vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+          }
+          vm.reportType = vm.itemsReports[vm.index]['document']
+          if (vm.showConfig) {
+            vm.showConfig = false
+            setTimeout(() => {
+              vm.showConfig = true
+            }, 200)
+          }
+          vm.pdfBlob = ''
+        }
+      }, 1000)
     })
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
-      vm.bindDataReportConfig()
-    },
-    itemsReports () {
-      let vm = this
-      vm.bindDataReportConfig()
-    }
-  },
-  methods: {
-    bindDataReportConfig () {
-      let vm = this
       vm.showErrorData = false
       vm.showCSVDownload = false
-      vm.agencyLists = []
-      vm.api = ''
-      vm.filters = []
+      vm.itemsReportsConfig = []
+      vm.groupBy = []
       vm.customize = false
       vm.data = {}
-      vm.groupBy = []
-      vm.itemsReportsConfig = []
+      vm.api = ''
+      vm.filters = []
+      vm.report1Def = {}
       vm.dataReportXX = ''
       vm.buttons = []
       vm.buttonsVal = ''
       vm.buttonsShow = false
       vm.exportXML = false
-      vm.nameReport = vm.itemsReports[vm.index]['reportName']
+      vm.nameReport = vm.itemsReports[vm.index] ? vm.itemsReports[vm.index]['reportName'] : ''
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
         vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
         vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
       }
+      // bug unsupported number: NaN
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
         vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+      } else {
+        vm.noHeader = true
       }
+      // 
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
         vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
         let defaultValGroup = vm.groupBy[0]['key']
@@ -311,6 +388,11 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
         vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
       }
+      for (let key in vm.itemsReportsConfig) {
+        vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+      }
+      vm.reportType = vm.itemsReports[vm.index]['document']
+      vm.pdfBlob = ''
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
@@ -327,19 +409,104 @@ export default {
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
         vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
       }
-      vm.report1Def = {}
-      for (let key in vm.itemsReportsConfig) {
-        vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
-      }
-      vm.reportType = vm.itemsReports[vm.index]['document']
       if (vm.showConfig) {
         vm.showConfig = false
         setTimeout(() => {
           vm.showConfig = true
         }, 200)
       }
-      vm.pdfBlob = ''
     },
+    itemsReports () {
+      let vm = this
+      setTimeout(() => {
+        vm.showErrorData = false
+        vm.showCSVDownload = false
+        vm.agencyLists = []
+        vm.api = ''
+        vm.filters = []
+        vm.customize = false
+        vm.data = {}
+        vm.groupBy = []
+        vm.itemsReportsConfig = []
+        vm.dataReportXX = ''
+        vm.buttons = []
+        vm.buttonsVal = ''
+        vm.buttonsShow = false
+        vm.exportXML = false
+        if (vm.itemsReports[vm.index]) {
+          vm.nameReport = vm.itemsReports[vm.index]['reportName']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('reportConfig')) {
+            vm.itemsReportsConfig = vm.itemsReports[vm.index]['filterConfig']['reportConfig']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('customize')) {
+            vm.customize = vm.itemsReports[vm.index]['filterConfig']['customize']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('autoHeader')) {
+            vm.noHeader = vm.itemsReports[vm.index]['filterConfig']['autoHeader']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupBy')) {
+            vm.groupBy = vm.itemsReports[vm.index]['filterConfig']['groupBy']
+            let defaultValGroup = vm.groupBy[0]['key']
+            for (let keyGroup in vm.groupBy) {
+              if (vm.groupBy[keyGroup]['selected']) {
+                defaultValGroup = vm.groupBy[keyGroup]['key']
+                break
+              }
+            }
+            vm.groupByVal = defaultValGroup
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
+            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+            if (vm.agencyLists.length > 0) {
+              let defaultVal = vm.agencyLists[0]['value']
+              for (let key in vm.agencyLists) {
+                if (vm.agencyLists[key]['selected']) {
+                  defaultVal = vm.agencyLists[key]['value']
+                  break
+                }
+              }
+              vm.govAgency = defaultVal
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
+            vm.api = vm.itemsReports[vm.index]['filterConfig']['api']
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('filters')) {
+            vm.filters = vm.itemsReports[vm.index]['filterConfig']['filters']
+          }
+          for (let key in vm.filters) {
+            if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
+              vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
+            vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
+            if (vm.buttons.length > 0) {
+              setTimeout(() => {
+                vm.buttonsShow = true
+              }, 100)
+            }
+          }
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('exportXML')) {
+            vm.exportXML = vm.itemsReports[vm.index]['filterConfig']['exportXML']
+          }
+          vm.report1Def = {}
+          for (let key in vm.itemsReportsConfig) {
+            vm.report1Def[vm.itemsReportsConfig[key]['value']] = vm.itemsReportsConfig[key]['text']
+          }
+          vm.reportType = vm.itemsReports[vm.index]['document']
+          if (vm.showConfig) {
+            vm.showConfig = false
+            setTimeout(() => {
+              vm.showConfig = true
+            }, 200)
+          }
+          vm.pdfBlob = ''
+        }
+      }, 200)
+    }
+  },
+  methods: {
     doCreatePDF () {
       let vm = this
       if (vm.reportType.startsWith('STATISTIC')) {
@@ -595,7 +762,6 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
-              
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -1152,6 +1318,17 @@ export default {
       var view = new Uint8Array(buf);
       for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
       return buf;
+    },
+    parseCurrentDate (date) {
+      if (!date) {
+        return null
+      }
+      try {
+        let [day, month, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      } catch (e) {
+        return ''
+      }
     }
   }
 }

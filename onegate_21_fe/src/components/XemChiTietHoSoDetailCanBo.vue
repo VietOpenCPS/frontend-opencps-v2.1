@@ -303,6 +303,28 @@
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
                     {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                     <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
+                    <div v-if="Array.isArray(itemAction.files) && itemAction.files.length > 0">
+                      <div v-for="(itemFile, index) in itemAction.files" :key="index" title="Tải xuống">
+                        <p v-if="itemFile.dossierDocumentId" @click="downloadFileDocument(itemFile.dossierReferenceUid ? itemFile.dossierReferenceUid : '')">
+                          <v-icon size="18" color="#0b72ba">
+                            get_app
+                          </v-icon>
+                          <!-- <v-icon size="18" color="#0b72ba" class="mx-2" @click="">visibility</v-icon> -->
+                          <span style="color: #0b72ba;cursor: pointer;">
+                            {{itemFile.fileName}}
+                          </span>
+                        </p>
+                        <p v-if="itemFile.dossierFileId" @click="downloadFileLogs(itemFile.dossierFileId)">
+                          <v-icon size="18" color="#0b72ba">
+                            get_app
+                          </v-icon>
+                          <!-- <v-icon size="18" color="#0b72ba" class="mx-2" @click="">visibility</v-icon> -->
+                          <span style="color: #0b72ba;cursor: pointer;">
+                            {{itemFile.fileName}}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <div v-if="props.item.statusText">
                     <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved'">
@@ -458,17 +480,24 @@
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b>: <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
                   <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
-                  <p
-                  class="history__download__link hover-pointer-download mb-1"
-                  title="Tải file"
-                  v-for="file in item.payload.files"
-                  :key="file.dossierFileId"
-                  style="cursor: pointer;"
-                  @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
-                  >
-                  <v-icon>file_download</v-icon> 
-                  <span>{{file.fileName}}</span>
-                </p>
+                  <div v-for="(file, index) in item.payload.files" :key="index">
+                    <p v-if="file.dossierFileId" class="history__download__link hover-pointer-download mb-1"
+                      title="Tải file"
+                      style="cursor: pointer;"
+                      @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
+                      >
+                      <v-icon>file_download</v-icon> 
+                      <span>{{file.fileName}}</span>
+                    </p>
+                    <p v-if="file.dossierDocumentId" class="history__download__link hover-pointer-download mb-1"
+                      title="Tải file"
+                      style="cursor: pointer;"
+                      @click.prevent.stop="downloadFileDocument(file.dossierReferenceUid ? file.dossierReferenceUid : '')"
+                      >
+                      <v-icon>file_download</v-icon> 
+                      <span>{{file.fileName}}</span>
+                    </p>
+                  </div>
               </td>
             </div>
           </v-tab-item>
@@ -598,6 +627,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    isMobile: false,
     inputTypes: [1, 3],
     outputTypes: [2],
     actionIdCurrent: 0,
@@ -798,6 +828,15 @@ export default {
       return this.$store.getters.kysoSuccess
     }
   },
+  beforeDestroy () {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    this.onResize()
+    window.addEventListener('resize', this.onResize, { passive: true })
+  },
   created () {
     var vm = this
     vm.$nextTick(function () {
@@ -829,6 +868,14 @@ export default {
       let vm = this
       let currentQuery = newRoute.query
     },
+    isMobile (val) {
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
+    },
     kysoSuccess (val) {
       var vm = this
       if (val) {
@@ -845,6 +892,11 @@ export default {
     }
   },
   methods: {
+    onResize () {
+      let vm = this
+      let isMobile = window.innerWidth < 1024
+      vm.isMobile = isMobile
+    },
     initData (data) {
       var vm = this
       vm.dossierId = data
@@ -926,6 +978,14 @@ export default {
         dossierId: vm.id
       }
       this.$store.dispatch('downloadFile', dataCommit)
+    },
+    downloadFileDocument(data) {
+      var vm = this
+      let dataCommit = {
+        referenceUid: data,
+        dossierId: vm.id
+      }
+      this.$store.dispatch('downloadFileDocument', dataCommit)
     },
     loadDossierActions (data) {
       var vm = this

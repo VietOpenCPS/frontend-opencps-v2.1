@@ -54,12 +54,16 @@
                 let dataMaxConvert = vm.parseDate(dataMax)
                 console.log('dataMax: ', dataMaxConvert)
                 vm.maxDate = dataMaxConvert
+            } else {
+                vm.maxDate = null
             }
             if (vm.item.hasOwnProperty('after')) {
                 let dataMin = vm.dataAll[vm.item['after']]
                 let dataMinConvert = vm.parseDate(dataMin)
                 console.log('dataMinConvert: ', dataMinConvert)
                 vm.minDate = dataMinConvert
+            } else {
+                vm.minDate = null
             }
         })
     },
@@ -72,23 +76,46 @@
             vm.$emit('change', new Date(val).getTime())
             // vm.$parent.reloadPicker()
         },
-        dataValue (val) {
+        '$route': function (newRoute, oldRoute) {
             let vm = this
-            console.log('input data change: ', val)
-            vm.rawDate = vm.parseDate(val)
+            console.log('input data change: ', vm.dataValue)
+            vm.rawDate = vm.parseDate(vm.dataValue)
             if (vm.item.hasOwnProperty('before')) {
                 let dataMax = vm.dataAll[vm.item['before']]
                 let dataMaxConvert = vm.parseDate(dataMax)
-                console.log('dataMax: ', dataMaxConvert)
                 vm.maxDate = dataMaxConvert
+            } else {
+                vm.maxDate = null
             }
             if (vm.item.hasOwnProperty('after')) {
                 let dataMin = vm.dataAll[vm.item['after']]
                 let dataMinConvert = vm.parseDate(dataMin)
-                console.log('dataMinConvert: ', dataMinConvert)
                 vm.minDate = dataMinConvert
+            } else {
+                vm.minDate = null
             }
         }
+        // dataValue (val) {
+        //     let vm = this
+        //     console.log('input data change: ', val)
+        //     vm.rawDate = vm.parseDate(val)
+        //     if (vm.item.hasOwnProperty('before')) {
+        //         let dataMax = vm.dataAll[vm.item['before']]
+        //         let dataMaxConvert = vm.parseDate(dataMax)
+        //         console.log('dataMax: ', dataMaxConvert)
+        //         vm.maxDate = dataMaxConvert
+        //     } else {
+        //         vm.maxDate = null
+        //     }
+        //     if (vm.item.hasOwnProperty('after')) {
+        //         let dataMin = vm.dataAll[vm.item['after']]
+        //         let dataMinConvert = vm.parseDate(dataMin)
+        //         console.log('dataMinConvert: ', dataMinConvert)
+        //         vm.minDate = dataMinConvert
+        //     } else {
+        //         vm.minDate = null
+        //     }
+        // }
     },
     methods: {
         formatDate (date) {

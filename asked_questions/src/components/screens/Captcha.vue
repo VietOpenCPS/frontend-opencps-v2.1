@@ -1,5 +1,5 @@
 <template>
-  <v-layout row wrap>
+  <v-layout wrap>
     <v-flex xs12 class="py-2" style="
       display: flex;
       align-items: center;

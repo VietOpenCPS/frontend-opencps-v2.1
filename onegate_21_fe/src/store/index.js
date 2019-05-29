@@ -649,56 +649,71 @@ export const store = new Vuex.Store({
     },
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
+        let dataOutPut = []
         let files = $('#file' + data.partNo)[0].files
-        let file = files[0]
-        let fileName = file['name']
-        if (file['name']) {
-          fileName = file['name'].replace(/\%/g, '')
-          fileName = fileName.replace(/\//g, '')
-          fileName = fileName.replace(/\\/g, '')
-        }
-        let formData = new FormData()
-        if (data.partType === 3) {
-          if (data['displayName']) {
-            fileName = data['displayName'].replace(/\%/g, '')
-            fileName = fileName.replace(/\//g, '')
-            fileName = fileName.replace(/\\/g, '')
-          }
-          formData.append('displayName', fileName)
-        } else {
-          formData.append('displayName', fileName)
-        }
-        formData.append('fileType', file.type)
-        formData.append('fileSize', file.size)
-        formData.append('isSync', 'false')
-        formData.append('file', file, fileName)
-        formData.append('dossierPartNo', data.partNo)
-        formData.append('dossierTemplateNo', data.dossierTemplateNo)
-        formData.append('fileTemplateNo', data.fileTemplateNo)
-        formData.append('formData', '')
-        formData.append('referenceUid', '')
-        let fileUpload = {
-          partTip: data.partTip,
-          file: file
-        }
-        store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
-        if (file && state.validFileUpload) {
-          axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
-            headers: {
-              'groupId': state.initData.groupId,
-              'Content-Type': 'multipart/form-data'
+        let countFiles = files.length
+        let count = 0
+        if (files) {
+          for (let index = 0; index < countFiles; index++) {
+            let file = files[index]
+            let fileName = file['name']
+            if (file['name']) {
+              fileName = file['name'].replace(/\%/g, '')
+              fileName = fileName.replace(/\//g, '')
+              fileName = fileName.replace(/\\/g, '')
             }
-          }).then(function (response) {
-            resolve(response.data)
-            console.log('upload file success!')
-          }).catch(function (xhr) {
-            console.log(xhr)
-            toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            reject(xhr)
-          })
-        } else {
-          reject('error')
+            let formData = new FormData()
+            if (data.partType === 3) {
+              if (data['displayName']) {
+                fileName = data['displayName'].replace(/\%/g, '')
+                fileName = fileName.replace(/\//g, '')
+                fileName = fileName.replace(/\\/g, '')
+              }
+              formData.append('displayName', fileName)
+            } else {
+              formData.append('displayName', fileName)
+            }
+            formData.append('fileType', file.type)
+            formData.append('fileSize', file.size)
+            formData.append('isSync', 'false')
+            formData.append('file', file, fileName)
+            formData.append('dossierPartNo', data.partNo)
+            formData.append('dossierTemplateNo', data.dossierTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('formData', '')
+            formData.append('referenceUid', '')
+            let fileUpload = {
+              partTip: data.partTip,
+              file: file
+            }
+            store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
+            if (file && state.validFileUpload) {
+              axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+                headers: {
+                  'groupId': state.initData.groupId,
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(function (response) {
+                count += 1
+                dataOutPut.push(response.data)
+                if (count === countFiles) {
+                  resolve(dataOutPut)
+                }
+              }).catch(function (xhr) {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                count += 1
+                if (count === countFiles) {
+                  reject(dataOutPut)
+                }
+              })
+            } else {
+              count += 1
+              if (count === countFiles) {
+                reject(dataOutPut)
+              }
+            }
+          }
         }
       })
     },
@@ -729,7 +744,7 @@ export const store = new Vuex.Store({
         }).then(function (response) {
           resolve(response.data)
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
@@ -943,6 +958,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    downloadFileDocument ({commit, state, dispatch}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+          // var url = window.URL.createObjectURL(response.data)
+          // window.open(url)
+          let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+          let serializable = response.data
+          saveAs(serializable, fileName)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     postDossier ({ commit, state }, data) {
       console.log('data-------------', data)
       return new Promise((resolve, reject) => {
@@ -970,7 +1004,7 @@ export const store = new Vuex.Store({
           commit('setThongTinChungHoSo', response.data)
           // commit('setDichVuChuyenPhatKetQua', response.data)
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -992,7 +1026,7 @@ export const store = new Vuex.Store({
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cloning', dataPostdossier, options).then(function (response) {
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -1014,7 +1048,7 @@ export const store = new Vuex.Store({
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cancel', dataPostdossier, options).then(function (response) {
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -1696,7 +1730,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    downloadFile ({commit, state}, data){
+    downloadFile ({commit, state}, data) {
       var vm = this
       let param = {
         headers: {
@@ -1705,8 +1739,11 @@ export const store = new Vuex.Store({
         responseType: 'blob'
       }
       axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.fileAttachId, param).then(function (response) {
-        var url = window.URL.createObjectURL(response.data)
-        window.open(url)
+        // var url = window.URL.createObjectURL(response.data)
+        // window.open(url)
+        let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+        let serializable = response.data
+        saveAs(serializable, fileName)
       })
       .catch(function (error) {
         console.log(error)

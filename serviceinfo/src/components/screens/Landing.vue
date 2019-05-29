@@ -1,200 +1,325 @@
 <template>
-  <div class="list-thu-tuc">
-    <div class="row-header no__hidden_class">
-      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-        <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
-      </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-text-field
-            v-model="serviceNameKey"
-            placeholder="Tìm kiếm theo tên thủ tục, mã thủ tục ..."
-            solo
-            chips
-            multiple
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @keyup.enter="filterServiceName"
-            content-class="adv__search__select"
-            return-object
-          ></v-text-field>
+  <div>
+    <!-- layout for desktop -->
+    <div class="list-thu-tuc" v-if="!isMobile">
+      <div class="row-header no__hidden_class">
+        <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
+          <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
         </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
-            <v-icon size="16">search</v-icon>
-          </v-btn>
-        </div>
-      </div> 
-    </div>
-    <v-layout wrap class="white py-2">
-      <v-flex xs4 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="govAgencyList"
-          v-model="govAgencySelected"
-          placeholder="Chọn cơ quan"
-          item-text="administrationName"
-          item-value="administrationCode"
-          :hide-selected="true"
-          clearable
-          @change="changeAdministration"
-          box
-        ></v-autocomplete>
-      </v-flex>
-      <v-flex xs4 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="domainListCurrent"
-          v-model="domainSelected"
-          placeholder="Chọn lĩnh vực"
-          item-text="domainName"
-          item-value="domainCode"
-          :hide-selected="true"
-          clearable
-          @change="changeDomain"
-          box
-        ></v-autocomplete>
-      </v-flex>
-      <v-flex xs4 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="levelList"
-          v-model="levelSelected"
-          placeholder="Chọn mức độ"
-          item-text="levelName"
-          item-value="level"
-          :hide-selected="true"
-          @change="changeLevel"
-          clearable
-          box
-        >
-        </v-autocomplete>
-      </v-flex>
-      <!-- <v-flex xs3 class="pl-2 pr-2">
-        <div style="position:relative">
-          <v-text-field class="input-border input-search"
-            label="Nhập tên thủ tục hành chính"
-            v-model="serviceNameKey"
-            @keyup.enter="filterServiceName()"
-            append-icon="search"
-            box
-            height="36"
-          ></v-text-field>
-        </div>
-      </v-flex> -->
-    </v-layout>
-    <content-placeholders class="mt-3" v-if="loading">
-      <content-placeholders-text :lines="10" />
-    </content-placeholders>
-    <div v-else class="service__info__table">
-      <v-data-table
-        :headers="headers"
-        :items="serviceInfoList"
-        hide-actions
-        class="table-landing table-bordered"
-      >
-        <template slot="items" slot-scope="props">
-          <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-            <td class="text-xs-center">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
-              </div>
-            </td>
-            <td class="text-xs-left" style="min-width: 135px;">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{props.item.serviceCode}}</span>
-              </div>
-            </td>
-            <td class="text-xs-left" @click="viewDetail(props.item)">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>{{props.item.serviceName}}</span>
-              </div>
-            </td>
-            <td class="text-xs-left" style="min-width: 135px">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <span>
-                  <span>{{props.item.domainName}}</span>
-                </span>
-              </div>
-            </td>
-            <td class="text-xs-center">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
-                style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
-              </div>
-            </td>
-            <td class="text-xs-center">
-              <content-placeholders v-if="loading">
-                <content-placeholders-text :lines="1" />
-              </content-placeholders>
-              <div v-else>
-                <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
-                  <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ</v-btn>
-                  <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
-                  <v-list v-if="props.item.serviceConfigs">
-                    <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
-                      <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                      <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
-                    </v-list-tile>
-                  </v-list>
-                </v-menu>
-                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
-                  v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
-                  @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
-                >
-                  Nộp hồ sơ
-                </v-btn>
-                <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
-                  v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
-                  @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
-                >
-                  Hướng dẫn
-                </v-btn>
-              </div>
-            </td>
-          </tr>
-        </template>
-        <template slot="no-data">
-          <div class="text-xs-center mt-2">
-            Không có thủ tục nào được tìm thấy
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+            <v-text-field
+              v-model="serviceNameKey"
+              placeholder="Tìm kiếm theo tên thủ tục, mã thủ tục ..."
+              solo
+              chips
+              multiple
+              deletable-chips
+              item-value="value"
+              item-text="text"
+              @keyup.enter="filterServiceName"
+              content-class="adv__search__select"
+              return-object
+            ></v-text-field>
           </div>
-        </template>
-      </v-data-table>
-      <div class="text-xs-right layout wrap mt-2" style="position: relative;">
-        <div class="flex pagging-table px-2"> 
-          <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
-            @tiny:change-page="paggingData" ></tiny-pagination> 
+          <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+            <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
+              <v-icon size="16">search</v-icon>
+            </v-btn>
+          </div>
+        </div> 
+      </div>
+      <v-layout wrap class="white py-2">
+        <v-flex xs4 class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="govAgencyList"
+            v-model="govAgencySelected"
+            placeholder="Chọn cơ quan"
+            item-text="administrationName"
+            item-value="administrationCode"
+            :hide-selected="true"
+            clearable
+            @change="changeAdministration"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex xs4 class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="domainListCurrent"
+            v-model="domainSelected"
+            placeholder="Chọn lĩnh vực"
+            item-text="domainName"
+            item-value="domainCode"
+            :hide-selected="true"
+            clearable
+            @change="changeDomain"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex xs4 class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="levelList"
+            v-model="levelSelected"
+            placeholder="Chọn mức độ"
+            item-text="levelName"
+            item-value="level"
+            :hide-selected="true"
+            @change="changeLevel"
+            clearable
+            box
+          >
+          </v-autocomplete>
+        </v-flex>
+      </v-layout>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
+      <div v-else class="service__info__table">
+        <v-data-table
+          :headers="headers"
+          :items="serviceInfoList"
+          hide-actions
+          class="table-landing table-bordered"
+        >
+          <template slot="items" slot-scope="props">
+            <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{thutucPage * 15 - 15 + props.index + 1}}</span><br>
+                </div>
+              </td>
+              <td class="text-xs-left" style="min-width: 135px;">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.serviceCode}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" @click="viewDetail(props.item)">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>{{props.item.serviceName}}</span>
+                </div>
+              </td>
+              <td class="text-xs-left" style="min-width: 135px">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <span>
+                    <span>{{props.item.domainName}}</span>
+                  </span>
+                </div>
+              </td>
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <v-btn class="mx-0 my-0 mt-1 white--text" depressed readonly small :color="getColor(props.item.maxLevel)"
+                  style="pointer-events: none;min-width: 110px;">Mức độ {{props.item.maxLevel}}</v-btn>
+                </div>
+              </td>
+              <td class="text-xs-center">
+                <content-placeholders v-if="loading">
+                  <content-placeholders-text :lines="1" />
+                </content-placeholders>
+                <div v-else>
+                  <v-menu bottom right offset-y v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length > 1">
+                    <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ</v-btn>
+                    <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
+                    <v-list v-if="props.item.serviceConfigs">
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                        <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
+                  <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
+                    v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) > 2"
+                    @click="createDossier(serviceConfigs(props.item.serviceConfigs)[0])"
+                  >
+                    Nộp hồ sơ
+                  </v-btn>
+                  <v-btn small slot="activator" color="primary" class="my-1" style="min-width: 110px;"
+                    v-if="props.item.serviceConfigs && serviceConfigs(props.item.serviceConfigs).length === 1 && Number(serviceConfigs(props.item.serviceConfigs)[0]['serviceLevel']) <= 2"
+                    @click="viewGuide(serviceConfigs(props.item.serviceConfigs)[0])"
+                  >
+                    Hướng dẫn
+                  </v-btn>
+                </div>
+              </td>
+            </tr>
+          </template>
+          <template slot="no-data">
+            <div class="text-xs-center mt-2">
+              Không có thủ tục nào được tìm thấy
+            </div>
+          </template>
+        </v-data-table>
+        <div class="text-xs-right layout wrap mt-2" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
         </div>
       </div>
+      <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
+        <v-card>
+          <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
+          <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
+              Đóng
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
-    <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
-      <v-card>
-        <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
-        <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
-            Đóng
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- layout for mobile -->
+    <div class="list-thu-tuc" v-else>
+      <v-layout wrap class="white py-2">
+        <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
+          <v-select
+            class="select-border"
+            :items="govAgencyList"
+            v-model="govAgencySelected"
+            placeholder="Chọn cơ quan"
+            item-text="administrationName"
+            item-value="administrationCode"
+            :hide-selected="true"
+            clearable
+            @change="changeAdministration"
+            box
+          ></v-select>
+        </v-flex>
+        <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
+          <v-select
+            class="select-border"
+            :items="domainListCurrent"
+            v-model="domainSelected"
+            placeholder="Chọn lĩnh vực"
+            item-text="domainName"
+            item-value="domainCode"
+            :hide-selected="true"
+            clearable
+            @change="changeDomain"
+            box
+          ></v-select>
+        </v-flex>
+        <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
+          <v-select
+            class="select-border"
+            :items="levelList"
+            v-model="levelSelected"
+            autocomplete
+            placeholder="Chọn mức độ"
+            item-text="levelName"
+            item-value="level"
+            :hide-selected="true"
+            @change="changeLevel"
+            clearable
+            box
+          >
+          </v-select>
+        </v-flex>
+        <v-flex xs12 sm6 md3 class="pl-2 pr-2">
+          <div style="position:relative">
+            <v-text-field class="input-border input-search"
+              placeholder="Nhập tên thủ tục hành chính"
+              v-model="serviceNameKey"
+              @keyup.enter="filterServiceName()"
+              box
+              append-icon="search"
+              :append-icon-cb="filterServiceName"
+            ></v-text-field>
+          </div>
+        </v-flex>
+      </v-layout>
+      <content-placeholders class="mt-3" v-if="loading">
+        <content-placeholders-text :lines="10" />
+      </content-placeholders>
+      <div v-else class="service__info__table mt-2">
+        <v-card class="mx-2">
+          <div class="px-2 py-2 blue text-bold white--text">
+            STT | Tên thủ tục
+          </div>
+          <v-list class="py-0">
+            <template v-for="(item, index) in serviceInfoList" >
+              <v-layout wrap :key="index" style="border-bottom:1px solid #dedede;height:auto">
+                <v-flex xs1 class="text-xs-center text-bold">
+                  <span>{{index + 1}}</span>
+                </v-flex>
+                <v-flex xs10 @click="viewDetail(item)">
+                  <div style="color:#1e5018">{{item.serviceName}}</div>
+                  <div> <span class="text-bold">Lĩnh vực: </span> <span>{{item.domainName}}</span> </div>
+                  <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
+                </v-flex>
+                <v-flex xs1 class="text-xs-center mt-1">
+                  <v-menu :close-on-content-click="false" left style="position:relative !important;">
+                    <v-btn slot="activator" icon class="mx-0 my-0" style="width:100%">
+                      <v-icon color="primary lighten-1">more_vert</v-icon>
+                    </v-btn>
+                    <v-list>
+                      <v-menu :close-on-content-click="false" bottom right offset-y v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length > 1" style="position:relative !important;">
+                        <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                        <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                        <v-list v-if="item.serviceConfigs">
+                          <v-list-tile v-for="(item2, index) in serviceConfigs(item.serviceConfigs)" :key="index">
+                            <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                            <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                          </v-list-tile>
+                        </v-list>
+                      </v-menu>
+                      <v-btn class="mx-0 my-0" small color="primary" 
+                        v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) > 2"
+                        @click="createDossier(serviceConfigs(item.serviceConfigs)[0])"
+                      >
+                        Nộp hồ sơ
+                      </v-btn>
+                      <v-btn class="mx-0 my-0" small color="primary" 
+                        v-if="item.serviceConfigs && serviceConfigs(item.serviceConfigs).length === 1 && Number(serviceConfigs(item.serviceConfigs)[0]['serviceLevel']) <= 2"
+                        @click="viewGuide(serviceConfigs(item.serviceConfigs)[0])"
+                      >
+                        Xem hướng dẫn
+                      </v-btn>
+                    </v-list>
+                  </v-menu>
+                </v-flex>
+              </v-layout>
+            </template>
+          </v-list>
+        </v-card>
+        <div :class="!viewMobile ? 'text-xs-right layout wrap mt-2' : 'mt-2'" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="totalThuTuc" :page="thutucPage" custom-class="custom-tiny-class" 
+              @tiny:change-page="paggingData" ></tiny-pagination> 
+          </div>
+        </div>
+      </div>
+      <v-dialog scrollable v-model="dialogGuide" persistent max-width="600">
+        <v-card>
+          <v-card-title class="headline">Hướng dẫn nộp hồ sơ</v-card-title>
+          <v-card-text v-if="serviceDetail" style="max-height: 400px" v-html="serviceDetail.serviceInstruction"></v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat="flat" @click.native="dialogGuide = false">
+              Đóng
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
   </div>
 </template>
 
@@ -202,9 +327,10 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
+import toastr from 'toastr'
 import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
-import { isMobile } from 'mobile-device-detect'
+Vue.use(toastr)
 export default {
   props: [],
   components: {
@@ -265,12 +391,14 @@ export default {
     },
     levelList () {
       return this.$store.getters.getLevelList
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
-      vm.pathRouter = isMobile ? '/m/thu-tuc-hanh-chinh/' : '/thu-tuc-hanh-chinh/'
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
@@ -465,7 +593,6 @@ export default {
       })
     },
     viewDetail (item) {
-      console.log('item', item)
       var vm = this
       vm.$router.push({
         path: vm.pathRouter + item.serviceInfoId
@@ -478,7 +605,7 @@ export default {
         let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
         window.open(url, '_self')
       } else {
-        alert('Vui lòng đăng nhập để thực hiện')
+        toastr.success('Để nộp hồ trực tuyến vui lòng đăng nhập hệ thống')
       }
     },
     viewGuide (item) {

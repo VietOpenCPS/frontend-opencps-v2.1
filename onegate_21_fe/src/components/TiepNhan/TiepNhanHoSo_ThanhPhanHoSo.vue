@@ -204,7 +204,14 @@
               </v-tooltip>
             </v-flex>
             <v-flex :style="{width: !onlyView ? '120px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
-              <input
+              <input v-if="item['multiple']"
+              type="file"
+              multiple
+              style="display: none"
+              :id="'file' + item.partNo"
+              @change="onUploadSingleFile($event, item, index)"
+              >
+              <input v-else
               type="file"
               style="display: none"
               :id="'file' + item.partNo"
@@ -515,7 +522,7 @@ export default {
     initData (data) {
       var vm = this
       vm.thongTinHoSo = data
-      vm.applicantNoteDossier = data['applicantNote'] && data['applicantNote'].indexOf('<br>[') < 0 ? data['applicantNote'] : ''
+      vm.applicantNoteDossier = data['applicantNote'] && String(data['applicantNote']).indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
         vm.sampleCount = data['sampleCount']
@@ -736,6 +743,7 @@ export default {
           }
           if (resData) {
             formData = eval('(' + resData + ')')
+            item['loaded'] = true
           } else {
             formData = {}
           }
@@ -813,7 +821,6 @@ export default {
     },
     onUploadSingleFile (e, data, index) {
       var vm = this
-      console.log('vm.dossierTemplateItems[index]', vm.dossierTemplateItems[index])
       vm.dossierTemplatesItemSelect = data
       vm.progressUploadPart = data.partNo
       data['dossierId'] = vm.thongTinHoSo.dossierId
@@ -825,15 +832,16 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
-            // var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-            //   return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
-            // })
-            // if (fileViewsTemp) {
-            //   vm.fileViews = fileViewsTemp
-            // }
           })
-        }).catch(function (xhr) {
+        }).catch(function (data) {
+          if (data.length > 0) {
+            vm.dossierTemplateItems[index]['passRequired'] = true
+          }
           vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
         })
       } else {
         if (window.$('#file' + data.partNo)[0].files.length === 0) {
@@ -892,7 +900,9 @@ export default {
         vm.dossierTemplateItems.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
-            vm.showAlpacaJSFORM(val)
+            if (!val['loaded']) {
+              vm.showAlpacaJSFORM(val)
+            }
           }
         })
       }

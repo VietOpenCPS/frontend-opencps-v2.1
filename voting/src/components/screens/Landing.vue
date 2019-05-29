@@ -86,6 +86,9 @@ export default {
               }
             })
           }
+        } else if (agencyLength === 1) {
+          vm.govAgencys = agencyList
+          viewListEmployee(vm.govAgencys[0])
         }
       }).catch(xhr => {
       })

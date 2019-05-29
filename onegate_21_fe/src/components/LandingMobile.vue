@@ -67,7 +67,7 @@
         </v-chip>
       </div>
     </v-layout>
-    <v-flex xs12 sm3 class="pl-2 pr-2" v-if="originality === 1 && viewMobile">
+    <v-flex xs12 sm3 class="pl-2 pr-2 mt-2" v-if="originality === 1 && viewMobile">
       <div style="position:relative">
         <v-text-field
           placeholder="Tìm theo mã hồ sơ, tên hồ sơ, tên thủ tục ..."

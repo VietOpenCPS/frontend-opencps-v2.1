@@ -6,9 +6,9 @@
           <v-layout wrap class="text-xs-center">
             <v-flex xs12 class="pr-2">
               <div class="input-custom">
-                <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="submitPass" required="required" />
+                <input id="passCheck" type="text" @focus="show" @keyup.enter="submitPass" required="required" />
                 <span class="bar"></span>
-                <label for="dossierNoKey">Mã tra cứu</label>
+                <label for="passCheck">Mã tra cứu</label>
               </div>
             </v-flex>
           </v-layout>

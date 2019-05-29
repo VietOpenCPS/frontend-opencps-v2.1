@@ -164,7 +164,7 @@
       }
     },
     created () {
-    var vm = this
+      var vm = this
       vm.$nextTick(function () {
         if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
           vm.reportTypeFilter = vm.$route.query.reportType

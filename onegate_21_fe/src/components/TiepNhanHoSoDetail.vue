@@ -172,6 +172,7 @@
 <script>
 
 import toastr from 'toastr'
+import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
@@ -208,6 +209,7 @@ export default {
     inputTypes: [1, 3],
     outputTypes: [2],
     sampleCount: 0,
+    isMobile: false,
     loadingAction: false
   }),
   computed: {
@@ -231,9 +233,31 @@ export default {
       vm.dossierId = vm.id
     })
   },
+  beforeDestroy () {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    this.onResize()
+    window.addEventListener('resize', this.onResize, { passive: true })
+  },
   watch: {
+    isMobile (val) {
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
+    }
   },
   methods: {
+    onResize () {
+      let vm = this
+      let isMobile = window.innerWidth < 1024
+      vm.isMobile = isMobile
+    },
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
