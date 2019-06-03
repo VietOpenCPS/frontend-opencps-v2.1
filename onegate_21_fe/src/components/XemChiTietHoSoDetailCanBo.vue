@@ -133,7 +133,7 @@
             </div>
             <!-- Action button -->
             <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
@@ -151,7 +151,7 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
-                <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -863,6 +863,10 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  beforeDestroy () {
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
+  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
@@ -1334,6 +1338,7 @@ export default {
     },
     btnActionEvent (item, index) {
       let vm = this
+      vm.btnIndex = -1
       vm.itemAction = item
       vm.indexAction = index
       if (item && item.title) {

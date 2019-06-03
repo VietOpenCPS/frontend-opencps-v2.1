@@ -304,7 +304,7 @@
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="getUser('Administrator') && currentQueryState['status'] !== 'deleted'"
+        v-if="getUser('Administrator')"
       >
         DELETE
       </v-btn>
@@ -2529,7 +2529,7 @@ export default {
       if (item.permission) {
        vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
       } else {
-        alert('Bạn không có quyền thao tác với hồ sơ này.')
+        alert('Bạn không có quyền thao tác với hồ sơ này')
       }
     },
     keywordEventChange (data) {

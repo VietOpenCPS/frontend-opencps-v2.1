@@ -225,7 +225,7 @@
                 </v-flex>
               </v-layout>
             </v-card-text>
-            <v-card-text v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
+            <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
               <div class="text-bold text-xs-center label__user_profile">{{user['applicantName']}}</div>
               <div class="text-xs-center label__user_profile pb-2">
                 <a href="javascript:;" style="
@@ -236,7 +236,7 @@
               <div class="text-xs-center label__user_profile">
                 {{user['applicantAddress']}}
               </div>
-              <hr class="my-3" style="
+              <hr class="my-1" style="
                     border: 0;
                     border-top: 1px solid rgba(0,0,0,.1);
                   ">
@@ -264,12 +264,121 @@
         </v-flex>
       </v-layout>
     </v-form>
+    <div class="mt-2 mb-5 pl-1 pr-3" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" style="
+      max-width: 1300px;
+      margin: 0 auto;
+    ">
+      <div class="row-header no__hidden_class">
+        <div class="background-triangle-big">
+          <span>DANH SÁCH GIẤY TỜ ĐÃ NỘP</span>
+        </div>
+      </div>
+      <v-data-table
+        :headers="headers"
+        :items="fileList"
+        hide-actions
+        class="table-landing table-bordered"
+      >
+        <template slot="items" slot-scope="props">
+          <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+            <td class="text-xs-center pt-2" width="50">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{filePage * 15 - 15 + props.index + 1}}</span><br>
+              </div>
+            </td>
+            <td class="text-xs-left pt-2">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.displayName}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left pt-2" @click="viewDetail(props.item)" width="150">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.eForm ? 'Khai trực tuyến' : 'Đính kèm'}}</span>
+              </div>
+            </td>
+            <td class="text-xs-center pt-2" width="170">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>
+                  <span>{{props.item.modifiedDate}}</span>
+                </span>
+              </div>
+            </td>
+            <td class="text-xs-center pt-0" width="170">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <v-btn flat icon color="indigo" class="mr-2" @click="viewFile(props.item)" title="Xem trước">
+                  <v-icon>visibility</v-icon>
+                </v-btn>
+                <v-btn flat icon color="green" class="mr-2" @click="downloadFile(props.item)" title="Tải xuống">
+                  <v-icon>cloud_download</v-icon>
+                </v-btn>
+                <v-btn flat icon color="red" class="" @click="deleteFileApplicant(props.item)" title="Xóa">
+                  <v-icon>delete</v-icon>
+                </v-btn>
+              </div>
+            </td>
+          </tr>
+        </template>
+        <template slot="no-data">
+          <div class="text-xs-center mt-2">
+            Không có giấy tờ nào được tìm thấy
+          </div>
+        </template>
+      </v-data-table>
+      <div class="layout wrap mt-2" style="position: relative;" v-if="totalFileList > 0">
+        <div class="flex pagging-table px-2"> 
+          <tiny-pagination :total="totalFileList" :page="filePage" custom-class="custom-tiny-class" 
+            @tiny:change-page="paggingData" ></tiny-pagination> 
+        </div>
+      </div>
+    </div>
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>{{titleDialogPdf}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
   import Vue from 'vue'
   import AttachedFileAvatar from '../ext/AttachedFileAvatar.vue'
+  import TinyPagination from './Pagination.vue'
   import toastr from 'toastr'
   Vue.use(toastr)
   toastr.options = {
@@ -278,9 +387,13 @@
   }
   export default {
     components: {
-      AttachedFileAvatar
+      AttachedFileAvatar,
+      'tiny-pagination': TinyPagination
     },
     data: () => ({
+      titleDialogPdf: '',
+      dialogPDF: false,
+      dialogPDFLoading: false,
       changePassWordFail: false,
       snackbarsuccess: false,
       oldPassWord: '',
@@ -298,6 +411,76 @@
       cityItems: [],
       districtItems: [],
       wardItems: [],
+      fileList: [
+        {
+          'dossierFileId': 13107,
+          'createDate': '16/05/2019 13:57:51',
+          'modifiedDate': '16/05/2019 14:36:43',
+          'referenceUid': '929240c4-fbeb-c2cd-718e-542556d4c4ad',
+          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
+          'dossierPartNo': 'TP01',
+          'dossierPartType': 1,
+          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
+          'displayName': 'Scan10001.pdf',
+          'fileType': 'pdf',
+          'fileSize': 122297,
+          'fileVersion': 1,
+          'isNew': false,
+          'signCheck': 0,
+          'signInfo': '',
+          'removed': false,
+          'eForm': false,
+          'formData': '{\'LicenceNo\':\'\'}',
+          'formReport': '',
+          'formScript': '',
+          'dossierId': 16509
+        },
+        {
+          'dossierFileId': 14736,
+          'createDate': '24/05/2019 17:23:28',
+          'modifiedDate': '24/05/2019 17:42:08',
+          'referenceUid': '520309a0-2903-4d13-a581-fcff7e6de380',
+          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
+          'dossierPartNo': 'TP01',
+          'dossierPartType': 1,
+          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
+          'displayName': 'Đơn đề nghị cấp lại giấy phép lái tàu có xác nhận của Thủ trưởng đơn vị trực tiếp quản lý theo mẫu quy định',
+          'fileType': 'pdf',
+          'fileSize': 72000,
+          'fileVersion': 1,
+          'isNew': true,
+          'signCheck': 0,
+          'signInfo': '',
+          'removed': false,
+          'eForm': true,
+          'dossierId': 19067
+        },
+        {
+          'dossierFileId': 14408,
+          'createDate': '23/05/2019 17:12:35',
+          'modifiedDate': '23/05/2019 17:40:59',
+          'referenceUid': '38c23ddc-5e64-6bd6-26bd-12c313bc9757',
+          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
+          'dossierPartNo': 'TP01',
+          'dossierPartType': 1,
+          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
+          'displayName': 'New Microsoft Word Document.docx',
+          'fileType': 'docx',
+          'fileSize': 11393,
+          'fileVersion': 1,
+          'isNew': false,
+          'signCheck': 0,
+          'signInfo': '',
+          'removed': false,
+          'eForm': false,
+          'formData': '{\'LicenceNo\':\'\'}',
+          'formReport': '',
+          'formScript': '',
+          'dossierId': 18708
+        }
+      ],
+      totalFileList: 0,
+      filePage: 1,
       item: {
         "model": "classPK",
         'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
@@ -325,7 +508,34 @@
       },
       e1: true,
       e2: true,
-      e3: true
+      e3: true,
+      headers: [
+        {
+          text: 'STT',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Tên giấy tờ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Loại giấy tờ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Ngày tạo',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Thao tác',
+          align: 'center',
+          sortable: false
+        }
+      ]
     }),
     watch: {
       ngayCap(val) {
@@ -334,11 +544,28 @@
       },
       menuBirthDate (val) {
         val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
+      },
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentParams = newRoute.params
+        let currentQuery = newRoute.query
+        if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
+          let filter = {
+            applicantIdNo: vm.user['applicantIdNo'],
+            page: currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+          }
+          vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+            vm.fileList = result.data
+            vm.totalFileList = result.total
+          })
+        }
       }
     },
     created() {
       var vm = this
       vm.$nextTick(function() {
+        let current = vm.$router.history.current
+        let currentQuery = current.query
         vm.user = {}
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
@@ -383,6 +610,14 @@
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
             vm.user['applicantIdDate'] = vm.parseDateInput(vm.user['applicantIdDate'])
+            let filter = {
+              applicantIdNo: vm.user['applicantIdNo'],
+              page: currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+            }
+            vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+              vm.fileList = result.data
+              vm.totalFileList = result.total
+            })
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
@@ -510,6 +745,44 @@
         } else {
           return ''
         }
+      },
+      viewFile (file) {
+        var vm = this
+        vm.titleDialogPdf = file.eForm ? 'Giấy tờ khai trực tuyến' : 'Giấy tờ đính kèm'
+        vm.dialogPDFLoading = true
+        vm.dialogPDF = true
+        document.getElementById('dialogPDFPreview').src = ''
+        vm.$store.dispatch('viewFile', file).then(result => {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPDFPreview').src = result
+        })
+      },
+      downloadFile (file) {
+        let vm = this
+        vm.$store.dispatch('downloadFile', file)
+      },
+      deleteFileApplicant (file) {
+        let vm = this
+        let confirm = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+        if (confirm) {
+          toastr.success('Chức năng đang hoàn thiện. Vui lòng thao tác lại sau.')
+        }
+      },
+      paggingData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
       }
     }
   }

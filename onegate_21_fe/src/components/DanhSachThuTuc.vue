@@ -142,7 +142,7 @@
           <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in domainListRender' :key='index2' :value="true">
             <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
                 <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
-                <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
+                <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}} <span v-if="domainListRender.length > 1"> - {{itemDomain.govAgencyName}}</span> </span>
             </div>
             <v-card>
               <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
@@ -158,13 +158,13 @@
                   <v-flex xs12 sm2 class="text-xs-center">
                     <v-menu left offset-x>
                       <v-btn flat class="mx-0 my-0" slot="activator" small 
-                        @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)"
+                        @click="pullServiceOptions(itemServiceConfig, itemDomain.govAgencyCode)"
                       >
                         Chọn
                       </v-btn>
                       <v-list v-if="serviceOptions.length > 1">
                         <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                          @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
+                          @click="selectServiceOption(itemOption, itemDomain.govAgencyCode, itemServiceConfig)">
                           <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -178,33 +178,40 @@
       </v-card-text>
     </v-card>
     <v-card v-if="activeFilterKey">
-      <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-        <!-- Cap 3 -->
-        <v-layout row wrap>
-          <v-flex xs12 sm9 class="pt-1">
-            <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-            <span>{{itemServiceConfig.serviceInfoName}}</span>
-          </v-flex>
-          <v-flex xs12 sm1 class="text-xs-center pt-1">
-            <span>Mức {{itemServiceConfig.level}}</span>
-          </v-flex>
-          <v-flex xs12 sm2 class="text-xs-center">
-            <v-menu left offset-x>
-              <v-btn flat class="mx-0 my-0" slot="activator" small 
-                @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
-              >
-                Chọn
-              </v-btn>
-              <v-list v-if="serviceOptions.length > 1">
-                <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                  @click="selectServiceOption(itemOption, itemServiceConfig.govAgencyCode, itemServiceConfig)">
-                  <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                </v-list-tile>
-              </v-list>
-            </v-menu>
-          </v-flex>
-        </v-layout>
-      </v-card-text>
+      <div v-if="serviceConfigListRender.length > 0">
+        <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
+          <!-- Cap 3 -->
+          <v-layout row wrap>
+            <v-flex xs12 sm9 class="pt-1">
+              <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
+              <span>{{itemServiceConfig.serviceInfoName}}</span>
+            </v-flex>
+            <v-flex xs12 sm1 class="text-xs-center pt-1">
+              <span>Mức {{itemServiceConfig.level}}</span>
+            </v-flex>
+            <v-flex xs12 sm2 class="text-xs-center">
+              <v-menu left offset-x>
+                <v-btn flat class="mx-0 my-0" slot="activator" small 
+                  @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
+                >
+                  Chọn
+                </v-btn>
+                <v-list v-if="serviceOptions.length > 1">
+                  <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                    @click="selectServiceOption(itemOption, itemServiceConfig.govAgencyCode, itemServiceConfig)">
+                    <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </div>
+      <div v-else class="my-2">
+        <v-alert outline color="warning" icon="priority_high" :value="true">
+          Không có thủ tục nào
+        </v-alert>
+      </div>
     </v-card>
   </div>
 </template>
@@ -247,22 +254,24 @@
         vm.govAgencies = result
         vm.govAgencyRender = vm.govAgencies
         vm.govAgencyList = []
+        vm.domainList = []
+        vm.serviceConfigList = []
         for (let index in vm.govAgencies) {
           let item = {
             govAgencyCode: vm.govAgencies[index]['govAgencyCode'],
             govAgencyName: vm.govAgencies[index]['govAgencyName']
           }
           vm.govAgencyList.push(item)
-          vm.domainList = []
           let itemDomain = vm.govAgencies[index]['domains']
           for (let index2 in itemDomain) {
             let item2 = {
+              govAgencyCode: vm.govAgencies[index]['govAgencyCode'],
+              govAgencyName: vm.govAgencies[index]['govAgencyName'],
               domainCode: itemDomain[index2]['domainCode'],
               domainName: itemDomain[index2]['domainName'],
               serviceConfigs: itemDomain[index2]['serviceConfigs']
             }
             vm.domainList.push(item2)
-            vm.serviceConfigList = []
             let itemServiceConfig = vm.govAgencies[index]['domains'][index2]['serviceConfigs']
             for (let index3 in itemServiceConfig) {
               let item3 = {
@@ -274,10 +283,10 @@
               }
               vm.serviceConfigList.push(item3)
             }
-            vm.serviceConfigListRender = vm.serviceConfigList
           }
-          vm.domainListRender = vm.domainList
         }
+        vm.serviceConfigListRender = vm.serviceConfigList
+        vm.domainListRender = vm.domainList
         // 
         if (String(vm.serviceCode) === '0') {
           vm.filterAndSort()
@@ -323,6 +332,7 @@
         vm.govAgencyFilter = ''
         vm.serviceNameKey = ''
         vm.activeFilterKey = false
+        vm.panelDomainList = [true]
         vm.filterService()
       },
       filterServiceName () {
@@ -335,7 +345,9 @@
         } else {
           vm.govAgencyFilter = ''
           vm.domainFilter = ''
+          vm.serviceNameKey = ''
           vm.activeFilterKey = false
+          vm.filterService()
         }
       },
       filterService () {
@@ -346,7 +358,7 @@
           let queryString = '?'
           newQuery['agency'] = vm.govAgencyFilter
           newQuery['domain'] = vm.domainFilter
-          newQuery['keyword'] = vm.serviceNameKey
+          newQuery['keyword'] = String(vm.serviceNameKey).trim()
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
               queryString += key + '=' + newQuery[key] + '&'
@@ -364,6 +376,9 @@
         let vm = this
         let current = vm.$router.history.current
         let newQuery = current.query
+        if (!newQuery.hasOwnProperty('agency') && !newQuery.hasOwnProperty('domain') && !newQuery.hasOwnProperty('keyword')) {
+          vm.govAgencyRender = vm.govAgencies
+        }
         if (newQuery.hasOwnProperty('agency') && newQuery.agency) {
           vm.govAgencyRender = vm.govAgencies.filter(function (item) {
             return String(item['govAgencyCode']) === newQuery.agency

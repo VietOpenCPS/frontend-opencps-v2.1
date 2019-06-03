@@ -101,9 +101,32 @@
     </div>
     <v-content>
       <router-view></router-view>
-      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
+      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
+      <v-layout class="mt-4" wrap style="max-width:500px;margin: 0 auto" v-if="!isSigned">
+        <v-flex xs12>
+          <v-card flat class="px-2 py-3" style="border: 1px solid #dddddd;">
+            <v-flex xs12 class="primary--text text-bold text-xs-center">
+              VUI LÒNG ĐĂNG NHẬP ĐỂ SỬ DỤNG
+            </v-flex>
+            <v-flex xs12 class="mt-3 text-xs-center">
+              <v-btn
+                @click="doLogin"
+                color="primary"
+                class="mr-2"
+              >
+                <v-icon>input</v-icon>&nbsp;
+                Đăng nhập
+              </v-btn>
+              <v-btn @click="goBack" color="primary">
+                <v-icon>reply</v-icon>&nbsp;
+                Quay lại
+              </v-btn>
+            </v-flex>
+          </v-card>
+        </v-flex>
+      </v-layout>
     </v-content>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </v-app>
@@ -118,7 +141,8 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0
+      detailState: 0,
+      isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
     }),
     computed: {
       currentIndex () {
@@ -301,6 +325,12 @@
           }
           vm.loading = false
         })
+      },
+      doLogin () {
+        window.location.href = window.themeDisplay.getPortalURL()
+      },
+      goBack () {
+        window.history.back()
       }
     }
   }

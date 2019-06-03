@@ -312,8 +312,9 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog">
+              <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog" :loading="loadingAddOther">
                 Quay lại
+                <span slot="loader">Loading...</span>
               </v-btn>
               <v-btn color="primary" flat="flat" @click.native="addOtherTemplate" :loading="loadingAddOther">
                 Đồng ý

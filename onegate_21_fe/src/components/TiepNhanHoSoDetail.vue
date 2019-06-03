@@ -234,6 +234,8 @@ export default {
     })
   },
   beforeDestroy () {
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
     if (typeof window !== 'undefined') {
       window.removeEventListener('resize', this.onResize, { passive: true })
     }
