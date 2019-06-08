@@ -213,14 +213,61 @@
         </v-alert>
       </div>
     </v-card>
+    <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Xác thực người dùng</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_captcha = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formCaptcha" v-model="validCaptcha" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12>
+                <captcha ref="captcha"></captcha>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doCreateDossier"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>done</v-icon> &nbsp;
+            Đồng ý
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click="dialog_captcha = false"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>clear</v-icon> &nbsp;
+            Hủy nộp hồ sơ
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-  
+  import Captcha from './Captcha.vue'
+  import toastr from 'toastr'
+  toastr.options = {
+  'closeButton': true,
+  'timeOut': '3000'
+}
   export default {
     props: ['serviceCode'],
+    components: {
+      'captcha': Captcha
+    },
     data: () => ({
+      dialog_captcha: false,
+      validCaptcha: false,
       govAgencyList: [],
       govAgencyFilter: '',
       domainList: [],
@@ -241,7 +288,8 @@
       govAgencyCodeSelect: '',
       serviceNameKey: '',
       activeFilterKey: false,
-      loadingMutiple: true
+      loadingMutiple: true,
+      dataPostDossier: ''
     }),
     computed: {
       currentIndex () {
@@ -406,6 +454,7 @@
                 vm.panelDomain.push([])
                 vm.panelDomain[key].push(false)
               }
+              vm.panelDomain[0] = [true]
             }
           } else {
             for (let key in vm.govAgencyRender) {
@@ -438,16 +487,23 @@
                 serviceCode: resServiceInfo.serviceCode,
                 govAgencyCode: govAgencyCode,
                 templateNo: result[0].templateNo,
-                originality: vm.getOriginality()
+                originality: vm.getOriginality(),
+                j_captcha_response: ''
               }
-              vm.$store.dispatch('postDossier', data).then(function (result) {
-                vm.loadingAction = false
-                vm.indexAction = -1
-                vm.$router.push({
-                  path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                  query: vm.$router.history.current.query
+              if (!vm.isOffLine) {
+                vm.$store.dispatch('postDossier', data).then(function (result) {
+                  vm.loadingAction = false
+                  vm.indexAction = -1
+                  vm.$router.push({
+                    path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                    query: vm.$router.history.current.query
+                  })
                 })
-              })
+              } else {
+                vm.dataPostDossier = data
+                vm.$refs.captcha.makeImageCap()
+                vm.dialog_captcha = true
+              }
             })
           } else {
             vm.serviceOptionsProcess = result
@@ -470,16 +526,23 @@
             serviceCode: resServiceInfo.serviceCode,
             govAgencyCode: govAgencyCode,
             templateNo: item.templateNo,
-            originality: vm.getOriginality()
+            originality: vm.getOriginality(),
+            j_captcha_response: ''
           }
-          vm.$store.dispatch('postDossier', data).then(function (result) {
-            vm.loadingAction = false
-            vm.indexAction = -1
-            vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-              query: vm.$router.history.current.query
+          if (!vm.isOffLine) {
+            vm.$store.dispatch('postDossier', data).then(function (result) {
+              vm.loadingAction = false
+              vm.indexAction = -1
+              vm.$router.push({
+                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                query: vm.$router.history.current.query
+              })
             })
-          })
+          } else {
+            vm.dataPostDossier = data
+            vm.$refs.captcha.makeImageCap()
+            vm.dialog_captcha = true
+          }
         })
       },
       selectServiceOptionCRD (item, govAgencyCode) {
@@ -501,6 +564,37 @@
               query: vm.$router.history.current.query
             })
           })
+        })
+      },
+      doCreateDossier () {
+        let vm = this
+        vm.$refs.formCaptcha.resetValidation()
+        let captchaInput = vm.$refs.captcha.j_captcha_response
+        if (vm.$refs.formCaptcha.validate()) {
+          vm.dataPostDossier['j_captcha_response'] = captchaInput
+          vm.createDossier(vm.dataPostDossier)
+        }
+      },
+      createDossier (data) {
+        let vm = this
+        vm.$store.dispatch('postDossier', data).then(function (result) {
+          if (result['status'] !== undefined && result['status'] === 203) {
+            vm.loadingAction = false
+            toastr.clear()
+            toastr.error('Mã captcha không chính xác. Vui lòng thử lại')
+            vm.$refs.captcha.makeImageCap()
+          } else {
+            vm.loadingAction = false
+            vm.dialog_captcha = false
+            vm.indexAction = -1
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.data.dossierId + '/NEW',
+              query: vm.$router.history.current.query
+            })
+          }
+        }).catch (function (reject) {
+          toastr.error('Nộp hồ sơ không thành công')
+          vm.$refs.captcha.makeImageCap()
         })
       },
       getColor (level) {

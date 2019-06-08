@@ -104,9 +104,12 @@
                       </span>
                     </span>
                   </v-flex>
-                  <v-flex v-if="showReasign" class="text-xs-right" style="width:100px">
+                  <v-flex v-if="showReasign" class="text-xs-right" style="width:80px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">Phân công lại</span>
+                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
+                        <span v-if="checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
+                        <span v-else>Phân công lại</span>
+                      </span>
                       <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new'">Ủy quyền</span>
                       <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
@@ -482,7 +485,7 @@
                   <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <div v-for="(file, index) in item.payload.files" :key="index">
                     <p v-if="file.dossierFileId" class="history__download__link hover-pointer-download mb-1"
-                      title="Tải file"
+                      title="Tải xuống"
                       style="cursor: pointer;"
                       @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
                       >
@@ -490,7 +493,7 @@
                       <span>{{file.fileName}}</span>
                     </p>
                     <p v-if="file.dossierDocumentId" class="history__download__link hover-pointer-download mb-1"
-                      title="Tải file"
+                      title="Tải xuống"
                       style="cursor: pointer;"
                       @click.prevent.stop="downloadFileDocument(file.dossierReferenceUid ? file.dossierReferenceUid : '')"
                       >
@@ -506,6 +509,7 @@
     </div>
     <!-- plugin ký số -->
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+    <!--  -->
     <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar dark color="primary">
@@ -524,7 +528,7 @@
           :loading="loadingAction"
           :disabled="loadingAction">
             <v-icon>how_to_reg</v-icon> &nbsp;
-            Phân công
+            Đồng ý
             <span slot="loader">Loading...</span>
           </v-btn>
           <v-btn class="mr-3" color="primary" @click.native="dialog_reAsign = false">

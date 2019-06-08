@@ -370,7 +370,7 @@
             })
           }).catch(reject => {
             console.log('run saveForm')
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         } else {
           item['dossierId'] = vm.detailDossier.dossierId
@@ -380,10 +380,10 @@
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
       },
@@ -526,7 +526,7 @@
                 })
               }, 1000)
             }).catch(reject => {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }
         })
@@ -543,7 +543,7 @@
               vm.dossierFilesItems = result
             })
           }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
       },

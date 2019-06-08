@@ -4,6 +4,7 @@
       <div class="background-triangle-big"> 
         <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
         <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
+        <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
         <span v-else>THÊM MỚI HỒ SƠ</span> 
       </div>
       <div class="layout row wrap header_tools row-blue">
@@ -305,17 +306,8 @@ export default {
           }
         }
         vm.thongTinChiTietHoSo = result
-        // call initData thong tin chu ho so
-        // if (result['delegateCityCode'] === '') {
-        //   result['delegateCityCode'] = 25
-        // }
-        // if (result['cityCode'] === '') {
-        //   result['cityCode'] = 25
-        // }
         vm.$refs.thongtinchuhoso.initData(result)
-        // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
-        // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
         if (result.viaPostal > 0) {
           let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
@@ -324,7 +316,6 @@ export default {
             result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
           }
           vm.$store.commit('setDichVuChuyenPhatKetQua', result)
-          // vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
       }).catch(reject => {
       })
@@ -615,10 +606,16 @@ export default {
       let vm = this
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
-      vm.$router.push({
-        path: '/danh-sach-ho-so/' + currentParams.index,
-        query: currentQuery
-      })
+      if (vm.isOffLine) {
+        vm.$router.push({
+          path: '/add-dvc/0'
+        })
+      } else {
+        vm.$router.push({
+          path: '/danh-sach-ho-so/' + currentParams.index,
+          query: currentQuery
+        })
+      }
     }
   }
 }

@@ -268,7 +268,7 @@
       </div>
       <div v-if="!partTypes.includes(2) && originality === 3">
         <v-card>
-          <v-card-text class="py-0">
+          <v-card-text class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
               <v-textarea class="py-0"
               box

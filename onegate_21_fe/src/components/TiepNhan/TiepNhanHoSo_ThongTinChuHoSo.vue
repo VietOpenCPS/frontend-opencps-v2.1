@@ -3,7 +3,7 @@
     <v-form v-model="valid_thongtinchuhoso" ref="formChuHoSo" lazy-validation>
       <div>
         <div style="position: relative;">
-          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl" v-if="!showApplicant">
             <v-expansion-panel-content>
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
@@ -200,7 +200,7 @@
               <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
             </v-radio-group>
           </div>
-          <div style="position: relative;" v-if="originality !== 1">
+          <div style="position: relative;" v-if="originality !== 1  && !showDelegate">
             <v-expansion-panel :value="[true]" expand  class="expansion-pl">
               <v-expansion-panel-content>
                 <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div> Thông tin người nộp hồ sơ</div>
@@ -372,7 +372,7 @@
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <div class="absolute__btn" style="width: 200px;margin-top: 4px;">
+            <div class="absolute__btn" style="width: 200px;margin-top: 4px;" v-if="!showApplicant">
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
@@ -441,6 +441,7 @@ export default {
   components: {
     'suggestions': Suggestions
   },
+  props: ['showApplicant', 'showDelegate'],
   data: () => ({
     valid_thongtinchuhoso: false,
     loadingVerify: false,
@@ -523,6 +524,9 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    forGroupDossier () {
+      return this.$store.getters.getForGroupDossier
     },
     originality () {
       var vm = this
@@ -675,7 +679,6 @@ export default {
               vm.districts = resultDistricts.data
             })
           }
-          console.log('districtCode-----------', data.districtCode)
           if (data.districtCode) {
             vm.$store.getters.getDictItems({
               collectionCode: 'ADMINISTRATIVE_REGION',
@@ -705,6 +708,7 @@ export default {
           }
         }, 200)
       })
+      vm.$refs.formChuHoSo.resetValidation()
     },
     onChangeCity (data) {
       var vm = this
@@ -719,7 +723,7 @@ export default {
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.districts = result.data
         vm.wards = []
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
+        if (vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
           vm.delegateDistricts = result.data
           vm.wards = []
         }
@@ -736,7 +740,7 @@ export default {
       vm.$store.commit('setDistrictVal', data)
       vm.$store.getters.getDictItems(filter).then(function (result) {
         vm.wards = result.data
-        if (vm.thongTinNguoiNopHoSo.sameUser) {
+        if (vm.thongTinNguoiNopHoSo.sameUser || (!vm.thongTinNguoiNopHoSo.sameUser && vm.showApplicant && !vm.showDelegate)) {
           vm.delegateWards = result.data
         }
       })
@@ -944,10 +948,11 @@ export default {
           )
         })
       }
-      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] !== null && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
+      console.log('thongTinNguoiNopHoSo', vm.thongTinNguoiNopHoSo)
+      if (vm.thongTinNguoiNopHoSo['delegateCityCode'] && vm.thongTinNguoiNopHoSo['delegateCityCode'] !== '0') {
         changeCity(vm.thongTinNguoiNopHoSo['delegateCityCode']).then(function () {
           vm.thongTinNguoiNopHoSo['delegateDistrictCode'] = item['districtCode'] ? item['districtCode'] : ''
-          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== null && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== undefined && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== 0 && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
+          if (vm.thongTinNguoiNopHoSo['delegateDistrictCode'] && vm.thongTinNguoiNopHoSo['delegateDistrictCode'] !== '0') {
             changeDistrict(vm.thongTinNguoiNopHoSo['delegateDistrictCode']).then(function () {
               vm.thongTinNguoiNopHoSo['delegateWardCode'] = item['wardCode'] ? item['wardCode'] : ''
             })

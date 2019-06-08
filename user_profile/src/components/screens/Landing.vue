@@ -194,7 +194,17 @@
         <!-- content-right -->
         <v-flex class="xs12 sm4 px-3">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
-            <v-card-text class="pt-3" style="width: 300px;padding: 0;margin: 0 auto;">
+            <v-card-text class="my-0 py-0 px-0">
+              <v-flex xs12 class="text-right" style="height: 30px;">
+                <v-tooltip top v-if="!isFollowZalo">
+                  <div class="zalo-follow-only-button" data-oaid="579745863508352884" data-callback="callbackzalo"
+                    slot="activator" style="width:90px">
+                  </div>
+                  <span>Nhấn Quan tâm để có thể nhận thông báo về tình hình xử lý hồ sơ trên ứng dụng Zalo </span>
+                </v-tooltip>
+              </v-flex>
+            </v-card-text>
+            <v-card-text class="mt-2" style="width: 395px;padding: 0;margin: 0 auto;">
               <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item" :type="'image'"></attached-file-avatar>
             </v-card-text>
             <v-card-text v-if="user['className'] === 'org.opencps.usermgt.model.Employee'">
@@ -264,7 +274,7 @@
         </v-flex>
       </v-layout>
     </v-form>
-    <div class="mt-2 mb-5 pl-1 pr-3" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" style="
+    <div class="mt-2 mb-5" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" style="
       max-width: 1300px;
       margin: 0 auto;
     ">
@@ -278,6 +288,7 @@
         :items="fileList"
         hide-actions
         class="table-landing table-bordered"
+        style="border-left: 1px solid #dedede;"
       >
         <template slot="items" slot-scope="props">
           <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
@@ -377,13 +388,14 @@
 
 <script>
   import Vue from 'vue'
+  import axios from 'axios'
   import AttachedFileAvatar from '../ext/AttachedFileAvatar.vue'
   import TinyPagination from './Pagination.vue'
   import toastr from 'toastr'
   Vue.use(toastr)
   toastr.options = {
     'closeButton': true,
-    'timeOut': '5000'
+    'timeOut': '3000'
   }
   export default {
     components: {
@@ -391,6 +403,10 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      zaloOaId: '402033447373752096333',
+      zaloOaid_token_access: 'ZAK13QrlEIg1fGC4e6myB8Aa0WMkTNj_skCICgqkMXxguJfYoITG4fkwR4ZHCoCOh8WUPOaSS2oaZXTto09N8f2-DK_c95PaYgvhGj8SBXkhX7TFvWqAQ8g6T3RGFJ9AlP95PleE4Jwud4fYmb4MFeRWI6lONZ83_SbLNfvUON31y5zSlJmY1fcXHcxbA3f6mAHk8RakCGdFjMXOZmmH0lEUJKwrE7CqrB0NVBCfR2hFeHjJxHL62y-_U4ozTWK3pUewAfCuTGotWouXSHN_3H-gT3uX',
+      userAppZaloUid: '',
+      isFollowZalo: false,
       titleDialogPdf: '',
       dialogPDF: false,
       dialogPDFLoading: false,
@@ -411,74 +427,7 @@
       cityItems: [],
       districtItems: [],
       wardItems: [],
-      fileList: [
-        {
-          'dossierFileId': 13107,
-          'createDate': '16/05/2019 13:57:51',
-          'modifiedDate': '16/05/2019 14:36:43',
-          'referenceUid': '929240c4-fbeb-c2cd-718e-542556d4c4ad',
-          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
-          'dossierPartNo': 'TP01',
-          'dossierPartType': 1,
-          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
-          'displayName': 'Scan10001.pdf',
-          'fileType': 'pdf',
-          'fileSize': 122297,
-          'fileVersion': 1,
-          'isNew': false,
-          'signCheck': 0,
-          'signInfo': '',
-          'removed': false,
-          'eForm': false,
-          'formData': '{\'LicenceNo\':\'\'}',
-          'formReport': '',
-          'formScript': '',
-          'dossierId': 16509
-        },
-        {
-          'dossierFileId': 14736,
-          'createDate': '24/05/2019 17:23:28',
-          'modifiedDate': '24/05/2019 17:42:08',
-          'referenceUid': '520309a0-2903-4d13-a581-fcff7e6de380',
-          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
-          'dossierPartNo': 'TP01',
-          'dossierPartType': 1,
-          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
-          'displayName': 'Đơn đề nghị cấp lại giấy phép lái tàu có xác nhận của Thủ trưởng đơn vị trực tiếp quản lý theo mẫu quy định',
-          'fileType': 'pdf',
-          'fileSize': 72000,
-          'fileVersion': 1,
-          'isNew': true,
-          'signCheck': 0,
-          'signInfo': '',
-          'removed': false,
-          'eForm': true,
-          'dossierId': 19067
-        },
-        {
-          'dossierFileId': 14408,
-          'createDate': '23/05/2019 17:12:35',
-          'modifiedDate': '23/05/2019 17:40:59',
-          'referenceUid': '38c23ddc-5e64-6bd6-26bd-12c313bc9757',
-          'dossierTemplateNo': 'MAU_B-BGT-284959-TT',
-          'dossierPartNo': 'TP01',
-          'dossierPartType': 1,
-          'fileTemplateNo': 'TP01-B-BGT-284959-TT',
-          'displayName': 'New Microsoft Word Document.docx',
-          'fileType': 'docx',
-          'fileSize': 11393,
-          'fileVersion': 1,
-          'isNew': false,
-          'signCheck': 0,
-          'signInfo': '',
-          'removed': false,
-          'eForm': false,
-          'formData': '{\'LicenceNo\':\'\'}',
-          'formReport': '',
-          'formScript': '',
-          'dossierId': 18708
-        }
-      ],
+      fileList: [],
       totalFileList: 0,
       filePage: 1,
       item: {
@@ -557,6 +506,7 @@
           vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
             vm.fileList = result.data
             vm.totalFileList = result.total
+            vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
           })
         }
       }
@@ -564,11 +514,14 @@
     created() {
       var vm = this
       vm.$nextTick(function() {
+        window.axios = axios
         let current = vm.$router.history.current
         let currentQuery = current.query
         vm.user = {}
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
+          window.callbackzalo = vm.callbackzalo
+          vm.getUserAppZaloInfo()
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
             vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
@@ -617,6 +570,7 @@
             vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
               vm.fileList = result.data
               vm.totalFileList = result.total
+              vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
             })
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
@@ -763,10 +717,76 @@
       },
       deleteFileApplicant (file) {
         let vm = this
-        let confirm = confirm('Bạn có chắc chắn xóa giấy tờ này?')
-        if (confirm) {
-          toastr.success('Chức năng đang hoàn thiện. Vui lòng thao tác lại sau.')
+        let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+        if (x) {
+          vm.$store.dispatch('deleteFileApplicant', file).then(function (result) {
+            toastr.success('Xóa giấy tờ thành công')
+            let current = vm.$router.history.current
+            let newQuery = current.query
+            let filter = {
+              applicantIdNo: vm.user['applicantIdNo'],
+              page: newQuery.hasOwnProperty('page') && newQuery.page ? newQuery.page : 1
+            }
+            vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+              vm.fileList = result.data
+              vm.totalFileList = result.total
+              vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+            })
+          }).catch(function(reject) {
+            toastr.error('Xóa giấy tờ không thành công')
+          })
         }
+      },
+      getUserAppZaloInfo () {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/ZALO_UID'
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            start: -1,
+            end: -1
+          }
+        }
+        window.axios.get(url, config).then(function (response) {
+          if (response.data && response.data.uid) {
+            vm.userAppZaloUid = response.data.uid
+            vm.getZaloIsFollowing(vm.userAppZaloUid)
+          } else {
+            vm.isFollowZalo = false
+          }
+        }).catch(function (error) {
+          vm.getZaloIsFollowing(vm.userAppZaloUid)
+        })
+      },
+      getZaloIsFollowing (uid) {
+        let vm = this
+        let zaloOaToken = vm.zaloOaid_token_access
+        let url = 'https://cors-anywhere.herokuapp.com/https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
+        window.axios.get(url).then(function (response) {
+          console.log(response.data)
+          if (response.data && response.data['user_id']) {
+            vm.isFollowZalo = true
+          }
+          // vm.zaloOaId = response.data.message !== 'Success' ? vm.MSystemConfiguration.configuration.zalo.oaid : ''
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      callbackzalo (responeFromZalo) {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/ZALO_UID'
+        const config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        let params = new URLSearchParams()
+        params.append('value', '{"uid":"' + responeFromZalo.userId + '"}')
+        window.axios.put(url, params, config).then(function (response) {
+        }).catch(function (error) {
+        })
       },
       paggingData (config) {
         let vm = this

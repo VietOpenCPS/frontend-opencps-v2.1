@@ -177,8 +177,7 @@ export const store = new Vuex.Store({
             end: filter.page*15
           }
         }
-        // axios.get('/o/rest/v2/dossiers/applicant/' + filter.applicantIdNo + '/files/search', param).then(function (response) {
-        axios.get('http://hanoi.fds.vn:1580/o/rest/v2/dossiers/17101/applicant/198973124/files/TP01-BNG-270814,TP02,TP03,TP04,TP05,KQ01,KQ03,KQ02/search', param).then(function (response) {
+        axios.get('/o/rest/v2/dossiers/applicant/' + filter.applicantIdNo + '/fileDone/search', param).then(function (response) {
           if (response.data) {
             resolve(response.data)
           } else {
@@ -220,6 +219,21 @@ export const store = new Vuex.Store({
       })
       .catch(function (error) {
         console.log(error)
+      })
+    },
+    deleteFileApplicant ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.delete('/o/rest/v2/dossiers/fileDone/' + data.dossierFileId, param).then(function (response) {
+          resolve(response)
+        })
+        .catch(function (error) {
+          reject(error)
+        })
       })
     }
   },

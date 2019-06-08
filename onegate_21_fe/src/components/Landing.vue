@@ -314,7 +314,6 @@
       >
         Khôi phục hồ sơ
       </v-btn>
-
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -478,6 +477,7 @@
                 <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
+                  :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn.']"
                   placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
@@ -492,13 +492,13 @@
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  placeholder="chọn dịch vụ"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -968,7 +968,7 @@ export default {
     /** */
     thongtinhoso: {},
     dossierId: 0,
-    valid: true,
+    valid: false,
     isCallBack: true,
     trangThaiHoSoList: null,
     listDichVu: [],
@@ -1564,7 +1564,8 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1588,7 +1589,8 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -1784,6 +1786,8 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       // set info buttonConfig
       vm.buttonConfigItem = {}
       vm.buttonConfigItem = item
@@ -1791,7 +1795,7 @@ export default {
       vm.itemAction = item
       // console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      if (String(item.form) === 'NEW') {
+      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           isOpenDialog = false
@@ -1800,7 +1804,18 @@ export default {
           // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
-          vm.doCreateDossier()
+          if (String(item.form) === 'NEW') {
+            vm.doCreateDossier()
+          } else {
+            let queryString = ''
+            let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
+            queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
+            '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
+            console.log('queryString', queryString)
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
+            })
+          }
         }
         // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
@@ -2270,10 +2285,21 @@ export default {
     },
     doSubmitDialogAction (item) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       if (vm.$refs.form.validate()) {
-        // console.log('yes-----')
-        // console.log('item++++++++', item)
-        vm.doCreateDossier()
+        if (String(item.form) === 'NEW') {
+          vm.doCreateDossier()
+        } else {
+          let queryString = ''
+          let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
+          queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
+          '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
+          console.log('queryString', queryString)
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
+          })
+        }
       }
     },
     processPullBtnDynamics (item) {
