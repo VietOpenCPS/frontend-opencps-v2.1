@@ -2,7 +2,7 @@
   <div>
     <div class="row-header no__hidden_class">
       <div class="background-triangle-big">
-        <span>TẠO TỜ KHAI TRỰC TUYẾN</span>
+        <span>TỜ KHAI TRỰC TUYẾN</span>
       </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
@@ -15,13 +15,13 @@
             deletable-chips
             item-value="eFormNo"
             item-text="eFormName"
-            @keyup.enter="filterEform"
+            @keyup.enter="searchEform"
             content-class="adv__search__select"
             return-object
           ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="filterEform">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="searchEform">
             <v-icon size="16">search</v-icon>
           </v-btn>
         </div>
@@ -35,14 +35,57 @@
       <v-card flat color="#fff" v-else>
         <h3 class="py-3 pl-3" style="color: #036edb">{{serviceinfoSelected.serviceName}}</h3>
         <v-flex xs12 class="text-xs-right">
-          <v-btn id="eform-btn" color="primary" @click.stop="postEform()" class="mr-3">
+          <v-btn v-if="!isUpdate" id="eform-btn" color="primary" @click.stop="postEform()" class="mr-3">
             <v-icon color="white">save</v-icon>&nbsp;
             Tạo tờ khai
+          </v-btn>
+          <v-btn v-else id="eform-btn" color="primary" @click.stop="putEform()" class="mr-3">
+            <v-icon color="white">save</v-icon>&nbsp;
+            Cập nhật tờ khai
           </v-btn>
         </v-flex>
         <div id="formAlpacaEform" class="mb-5"></div>
       </v-card>
     </div>
+    <v-flex xs12 class="text-xs-right mt-3">
+      <v-btn color="primary" class="ml-3 white--text" @click="goBack">
+        <v-icon>reply</v-icon> &nbsp;
+        Quay lại
+      </v-btn>
+    </v-flex>
+    <!--  -->
+    <v-dialog v-model="dialogSecret" persistent max-width="400">
+      <v-form v-model="validSecret" ref="formSecret" lazy-validation>
+        <v-card>
+          <v-toolbar flat dark color="primary">
+              <v-toolbar-title>Mã xác thực</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon dark @click.native="dialogSecret = false">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </v-toolbar>
+          <v-card-text>
+            <v-layout row wrap>
+              <v-flex xs12 sm12>
+                <v-text-field
+                box
+                label="Mã xác thực"
+                v-model="secretKey"
+                :rules="[v => !!v || 'Mã xác thực là bắt buộc']"
+                required
+                @keyup.enter="submitSearchEform"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click.native="submitSearchEform">Đồng ý</v-btn>
+            <v-btn color="green darken-1" flat @click.native="() => dialogSecret = false">Thoát</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </div>
 </template>
 
@@ -61,7 +104,11 @@ export default {
   data: () => ({
     serviceInfoList: [],
     eformNoSearch: '',
-    formScriptEform: ''
+    secretKey: '',
+    dialogSecret: false,
+    validSecret: false,
+    isUpdate: false,
+    dataCheck: ''
   }),
   computed: {
     serviceinfoSelected () {
@@ -69,6 +116,9 @@ export default {
     },
     fileTemplateSelected () {
       return this.$store.getters.getFileTemplateSelected
+    },
+    formScriptEform () {
+      return this.$store.getters.getFormScriptEform
     }
   },
   created () {
@@ -76,34 +126,38 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.$store.dispatch('loadFormScript', vm.fileTemplateSelected).then(resFormScript => {
-        vm.$store.commit('setFormScriptEform', resFormScript)
-        if (resFormScript) {
-          let formScript, formData
-          /* eslint-disable */
+      if (vm.fileTemplateSelected) {
+        vm.$store.dispatch('loadFormScript', vm.fileTemplateSelected).then(resFormScript => {
+          vm.$store.commit('setFormScriptEform', resFormScript)
           if (resFormScript) {
-            formScript = eval('(' + resFormScript + ')')
-          } else {
-            formScript = {}
-          }
-          formData = {}
-          /* eslint-disable */
-          formScript.data = formData
-          window.$('#formAlpacaEform').alpaca(formScript)
+            let formScript, formData
+            /* eslint-disable */
+            if (resFormScript) {
+              formScript = eval('(' + resFormScript + ')')
+            } else {
+              formScript = {}
+            }
+            formData = {}
+            /* eslint-disable */
+            formScript.data = formData
+            window.$('#formAlpacaEform').alpaca(formScript)
 
-          setTimeout(function () {
-            let pstEl = $('#formAlpacaEform').offset().top + 100
-            let offsetLeft = $('#eform-btn').offset().left
-            $(window).scroll(function () {
-              if ($(window).scrollTop() > pstEl) {
-                $('#eform-btn').css({'position':'fixed', 'top':0, 'left': `${offsetLeft}px`})
-              } else {
-                $('#eform-btn').css({'position':'relative', 'top':0, 'left': 0})
-              }
-            })
-          }, 300)
-        }
-      })
+            setTimeout(function () {
+              let pstEl = $('#formAlpacaEform').offset().top + 100
+              let offsetLeft = $('#eform-btn').offset().left
+              $(window).scroll(function () {
+                if ($(window).scrollTop() > pstEl) {
+                  $('#eform-btn').css({'position':'fixed', 'top':0, 'left': `${offsetLeft}px`})
+                } else {
+                  $('#eform-btn').css({'position':'relative', 'top':0, 'left': 0})
+                }
+              })
+            }, 300)
+          }
+        })
+      } else {
+        vm.goBack()
+      }
     })
   },
   updated () {
@@ -145,8 +199,44 @@ export default {
     }
   },
   methods: {
-    filterEform () {
+    searchEform () {
       let vm = this
+      if (String(vm.eformNoSearch).length > 3) {
+        vm.dialogSecret = true
+      }
+    },
+    submitSearchEform () {
+      let vm = this
+      if (vm.$refs.formSecret.validate()) {
+        let filter = {
+          eFormNo: vm.eformNoSearch,
+          secret: vm.secretKey
+        }
+        vm.$store.dispatch('getEformSecret', filter).then(function(result) {
+          if (result) {
+            vm.$store.commit('setEformDetail', result)
+            vm.dialogSecret = false
+            window.$('#formAlpacaEform').empty()
+            let formScript, formData
+            /* eslint-disable */
+            if (vm.formScriptEform) {
+              formScript = eval('(' + vm.formScriptEform + ')')
+            } else {
+              formScript = {}
+            }
+            formData = eval('(' + result.eFormData + ')')
+            /* eslint-disable */
+            formScript.data = formData
+            window.$('#formAlpacaEform').alpaca(formScript)
+            vm.isUpdate = true
+            vm.dataCheck = {
+              eFormNo: result.eFormNo,
+              secret: result.secret
+            }
+          }
+        }).catch(function(error) {
+        })
+      }
     },
     postEform () {
       let vm = this
@@ -175,7 +265,42 @@ export default {
         dataCreateEform.append('fileTemplateNo', vm.fileTemplateSelected.fileTemplateNo)
         dataCreateEform.append('email', '')
         axios.post('/o/rest/v2/eforms', dataCreateEform, options).then(function (response) {
-          vm.$store.commit('setEformDetail', response)
+          vm.$store.commit('setEformDetail', response.data)
+          vm.$router.push({
+            path: '/tao-to-khai-thanh-cong',
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }).catch(function (xhr) {
+        })
+      } catch (e) {
+      }
+    },
+    putEform () {
+      let vm = this
+      let options = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      try {
+        let control = window.$('#formAlpacaEform').alpaca('get')
+        let formData = control.getValue()
+        console.log('formData post', formData)
+        let field = window.$('#formAlpacaEform').alpaca('get').childrenByPropertyId
+        if (field) {
+          for (var prop in field) {
+            if (field[prop].isRequired() && field[prop].getValue() === '') {
+              toastr.clear()
+              toastr.error(field[prop].options.placeholder ? field[prop].options.placeholder + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+              return
+            }
+          }
+        }
+        let dataUpdateEform = new URLSearchParams()
+        dataUpdateEform.append('eFormData', JSON.stringify(formData))
+        axios.put('/o/rest/v2/eforms/' + vm.dataCheck.eFormNo + '/password/' + vm.dataCheck.secret, dataUpdateEform, options).then(function (response) {
           vm.$router.push({
             path: '/tao-to-khai-thanh-cong',
             query: {
@@ -189,6 +314,15 @@ export default {
     },
     deleteAlpacaForm () {
       let vm = this
+    },
+    goBack () {
+      let vm = this
+      vm.$router.push({
+        path: '/',
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
     }
   }
 }

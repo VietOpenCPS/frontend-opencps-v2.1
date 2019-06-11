@@ -155,6 +155,44 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    downloadEform ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret + '/report', param).then(function (response) {
+            var url = window.URL.createObjectURL(response.data)
+            window.open(url)
+            // let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+            // let serializable = response.data
+            // saveAs(serializable, fileName)
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getEformSecret ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            }
+          }
+          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (xhr) {
+            toastr.error('Thực hiện thất bại. Vui lòng kiểm tra lại mã tờ khai, mã xác thực.')
+          })
+        })
+      })
     }
   },
   mutations: {

@@ -5,7 +5,7 @@
         <span>DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</span>
       </div>
       <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+        <!-- <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
             v-model="eformNoSearch"
             placeholder="Tìm kiếm tờ khai đã tạo theo mã"
@@ -15,16 +15,16 @@
             deletable-chips
             item-value="eFormNo"
             item-text="eFormName"
-            @keyup.enter="filterEform"
+            @keyup.enter="searchEform"
             content-class="adv__search__select"
             return-object
           ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="filterEform">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="searchEform">
             <v-icon size="16">search</v-icon>
           </v-btn>
-        </div>
+        </div> -->
       </div> 
     </div>
     <v-card flat class="mt-3">
@@ -38,8 +38,8 @@
             <v-card>
               <v-card-text class="card__text__gov" v-for='(itemTemplate, index2) in item.templateList' :key='index2'>
                 <v-layout row wrap>
-                  <v-flex xs12 sm10 class="pt-1 primary--text">
-                    <span style="font-weight: bold">{{index2 + 1}}.</span> &nbsp;
+                  <v-flex xs12 sm10 class="pt-1 primary--text text-bold" @click="selectTemplate(index, itemTemplate, item)" style="cursor: pointer">
+                    <span>{{index2 + 1}}.</span> &nbsp;
                     <span>{{itemTemplate.templateName}}</span>
                   </v-flex>
 
@@ -159,6 +159,8 @@ export default {
           renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
         }
       })
+    },
+    searchEform () {
     },
     goBack () {
       window.history.back()
