@@ -4,10 +4,13 @@ import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
 import DanhSachChoTiepNhan from '@/components/screens/DanhSachChoTiepNhan'
 import DieuHanhXepHang from '@/components/screens/DieuHanhXepHang'
-
+import LaySoTuDong from '@/components/screens/LaySoTuDong'
+import Landing from '@/components/screens/Landing'
 const routes = [
+  { path: '/', name: 'Landing', component: Landing, props: true },
   { path: '/danh-sach-cho-tiep-nhan', name: 'DanhSachChoTiepNhan', component: DanhSachChoTiepNhan, props: true },
   { path: '/dieu-hanh-xep-hang', name: 'DieuHanhXepHang', component: DieuHanhXepHang, props: true },
+  { path: '/lay-so-tu-dong', name: 'LaySoTuDong', component: LaySoTuDong, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

@@ -13,6 +13,11 @@ export const store = new Vuex.Store({
     initData: {},
     endPoint: '/o/rest/v2',
     // endPoint: 'http://127.0.0.1:8081/api',
+    serviceinfoSelected: '',
+    fileTemplateSelected: '',
+    formScriptEform: '',
+    formDataEform: '',
+    eformDetail: '',
     loading: false,
     index: 0,
     agencyList: [],
@@ -41,99 +46,12 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
-    getGovAgency ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            },
-            params: {
-              sort: 'siblingSearch'
-            }
-          }
-          axios.get(state.endPoint + '/serviceinfos/statistics/agencies', param).then(function (response) {
-            let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
-          }).catch(function (xhr) {
-            console.log(xhr)
-          })
-        })
-      })
-    },
-    getDomain ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            },
-            params: {
-              agency: data.agencyCode,
-              sort: 'siblingSearch'
-            }
-          }
-          axios.get(state.endPoint + '/serviceinfos/statistics/domains', param).then(function (response) {
-            let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
-          }).catch(function (xhr) {
-            console.log(xhr)
-          })
-        })
-      })
-    },
-    getLevelList ({commit, state}, data) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: state.initData.groupId
-            }
-          }
-          axios.get(state.endPoint + '/serviceinfos/statistics/levels', param).then(function (response) {
-            let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
-              for (let key in dataReturn) {
-                dataReturn[key]['levelName'] = 'Mức độ ' + dataReturn[key].level
-              }
-              resolve(dataReturn)
-            } else {
-              resolve([])
-            }
-          }).catch(function (error) {
-            console.log(error)
-            reject(error)
-          })
-        })
-      })
-    },
     getServiceLists ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let paramGet = {
             start: filter.page * 15 - 15,
-            end: filter.page * 15,
-            administration: filter.administration ? filter.administration : '',
-            keyword: filter.keyword ? filter.keyword : '',
-            level: filter.level ? filter.level : 0,
-            domain: filter.domain ? filter.domain : '',
-            sort: ''
-          }
-          if (filter.domain) {
-            paramGet.sort = "siblingSearch"
-          } else {
-            paramGet.sort = "siblingDomain"
+            end: filter.page * 15
           }
           let param = {
             headers: {
@@ -168,6 +86,75 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getFileTemplateEform ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              eForm: true
+            }
+          }
+          axios.get(state.endPoint + '/serviceinfos/' + filter.serviceInfoId + '/filetemplates', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    loadFormScript ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          $.ajax({
+            url: '/o/rest/v2/serviceinfos/' + data.serviceInfoId + '/filetemplates/' + data.fileTemplateNo + '/formscript',
+            type: 'GET',
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            dataType: 'text',
+            success: function (result) {
+              let serializable = result
+              resolve(serializable)
+            },
+            error: function (xhr) {
+              console.log(xhr)
+              resolve(xhr)
+              reject(xhr)
+            }
+          })
+        })
+      })
+    },
+    loadFormData ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          $.ajax({
+            url: '/o/rest/v2/serviceinfos/' + data.serviceInfoId + '/filetemplates/' + data.fileTemplateNo + '/formreport',
+            type: 'GET',
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            dataType: 'text',
+            success: function (result) {
+              let serializable = result
+              resolve(serializable)
+            },
+            error: function (xhr) {
+              console.log(xhr)
+              resolve(xhr)
+              reject(xhr)
+            }
+          })
+        })
+      })
     }
   },
   mutations: {
@@ -177,17 +164,20 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
-    setAgencyList (state, payload) {
-      state.agencyList = payload
+    setServiceinfoSelected (state, payload) {
+      state.serviceinfoSelected = payload
     },
-    setDomainList (state, payload) {
-      state.domainList = payload
+    setFormScriptEform (state, payload) {
+      state.formScriptEform = payload
     },
-    setLevelList (state, payload) {
-      state.levelList = payload
+    setFormDataEform (state, payload) {
+      state.formDataEform = payload
     },
-    setIsMobile (state, payload) {
-      state.isMobile = payload
+    setFileTemplateSelected (state, payload) {
+      state.fileTemplateSelected = payload
+    },
+    setEformDetail (state, payload) {
+      state.eformDetail = payload
     }
   },
   getters: {
@@ -197,17 +187,20 @@ export const store = new Vuex.Store({
     index (state) {
       return state.index
     },
-    getAgencyList (state) {
-      return state.agencyList
+    getServiceinfoSelected (state) {
+      return state.serviceinfoSelected
     },
-    getDomainList (state) {
-      return state.domainList
+    getFormScriptEform (state) {
+      return state.formScriptEform
     },
-    getLevelList (state) {
-      return state.levelList
+    getFormDataEform (state) {
+      return state.formDataEform
     },
-    getIsMobile (state) {
-      return state.isMobile
+    getFileTemplateSelected (state, payload) {
+      return state.fileTemplateSelected
+    },
+    getEformDetail (state, payload) {
+      return state.eformDetail
     }
   }
 })

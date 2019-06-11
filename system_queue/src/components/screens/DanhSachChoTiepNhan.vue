@@ -6,42 +6,44 @@
         <h1 style="font-size:34px; color: #ffffff" class="text-bold">CỤC LÃNH SỰ</h1>
       </div>
     </v-flex>
-    <v-flex xs12 class="text-xs-center" style="margin-top: 20px">
+    <v-flex xs12 class="text-xs-center" style="margin-top: 20px; margin-bottom: 40px">
       <h1 style="font-size:32px; color: yellow" class="text-bold">DANH SÁCH XẾP HÀNG NỘP HỒ SƠ</h1>
     </v-flex>
-    <v-data-table
-      id="table-danhsachcho"
-      :headers="headers"
-      :items="applicantList"
-      hide-actions
-      class="table-landing table-bordered mx-5"
-      style="border-left: 1px solid #dedede; margin-top: 30px;"
-    >
-      <template slot="items" slot-scope="props">
-        <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-          <td class="text-xs-center text-bold py-2" width="150px">
-            <div>
-              <span>{{props.index + 1}}</span><br>
-            </div>
-          </td>
-          <td class="text-xs-center text-bold py-2" style="letter-spacing:2px" width="300px">
-            <div>
-              <span>{{props.item.formCode}}</span>
-            </div>
-          </td>
-          <td class="text-xs-left text-bold py-2 px-5" style="letter-spacing:2px; word-spacing:2px">
-            <div style="text-transform: uppercase">
-              <span>{{props.item.applicantName}}</span>
-            </div>
-          </td>
-          <td class="text-xs-center text-bold py-2" style="letter-spacing:2px;color:#1867c0;font-weight:600;font-size: 36px !important;" width="150px">
-            <div>
-              <span>{{props.item.counter}}</span>
-            </div>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <v-layout wrap>
+      <v-flex class="column-danhsachcho">
+        <v-flex xs12 class="text-xs-center title mx-4 py-3" style="min-height:100px">
+          <h1 style="font-size:32px; color: white;" class="text-bold">THÔNG BÁO</h1>
+        </v-flex>
+        <v-flex xs12 class="text-xs-center title mx-4 py-3" style="min-height:2000px;border-bottom:2px solid #d3d3d3">
+
+        </v-flex>
+      </v-flex>
+      <v-flex class="column-danhsachcho">
+        <v-flex xs12 class="text-xs-center title mx-4 py-3">
+          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        </v-flex>
+        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
+      </v-flex>
+      <v-flex class="column-danhsachcho">
+        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
+          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        </v-flex>
+        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
+      </v-flex>
+      <v-flex class="column-danhsachcho">
+        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
+          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        </v-flex>
+        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
+      </v-flex>
+      <v-flex class="column-danhsachcho">
+        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
+          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        </v-flex>
+        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
+      </v-flex>
+      
+    </v-layout>
   </v-card>
 </template>
 
@@ -51,12 +53,12 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import support from '../../store/support.json'
-import TinyPagination from './Pagination.vue'
+import TableChoTiepNhan from './TableChoTiepNhan.vue'
 Vue.use(toastr)
 export default {
   props: [],
   components: {
-    'tiny-pagination': TinyPagination
+    'table-cho-tiep-nhan': TableChoTiepNhan
   },
   data: () => ({
     applicantList: [
@@ -120,32 +122,6 @@ export default {
         formCode: 123548123,
         applicantName: 'Trần Đức Lương'
       }
-    ],
-    headers: [
-      {
-        text: 'THỨ TỰ',
-        align: 'center',
-        sortable: false,
-        class: 'py-3'
-      },
-      {
-        text: 'MÃ TỜ KHAI',
-        align: 'center',
-        sortable: false,
-        class: 'py-3'
-      },
-      {
-        text: 'NGƯỜI NỘP HỒ SƠ',
-        align: 'center',
-        sortable: false,
-        class: 'py-3'
-      },
-      {
-        text: 'BÀN SỐ',
-        align: 'center',
-        sortable: false,
-        class: 'py-3'
-      }
     ]
   }),
   computed: {
@@ -158,6 +134,10 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
+      $('header').css('display','none')
+      $('#banner').css('display','none')
+      $('.navbar-container').css('display','none')
+      $('#footer').css('display','none')
       vm.getDanhSachCho()
     })
   },

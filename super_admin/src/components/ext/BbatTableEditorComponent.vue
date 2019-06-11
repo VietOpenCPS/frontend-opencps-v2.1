@@ -637,19 +637,22 @@
         if (item.hasOwnProperty('concatina')) {
           vm.pullOk = false
           vm.pullCounter = vm.pullCounter + 1
-          vm.$socket.sendObj(
-            {
-              type: 'api',
-              cmd: 'get',
-              respone: item.concatina['datasource_key'],
-              api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
-              headers: {
-                'Token': vm.getAuthToken(),
-                'groupId': vm.getScopeGroupId(),
-                'USER_ID': vm.getUserId()
+          // comment send login user
+          if (item.concatina['datasource_key'] !== 'loginUser') {
+            vm.$socket.sendObj(
+              {
+                type: 'api',
+                cmd: 'get',
+                respone: item.concatina['datasource_key'],
+                api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
+                headers: {
+                  'Token': vm.getAuthToken(),
+                  'groupId': vm.getScopeGroupId(),
+                  'USER_ID': vm.getUserId()
+                }
               }
-            }
-          )
+            )
+          }
         }
       },
       processDataSourceVerify () {
@@ -672,19 +675,22 @@
             if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
               apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']
             }
-            vm.$socket.sendObj(
-              {
-                type: 'api',
-                cmd: 'get',
-                respone: vm.detailForm[key]['datasource_key'],
-                api: apiURL,
-                headers: {
-                  'Token': vm.getAuthToken(),
-                  'groupId': vm.getScopeGroupId(),
-                  'USER_ID': vm.getUserId()
+            // comment send login user
+            if (vm.detailForm[key]['datasource_key'] !== 'loginUser') {
+              vm.$socket.sendObj(
+                {
+                  type: 'api',
+                  cmd: 'get',
+                  respone: vm.detailForm[key]['datasource_key'],
+                  api: apiURL,
+                  headers: {
+                    'Token': vm.getAuthToken(),
+                    'groupId': vm.getScopeGroupId(),
+                    'USER_ID': vm.getUserId()
+                  }
                 }
-              }
-            )
+              )
+            }
           }
         }
       },

@@ -2,12 +2,13 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import DetailForward from '@/components/blacklist/DetailForward'
 import NotFound from '@/components/NotFound'
-import LandingServiceInfo from '@/components/screens/Landing'
-import ChiTietThuTuc from '@/components/screens/ChiTietThuTuc'
-
+import Landing from '@/components/screens/Landing'
+import ChiTietToKhai from '@/components/screens/ChiTietToKhai'
+import TaoFormThanhCong from '@/components/screens/TaoFormThanhCong'
 const routes = [
-  { path: '/thu-tuc-hanh-chinh', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
-  { path: '/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
+  { path: '/', name: 'Landing', component: Landing, props: true },
+  { path: '/thong-tin-to-khai', name: 'ChiTietToKhai', component: ChiTietToKhai, props: true },
+  { path: '/tao-to-khai-thanh-cong', name: 'TaoFormThanhCong', component: TaoFormThanhCong, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

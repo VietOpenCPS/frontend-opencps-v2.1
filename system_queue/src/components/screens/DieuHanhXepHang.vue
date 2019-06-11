@@ -1,11 +1,80 @@
 <template>
-  <div id="contain-dhxh">
-    <v-card flat color="#1867c0" class="py-4" style="height: 100px;">
-      <v-flex xs12 class="text-xs-center">
-        <h1 style="font-size:36px; color: #ffffff" class="text-bold">HỆ THỐNG XẾP HÀNG TỰ ĐỘNG</h1>
+  <v-card id="contain-dhxh" flat color="#1867c0">
+    <v-flex xs12 class="header_login text-xs-center pt-3">
+      <div class="logo d-inline-block">
+        <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png"> 
+        <h1 style="font-size:34px; color: #ffffff" class="text-bold">CỤC LÃNH SỰ</h1>
+      </div>
+    </v-flex>
+    <v-flex xs12 class="text-xs-center">
+      <h1 style="font-size:32px; color: yellow" class="text-bold">
+        BẢNG ĐIỀU HÀNH XẾP HÀNG
+      </h1>
+    </v-flex>
+    <v-layout wrap class="mt-5" style="height: calc(100vh - 320px)">
+      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
+        <div class="py-3">
+          <div class="mb-4" style="border-bottom:2px solid #ffff">
+            <span class="text-bold">BÀN SỐ</span> <br>
+            <v-avatar color="white" class="mt-3 mb-4">
+              <span class="red--text headline text-bold">1</span>
+            </v-avatar>
+          </div>
+          <div class="d-inline-block mb-2 text-bold">
+            <span>198378312</span> 
+          </div>
+          <br>
+          <span class="text-bold">Trần Văn Duẩn</span>
+        </div>
       </v-flex>
-    </v-card>
-    <v-layout wrap style="height: calc(100vh - 100px)">
+      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
+        <div class="py-3">
+          <div class="mb-4" style="border-bottom:2px solid #ffff">
+            <span class="text-bold">BÀN SỐ</span> <br>
+            <v-avatar color="white" class="mt-3 mb-4">
+              <span class="red--text headline text-bold">2</span>
+            </v-avatar>
+          </div>
+          <div class="d-inline-block mb-2 text-bold">
+            <span>198378312</span> 
+          </div>
+          <br>
+          <span class="text-bold">Trần Văn Duẩn</span>
+        </div>
+      </v-flex>
+      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
+        <div class="py-3">
+          <div class="mb-4" style="border-bottom:2px solid #ffff">
+            <span class="text-bold">BÀN SỐ</span> <br>
+            <v-avatar color="white" class="mt-3 mb-4">
+              <span class="red--text headline text-bold">3</span>
+            </v-avatar>
+          </div>
+          <div class="d-inline-block mb-2 text-bold">
+            <span>-- -- --</span> 
+          </div>
+          <br>
+          <span class="text-bold">-- -- --</span>
+        </div>
+      </v-flex>
+      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
+        <div class="py-3">
+          <div class="mb-4" style="border-bottom:2px solid #ffff">
+            <span class="text-bold">BÀN SỐ</span> <br>
+            <v-avatar color="white" class="mt-3 mb-4">
+              <span class="red--text headline text-bold">4</span>
+            </v-avatar>
+          </div>
+          <div class="d-inline-block mb-2 text-bold">
+            <span>198378312</span> 
+          </div>
+          <br>
+          <span class="text-bold">Trần Văn Duẩn</span>
+        </div>
+      </v-flex>
+    </v-layout>
+
+    <!-- <v-layout wrap style="height: calc(100vh - 100px)">
       <v-flex>
         <v-data-table
           id="table-dieuhanhxephang"
@@ -47,17 +116,9 @@
             <h1 style="font-size:34px; color: #1867c0" class="text-bold">CỤC LÃNH SỰ</h1>
           </div>
         </div>
-        <!-- <div style="width:100%;height:auto;display: table;">
-          <div style="display: table-cell;
-            text-align: center;
-            vertical-align: middle;">
-            <span>LƯỢT CHỜ: </span>
-            <span>25</span>
-          </div>
-        </div> -->
       </v-flex>
-    </v-layout>
-  </div>
+    </v-layout> -->
+  </v-card>
 </template>
 
 <script>
@@ -66,12 +127,10 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import support from '../../store/support.json'
-import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {
   props: [],
   components: {
-    'tiny-pagination': TinyPagination
   },
   data: () => ({
     rowHeight: 70,
@@ -95,11 +154,6 @@ export default {
         gateNumber: '04',
         eFormNo: '1981225',
         applicantName: 'Vũ Đình Huy'
-      },
-      {
-        gateNumber: '05',
-        eFormNo: '1954211',
-        applicantName: 'Trịnh Công Trình'
       }
     ],
     headers: [
@@ -133,6 +187,10 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
+      $('header').css('display','none')
+      $('#banner').css('display','none')
+      $('.navbar-container').css('display','none')
+      $('#footer').css('display','none')
       vm.rowHeight = ($( window ).height() - 187) / vm.queueList.length
     })
   },

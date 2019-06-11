@@ -764,14 +764,25 @@
         let vm = this
         let zaloOaToken = vm.zaloOaid_token_access
         let url = 'https://cors-anywhere.herokuapp.com/https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
-        window.axios.get(url).then(function (response) {
-          console.log(response.data)
-          if (response.data && response.data['user_id']) {
-            vm.isFollowZalo = true
+        // window.axios.get(url).then(function (response) {
+        //   console.log(response.data)
+        //   if (response.data && response.data['user_id']) {
+        //     vm.isFollowZalo = true
+        //   }
+        //   // vm.zaloOaId = response.data.message !== 'Success' ? vm.MSystemConfiguration.configuration.zalo.oaid : ''
+        // }).catch(function (error) {
+        //   console.log(error)
+        // })
+        // 
+        $.ajax({
+          url: url,
+          method: 'GET',
+          success: function(data){
+            console.log(data)
+            if (data['user_id']) {
+              vm.isFollowZalo = true
+            }
           }
-          // vm.zaloOaId = response.data.message !== 'Success' ? vm.MSystemConfiguration.configuration.zalo.oaid : ''
-        }).catch(function (error) {
-          console.log(error)
         })
       },
       callbackzalo (responeFromZalo) {
