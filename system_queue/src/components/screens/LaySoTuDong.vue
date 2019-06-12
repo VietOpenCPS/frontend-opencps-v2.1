@@ -32,7 +32,7 @@
       </v-flex>
       <v-flex v-if="isActive" xs12 class="mt-3 text-xs-center" style="color:yellow">
         <span>
-          Tờ khai của quý khách đã được tiếp nhận
+          Thông tin của quý khách đã được tiếp nhận
         </span><br>
         <span>
           Vui lòng đợi gọi tên để được xử lý. Xin cảm ơn!
@@ -40,10 +40,10 @@
       </v-flex>
       <v-flex v-else xs12 class="mt-3 text-xs-center" style="color:yellow">
         <span>
-          Xin mời quý khách xác nhận tờ khai trực tuyến để xếp hàng 
+          Xin mời quý khách quét mã vạch để đăng ký xếp hàng 
         </span><br>
         <span>
-          Please confirm your booking online here to do
+          Please scan barcode here to do
         </span>
       </v-flex>
     </v-layout>
@@ -92,19 +92,47 @@ export default {
     submitQueue () {
       let vm = this
       if (String(vm.eformInformation).indexOf('-') > 0) {
-        let filter = {
-          eformNo: vm.eformInformation.split('-')[0],
+        let keySearch = vm.eformInformation.split('-')
+        let filterBooking = {
+          className: '',
+          classPK: '',
+          serviceCode: '',
+          gateNumber: '',
           state: 1
         }
-        vm.$store.dispatch('updateStateEform', filter).then(function (result) {
-          vm.isActive = true
-          setTimeout(function() {
-            vm.isActive = false
-            vm.eformInformation = ''
-          }, 5000)
-        }).catch (function (reject) {
-        })
+        if (keySearch[0] === 'E') {
+          let filterEform = {
+            eFormId: keySearch[2]
+          }
+          vm.$store.dispatch('getEform', filterEform).then(function (result) {
+            filterBooking.className = 'eform'
+            filterBooking.classPK = result.eFormId
+            filterBooking.serviceCode = result.serviceCode
+            vm.createBooking()
+          })
+        } else if (keySearch[1] === 'D') {
+          let filterDossier = {
+            dossierId: keySearch[2]
+          }
+          vm.$store.dispatch('getDossier', filterDossier).then(function (result) {
+            filterBooking.className = 'dossier'
+            filterBooking.classPK = result.dossierId
+            filterBooking.serviceCode = result.serviceCode
+            vm.createBooking()
+          })
+        }
       }
+    },
+    createBooking () {
+      let vm = this
+      vm.$store.dispatch('createBooking', filter).then(function (result) {
+        vm.isActive = true
+        setTimeout(function() {
+          vm.isActive = false
+          vm.eformInformation = ''
+        }, 5000)
+      }).catch (function (reject) {
+      })
     }
   }
 }

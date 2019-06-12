@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_system_queue_calling" style="border: 1px solid #dedede;max-width:1300px;margin:0 auto">
-    <v-navigation-drawer app clipped floating width="265" v-if="!isMobile">
+    <!-- <v-navigation-drawer app clipped floating width="265" v-if="!isMobile">
       <v-list class="py-0">
         <v-list-group
           v-for="(item, index) in menuServiceInfos"
@@ -21,7 +21,7 @@
           </v-list-tile>
         </v-list-group>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -35,14 +35,6 @@
       active: null,
       activeAll: false,
       activeTab: 0,
-      pathRouter: '/thu-tuc-hanh-chinh',
-      currentAgency: '',
-      currentDomain: '',
-      currentLevel: '',
-      currentMethod: '',
-      countAllService: 0,
-      isDetail: false,
-      text: '',
       menuServiceInfos: [
         {
           id: 1,
@@ -70,18 +62,6 @@
     computed: {
       currentIndex () {
         return this.$store.getters.index
-      },
-      govAgencyList () {
-        return this.$store.getters.getAgencyList
-      },
-      domainList () {
-        return this.$store.getters.getDomainList
-      },
-      levelList () {
-        return this.$store.getters.getLevelList
-      },
-      isMobile () {
-        return this.$store.getters.getIsMobile
       }
     },
     beforeDestroy () {
@@ -98,48 +78,6 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        vm.$store.dispatch('getGovAgency').then(function (result) {
-          vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-          vm.menuServiceInfos[0].children = result
-          vm.$store.commit('setAgencyList', result)
-          if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
-          (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
-          ) {
-            vm.currentAgency = vm.govAgencyList[0].administrationCode
-            let queryString = '?'
-            newQuery['page'] = 1
-            newQuery['agency'] = vm.govAgencyList[0].administrationCode
-            for (let key in newQuery) {
-              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-                queryString += key + '=' + newQuery[key] + '&'
-              }
-            }
-            vm.$router.push({
-              path: vm.pathRouter + queryString,
-              query: {
-                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              }
-            })
-          } else {
-            vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
-          }
-        })
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.menuServiceInfos[1].children = result
-          vm.$store.commit('setDomainList', result)
-          vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-        })
-        vm.$store.dispatch('getLevelList').then(function (result) {
-          vm.menuServiceInfos[2].children = result
-          vm.$store.commit('setLevelList', result)
-          vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
-        })
-        vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
-        vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
-        vm.getCountAll()
       })
     },
     watch: {
@@ -172,19 +110,6 @@
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
-        })
-      },
-      getCountAll () {
-        let vm = this
-        let filter = {
-          page: 1
-        }
-        vm.$store.dispatch('getServiceLists', filter).then(function (result) {
-          if (result.data) {
-            vm.countAllService = result.total
-            console.log('countAllService', vm.countAllService)
-          }
-        }).catch(reject => {
         })
       },
       goBack () {

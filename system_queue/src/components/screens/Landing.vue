@@ -10,22 +10,22 @@
       <h1 style="font-size:32px; color: yellow" class="text-bold">ĐIỀU KHIỂN HỆ THỐNG HIỂN THỊ</h1>
     </v-flex>
     <v-layout wrap style="font-size:24px; color: white;max-width:1200px;margin: 0 auto">
-      <v-flex xs3 class="text-xs-center" @click="goTo(1)">
+      <v-flex xs4 class="text-xs-center" @click="goTo(1)">
         <img :src="'/documents/' + groupId + '/0/layso.png'" alt="" width="250px" height="150px">
         <div class="mt-2">LẤY SỐ XẾP HÀNG</div>
       </v-flex>
-      <v-flex xs3 class="text-xs-center" @click="goTo(2)">
+      <v-flex xs4 class="text-xs-center" @click="goTo(2)">
         <img :src="'/documents/' + groupId + '/0/danhsachcho.png'" alt="" width="250px" height="150px">
         <div class="mt-2">DANH SÁCH CHỜ</div>
       </v-flex>
-      <v-flex xs3 class="text-xs-center"  @click="goTo(3)">
+      <v-flex xs4 class="text-xs-center"  @click="goTo(3)">
         <img :src="'/documents/' + groupId + '/0/dhxh.png'" alt="" width="250px" height="150px">
         <div class="mt-2">SỐ ĐANG TIẾP NHẬN</div>
       </v-flex>
-      <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
+      <!-- <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
         <img :src="'/documents/' + groupId + '/0/kios.png'" alt="" width="250px" height="150px">
         <div class="mt-2">KIOSK TRA CỨU</div>
-      </v-flex>
+      </v-flex> -->
     </v-layout>
   </v-card>
 </template>

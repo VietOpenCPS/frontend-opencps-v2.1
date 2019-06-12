@@ -64,6 +64,50 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getEform ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/eforms/' + filter.eFormId, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getDossier ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/dossiers/' + filter.dossierId, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getThongTinXepHang ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -85,7 +129,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    updateStateEform ({commit, state}, filter) {
+    createBooking ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -93,10 +137,13 @@ export const store = new Vuex.Store({
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             }
           }
-          let dataUpdateEform = new URLSearchParams()
-          dataUpdateEform.append('state', filter.state)
-          dataUpdateEform.append('gateNumber', '')
-          axios.put('/o/rest/eforms/' + filter.eformNo, dataUpdateEform, param).then(function (response) {
+          let dataCreateBooking = new URLSearchParams()
+          dataCreateBooking.append('className', filter.className)
+          dataCreateBooking.append('classPK', filter.classPK)
+          dataCreateBooking.append('serviceCode', filter.serviceCode)
+          dataCreateBooking.append('state', filter.state)
+          dataCreateBooking.append('gateNumber', '')
+          axios.post('/o/rest/bookings', dataCreateBooking, param).then(function (response) {
             resolve(response)
           }).catch(function (xhr) {
             reject(xhr)
