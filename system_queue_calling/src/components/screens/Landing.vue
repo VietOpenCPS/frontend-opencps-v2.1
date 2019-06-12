@@ -1,24 +1,24 @@
 <template>
-  <v-card flat color="#ffffff" class="pt-3">
+  <v-card flat color="#ffffff" class="pt-2">
     <v-flex xs12 class="text-xs-center" id="nav-calling">
-      <v-chip class="text-bold" color="#3fa8f1" text-color="white" style="width:170px;height:42px;font-size: 22px;position:absolute;top:20px;left:10px">
+      <v-chip class="text-bold" color="#3fa8f1" text-color="white" style="width:170px;height:42px;font-size: 22px;position:absolute;top:10px;left:10px">
         <v-avatar class="pl-3">
           <v-icon color="white"> chrome_reader_mode</v-icon>
         </v-avatar>
         <span class="pl-2" v-if="!currentCounter">BÀN SỐ ---</span>
         <span class="pl-2" v-else>BÀN SỐ {{currentCounter}}</span>
       </v-chip>
-      <h1 style="font-size:24px; color: #11558e" class="text-bold">HỆ THỐNG GỌI SỐ TỰ ĐỘNG</h1>
+      <h1 style="font-size:24px; color: #11558e" class="text-bold my-0">HỆ THỐNG GỌI SỐ TỰ ĐỘNG</h1>
       <v-flex xs12 class="text-xs-center" style="position: relative;">
         <div class="d-inline-block">
           <div class="d-inline-block">
             <h1 class="my-2" style="color: green">SỐ ĐANG GỌI</h1>
             <v-chip class="d-inline-block text-xs-center pt-2" label color="#3fa8f1" text-color="white" style="width:200px;height:70px;font-size:32px;color:#ffffff">
-              <span v-if="currentApplicant">{{currentApplicant.formCode}}</span>
+              <span v-if="currentBooking">{{currentBooking.formCode}}</span>
               <span v-else>-- -- --</span>
             </v-chip>
           </div>
-          <div v-if="currentApplicant" class="d-inline-block ml-3" style="position: absolute;top:50px">
+          <div v-if="currentBooking" class="d-inline-block ml-3" style="position: absolute;top:50px">
             <v-btn
               :loading="loadingCalling"
               :disabled="loadingCalling"
@@ -69,7 +69,7 @@
     <v-data-table
       id="table-danhsachchoMC"
       :headers="headers"
-      :items="applicantList"
+      :items="bookingList"
       hide-actions
       class="mt-2"
       style="border-left: 1px solid #dedede; margin-top: 10px;"
@@ -124,10 +124,10 @@
       </template>
     </v-data-table>
     <!--  -->
-    <audio id="my-audio" controls autoplay>
+    <!-- <audio id="my-audio" controls autoplay>
       <source src="" type="audio/mpeg">
       Your browser does not support the audio element.
-    </audio>
+    </audio> -->
   </v-card>
 </template>
 
@@ -168,7 +168,7 @@ export default {
       text: 'Bàn số 5'
     }],
     currentCounter: '',
-    applicantList: [
+    bookingList: [
       {
         formCode: 143983123,
         applicantName: 'Trần Văn Duẩn',
@@ -233,7 +233,7 @@ export default {
         sortable: false
       }
     ],
-    currentApplicant : ''
+    currentBooking : ''
   }),
   computed: {
   },
@@ -241,7 +241,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       setTimeout(function () {
-        if (vm.applicantList.length > 5) {
+        if (vm.bookingList.length > 5) {
           let heightScroll = $('header').height() + $('.navbar-container').height()
           let widthParent = $('#nav-calling').parent().width()
           $(window).scroll(function () {
@@ -256,27 +256,7 @@ export default {
       }, 500)
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
-      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
-      if (currentQuery.hasOwnProperty('agency')) {
-        let filterDomain = {
-          agencyCode: currentQuery['agency']
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-      } else {
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-      }
-      vm.doLoadingThuTuc()
+      vm.loadBooking()
     })
   },
   updated () {
@@ -315,35 +295,20 @@ export default {
         })
       }, 100)
     },
-    doLoadingThuTuc () {
+    loadBooking () {
       var vm = this
-      vm.serviceInfoList = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
-      var filter = null
-      filter = {
-        page: currentQuery.page ? currentQuery.page : 1,
-        administration: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
-        keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      let filter = {
+        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : ''
       }
-      vm.$store.dispatch('getServiceLists', filter).then(function (result) {
+      vm.$store.dispatch('getBooking', filter).then(function (result) {
         vm.loading = false
         if (result.data) {
-          vm.serviceInfoList = result.data
-          vm.thutucPage = Number(currentQuery.page) ? Number(currentQuery.page) : 1
-          vm.totalThuTuc = result.total
-        } else {
-          vm.totalThuTuc = 0
-          vm.serviceInfoList = []
+          vm.bookingList = result.data
         }
-        vm.serviceItemTotal = result.total
       }).catch(reject => {
         vm.loading = false
-        vm.serviceInfoList = []
-        vm.totalThuTuc = 0
-        vm.thutucPage = 1
       })
     },
     paggingData (config) {
@@ -364,12 +329,12 @@ export default {
     },
     callingApplicant (item) {
       let vm = this
-      vm.currentApplicant = item
+      vm.currentBooking = item
       console.log(item)
     },
     ignoreApplicant (item) {
       let vm = this
-      vm.currentApplicant = ''
+      vm.currentBooking = ''
       vm.currentCounter = ''
       console.log(item)
     },
@@ -400,7 +365,7 @@ export default {
     },
     receiveDossier (item) {
       let vm = this
-      vm.currentApplicant = item
+      vm.currentBooking = item
       console.log(item)
     },
     createDossier (item) {

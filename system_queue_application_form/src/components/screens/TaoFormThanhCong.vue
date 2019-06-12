@@ -8,7 +8,7 @@
       <span class="mr-2"><v-icon color="warning">warning</v-icon></span>
       <i>Vui lòng ghi lại Mã tờ khai, mã xác thực để tra cứu, sửa, in lại tờ khai khi cần thiết!</i>
       <div class="mt-3">
-        <v-btn color="success" class="white--text" @click="downloadEform">
+        <v-btn color="success" class="white--text" @click="previewEform">
           <v-icon>visibility</v-icon> &nbsp;
           Xem trước
         </v-btn>
@@ -25,11 +25,38 @@
       </p>
     </div>
     <v-flex xs12 class="text-xs-right mt-3">
-      <v-btn color="primary" class="ml-3 white--text" @click="goBack">
+      <v-btn color="primary" class="ml-3 mr-2 white--text" @click="goBack">
         <v-icon>reply</v-icon> &nbsp;
         Quay lại
       </v-btn>
     </v-flex>
+    <!--  -->
+    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Tờ khai trực tuyến</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 700px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -48,7 +75,9 @@ export default {
   data: () => ({
     serviceInfoList: [],
     eformNoSearch: '',
-    formScriptEform: ''
+    formScriptEform: '',
+    dialogPDF: false,
+    dialogPDFLoading: false
   }),
   computed: {
     serviceinfoSelected () {
@@ -87,6 +116,17 @@ export default {
     downloadEform () {
       let vm = this
       vm.$store.dispatch('downloadEform', vm.eformDetail)
+    },
+    previewEform () {
+      let vm = this
+      vm.dialogPDFLoading = true
+      vm.$store.dispatch('previewEform', vm.eformDetail).then(function (result) {
+        vm.dialogPDFLoading = false
+        vm.dialogPDF = true
+        document.getElementById('dialogPDFPreview').src = result
+      }).catch(function (reject) {
+        vm.dialogPDFLoading = false
+      })
     },
     goBack () {
       let vm = this

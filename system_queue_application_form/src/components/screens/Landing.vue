@@ -27,7 +27,7 @@
         </div> -->
       </div> 
     </div>
-    <v-card flat class="mt-3">
+    <v-card flat class="">
       <v-card-text class='grey lighten-3 px-0 py-0'>
         <v-expansion-panel class="expand__select__domain" v-model="panelServiceList" expand>
           <v-expansion-panel-content v-for='(item, index) in serviceInfoList' :key='index' :value="true">

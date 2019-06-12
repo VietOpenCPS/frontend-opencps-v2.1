@@ -151,6 +151,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getBooking ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            service: filter.service ? filter.service : ''
+          }
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: paramGet
+          }
+          axios.get(state.endPoint + '/bookings', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
     getServiceDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

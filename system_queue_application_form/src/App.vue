@@ -148,7 +148,7 @@
                     if ($(window).scrollTop() > pstEl) {
                       $('#eform-btn').css({'position':'fixed', 'top':0, 'left': `${offsetLeft}px`})
                     } else {
-                      $('#eform-btn').css({'position':'relative', 'top':0, 'left': 0})
+                      $('#eform-btn').css({'position':'relative', 'top':0, 'right': '30px'})
                     }
                   })
                 }, 300)

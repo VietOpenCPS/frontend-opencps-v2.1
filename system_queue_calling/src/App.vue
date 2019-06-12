@@ -47,31 +47,19 @@
         {
           id: 1,
           name: 'Tất cả thủ tục',
-          mappingName: 'administrationName',
-          mappingCode: 'administrationCode',
-          mappingCount: 'count',
           children: [],
-          icon: 'account_balance',
           counter: 15
         },
         {
           id: 2,
           name: 'Thủ tục cấp hộ chiếu',
-          mappingName: 'domainName',
-          mappingCode: 'domainCode',
-          mappingCount: 'count',
           children: [],
-          icon: 'domain',
           counter: 5
         },
         {
           id: 3,
           name: 'Thủ tục cấp thị thực',
-          mappingName: 'levelName',
-          mappingCode: 'level',
-          mappingCount: 'count',
           children: [],
-          icon: 'sort',
           counter: 10
         }
       ],
@@ -170,45 +158,10 @@
       filterAction (index, item1) {
         let vm = this
         vm.activeTab = index
-        if (index === 0) {
-          // vm.filterAgency(item1)
-        }
-      },
-      filterDomain (item) {
-        var vm = this
-        vm.currentDomain = item.domainCode
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
-        newQuery['page'] = 1
-        newQuery['domain'] = item.domainCode
-        newQuery['agency'] = ''
-        newQuery['level'] = ''
-        newQuery['all'] = false
-        for (let key in newQuery) {
-          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-            queryString += key + '=' + newQuery[key] + '&'
-          }
-        }
-        vm.$router.push({
-          path: vm.pathRouter + queryString,
-          query: {
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-          }
-        })
-      },
-      filterAll () {
-        var vm = this
-        vm.activeAll = true
-        vm.currentLevel = ''
-        let current = vm.$router.history.current
-        let newQuery = current.query
-        let queryString = '?'
-        newQuery['page'] = 1
-        newQuery['domain'] = ''
-        newQuery['agency'] = ''
-        newQuery['level'] = ''
-        newQuery['all'] = true
+        newQuery['service'] = item.serviceCode
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'

@@ -134,6 +134,7 @@ export default {
   },
   data: () => ({
     rowHeight: 70,
+    loadData: false,
     queueList: [
       {
         gateNumber: '01',
@@ -184,32 +185,49 @@ export default {
   },
   created () {
     var vm = this
+    $('header').css('display','none')
+    $('#banner').css('display','none')
+    $('.navbar-container').css('display','none')
+    $('#footer').css('display','none')
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      $('header').css('display','none')
-      $('#banner').css('display','none')
-      $('.navbar-container').css('display','none')
-      $('#footer').css('display','none')
+      setTimeout(function(){$('#footer').css('display','none')},500)
       vm.rowHeight = ($( window ).height() - 187) / vm.queueList.length
     })
   },
   updated () {
     var vm = this
+    $('header').css('display','none')
+    $('#banner').css('display','none')
+    $('.navbar-container').css('display','none')
+    $('#footer').css('display','none')
+    setTimeout(function(){$('#footer').css('display','none')},500)
     vm.$nextTick(function () {
     })
   },
-  watch: {},
+  watch: {
+    loadData (val) {
+      let vm = this
+      vm.getDanhSachCho()
+    }
+  },
   methods: {
     getDanhSachCho () {
       var vm = this
       let currentQuery = vm.$router.history.current.query
       let filter = {}
       vm.$store.dispatch('getThongTinXepHang', filter).then(function (result) {
+        setTimeout(function () {
+          vm.loadData = !vm.loadData
+        }, 5000)
         if (result.data) {
           vm.queueList = result.data
         }
       }).catch(reject => {
+        setTimeout(function () {
+          vm.loadData = !vm.loadData
+        }, 5000)
       })
     }
   }

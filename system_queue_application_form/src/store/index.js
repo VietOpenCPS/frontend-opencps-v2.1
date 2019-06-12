@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
+import saveAs from 'file-saver'
 import support from './support.json'
 // 
 
@@ -166,11 +167,28 @@ export const store = new Vuex.Store({
             responseType: 'blob'
           }
           axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret + '/report', param).then(function (response) {
-            var url = window.URL.createObjectURL(response.data)
-            window.open(url)
-            // let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
-            // let serializable = response.data
-            // saveAs(serializable, fileName)
+            // var url = window.URL.createObjectURL(response.data)
+            // window.open(url)
+            let serializable = response.data
+            saveAs(serializable, 'ToKhaiTrucTuyen.pdf')
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },    
+    previewEform ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret + '/report', param).then(function (response) {
+            let url = window.URL.createObjectURL(response.data)
+            resolve(url)
           }).catch(function (xhr) {
             console.log(xhr)
           })

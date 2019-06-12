@@ -11,8 +11,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     initData: {},
-    // endPoint: '/o/rest/v2',
-    endPoint: 'http://127.0.0.1:8081/api',
+    endPoint: '/o/rest/v2',
+    // endPoint: 'http://127.0.0.1:8081/api',
     loading: false,
     index: 0,
     agencyList: [],
@@ -55,9 +55,11 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               resolve(dataReturn)
+            } else {
+              resolve('')
             }
           }).catch(function (xhr) {
-            console.log(xhr)
+            reject(xhr)
           })
         })
       })
@@ -79,6 +81,25 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             console.log(xhr)
+          })
+        })
+      })
+    },
+    updateStateEform ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let dataUpdateEform = new URLSearchParams()
+          dataUpdateEform.append('state', filter.state)
+          dataUpdateEform.append('gateNumber', '')
+          axios.put('/o/rest/eforms/' + filter.eformNo, dataUpdateEform, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
           })
         })
       })

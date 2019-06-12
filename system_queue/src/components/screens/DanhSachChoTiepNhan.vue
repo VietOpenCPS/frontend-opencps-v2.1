@@ -122,7 +122,8 @@ export default {
         formCode: 123548123,
         applicantName: 'Trần Đức Lương'
       }
-    ]
+    ],
+    loadData: false
   }),
   computed: {
     isMobile () {
@@ -131,32 +132,47 @@ export default {
   },
   created () {
     var vm = this
+    $('header').css('display','none')
+    $('#banner').css('display','none')
+    $('.navbar-container').css('display','none')
+    $('#footer').css('display','none')
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      $('header').css('display','none')
-      $('#banner').css('display','none')
-      $('.navbar-container').css('display','none')
-      $('#footer').css('display','none')
       vm.getDanhSachCho()
+      setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
   updated () {
     var vm = this
-    vm.$nextTick(function () {
-    })
+    $('header').css('display','none')
+    $('#banner').css('display','none')
+    $('.navbar-container').css('display','none')
+    $('#footer').css('display','none')
+    setTimeout(function(){$('#footer').css('display','none')},500)
   },
-  watch: {},
+  watch: {
+    loadData (val) {
+      let vm = this
+      vm.getDanhSachCho()
+    }
+  },
   methods: {
     getDanhSachCho () {
       var vm = this
       let currentQuery = vm.$router.history.current.query
       let filter = {}
       vm.$store.dispatch('getDanhSachCho', filter).then(function (result) {
+        setTimeout(function () {
+          vm.loadData = !vm.loadData
+        }, 5000)
         if (result.data) {
           vm.applicantList = result.data
         }
       }).catch(reject => {
+        setTimeout(function () {
+          vm.loadData = !vm.loadData
+        }, 5000)
       })
     }
   }
