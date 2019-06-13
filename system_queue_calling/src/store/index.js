@@ -160,7 +160,7 @@ export const store = new Vuex.Store({
             },
             params: paramGet
           }
-          axios.get(state.endPoint + '/bookings', param).then(function (response) {
+          axios.get(state.endPoint + '/bookings/' + filter.className, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
@@ -170,7 +170,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getServiceDetail ({commit, state}, filter) {
+    updateBooking ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -178,7 +178,87 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.endPoint + '/serviceinfos/' + filter.index, param).then(function (response) {
+          let dataUpdateBooking = new URLSearchParams()
+          dataUpdateBooking.append('state', filter.state)
+          dataUpdateBooking.append('gateNumber', filter.gateNumber)
+          axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    postDossier ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        var dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('serviceCode', data.serviceCode)
+        dataPostdossier.append('govAgencyCode', data.govAgencyCode)
+        dataPostdossier.append('dossierTemplateNo', data.dossierTemplateNo)
+        dataPostdossier.append('originality', 3)
+        axios.post('/o/rest/v2/dossiers', dataPostdossier, options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    getProcessDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/onegate/serviceconfigs/processes', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    updateGateNumber ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences/GATE_NUMBER'
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let params = new URLSearchParams()
+          params.append('value', '{"gateNumber":"' + filter.gateNumber + '"}')
+          axios.put(url, params, config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getGateNumber ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences/GATE_NUMBER'
+          axios.get(url, param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

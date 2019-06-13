@@ -3,7 +3,6 @@
     <v-flex xs12 class="header_login text-xs-center pt-3">
       <div class="logo d-inline-block">
         <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png"> 
-        <h1 style="font-size:34px; color: #ffffff" class="text-bold">CỤC LÃNH SỰ</h1>
       </div>
     </v-flex>
     <v-flex xs12 class="text-xs-center">
@@ -11,65 +10,19 @@
         BẢNG ĐIỀU HÀNH XẾP HÀNG
       </h1>
     </v-flex>
-    <v-layout wrap class="mt-5" style="height: calc(100vh - 320px)">
-      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
+    <v-layout wrap class="pt-5" style="height: calc(100vh - 270px)">
+      <v-flex xs4 class="colum-dhxh text-xs-center px-2" v-for="(item, index) in gateNumberList" v-bind:key="index">
         <div class="py-3">
           <div class="mb-4" style="border-bottom:2px solid #ffff">
             <span class="text-bold">BÀN SỐ</span> <br>
             <v-avatar color="white" class="mt-3 mb-4">
-              <span class="red--text headline text-bold">1</span>
+              <span class="red--text headline text-bold" style="font-size: 42px !important;">{{item.gateNumber}}</span>
             </v-avatar>
           </div>
           <div class="d-inline-block mb-2 text-bold">
-            <span>198378312</span> 
+            <span>{{item.bookings['codeNumber'] ? item.bookings['codeNumber'] : '-- -- --'}}</span> <br>
+            <span>{{item.bookings['bookingName'] ? item.bookings['bookingName'] : '-- -- --'}}</span>
           </div>
-          <br>
-          <span class="text-bold">Trần Văn Duẩn</span>
-        </div>
-      </v-flex>
-      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
-        <div class="py-3">
-          <div class="mb-4" style="border-bottom:2px solid #ffff">
-            <span class="text-bold">BÀN SỐ</span> <br>
-            <v-avatar color="white" class="mt-3 mb-4">
-              <span class="red--text headline text-bold">2</span>
-            </v-avatar>
-          </div>
-          <div class="d-inline-block mb-2 text-bold">
-            <span>198378312</span> 
-          </div>
-          <br>
-          <span class="text-bold">Trần Văn Duẩn</span>
-        </div>
-      </v-flex>
-      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
-        <div class="py-3">
-          <div class="mb-4" style="border-bottom:2px solid #ffff">
-            <span class="text-bold">BÀN SỐ</span> <br>
-            <v-avatar color="white" class="mt-3 mb-4">
-              <span class="red--text headline text-bold">3</span>
-            </v-avatar>
-          </div>
-          <div class="d-inline-block mb-2 text-bold">
-            <span>-- -- --</span> 
-          </div>
-          <br>
-          <span class="text-bold">-- -- --</span>
-        </div>
-      </v-flex>
-      <v-flex xs3 class="colum-dhxh text-xs-center px-2">
-        <div class="py-3">
-          <div class="mb-4" style="border-bottom:2px solid #ffff">
-            <span class="text-bold">BÀN SỐ</span> <br>
-            <v-avatar color="white" class="mt-3 mb-4">
-              <span class="red--text headline text-bold">4</span>
-            </v-avatar>
-          </div>
-          <div class="d-inline-block mb-2 text-bold">
-            <span>198378312</span> 
-          </div>
-          <br>
-          <span class="text-bold">Trần Văn Duẩn</span>
         </div>
       </v-flex>
     </v-layout>
@@ -136,26 +89,6 @@ export default {
     rowHeight: 70,
     loadData: false,
     queueList: [
-      {
-        gateNumber: '01',
-        eFormNo: '1989644',
-        applicantName: 'Trần Văn Duẩn'
-      },
-      {
-        gateNumber: '02',
-        eFormNo: '1964613',
-        applicantName: 'Vũ Văn Nguyên'
-      },
-      {
-        gateNumber: '03',
-        eFormNo: '1349644',
-        applicantName: 'Nguyễn Nguyên Nam'
-      },
-      {
-        gateNumber: '04',
-        eFormNo: '1981225',
-        applicantName: 'Vũ Đình Huy'
-      }
     ],
     headers: [
       {
@@ -176,7 +109,31 @@ export default {
         sortable: false,
         class: 'py-3'
       }
-    ]
+    ],
+    gateNumberList: [
+      {
+        gateNumber: 1,
+        bookings: {
+          codeNumber: '',
+          bookingName: ''
+        }
+      },
+      {
+        gateNumber: 2,
+        bookings: {
+          codeNumber: '',
+          bookingName: ''
+        }
+      },
+      {
+        gateNumber: 3,
+        bookings: {
+          codeNumber: '',
+          bookingName: ''
+        }
+      }
+    ],
+    bookingList: []
   }),
   computed: {
     isMobile () {
@@ -195,6 +152,7 @@ export default {
       setTimeout(function(){$('#footer').css('display','none')},500)
       vm.rowHeight = ($( window ).height() - 187) / vm.queueList.length
     })
+    vm.getDanhSachCho()
   },
   updated () {
     var vm = this
@@ -209,26 +167,90 @@ export default {
   watch: {
     loadData (val) {
       let vm = this
-      vm.getDanhSachCho()
+      setTimeout (function () {
+        vm.getDanhSachCho()
+      }, 30000)
     }
   },
   methods: {
     getDanhSachCho () {
       var vm = this
       let currentQuery = vm.$router.history.current.query
-      let filter = {}
-      vm.$store.dispatch('getThongTinXepHang', filter).then(function (result) {
-        setTimeout(function () {
-          vm.loadData = !vm.loadData
-        }, 5000)
-        if (result.data) {
-          vm.queueList = result.data
+      let filterEform = {
+        state: 2,
+        className: 'EFORM'
+      }
+      let bookingDossier = ''
+      let bookingEform = ''
+      let count = 0
+      vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
+        count+=1
+        vm.loading = false
+        if (result) {
+          bookingEform = result
+        } else {
+          bookingEform = []
+        }
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
         }
       }).catch(reject => {
-        setTimeout(function () {
-          vm.loadData = !vm.loadData
-        }, 5000)
+        count+=1
+        bookingEform = []
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
+        vm.loading = false
       })
+      let filterDossier = {
+        state: 2,
+        className: 'DOSSIER'
+      }
+      vm.$store.dispatch('getBookingDangGoi', filterDossier).then(function (result) {
+        count+=1
+        vm.loading = false
+        if (result) {
+          bookingDossier = result
+        } else {
+          bookingDossier = []
+        }
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
+      }).catch(reject => {
+        count+=1
+        bookingDossier = []
+        vm.loading = false
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
+      })
+    },
+    mergeBooking (bookingEform, bookingDossier) {
+      let vm = this
+      console.log('booking', bookingEform, bookingDossier)
+      if (bookingEform.length > 0 || bookingDossier.length > 0) {
+        vm.bookingList = bookingEform.concat(bookingDossier)
+        let sortBooking = function (bookingList) {
+          function compare(a, b) {
+            if (a.checkinDate < b.checkinDate)
+              return -1
+            if (a.checkinDate > b.checkinDate)
+              return 1
+            return 0
+          }
+          return bookingList.sort(compare)
+        }
+        vm.bookingList = sortBooking(vm.bookingList)
+        console.log('bookingList', vm.bookingList)
+        for (let index in vm.gateNumberList) {
+          let currentGate = vm.bookingList.filter(function (item) {
+            return String(item.gateNumber) === String(vm.gateNumberList[index]['gateNumber'])
+          })[0]
+          vm.gateNumberList[index].bookings = currentGate ? currentGate : vm.gateNumberList[index].bookings
+        }
+        console.log('vm.gateNumberList', vm.gateNumberList)
+      }
     }
   }
 }

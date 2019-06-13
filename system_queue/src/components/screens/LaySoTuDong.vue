@@ -31,12 +31,22 @@
         </v-flex>
       </v-flex>
       <v-flex v-if="isActive" xs12 class="mt-3 text-xs-center" style="color:yellow">
-        <span>
-          Thông tin của quý khách đã được tiếp nhận
-        </span><br>
-        <span>
-          Vui lòng đợi gọi tên để được xử lý. Xin cảm ơn!
-        </span>
+        <div v-if="checkinFail">
+          <span>
+            Thông tin của quý khách không chính xác
+          </span><br>
+          <span>
+            Quý khách vui lòng kiểm tra lại. Xin cảm ơn!
+          </span>
+        </div>
+        <div v-else>
+          <span>
+            Thông tin của quý khách đã được tiếp nhận
+          </span><br>
+          <span>
+            Vui lòng đợi gọi tên để được xử lý. Xin cảm ơn!
+          </span>
+        </div>
       </v-flex>
       <v-flex v-else xs12 class="mt-3 text-xs-center" style="color:yellow">
         <span>
@@ -64,6 +74,7 @@ export default {
   data: () => ({
     eformInformation: '',
     isActive: false,
+    checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
   }),
   computed: {
@@ -73,18 +84,24 @@ export default {
   },
   created () {
     var vm = this
+    $('header').css('display','none')
+    $('#banner').css('display','none')
+    $('.navbar-container').css('display','none')
+    $('#footer').css('display','none')
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      $('header').css('display','none')
-      $('#banner').css('display','none')
-      $('.navbar-container').css('display','none')
-      $('#footer').css('display','none')
+      setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
+      $('header').css('display','none')
+      $('#banner').css('display','none')
+      $('.navbar-container').css('display','none')
+      $('#footer').css('display','none')
+      setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
   watch: {},
@@ -92,38 +109,97 @@ export default {
     submitQueue () {
       let vm = this
       if (String(vm.eformInformation).indexOf('-') > 0) {
-        let keySearch = vm.eformInformation.split('-')
+        let keySearch = String(vm.eformInformation).split('-')
+        if (keySearch.length !== 3) {
+          vm.isActive = true
+          vm.checkinFail = true
+          setTimeout(function() {
+            vm.isActive = false
+            vm.eformInformation = ''
+          }, 5000)
+        }
         let filterBooking = {
           className: '',
           classPK: '',
           serviceCode: '',
           gateNumber: '',
-          state: 1
+          state: 1,
+          codeNumber: vm.eformInformation,
+          bookingName: ''
         }
-        if (keySearch[0] === 'E') {
+        if (keySearch[0] === 'E' && keySearch.length === 3) {
           let filterEform = {
             eFormId: keySearch[2]
           }
           vm.$store.dispatch('getEform', filterEform).then(function (result) {
-            filterBooking.className = 'eform'
-            filterBooking.classPK = result.eFormId
-            filterBooking.serviceCode = result.serviceCode
-            vm.createBooking()
+            let bookingName = ''
+            if (result['eFormId']) {
+              try {
+                let name = JSON.parse(result['eFormData'])['ho_ten_yeu_cau']
+                bookingName = name !== 'undefined' && name !== undefined ? name : ''
+              } catch (e) {
+              }
+              vm.checkinFail = false
+              filterBooking.className = 'EFORM'
+              filterBooking.classPK = result.eFormId
+              filterBooking.serviceCode = result.serviceCode
+              filterBooking.bookingName = bookingName
+              vm.createBooking(filterBooking)
+            } else {
+              vm.isActive = true
+              vm.checkinFail = true
+              setTimeout(function() {
+                vm.isActive = false
+                vm.eformInformation = ''
+              }, 5000)
+            }
+          }).catch (function (reject) {
+            vm.isActive = true
+            vm.checkinFail = true
+            setTimeout(function() {
+              vm.isActive = false
+              vm.eformInformation = ''
+            }, 5000)
           })
-        } else if (keySearch[1] === 'D') {
+        } else if (keySearch[1] === 'D' && keySearch.length === 3) {
           let filterDossier = {
             dossierId: keySearch[2]
           }
           vm.$store.dispatch('getDossier', filterDossier).then(function (result) {
-            filterBooking.className = 'dossier'
-            filterBooking.classPK = result.dossierId
-            filterBooking.serviceCode = result.serviceCode
-            vm.createBooking()
+            if (result) {
+              vm.checkinFail = false
+              filterBooking.className = 'DOSSIER'
+              filterBooking.classPK = result.dossierId
+              filterBooking.serviceCode = result.serviceCode
+              filterBooking.bookingName = result.applicantName
+              vm.createBooking(filterBooking)
+            } else {
+              vm.isActive = true
+              vm.checkinFail = true
+              setTimeout(function() {
+                vm.isActive = false
+                vm.eformInformation = ''
+              }, 5000)
+            }
+          }).catch (function (reject) {
+            vm.isActive = true
+            vm.checkinFail = true
+            setTimeout(function() {
+              vm.isActive = false
+              vm.eformInformation = ''
+            }, 5000)
           })
         }
+      } else {
+        vm.isActive = true
+        vm.checkinFail = true
+        setTimeout(function() {
+          vm.isActive = false
+          vm.eformInformation = ''
+        }, 5000)
       }
     },
-    createBooking () {
+    createBooking (filter) {
       let vm = this
       vm.$store.dispatch('createBooking', filter).then(function (result) {
         vm.isActive = true

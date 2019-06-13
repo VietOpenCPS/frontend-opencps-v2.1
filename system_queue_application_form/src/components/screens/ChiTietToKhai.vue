@@ -44,7 +44,7 @@
       <v-form v-model="validSecret" ref="formSecret" lazy-validation>
         <v-card>
           <v-toolbar flat dark color="primary">
-              <v-toolbar-title>Mã xác thực</v-toolbar-title>
+              <v-toolbar-title>Mã tờ khai</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon dark @click.native="dialogSecret = false">
                 <v-icon>close</v-icon>
@@ -60,16 +60,6 @@
                   :rules="[v => !!v || 'Mã tờ khai là bắt buộc']"
                   required
                   @keyup.enter="submitSearchEform"
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12>
-                <v-text-field
-                box
-                label="Nhập mã xác thực"
-                v-model="secretKey"
-                :rules="[v => !!v || 'Mã xác thực là bắt buộc']"
-                required
-                @keyup.enter="submitSearchEform"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -207,12 +197,13 @@ export default {
     },
     submitSearchEform () {
       let vm = this
-      if (vm.$refs.formSecret.validate()) {
+      if (vm.$refs.formSecret.validate() && vm.eformNoSearch.indexOf('-') > 0) {
         let filter = {
-          eFormNo: vm.eformNoSearch,
-          secret: vm.secretKey
+          eFormId: String(vm.eformNoSearch).split('-')[2],
+          secret: String(vm.eformNoSearch).split('-')[1]
         }
-        vm.$store.dispatch('getEformSecret', filter).then(function(result) {
+        vm.dataCheck = filter
+        vm.$store.dispatch('getEformData', filter).then(function(result) {
           if (result) {
             toastr.success('Lấy thông tin tờ khai thành công')
             vm.$store.commit('setEformDetail', result)
@@ -225,15 +216,11 @@ export default {
             } else {
               formScript = {}
             }
-            formData = eval('(' + result.eFormData + ')')
+            formData = eval('(' + result + ')')
             /* eslint-disable */
             formScript.data = formData
             window.$('#formAlpacaEform').alpaca(formScript)
             vm.isUpdate = true
-            vm.dataCheck = {
-              eFormNo: result.eFormNo,
-              secret: result.secret
-            }
           }
         }).catch(function(error) {
         })
@@ -301,12 +288,18 @@ export default {
         }
         let dataUpdateEform = new URLSearchParams()
         dataUpdateEform.append('eFormData', JSON.stringify(formData))
-        axios.put('/o/rest/v2/eforms/' + vm.dataCheck.eFormNo + '/password/' + vm.dataCheck.secret, dataUpdateEform, options).then(function (response) {
-          vm.$router.push({
-            path: '/tao-to-khai-thanh-cong',
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            }
+        axios.put('/o/rest/v2/eforms/' + vm.dataCheck.eFormId + '/data/' + vm.dataCheck.secret, dataUpdateEform, options).then(function (response) {
+          let filterEform = {
+            eFormId: vm.dataCheck['eFormId']
+          }
+          vm.$store.dispatch('getEform', filterEform).then(function (result) {
+            vm.$store.commit('setEformDetail', result)
+            vm.$router.push({
+              path: '/tao-to-khai-thanh-cong',
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
           })
         }).catch(function (xhr) {
         })

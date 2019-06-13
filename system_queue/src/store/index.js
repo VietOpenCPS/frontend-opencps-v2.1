@@ -108,16 +108,18 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getThongTinXepHang ({commit, state}, filter) {
+    getBookingDangGoi ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             },
-            params: {}
+            params: {
+              state: filter.state ? filter.state : ''
+            }
           }
-          axios.get(state.endPoint + '/', param).then(function (response) {
+          axios.get(state.endPoint + '/bookings/' + filter.className, param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
@@ -140,10 +142,12 @@ export const store = new Vuex.Store({
           let dataCreateBooking = new URLSearchParams()
           dataCreateBooking.append('className', filter.className)
           dataCreateBooking.append('classPK', filter.classPK)
+          dataCreateBooking.append('codeNumber', filter.codeNumber)
           dataCreateBooking.append('serviceCode', filter.serviceCode)
           dataCreateBooking.append('state', filter.state)
           dataCreateBooking.append('gateNumber', '')
-          axios.post('/o/rest/bookings', dataCreateBooking, param).then(function (response) {
+          dataCreateBooking.append('bookingName', filter.bookingName)
+          axios.post('/o/rest/v2/bookings', dataCreateBooking, param).then(function (response) {
             resolve(response)
           }).catch(function (xhr) {
             reject(xhr)

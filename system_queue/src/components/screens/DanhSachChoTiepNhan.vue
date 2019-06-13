@@ -11,34 +11,34 @@
     </v-flex>
     <v-layout wrap>
       <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title mx-4 py-3" style="min-height:100px">
-          <h1 style="font-size:32px; color: white;" class="text-bold">THÔNG BÁO</h1>
+        <v-flex xs12 class="text-xs-center title thongbao-title py-3">
+          <p class="text-bold white--text">THÔNG BÁO</p>
         </v-flex>
-        <v-flex xs12 class="text-xs-center title mx-4 py-3" style="min-height:2000px;border-bottom:2px solid #d3d3d3">
+        <v-flex xs12 class="text-xs-center title content-thongbao py-3" style="border-bottom:2px solid #d3d3d3">
 
         </v-flex>
       </v-flex>
       <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title mx-4 py-3">
-          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        <v-flex xs12 class="text-xs-center title py-3">
+          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
         </v-flex>
         <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
       </v-flex>
       <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
-          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        <v-flex xs12 class="text-xs-center title py-3" >
+          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
         </v-flex>
         <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
       </v-flex>
       <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
-          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        <v-flex xs12 class="text-xs-center title py-3" >
+          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
         </v-flex>
         <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
       </v-flex>
       <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title mx-4 py-3" >
-          <h1 style="font-size:32px; color: white" class="text-bold">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</h1>
+        <v-flex xs12 class="text-xs-center title py-3" >
+          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
         </v-flex>
         <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
       </v-flex>

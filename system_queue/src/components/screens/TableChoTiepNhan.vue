@@ -4,7 +4,7 @@
     :headers="headers"
     :items="applicantList"
     hide-actions
-    class="table-landing table-bordered mx-4"
+    class="table-landing table-bordered"
   >
     <template slot="items" slot-scope="props">
       <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">

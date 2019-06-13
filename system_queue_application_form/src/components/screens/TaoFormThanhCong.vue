@@ -3,10 +3,9 @@
     <h2 class="text-xs-center py-4 primary--text">TẠO TỜ KHAI THÀNH CÔNG !</h2>
     <div class="px-3" style="font-size:16px">
       <p class="mb-2 text-bold">Tên tờ khai: <span class="ml-2 primary--text">{{fileTemplateSelected.templateName}}</span></p>
-      <p class="mb-2 text-bold">Mã tờ khai: <span class="ml-2 primary--text">{{eformDetail.eFormNo }}</span></p>
-      <p class="text-bold">Mã xác thực: <span class="ml-2 primary--text">{{eformDetail.secret}}</span></p>
+      <p class="mb-2 text-bold">Mã tờ khai: <span class="ml-2 primary--text">E-{{eformDetail.secret}}-{{eformDetail.eFormId }}</span></p>
       <span class="mr-2"><v-icon color="warning">warning</v-icon></span>
-      <i>Vui lòng ghi lại Mã tờ khai, mã xác thực để tra cứu, sửa, in lại tờ khai khi cần thiết!</i>
+      <i>Vui lòng ghi lại Mã tờ khai để tra cứu, sửa, in lại tờ khai khi cần thiết!</i>
       <div class="mt-3">
         <v-btn color="success" class="white--text" @click="previewEform">
           <v-icon>visibility</v-icon> &nbsp;

@@ -2275,7 +2275,7 @@ export default {
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-       vm.$router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })

@@ -166,7 +166,7 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob'
           }
-          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret + '/report', param).then(function (response) {
+          axios.get('/o/rest/v2/eforms/' + data.eFormId + '/report/' + data.secret, param).then(function (response) {
             // var url = window.URL.createObjectURL(response.data)
             // window.open(url)
             let serializable = response.data
@@ -186,7 +186,7 @@ export const store = new Vuex.Store({
             },
             responseType: 'blob'
           }
-          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret + '/report', param).then(function (response) {
+          axios.get('/o/rest/v2/eforms/' + data.eFormId + '/report/' + data.secret, param).then(function (response) {
             let url = window.URL.createObjectURL(response.data)
             resolve(url)
           }).catch(function (xhr) {
@@ -195,7 +195,29 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getEformSecret ({state, commit}, data) {
+    getEform ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/eforms/' + filter.eFormId, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getEformData ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -203,11 +225,16 @@ export const store = new Vuex.Store({
               groupId: window.themeDisplay.getScopeGroupId()
             }
           }
-          axios.get('/o/rest/v2/eforms/' + data.eFormNo + '/password/' + data.secret, param).then(function (response) {
+          axios.get('/o/rest/v2/eforms/' + data.eFormId + '/data/' + data.secret, param).then(function (response) {
             let serializable = response.data
-            resolve(serializable)
+            if (typeof (serializable) === 'object') {
+              resolve(JSON.stringify(serializable))
+            } else {
+              resolve(serializable)
+            }
+            
           }).catch(function (xhr) {
-            toastr.error('Thực hiện thất bại. Vui lòng kiểm tra lại mã tờ khai, mã xác thực.')
+            toastr.error('Thực hiện thất bại. Vui lòng kiểm tra lại mã tờ khai.')
           })
         })
       })

@@ -22,6 +22,7 @@
               clearable
               @change="changeService"
               box
+              :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
           <v-flex xs6 class="px-2">
@@ -36,6 +37,7 @@
               clearable
               @change="changeState"
               box
+              :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
         </v-layout>
@@ -58,10 +60,10 @@
             <div v-if="currentBooking" class="d-inline-block ml-3" style="position: absolute;top:50px">
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling"
+                :disabled="loadingCalling || isCalling"
                 color="red"
                 class="white--text"
-                @click="deleteBooking"
+                @click="ignoreBooking"
               >
                 <v-icon class="ml-0" right dark>clear</v-icon> &nbsp;
                 BỎ QUA
@@ -69,7 +71,7 @@
               <br>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling"
+                :disabled="loadingCalling || isCalling"
                 color="primary"
                 class="white--text mt-1"
                 @click="callBack"
@@ -120,53 +122,112 @@
                 <span>{{props.index + 1}}</span><br>
               </div>
             </td>
-            <td class="text-xs-center text-bold py-2" style="letter-spacing:2px" width="150px">
+            <td class="text-xs-center text-bold py-2" width="150px">
               <div>
                 <span>{{props.item.codeNumber}}</span>
               </div>
             </td>
-            <td class="text-xs-left text-bold py-2 px-5" style="letter-spacing:2px; word-spacing:2px">
+            <td class="text-xs-left text-bold py-2 px-5">
               <div>
-                <span>{{props.item.applicantName}}</span>
+                <span>{{props.item.bookingName}}</span>
               </div>
             </td>
-            <td class="text-xs-center text-bold py-1" width="300px">
+            <td class="text-xs-center text-bold py-1" width="350px">
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber']"
-                :color="currentBooking['codeNumber'] === props.item['codeNumber'] ? 'grey' : 'primary'"
+                :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1 || isCalling"
+                :color="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1  ? 'grey' : 'primary'"
                 class="white--text"
                 @click="callingApplicant(props.item)"
+                style="width: 100px;"
               >
-                <span v-if="currentBooking['codeNumber'] === props.item['codeNumber']">Đang gọi...</span>
+                <span v-if="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] == 2">Đang gọi...</span>
                 <span v-else>Gọi số</span>
               </v-btn>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling"
-                color="red"
+                :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber'] || 
+                props.item['state'] === 4 || props.item['state'] === 3 || isCalling"
+                :color="currentBooking['codeNumber'] === props.item['codeNumber'] ? 'grey' : 'red'"
                 class="white--text ml-2"
-                @click="deleteBooking(props.item)"
+                @click="ignoreBooking(props.item)"
+                style="width: 100px;"
               >
                 Bỏ qua
               </v-btn>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling"
+                :disabled="loadingCalling || props.item['state'] === 4"
                 color="#3fa8f1"
                 class="white--text ml-2"
-                @click="receiveDossier(props.item)"
+                @click="receiveBooking(props.item)"
+                style="width: 100px;"
               >
                 Tiếp nhận
               </v-btn>
             </td>
           </tr>
         </template>
+        <template slot="no-data">
+          <v-card flat color="#fff">
+            <v-flex class="text-xs-center">
+              <span>Không có lượt chờ nào</span>
+            </v-flex>
+          </v-card>
+        </template>
       </v-data-table>
       <!--  -->
       <div id="audioCalling" style="visibility: hidden;position:fixed;top:0;right:0;z-index:-999">
       </div>
     </v-card>
+
+    <v-dialog v-model="dialogAction" max-width="550" transition="fade-transition" persistent>
+      <v-card>
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-toolbar dark color="primary">
+            <v-toolbar-title>Lựa chọn dịch vụ</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialogAction = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text class="pb-0 pt-4">
+            <v-layout wrap>
+              <v-flex xs12 class="px-2">
+                <v-select
+                  :items="listDichVu"
+                  v-model="dichVuSelected"
+                  label="Dịch vụ:"
+                  item-text="optionName"
+                  item-value="processOptionId"
+                  return-object
+                  :hide-selected="true"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  required
+                  box
+                ></v-select>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions class="mx-3">
+            <v-spacer></v-spacer>
+            <v-btn color="red darken-3" flat="flat" @click.native="dialogAction = false"
+            >
+              <v-icon>reply</v-icon>&nbsp;
+              Thoát
+            </v-btn>
+            <v-btn color="primary" flat="flat" @click.native="doSubmitCreateDossier()"
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon>save</v-icon>&nbsp;
+              Đồng ý
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -185,13 +246,18 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
+    loadData: false,
+    dialogAction: false,
+    dichVuSelected: '',
+    listDichVu: '',
+    filterCreateDossier: '',
     groupId: window.themeDisplay.getScopeGroupId(),
     idVoicePortlet: 161427,
     serviceInfoList: [],
     serviceInfoSelected: '',
     stateList: [
       {
-        stateName: 'Đang chờ tiếp nhận',
+        stateName: 'Đang chờ gọi',
         stateCode: '1'
       },
       {
@@ -231,34 +297,6 @@ export default {
     }],
     currentGate: '',
     bookingList: [
-      {
-        codeNumber: 'E-14398-1125',
-        applicantName: 'Trần Văn Duẩn',
-        counter: '02'
-      },
-      {
-        codeNumber: 'D-14592-4124',
-        applicantName: 'Trần Viết Lãm',
-        counter: '04'
-      },
-      {
-        codeNumber: 'E-12298-4124',
-        applicantName: 'Trịnh Công Trình',
-        counter: '01'
-      },
-      {
-        codeNumber: 'D-14528-4525',
-        applicantName: 'Nguyễn Tấn Dũng',
-        counter: '05'
-      },
-      {
-        codeNumber: 'E-1498-1123',
-        applicantName: 'Nông Đức Mạnh'
-      },
-      {
-        codeNumber: 'E-14498-2122',
-        applicantName: 'Trần Văn Duẩn'
-      }
     ],
     loading: true,
     headers: [
@@ -283,7 +321,8 @@ export default {
         sortable: false
       }
     ],
-    currentBooking : ''
+    currentBooking : '',
+    isCalling: false
   }),
   computed: {
   },
@@ -321,6 +360,16 @@ export default {
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       vm.loadBooking()
+    },
+    loadData (val) {
+      let vm = this
+      setTimeout(function () {
+        vm.loadBooking()
+      }, 15000)
+    },
+    currentGate (val) {
+      let vm = this
+      vm.updateGateNumber(val)
     }
   },
   methods: {
@@ -330,7 +379,7 @@ export default {
       let newQuery = current.query
       vm.$store.dispatch('getServiceLists').then(function (result) {
         vm.serviceInfoList = result
-        vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : vm.serviceInfoList[0]
+        vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : ''
       })
     },
     filterBooking () {
@@ -364,20 +413,72 @@ export default {
     },
     loadBooking () {
       var vm = this
+      let count = 0
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
-      let filter = {
+      let filterEform = {
         service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
-        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected
+        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+        className: 'EFORM'
       }
-      vm.$store.dispatch('getBooking', filter).then(function (result) {
+      let bookingDossier = ''
+      let bookingEform = ''
+      vm.$store.dispatch('getBooking', filterEform).then(function (result) {
+        count+=1
         vm.loading = false
         if (result.data) {
-          vm.bookingList = result.data
+          bookingEform = result.data
+        }
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
         }
       }).catch(reject => {
+        count+=1
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
         vm.loading = false
       })
+      let filterDossier = {
+        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+        className: 'DOSSIER'
+      }
+      vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
+        count+=1
+        vm.loading = false
+        if (result.data) {
+          bookingDossier = result.data
+        }
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
+      }).catch(reject => {
+        count+=1
+        vm.loading = false
+        if (count === 2) {
+          vm.mergeBooking(bookingDossier, bookingEform)
+        }
+      })
+      
+    },
+    mergeBooking (bookingEform, bookingDossier) {
+      let vm = this
+      if (bookingEform || bookingDossier) {
+        vm.bookingList = bookingEform.concat(bookingDossier)
+        let sortBooking = function (bookingList) {
+          function compare(a, b) {
+            if (a.checkinDate < b.checkinDate)
+              return -1
+            if (a.checkinDate > b.checkinDate)
+              return 1
+            return 0
+          }
+          return bookingList.sort(compare)
+        }
+        vm.bookingList = sortBooking(vm.bookingList)
+      }
+      vm.loadData = !vm.loadData
     },
     paggingData (config) {
       let vm = this
@@ -399,6 +500,7 @@ export default {
       let vm = this
       if (vm.currentGate) {
         vm.currentBooking = item
+        $('#audioCalling').html('')
         let splitNumberCode = vm.currentBooking['codeNumber'].split('-')
         let numberCalling = splitNumberCode[1] + splitNumberCode[2]
         let srcAudioStart = splitNumberCode[0] === 'E' ? `http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
@@ -428,50 +530,107 @@ export default {
         `
         $('#audioCalling').html(audioStart + audioNumber + audioEnd + gateAudio)
         // 
-        document.getElementById('start').onended = function() {
+        document.getElementById('start').onended = function () {
           for (let index = 0; index < numberArr.length; index++) {
             setTimeout (function() {
               document.getElementById(`au${index}`).play()
             }, (index + 1)*1000)
           }
-          setTimeout (function () {
-            document.getElementById('end').play()
-          }, numberArr.length * 1000)
+        }
+        document.getElementById(`au${numberArr.length - 1}`).onended = function () {
+          document.getElementById('end').play()
         }
         document.getElementById('end').onended = function() {
           document.getElementById('gateNumber').play()
         }
-        document.getElementById('start').play()
+        document.getElementById('gateNumber').onended = function () {
+          vm.isCalling = false
+        }
+        setTimeout (function () {
+          vm.isCalling = true
+          document.getElementById('start').play()
+        }, 300)
         // 
+        item.state = 2
+        item.gateNumber = vm.currentGate
+        vm.updateStateBooking(item)
       } else {
         alert('Chọn bàn tiếp nhận')
       }
     },
-    deleteBooking (item) {
+    ignoreBooking (item) {
       let vm = this
       vm.currentBooking = ''
-      vm.currentGate = ''
-      console.log(item)
+      item.state = 3
+      vm.updateStateBooking(item)
+    },
+    updateStateBooking (item) {
+      let vm = this
+      let filter = item
+      vm.$store.dispatch('updateBooking', filter).then(function (result) {
+        setTimeout (function () {
+          vm.loadBooking()
+        }, 500)
+      }).catch (function (reject) {
+        setTimeout (function () {
+          vm.loadBooking()
+        }, 500)
+      })
     },
     callBack () {
       let vm = this
       vm.callingApplicant(vm.currentBooking)
     },
-    receiveDossier (item) {
+    receiveBooking (item) {
       let vm = this
       vm.currentBooking = item
-      console.log(item)
+      vm.filterCreateDossier = ''
+      vm.$store.dispatch('getProcessDetail').then(function (result) {
+        let processDetail = result.filter(function (item2) {
+          return item2.serviceCode === item.serviceCode
+        })[0]
+        vm.filterCreateDossier = {
+          serviceCode: item.serviceCode,
+          govAgencyCode: processDetail['govAgencyCode'],
+          dossierTemplateNo: ''
+        }
+        if (processDetail['options'].length === 1) {
+          vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
+          vm.postDossier()
+        } else {
+          vm.listDichVu = processDetail['options']
+          vm.dichVuSelected = vm.listDichVu[0]
+          vm.dialogAction = true
+        }
+      }).catch (function (reject) {
+      })
     },
-    createDossier (item) {
-      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-      if (isSigned) {
-        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-        window.open(url, '_self')
-      } else {
-        alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
-        // vm.dialog_createDossier = true
+    doSubmitCreateDossier () {
+      let vm = this
+      vm.filterCreateDossier.dossierTemplateNo = vm.dichVuSelected['templateNo']
+      vm.postDossier()
+      vm.dialogAction = false
+    },
+    postDossier () {
+      let vm = this
+      vm.$store.dispatch('postDossier', vm.filterCreateDossier).then(function (result) {
+        vm.currentBooking.state = 4
+        vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
+        }).catch (function (reject1) {
+        })
+        let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
+        window.open(urlRedirect, '_blank')
+      }).catch (function (reject) {
+      })
+    },
+    updateGateNumber (val) {
+      let vm = this
+      let filter = {
+        gateNumber: val
       }
+      vm.$store.dispatch('updateGateNumber', filter).then(function (result) {
+        console.log(result)
+      })
     },
     getStateName () {
       let vm = this
