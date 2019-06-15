@@ -1,5 +1,5 @@
 <template>
-  <v-card flat color="#2585f1" id="contain-control" class="">
+  <v-card flat color="#064787" id="contain-control" class="">
     <v-flex xs12 class="header_login text-xs-center pt-2">
       <div class="logo d-inline-block">
         <!-- <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png">  -->
@@ -12,16 +12,20 @@
     <v-layout wrap style="font-size:24px; color: white;max-width:1200px;margin: 0 auto">
       <v-flex xs4 class="text-xs-center" @click="goTo(1)">
         <img :src="'/documents/' + groupId + '/0/layso.png'" alt="" width="250px" height="150px">
-        <div class="mt-2">LẤY SỐ XẾP HÀNG</div>
+        <div class="mt-2">SCREEN-1</div>
       </v-flex>
       <v-flex xs4 class="text-xs-center" @click="goTo(2)">
         <img :src="'/documents/' + groupId + '/0/danhsachcho.png'" alt="" width="250px" height="150px">
-        <div class="mt-2">DANH SÁCH CHỜ</div>
+        <div class="mt-2">SCREEN-2</div>
       </v-flex>
       <v-flex xs4 class="text-xs-center"  @click="goTo(3)">
         <img :src="'/documents/' + groupId + '/0/dhxh.png'" alt="" width="250px" height="150px">
-        <div class="mt-2">SỐ ĐANG TIẾP NHẬN</div>
+        <div class="mt-2">SCREEN-3</div>
       </v-flex>
+      <!-- <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
+        <img :src="'/documents/' + groupId + '/0/dhxh2.png'" alt="" width="250px" height="150px">
+        <div class="mt-2">SCREEN-4</div>
+      </v-flex> -->
       <!-- <v-flex xs3 class="text-xs-center"  @click="goTo(4)">
         <img :src="'/documents/' + groupId + '/0/kios.png'" alt="" width="250px" height="150px">
         <div class="mt-2">KIOSK TRA CỨU</div>
@@ -78,8 +82,6 @@ export default {
         vm.$router.push({
           path: '/dieu-hanh-xep-hang'
         })
-      } else if (val === 4) {
-        window.location.href = '/web/cong-dich-vu-cong-bo-ngoai-giao/kios#/'
       }
     }
   }

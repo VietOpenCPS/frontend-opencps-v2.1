@@ -230,17 +230,34 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getGateNumber ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences/gateNumber'
+          let config = {
+            headers: {
+              'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get(url, config).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     updateGateNumber ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
-          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences/GATE_NUMBER'
+          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences'
           let config = {
             headers: {
               'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             }
           }
           let params = new URLSearchParams()
-          params.append('value', '{"gateNumber":"' + filter.gateNumber + '"}')
+          params.append('preferences', '{"gateNumber":"' + filter.gateNumber + '"}')
           axios.put(url, params, config).then(function (response) {
             resolve(response.data)
           }).catch(function (error) {
@@ -249,7 +266,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getGateNumber ({commit, state}, filter) {
+    getGateLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -257,10 +274,17 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          let url = '/o/rest/v2/users/' + window.themeDisplay.getUserId() + '/preferences/GATE_NUMBER'
-          axios.get(url, param).then(function (response) {
+          axios.get(state.endPoint + '/dictcollections/GATE_NUMBER/dictitems', param).then(function (response) {
             let serializable = response.data
-            resolve(serializable)
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              for (let index in dataReturn) {
+                dataReturn[index]['itemCode'] = isNaN(dataReturn[index]['itemCode']) ? dataReturn[index]['itemCode'] : Number(dataReturn[index]['itemCode'])
+              }
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
           }).catch(function (error) {
             console.log(error)
             reject(error)

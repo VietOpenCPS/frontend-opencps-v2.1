@@ -1,18 +1,19 @@
 <template>
-  <v-card flat color="#2585f1" id="contain-dktn" class="">
+  <v-card flat color="#064787" id="contain-dktn" class="">
     <v-flex xs12 class="header_login text-xs-center pt-2">
       <div class="logo d-inline-block">
-        <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png"> 
-        <h1 style="font-size:34px; color: #ffffff" class="text-bold">CỤC LÃNH SỰ</h1>
+        <img :src="'/documents/' + groupId + '/0/logo.png'">
+        <div style="font-size:22px;color:#e5e0e0" class="mt-2 text-xs-center">BỘ NGOẠI GIAO</div>
+        <h1 style="font-size:26px; color: #ffffff" class="text-bold my-2">CỤC LÃNH SỰ</h1>
       </div>
     </v-flex>
     <!-- <v-flex xs12 class="text-xs-center" style="margin-top: 10px">
       <h1 style="font-size:32px; color: yellow" class="text-bold">ĐĂNG KÝ TIẾP NHẬN HỒ SƠ TỰ ĐỘNG</h1>
     </v-flex> -->
     <v-layout wrap style="font-size:32px; color: white;max-width:1000px;margin: 0 auto">
-      <v-flex xs12 class="text-xs-center mt-4">
+      <v-flex xs12 class="text-xs-center mt-2">
         <v-card color="#ffffff" width="480px" class="py-3 d-inline-block">
-          <img :src="'/documents/' + groupId + '/0/barcode.png'" alt="" width="480px" height="150px">
+          <img :src="'/documents/' + groupId + '/0/barcode.png'" alt="" width="480px" height="100px">
         </v-card>
       </v-flex>
       <v-flex xs12 class="mt-4">
@@ -32,19 +33,15 @@
       </v-flex>
       <v-flex v-if="isActive" xs12 class="mt-3 text-xs-center" style="color:yellow">
         <div v-if="checkinFail">
-          <span>
-            Thông tin của quý khách không chính xác
-          </span><br>
-          <span>
-            Quý khách vui lòng kiểm tra lại. Xin cảm ơn!
+          <span >
+            Lỗi. Quý khách vui lòng quét lại <br>
+            ERROR. Please again!
           </span>
         </div>
         <div v-else>
           <span>
-            Thông tin của quý khách đã được tiếp nhận
-          </span><br>
-          <span>
-            Vui lòng đợi gọi tên để được xử lý. Xin cảm ơn!
+            Mã {{codeShow}} của quý khách đã được xếp hàng<br>
+            COMPLETED!
           </span>
         </div>
       </v-flex>
@@ -73,9 +70,10 @@ export default {
   },
   data: () => ({
     eformInformation: '',
+    codeShow: '',
     isActive: false,
     checkinFail: false,
-    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '124302',
   }),
   computed: {
     isMobile () {
@@ -110,13 +108,14 @@ export default {
       let vm = this
       if (String(vm.eformInformation).indexOf('-') > 0) {
         let keySearch = String(vm.eformInformation).split('-')
+        vm.codeShow = vm.eformInformation
         if (keySearch.length !== 3) {
           vm.isActive = true
           vm.checkinFail = true
           setTimeout(function() {
             vm.isActive = false
-            vm.eformInformation = ''
           }, 5000)
+          vm.eformInformation = ''
         }
         let filterBooking = {
           className: '',
@@ -135,8 +134,8 @@ export default {
             let bookingName = ''
             if (result['eFormId']) {
               try {
-                let name = JSON.parse(result['eFormData'])['ho_ten_yeu_cau']
-                bookingName = name !== 'undefined' && name !== undefined ? name : ''
+                let name = JSON.parse(result['eFormData'])
+                bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
               } catch (e) {
               }
               vm.checkinFail = false
@@ -150,16 +149,16 @@ export default {
               vm.checkinFail = true
               setTimeout(function() {
                 vm.isActive = false
-                vm.eformInformation = ''
               }, 5000)
+              vm.eformInformation = ''
             }
           }).catch (function (reject) {
             vm.isActive = true
             vm.checkinFail = true
             setTimeout(function() {
               vm.isActive = false
-              vm.eformInformation = ''
             }, 5000)
+            vm.eformInformation = ''
           })
         } else if (keySearch[1] === 'D' && keySearch.length === 3) {
           let filterDossier = {
@@ -178,16 +177,16 @@ export default {
               vm.checkinFail = true
               setTimeout(function() {
                 vm.isActive = false
-                vm.eformInformation = ''
               }, 5000)
+              vm.eformInformation = ''
             }
           }).catch (function (reject) {
             vm.isActive = true
             vm.checkinFail = true
             setTimeout(function() {
               vm.isActive = false
-              vm.eformInformation = ''
             }, 5000)
+            vm.eformInformation = ''
           })
         }
       } else {
@@ -195,8 +194,8 @@ export default {
         vm.checkinFail = true
         setTimeout(function() {
           vm.isActive = false
-          vm.eformInformation = ''
         }, 5000)
+        vm.eformInformation = ''
       }
     },
     createBooking (filter) {
@@ -205,9 +204,10 @@ export default {
         vm.isActive = true
         setTimeout(function() {
           vm.isActive = false
-          vm.eformInformation = ''
         }, 5000)
+        vm.eformInformation = ''
       }).catch (function (reject) {
+        vm.eformInformation = ''
       })
     }
   }

@@ -1,46 +1,44 @@
 <template>
-  <v-card flat color="#1867c0" id="contain-ctn" class="pb-4">
-    <v-flex xs12 class="header_login text-xs-center pt-3">
+  <v-card flat color="#064787" id="contain-ctn" >
+    <v-flex xs12 class="header_dhxh text-xs-center pt-4">
       <div class="logo d-inline-block">
-        <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png"> 
-        <h1 style="font-size:34px; color: #ffffff" class="text-bold">CỤC LÃNH SỰ</h1>
+        <div class="d-inline-block px-3 pt-2" style="position:fixed;top:0;left:0">
+          <img style="width:100px;" :src="'/documents/' + groupId + '/0/logo.png'">
+          <div style="font-size:22px;color:#e5e0e0" class="text-xs-center mt-3">BỘ NGOẠI GIAO</div>
+        </div>
+        <div class="d-inline-block px-2 pt-2" style="position:fixed;top:0;right:0">
+          <img class="img-slogan mb-3" :src="'/documents/' + groupId + '/0/ct.png'">
+          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
+          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
+        </div>
+        <div style="font-size:26px;color:#e5e0e0" class="mb-1">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
+        <v-flex style="line-height: 5px">
+          <div class="underline-white" style="width:350px;height:2px"></div>
+        </v-flex>
       </div>
     </v-flex>
-    <v-flex xs12 class="text-xs-center" style="margin-top: 20px; margin-bottom: 40px">
-      <h1 style="font-size:32px; color: yellow" class="text-bold">DANH SÁCH XẾP HÀNG NỘP HỒ SƠ</h1>
+    <v-flex xs12 class="text-xs-center">
+      <div style="font-size:30px; color: #f7d900;height:50px" class="pt-2">
+        DANH SÁCH XẾP HÀNG NỘP HỒ SƠ, NHẬN KẾT QUẢ
+      </div>
     </v-flex>
-    <v-layout wrap>
-      <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title thongbao-title py-3">
-          <p class="text-bold white--text">THÔNG BÁO</p>
-        </v-flex>
-        <v-flex xs12 class="text-xs-center title content-thongbao py-3" style="border-bottom:2px solid #d3d3d3">
 
-        </v-flex>
-      </v-flex>
-      <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title py-3">
-          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
-        </v-flex>
-        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
-      </v-flex>
-      <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title py-3" >
-          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
-        </v-flex>
-        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
-      </v-flex>
-      <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title py-3" >
-          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
-        </v-flex>
-        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
-      </v-flex>
-      <v-flex class="column-danhsachcho">
-        <v-flex xs12 class="text-xs-center title py-3" >
-          <p class="text-bold white--text">CÁC THỦ TỤC HÀNH CHÍNH TẠI CƠ QUAN TRONG NƯỚC</p>
-        </v-flex>
-        <table-cho-tiep-nhan :applicantList="applicantList"></table-cho-tiep-nhan>
+    <v-layout wrap class="content-dhxh px-2 py-2 pt-3">
+      <v-flex class="column-danhsachcho" :style="`width: ${100/columnList.length}%`" v-for="(item, index) in columnList" v-bind:key="index">
+        <div v-if="item.key === 'newboard'" style="height:100%">
+          <v-flex xs12 class="text-xs-center title thongbao-title py-3" style="height:70px">
+            <p class="text-bold white--text">{{item.title}}</p>
+          </v-flex>
+          <v-flex xs12 class="title content-thongbao py-3 px-2" style="border-bottom:2px solid #d3d3d3;">
+            <div class="white--text" v-html="item.content"></div>
+          </v-flex>
+        </div>
+        <div v-else style="height:100%">
+          <v-flex xs12 class="text-xs-center title py-3" style="height:70px">
+            <p class="text-bold white--text">{{item.title}}</p>
+          </v-flex>
+          <table-cho-tiep-nhan :applicantList="item.content"></table-cho-tiep-nhan>
+        </div>
       </v-flex>
       
     </v-layout>
@@ -61,6 +59,7 @@ export default {
     'table-cho-tiep-nhan': TableChoTiepNhan
   },
   data: () => ({
+    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     applicantList: [
       {
         formCode: 143983123,
@@ -123,6 +122,7 @@ export default {
         applicantName: 'Trần Đức Lương'
       }
     ],
+    columnList: [],
     loadData: false
   }),
   computed: {
@@ -139,8 +139,11 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.getDanhSachCho()
       setTimeout(function(){$('#footer').css('display','none')},500)
+      vm.getServerConfig()
+      setInterval(function () {
+        vm.getDanhSachCho()
+      }, 15000)
     })
   },
   updated () {
@@ -152,28 +155,104 @@ export default {
     setTimeout(function(){$('#footer').css('display','none')},500)
   },
   watch: {
-    loadData (val) {
-      let vm = this
-      vm.getDanhSachCho()
-    }
+    // loadData (val) {
+    //   let vm = this
+    //   setTimeout(function () {
+    //     vm.getDanhSachCho()
+    //   }, 30000)
+    // }
   },
   methods: {
+    getServerConfig () {
+      let vm = this
+      let filter = {
+        serverNo: 'BOOKING_CONFIG'
+      }
+      vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+        vm.columnList = JSON.parse(result.configs)
+        // console.log('columnList', vm.columnList)
+        vm.getDanhSachCho()
+      })
+    },
     getDanhSachCho () {
       var vm = this
       let currentQuery = vm.$router.history.current.query
-      let filter = {}
-      vm.$store.dispatch('getDanhSachCho', filter).then(function (result) {
-        setTimeout(function () {
-          vm.loadData = !vm.loadData
-        }, 5000)
-        if (result.data) {
-          vm.applicantList = result.data
+      if (vm.columnList.length > 0) {
+        for (let index in vm.columnList) {
+          if (vm.columnList[index]['key'] === 'booking') {
+            let filterEform = {
+              state: 1,
+              className: 'EFORM',
+              service: vm.columnList[index]['config']
+            }
+            let bookingDossier = ''
+            let bookingEform = ''
+            let count = 0
+            vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
+              count+=1
+              vm.loading = false
+              if (result) {
+                bookingEform = result
+              } else {
+                bookingEform = []
+              }
+              if (count === 2) {
+                vm.mergeBooking(bookingDossier, bookingEform, index)
+              }
+            }).catch(reject => {
+              count+=1
+              bookingEform = []
+              if (count === 2) {
+                vm.mergeBooking(bookingDossier, bookingEform, index)
+              }
+              vm.loading = false
+            })
+            let filterDossier = {
+              state: 1,
+              className: 'DOSSIER',
+              service: vm.columnList[index]['config']
+            }
+            vm.$store.dispatch('getBookingDangGoi', filterDossier).then(function (result) {
+              count+=1
+              vm.loading = false
+              if (result) {
+                bookingDossier = result
+              } else {
+                bookingDossier = []
+              }
+              if (count === 2) {
+                vm.mergeBooking(bookingDossier, bookingEform, index)
+              }
+            }).catch(reject => {
+              count+=1
+              bookingDossier = []
+              vm.loading = false
+              if (count === 2) {
+                vm.mergeBooking(bookingDossier, bookingEform, index)
+              }
+            })
+          }
         }
-      }).catch(reject => {
-        setTimeout(function () {
-          vm.loadData = !vm.loadData
-        }, 5000)
-      })
+      }
+    },
+    mergeBooking (bookingEform, bookingDossier, index) {
+      let vm = this
+      // console.log('booking', bookingEform, bookingDossier)
+      if (bookingEform.length > 0 || bookingDossier.length > 0) {
+        let booking = bookingEform.concat(bookingDossier)
+        let sortBooking = function (bookingList) {
+          function compare(a, b) {
+            if (a.checkinDate < b.checkinDate)
+              return -1
+            if (a.checkinDate > b.checkinDate)
+              return 1
+            return 0
+          }
+          return bookingList.sort(compare)
+        }
+        booking = sortBooking(booking)
+        vm.columnList[index]['content'] = booking
+      }
     }
   }
 }

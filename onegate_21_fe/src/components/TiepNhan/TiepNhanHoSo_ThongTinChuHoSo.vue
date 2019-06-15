@@ -22,14 +22,12 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red"></span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <v-text-field
                         v-if="originality === 1 || originality === '1'"
                         v-model="thongTinChuHoSo.applicantIdNo"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
                       ></v-text-field>
@@ -54,7 +52,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red"></span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -64,8 +62,6 @@
                         v-else
                         v-model="thongTinChuHoSo.applicantName"
                         @input="changeApplicantInfos"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         :disabled="loadingVerify"
                       ></v-text-field>
                     </v-flex>
@@ -73,7 +69,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="originality === 1" style="color:red"></span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -84,15 +80,13 @@
                       v-model="thongTinChuHoSo.address"
                       multi-line
                       rows="2"
-                      :rules="originality === 1 ? [v => !!v || 'Trường dữ liệu bắt buộc'] : ''"
-                      required
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Tỉnh/Thành phố<span style="color:red"></span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -105,15 +99,13 @@
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.cityCode"
                       @change="onChangeCity"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red"></span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -126,15 +118,13 @@
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.districtCode"
                       @change="onChangeDistrict"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                      <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red"></span> : </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -147,15 +137,13 @@
                       item-value="itemCode"
                       v-model="thongTinChuHoSo.wardCode"
                       @change="onChangeWard"
-                      :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                      required
                       ></v-autocomplete>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số điện thoại <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số điện thoại <span style="color:red"></span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -165,15 +153,13 @@
                       v-else
                       v-model="thongTinChuHoSo.contactTelNo"
                       append-icon="phone"
-                      :rules="[rules.telNo, rules.required]"
-                      required
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ E-mail <span v-if="originality === 1" style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ E-mail <span v-if="originality === 1" style="color:red"></span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -182,8 +168,6 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
-                      :rules="originality === 1 ? [rules.email, rules.required] : (thongTinChuHoSo.contactEmail && originality !== 1 ? [rules.email] : '')"
-                      required
                       ></v-text-field>
                     </v-flex>
                   </v-layout>
@@ -211,7 +195,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">CMND/Hộ chiếu <span style="color:red"></span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -242,7 +226,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red">&nbsp;*&nbsp;</span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red"></span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -251,8 +235,6 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -276,7 +258,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Tỉnh/Thành phố <span style="color:red"></span> : </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -289,15 +271,13 @@
                         item-value="itemCode"
                         @change="onChangeDelegateCity"
                         v-model="thongTinNguoiNopHoSo.delegateCityCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Quận/Huyện <span style="color:red"></span> : </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -310,15 +290,13 @@
                         item-value="itemCode"
                         @change="onChangeDelegateDistrict"
                         v-model="thongTinNguoiNopHoSo.delegateDistrictCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red">&nbsp;*&nbsp;</span> : </v-subheader>
+                        <v-subheader v-else class="pl-0">Xã/Phường <span style="color:red"></span> : </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -330,8 +308,6 @@
                         item-text="itemName"
                         item-value="itemCode"
                         v-model="thongTinNguoiNopHoSo.delegateWardCode"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                        required
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm2>

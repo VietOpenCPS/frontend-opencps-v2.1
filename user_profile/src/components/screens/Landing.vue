@@ -197,7 +197,7 @@
             <v-card-text class="my-0 py-0 px-0">
               <v-flex xs12 class="text-right" style="height: 30px;">
                 <v-tooltip top v-if="!isFollowZalo">
-                  <div class="zalo-follow-only-button" data-oaid="579745863508352884" data-callback="callbackzalo"
+                  <div class="zalo-follow-only-button" data-oaid="1939207196454340331" data-callback="callbackzalo"
                     slot="activator" style="width:90px">
                   </div>
                   <span>Nhấn Quan tâm để có thể nhận thông báo về tình hình xử lý hồ sơ trên ứng dụng Zalo </span>
@@ -403,8 +403,8 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
-      zaloOaId: '402033447373752096333',
-      zaloOaid_token_access: 'ZAK13QrlEIg1fGC4e6myB8Aa0WMkTNj_skCICgqkMXxguJfYoITG4fkwR4ZHCoCOh8WUPOaSS2oaZXTto09N8f2-DK_c95PaYgvhGj8SBXkhX7TFvWqAQ8g6T3RGFJ9AlP95PleE4Jwud4fYmb4MFeRWI6lONZ83_SbLNfvUON31y5zSlJmY1fcXHcxbA3f6mAHk8RakCGdFjMXOZmmH0lEUJKwrE7CqrB0NVBCfR2hFeHjJxHL62y-_U4ozTWK3pUewAfCuTGotWouXSHN_3H-gT3uX',
+      zaloOaId: '1939207196454340331',
+      zaloOaid_token_access: '36ipLhREF2O1Qp5Vkyqv809gC5wrr4vnRZ06R93kNK1D6nzEgxfwRXDi267BibX016q0L-oHQKiDQGmxv91F1o9Z3JR-brOwHrGw5hxrOH574YykkC0jNsG5VKAep2rGPGjoJPp4E40X0aDuoy8GSIb_JshLkKSF11yL1kR1THHVE1qujVrY7cWY22A3z00oFnmB68F4PnftFMqrWEOVK4qlO2wGtYu-MGLW8UFy55euBHXLmSyHHmXf7rttonrAF2bJLSlR1qaV1cynZf0wIB7LEoq',
       userAppZaloUid: '',
       isFollowZalo: false,
       titleDialogPdf: '',

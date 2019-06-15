@@ -1,48 +1,76 @@
 <template>
-  <v-card id="contain-dhxh" flat color="#064787">
-    <v-flex xs12 class="header_dhxh text-xs-center pt-4">
+  <v-card id="contain-dhxh" flat color="#1867c0">
+    <v-flex xs12 class="header_login text-xs-center pt-3">
       <div class="logo d-inline-block">
-        <div class="d-inline-block px-3 pt-2" style="position:fixed;top:0;left:0">
-          <img style="width:100px;" :src="'/documents/' + groupId + '/0/logo.png'">
-          <div style="font-size:22px;color:#e5e0e0" class="mt-3 text-xs-center">BỘ NGOẠI GIAO</div>
-        </div>
-        <div class="d-inline-block px-2 pt-2" style="position:fixed;top:0;right:0">
-          <img class="img-slogan mb-3" :src="'/documents/' + groupId + '/0/ct.png'">
-          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
-          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
-        </div>
-        <div style="font-size:26px;color:#e5e0e0" class="mb-1">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
-        <v-flex style="line-height: 5px">
-          <div class="underline-white" style="width:350px;height:2px"></div>
-        </v-flex>
+        <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png"> 
       </div>
     </v-flex>
     <v-flex xs12 class="text-xs-center">
-      <div style="font-size:30px; color: #f7d900;height:50px" class="">
+      <h1 style="font-size:32px; color: yellow" class="text-bold">
         BẢNG ĐIỀU HÀNH XẾP HÀNG
-      </div>
+      </h1>
     </v-flex>
-    <v-layout wrap class="content-dhxh px-2 py-2 pt-3">
-      <v-flex class="colum-dhxh text-xs-center px-0" :class="`xs${12/gateNumberList.length}`" v-for="(item, index) in gateNumberList" v-bind:key="index">
-        <div class="py-2">
-          <div class="">
-            <span class="">QUẦY</span> <br>
-            <v-flex>
-              <div class="circle white-circle text-bold;">{{item.gateNumber}}</div><br>
-            </v-flex>
-            <v-flex style="line-height: 5px">
-              <div class="underline-white"></div>
-            </v-flex>
+    <v-layout wrap class="pt-5" style="height: calc(100vh - 270px);max-width: 1500px;margin:0 auto">
+      <v-flex xs6 class="colum-dhxh text-xs-center px-2" v-for="(item, index) in gateNumberList" v-bind:key="index">
+        <div class="py-3">
+          <div class="mb-4" style="border-bottom:2px solid #ffff">
+            <span class="text-bold">BÀN SỐ</span> <br>
+            <v-avatar color="white" class="mt-3 mb-4">
+              <span class="red--text headline text-bold" style="font-size: 42px !important;">{{item.gateNumber}}</span>
+            </v-avatar>
           </div>
-          <div class="content-applicant">
-            <div class="py-2">
-              <span>{{item.bookings['codeNumber'] ? item.bookings['codeNumber'] : 'E-1231-9876'}}</span> <br>
-              <span>{{item.bookings['bookingName'] ? item.bookings['bookingName'] : 'Trần Văn Duẩn'}}</span>
-            </div>
+          <div class="d-inline-block mb-2 text-bold">
+            <span>{{item.bookings['codeNumber'] ? item.bookings['codeNumber'] : '-- -- --'}}</span> <br>
+            <span>{{item.bookings['bookingName'] ? item.bookings['bookingName'] : '-- -- --'}}</span>
           </div>
         </div>
       </v-flex>
     </v-layout>
+
+    <!-- <v-layout wrap style="height: calc(100vh - 100px)">
+      <v-flex>
+        <v-data-table
+          id="table-dieuhanhxephang"
+          :headers="headers"
+          :items="queueList"
+          hide-actions
+          class="table-landing table-bordered"
+        >
+          <template slot="items" slot-scope="props">
+            <tr style="cursor: pointer;" :style="'height:' + rowHeight + 'px'">
+              <td class="text-xs-center text-bold py-2" style="letter-spacing:2px;color:#1867c0;font-weight:600;font-size: 36px !important;" width="200px">
+                <div>
+                  <span>{{props.item.gateNumber}}</span>
+                </div>
+              </td>
+
+              <td class="text-xs-center text-bold py-2" width="250px" style="letter-spacing:2px;">
+                <div>
+                  <span>{{props.item.eFormNo}}</span><br>
+                </div>
+              </td>
+              <td class="text-xs-left text-bold py-2 px-4" width="450px" style="letter-spacing:2px">
+                <div style="text-transform: uppercase">
+                  <span>{{props.item.applicantName}}</span>
+                </div>
+              </td>
+              
+            </tr>
+          </template>
+        </v-data-table>
+      </v-flex>
+
+      <v-flex style="max-width:400px;">
+        <div xs12 class="" style="background:#ededed;width:100%;height:100%;display: table; border-bottom: 1px solid #dedede">
+          <div class="logo" style="display: table-cell;
+            text-align: center;
+            vertical-align: middle;">
+            <img src="http://hanoi.fds.vn:1580/o/bongoaigiao-theme/images/logo3.png">
+            <h1 style="font-size:34px; color: #1867c0" class="text-bold">CỤC LÃNH SỰ</h1>
+          </div>
+        </div>
+      </v-flex>
+    </v-layout> -->
   </v-card>
 </template>
 
@@ -58,7 +86,6 @@ export default {
   components: {
   },
   data: () => ({
-    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     rowHeight: 70,
     loadData: false,
     queueList: [
@@ -85,21 +112,14 @@ export default {
     ],
     gateNumberList: [
       {
-        gateNumber: 1,
+        gateNumber: 4,
         bookings: {
           codeNumber: '',
           bookingName: ''
         }
       },
       {
-        gateNumber: 2,
-        bookings: {
-          codeNumber: '',
-          bookingName: ''
-        }
-      },
-      {
-        gateNumber: 3,
+        gateNumber: 5,
         bookings: {
           codeNumber: '',
           bookingName: ''
@@ -123,24 +143,9 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       setTimeout(function(){$('#footer').css('display','none')},500)
-      vm.gateNumberList = []
-      if (currentQuery.hasOwnProperty('gate') && currentQuery.gate) {
-        let gate = currentQuery.gate.split(',')
-        for (let index in gate) {
-          vm.gateNumberList.push({
-            gateNumber: gate[index],
-            bookings: {
-              codeNumber: '',
-              bookingName: ''
-            }
-          })
-        }
-      }
+      vm.rowHeight = ($( window ).height() - 187) / vm.queueList.length
     })
     vm.getDanhSachCho()
-    // setTimeout (function () {
-    //   vm.getDanhSachCho()
-    // }, 30000)
   },
   updated () {
     var vm = this
@@ -157,26 +162,7 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.getDanhSachCho()
-      }, 15000)
-    },
-    '$route': function (newRoute, oldRoute) {
-      let vm = this
-      let currentParams = newRoute.params
-      let currentQuery = newRoute.query
-      vm.gateNumberList = []
-      if (currentQuery.hasOwnProperty('gate') && currentQuery.gate) {
-        let gate = currentQuery.gate.split(',')
-        for (let index in gate) {
-          vm.gateNumberList.push({
-            gateNumber: gate[index],
-            bookings: {
-              codeNumber: '',
-              bookingName: ''
-            }
-          })
-        }
-        vm.getDanhSachCho()
-      }
+      }, 30000)
     }
   },
   methods: {
@@ -197,14 +183,12 @@ export default {
         } else {
           bookingEform = []
         }
-        // console.log('count', count)
         if (count === 2) {
           vm.mergeBooking(bookingDossier, bookingEform)
         }
       }).catch(reject => {
         count+=1
         bookingEform = []
-        // console.log('count', count)
         if (count === 2) {
           vm.mergeBooking(bookingDossier, bookingEform)
         }
@@ -220,14 +204,12 @@ export default {
         } else {
           bookingDossier = []
         }
-        // console.log('count', count)
         if (count === 2) {
           vm.mergeBooking(bookingDossier, bookingEform)
         }
       }).catch(reject => {
         count+=1
         bookingDossier = []
-        // console.log('count', count)
         if (count === 2) {
           vm.mergeBooking(bookingDossier, bookingEform)
         }
@@ -235,26 +217,28 @@ export default {
     },
     mergeBooking (bookingEform, bookingDossier) {
       let vm = this
+      console.log('booking', bookingEform, bookingDossier)
       if (bookingEform.length > 0 || bookingDossier.length > 0) {
         vm.bookingList = bookingEform.concat(bookingDossier)
         let sortBooking = function (bookingList) {
           function compare(a, b) {
-            if (a.checkinDate > b.checkinDate)
-              return -1
             if (a.checkinDate < b.checkinDate)
+              return -1
+            if (a.checkinDate > b.checkinDate)
               return 1
             return 0
           }
           return bookingList.sort(compare)
         }
         vm.bookingList = sortBooking(vm.bookingList)
+        console.log('bookingList', vm.bookingList)
         for (let index in vm.gateNumberList) {
           let currentGate = vm.bookingList.filter(function (item) {
             return String(item.gateNumber) === String(vm.gateNumberList[index]['gateNumber'])
           })[0]
           vm.gateNumberList[index].bookings = currentGate ? currentGate : vm.gateNumberList[index].bookings
         }
-        vm.loadData = !vm.loadData
+        console.log('vm.gateNumberList', vm.gateNumberList)
       }
     }
   }

@@ -7,23 +7,25 @@
     class="table-landing table-bordered"
   >
     <template slot="items" slot-scope="props">
-      <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
-        <td class="text-xs-center text-bold py-2" width="150px">
+      <tr>
+        <td class="text-xs-center text-bold py-2" style="">
           <div>
-            <span>{{props.index + 1}}</span><br>
+            <span>{{props.item.codeNumber}}</span>
           </div>
         </td>
-        <td class="text-xs-center text-bold py-2" style="letter-spacing:2px" width="300px">
-          <div>
-            <span>{{props.item.formCode}}</span>
-          </div>
-        </td>
-        <td class="text-xs-left text-bold py-2 px-5" style="letter-spacing:2px; word-spacing:2px">
+        <td class="text-xs-left text-bold py-2" style="">
           <div style="text-transform: uppercase">
-            <span>{{props.item.applicantName}}</span>
+            <span>{{props.item.bookingName}}</span>
           </div>
         </td>
       </tr>
+    </template>
+    <template slot="no-data">
+      <v-card flat color="transparent">
+        <v-flex class="text-xs-center pt-3 white--text">
+          <span>Không có lượt chờ nào</span>
+        </v-flex>
+      </v-card>
     </template>
   </v-data-table>
 </template>
@@ -42,19 +44,13 @@ export default {
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     headers: [
       {
-        text: 'THỨ TỰ',
+        text: 'MÃ XẾP HÀNG',
         align: 'center',
         sortable: false,
         class: 'py-3'
       },
       {
-        text: 'MÃ TỜ KHAI',
-        align: 'center',
-        sortable: false,
-        class: 'py-3'
-      },
-      {
-        text: 'NGƯỜI NỘP HỒ SƠ',
+        text: 'HỌ TÊN',
         align: 'center',
         sortable: false,
         class: 'py-3'

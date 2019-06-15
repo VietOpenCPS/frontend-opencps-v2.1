@@ -1361,6 +1361,9 @@ ul#captcha li:hover {
 
 
 /*  */
+html {
+    overflow-y: hidden !important;
+}
 .go-home-btn {
     position: absolute !important;
     top: 0;
@@ -1379,27 +1382,67 @@ ul#captcha li:hover {
     min-height: 100vh;
     height: 100vh;
 }
+.header_dhxh {
+    height: 100px;
+    box-sizing: border-box
+}
+.content-dhxh {
+    margin-top: 50px;
+    height: calc(100vh - 200px);
+    height: -moz-calc(100vh - 200px);
+    height: -webkit-calc(100vh - 200px);
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+.img-slogan {
+    width:100px;
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.23), 0px 2px 2px 0px rgba(0, 0, 0, 0.23) inset;
+    border-radius: 100%
+}
+#table-danhsachcho {
+    border-right: 2px solid #d3d3d3;
+    border-left: 2px solid #d3d3d3;
+}
+#table-danhsachcho .v-table__overflow {
+    overflow-x: hidden !important
+}
 #table-danhsachcho thead th {
     border: 2px solid #d3d3d3;
     border-bottom: 0;
+    color: #fff
+}
+#table-danhsachcho tr td  {
+    color: #fff
+}
+#table-danhsachcho thead th:last-child {
+    border-right: 0px !important;
+}
+#table-danhsachcho thead th:first-child {
+    border-left: 0px !important;
+}
+#table-danhsachcho tr td:last-child {
+    border-right: 0px !important;
 }
 #table-danhsachcho tbody tr:not(:last-child) {
     border-bottom: 2px solid #dedede;
 }
-#table-danhsachcho tbody td {
+#table-danhsachcho tbody td:not(:last-child) {
     border-right: 2px solid #d3d3d3;
+}
+#table-danhsachcho tbody td:not(:first-child) {
     border-left: 2px solid #d3d3d3;
 }
 
 #table-dieuhanhxephang th {
     font-size:36px !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     color: #1867c0
 }
 #table-dieuhanhxephang td {
     font-size:36px !important;
-    font-weight: 550;
-    color: #11558e
+    font-weight: 500;
+    color: #11558e;
 }
 #table-dieuhanhxephang thead th {
     border: 3px solid #d3d3d3;
@@ -1426,74 +1469,132 @@ ul#captcha li:hover {
 }
 .colum-dhxh > div {
     border: 2px solid #ffffff;
-    border-radius: 10px;
+    border-radius: 30px;
     font-size: 36px;
     color: #ffffff;
-    min-height: 300px
+    height: 100%;
+}
+.colum-dhxh .content-applicant {
+    display: table;
+    width: 100%;
+    height: calc(100% - 160px);
+    height: -moz-calc(100% - 160px);
+    text-align: center;
+}
+.colum-dhxh .content-applicant > div {
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 36px;
+    text-transform: uppercase;
 }
 .centered-input input {
     text-align: center !important
 }
+.circle {
+    width: 90px;
+    height: 90px;
+    line-height: 80px;
+    border: 5px solid #f00;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    text-align: center;
+    color: #1867c0;
+    font-size: 48px;
+    font-weight: 550;
+    display: inline-block;
+}
+.white-circle {
+    background-color: #fff;  
+}
+.underline-white {
+    display: inline-block;
+    height: 3px;
+    width: 70px;
+    background: #fff;
+}
+.theme--light.v-table {
+    background: transparent !important
+}
 @media only screen and (min-width: 320px) and (max-width: 2560px) {
-    .column-danhsachcho {
-        width: 20%;
-    }
     .column-danhsachcho .content-thongbao {
-        height: calc(100vh - 400px);
+        height: calc(100% - 70px);
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border-top-right-radius: 0px !important;
+        border-top-left-radius: 0px !important;
     }
     .column-danhsachcho .title {
         font-size:16px !important; 
-        margin: 0 8px 
+        margin: 0;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
     }
     .column-danhsachcho #table-danhsachcho {
-        margin: 0 8px;
-        height: calc(100vh - 400px);
-        background: #ffffff;
+        margin: 0;
+        height: calc(100% - 70px);
+        background: transparent;
         overflow: hidden;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
     }
     #table-danhsachcho th {
         font-size:14px !important;
         font-weight: 500 !important;
-        color: #031674
+        color: #fff
     }
     #table-danhsachcho td {
         font-size:14px !important;
         font-weight: 500;
-        color: #11558e
+        color: #fff
+    }
+    #table-danhsachcho table td:last-child {
+        padding-left: 5px;
+        padding-right: 5px
     }
     .column-danhsachcho .thongbao-title {
-        height: 70px
+        height: 55px
     }
+    /* #table-danhsachcho tbody td:nth-child(2) {
+        width: 120px;
+    } */
 }
 @media only screen and (min-width: 2560px) {
-    .column-danhsachcho {
-        width: 20%;
-    }
-    .column-danhsachcho .thongbao-title {
+    /* .column-danhsachcho .thongbao-title {
         height: 100px
-    }
+    } */
     .column-danhsachcho .content-thongbao {
-        height: calc(100vh - 430px);
+        height: calc(100% - 70px);
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border-top-right-radius: 0px !important;
+        border-top-left-radius: 0px !important;
     }
     .column-danhsachcho .title {
         font-size:32px !important;
-        margin: 0 24px;
-        height: 100px;
+        /* height: 100px; */
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
     }
     .column-danhsachcho #table-danhsachcho {
-        margin: 0 24px;
-        height: calc(100vh - 430px);
-        background: #ffffff
+        height: calc(100% - 70px);
+        background:transparent;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
     }
     #table-danhsachcho th {
         font-size:28px !important;
-        font-weight: 600 !important;
-        color: #031674
+        font-weight: 500 !important;
+        color: #fff
     }
     #table-danhsachcho td {
         font-size:28px !important;
-        font-weight: 550;
-        color: #11558e
+        font-weight: 500;
+        color: #fff
+    }
+    #table-danhsachcho table td:last-child {
+        padding-left: 48px;
+        padding-right: 48px
     }
 }
 /*  */

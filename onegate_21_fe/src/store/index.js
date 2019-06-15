@@ -511,7 +511,11 @@ export const store = new Vuex.Store({
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/marks', paramDossierMark).then(function (response) {
           let serializable = response.data
           if (serializable.data) {
-            resolve(serializable.data)
+            let marks = serializable.data
+            for (let index in marks) {
+              marks[index].recordCount = ''
+            }
+            resolve(marks)
           } else {
             resolve([])
           }
@@ -1328,9 +1332,12 @@ export const store = new Vuex.Store({
             dataPostdossierMark.append('fileComment', data.fileComment)
           }
         } else {
-          if (data.fileMark !== undefined && data.fileMark !== 'undefined' && data.fileMark !== null) {
+          if (data.fileMark && data.fileMark !== undefined && data.fileMark !== 'undefined' && data.fileMark !== null) {
             dataPostdossierMark.append('fileMark', data.fileMark)
           }
+        }
+        if (!isNaN(data.recordCount) && data.recordCount !== undefined && data.recordCount !== 'undefined' && data.recordCount !== null) {
+          dataPostdossierMark.append('recordCount', data.recordCount)
         }
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {

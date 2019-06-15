@@ -170,6 +170,19 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
+            <v-flex style="width: 100px;" class="layout wrap">
+              <span style="padding-top: 7px">Số lượng:</span>&nbsp;
+              <v-text-field
+              class="px-0 py-0 pl-2 d-inline-block"
+              style="width: 40px; max-width: 40px;"
+              v-model="dossierTemplateItems[index]['recordCount']"
+              @input="changeRecordCount(dossierTemplateItems[index])"
+              v-if="!onlyView"
+              ></v-text-field>
+              <!-- <v-icon v-if="!onlyView && originality !== 1" v-on:click.stop="changeRecoreCount" style="cursor: pointer;" size="16" color="primary">edit</v-icon> -->
+              <!-- <v-icon v-if="!onlyView && originality !== 1" style="cursor: pointer;" v-on:click.stop="updateRecordCount" size="16" color="primary">done</v-icon> -->
+              <span v-if="onlyView">{{dossierTemplateItems[index]['recordCount']}}</span>
+            </v-flex>
             <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
@@ -1403,6 +1416,13 @@ export default {
       } else {
         return false
       }
+    },
+    changeRecordCount (markRecord) {
+      var vm = this
+      setTimeout(function () {
+        let item = markRecord
+        vm.$store.dispatch('postDossierMark', item)
+      }, 200)
     }
   }
 }

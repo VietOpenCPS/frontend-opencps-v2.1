@@ -41,18 +41,18 @@
             ></v-autocomplete>
           </v-flex>
         </v-layout>
-        <v-chip class="text-bold" color="#3fa8f1" text-color="white" style="width:170px;height:42px;font-size: 22px;position:absolute;top:100px;left:10px">
+        <v-chip class="text-bold" color="#3fa8f1" text-color="white" style="width:200px;height:42px;font-size: 22px;position:absolute;top:100px;left:10px">
           <v-avatar class="pl-3">
             <v-icon color="white"> chrome_reader_mode</v-icon>
           </v-avatar>
-          <span class="pl-2" v-if="!currentGate">BÀN SỐ ---</span>
-          <span class="pl-2" v-else>BÀN SỐ {{currentGate}}</span>
+          <span class="pl-2" v-if="!currentGate">QUẦY SỐ ---</span>
+          <span class="pl-2" v-else>QUẦY SỐ {{currentGate}}</span>
         </v-chip>
         <v-flex xs12 class="text-xs-center" style="position: relative;">
           <div class="d-inline-block">
             <div class="d-inline-block">
               <h1 class="my-2" style="color: green">SỐ ĐANG GỌI</h1>
-              <v-chip class="d-inline-block text-xs-center pt-2" label color="#3fa8f1" text-color="white" style="width:250px;height:70px;font-size:32px;color:#ffffff">
+              <v-chip class="d-inline-block text-xs-center pt-4" label color="#3fa8f1" text-color="white" style="width:250px;height:100px;font-size:32px;color:#ffffff">
                 <span v-if="currentBooking">{{currentBooking.codeNumber}}</span>
                 <span v-else>-- -- --</span>
               </v-chip>
@@ -62,8 +62,9 @@
                 :loading="loadingCalling"
                 :disabled="loadingCalling || isCalling"
                 color="red"
-                class="white--text"
+                class="white--text mb-1"
                 @click="ignoreBooking"
+                style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>clear</v-icon> &nbsp;
                 BỎ QUA
@@ -72,9 +73,22 @@
               <v-btn
                 :loading="loadingCalling"
                 :disabled="loadingCalling || isCalling"
+                color="#3fa8f1"
+                class="white--text my-0"
+                @click="receiveBooking(currentBooking)"
+                style="width: 120px;"
+              >
+                <v-icon class="ml-0" right dark>save</v-icon> &nbsp;
+                TIẾP NHẬN
+              </v-btn>
+              <br>
+              <v-btn
+                :loading="loadingCalling"
+                :disabled="loadingCalling || isCalling"
                 color="primary"
                 class="white--text mt-1"
                 @click="callBack"
+                style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>cached</v-icon> &nbsp;
                 GỌI LẠI
@@ -91,12 +105,12 @@
           </v-flex>
           <v-flex xs6 class="text-right pt-3">
             <div class="d-inline-block">
-              <span class="text-bold">BÀN TIẾP NHẬN SỐ:</span>
+              <span class="text-bold">QUẦY TIẾP NHẬN SỐ:</span>
               <v-select
                 :items="gateList"
                 v-model="currentGate"
-                item-text="value"
-                item-value="value"
+                item-text="itemCode"
+                item-value="itemCode"
                 :hide-selected="true"
                 clearable
                 class="d-inline-block ml-3 text-bold"
@@ -170,7 +184,7 @@
         </template>
         <template slot="no-data">
           <v-card flat color="#fff">
-            <v-flex class="text-xs-center">
+            <v-flex class="text-xs-center pt-2">
               <span>Không có lượt chờ nào</span>
             </v-flex>
           </v-card>
@@ -238,12 +252,10 @@ import $ from 'jquery'
 import axios from 'axios'
 import toastr from 'toastr'
 import support from '../../store/support.json'
-import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {
   props: [],
   components: {
-    'tiny-pagination': TinyPagination
   },
   data: () => ({
     loadData: false,
@@ -276,24 +288,24 @@ export default {
     stateSelected: '1',
     loadingCalling: false,
     gateList: [{
-      value: 1,
-      text: 'Bàn số 1'
+      itemCode: 1,
+      itemName: 'Quầy số 1'
     },
     {
-      value: 2,
-      text: 'Bàn số 2'
+      itemCode: 2,
+      itemName: 'Quầy số 2'
     },
     {
-      value: 3,
-      text: 'Bàn số 3'
+      itemCode: 3,
+      itemName: 'Quầy số 3'
     },
     {
-      value: 4,
-      text: 'Bàn số 4'
+      itemCode: 4,
+      itemName: 'Quầy số 4'
     },
     {
-      value: 5,
-      text: 'Bàn số 5'
+      itemCode: 5,
+      itemName: 'Quầy số 5'
     }],
     currentGate: '',
     bookingList: [
@@ -306,12 +318,12 @@ export default {
         sortable: false
       },
       {
-        text: 'Mã tờ khai',
+        text: 'Mã xếp hàng',
         align: 'center',
         sortable: false
       },
       {
-        text: 'Người nộp hồ sơ',
+        text: 'Họ tên',
         align: 'center',
         sortable: false
       },
@@ -332,6 +344,7 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.getServiceInfo()
+      vm.getGateLists()
       vm.loadBooking()
       setTimeout(function () {
         if (vm.bookingList.length > 5) {
@@ -369,7 +382,8 @@ export default {
     },
     currentGate (val) {
       let vm = this
-      vm.updateGateNumber(val)
+      let gateNumber = isNaN(val) ? val : Number(val)
+      vm.updateGateNumber(gateNumber)
     }
   },
   methods: {
@@ -380,6 +394,13 @@ export default {
       vm.$store.dispatch('getServiceLists').then(function (result) {
         vm.serviceInfoList = result
         vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : ''
+      })
+    },
+    getGateLists () {
+      let vm = this
+      vm.$store.dispatch('getGateLists').then(function (result) {
+        vm.gateList = result
+        vm.getGateNumber()
       })
     },
     filterBooking () {
@@ -421,8 +442,8 @@ export default {
         state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
         className: 'EFORM'
       }
-      let bookingDossier = ''
-      let bookingEform = ''
+      let bookingDossier = []
+      let bookingEform = []
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
         count+=1
         vm.loading = false
@@ -480,61 +501,46 @@ export default {
       }
       vm.loadData = !vm.loadData
     },
-    paggingData (config) {
-      let vm = this
-      let current = vm.$router.history.current
-      let newQuery = current.query
-      let queryString = '?'
-      newQuery['page'] = ''
-      for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
-          queryString += key + '=' + newQuery[key] + '&'
-        }
-      }
-      queryString += 'page=' + config.page
-      vm.$router.push({
-        path: current.path + queryString
-      })
-    },
     callingApplicant (item) {
       let vm = this
       if (vm.currentGate) {
         vm.currentBooking = item
         $('#audioCalling').html('')
         let splitNumberCode = vm.currentBooking['codeNumber'].split('-')
-        let numberCalling = splitNumberCode[1] + splitNumberCode[2]
-        let srcAudioStart = splitNumberCode[0] === 'E' ? `http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
+        let numberCalling = splitNumberCode[0] + splitNumberCode[1] + splitNumberCode[2]
+        let srcAudioStart = splitNumberCode[0] === 'E' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
         let audioStart = `
-          <audio id="start" controls>
+          <audio id="start">
             <source src="${srcAudioStart}" type="audio/mp3">
           </audio>
         `
         let audioEnd = `
           <audio id="end">
-            <source src="http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/toGateNumber.mp3" type="audio/mp3">
+            <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/toGateNumber.mp3" type="audio/mp3">
           </audio>
         `
         let audioNumber = ''
         for (let index = 0; index < numberArr.length; index++) {
           audioNumber += `
             <audio id="au${index}">
-              <source src="http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/${numberArr[index]}.mp3" type="audio/mp3">
+              <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${numberArr[index]}.mp3" type="audio/mp3">
             </audio>
           `
         }
         let gateAudio = `
           <audio id="gateNumber">
-            <source src="http://hanoi.fds.vn:1580/documents/${vm.groupId}/${vm.idVoicePortlet}/${vm.currentGate}.mp3" type="audio/mp3">
+            <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${Number(vm.currentGate)}.mp3" type="audio/mp3">
           </audio>
         `
         $('#audioCalling').html(audioStart + audioNumber + audioEnd + gateAudio)
         // 
         document.getElementById('start').onended = function () {
-          for (let index = 0; index < numberArr.length; index++) {
+          document.getElementById(`au0`).play()
+          for (let index = 1; index < numberArr.length; index++) {
             setTimeout (function() {
               document.getElementById(`au${index}`).play()
-            }, (index + 1)*1000)
+            }, (index)*800)
           }
         }
         document.getElementById(`au${numberArr.length - 1}`).onended = function () {
@@ -585,25 +591,35 @@ export default {
       let vm = this
       vm.currentBooking = item
       vm.filterCreateDossier = ''
-      vm.$store.dispatch('getProcessDetail').then(function (result) {
-        let processDetail = result.filter(function (item2) {
-          return item2.serviceCode === item.serviceCode
-        })[0]
-        vm.filterCreateDossier = {
-          serviceCode: item.serviceCode,
-          govAgencyCode: processDetail['govAgencyCode'],
-          dossierTemplateNo: ''
-        }
-        if (processDetail['options'].length === 1) {
-          vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
-          vm.postDossier()
-        } else {
-          vm.listDichVu = processDetail['options']
-          vm.dichVuSelected = vm.listDichVu[0]
-          vm.dialogAction = true
-        }
-      }).catch (function (reject) {
-      })
+      if (item.codeNumber.indexOf('E')) {
+        vm.$store.dispatch('getProcessDetail').then(function (result) {
+          let processDetail = result.filter(function (item2) {
+            return item2.serviceCode === item.serviceCode
+          })[0]
+          vm.filterCreateDossier = {
+            serviceCode: item.serviceCode,
+            govAgencyCode: processDetail['govAgencyCode'],
+            dossierTemplateNo: ''
+          }
+          if (processDetail['options'].length === 1) {
+            vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
+            vm.postDossier()
+          } else {
+            vm.listDichVu = processDetail['options']
+            vm.dichVuSelected = vm.listDichVu[0]
+            vm.dialogAction = true
+          }
+        }).catch (function (reject) {
+        })
+      } else if (item.codeNumber.indexOf('D')) {
+        vm.currentBooking.state = 4
+        vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
+        }).catch (function (reject1) {
+        })
+        let dossierId = item.codeNumber.split('-')[2]
+        let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/9/chi-tiet-ho-so/' + dossierId
+        window.open(urlRedirect, '_blank')
+      }
     },
     doSubmitCreateDossier () {
       let vm = this
@@ -620,6 +636,13 @@ export default {
         })
         let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
         window.open(urlRedirect, '_blank')
+      }).catch (function (reject) {
+      })
+    },
+    getGateNumber () {
+      let vm = this
+      vm.$store.dispatch('getGateNumber').then(function (result) {
+        vm.currentGate = result
       }).catch (function (reject) {
       })
     },

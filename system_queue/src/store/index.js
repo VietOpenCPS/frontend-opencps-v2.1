@@ -116,7 +116,8 @@ export const store = new Vuex.Store({
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             },
             params: {
-              state: filter.state ? filter.state : ''
+              state: filter.state ? filter.state : '',
+              service: filter.service ? filter.service : ''
             }
           }
           axios.get(state.endPoint + '/bookings/' + filter.className, param).then(function (response) {
@@ -124,9 +125,30 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               resolve(dataReturn)
+            } else {
+              resolve([])
             }
           }).catch(function (xhr) {
-            console.log(xhr)
+            reject([])
+          })
+        })
+      })
+    },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
           })
         })
       })
