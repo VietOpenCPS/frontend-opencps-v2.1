@@ -8,22 +8,27 @@
   >
     <template slot="items" slot-scope="props">
       <tr>
-        <td class="text-xs-center text-bold py-2" style="">
+        <td class="text-xs-center text-bold px-0" style="">
           <div>
-            <span style="font-size:24px">{{props.item.codeNumber}}</span>
+            <span style="font-size:24px">{{props.index + 1}}</span>
           </div>
         </td>
-        <td class="text-xs-left text-bold py-2" style="">
+        <td class="text-xs-center text-bold px-0" style="">
+          <div>
+            <span style="font-size:32px">{{props.item['codeNumber']}}</span>
+          </div>
+        </td>
+        <!-- <td class="text-xs-left text-bold py-2" style="">
           <div style="">
             <span>{{props.item.bookingName}}</span>
           </div>
-        </td>
+        </td> -->
       </tr>
     </template>
     <template slot="no-data">
       <v-card flat color="transparent">
-        <v-flex class="text-xs-center pt-2 white--text">
-          <span>Không có lượt chờ nào</span>
+        <v-flex class="text-xs-center white--text">
+          <span>Không có</span>
         </v-flex>
       </v-card>
     </template>
@@ -44,17 +49,23 @@ export default {
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     headers: [
       {
-        text: 'MÃ TK/BN',
+        text: 'TT',
         align: 'center',
         sortable: false,
         class: 'py-3'
       },
       {
-        text: 'HỌ TÊN',
+        text: 'MÃ TK/BN',
         align: 'center',
         sortable: false,
         class: 'py-3'
       }
+      // {
+      //   text: 'HỌ TÊN',
+      //   align: 'center',
+      //   sortable: false,
+      //   class: 'py-3'
+      // }
     ]
   }),
   computed: {

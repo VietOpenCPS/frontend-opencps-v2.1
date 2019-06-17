@@ -134,6 +134,44 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDossier ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get(filter.url, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            reject([])
+          })
+        })
+      })
+    },
+    getDossierDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (xhr) {
+            reject()
+          })
+        })
+      })
+    },
     getServerConfig ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -170,6 +208,24 @@ export const store = new Vuex.Store({
           dataCreateBooking.append('gateNumber', '')
           dataCreateBooking.append('bookingName', filter.bookingName)
           axios.post('/o/rest/v2/bookings', dataCreateBooking, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    updateBooking ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataUpdateBooking = new URLSearchParams()
+          dataUpdateBooking.append('speaking', filter.speaking)
+          axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
             resolve(response)
           }).catch(function (xhr) {
             reject(xhr)

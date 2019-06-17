@@ -1374,13 +1374,17 @@ html {
 .go-home-btn:hover {
     opacity: 1;
 }
-#contain-ctn, #contain-dhxh, #contain-dktn, #contain-control {
+#contain-ctn, #contain-dhxh, #contain-dktn, #contain-control, #contain-calling {
     font-family: 'Times New Roman', Times, serif !important;
 }
 #contain-ctn, #contain-dhxh, #contain-dktn, #contain-control {
     height: auto;
     min-height: 100vh;
     height: 100vh;
+}
+#contain-calling {
+    height: auto;
+    min-height: 100vh;
 }
 .header_dhxh {
     height: 70px;
@@ -1435,7 +1439,9 @@ html {
 #table-danhsachcho tbody td:not(:first-child) {
     border-left: 2px solid #d3d3d3;
 }
-
+#table-danhsachcho tbody td:first-child {
+    width: 50px !important
+}
 #table-dieuhanhxephang th {
     font-size:36px !important;
     font-weight: 500 !important;
@@ -1469,24 +1475,27 @@ html {
     border: 2px solid #d3d3d3;
     border-bottom: 0
 }
+.colum-dhxh {
+    height: 100%;
+}
 .colum-dhxh > div {
     border: 2px solid #ffffff;
     border-radius: 30px;
-    font-size: 26px;
+    font-size: 32px;
     color: #ffffff;
     height: 100%;
 }
 .colum-dhxh .content-applicant {
     display: table;
     width: 100%;
-    height: calc(100% - 210px);
-    height: -moz-calc(100% - 210px);
+    height: calc(100% - 300px);
+    height: -moz-calc(100% - 300px);
     text-align: center;
 }
 .colum-dhxh .content-applicant > div {
     display: table-cell;
     vertical-align: middle;
-    font-size: 36px;
+    font-size: 32px;
     text-transform: uppercase;
 }
 .content-applicant .codeNumber {
@@ -1496,16 +1505,16 @@ html {
     text-align: center !important
 }
 .circle {
-    width: 155px;
-    height: 155px;
-    line-height: 140px;
+    width: 195px;
+    height: 195px;
+    line-height: 170px;
     border: 5px solid red;
     border-radius: 50%;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     text-align: center;
     color: #1867c0;
-    font-size: 72px;
+    font-size: 100px;
     font-weight: 550;
     display: inline-block;
 }

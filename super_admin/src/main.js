@@ -98,19 +98,19 @@ new Vue({
             end: -1
           }
         )
-        // vm.$socket.sendObj(
-        //   {
-        //     type: 'api',
-        //     cmd: 'get',
-        //     respone: 'loginUser',
-        //     api: '/o/v1/opencps/users/login',
-        //     headers: {
-        //       'Token': vm.getAuthToken(),
-        //       'groupId': vm.getScopeGroupId(),
-        //       'USER_ID': vm.getUserId()
-        //     }
-        //   }
-        // )
+        vm.$socket.sendObj(
+          {
+            type: 'api',
+            cmd: 'get',
+            respone: 'loginUser',
+            api: '/o/v1/opencps/users/login',
+            headers: {
+              'Token': vm.getAuthToken(),
+              'groupId': vm.getScopeGroupId(),
+              'USER_ID': vm.getUserId()
+            }
+          }
+        )
         if (window.location.href.endsWith('#/')) {
           vm.$router.push('/table/opencps_employee')
         }

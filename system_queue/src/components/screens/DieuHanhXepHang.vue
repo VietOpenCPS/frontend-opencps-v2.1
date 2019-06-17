@@ -3,31 +3,31 @@
     <v-flex xs12 class="header_dhxh text-xs-center pt-0">
       <div class="logo d-inline-block">
         <div class="d-inline-block px-3 pt-2" style="position:fixed;top:0;left:0">
-          <img style="width:70px;" :src="'/documents/' + groupId + '/0/logo.png'">
-          <div style="font-size:16px;color:#e5e0e0" class="mt-3 text-xs-center">BỘ NGOẠI GIAO</div>
+          <img style="width:100px;" :src="'/documents/' + groupId + '/0/logo.png'">
+          <div style="font-size:22px;color:#e5e0e0" class="mt-3 text-xs-center">BỘ NGOẠI GIAO</div>
         </div>
         <div class="d-inline-block px-2 pt-2" style="position:fixed;top:0;right:0">
-          <img class="img-slogan mb-3" :src="'/documents/' + groupId + '/0/ct.png'">
-          <div style="font-size:16px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
-          <div style="font-size:16px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
+          <img class="img-slogan mb-3" style="width:100px;" :src="'/documents/' + groupId + '/0/ct.png'">
+          <div style="font-size:22px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
+          <div style="font-size:22px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
         </div>
-        <div style="font-size:26px;color:#e5e0e0" class="mb-1">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
+        <div style="font-size:32px;color:#e5e0e0" class="mb-1">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
         <v-flex style="line-height: 5px">
           <div class="underline-white" style="width:350px;height:2px"></div>
         </v-flex>
       </div>
     </v-flex>
     <v-flex xs12 class="text-xs-center">
-      <div style="font-size:24px; color: #f7d900;height:50px" class="">
+      <div style="font-size:32px; color: #f7d900;height:50px" class="">
         BẢNG ĐIỀU HÀNH XẾP HÀNG
       </div>
     </v-flex>
-    <v-layout wrap class="content-dhxh px-2 py-2 pt-4">
+    <v-layout wrap class="content-dhxh px-2 py-2 pt-5">
       <v-flex class="colum-dhxh text-xs-center px-0" :class="`xs${12/gateNumberList.length}`" v-for="(item, index) in gateNumberList" v-bind:key="index">
         <div class="py-2">
-          <div class="">
-            <span class="">QUẦY</span> <br>
-            <v-flex>
+          <div class="pt-4" style="min-height:300px">
+            <span class="" style="">QUẦY</span> <br>
+            <v-flex class="pt-1">
               <div class="circle white-circle text-bold;">{{item.gateNumber}}</div><br>
             </v-flex>
             <v-flex style="line-height: 5px">

@@ -30,12 +30,12 @@
             <p class="text-bold white--text">{{item.title}}</p>
           </v-flex>
           <v-flex xs12 class="title content-thongbao py-3 px-2" style="border-bottom:2px solid #d3d3d3;">
-            <div class="white--text" v-html="item.content"></div>
+            <div class="white--text" v-html="item.content" id="noidung-thongbao"></div>
           </v-flex>
         </div>
         <div v-else style="height:100%">
-          <v-flex xs12 class="text-xs-center title py-3" style="height:70px">
-            <p class="text-bold white--text">{{item.title}}</p>
+          <v-flex xs12 class="text-xs-center title py-3 pt-4" style="height:70px">
+            <p class="text-bold white--text">{{item.title}} ({{Array.isArray(columnList[index]['content']) ? columnList[index]['content'].length : 0}})</p>
           </v-flex>
           <table-cho-tiep-nhan :applicantList="item.content"></table-cho-tiep-nhan>
         </div>
@@ -70,56 +70,6 @@ export default {
         formCode: 123983123,
         applicantName: 'Trần Viết Lãm',
         counter: '04'
-      },
-      {
-        formCode: 123483123,
-        applicantName: 'Trịnh Công Trình',
-        counter: '01'
-      },
-      {
-        formCode: 123984523,
-        applicantName: 'Nguyễn Tấn Dũng',
-        counter: '05'
-      },
-      {
-        formCode: 123933123,
-        applicantName: 'Nông Đức Mạnh'
-      },
-      {
-        formCode: 123922123,
-        applicantName: 'Trần Văn Duẩn'
-      },
-      {
-        formCode: 123548123,
-        applicantName: 'Trần Đức Lương'
-      },
-      {
-        formCode: 143983123,
-        applicantName: 'Trần Văn Duẩn'
-      },
-      {
-        formCode: 123983123,
-        applicantName: 'Trần Viết Lãm'
-      },
-      {
-        formCode: 123483123,
-        applicantName: 'Trịnh Công Trình'
-      },
-      {
-        formCode: 123984523,
-        applicantName: 'Nguyễn Tấn Dũng'
-      },
-      {
-        formCode: 123933123,
-        applicantName: 'Nông Đức Mạnh'
-      },
-      {
-        formCode: 123922123,
-        applicantName: 'Trần Văn Duẩn'
-      },
-      {
-        formCode: 123548123,
-        applicantName: 'Trần Đức Lương'
       }
     ],
     columnList: [],
@@ -231,15 +181,62 @@ export default {
                 vm.mergeBooking(bookingDossier, bookingEform, index)
               }
             })
+          } else if (vm.columnList[index]['key'] === 'API') {
+            let bookingDossierRealease = []
+            let filter = {
+              url: vm.columnList[index]['url'] ? vm.columnList[index]['url'] : ''
+            }
+            vm.$store.dispatch('getDossier', filter).then(function (result) {
+              // -----
+              let bookingDossierArray = []
+              if (Array.isArray(result) && result.length > 0) {
+                let filter = {
+                  state: '',
+                  className: 'DOSSIER',
+                  service: vm.columnList[index]['config']
+                }
+                vm.$store.dispatch('getBookingDangGoi', filter).then(function (resultBooking) {
+                  if (resultBooking) {
+                    bookingDossierRealease = resultBooking
+                  } else {
+                    bookingDossierRealease = []
+                  }
+                  if (bookingDossierRealease.length > 0) {
+                    let lengthBooking = bookingDossierRealease.length
+                    for (let i = 0; i < lengthBooking; i++) {
+                      let dossierId = bookingDossierRealease[i]['codeNumber'].split('-')[2]
+                      let lengthDossier = result.length
+                      for (let j = 0; j < lengthDossier; j++) {
+                        if (String(dossierId) === String(result[j]['dossierId'])) {
+                          bookingDossierArray.push(bookingDossierRealease[i])
+                          break
+                        }
+                      }
+                      vm.columnList[index]['content'] = bookingDossierArray
+                    }
+                  }
+                })
+              }
+              // -----
+              vm.columnList[index]['content'] = result
+            }).catch(function (reject) {
+            })
           }
         }
       }
     },
-    mergeBooking (bookingEform, bookingDossier, index) {
+    mergeBooking (bookingDossier, bookingEform, index) {
       let vm = this
       // console.log('booking', bookingEform, bookingDossier)
       if (bookingEform.length > 0 || bookingDossier.length > 0) {
-        let booking = bookingEform.concat(bookingDossier)
+        let booking
+        if (vm.columnList[index]['className'] && vm.columnList[index]['className'] === 'DOSSIER') {
+          booking = bookingDossier
+        } else if (vm.columnList[index]['className'] && vm.columnList[index]['className'] === 'EFORM') {
+          booking = bookingEform
+        } else {
+          booking = bookingEform.concat(bookingDossier)
+        }
         let sortBooking = function (bookingList) {
           function compare(a, b) {
             if (a.checkinDate < b.checkinDate)

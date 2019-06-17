@@ -4,7 +4,8 @@
       <div class="logo d-inline-block">
         <img :src="'/documents/' + groupId + '/0/logo.png'">
         <div style="font-size:22px;color:#e5e0e0" class="mt-2 text-xs-center">BỘ NGOẠI GIAO</div>
-        <h1 style="font-size:26px; color: #ffffff" class="text-bold my-2">CỤC LÃNH SỰ</h1>
+        <h1 style="font-size:26px; color: #ffffff" class="text-bold my-2">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ
+        </h1>
       </div>
     </v-flex>
     <!-- <v-flex xs12 class="text-xs-center" style="margin-top: 10px">
@@ -160,18 +161,28 @@ export default {
             }, 5000)
             vm.eformInformation = ''
           })
-        } else if (keySearch[1] === 'D' && keySearch.length === 3) {
+        } else if (keySearch[0] === 'D' && keySearch.length === 3) {
           let filterDossier = {
             dossierId: keySearch[2]
           }
-          vm.$store.dispatch('getDossier', filterDossier).then(function (result) {
+          vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
             if (result) {
               vm.checkinFail = false
               filterBooking.className = 'DOSSIER'
               filterBooking.classPK = result.dossierId
               filterBooking.serviceCode = result.serviceCode
               filterBooking.bookingName = result.applicantName
-              vm.createBooking(filterBooking)
+              if (result['stepCode'] && '404,600,300'.indexOf(String(result['stepCode'])) >= 0) {
+                console.log('createBK', result['stepCode'], filterBooking)
+                vm.createBooking(filterBooking)
+              } else {
+                vm.isActive = true
+                vm.checkinFail = true
+                setTimeout(function() {
+                  vm.isActive = false
+                }, 5000)
+                vm.eformInformation = ''
+              }
             } else {
               vm.isActive = true
               vm.checkinFail = true

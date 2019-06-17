@@ -60,7 +60,7 @@
             <div v-if="currentBooking" class="d-inline-block ml-3" style="position: absolute;top:50px">
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || isCalling"
+                :disabled="loadingCalling"
                 color="red"
                 class="white--text mb-1"
                 @click="ignoreBooking"
@@ -72,7 +72,7 @@
               <br>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || isCalling"
+                :disabled="loadingCalling"
                 color="#3fa8f1"
                 class="white--text my-0"
                 @click="receiveBooking(currentBooking)"
@@ -84,7 +84,7 @@
               <br>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || isCalling"
+                :disabled="loadingCalling || !currentBooking['speaking']"
                 color="primary"
                 class="white--text mt-1"
                 @click="callBack"
@@ -152,7 +152,7 @@
                 :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1 || isCalling"
                 :color="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1  ? 'grey' : 'primary'"
                 class="white--text"
-                @click="callingApplicant(props.item)"
+                @click="callingBooking(props.item)"
                 style="width: 100px;"
               >
                 <span v-if="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] == 2">Đang gọi...</span>
@@ -259,6 +259,7 @@ export default {
   },
   data: () => ({
     loadData: false,
+    apiRelease: '',
     dialogAction: false,
     dichVuSelected: '',
     listDichVu: '',
@@ -318,7 +319,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Mã xếp hàng',
+        text: 'Mã TK/BN',
         align: 'center',
         sortable: false
       },
@@ -343,6 +344,7 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
+      vm.getServerConfig()
       vm.getServiceInfo()
       vm.getGateLists()
       vm.loadBooking()
@@ -378,7 +380,7 @@ export default {
       let vm = this
       setTimeout(function () {
         vm.loadBooking()
-      }, 15000)
+      }, 5000)
     },
     currentGate (val) {
       let vm = this
@@ -394,6 +396,18 @@ export default {
       vm.$store.dispatch('getServiceLists').then(function (result) {
         vm.serviceInfoList = result
         vm.serviceInfoSelected = newQuery.hasOwnProperty('service') && newQuery.service ? newQuery.service : ''
+      })
+    },
+    getServerConfig () {
+      let vm = this
+      let filter = {
+        serverNo: 'BOOKING_CONFIG'
+      }
+      vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+        let configs = JSON.parse(result.configs)
+        vm.apiRelease = configs.filter(function (item) {
+          return item.key === 'API'
+        })[0]['url']
       })
     },
     getGateLists () {
@@ -437,13 +451,13 @@ export default {
       let count = 0
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
+      let bookingDossier = []
+      let bookingEform = []
       let filterEform = {
         service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
         state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
         className: 'EFORM'
       }
-      let bookingDossier = []
-      let bookingEform = []
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
         count+=1
         vm.loading = false
@@ -460,6 +474,7 @@ export default {
         }
         vm.loading = false
       })
+      // 
       let filterDossier = {
         service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
         state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
@@ -481,12 +496,155 @@ export default {
           vm.mergeBooking(bookingDossier, bookingEform)
         }
       })
-      
     },
     mergeBooking (bookingEform, bookingDossier) {
       let vm = this
-      if (bookingEform || bookingDossier) {
-        vm.bookingList = bookingEform.concat(bookingDossier)
+      // ------>
+      let bookingRelease = []
+      let bookingDossierRealease = []
+      let filter = {
+        url: vm.apiRelease
+      }
+      vm.$store.dispatch('getDossier', filter).then(function (result) {
+        // -----
+        let bookingDossierArray = []
+        let filter = {
+          state: 4,
+          className: 'DOSSIER'
+        }
+        vm.$store.dispatch('getBooking', filter).then(function (resultBooking) {
+          if (resultBooking.data) {
+            bookingDossierRealease = resultBooking.data
+          } else {
+            bookingDossierRealease = []
+          }
+          if (bookingDossierRealease.length > 0) {
+            let lengthBooking = bookingDossierRealease.length
+            for (let i = 0; i < lengthBooking; i++) {
+              let dossierId = bookingDossierRealease[i]['codeNumber'].split('-')[2]
+              let lengthDossier = result.length
+              for (let j = 0; j < lengthDossier; j++) {
+                if (String(dossierId) === String(result[j]['dossierId'])) {
+                  let bookingConvert = Object.assign({}, bookingDossierRealease[i], {state: 1})
+                  bookingDossierArray.push(bookingConvert)
+                  break
+                }
+              }
+            }
+          }
+          bookingRelease = bookingDossierArray
+          // merge
+          if (bookingEform || bookingDossier || bookingRelease) {
+            vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            let sortBooking = function (bookingList) {
+              function compare(a, b) {
+                if (a.checkinDate < b.checkinDate)
+                  return -1
+                if (a.checkinDate > b.checkinDate)
+                  return 1
+                return 0
+              }
+              return bookingList.sort(compare)
+            }
+            vm.bookingList = sortBooking(vm.bookingList)
+          }
+          vm.loadData = !vm.loadData
+        }).catch (function (reject) {
+          if (bookingEform || bookingDossier || bookingRelease) {
+            vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            let sortBooking = function (bookingList) {
+              function compare(a, b) {
+                if (a.checkinDate < b.checkinDate)
+                  return -1
+                if (a.checkinDate > b.checkinDate)
+                  return 1
+                return 0
+              }
+              return bookingList.sort(compare)
+            }
+            vm.bookingList = sortBooking(vm.bookingList)
+          }
+          vm.loadData = !vm.loadData
+        })
+        // -----
+      }).catch(function (reject) {
+        if (bookingEform || bookingDossier || bookingRelease) {
+          vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+          let sortBooking = function (bookingList) {
+            function compare(a, b) {
+              if (a.checkinDate < b.checkinDate)
+                return -1
+              if (a.checkinDate > b.checkinDate)
+                return 1
+              return 0
+            }
+            return bookingList.sort(compare)
+          }
+          vm.bookingList = sortBooking(vm.bookingList)
+        }
+        vm.loadData = !vm.loadData
+      })
+      // ------>
+    },
+    getBookingCalling () {
+      var vm = this
+      let count = 0
+      vm.loading = true
+      let currentQuery = vm.$router.history.current.query
+      let bookingDossier = []
+      let bookingEform = []
+      let filterEform = {
+        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+        state: 2,
+        className: 'EFORM',
+        gateNumber: vm.currentGate
+      }
+      vm.$store.dispatch('getBooking', filterEform).then(function (result) {
+        count+=1
+        vm.loading = false
+        if (result.data) {
+          bookingEform = result.data
+        }
+        if (count === 2) {
+          vm.mergeBookingCalling(bookingDossier, bookingEform)
+        }
+      }).catch(reject => {
+        count+=1
+        if (count === 2) {
+          vm.mergeBookingCalling(bookingDossier, bookingEform)
+        }
+        vm.loading = false
+      })
+      // 
+      let filterDossier = {
+        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+        state: 2,
+        className: 'DOSSIER',
+        gateNumber: vm.currentGate
+      }
+      vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
+        count+=1
+        vm.loading = false
+        if (result.data) {
+          bookingDossier = result.data
+        }
+        if (count === 2) {
+          vm.mergeBookingCalling(bookingDossier, bookingEform)
+        }
+      }).catch(reject => {
+        count+=1
+        vm.loading = false
+        if (count === 2) {
+          vm.mergeBookingCalling(bookingDossier, bookingEform)
+        }
+      })
+    },
+    mergeBookingCalling (bookingDossier, bookingEform, index) {
+      let vm = this
+      // console.log('booking', bookingEform, bookingDossier)
+      if (bookingEform.length > 0 || bookingDossier.length > 0) {
+        let booking
+        booking = bookingEform.concat(bookingDossier)
         let sortBooking = function (bookingList) {
           function compare(a, b) {
             if (a.checkinDate < b.checkinDate)
@@ -497,9 +655,23 @@ export default {
           }
           return bookingList.sort(compare)
         }
-        vm.bookingList = sortBooking(vm.bookingList)
+        booking = sortBooking(booking)
+        vm.currentBooking = booking[0]
       }
-      vm.loadData = !vm.loadData
+    },
+    callingBooking (item) {
+      let vm = this
+      vm.currentBooking = item
+      item.speaking = false
+      item.state = 2
+      vm.updateStateBooking(item)
+    },
+    callBack () {
+      let vm = this
+      vm.currentBooking = item
+      item.state = 2
+      item.speaking = false
+      vm.updateStateBooking(item)
     },
     callingApplicant (item) {
       let vm = this
@@ -583,15 +755,11 @@ export default {
         }, 500)
       })
     },
-    callBack () {
-      let vm = this
-      vm.callingApplicant(vm.currentBooking)
-    },
     receiveBooking (item) {
       let vm = this
       vm.currentBooking = item
       vm.filterCreateDossier = ''
-      if (item.codeNumber.indexOf('E')) {
+      if (item.codeNumber.indexOf('E-') >= 0) {
         vm.$store.dispatch('getProcessDetail').then(function (result) {
           let processDetail = result.filter(function (item2) {
             return item2.serviceCode === item.serviceCode
@@ -611,7 +779,7 @@ export default {
           }
         }).catch (function (reject) {
         })
-      } else if (item.codeNumber.indexOf('D')) {
+      } else if (item.codeNumber.indexOf('D-' >=0)) {
         vm.currentBooking.state = 4
         vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
         }).catch (function (reject1) {
@@ -643,6 +811,7 @@ export default {
       let vm = this
       vm.$store.dispatch('getGateNumber').then(function (result) {
         vm.currentGate = result
+        vm.getBookingCalling()
       }).catch (function (reject) {
       })
     },
@@ -652,7 +821,7 @@ export default {
         gateNumber: val
       }
       vm.$store.dispatch('updateGateNumber', filter).then(function (result) {
-        console.log(result)
+        vm.getBookingCalling()
       })
     },
     getStateName () {
