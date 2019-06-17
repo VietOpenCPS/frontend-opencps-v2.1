@@ -171,16 +171,14 @@
           </content-placeholders>
           <v-layout row wrap v-else>
             <v-flex style="width: 100px;" class="layout wrap">
-              <span style="padding-top: 7px">Số lượng:</span>&nbsp;
+              <span style="padding-top: 6px">Số lượng:</span>&nbsp;
               <v-text-field
-              class="px-0 py-0 pl-2 d-inline-block"
-              style="width: 40px; max-width: 40px;"
+              class="px-0 py-0 d-inline-block record_count"
+              style="width: 30px; max-width: 30px;"
               v-model="dossierTemplateItems[index]['recordCount']"
               @input="changeRecordCount(dossierTemplateItems[index])"
               v-if="!onlyView"
               ></v-text-field>
-              <!-- <v-icon v-if="!onlyView && originality !== 1" v-on:click.stop="changeRecoreCount" style="cursor: pointer;" size="16" color="primary">edit</v-icon> -->
-              <!-- <v-icon v-if="!onlyView && originality !== 1" style="cursor: pointer;" v-on:click.stop="updateRecordCount" size="16" color="primary">done</v-icon> -->
               <span v-if="onlyView">{{dossierTemplateItems[index]['recordCount']}}</span>
             </v-flex>
             <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
@@ -699,10 +697,12 @@ export default {
             itemTemplate['fileMark'] = fileMarkFind.fileMark
             itemTemplate['fileComment'] = fileMarkFind.fileComment
             itemTemplate['fileCheck'] = fileMarkFind.fileCheck
+            itemTemplate['recordCount'] = fileMarkFind.recordCount
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
             itemTemplate['fileCheck'] = 0
+            itemTemplate['recordCount'] = ''
           }
           return itemTemplate
         })
@@ -1202,7 +1202,7 @@ export default {
       } else {
         let divPx = 0
         if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
-          divPx += 140
+          divPx += 240
         }
         if (item.fileCheck > 0 && !vm.thongTinHoSo.online) {
           divPx += 20
@@ -1420,7 +1420,9 @@ export default {
     changeRecordCount (markRecord) {
       var vm = this
       setTimeout(function () {
-        let item = markRecord
+        console.log('markRecord', markRecord)
+        let item = Object.assign({}, markRecord, {dossierId: vm.thongTinHoSo.dossierId})  
+        console.log('item', item)
         vm.$store.dispatch('postDossierMark', item)
       }, 200)
     }

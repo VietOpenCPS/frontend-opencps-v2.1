@@ -80,7 +80,7 @@ export default {
         })
       } else if (val === 3) {
         vm.$router.push({
-          path: '/dieu-hanh-xep-hang'
+          path: '/dieu-hanh-xep-hang?gate=1,2,3,4'
         })
       }
     }

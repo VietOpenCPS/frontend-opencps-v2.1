@@ -283,7 +283,7 @@ export default {
                 vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
                 vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
                 }

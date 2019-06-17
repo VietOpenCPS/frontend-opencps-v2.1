@@ -10,11 +10,11 @@
       <tr>
         <td class="text-xs-center text-bold py-2" style="">
           <div>
-            <span>{{props.item.codeNumber}}</span>
+            <span style="font-size:24px">{{props.item.codeNumber}}</span>
           </div>
         </td>
         <td class="text-xs-left text-bold py-2" style="">
-          <div style="text-transform: uppercase">
+          <div style="">
             <span>{{props.item.bookingName}}</span>
           </div>
         </td>
@@ -22,7 +22,7 @@
     </template>
     <template slot="no-data">
       <v-card flat color="transparent">
-        <v-flex class="text-xs-center pt-3 white--text">
+        <v-flex class="text-xs-center pt-2 white--text">
           <span>Không có lượt chờ nào</span>
         </v-flex>
       </v-card>
@@ -44,7 +44,7 @@ export default {
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     headers: [
       {
-        text: 'MÃ XẾP HÀNG',
+        text: 'MÃ TK/BN',
         align: 'center',
         sortable: false,
         class: 'py-3'

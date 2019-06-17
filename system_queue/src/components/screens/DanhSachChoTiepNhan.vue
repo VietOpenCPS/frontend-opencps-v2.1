@@ -1,15 +1,15 @@
 <template>
   <v-card flat color="#064787" id="contain-ctn" >
-    <v-flex xs12 class="header_dhxh text-xs-center pt-4">
+    <v-flex xs12 class="header_dhxh text-xs-center pt-1">
       <div class="logo d-inline-block">
         <div class="d-inline-block px-3 pt-2" style="position:fixed;top:0;left:0">
-          <img style="width:100px;" :src="'/documents/' + groupId + '/0/logo.png'">
-          <div style="font-size:22px;color:#e5e0e0" class="text-xs-center mt-3">BỘ NGOẠI GIAO</div>
+          <img style="width:70px;" :src="'/documents/' + groupId + '/0/logo.png'">
+          <div style="font-size:16px;color:#e5e0e0" class="text-xs-center mt-3">BỘ NGOẠI GIAO</div>
         </div>
         <div class="d-inline-block px-2 pt-2" style="position:fixed;top:0;right:0">
           <img class="img-slogan mb-3" :src="'/documents/' + groupId + '/0/ct.png'">
-          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
-          <div style="font-size:20px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
+          <div style="font-size:14px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
+          <div style="font-size:14px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
         </div>
         <div style="font-size:26px;color:#e5e0e0" class="mb-1">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
         <v-flex style="line-height: 5px">
@@ -18,12 +18,12 @@
       </div>
     </v-flex>
     <v-flex xs12 class="text-xs-center">
-      <div style="font-size:30px; color: #f7d900;height:50px" class="pt-2">
+      <div style="font-size:20px; color: #f7d900;height:50px" class="pt-2">
         DANH SÁCH XẾP HÀNG NỘP HỒ SƠ, NHẬN KẾT QUẢ
       </div>
     </v-flex>
 
-    <v-layout wrap class="content-dhxh px-2 py-2 pt-3">
+    <v-layout wrap class="content-dhxh px-2 pt-0">
       <v-flex class="column-danhsachcho" :style="`width: ${100/columnList.length}%`" v-for="(item, index) in columnList" v-bind:key="index">
         <div v-if="item.key === 'newboard'" style="height:100%">
           <v-flex xs12 class="text-xs-center title thongbao-title py-3" style="height:70px">

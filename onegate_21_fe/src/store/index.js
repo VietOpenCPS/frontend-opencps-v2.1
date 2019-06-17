@@ -512,9 +512,6 @@ export const store = new Vuex.Store({
           let serializable = response.data
           if (serializable.data) {
             let marks = serializable.data
-            for (let index in marks) {
-              marks[index].recordCount = ''
-            }
             resolve(marks)
           } else {
             resolve([])
@@ -1339,6 +1336,7 @@ export const store = new Vuex.Store({
         if (!isNaN(data.recordCount) && data.recordCount !== undefined && data.recordCount !== 'undefined' && data.recordCount !== null) {
           dataPostdossierMark.append('recordCount', data.recordCount)
         }
+        console.log('dataChangeRecord', data.dossierId)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
