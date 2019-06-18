@@ -1,6 +1,6 @@
 <template>
   <div class="py-0 kios-item">
-    <v-card flat>
+    <v-card flat style="">
       <h4 class="pt-2 ml-2">
         <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
       </h4>

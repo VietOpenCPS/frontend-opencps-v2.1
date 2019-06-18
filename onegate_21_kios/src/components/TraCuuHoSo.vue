@@ -1,7 +1,7 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card flat class="pb-2">
+      <v-card flat class="pb-2" style="">
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
           {{agencies[0]['administrationName']}}
         </h4>

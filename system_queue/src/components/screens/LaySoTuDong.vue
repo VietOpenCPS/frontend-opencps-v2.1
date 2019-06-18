@@ -51,7 +51,7 @@
           Xin mời quý khách quét mã vạch để đăng ký xếp hàng 
         </span><br>
         <span>
-          Please scan barcode here to do
+          Please scan barcode here to queue
         </span>
       </v-flex>
     </v-layout>
@@ -74,7 +74,7 @@ export default {
     codeShow: '',
     isActive: false,
     checkinFail: false,
-    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '124302',
+    groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
   }),
   computed: {
     isMobile () {

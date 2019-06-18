@@ -18,7 +18,7 @@ import CheckPasswordHP from '@/components/CheckPasswordHP'
 import ChiTietHoSoQR from '@/components/ChiTietHoSoQR'
 
 const routes = [
-  { path: '/', name: 'HoSoKetQua', component: HoSoKetQua, props: false },
+  { path: '/', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: false },
   { path: '/ho-so/:index', name: 'ChiTietHoSo', component: ChiTietHoSo, props: true },
   { path: '/tra-cuu-ho-so-homepage', name: 'TraCuuHomePage', component: TraCuuHomePage, props: false },

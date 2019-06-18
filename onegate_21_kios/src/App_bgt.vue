@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app @mousemove="stopInterval()" @click="stopInterval()">
     <v-btn v-if="isMobile" 
       class="elevation-0"
       color="grey"
@@ -56,6 +56,30 @@
     </v-content>
     
     <v-content v-else>
+      <v-card flat color="#0f66dd" style="font-family: 'Times New Roman', Times, serif;height: 130px;">
+        <v-flex xs12 class="header_dhxh text-xs-center pt-1">
+          <div class="logo d-inline-block">
+            <div class="d-inline-block px-3 pt-2" style="position:absolute;top:0;left:0">
+              <img style="width:70px;" :src="'/documents/' + groupId + '/0/logo.png'">
+              <div style="font-size:16px;color:#e5e0e0" class="text-xs-center mt-3">BỘ NGOẠI GIAO</div>
+            </div>
+            <div class="d-inline-block px-2 pt-2" style="position:absolute;top:0;right:0">
+              <img class="img-slogan mb-3" style="width:70px;"  :src="'/documents/' + groupId + '/0/ct.png'">
+              <div style="font-size:14px;color:#e5e0e0" class="text-xs-center">CHUNG TAY CẢI CÁCH</div>
+              <div style="font-size:14px;color:#e5e0e0" class="text-xs-center mt-1">THỦ TỤC HÀNH CHÍNH</div>
+            </div>
+            <div style="font-size:26px;color:#e5e0e0" class="mb-1 mt-2">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ</div>
+            <v-flex style="line-height: 5px">
+              <div class="underline-white" style="width:350px;height:2px"></div>
+            </v-flex>
+            <v-flex xs12 class="text-xs-center pt-3">
+              <div style="font-size:32px; color: #f7d900;height:50px" class="">
+                TRA CỨU THÔNG TIN
+              </div>
+            </v-flex>
+          </div>
+        </v-flex>
+      </v-card>
       <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
         <div :class="isKios ? 'tab-item' : ''">
           <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
@@ -123,6 +147,7 @@
       isMobile: false,
       drawer: null,
       active: 0,
+      groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
       kiosItems: [
         {
           route: 'ketquahoso',
@@ -157,6 +182,9 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        $('header').css('display', 'none')
+        $('.navbar-container').css('display', 'none')
+        vm.setInterval()
         $(window).scroll(function () {
           vm.enableToTop = $(window).scrollTop() > 200
         })
@@ -192,6 +220,8 @@
       let vm = this
       vm.$nextTick(function () {
         $('#navigation').css('display', 'none')
+        $('header').css('display', 'none')
+        $('.navbar-container').css('display', 'none')
       })
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
@@ -206,6 +236,8 @@
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
+        $('header').css('display', 'none')
+        $('.navbar-container').css('display', 'none')
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
@@ -234,7 +266,7 @@
           vm.$router.push({
             path: '/'
           })
-        }, 5 * 60 * 1000)
+        }, 3 * 60 * 1000)
       },
       setInterval () {
         this.backKiosHome()

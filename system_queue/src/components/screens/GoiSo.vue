@@ -279,7 +279,13 @@ export default {
         }
         if (vm.activeCalling && vm.called && Array.isArray(vm.queueList) && vm.queueList.length > 0) {
           vm.currentCalling = vm.queueList[0]
-          vm.callingApplicant(vm.currentCalling)
+          try {
+            vm.callingApplicant(vm.currentCalling)
+          }
+          catch(err) {
+            console.log('catch play audio 1')
+            vm.getDanhSachCho()
+          }
         } else {
           vm.loadData = !vm.loadData
         }
@@ -351,7 +357,12 @@ export default {
         }
         // start audio
         setTimeout (function () {
-          document.getElementById('start').play()
+          try {
+            document.getElementById('start').play()
+          } catch (error) {
+            console.log('catch play audio')
+            vm.getDanhSachCho()
+          }
         }, 300)
       } else {
         vm.called = true

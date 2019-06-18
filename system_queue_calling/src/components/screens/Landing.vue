@@ -22,6 +22,7 @@
               clearable
               @change="changeGroup"
               box
+              return-object
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
@@ -78,7 +79,7 @@
                 :disabled="loadingCalling"
                 color="red"
                 class="white--text mb-1"
-                @click="ignoreBooking"
+                @click="ignoreBooking(currentBooking)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>clear</v-icon> &nbsp;
@@ -429,7 +430,9 @@ export default {
       })
     },
     changeGroup () {
-
+      let vm = this
+      vm.serviceInfoSelected = ''
+      vm.filterBooking()
     },
     getGateLists () {
       let vm = this
@@ -444,7 +447,20 @@ export default {
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
-        newQuery['service'] = vm.serviceInfoSelected
+        newQuery['service'] = vm.serviceInfoSelected ? vm.serviceInfoSelected : ''
+        if (vm.serviceGroupSelected['config'] && vm.serviceGroupSelected['key'] === 'booking') {
+          newQuery['service'] = vm.serviceGroupSelected['config']
+        }
+        if (vm.serviceGroupSelected['key'] === 'booking' && vm.serviceGroupSelected['className'] === 'DOSSIER') {
+          newQuery['service'] = ''
+          newQuery['keyBooking'] = ''
+          newQuery['className'] = vm.serviceGroupSelected['className']
+        }
+        if (vm.serviceGroupSelected['key'] === 'API') {
+          newQuery['service'] = ''
+          newQuery['className'] = ''
+          newQuery['keyBooking'] = vm.serviceGroupSelected['key']
+        }
         newQuery['state'] = vm.stateSelected
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -520,6 +536,8 @@ export default {
     },
     mergeBooking (bookingEform, bookingDossier) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       vm.getBookingCalling()
       // ------>
       let bookingRelease = []
@@ -557,7 +575,14 @@ export default {
           bookingRelease = bookingDossierArray
           // merge
           if (bookingEform || bookingDossier || bookingRelease) {
-            vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            if (newQuery.hasOwnProperty('className') && newQuery.className === 'DOSSIER') {
+              vm.bookingList = [].concat(bookingDossier)
+            } else if (newQuery.hasOwnProperty('keyBooking') && newQuery.keyBooking === 'API') {
+              vm.bookingList = [].concat(bookingRelease)
+            } else {
+              vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            }
+            // vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
             let sortBooking = function (bookingList) {
               function compare(a, b) {
                 if (a.checkinDate < b.checkinDate)
@@ -621,7 +646,7 @@ export default {
         className: 'EFORM',
         gateNumber: vm.currentGate
       }
-      console.log('vm.currentGate', vm.currentGate, filterEform)
+      // console.log('vm.currentGate', vm.currentGate, filterEform)
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
         count+=1
         vm.loading = false

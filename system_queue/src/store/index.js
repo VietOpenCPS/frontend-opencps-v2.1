@@ -113,7 +113,8 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
             },
             params: {
               state: filter.state ? filter.state : '',
@@ -177,7 +178,8 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
             }
           }
           let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
