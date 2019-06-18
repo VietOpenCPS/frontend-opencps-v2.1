@@ -16,6 +16,41 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
+    indexQuestion: 0,
+    questionListDefault: [
+      {
+        questionId: 101,
+        createDate: "30/01/2019 17:16:38",
+        fullname: "Nguyễn Văn A",
+        email: "nguyenvana@gmail.com",
+        content: 'Làm thế nào để nộp hồ sơ?',
+        publish: 1
+      },
+      {
+        questionId: 102,
+        createDate: "30/01/2019 17:16:38",
+        fullname: "Nguyễn Văn A",
+        email: "nguyenvana@gmail.com",
+        content: 'Làm thế nào để tra cứu hồ sơ sau khi đã nộp?',
+        publish: 1
+      },
+      {
+        questionId: 103,
+        createDate: "30/01/2019 17:16:38",
+        fullname: "Nguyễn Văn A",
+        email: "nguyenvana@gmail.com",
+        content: 'Cần chuẩn bị gì khi thực hiện giao dịch tại Trung tâm Hành Chính Công?',
+        publish: 1
+      },
+      {
+        questionId: 104,
+        createDate: "30/01/2019 17:16:38",
+        fullname: "Nguyễn Văn A",
+        email: "nguyenvana@gmail.com",
+        content: 'Sau bao lâu tôi nhận được kết quả giải quyết?',
+        publish: 1
+      }
+    ],
     questionList: [],
     questionDetail: '',
     activeAddQuestion: false,
@@ -103,14 +138,31 @@ export const store = new Vuex.Store({
             if (response.data && response.data['total']) {
               commit('setTotalQuestion', response.data['total'])
             }
+            let dataOutput
             if (response.data && response.data['data']) {
-              resolve(response.data['data'])
+              if (Array.isArray(response.data['data'])) {
+                dataOutput = response.data['data']
+              } else {
+                dataOutput = [[response.data['data']]]
+              }
+              if (dataOutput && dataOutput.length > 0) {
+                for (let key in dataOutput) {
+                  dataOutput[key].answers = []
+                }
+              }
             } else {
-              resolve([])
+              dataOutput = state.questionListDefault
+              for (let key in dataOutput) {
+                dataOutput[key].answers = []
+              }
             }
-          }).catch(function (xhr) {
-            console.log(xhr)
-            reject(xhr)
+            resolve(dataOutput)
+          }).catch(function () {
+            let dataOutput = state.questionListDefault
+            for (let key in dataOutput) {
+              dataOutput[key].answers = []
+            }
+            reject(dataOutput)
           })
         })
       })
@@ -342,6 +394,9 @@ export const store = new Vuex.Store({
     },
     setTotalQuestion (state, payload) {
       state.totalQuestion = payload
+    },
+    setIndexQuestion (state, payload) {
+      state.indexQuestion = payload
     }
   },
   getters: {
@@ -368,6 +423,9 @@ export const store = new Vuex.Store({
     },
     getActiveGetQuestion (state) {
       return state.activeGetQuestion
+    },
+    getIndexQuestion (state) {
+      return state.indexQuestion
     },
     getUser (state) {
       return state.user

@@ -44,6 +44,10 @@
                       <table class="datatable table">
                         <tbody>
                           <tr>
+                            <td width="200"><span class="text-bold">Mã thủ tục</span></td>
+                            <td><span>{{serviceDetail.serviceCode}}</span></td>
+                          </tr>
+                          <tr>
                             <td width="200"><span class="text-bold">Cơ quan quản lý</span></td>
                             <td><span>{{serviceDetail.administrationName}}</span></td>
                           </tr>

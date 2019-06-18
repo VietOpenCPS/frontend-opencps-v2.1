@@ -97,7 +97,7 @@
     width: 100%;
 }
 .background-triangle-big {
-    background-color: #0b72ba;
+    background-color: #0054A6;
     display: inline-block;
     padding: 9px 15px;
     width: auto;
@@ -109,7 +109,7 @@
     cursor: pointer;
 }
 .background-triangle-small {
-    background-color: #0b72ba;
+    background-color: #0054A6;
     display: inline-block;
     padding: 3px;
     width: 25px;
@@ -132,7 +132,7 @@
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
     right: -4px;
-    border-top: 28px solid #0b72ba;
+    border-top: 28px solid #0054A6;
     border-left: 28px solid transparent;
     border-bottom: 28px solid transparent;
 }
@@ -143,7 +143,7 @@
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
     right: -2px;
-    border-top: 19px solid #0b72ba;
+    border-top: 19px solid #0054A6;
     border-left: 19px solid transparent;
     border-bottom: 19px solid transparent
 }
@@ -407,7 +407,7 @@ body .navigation-drawer .list__group__header__prepend-icon .icon{
     min-width: inherit;
 }
 .btn.primary {
-    background-color: #3563c1 !important;
+    background-color: #0054A6 !important;
 }
 body .handsontable td, body .handsontable th {
     max-width: 100px;
@@ -435,7 +435,7 @@ body .list__tile__title {
     background-color: #f6f6f6;
 }
 body .primary--text {
-    color: #0b72ba !important;
+    color: #0054A6 !important;
 }
 body .navigation-drawer .list__tile {
     padding: 0;
@@ -600,7 +600,7 @@ body .application--wrap {
     font-size: 12px;
 }
 .background-triangle-big, .background-triangle-small {
-    background-color: #0b72ba;
+    background-color: #0054A6;
     display: inline-block;
     text-align: left;
     color: #fff;
@@ -616,7 +616,7 @@ body .application--wrap {
 }
 .background-triangle-small:before {
     right: -2px;
-    border-top: 19px solid #0b72ba;
+    border-top: 19px solid #0054A6;
     border-left: 19px solid transparent;
     border-bottom: 21px solid transparent;
 }
@@ -1199,7 +1199,7 @@ body .menu__content--select .text--disabled {
     color: #fff;
     font-size: 1.1em;
     height: 35px;
-    left: 58px;
+    left: 33px;
     line-height: 34px;
     margin-left: -25px;
     position: absolute;

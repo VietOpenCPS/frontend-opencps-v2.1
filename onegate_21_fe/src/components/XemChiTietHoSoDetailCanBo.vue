@@ -20,7 +20,7 @@
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
       <v-card>
         <v-toolbar dark color="primary">
-          <v-toolbar-title>File đính kèm</v-toolbar-title>
+          <v-toolbar-title>{{titleDialogPdf}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
@@ -459,8 +459,7 @@
             <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                 <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
                 <td class="text-xs-left px-2 pt-2 pb-1">
-                  <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b> 
-                    : <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
+                  <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b>: <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
                   <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
                   <p
@@ -772,7 +771,8 @@ export default {
     loadingMermaidgraph: false,
     typeTienTrinh: 1,
     votingItems: [],
-    loadingVoting: false
+    loadingVoting: false,
+    titleDialogPdf: 'File đính kèm'
   }),
   computed: {
     loading () {
@@ -1197,7 +1197,7 @@ export default {
         }
         if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
           // add thanh toán điện tử
-          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3') && (dossierItem['stepCode'] === 610 || dossierItem['stepCode'] === 611)) {
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
             isPopup = true
             vm.showThanhToanDienTu = true
             let filter = {
@@ -1279,6 +1279,12 @@ export default {
       let vm = this
       vm.itemAction = item
       vm.indexAction = index
+      if (item && item.title) {
+        vm.titleDialogPdf = item.title;
+      } else {
+        vm.titleDialogPdf = "File đính kèm";
+      }
+      console.log('vm.titleDialogPdf++++++++++', vm.titleDialogPdf)
       if (String(item.form) === 'UPDATE') {
         vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + vm.thongTinChiTietHoSo.dossierId + '/' + vm.itemAction.form,

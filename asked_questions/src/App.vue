@@ -1,13 +1,6 @@
 <template>
-  <v-app id="app_asked_questions" >
-    <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
-      <div class="mx-2 mb-2">
-        <v-btn class="mx-0" block color="primary" v-on:click.native="addQuestion()"
-        >
-          <v-icon>add</v-icon>&nbsp;
-          Thêm mới câu hỏi
-        </v-btn>
-      </div>
+  <v-app id="app_asked_questions" style="background: #fff !important">
+    <!-- <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
       <v-list class="pt-0">
         <v-list-tile @click="viewList">
           <v-list-tile-action class="ml-3">
@@ -21,25 +14,13 @@
           </v-list-tile-content>
         </v-list-tile>
         <v-divider></v-divider>
-        <!-- <v-list-tile @click="getQuestionList" v-if="getUser('Administrator')">
-          <v-list-tile-action class="ml-3">
-            <v-icon color="green">question_answer</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-badge color="green" right class="mt-1">
-              <span slot="badge" >{{questionListNew.length}}</span>
-              <span class="mr-2">Câu hỏi mới</span>
-            </v-badge>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-divider v-if="getUser('Administrator')"></v-divider> -->
       </v-list>
-    </v-navigation-drawer>
-    <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1200px;margin: 0 auto' : ''">
-      <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
+    </v-navigation-drawer> -->
+    <v-content style="width: 100%;max-width: 1200px;margin: 0 auto">
+      <!-- <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
         <v-icon>near_me</v-icon>&nbsp;
         Gửi câu hỏi
-      </v-btn>
+      </v-btn> -->
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -102,6 +83,7 @@
           }
         }).catch(function (reject) {
           vm.$store.commit('setLoading', false)
+          vm.$store.commit('setQuestionList', reject)
         })
       },
       getQuestionListNew (questionList) {

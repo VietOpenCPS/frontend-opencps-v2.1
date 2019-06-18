@@ -15,6 +15,14 @@
             </span>
           </h4>
           <div class="mt-3"> 
+            <v-flex xs12 sm4 class="mb-3 right">
+              <div class="input-border input-group input-group--placeholder input-group--text-field">
+                <div class="input-group__input">
+                  <input id="dossierNoKey" class="kios-input" data-layout="normal" @keyup.enter="searchDossier" placeholder="Nhập mã hồ sơ" type="text">
+                  <i aria-hidden="true" @click="searchDossier" class="px-3 icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">search</i>
+                </div>
+              </div>
+            </v-flex>
             <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" v-if="dossierList.length > 0">
               <v-carousel-item
                 v-for="i in totalPages"
@@ -51,9 +59,11 @@
                 </v-data-table>
               </v-carousel-item>
             </v-carousel>
-            <v-alert class="mt-3 mx-3" v-else :value="true" outline color="blue" icon="priority_high">
-              Không có hồ sơ có kết quả ngày {{fromDate()}}
-            </v-alert>
+            <v-flex xs12 v-else>
+              <v-alert class="mt-3 mx-3" :value="true" outline color="blue" icon="priority_high">
+                Không có hồ sơ có kết quả ngày {{fromDate()}}
+              </v-alert>
+            </v-flex>
           </div>
         </div>
         <v-btn class="back-btn" @click="changeScreen" fab color="primary">
@@ -142,7 +152,6 @@ export default {
   methods: {
     changeItem (event) {
       let vm = this
-      console.log('event', event)
       vm.pagination.page = event + 1
     },
     doLoadingDataHoSo () {
@@ -190,6 +199,31 @@ export default {
         }).catch(reject => {
           vm.loading = false
         })
+      }
+    },
+    searchDossier () {
+      let vm = this
+      vm.dossierList = []
+      vm.loading = true
+      let filter = {
+        fromDate: vm.fromDate(),
+        toDate: vm.fromDate(),
+        groupId: '',
+        dossierNo: $('#dossierNoKey').val()
+      }
+      if ($('#dossierNoKey').val()) {
+        vm.$store.dispatch('loadingDataHoSoKQ', filter).then(function (result) {
+          vm.loading = false
+          if (result.data) {
+            vm.dossierList = vm.dossierList.concat(result.data)
+            vm.totalPages = Math.ceil(vm.dossierList.length / vm.pagination.rowsPerPage)
+          }
+        }).catch(reject => {
+          vm.loading = false
+        })
+        $('#dossierNoKey').value = $('#dossierNoKey').val()
+      } else {
+        vm.loading = false
       }
     },
     getGroupIdArr (groupIds) {
