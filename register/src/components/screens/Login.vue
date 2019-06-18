@@ -26,7 +26,7 @@
       <v-flex v-if="!isSigned" xs12>
         <nav class="toolbar theme--dark primary py-2" data-booted="true">
           <div class="toolbar__content"  style="justify-content: center">
-            <h4>ĐĂNG NHẬP</h4>
+            <h4 class="white--text">ĐĂNG NHẬP</h4>
           </div>
         </nav>
         <v-flex xs12 v-if="!isSigned" class="px-2 pb-2" style="border: 1px solid #dddddd;">
@@ -40,7 +40,6 @@
                 required
                 prepend-inner-icon="person_outline"
                 @keyup.enter="submitConfirmLogin"
-                autofocus
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="">
@@ -74,16 +73,16 @@
             </v-layout>
             <v-flex xs12 class="text-xs-left text-xs-center">
               <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
-                :loading="loading"
-                :disabled="loading"
+                :loading="loadingLogin"
+                :disabled="loadingLogin"
                 @click="submitConfirmLogin"
               >
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 Đăng nhập
               </v-btn>
               <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
-                :loading="loading"
-                :disabled="loading"
+                :loading="loadingLogin"
+                :disabled="loadingLogin"
                 @click="goBack"
               >
                 <v-icon>reply</v-icon>&nbsp;
@@ -134,6 +133,9 @@ export default {
     isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
   }),
   computed: {
+    loadingLogin () {
+      return this.$store.getters.loading
+    }
   },
   created () {
     var vm = this

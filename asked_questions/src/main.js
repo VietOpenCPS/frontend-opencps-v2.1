@@ -44,13 +44,6 @@ Vue.mixin({
     }
   }
 })
-Vue.mixin({
-  methods: {
-    getOriginality: function () {
-      return 3
-    }
-  }
-})
 new Vue({
   router,
   store,

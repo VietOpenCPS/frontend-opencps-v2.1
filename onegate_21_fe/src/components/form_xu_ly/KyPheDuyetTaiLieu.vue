@@ -159,6 +159,7 @@ export default {
         }
         if (idArr) {
           var paramObj = {}
+          var strIdArr
           paramObj.actionCode = item.actionCode
           paramObj.actionUser = window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : ''
           paramObj.actionNote = ''
@@ -167,7 +168,7 @@ export default {
           paramObj.assignUsers = item.assignUsers ? item.assignUsers : ''
           paramObj.payment = item.payment ? item.payment : ''
           paramObj.userNote = item.userNote ? item.userNote : ''
-          var strIdArr = idArr.join(';')
+          strIdArr = idArr.join(',')
           var actionName = item.actionName
           console.log('strIdArr', strIdArr)
           console.log('paramObj', paramObj)
@@ -276,9 +277,9 @@ export default {
           var msg = result.msg
           if (msg === 'success') {
             vm.$store.commit('setKysoSuccess', true)
-            toastr.success('Thực hiện ký số thành công.')
+            toastr.success('Thực hiện ký số thành công')
           } else if (msg === 'fileEntryId') {
-            alert('Cảnh báo: Không tìm thấy file bản thảo. Tạm dừng tiến trình đóng dấu số')
+            alert('Không tìm thấy file bản thảo. Tạm dừng tiến trình ký số')
           } else {
             alert(msg)
           }

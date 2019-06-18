@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build:survey_2.2": "vue-cli-service build src/main.js",
+    "build:survey_2.1": "vue-cli-service build src/main_v2.1.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

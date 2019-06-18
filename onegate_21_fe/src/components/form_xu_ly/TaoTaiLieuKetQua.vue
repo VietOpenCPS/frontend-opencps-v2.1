@@ -13,19 +13,22 @@
               <v-expansion-panel-content hide-actions>
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                    <div class="mr-2" @click="loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
-                      <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
+                    <div class="mr-2" @click="loadAlpcaFormClick(item)" style="min-width: 20px; display: flex;">
+                      <div class="header__tphs" style="min-width: 20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                       <div class="header__tphs">
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                         &nbsp;&nbsp;
                         <v-tooltip top v-if="item.eForm && item.daKhai">
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
-                          <span>Biểu mẫu trực tuyến (Đã khai)</span>
+                          <span>Đã khai</span>
                         </v-tooltip>
                         <v-tooltip top v-if="item.eForm && !item.daKhai">
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
-                          <span>Biểu mẫu trực tuyến (Chưa khai)</span>
+                          <span>Chưa khai</span>
                         </v-tooltip>
+                        &nbsp;&nbsp;
+                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
+                        &nbsp;&nbsp;
                         <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
                           <v-badge v-on:click.stop="downloadFileTemplate(item, index)">
                             <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -54,10 +57,19 @@
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
                         <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px;z-index:101' : ''">
-                          <v-btn color="primary" @click="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
-                          v-if="item.eForm">Lưu lại</v-btn>
-                          <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">Xóa</v-btn>
-                          <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">In</v-btn>
+                          <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
+                          v-if="item.eForm">
+                            <v-icon color="white">save</v-icon>&nbsp;
+                            Lưu lại
+                          </v-btn>
+                          <v-btn color="primary" @click.stop="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">
+                            <v-icon color="white">print</v-icon>&nbsp;
+                            In
+                          </v-btn>
+                          <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">
+                            <v-icon color="white">delete</v-icon>&nbsp;
+                            Xóa
+                          </v-btn>
                         </div>
                         <div :id="'formAlpaca' + item.partNo + id"></div>
                       </v-flex>
@@ -71,7 +83,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-layout row wrap v-else>
-                <v-flex style="width: 50px;">
+                <v-flex style="width: 100px;">
                   <input
                   type="file"
                   style="display: none"
@@ -85,14 +97,22 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <v-tooltip top v-else-if="progressUploadPart + id !== item.partNo + id">
-                    <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                       <v-badge>
-                        <v-icon size="16" color="primary">cloud_upload</v-icon>
+                        <v-icon size="24" color="#004b94">edit</v-icon>
                       </v-badge>
                     </v-btn>
-                    <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
-                    <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
+                    <span>Khai trực tuyến</span>
+                  </v-tooltip>
+                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                      <v-badge>
+                        <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                      </v-badge>
+                    </v-btn>
+                    <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
+                    <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
                   </v-tooltip>
                   <!-- <v-tooltip top>
                     <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
@@ -223,17 +243,12 @@
                   return template.partNo === part.partNo
                 })
                 if (itemFind) {
+                  template['required'] = itemFind['required']
                   template['partTip'] = itemFind['partTip']
                 }
               })
             }
           })
-
-          // vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
-          //   vm.dossierFilesItems = resFiles
-          //   vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, resFiles)
-          // }).catch(reject => {
-          // })
         }
       })
     },
@@ -355,7 +370,7 @@
             })
           }).catch(reject => {
             console.log('run saveForm')
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         } else {
           item['dossierId'] = vm.detailDossier.dossierId
@@ -365,10 +380,10 @@
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
       },
@@ -511,7 +526,7 @@
                 })
               }, 1000)
             }).catch(reject => {
-              toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }
         })
@@ -528,7 +543,7 @@
               vm.dossierFilesItems = result
             })
           }).catch(reject => {
-            toastr.error('Yêu cầu của bạn được thực hiện thất bại.')
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
       },
@@ -578,7 +593,7 @@
         return
       },
       checkStyle (item) {
-        return 'calc(100% - ' + 50 + 'px)'
+        return 'calc(100% - ' + 140 + 'px)'
       },
       downloadFileTemplate (item, index) {
         var vm = this

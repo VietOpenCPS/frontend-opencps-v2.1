@@ -14,7 +14,7 @@
             </v-list-tile-action>
 
             <v-list-tile-content>
-              <v-list-tile-title>{{ item.reportName }}</v-list-tile-title>
+              <v-list-tile-title :title="item.reportName">{{ item.reportName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -164,7 +164,7 @@
       }
     },
     created () {
-    var vm = this
+      var vm = this
       vm.$nextTick(function () {
         if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
           vm.reportTypeFilter = vm.$route.query.reportType

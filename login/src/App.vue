@@ -115,7 +115,7 @@
         <v-menu offset-y :nudge-bottom="5">
           <v-chip slot="activator" @click="isShowUserMenu = !isShowUserMenu">
             <v-avatar v-if="avatarURL !== ''">
-              <img :src="avatarURL">
+              <img :src="avatarURL" style="width: 32px;height: 32px;margin: 0 !important;">
             </v-avatar>
             <v-avatar v-else class="white--text" :style="{background: '#' + colorBG}">
               <span class="white--text">{{ userNameLogin.slice(0, 1).toUpperCase() }}</span>
@@ -314,33 +314,35 @@ export default {
   created() {
     let vm = this;
     vm.$nextTick(function() {
-      vm.isSignedIn = themeDisplay.isSignedIn();
-      vm.userNameLogin = themeDisplay.getUserName();
+      vm.isSignedIn = window.themeDisplay.isSignedIn();
+      vm.userNameLogin = window.themeDisplay.getUserName();
       vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
-      let redirectURL = themeDisplay
+      let redirectURL = window.themeDisplay
         .getLayoutRelativeURL()
-        .substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
+        .substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
       if (redirectURL !== "") {
         vm.forgottenURLStr = redirectURL + "/register/#/cap-lai-mat-khau";
       } else {
         vm.forgottenURLStr =
-          themeDisplay.getURLHome() + "/register/#/cap-lai-mat-khau";
+          window.themeDisplay.getURLHome() + "/register/#/cap-lai-mat-khau";
       }
       if (vm.isSignedIn) {
         vm.userData = {};
         vm.pullNotificationCount();
         setTimeout(() => {
-          let param = {
-            responseType: "blob"
-          };
           axios
-            .get("/o/v1/opencps/users/" + themeDisplay.getUserId(), param)
+            .get("/o/v1/opencps/users/" + window.themeDisplay.getUserId())
             .then(function(response) {
               vm.userData = response.data;
-              vm.avatarURL = vm.userData["avatar"];
-              if (vm.avatarURL.includes("img_id=0")) {
-                vm.avatarURL = "";
+              // vm.avatarURL = vm.userData["avatar"];
+              // if (vm.avatarURL.includes("img_id=0")) {
+              //   vm.avatarURL = "";
+              // }
+              let filter = {
+                className: vm.userData['className'] === 'org.opencps.usermgt.model.Applicant' ? 'org.opencps.usermgt.model.ApplicantAvatar' : vm.userData['className'],
+                classPK: vm.userData['classPK']
               }
+              vm.getImageAvatar(filter)
               vm.userNameLogin = vm.userData["userName"];
               vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
             })
@@ -360,6 +362,24 @@ export default {
     }
   },
   methods: {
+    getImageAvatar (filter) {
+      let vm = this
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        }
+      }
+      axios.get('/o/v1/opencps/users/avatar/' + filter['className'] + '/' + filter['classPK'], param).then(function (response) {
+        if (response.data) {
+          let url = String(response.data)
+          vm.avatarURL = window.themeDisplay.getPortalURL() + url
+        } else {
+          vm.avatarURL = ''
+        }
+      }).catch(function (xhr) {
+        vm.avatarURL = ''
+      })
+    },
     markRead () {
       let vm = this
       for (let key in vm.testData) {
@@ -440,21 +460,21 @@ export default {
       vm.pullNotificationData();
     },
     doRegisterRedirect() {
-      let redirectURL = themeDisplay
+      let redirectURL = window.themeDisplay
         .getLayoutRelativeURL()
-        .substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
+        .substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
       if (redirectURL !== "") {
         window.location.href = redirectURL + "/register";
       } else {
-        window.location.href = themeDisplay.getURLHome() + "/register";
+        window.location.href = window.themeDisplay.getURLHome() + "/register";
       }
     },
     doUserInfo() {
-      if (themeDisplay !== null && themeDisplay !== undefined) {
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
         // eslint-disable-next-line
-        let redirectURL = themeDisplay
+        let redirectURL = window.themeDisplay
           .getLayoutRelativeURL()
-          .substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
+          .substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
         window.location.href = redirectURL + "/profile";
       } else {
         window.location.href = "/profile";
@@ -464,15 +484,15 @@ export default {
       window.location.href = "/c/portal/logout";
     },
     goToDangKyPage() {
-      if (themeDisplay !== null && themeDisplay !== undefined) {
+      if (window.themeDisplay !== null && window.themeDisplay !== undefined) {
         // eslint-disable-next-line
-        let redirectURL = themeDisplay
+        let redirectURL = window.themeDisplay
           .getLayoutRelativeURL()
-          .substring(0, themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
+          .substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/"));
         if (redirectURL !== "") {
           window.location.href = redirectURL + "/register";
         } else {
-          window.location.href = themeDisplay.getURLHome() + "/register";
+          window.location.href = window.themeDisplay.getURLHome() + "/register";
         }
       } else {
         window.location.href = "/register";
@@ -510,17 +530,17 @@ export default {
           } else if (response.data === "ok") {
             window.location.href = window.themeDisplay.getURLHome();
           } else if (response.data === "captcha") {
-            let redirectURL = themeDisplay
+            let redirectURL = window.themeDisplay
               .getLayoutRelativeURL()
               .substring(
                 0,
-                themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
+                window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
               );
             if (redirectURL !== "") {
               window.location.href = redirectURL + "/register#/login";
             } else {
               window.location.href =
-                themeDisplay.getURLHome() + "/register#/login";
+                window.themeDisplay.getURLHome() + "/register#/login";
             }
           } else {
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
@@ -564,17 +584,17 @@ export default {
             } else if (response.data === "ok") {
               window.location.href = window.themeDisplay.getURLHome();
             } else if (response.data === "captcha") {
-              let redirectURL = themeDisplay
+              let redirectURL = window.themeDisplay
                 .getLayoutRelativeURL()
                 .substring(
                   0,
-                  themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
+                  window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
                 );
               if (redirectURL !== "") {
                 window.location.href = redirectURL + "/register#/login";
               } else {
                 window.location.href =
-                  themeDisplay.getURLHome() + "/register#/login";
+                  window.themeDisplay.getURLHome() + "/register#/login";
               }
             } else {
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");

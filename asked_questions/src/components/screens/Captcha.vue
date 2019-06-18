@@ -1,5 +1,5 @@
 <template>
-  <v-layout row wrap>
+  <v-layout wrap>
     <v-flex xs12 class="py-2" style="
       display: flex;
       align-items: center;
@@ -15,7 +15,7 @@
       <v-text-field
         box
         v-model="j_captcha_response"
-        placeholder="Nhập captcha"
+        placeholder="Nhập mã captcha"
       ></v-text-field>
     </v-flex>
   </v-layout>
@@ -59,6 +59,7 @@ export default {
       vm.chapchablob = ''
       vm.$store.dispatch('makeImageCap').then(function (result) {
         vm.chapchablob = result
+        vm.j_captcha_response = ''
       }).catch(function (reject) {
         vm.chapchablob = ''
       })

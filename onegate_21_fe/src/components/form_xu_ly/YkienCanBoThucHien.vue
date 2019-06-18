@@ -16,7 +16,7 @@
                   :rows="4"
                   :rules="user_note === 2 ? [() => noteYkien !== '' || 'Trường dữ liệu bắt buộc'] : []"
                   box
-                  label="nhập ý kiến"
+                  label="Nhập ý kiến"
                 ></v-text-field>
               </v-form>
             </v-flex>

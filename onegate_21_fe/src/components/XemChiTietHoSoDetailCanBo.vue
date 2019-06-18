@@ -104,9 +104,12 @@
                       </span>
                     </span>
                   </v-flex>
-                  <v-flex v-if="showReasign" class="text-xs-right" style="width:100px">
+                  <v-flex v-if="showReasign" class="text-xs-right" style="width:80px">
                     <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
-                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">Phân công lại</span>
+                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
+                        <span v-if="checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
+                        <span v-else>Phân công lại</span>
+                      </span>
                       <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new'">Ủy quyền</span>
                       <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId) && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
@@ -127,13 +130,13 @@
                     <span v-if="checkInput === 2">Chỉnh sửa thành phần hồ sơ</span> 
                     <span v-else>Kiểm tra thành phần hồ sơ</span>&nbsp;&nbsp;&nbsp;&nbsp; 
                   </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="false" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  <thanh-phan-ho-so ref="thanhphanhoso" :checkInput="checkInput" :onlyView="checkInput === 2 ? false : true" :id="'ci'" :partTypes="inputTypes"></thanh-phan-ho-so>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </div>
             <!-- Action button -->
             <div class="px-4 py-3" v-if="btnStateVisible" style="border-bottom: 1px solid #dddddd;">
-              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) !== String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
+              <v-btn color="primary" class="ml-0 mr-2" :class='{"deactive__btn": String(btnIndex) === String(index)}' v-for="(item, index) in btnDossierDynamics" v-bind:key="index" 
                 v-on:click.native="processPullBtnDetail(item, index)" 
                 :loading="loadingAction && index === btnIndex"
                 :disabled="loadingAction || item.enable === 2"
@@ -150,18 +153,8 @@
                 {{item.pluginName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
-              <!-- Action rollBack -->
-              <!-- <v-btn color="primary" class="ml-0 mr-2 deactive__btn" v-if="String(currentUser.userId) === String(thongTinChiTietHoSo.lastActionUserId)"
-                @click="rollBackDossier(true)"
-                :loading="loadingAction"
-                :disabled="loadingAction"
-              >
-                Quay lại bước trước
-                <span slot="loader">Loading...</span>
-              </v-btn> -->
-              <!-- Action special -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
-                <v-btn slot="activator" class="deactive__btn" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
+                <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
                   <v-list-tile v-for="(item, index) in btnStepsDynamics" :key="index" @click="btnActionEvent(item, index)">
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -207,8 +200,8 @@
             <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
               {{alertObj.message}}
             </v-alert>
-            <div v-if="rollbackable || printDocument" class="py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-              <!-- <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn> -->
+            <div v-if="rollbackable || printDocument" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
               <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
             </div>
             <!--  -->
@@ -233,21 +226,21 @@
                 <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+            <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> 
-                    <span v-if="stateViewResult">III</span>
-                    <span v-else>II</span>
+                    <span v-if="stateViewResult">III.</span>
+                    <span v-else>II.</span>
                   </div>
                   Văn bản hành chính
                 </div>
                 <div v-for="(item, index) in documents" v-bind:key="index">
                   <v-card>
-                    <v-layout wrap class="px-3 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="px-4 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                        <div style="margin-left: 30px;">{{item.documentName}}</div>
+                        <div style="margin-left: 20px;">{{item.documentName}}</div>
                       </v-flex>
                       <v-flex xs1 class="text-right">
                         <v-tooltip top>
@@ -313,9 +306,36 @@
                   <div v-for="(itemAction, index) in props.item.actions" :key="index">
                     {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
                     <span v-if="itemAction.actionNote && itemAction.actionNote !== 'null'"> - <i>{{itemAction.actionNote}}</i></span>
+                    <div v-if="Array.isArray(itemAction.files) && itemAction.files.length > 0">
+                      <div v-for="(itemFile, index) in itemAction.files" :key="index" title="Tải xuống">
+                        <p v-if="itemFile.dossierDocumentId" @click="downloadFileDocument(itemFile.dossierReferenceUid ? itemFile.dossierReferenceUid : '')">
+                          <v-icon size="18" color="#0b72ba">
+                            get_app
+                          </v-icon>
+                          <!-- <v-icon size="18" color="#0b72ba" class="mx-2" @click="">visibility</v-icon> -->
+                          <span style="color: #0b72ba;cursor: pointer;">
+                            {{itemFile.fileName}}
+                          </span>
+                        </p>
+                        <p v-if="itemFile.dossierFileId" @click="downloadFileLogs(itemFile.dossierFileId)">
+                          <v-icon size="18" color="#0b72ba">
+                            get_app
+                          </v-icon>
+                          <!-- <v-icon size="18" color="#0b72ba" class="mx-2" @click="">visibility</v-icon> -->
+                          <span style="color: #0b72ba;cursor: pointer;">
+                            {{itemFile.fileName}}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <div v-if="props.item.statusText">
-                    <span style="color: green">{{props.item.statusText}}</span>
+                    <span style="color: green" v-if="thongTinChiTietHoSo['dossierStatus'] === 'done' || thongTinChiTietHoSo['dossierStatus'] === 'unresolved'">
+                      {{props.item.statusText.replace("Đang thực hiện:", "")}}
+                    </span>
+                    <span style="color: green" v-else>
+                      {{props.item.statusText}}
+                    </span>
                   </div>
                 </td>
               </template>
@@ -361,7 +381,7 @@
                 <div class="text-bold">
                   {{index + 1}}.&nbsp; {{ item.subject }}
                 </div>
-                <v-radio-group class="ml-3 pt-2" v-model="item.selected" column>
+                <v-radio-group class="ml-3 mt-2" v-model="item.selected" column>
                   <v-radio class="ml-2" v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1" :disabled="originality === 3"></v-radio>
                 </v-radio-group>
                 <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -401,7 +421,8 @@
                     <v-card-text class="px-0 py-0 pr-3">
                       <v-flex xs12>
                         <ul class="timeline overflowComment" style="max-height: 300px;overflow: auto;" v-if="dossierSyncs.length > 0">
-                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index" v-if="item.syncType !==0 && item.infoType !== 0">
+                          <li class="timeline-item" v-for="(item, index) in dossierSyncs" v-bind:key="index"
+                            v-if="item.syncType !==0 && item.infoType !== 0 && item.actionNote && item.actionNote !== 'null'">
                             <div class="timeline-badge" :class="item.syncType === 2 ? 'primary' : 'warning'">
                               <v-icon color="grey lighten-4" size="20">{{item.syncType === 2 ? 'account_balance' : 'perm_identity'}}</v-icon>
                             </div>
@@ -414,8 +435,8 @@
                                 </div>
                               </div>
                               <div class="timeline-body">
-                                <span v-if="item.syncType === 2">{{item.actionName}} </span>
-                                <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">:</span>
+                                <span v-if="item.syncType === 2">Cán bộ trả lời</span>
+                                <span v-if="item.syncType === 2 && item.actionNote && item.actionNote !== 'null'">: </span>
                                 <span v-if="item.actionNote && item.actionNote !== 'null'" style="color: #0b72ba">{{ item.actionNote }}</span>
                               </div>
                             </div>
@@ -462,24 +483,33 @@
                   <p class="mb-1"> <span>{{ item.createDate | dateTimeView }}</span> - <b>{{ item.author }}</b>: <span style="color: #0b72ba">{{ item.payload.stepName }}</span>
                   </p>
                   <p class="mb-1" v-if="item.content !== '' && item.content !== null">Ý kiến: <span v-html="item.content"></span></p>
-                  <p
-                  class="history__download__link hover-pointer-download mb-1"
-                  title="Tải file"
-                  v-for="file in item.payload.files"
-                  :key="file.dossierFileId"
-                  style="cursor: pointer;"
-                  @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
-                  >
-                  <v-icon>file_download</v-icon> 
-                  <span>{{file.fileName}}</span>
-                </p>
+                  <div v-for="(file, index) in item.payload.files" :key="index">
+                    <p v-if="file.dossierFileId" class="history__download__link hover-pointer-download mb-1"
+                      title="Tải xuống"
+                      style="cursor: pointer;"
+                      @click.prevent.stop="downloadFileLogs(file.dossierFileId)"
+                      >
+                      <v-icon>file_download</v-icon> 
+                      <span>{{file.fileName}}</span>
+                    </p>
+                    <p v-if="file.dossierDocumentId" class="history__download__link hover-pointer-download mb-1"
+                      title="Tải xuống"
+                      style="cursor: pointer;"
+                      @click.prevent.stop="downloadFileDocument(file.dossierReferenceUid ? file.dossierReferenceUid : '')"
+                      >
+                      <v-icon>file_download</v-icon> 
+                      <span>{{file.fileName}}</span>
+                    </p>
+                  </div>
               </td>
             </div>
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
     </div>
+    <!-- plugin ký số -->
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
+    <!--  -->
     <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar dark color="primary">
@@ -498,7 +528,7 @@
           :loading="loadingAction"
           :disabled="loadingAction">
             <v-icon>how_to_reg</v-icon> &nbsp;
-            Phân công
+            Đồng ý
             <span slot="loader">Loading...</span>
           </v-btn>
           <v-btn class="mr-3" color="primary" @click.native="dialog_reAsign = false">
@@ -601,6 +631,7 @@ export default {
     'phan-cong-lai': PhanCongLai
   },
   data: () => ({
+    isMobile: false,
     inputTypes: [1, 3],
     outputTypes: [2],
     actionIdCurrent: 0,
@@ -801,6 +832,15 @@ export default {
       return this.$store.getters.kysoSuccess
     }
   },
+  beforeDestroy () {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    this.onResize()
+    window.addEventListener('resize', this.onResize, { passive: true })
+  },
   created () {
     var vm = this
     vm.$nextTick(function () {
@@ -827,10 +867,22 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  beforeDestroy () {
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
+  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
+    },
+    isMobile (val) {
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
     },
     kysoSuccess (val) {
       var vm = this
@@ -848,6 +900,11 @@ export default {
     }
   },
   methods: {
+    onResize () {
+      let vm = this
+      let isMobile = window.innerWidth < 1024
+      vm.isMobile = isMobile
+    },
     initData (data) {
       var vm = this
       vm.dossierId = data
@@ -929,6 +986,14 @@ export default {
         dossierId: vm.id
       }
       this.$store.dispatch('downloadFile', dataCommit)
+    },
+    downloadFileDocument(data) {
+      var vm = this
+      let dataCommit = {
+        referenceUid: data,
+        dossierId: vm.id
+      }
+      this.$store.dispatch('downloadFileDocument', dataCommit)
     },
     loadDossierActions (data) {
       var vm = this
@@ -1147,7 +1212,7 @@ export default {
       if (result !== null && result !== undefined && result !== 'undefined' &&
         (result.hasOwnProperty('userNote') || result.hasOwnProperty('extraForm') || result.hasOwnProperty('allowAssignUser') ||
         result.hasOwnProperty('createFiles') || result.hasOwnProperty('eSignature') || result.hasOwnProperty('returnFiles') ||
-        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes'))) {
+        result.hasOwnProperty('payment') || result.hasOwnProperty('checkInput') || result.hasOwnProperty('overdue') || result.hasOwnProperty('betimes') || result.hasOwnProperty('preoverdue'))) {
         if (result.hasOwnProperty('userNote') && (result.userNote === 1 || result.userNote === '1' || result.userNote === 2 || result.userNote === '2')) {
           isPopup = true
           vm.showYkienCanBoThucHien = true
@@ -1277,6 +1342,7 @@ export default {
     },
     btnActionEvent (item, index) {
       let vm = this
+      vm.btnIndex = -1
       vm.itemAction = item
       vm.indexAction = index
       if (item && item.title) {
@@ -1466,7 +1532,7 @@ export default {
         vm.alertObj = {
           icon: 'error',
           color: 'error',
-          message: 'Rút lại hồ sơ không thành công!'
+          message: 'Trả lại bước trước không thành công!'
         }
         vm.btnStateVisible = false
       })
@@ -1480,14 +1546,18 @@ export default {
       if (isSpecial) {
         vm.doActionSpecial(result)
       } else {
-        vm.$store.dispatch('postAction', result).then(function (result) {
-          vm.getNextActions()
-          vm.rollbackable = false
-          vm.btnStateVisible = true
-        }).catch(function (reject) {
-        })
+        let x = confirm('Bạn có chắc chắn thực hiện hành động này?')
+        if (x) {
+          let fiter = {
+            dossierId: vm.thongTinChiTietHoSo.dossierId
+          }
+          vm.$store.dispatch('rollBack', fiter).then(function (result) {
+          }).catch(function () {
+          })
+        }
       }
     },
+    // Hàm xử lý Actions
     processAction (dossierItem, item, result, index, isConfirm) {
       let vm = this
       var validPhanCong = true
@@ -1539,17 +1609,17 @@ export default {
       if (vm.showThanhToanDienTu) {
         vm.$refs.epayment.validPayment()
         let valid = vm.$refs.epayment.validPayment()
-        let paymentProfile = vm.$store.getters.getPaymentProfile
-        if (paymentProfile && paymentProfile['paymentFile'] && valid) {
+        let paymentData = vm.$store.getters.getPaymentProfile
+        if (paymentData && paymentData['paymentFile'] && valid) {
           validThanhToanDienTu = true
           filter['payment'] = {
             requestPayment: 3,
-            advanceAmount: paymentProfile.advanceAmount ? paymentProfile.advanceAmount : 0,
-            feeAmount: paymentProfile.feeAmount ? paymentProfile.feeAmount : 0,
-            paymentAmount: paymentProfile.paymentAmount ? paymentProfile.paymentAmount : 0,
-            paymentNote: paymentProfile.paymentNote ? paymentProfile.paymentNote : '',
-            serviceAmount: paymentProfile.serviceAmount ? paymentProfile.serviceAmount : 0,
-            shipAmount: paymentProfile.shipAmount ? paymentProfile.shipAmount : 0
+            advanceAmount: paymentData.advanceAmount ? paymentData.advanceAmount : 0,
+            feeAmount: paymentData.feeAmount ? paymentData.feeAmount : 0,
+            paymentAmount: paymentData.paymentAmount ? paymentData.paymentAmount : 0,
+            paymentNote: paymentData.paymentNote ? paymentData.paymentNote : '',
+            serviceAmount: paymentData.serviceAmount ? paymentData.serviceAmount : 0,
+            shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0
           }
           let paymentsOut = filter['payment']
           let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
@@ -1566,9 +1636,6 @@ export default {
       }
       if (vm.showEditDate) {
         let date = vm.$refs.ngayhentra.getDateInput()
-        // console.log('dueDateEdit', date)
-        // filter['dueDate'] = date ? date : ''
-        // filter['receiveDate'] = vm.receiveDateEdit ? vm.receiveDateEdit : ''
         let payload = {
           'dueDate': date,
           'receiveDate': vm.receiveDateEdit
@@ -1620,9 +1687,9 @@ export default {
         }
         filter['userNote'] = note
       }
-      // if (vm.showTaoTaiLieuKetQua) {
-      //   validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
-      // }
+      if (vm.showTaoTaiLieuKetQua) {
+        validCreateFiles = vm.$refs.tailieuketqua.validCreateFileTemplate()
+      }
       if (vm.showKyPheDuyetTaiLieu) {
         let resultTmp = vm.$refs.kypheduyettailieu.doExport()
         if (resultTmp.required) {
@@ -1634,7 +1701,7 @@ export default {
           }
         }
       }
-      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung) {
+      if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung && validCreateFiles) {
         vm.validateAction = true
       } else {
         vm.validateAction = false
@@ -1642,6 +1709,7 @@ export default {
       vm.dossierId = dossierItem.dossierId
       let currentQuery = vm.$router.history.current.query
       vm.loadingActionProcess = true
+      // case confirm Thao tác từ trang danh sách hồ sơ
       if (isConfirm) {
         let x = confirm('Bạn có muốn thực hiện hành động này?')
         if (x && vm.validateAction) {
@@ -1677,7 +1745,9 @@ export default {
         } else {
           return false
         }
-      } else if (vm.validateAction) {
+      }
+      // case Thao tác trong chi tiết hồ sơ
+      else if (vm.validateAction) {
         if (vm.checkInput === 2 && vm.$refs.thanhphanhoso !== null && vm.$refs.thanhphanhoso !== undefined && vm.$refs.thanhphanhoso !== 'undefined') {
           var valid = vm.$refs.thanhphanhoso.validDossierTemplate()
           if (!valid) {
@@ -1687,6 +1757,7 @@ export default {
           }
         }
         vm.loadingActionProcess = true
+        // tách riêng case sử dụng ký số
         if (vm.showKyPheDuyetTaiLieu) {
           if (useKySo) {
             let filter = {
@@ -1712,7 +1783,6 @@ export default {
                     let counterSave = 0
                     for (let i = 0; i < lengthFiles; i++) {
                       let fileDetail = fileArr[i]
-                      // <---------
                       var fileFind = vm.listDossierFiles.find(itemFile => {
                         return itemFile.dossierPartNo === fileDetail.partNo
                       })
@@ -1748,6 +1818,7 @@ export default {
                 }
               } else {
                 var paymentsOut = ''
+                // check phí = 0 => show cảnh báo
                 if (vm.showThuPhi) {
                   paymentsOut = {
                     requestPayment: vm.payments['requestPayment'],
@@ -1788,6 +1859,7 @@ export default {
             })
           }
         } else {
+          // case không sử dụng ký số
           vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
             if (vm.checkInput === 2 || vm.checkInput === '2') {
               vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
@@ -2114,7 +2186,7 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
-        // console.log('paymentProfile', vm.paymentProfile)
+        vm.$refs.thongtinthanhtoan.getPaymentFiles()
       }).catch(reject => {
       })
     },

@@ -78,7 +78,7 @@ export default {
     return {
       version: '0.2.1',
       currentPage: 1,
-      currentLimit: 10,
+      currentLimit: 20,
       translations: {
         en: {
           prev: 'Previous',

@@ -5,19 +5,15 @@
         <div style="width: calc(100% - 150px)">
           <v-layout wrap class="text-xs-center">
             <v-flex xs12 class="pr-2">
-              <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                <div class="input-group__input">
-                  <input id="passCheck" class="kios-input" data-layout="normal" @keyup.enter="submitPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
-                  <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
-                </div>
-                <div class="mt-2" v-if="!validPass">
-                  <div class="input-group__messages" style="color:red">* Mã tra cứu là bắt buộc</div>
-                </div>
+              <div class="input-custom">
+                <input id="passCheck" type="text" @focus="show" @keyup.enter="submitPass" required="required" />
+                <span class="bar"></span>
+                <label for="passCheck">Mã tra cứu</label>
               </div>
             </v-flex>
           </v-layout>
         </div>
-        <div class="text-center" style="width: 150px;margin-top:12px">
+        <div class="text-center" style="width: 150px;">
           <v-btn color="primary"
             :loading="loadingTable"
             :disabled="loadingTable"
@@ -35,7 +31,10 @@
           <p class="mb-1"> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
         </div>
       </v-layout>
-      <div class="virtual-keyboard" v-if="visible">
+      <div class="virtual-keyboard" v-if="visible && !isMobile">
+        <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
+          <v-icon color="#fff">clear</v-icon>
+        </v-btn>
         <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
       </div>
     </v-card>
@@ -96,6 +95,9 @@ export default {
     },
     dossierNoSearch () {
       return this.$store.getters.getDossierNoSearch
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
@@ -227,56 +229,28 @@ export default {
       window.history.back()
     },
     //
-    clear (id) {
-      $(`#${id}`).val('')
-    },
-    accept (text) {
-      this.hide()
-    },
     show (e) {
       this.validPass = true
       this.input = e.target
       if (!this.visible) {
         this.visible = true
       }
-      this.bindClick()
+      this.bindClick('view')
     },
-    showKeyboard (e) {
-      this.validPass = true
-      this.input = e.target
-      if (!this.visible) {
-        this.visible = true
-      }
-      this.bindClick()
-    },
-    hide () {
-      this.visible = false
-    },
-    next () {
-      let inputs = document.querySelectorAll('input')
-      let found = false
-      let arr1 = []
-      arr1.forEach.call(inputs, (item, i) => {
-        if (!found && item === this.input && i < inputs.length - 1) {
-          found = true
-          this.$nextTick(() => {
-            inputs[i + 1].focus()
-          })
-        }
-      })
-      if (!found) {
-        this.input.blur()
-        this.hide()
-      }
-    },
-    bindClick () {
+    bindClick (type) {
       var vm = this
       setTimeout(function () {
-        $('.keyboard .line:nth-child(2) .key:last-child').unbind('click')
-        $('.keyboard .line:nth-child(2) .key:last-child').bind('click', function () {
-          vm.submitPass()
-        })
-      }, 200)
+        $('.keyboard .enter').unbind('click')
+        if (type === 'search') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.filterDossier()
+          })
+        } else if (type === 'view') {
+          $('.keyboard .enter').bind('click', function () {
+            vm.submitViewDetail()
+          })
+        }
+      }, 300)
     }
   }
 }

@@ -15,6 +15,9 @@ Vue.use(VueContentPlaceholders)
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+    isOffLine: window.themeDisplay ? !window.themeDisplay.isSignedIn() : true
+  }),
   methods: {
     getOriginality: function () {
       return 1

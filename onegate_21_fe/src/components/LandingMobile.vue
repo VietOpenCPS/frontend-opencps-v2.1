@@ -17,6 +17,7 @@
             :hide-selected="true"
             @change="changeDomain"
             clearable
+            box
           ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -30,6 +31,7 @@
             :hide-selected="true"
             @change="changeServiceConfigs"
             clearable
+            box
           ></v-autocomplete>
         </v-flex>
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
@@ -42,9 +44,10 @@
             return-object
             :hide-selected="true"
             @change="changeDichVuConfigs"
+            box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs12 sm3 class="pl-2 pr-2">
+        <v-flex xs12 sm3 class="pl-2 pr-2 mt-1">
           <div style="position:relative">
             <v-text-field
               placeholder="Mã hồ sơ, tên hồ sơ, tên thủ tục ..."
@@ -67,7 +70,7 @@
         </v-chip>
       </div>
     </v-layout>
-    <v-flex xs12 sm3 class="pl-2 pr-2" v-if="originality === 1 && viewMobile">
+    <v-flex xs12 sm3 class="pl-2 pr-2 mt-2" v-if="originality === 1 && viewMobile">
       <div style="position:relative">
         <v-text-field
           placeholder="Tìm theo mã hồ sơ, tên hồ sơ, tên thủ tục ..."

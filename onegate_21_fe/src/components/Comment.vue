@@ -3,20 +3,10 @@
     <!-- Component Trao đổi thảo luận -->
     <div>
       <v-expansion-panel :value="[true]" expand  class="expansion-pl-transparent">
-        <v-expansion-panel-content>
-          <!-- <div slot="header">
-            <div class="background-triangle-small"> 
-              <v-icon size="18" color="white">star_rate</v-icon> 
-            </div>
-            TRAO ĐỔI THÔNG TIN
-          </div> -->
-          
+        <v-expansion-panel-content>         
           <v-card class="comments__container" >
             <v-card-text class="pl-4">
               <div id="comments-container-el"></div>
-              
-              <!-- <v-flex v-if="argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Xem thêm</span></v-flex>
-              <v-flex v-if="!argShowMore2"><span class="action-show primary--text mx-2 my-2" @click="showMore2">Rút gọn</span></v-flex> -->
             </v-card-text>
           </v-card>
         </v-expansion-panel-content>
@@ -303,7 +293,6 @@ export default {
                 type: 'POST',
                 headers: {
                   'groupId': vm.initData.groupId
-                  // 'groupId': 55301
                 },
                 data: formData,
                 cache: false,

@@ -1,13 +1,15 @@
 <template>
-  <v-app class="onegate__fe">
+  <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile && !isOffLine"
     >
-      <div class="mx-2">
-        <v-btn block color="primary" v-on:click.native="doAddDVC()"
+      <div class="">
+        <v-btn class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="doAddDVC()"
           :loading="loadingGov"
           :disabled="loadingGov"
+          style="height:36px"
         >
+          <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới hồ sơ
           <span slot="loader">Loading...</span>
         </v-btn>
@@ -37,7 +39,7 @@
               </span>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile v-for="subItem in item.items" :key="subItem.stepCode"
+          <v-list-tile v-if="item.items && item.items.length > 1" v-for="subItem in item.items" :key="subItem.stepCode"
             v-on:click.native="filterSteps(subItem, index)"
             :class="{'list__tile--active': String(currentStep) === String(subItem.stepCode)}"
             >
@@ -57,7 +59,7 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile">
+    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile && !isOffLine">
       <div class="row-header mb-2 py-2" style="background-color: #070f52">
         <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
@@ -119,7 +121,7 @@
     </div>
     <v-content>
       <router-view></router-view>
-      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0" outline color="warning" icon="priority_high" :value="true">
+      <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && !isOffLine" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
     </v-content>

@@ -6,7 +6,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span>{{getEPaymentProfile(paymentProfile.epaymentProfile).paymentFee}}</span>
+          <span>{{paymentProfile.paymentFee}}</span>
         </div>
         <v-card>
           <v-card-text class="px-4 pb-1">
@@ -76,10 +76,10 @@
               <v-icon>payment</v-icon> &nbsp;
               Thanh toán điện tử
             </v-btn>
-            <div v-if="isBank" class="ml-3">
+            <div v-if="isBank" class="ml-3 mt-2 px-2 py-1" style="border: 1px solid #004b9485;border-radius: 3px;">
               <div>
                 <input type="file" id="paymentFile1" @change="uploadPaymentFile($event)" style="display:none">
-                <span>Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
+                <span class="text-bold" style="color: #004b94!important">Tải lên file báo thanh toán chuyển khoản (Định dạng: .png, .jpg, .jpeg)</span>
                 <v-progress-circular
                 :width="2"
                 :size="25"
@@ -87,10 +87,10 @@
                 indeterminate
                 v-if="progressUploadPart"
                 ></v-progress-circular>
-                <v-tooltip top v-else>
+                <v-tooltip top v-else class="ml-2">
                   <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile()">
                     <v-badge>
-                      <v-icon size="16" color="primary">cloud_upload</v-icon>
+                      <v-icon size="24" color="#004b94">cloud_upload</v-icon>
                     </v-badge>
                   </v-btn>
                   <span>Tải file lên</span>
@@ -98,16 +98,32 @@
               </div>
               <!-- view file -->
               <div v-if="paymentFile">
-                <span v-on:click.stop="viewFile()" style="cursor: pointer;">
-                  <v-icon color="blue">insert_drive_file</v-icon>
-                  {{paymentFileName}}
-                </span>
-                <v-tooltip top>
-                  <v-btn icon ripple slot="activator" v-on:click.stop="downloadPaymentFile(item)" class="mx-0 my-0">
-                    <v-icon style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
+                <div v-on:click.stop="viewFile()" style="cursor: pointer;">
+                  <v-icon size="24" color="#004b94">insert_drive_file</v-icon>
+                  <span class="ml-2">{{paymentFileName}}</span>
+                  <!-- <v-tooltip top class="ml-3">
+                    <v-btn icon ripple slot="activator" v-on:click.stop="downloadPaymentFile(item)" class="mx-0 my-0">
+                      <v-icon size="24" color="#004b94">cloud_download</v-icon>
+                    </v-btn>
+                    <span>Tải xuống</span>
+                  </v-tooltip> -->
+                  <v-btn dark small color="blue darken-1" class="ml-3 mr-2" v-on:click.stop="downloadPaymentFile(item)">
+                    <v-icon>cloud_download</v-icon> &nbsp;
+                    Tải xuống
                   </v-btn>
-                  <span>Tải xuống</span>
-                </v-tooltip>
+                  <!-- <v-tooltip top class="ml-3">
+                    <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="pickFile()">
+                      <v-badge>
+                        <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                      </v-badge>
+                    </v-btn>
+                    <span>Cập nhật</span>
+                  </v-tooltip> -->
+                  <v-btn dark small color="blue darken-1" class="ml-2 mr-2" @click.stop="pickFile()">
+                    <v-icon>cloud_upload</v-icon> &nbsp;
+                    Cập nhật
+                  </v-btn>
+                </div>
               </div>
               <span v-if="!epaymentValid" style="color:#f44336">* Yêu cầu tải lên file báo thanh toán</span>
             </div>
@@ -268,7 +284,7 @@ export default {
       data['partTip'] = {
         tip: '',
         maxSize: 10,
-        extensions: 'jpg,png,jpeg,JPG,PNG,JPEG'
+        extensions: 'jpg,png,jpeg'
       }
       let file = $('#paymentFile1')[0].files[0]
       vm.$store.dispatch('uploadPaymentFile', data).then(function (result) {

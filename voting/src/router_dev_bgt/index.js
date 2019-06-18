@@ -7,7 +7,8 @@ import Employees from '@/components/screens/EmployeesBGT'
 import EmployeeDetail from '@/components/screens/EmployeeDetailBGT'
 
 const routes = [
-  { path: '/', component: Employees, props: true },
+  { path: '/', component: LandingVoting, props: false },
+  { path: '/danh-gia-can-bo/:itemCode', component: Employees, props: true },
   { path: '/danh-sach-can-bo/:id', component: EmployeeDetail, props: true },
   {
     path: '/danh-sach-ho-so/:index',

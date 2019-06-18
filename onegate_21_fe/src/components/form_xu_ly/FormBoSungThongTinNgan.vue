@@ -8,8 +8,9 @@
         <v-card>
           <v-card-text class="py-2 px-2">
             <v-layout wrap>
-              <v-flex xs12>
+              <v-flex xs12 class="mx-3">
                 <v-text-field v-if="item.fieldType === 'textarea'"
+                  box
                   :id="item.fieldName"
                   :value="item.value"
                   :placeholder="item.placeholder"
@@ -19,6 +20,7 @@
                   :required="(item.required === true || item.required === 'true') ? true : false"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'string'"
+                  box
                   :id="item.fieldName"
                   :value="item.value"
                   :placeholder="item.placeholder"
@@ -27,6 +29,7 @@
                   :required="(item.required === true || item.required === 'true') ? true : false"
                 ></v-text-field>
                 <v-text-field v-if="item.fieldType === 'number'"
+                  box
                   :id="item.fieldName"
                   :value="item.value"
                   :placeholder="item.placeholder"
@@ -45,7 +48,7 @@
                   :required="(item.required === true || item.required === 'true') ? true : false"
                 ></v-text-field> -->
                 <v-layout wrap class="pl-2" v-if="item.fieldType === 'date'">
-                  <v-icon color="blue" class="ml-3">event</v-icon>
+                  <v-icon color="blue" class="">event</v-icon>
                   <vue-ctk-date-time-picker 
                     ref="datepicker"
                     :label="item.value ? '' : 'Chọn ngày'"
@@ -56,6 +59,7 @@
                     formatted="DD/MM/YYYY HH:mm"
                     format="YYYY-MM-DDTHH:mm"
                     time-format="HH:mm"
+                    :min-date="getCurentDateTime()"
                     :without-header="true"
                   />
                 </v-layout>
@@ -354,6 +358,10 @@
           objectReturn = ''
         }
         return objectReturn
+      },
+      getCurentDateTime () {
+        let date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       }
     },
     filters: {

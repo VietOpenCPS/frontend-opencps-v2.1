@@ -85,9 +85,10 @@
             <!--  -->
             <v-flex xs12 sm4 v-if="originality !== 1">
               <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Ngày gửi trực tuyến: </span>
+                <span class="pr-2" v-if="thongTinChiTietHoSo.online">Ngày gửi trực tuyến: </span>
+                <span class="pr-2" v-else>Ngày nộp hồ sơ: </span>
                 <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
-                <span class="pl-0 text-bold" v-else> Một cửa </span>
+                <span class="pl-0 text-bold" v-else> {{thongTinChiTietHoSo.receiveDate}} </span>
               </div>
               <!--  -->
               <div class="xs12 sm12 pb-1">
@@ -112,9 +113,10 @@
             </v-flex>
             <v-flex xs12 sm4 v-else>
               <div class="xs12 sm12 pb-1">
-                <span class="pr-2">Ngày gửi: </span>
+                <span class="pr-2" v-if="thongTinChiTietHoSo.online">Ngày gửi trực tuyến: </span>
+                <span class="pr-2" v-else>Ngày nộp hồ sơ: </span>
                 <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> {{thongTinChiTietHoSo.submitDate}} </span>
-                <span class="pl-0 text-bold" v-else> Một cửa </span>
+                <span class="pl-0 text-bold" v-else> {{thongTinChiTietHoSo.receiveDate}} </span>
               </div>
               <!--  -->
               <div class="xs12 sm12 pb-1">
@@ -143,8 +145,14 @@
                 <span class="pr-2">Trạng thái: </span>
                 <span class="pl-0 text-bold "> {{thongTinChiTietHoSo.dossierStatusText}} </span>
               </div>
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">Ghi chú:</div>
-              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0&&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
+              <div class="xs12 sm12 pb-1 overHidden" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0&&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
                 <v-tooltip top>
                   <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
                   <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
@@ -160,8 +168,12 @@
               </div> -->
             </v-flex>
             <v-flex xs12 sm4 v-else>
-              <div class="xs12 sm12 pb-1" style="color:#0b72ba" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">Ghi chú:</div>
-              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'">
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
+              <div class="xs12 sm12 pb-1 overHidden" v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
                 <v-tooltip top>
                   <span slot="activator" class="text-bold ">{{thongTinChiTietHoSo.dossierNote}} </span>
                   <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>

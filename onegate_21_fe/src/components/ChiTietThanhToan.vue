@@ -53,7 +53,7 @@
           </v-card>
         </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+      <v-expansion-panel :value="[true]" expand class="expansion-pl">
         <v-expansion-panel-content>
           <div slot="header">
             <div class="background-triangle-small"> 
@@ -155,7 +155,7 @@
                   <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
                 </v-flex>
                 <v-flex xs12 sm7></v-flex>
-                <v-flex xs12 sm12 class="mb-3">
+                <v-flex xs12 sm12 class="ml-3 mb-3">
                   <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 
                     Tra cứu hóa đơn
@@ -243,16 +243,12 @@ export default {
     let vm = this
     vm.$nextTick(function () {
       var vm = this
-      let query = vm.$router.history.current.query
     })
   },
   watch: {
     dossierDetail (val) {
       var vm = this
-      let filter = vm.dossierDetail
-      vm.$store.dispatch('getPaymentFiles', filter).then(result => {
-        vm.paymentFile = result
-      })
+      vm.getPaymentFiles()
     },
     payments (val) {
       // lấy thông tin tra cứu trên keypay
@@ -268,6 +264,13 @@ export default {
     }
   },
   methods: {
+    getPaymentFiles () {
+      let vm = this
+      let filter = vm.dossierDetail
+      vm.$store.dispatch('getPaymentFiles', filter).then(result => {
+        vm.paymentFile = result
+      })
+    },
     currency (value) {
       if (value) {
         let moneyCur = (value / 1).toFixed(0).replace('.', ',')

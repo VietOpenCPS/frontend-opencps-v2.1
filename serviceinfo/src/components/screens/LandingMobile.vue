@@ -12,6 +12,7 @@
           :hide-selected="true"
           clearable
           @change="changeAdministration"
+          box
         ></v-select>
       </v-flex>
       <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
@@ -25,6 +26,7 @@
           :hide-selected="true"
           clearable
           @change="changeDomain"
+          box
         ></v-select>
       </v-flex>
       <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
@@ -39,6 +41,7 @@
           :hide-selected="true"
           @change="changeLevel"
           clearable
+          box
         >
         </v-select>
       </v-flex>
@@ -207,11 +210,18 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       if (currentQuery.hasOwnProperty('agency')) {
         let filterDomain = {
           agencyCode: currentQuery['agency']
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
+      } else {
+        let filterDomain = {
+          agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
@@ -247,20 +257,10 @@ export default {
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.doLoadingThuTuc()
     }
-    // domainList (val) {
-    //   var vm = this
-    //   if (vm.govAgencySelected) {
-    //     vm.domainListCurrent = val.filter(function (itemLinhVuc) {
-    //       return (itemLinhVuc.domainCode.indexOf(vm.govAgencySelected) === 0)
-    //     })
-    //   } else {
-    //     vm.domainListCurrent = val
-    //   }
-    // }
   },
   methods: {
     changeAdministration () {
