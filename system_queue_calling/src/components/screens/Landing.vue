@@ -10,7 +10,22 @@
     <v-card flat color="#ffffff" class="pt-2 pb-4">
       <v-flex xs12 class="text-xs-center pt-2" id="nav-calling">
         <v-layout wrap class="white py-0">
-          <v-flex xs6 class="px-2">
+          <v-flex xs4 class="px-2">
+            <v-autocomplete
+              class="select-border"
+              :items="serviceGroupList"
+              v-model="serviceGroupSelected"
+              label="Chọn nhóm"
+              item-text="title"
+              item-value="sibling"
+              :hide-selected="true"
+              clearable
+              @change="changeGroup"
+              box
+              :disabled="isCalling"
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs4 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="serviceInfoList"
@@ -25,7 +40,7 @@
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs6 class="px-2">
+          <v-flex xs4 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="stateList"
@@ -57,7 +72,7 @@
                 <span v-else>-- -- --</span>
               </v-chip>
             </div>
-            <div v-if="currentBooking" class="d-inline-block ml-3" style="position: absolute;top:50px">
+            <div v-if="currentBooking" class="d-inline-block ml-3 pt-1" style="position: absolute;top:50px">
               <v-btn
                 :loading="loadingCalling"
                 :disabled="loadingCalling"
@@ -87,7 +102,7 @@
                 :disabled="loadingCalling || !currentBooking['speaking']"
                 color="primary"
                 class="white--text mt-1"
-                @click="callBack"
+                @click="callBack(currentBooking)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>cached</v-icon> &nbsp;
@@ -335,7 +350,9 @@ export default {
       }
     ],
     currentBooking : '',
-    isCalling: false
+    isCalling: false,
+    serviceGroupList: [],
+    serviceGroupSelected: ''
   }),
   computed: {
   },
@@ -405,10 +422,14 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
+        vm.serviceGroupList = configs
         vm.apiRelease = configs.filter(function (item) {
           return item.key === 'API'
         })[0]['url']
       })
+    },
+    changeGroup () {
+
     },
     getGateLists () {
       let vm = this
@@ -499,6 +520,7 @@ export default {
     },
     mergeBooking (bookingEform, bookingDossier) {
       let vm = this
+      vm.getBookingCalling()
       // ------>
       let bookingRelease = []
       let bookingDossierRealease = []
@@ -599,6 +621,7 @@ export default {
         className: 'EFORM',
         gateNumber: vm.currentGate
       }
+      console.log('vm.currentGate', vm.currentGate, filterEform)
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
         count+=1
         vm.loading = false
@@ -657,6 +680,7 @@ export default {
         }
         booking = sortBooking(booking)
         vm.currentBooking = booking[0]
+        console.log('currentBooking', vm.currentBooking)
       }
     },
     callingBooking (item) {
@@ -664,9 +688,10 @@ export default {
       vm.currentBooking = item
       item.speaking = false
       item.state = 2
+      item.gateNumber = vm.currentGate
       vm.updateStateBooking(item)
     },
-    callBack () {
+    callBack (item) {
       let vm = this
       vm.currentBooking = item
       item.state = 2

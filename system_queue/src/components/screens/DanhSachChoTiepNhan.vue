@@ -102,7 +102,7 @@ export default {
     $('#banner').css('display','none')
     $('.navbar-container').css('display','none')
     $('#footer').css('display','none')
-    setTimeout(function(){$('#footer').css('display','none')},500)
+    setTimeout(function(){$('#footer').css('display','none')}, 500)
   },
   watch: {
     // loadData (val) {

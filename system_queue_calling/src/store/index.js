@@ -152,7 +152,8 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let paramGet = {
             service: filter.service ? filter.service : '',
-            state: filter.state ? filter.state : ''
+            state: filter.state ? filter.state : '',
+            gateNumber: filter.gateNumber ? filter.gateNumber : ''
           }
           let param = {
             headers: {
@@ -181,6 +182,7 @@ export const store = new Vuex.Store({
           let dataUpdateBooking = new URLSearchParams()
           dataUpdateBooking.append('state', filter.state)
           dataUpdateBooking.append('gateNumber', filter.gateNumber)
+          dataUpdateBooking.append('speaking', filter.speaking)
           axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
             resolve(response)
           }).catch(function (xhr) {
@@ -293,6 +295,27 @@ export const store = new Vuex.Store({
       })
     },
     getDossier ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          axios.get(filter.url, param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            reject([])
+          })
+        })
+      })
+    },
+    getDossierDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {

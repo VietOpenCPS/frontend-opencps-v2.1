@@ -96,7 +96,7 @@ export default {
   },
   data: () => ({
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-    activeCalling: false,
+    activeCalling: true,
     called: true,
     currentCalling: '',
     loadData: false,
@@ -273,11 +273,11 @@ export default {
         vm.bookingList = sortBooking(vm.bookingList)
         for (let index in vm.gateNumberList) {
           let currentGate = vm.bookingList.filter(function (item) {
-            return (String(item.gateNumber) === String(vm.gateNumberList[index]['gateNumber']) && !vm.gateNumberList[index]['speaking'])
+            return (String(item.gateNumber) === String(vm.gateNumberList[index]['gateNumber']) && !item['speaking'])
           })
           vm.queueList = vm.queueList.concat(currentGate)
         }
-        if (vm.activeCalling && vm.called) {
+        if (vm.activeCalling && vm.called && Array.isArray(vm.queueList) && vm.queueList.length > 0) {
           vm.currentCalling = vm.queueList[0]
           vm.callingApplicant(vm.currentCalling)
         } else {
@@ -347,7 +347,7 @@ export default {
           vm.currentCalling = ''
           vm.called = true
           vm.loadData = !vm.loadData
-          vm.updateStateBooking(item, false)
+          // vm.updateStateBooking(item, false)
         }
         // start audio
         setTimeout (function () {

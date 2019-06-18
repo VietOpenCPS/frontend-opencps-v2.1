@@ -1329,7 +1329,7 @@ export const store = new Vuex.Store({
             dataPostdossierMark.append('fileComment', data.fileComment)
           }
         } else {
-          if (data.fileMark && data.fileMark !== undefined && data.fileMark !== 'undefined' && data.fileMark !== null) {
+          if (data.fileMark !== undefined && data.fileMark !== 'undefined') {
             dataPostdossierMark.append('fileMark', data.fileMark)
           }
         }

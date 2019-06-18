@@ -277,26 +277,108 @@ export default {
       let queryString = '?'
       vm.dossierNoKey = $('#dossierNoKey').val()
       vm.applicantIdNoKey = $('#applicantIdNoKey').val()
-      newQuery['dossierNo'] = vm.dossierNoKey
-      newQuery['applicantIdNo'] = vm.applicantIdNoKey
-      vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
-      vm.$store.commit('setApplicantIdNoSearch', vm.applicantIdNoKey)
-      newQuery['detail'] = ''
-      for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
-          queryString += key + '=' + newQuery[key] + '&'
-        }
-      }
-      if (vm.dossierNoKey || vm.applicantIdNoKey) {
-        vm.validateTracuu = true
-        vm.$router.push({
-          path: current.path + queryString,
-          query: {
-            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+      if (vm.dossierNoKey.indexOf('D-') < 0) {
+        newQuery['dossierNo'] = vm.dossierNoKey
+        newQuery['applicantIdNo'] = vm.applicantIdNoKey
+        vm.$store.commit('setDossierNoSearch', vm.dossierNoKey)
+        vm.$store.commit('setApplicantIdNoSearch', vm.applicantIdNoKey)
+        newQuery['detail'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
           }
+        }
+        if (vm.dossierNoKey || vm.applicantIdNoKey) {
+          vm.validateTracuu = true
+          vm.$router.push({
+            path: current.path + queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          vm.validateTracuu = false
+        }
+      } else if (vm.dossierNoKey.indexOf('D-') >= 0 && String(vm.dossierNoKey).split('-').length === 3) {
+        console.log('run run run')
+        let filter = {
+          password: String(vm.dossierNoKey).split('-')[1],
+          dossierId: String(vm.dossierNoKey).split('-')[2]
+        }
+        console.log('filter', filter)
+        vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+          if (result.status && result.status.toString() === '203') {
+            vm.dialogError = true
+          } else if (result.status && result.status.toString() === '200') {
+            vm.$store.commit('setDossierDetail', result.data)
+            let queryString = '?detail=true'
+            vm.$router.push({
+              path: '/tra-cuu-ho-so' + queryString
+            })
+          }
+        }).catch(function (reject) {
+          vm.dialogCheckPass = false
+          vm.visible = false
+          vm.loading = false
+          console.log('reject', reject)
         })
+      }
+    },
+    submitPass () {
+      var vm = this
+      if ($('#passCheck').val() !== '') {
+        vm.validPass = true
+        if (vm.targetCheckPass === 'tracuuhoso') {
+          let payload = {
+            dossierNo: vm.filterDossierKey.dossierNo ? vm.filterDossierKey.dossierNo : '',
+            applicantIdNo: vm.filterDossierKey.applicantIdNo ? vm.filterDossierKey.applicantIdNo : '',
+            secretCode: $('#passCheck').val()
+          }
+          vm.$store.commit('setFilterDossierKey', payload)
+          let newQuery = {
+            dossierNo: vm.filterDossierKey.dossierNo,
+            applicantIdNo: vm.filterDossierKey.applicantIdNo
+          }
+          let queryString = '?'
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          vm.$router.push({
+            path: '/tra-cuu-ho-so' + queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        } else {
+          console.log('vm.dossierDetail', vm.dossierDetail)
+          let filter = {
+            password: $('#passCheck').val(),
+            dossierId: vm.dossierDetail.dossierId
+          }
+          vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+            vm.loading = false
+            vm.dialogCheckPass = false
+            vm.clearDialog()
+            if (result.status && result.status.toString() === '203') {
+              vm.dialogError = true
+            } else if (result.status && result.status.toString() === '200') {
+              vm.$store.commit('setDossierDetail', result.data)
+              let queryString = '?dossierNo=' + vm.dossierNoSearch + '&applicantIdNo=' + vm.applicantIdNoSearch + '&detail=true'
+              vm.$router.push({
+                path: '/tra-cuu-ho-so' + queryString
+              })
+            }
+          }).catch(function (reject) {
+            vm.dialogCheckPass = false
+            vm.visible = false
+            vm.loading = false
+            console.log('reject', reject)
+          })
+        }
       } else {
-        vm.validateTracuu = false
+        vm.validPass = false
       }
     },
     confirmPass () {
