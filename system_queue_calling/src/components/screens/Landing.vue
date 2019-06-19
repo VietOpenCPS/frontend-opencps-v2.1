@@ -695,9 +695,9 @@ export default {
         booking = bookingEform.concat(bookingDossier)
         let sortBooking = function (bookingList) {
           function compare(a, b) {
-            if (a.checkinDate < b.checkinDate)
+            if (a.modifiedDate > b.modifiedDate)
               return -1
-            if (a.checkinDate > b.checkinDate)
+            if (a.modifiedDate < b.modifiedDate)
               return 1
             return 0
           }

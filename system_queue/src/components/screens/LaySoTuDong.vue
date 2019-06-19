@@ -111,78 +111,53 @@ export default {
       setTimeout (function () {
         vm.getBooking()
       }, 5000)
+    },
+    isActive () {
+      let vm = this
+      vm.eformInformation = ''
     }
   },
   methods: {
     submitQueue () {
       let vm = this
-      if (String(vm.eformInformation).indexOf('-') > 0) {
-        let keySearch = String(vm.eformInformation).split('-')
-        vm.codeShow = vm.eformInformation
-        if (keySearch.length !== 3) {
-          vm.isActive = true
-          vm.checkinFail = true
-          setTimeout(function() {
-            vm.isActive = false
-          }, 5000)
-          vm.eformInformation = ''
-        }
-        let filterBooking = {
-          className: '',
-          classPK: '',
-          serviceCode: '',
-          gateNumber: '',
-          state: 1,
-          codeNumber: vm.eformInformation,
-          bookingName: ''
-        }
-        if (keySearch[0] === 'E' && keySearch.length === 3) {
-          let filterEform = {
-            eFormId: keySearch[2]
-          }
-          vm.$store.dispatch('getEform', filterEform).then(function (result) {
-            let bookingName = ''
-            if (result['eFormId']) {
-              try {
-                let name = JSON.parse(result['eFormData'])
-                bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
-              } catch (e) {
-              }
-              vm.checkinFail = false
-              filterBooking.className = 'EFORM'
-              filterBooking.classPK = result.eFormId
-              filterBooking.serviceCode = result.serviceCode
-              filterBooking.bookingName = bookingName
-              vm.createBooking(filterBooking)
-            } else {
-              vm.isActive = true
-              vm.checkinFail = true
-              setTimeout(function() {
-                vm.isActive = false
-              }, 5000)
-              vm.eformInformation = ''
-            }
-          }).catch (function (reject) {
+      if (!vm.isActive) {
+        if (String(vm.eformInformation).indexOf('-') > 0) {
+          let keySearch = String(vm.eformInformation).split('-')
+          vm.codeShow = vm.eformInformation
+          if (keySearch.length !== 3) {
             vm.isActive = true
             vm.checkinFail = true
             setTimeout(function() {
               vm.isActive = false
             }, 5000)
             vm.eformInformation = ''
-          })
-        } else if (keySearch[0] === 'D' && keySearch.length === 3) {
-          let filterDossier = {
-            dossierId: keySearch[2]
           }
-          vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
-            if (result) {
-              vm.checkinFail = false
-              filterBooking.className = 'DOSSIER'
-              filterBooking.classPK = result.dossierId
-              filterBooking.serviceCode = result.serviceCode
-              filterBooking.bookingName = result.applicantName
-              if (result['stepCode'] && '404,600,300'.indexOf(String(result['stepCode'])) >= 0) {
-                console.log('createBK', result['stepCode'], filterBooking)
+          let filterBooking = {
+            className: '',
+            classPK: '',
+            serviceCode: '',
+            gateNumber: '',
+            state: 1,
+            codeNumber: vm.eformInformation,
+            bookingName: ''
+          }
+          if (keySearch[0] === 'E' && keySearch.length === 3) {
+            let filterEform = {
+              eFormId: keySearch[2]
+            }
+            vm.$store.dispatch('getEform', filterEform).then(function (result) {
+              let bookingName = ''
+              if (result['eFormId']) {
+                try {
+                  let name = JSON.parse(result['eFormData'])
+                  bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
+                } catch (e) {
+                }
+                vm.checkinFail = false
+                filterBooking.className = 'EFORM'
+                filterBooking.classPK = result.eFormId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = bookingName
                 vm.createBooking(filterBooking)
               } else {
                 vm.isActive = true
@@ -192,30 +167,61 @@ export default {
                 }, 5000)
                 vm.eformInformation = ''
               }
-            } else {
+            }).catch (function (reject) {
               vm.isActive = true
               vm.checkinFail = true
               setTimeout(function() {
                 vm.isActive = false
               }, 5000)
               vm.eformInformation = ''
+            })
+          } else if (keySearch[0] === 'D' && keySearch.length === 3) {
+            let filterDossier = {
+              dossierId: keySearch[2]
             }
-          }).catch (function (reject) {
-            vm.isActive = true
-            vm.checkinFail = true
-            setTimeout(function() {
-              vm.isActive = false
-            }, 5000)
-            vm.eformInformation = ''
-          })
+            vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
+              if (result) {
+                vm.checkinFail = false
+                filterBooking.className = 'DOSSIER'
+                filterBooking.classPK = result.dossierId
+                filterBooking.serviceCode = result.serviceCode
+                filterBooking.bookingName = result.applicantName
+                if (result['stepCode'] && '404,600,300'.indexOf(String(result['stepCode'])) >= 0) {
+                  console.log('createBK', result['stepCode'], filterBooking)
+                  vm.createBooking(filterBooking)
+                } else {
+                  vm.isActive = true
+                  vm.checkinFail = true
+                  setTimeout(function() {
+                    vm.isActive = false
+                  }, 5000)
+                  vm.eformInformation = ''
+                }
+              } else {
+                vm.isActive = true
+                vm.checkinFail = true
+                setTimeout(function() {
+                  vm.isActive = false
+                }, 5000)
+                vm.eformInformation = ''
+              }
+            }).catch (function (reject) {
+              vm.isActive = true
+              vm.checkinFail = true
+              setTimeout(function() {
+                vm.isActive = false
+              }, 5000)
+              vm.eformInformation = ''
+            })
+          }
+        } else {
+          vm.isActive = true
+          vm.checkinFail = true
+          setTimeout(function() {
+            vm.isActive = false
+          }, 5000)
+          vm.eformInformation = ''
         }
-      } else {
-        vm.isActive = true
-        vm.checkinFail = true
-        setTimeout(function() {
-          vm.isActive = false
-        }, 5000)
-        vm.eformInformation = ''
       }
     },
     createBooking (filter) {

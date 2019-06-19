@@ -84,7 +84,6 @@
 </template>
 
 <script>
-
 import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
@@ -308,15 +307,8 @@ export default {
         $('#audioCalling').html('')
         let splitNumberCode = item['codeNumber'].split('-')
         let numberCalling = splitNumberCode[0] + splitNumberCode[1] + splitNumberCode[2]
-        let srcAudioStart = splitNumberCode[0] === 'E' ? `/o/opencps-store/js/cli/system_queue/app/media/eformStart1.mp3` : `/o/opencps-store/js/cli/system_queue/app/media/dossierStart1.mp3`
+        let srcAudioStart = splitNumberCode[0] === 'E' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
-        // let gateNumber, subGate
-        // if (isNaN(item['gateNumber'].slice(-1))) {
-        //   gateNumber = item['gateNumber'].replace(item['gateNumber'].slice(-1), '')
-        //   subGate = item['gateNumber'].slice(-1)
-        // } else {
-        //   gateNumber = item['gateNumber']
-        // }
         let audioStart = `
           <audio id="start">
             <source src="${srcAudioStart}" type="audio/mp3">
@@ -324,38 +316,20 @@ export default {
         `
         let audioEnd = `
           <audio id="end">
-            <source src="/o/opencps-store/js/cli/system_queue/app/media/toGateNumber.mp3" type="audio/mp3">
+            <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/toGateNumber.mp3" type="audio/mp3">
           </audio>
         `
         let audioNumber = ''
         for (let index = 0; index < numberArr.length; index++) {
           audioNumber += `
             <audio id="au${index}">
-              <source src="/o/opencps-store/js/cli/system_queue/app/media/${numberArr[index]}.mp3" type="audio/mp3">
+              <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${numberArr[index]}.mp3" type="audio/mp3">
             </audio>
           `
         }
-        // 
-        if (subGate) {
-          let gateAudio = `
-            <audio id="gateNumber1">
-              <source src="/o/opencps-store/js/cli/system_queue/app/media/${gateNumber}.mp3" type="audio/mp3">
-            </audio>
-            <audio id="gateNumber2">
-              <source src="/o/opencps-store/js/cli/system_queue/app/media/${subGate}.mp3" type="audio/mp3">
-            </audio>
-          `
-        } else {
-          let gateAudio = `
-            <audio id="gateNumber">
-              <source src="/o/opencps-store/js/cli/system_queue/app/media/${Number(item['gateNumber'])}.mp3" type="audio/mp3">
-            </audio>
-          `
-        }
-        // 
         let gateAudio = `
           <audio id="gateNumber">
-            <source src="/o/opencps-store/js/cli/system_queue/app/media/${Number(item['gateNumber'])}.mp3" type="audio/mp3">
+            <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${Number(item['gateNumber'])}.mp3" type="audio/mp3">
           </audio>
         `
         $('#audioCalling').html(audioStart + audioNumber + audioEnd + gateAudio)
@@ -372,14 +346,7 @@ export default {
           document.getElementById('end').play()
         }
         document.getElementById('end').onended = function() {
-          if (subGate) {
-            document.getElementById('gateNumber1').play()
-            setTimeout (function() {
-              document.getElementById('gateNumber2').play()
-            }, 800)
-          } else {
-            document.getElementById('gateNumber').play()
-          }
+          document.getElementById('gateNumber').play()
         }
         document.getElementById('gateNumber').onended = function () {
           vm.currentCalling = ''
