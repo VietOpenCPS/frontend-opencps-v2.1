@@ -57,15 +57,21 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      $('header').css('display','block')
-      $('#banner').css('display','block')
-      $('.navbar-container').css('display','block')
-      $('#footer').css('display','block')
+      $('header').css('display','none')
+      $('#banner').css('display','none')
+      $('.navbar-container').css('display','none')
+      $('#footer').css('display','none')
+      setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
+      $('header').css('display','none')
+      $('#banner').css('display','none')
+      $('.navbar-container').css('display','none')
+      $('#footer').css('display','none')
+      setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
   watch: {
