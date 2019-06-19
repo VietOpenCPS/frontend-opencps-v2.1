@@ -84,31 +84,31 @@
         <div :class="isKios ? 'tab-item' : ''">
           <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
             <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
+              <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icons-document.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Hồ sơ đã có kết quả</span>
               </p>
             </a>
             <a href="javascript:;" class="active" @click="goPage('tiepnhanhoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons8-open-file-50.png"></p>
+              <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icons8-open-file-50.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Hồ sơ đã tiếp nhận</span>
               </p>
             </a>
             <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-search-50.png"></p>
+              <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icons-search-50.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Tra cứu hồ sơ</span>
               </p>
             </a>
             <a href="javascript:;" @click="goPage('tracuuthutuc')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-search-dc-50.png"></p>
+              <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icon-search-dc-50.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Tra cứu thủ tục</span>
               </p>
             </a>
             <a href="javascript:;" @click="goPage('danhgia')">
-              <p class="icon pl-1 pr-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-evaluation.png"></p>
+              <p class="icon pl-1 pr-2"><img src="/o/opencps-store/js/kios/img/icon-evaluation.png"></p>
               <p class="ml-2 my-0">
                 <span class="text-bold">Đánh giá cán bộ</span>
               </p>

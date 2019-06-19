@@ -2,8 +2,8 @@
   <v-card flat color="#064787" id="contain-dktn" class="">
     <v-flex xs12 class="header_login text-xs-center pt-2">
       <div class="logo d-inline-block">
-        <img :src="'/documents/' + groupId + '/0/logo.png'">
-        <div style="font-size:22px;color:#e5e0e0" class="mt-2 text-xs-center">BỘ NGOẠI GIAO</div>
+        <img src="/o/bongoaigiao-theme/images/logo3.png">
+        <!-- <div style="font-size:22px;color:#e5e0e0" class="mt-2 text-xs-center">BỘ NGOẠI GIAO</div> -->
         <h1 style="font-size:26px; color: #ffffff" class="text-bold my-2">BỘ PHẬN TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ
         </h1>
       </div>
@@ -75,6 +75,7 @@ export default {
     isActive: false,
     checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+    loadData: false
   }),
   computed: {
     isMobile () {
@@ -88,6 +89,7 @@ export default {
     $('.navbar-container').css('display','none')
     $('#footer').css('display','none')
     vm.$nextTick(function () {
+      vm.getBooking()
       let current = vm.$router.history.current
       let currentQuery = current.query
       setTimeout(function(){$('#footer').css('display','none')},500)
@@ -103,7 +105,14 @@ export default {
       setTimeout(function(){$('#footer').css('display','none')},500)
     })
   },
-  watch: {},
+  watch: {
+    loadData (val) {
+      let vm = this
+      setTimeout (function () {
+        vm.getBooking()
+      }, 5000)
+    }
+  },
   methods: {
     submitQueue () {
       let vm = this
@@ -219,6 +228,18 @@ export default {
         vm.eformInformation = ''
       }).catch (function (reject) {
         vm.eformInformation = ''
+      })
+    },
+    getBooking () {
+      let vm = this
+      let filterEform = {
+        state: 1,
+        className: 'EFORM'
+      }
+      vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
+        vm.loadData = !vm.loadData
+      }).catch(reject => {
+        vm.loadData = !vm.loadData
       })
     }
   }

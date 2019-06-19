@@ -714,7 +714,11 @@ export default {
       item.speaking = false
       item.state = 2
       item.gateNumber = vm.currentGate
-      vm.updateStateBooking(item)
+      if (vm.currentGate) {
+        vm.updateStateBooking(item)
+      } else {
+        alert('Vui lòng chọn quầy trước khi gọi!')
+      }
     },
     callBack (item) {
       let vm = this
@@ -817,7 +821,8 @@ export default {
           vm.filterCreateDossier = {
             serviceCode: item.serviceCode,
             govAgencyCode: processDetail['govAgencyCode'],
-            dossierTemplateNo: ''
+            dossierTemplateNo: '',
+            serviceConfigId: processDetail['serviceConfigId']
           }
           if (processDetail['options'].length === 1) {
             vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
@@ -853,7 +858,8 @@ export default {
         }).catch (function (reject1) {
         })
         let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
-        window.open(urlRedirect, '_blank')
+        let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo']
+        window.open(urlRedirect + query, '_blank')
       }).catch (function (reject) {
       })
     },
