@@ -1,26 +1,63 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
-    <!-- <v-navigation-drawer app clipped floating width="250" v-if="getUser('Administrator')">
+    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator')">
+      <div class="">
+        <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
+          style="height:36px"
+        >
+          <v-icon size="22" color="white">add</v-icon>&nbsp;
+          Thêm mới câu hỏi
+        </v-btn>
+      </div>
       <v-list class="pt-0">
-        <v-list-tile @click="viewList">
-          <v-list-tile-action class="ml-3">
-            <v-icon color="primary">dashboard</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-badge color="blue" right class="mt-1">
-              <span slot="badge">{{totalQuestion}}</span>
-              <span class="mr-2">Danh sách câu hỏi</span>
-            </v-badge>
+        <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
+            <v-list-tile-title>Tất cả câu hỏi</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalQuestion}}
+            </span>
           </v-list-tile-content>
         </v-list-tile>
-        <v-divider></v-divider>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'answered=true')">
+            <v-list-tile-title>Câu hỏi đã trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalAnswered}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 2 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(2, 'answered=false')">
+            <v-list-tile-title>Câu hỏi chưa trả lời</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotAnswer}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 3 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(3, 'publish=1')">
+            <v-list-tile-title>Câu hỏi công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalPublished}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 4 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(4, 'publish=0')">
+            <v-list-tile-title>Câu hỏi không công khai</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalNotPublish}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
       </v-list>
-    </v-navigation-drawer> -->
-    <v-content style="width: 100%;max-width: 1200px;margin: 0 auto">
-      <!-- <v-btn v-if="!getUser('Administrator')" @click.native="addQuestion()" round color="primary" dark style="position:absolute;top:0px;right:20px;z-index:101">
-        <v-icon>near_me</v-icon>&nbsp;
-        Gửi câu hỏi
-      </v-btn> -->
+    </v-navigation-drawer>
+    <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -29,6 +66,48 @@
 <script>
   export default {
     data: () => ({
+      activeTab: 0,
+      totalAnswered: 0,
+      totalNotAnswer: 0,
+      totalPublished: 0,
+      totalNotPublish: 0,
+      agencyList: [
+        {
+          agencyName: 'Cơ quan Bộ Giao thông vận tải',
+          agencyCode: 'BGTVT_VPB',
+          groupId: '63785'
+        },
+        {
+          agencyName: 'Tổng Cục Đường bộ Việt Nam',
+          agencyCode: 'BGTVT_DB',
+          groupId: '35243'
+        },
+        {
+          agencyName: 'Cục Đường sắt Việt Nam',
+          agencyCode: 'CDSVN',
+          groupId: '35219'
+        },
+        {
+          agencyName: 'Cục Đường thủy nội địa Việt Nam',
+          agencyCode: 'BGTVT_DTND',
+          groupId: '53152'
+        },
+        {
+          agencyName: 'Cục Hàng hải Việt Nam',
+          agencyCode: 'BGTVT_HH',
+          groupId: '51801'
+        },
+        {
+          agencyName: 'Cục Hàng không Việt Nam',
+          agencyCode: 'BGTVT_HK',
+          groupId: '51883'
+        },
+        {
+          agencyName: 'Cục Đăng kiểm Việt Nam',
+          agencyCode: 'BGTVT_DK',
+          groupId: '53084'
+        }
+      ]
     }),
     computed: {
       loading () {
@@ -36,10 +115,6 @@
       },
       questionList () {
         return this.$store.getters.getQuestionList
-      },
-      questionListNew () {
-        let vm = this
-        return vm.getQuestionListNew(vm.questionList)
       },
       activeAddQuestion () {
         return this.$store.getters.getActiveAddQuestion
@@ -49,6 +124,12 @@
       },
       totalQuestion () {
         return this.$store.getters.getTotalQuestion
+      },
+      keyword () {
+        return this.$store.getters.getKeywordFilter
+      },
+      agencyFilterSelected () {
+        return this.$store.getters.getAgencyFilter
       }
     },
     created () {
@@ -64,6 +145,7 @@
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
+        vm.getQuestionList()
       },
       activeGetQuestion () {
         let vm = this
@@ -73,28 +155,100 @@
     methods: {
       getQuestionList () {
         let vm = this
+        let current = vm.$router.history.current
+        let query = current.query
         vm.$store.commit('setLoading', true)
         vm.$store.dispatch('getQuestions').then(function (result) {
           vm.$store.commit('setLoading', false)
+          let questionList = []
+          let keyword = vm.keyword ? vm.convertString(vm.keyword.toString()) : ''
           if (Array.isArray(result)) {
-            vm.$store.commit('setQuestionList', result)
+            questionList = result
+            vm.totalAnswered = questionList.filter(function (item) {
+              return String(item['answered']) === 'true'
+            }).length
+            vm.totalNotAnswer = questionList.filter(function (item) {
+              return String(item['answered']) === 'false'
+            }).length
+
+            vm.totalPublished = questionList.filter(function (item) {
+              return String(item['publish']) === '1'
+            }).length
+            vm.totalNotPublish = questionList.filter(function (item) {
+              return String(item['publish']) === '0'
+            }).length
+
+            if (query.hasOwnProperty('answered')) {
+              questionList = questionList.filter(function (item) {
+                return String(item['answered']) === String(query.answered)
+              })
+            }
+            if (query.hasOwnProperty('publish')) {
+              questionList = questionList.filter(function (item) {
+                return String(item['publish']) === String(query.publish)
+              })
+            }
+            if (vm.agencyFilterSelected) {
+              questionList = questionList.filter(function (item) {
+                return item['content'].toString().indexOf('&&' + vm.agencyFilterSelected.agencyCode) >= 0
+              })
+            }
+            if (vm.keyword && String(vm.keyword).length > 3) {
+              questionList = questionList.filter(function (item) {
+                return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
+              })
+            }
+            vm.$store.commit('setQuestionList', questionList)
           } else {
-            vm.$store.commit('setQuestionList', [result])
+            questionList = [result]
+            vm.totalAnswered = questionList.filter(function (item) {
+              return String(item['answered']) === 'true'
+            }).length
+            vm.totalNotAnswer = questionList.filter(function (item) {
+              return String(item['answered']) === 'false'
+            }).length
+
+            vm.totalPublished = questionList.filter(function (item) {
+              return String(item['publish']) === '1'
+            }).length
+            vm.totalNotPublish = questionList.filter(function (item) {
+              return String(item['publish']) === '0'
+            }).length
+            if (query.hasOwnProperty('answered')) {
+              questionList = questionList.filter(function (item) {
+                return String(item['answered']) === String(query.answered)
+              })
+            }
+            if (query.hasOwnProperty('publish')) {
+              questionList = questionList.filter(function (item) {
+                return String(item['publish']) === String(query.publish)
+              })
+            }
+            if (vm.agencyFilterSelected) {
+              questionList = questionList.filter(function (item) {
+                return item['content'].toString().indexOf('&&' + vm.agencyFilterSelected.agencyCode) >= 0
+              })
+            }
+            if (vm.keyword && String(vm.keyword).length > 3) {
+              questionList = questionList.filter(function (item) {
+                return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
+              })
+            }
+            vm.$store.commit('setQuestionList', questionList)
           }
         }).catch(function (reject) {
           vm.$store.commit('setLoading', false)
           vm.$store.commit('setQuestionList', reject)
         })
       },
-      getQuestionListNew (questionList) {
+      filterQuestion (index, target) {
         let vm = this
-        let readed = []
-        if (questionList.length > 0) {
-          readed = questionList.filter(function (item) {
-            return item.hasOwnProperty('read') && item['read'] === false
-          })
-        }
-        return readed
+        vm.$store.commit('setAgencyFilter', '')
+        vm.$store.commit('setKeywordFilter', '')
+        vm.activeTab = index
+        vm.$router.push({
+          path: '/?' + target 
+        })
       },
       addQuestion () {
         let vm = this
@@ -102,11 +256,8 @@
         let newQuery = current.query
         if (current['name'] === 'Landing') {
           vm.$store.commit('setActiveAddQuestion', true)
-          setTimeout (function () {
-            let elmnt = document.getElementById("contentQuestion")
-            elmnt.scrollIntoView()
-          }, 300)
         } else {
+          vm.$store.commit('setActiveAddQuestion', true)
           vm.$router.push({
             path: '/',
             query: {
@@ -129,6 +280,24 @@
         vm.$router.push({
           path: '/'
         })
+      },
+      convertString(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
       }
     }
   }

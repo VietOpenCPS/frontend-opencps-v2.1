@@ -57,6 +57,8 @@ export const store = new Vuex.Store({
     activeGetQuestion: false,
     questionPage: 1,
     totalQuestion: 0,
+    agencyFilter: '',
+    keywordFilter: '',
     user: {
       'role': ''
     },
@@ -118,18 +120,18 @@ export const store = new Vuex.Store({
                 groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
               },
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10
+                // start: state.questionPage * 20 - 20,
+                // end: state.questionPage * 20
               }
             }
           } else {
             param = {
               headers: {
-                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+                groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
               },
               params: {
-                start: state.questionPage * 10 - 10,
-                end: state.questionPage * 10,
+                // start: state.questionPage * 20 - 20,
+                // end: state.questionPage * 20,
                 publish: 1
               }
             }
@@ -143,7 +145,7 @@ export const store = new Vuex.Store({
               if (Array.isArray(response.data['data'])) {
                 dataOutput = response.data['data']
               } else {
-                dataOutput = [[response.data['data']]]
+                dataOutput = [response.data['data']]
               }
               if (dataOutput && dataOutput.length > 0) {
                 for (let key in dataOutput) {
@@ -210,7 +212,9 @@ export const store = new Vuex.Store({
           }
           var url = state.endPointApi + '/faq/questions/' + filter.questionId
           var dataAdd = new URLSearchParams()
+          dataAdd.append('email', filter.email ? filter.email : '')
           dataAdd.append('content', filter.content ? filter.content : '')
+          dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('publish', filter.publish)
           axios.put(url, dataAdd, param).then(response => {
             resolve(response)
@@ -307,7 +311,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
             }
           }
           axios.get(state.endPointApi + '/faq/questions/' + filter.questionId + '/answers', param).then(function (response) {
@@ -389,6 +393,12 @@ export const store = new Vuex.Store({
     setActiveGetQuestion (state, payload) {
       state.activeGetQuestion = payload
     },
+    setAgencyFilter (state, payload) {
+      state.agencyFilter = payload
+    },
+    setKeywordFilter (state, payload) {
+      state.keywordFilter = payload
+    },
     setQuestionPage (state, payload) {
       state.questionPage = payload
     },
@@ -429,6 +439,12 @@ export const store = new Vuex.Store({
     },
     getUser (state) {
       return state.user
-    }
+    },
+    getAgencyFilter (state, payload) {
+      return state.agencyFilter
+    },
+    getKeywordFilter (state, payload) {
+      return state.keywordFilter
+    },
   }
 })

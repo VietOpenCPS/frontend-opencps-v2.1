@@ -9,7 +9,6 @@ import axios from 'axios'
 import { isMobile } from 'mobile-device-detect'
 
 Vue.use(VueContentPlaceholders)
-
 let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0
 
 axios.defaults.withCredentials = true

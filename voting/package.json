@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build src/main.js",
-    "build:bgt": "vue-cli-service build src/main_bgt.js",
+    "build": "vue-cli-service build src/main_bgt.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

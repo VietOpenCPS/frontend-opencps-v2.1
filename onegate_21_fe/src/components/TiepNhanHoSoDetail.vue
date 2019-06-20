@@ -4,6 +4,7 @@
       <div class="background-triangle-big"> 
         <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
         <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
+        <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
         <span v-else>THÊM MỚI HỒ SƠ</span> 
       </div>
       <div class="layout row wrap header_tools row-blue">
@@ -57,7 +58,7 @@
                   v-model="briefNote"
                   :rows="2"
                   box
-                  label="Nhập tên hồ sơ..."
+                  label="Nhập tên hồ sơ"
                 ></v-textarea>
               </v-card-text>
             </v-card>
@@ -172,6 +173,7 @@
 <script>
 
 import toastr from 'toastr'
+import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
@@ -208,6 +210,7 @@ export default {
     inputTypes: [1, 3],
     outputTypes: [2],
     sampleCount: 0,
+    isMobile: false,
     loadingAction: false
   }),
   computed: {
@@ -231,9 +234,33 @@ export default {
       vm.dossierId = vm.id
     })
   },
+  beforeDestroy () {
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    this.onResize()
+    window.addEventListener('resize', this.onResize, { passive: true })
+  },
   watch: {
+    isMobile (val) {
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
+    }
   },
   methods: {
+    onResize () {
+      let vm = this
+      let isMobile = window.innerWidth < 1024
+      vm.isMobile = isMobile
+    },
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
@@ -256,7 +283,7 @@ export default {
                 vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
                 vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                 vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
+                if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
                   vm.showThuPhi = true
                   vm.payments = resAction.payment
                 }
@@ -279,17 +306,8 @@ export default {
           }
         }
         vm.thongTinChiTietHoSo = result
-        // call initData thong tin chu ho so
-        // if (result['delegateCityCode'] === '') {
-        //   result['delegateCityCode'] = 25
-        // }
-        // if (result['cityCode'] === '') {
-        //   result['cityCode'] = 25
-        // }
         vm.$refs.thongtinchuhoso.initData(result)
-        // call initData thanh phan ho so
         vm.$refs.thanhphanhoso.initData(result)
-        // call initData dich vu ket qua
         vm.viaPortalDetail = result.viaPostal
         if (result.viaPostal > 0) {
           let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
@@ -298,7 +316,6 @@ export default {
             result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
           }
           vm.$store.commit('setDichVuChuyenPhatKetQua', result)
-          // vm.$refs.dichvuchuyenphatketqua.initData(result)
         }
       }).catch(reject => {
       })
@@ -589,10 +606,16 @@ export default {
       let vm = this
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
-      vm.$router.push({
-        path: '/danh-sach-ho-so/' + currentParams.index,
-        query: currentQuery
-      })
+      if (vm.isOffLine) {
+        vm.$router.push({
+          path: '/add-dvc/0'
+        })
+      } else {
+        vm.$router.push({
+          path: '/danh-sach-ho-so/' + currentParams.index,
+          query: currentQuery
+        })
+      }
     }
   }
 }

@@ -1,11 +1,11 @@
 <template>
   <div :class="!isPermission ? 'pt-2' : ''">
-    <div v-if="!isPermission && !loading" class="mx-2 mt-3">
+    <v-flex xs12 v-if="!isPermission && !loading" class="mx-2 mt-3">
       <v-alert outline color="warning" icon="priority_high" :value="true">
-        Bạn không có quyền truy cập hồ sơ
+        Bạn không có quyền truy cập hồ sơ này
       </v-alert>
-    </div>
-    <div v-if="isPermission && !loading">
+    </v-flex>
+    <v-flex xs12 v-if="isPermission && !loading">
       <div class="detailQR_desktop">
         <h4 class="pt-2 ml-2">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
@@ -26,7 +26,7 @@
             <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
             <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
             <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
-              <v-card >
+              <v-card flat>
                 <v-card-text class="px-0 py-0">
                   <v-layout wrap class="px-2 py-2">
                     <v-flex xs12 sm4 class="pr-3">
@@ -75,7 +75,7 @@
               </v-card>
             </v-tab-item>
             <v-tab-item key="2">
-              <v-card>
+              <v-card flat>
                 <v-card-text class="px-0 py-0">
                   <div>
                     <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
@@ -117,7 +117,7 @@
               </v-card>
             </v-tab-item>
             <v-tab-item key="3" class="wrap-scroll wrap-scroll-dossier">
-              <v-card>
+              <v-card flat>
                 <v-card-text class="px-0 py-0">
                   <div v-for="(item, index) in listHistoryProcessing" v-bind:key="item.dossierLogId" class="list_history_style">
                     <td class="px-2 pt-2" :class="index % 2 !== 0 ? 'col-tien-trinh-1' : 'col-tien-trinh-2'">{{ index + 1 }}</td>
@@ -133,14 +133,11 @@
             </v-tab-item>
           </v-tabs>
         </div>
-        <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
-          <v-icon dark>home</v-icon>
-        </v-btn>
       </div>
       <div class="detailQR_mobile">
         <v-layout row wrap>
           <v-flex xs12 sm12 md6>
-            <v-card>
+            <v-card flat>
               <v-toolbar color="primary" dark>
                 <v-menu transition="slide-x-transition">
                   <v-toolbar-side-icon slot="activator"></v-toolbar-side-icon>
@@ -153,10 +150,6 @@
                 <v-toolbar-title class="mobile mx-2" v-if="detailInfo">THÔNG TIN HỒ SƠ</v-toolbar-title>
                 <v-toolbar-title class="mobile mx-2" v-if="detailVoting">ĐÁNH GIÁ</v-toolbar-title>
                 <v-toolbar-title class="mobile mx-2" v-if="detailSync">TIẾN TRÌNH THỤ LÝ</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn icon class="mr-2">
-                  <v-icon size="20">home</v-icon>
-                </v-btn>
               </v-toolbar>
               <v-layout wrap class="mx-2 my-3" v-if="detailInfo">
                 <v-flex xs4 class="mb-1">
@@ -249,7 +242,7 @@
                 </div>
               </v-layout>
               <v-layout wrap class="mx-2 my-3" v-if="detailSync">
-                <v-card>
+                <v-card flat>
                   <v-card-text class="px-0 py-0">
                     <div>
                       <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
@@ -294,7 +287,7 @@
           </v-flex>
         </v-layout>
       </div>
-    </div>
+    </v-flex>
   </div>
 </template>
 <script>

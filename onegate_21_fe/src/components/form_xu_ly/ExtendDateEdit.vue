@@ -2,15 +2,21 @@
   <div style="background-color: white;width:100%">
     <v-expansion-panel :value="[true]" expand  v-if="type === 'overdue' || type === 'preoverdue'" class="expansion-pl">
       <v-expansion-panel-content>
-        <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+        <div slot="header" v-if="type === 'overdue'">
+          <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
           <span>Lý do chậm hạn trả</span><span style="color:red"> *</span>
+        </div>
+        <div slot="header" v-else>
+          <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
+          <span>Lý do</span><span style="color:red"> *</span>
         </div>
         <v-card>
           <v-card-text class="py-2 px-2">
             <v-layout wrap>
-              <v-flex xs12>
+              <v-flex xs12 class="mx-3">
                 <v-form v-model="valid" ref="delayNoteForm">
                   <v-text-field
+                    box
                     v-model="delayNote"
                     multi-line
                     :rows="3"
@@ -35,7 +41,7 @@
         <v-card >
           <v-card-text>
             <v-layout wrap class="pl-2">
-              <v-icon color="blue" class="hover-pointer ml-3" @click="showDatePicker">event</v-icon>
+              <v-icon color="blue" class="hover-pointer" @click="showDatePicker">event</v-icon>
               <vue-ctk-date-time-picker
                 ref="datepicker" 
                 style="width:auto!important"

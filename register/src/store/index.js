@@ -128,9 +128,10 @@ export const store = new Vuex.Store({
           }
         }
         var dataPostApplicant = new URLSearchParams()
+        commit('setLoading', true)
         // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
         axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
-          console.log(response.data)
+          commit('setLoading', false)
           if (response.data !== '' && response.data !== 'ok') {
             if (response.data === 'pending') {
               window.location.href = window.themeDisplay.getURLHome() +
@@ -140,13 +141,15 @@ export const store = new Vuex.Store({
               window.location.href = response.data
             }
           } else if (response.data === 'ok') {
-            window.location.href = window.themeDisplay.getURLHome()
+            let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+            window.location.href = urlDvc + '/dich-vu-cong'
           } else if (response.data === 'captcha') {
             toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
           } else {
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
           }
         }).catch(function (error) {
+          commit('setLoading', false)
           toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
         })
       })

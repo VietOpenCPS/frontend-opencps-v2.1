@@ -242,6 +242,7 @@ export default {
       }
       Promise.all(arrAction).then(results => {
         toastr.success('Gửi đánh giá thành công')
+        vm.dialogShowApplicantIdNo = false
         vm.getVotingEmployee()
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
@@ -252,13 +253,7 @@ export default {
       vm.isMobile = window.innerWidth < 600
     },
     goBack () {
-      var vm = this
-      vm.$router.push({
-        path: '/',
-        query: {
-          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-        }
-      })
+      window.history.back()
     }
   },
   filters: {

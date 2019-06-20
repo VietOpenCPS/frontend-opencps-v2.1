@@ -304,7 +304,7 @@
 
       <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'DELETE'}, 0, true)" 
-        v-if="getUser('Administrator') && currentQueryState['status'] !== 'deleted'"
+        v-if="getUser('Administrator')"
       >
         DELETE
       </v-btn>
@@ -314,7 +314,6 @@
       >
         Khôi phục hồ sơ
       </v-btn>
-
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -340,7 +339,7 @@
       <!--  -->
       <template slot="headers" slot-scope="props">
         <tr>
-          <th class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <th width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               :input-value="props.all"
               :indeterminate="props.indeterminate"
@@ -374,7 +373,7 @@
       <!--  -->
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
+          <td width="32px" class="v_data_table_check_all" v-if="(menuType !== 3 && originality !== 1 && btnDynamics.length > 0) || getUser('Administrator') || getUser('Administrator_data')">
             <v-checkbox
               v-model="props.selected"
               @change="changeSelected"
@@ -478,7 +477,8 @@
                 <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  placeholder="chọn thủ tục hành chính"
+                  :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn.']"
+                  placeholder="Chọn thủ tục hành chính"
                   item-text="serviceName"
                   item-value="serviceConfigId"
                   return-object
@@ -492,13 +492,13 @@
                   :items="listDichVu"
                   v-model="dichVuSelected"
                   label="Dịch vụ:"
-                  placeholder="chọn dịch vụ"
+                  placeholder="Chọn dịch vụ"
                   item-text="optionName"
                   item-value="processOptionId"
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
                   @change="changeDichVuConfigs"
                   required
                   box
@@ -512,7 +512,7 @@
               :loading="loadingAction"
               :disabled="loadingAction"
             >
-              <v-icon>undo</v-icon>&nbsp;
+              <v-icon>reply</v-icon>&nbsp;
               Quay lại
               <span slot="loader">Loading...</span>
             </v-btn>
@@ -565,7 +565,7 @@
               :loading="loadingActionProcess"
               :disabled="loadingActionProcess"
             >
-            <v-icon>undo</v-icon>&nbsp;
+            <v-icon>reply</v-icon>&nbsp;
             Quay lại
             <span slot="loader">Loading...</span>
             </v-btn>
@@ -665,7 +665,7 @@
         <v-card-text>
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
-              <v-flex xs12 class="px-2 pb-3">
+              <v-flex xs12 class="px-2">
                 <div class="my-2">Thủ tục hành chính:</div>
                 <v-autocomplete
                   box
@@ -968,7 +968,7 @@ export default {
     /** */
     thongtinhoso: {},
     dossierId: 0,
-    valid: true,
+    valid: false,
     isCallBack: true,
     trangThaiHoSoList: null,
     listDichVu: [],
@@ -1564,7 +1564,8 @@ export default {
             keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1588,7 +1589,8 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
-            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : ''
+            dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         }
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
@@ -1784,6 +1786,8 @@ export default {
     },
     btnActionEvent (dossierItem, item, index, isGroup) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       // set info buttonConfig
       vm.buttonConfigItem = {}
       vm.buttonConfigItem = item
@@ -1791,7 +1795,7 @@ export default {
       vm.itemAction = item
       // console.log('itemAction++++++++++++', item)
       vm.indexAction = index
-      if (String(item.form) === 'NEW') {
+      if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP') {
         let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           isOpenDialog = false
@@ -1800,7 +1804,18 @@ export default {
           // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
-          vm.doCreateDossier()
+          if (String(item.form) === 'NEW') {
+            vm.doCreateDossier()
+          } else {
+            let queryString = ''
+            let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
+            queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
+            '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
+            console.log('queryString', queryString)
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
+            })
+          }
         }
         // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
@@ -1923,6 +1938,10 @@ export default {
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
+        if (vm.selectedDoAction.length === 0) {
+          alert('Chọn hồ sơ để thực hiện')
+          return
+        }
         let filter = {
           document: item.document,
           'serviceCode': vm.thuTucHanhChinhSelected.serviceCode,
@@ -1963,7 +1982,8 @@ export default {
           applicantAddress: vm.applicantAddressGuide,
           applicantEmail: vm.applicantEmailGuide,
           applicantTelNo: vm.applicantTelNoGuide,
-          // employeeName: window.themeDisplay.getUserName() ? window.themeDisplay.getUserName() : '',
+          govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
+          govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
           typeCode: 'DOC_03'
         }
         if (type === 'doc') {
@@ -2255,7 +2275,7 @@ export default {
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.loadingAction = false
         vm.indexAction = -1
-       vm.$router.push({
+        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
           query: vm.$router.history.current.query
         })
@@ -2265,10 +2285,21 @@ export default {
     },
     doSubmitDialogAction (item) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       if (vm.$refs.form.validate()) {
-        // console.log('yes-----')
-        // console.log('item++++++++', item)
-        vm.doCreateDossier()
+        if (String(item.form) === 'NEW') {
+          vm.doCreateDossier()
+        } else {
+          let queryString = ''
+          let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
+          queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
+          '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
+          console.log('queryString', queryString)
+          vm.$router.push({
+            path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
+          })
+        }
       }
     },
     processPullBtnDynamics (item) {
@@ -2532,11 +2563,15 @@ export default {
           }
         }
       } else {
+<<<<<<< HEAD
         if (item.permission) {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         } else {
           alert('Bạn không có quyền thao tác với hồ sơ này.')
         }
+=======
+        alert('Bạn không có quyền thao tác với hồ sơ này')
+>>>>>>> upstream/bgt
       }
       // phục vụ khi import hồ sơ không lấy được quyền thao tác -> không check quyền với hs đã hoàn thành và từ chối.
     },

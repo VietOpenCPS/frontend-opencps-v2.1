@@ -156,7 +156,7 @@ export default {
           vm.statusDeal = false
           vm.keypayStatusText = vm.keypayStatusCode['responseCode'] ? vm.keypayStatusCode['responseCode'] : ''
         }
-        vm.$store.dispatch('getDetailDossier', dossierId).then(resultDossier => {
+        vm.$store.dispatch('getDetailDossier', referenceUidQuery).then(resultDossier => {
           vm.dossierDetail['serviceName'] = resultDossier.serviceName
           vm.dossierDetail['dossierNo'] = resultDossier.dossierNo
           vm.dossierDetail['govAgencyName'] = resultDossier.govAgencyName

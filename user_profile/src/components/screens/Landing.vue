@@ -194,7 +194,17 @@
         <!-- content-right -->
         <v-flex class="xs12 sm4 px-3">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
-            <v-card-text class="pt-3" style="width: 300px;padding: 0;margin: 0 auto;">
+            <v-card-text class="my-0 py-0 px-0">
+              <v-flex xs12 class="text-right" style="height: 30px;">
+                <v-tooltip top v-if="!isFollowZalo">
+                  <div class="zalo-follow-only-button" data-oaid="1939207196454340331" data-callback="callbackzalo"
+                    slot="activator" style="width:90px">
+                  </div>
+                  <span>Nhấn Quan tâm để có thể nhận thông báo về tình hình xử lý hồ sơ trên ứng dụng Zalo </span>
+                </v-tooltip>
+              </v-flex>
+            </v-card-text>
+            <v-card-text class="mt-2" style="width: 395px;padding: 0;margin: 0 auto;">
               <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="item" :type="'image'"></attached-file-avatar>
             </v-card-text>
             <v-card-text v-if="user['className'] === 'org.opencps.usermgt.model.Employee'">
@@ -225,7 +235,7 @@
                 </v-flex>
               </v-layout>
             </v-card-text>
-            <v-card-text v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
+            <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
               <div class="text-bold text-xs-center label__user_profile">{{user['applicantName']}}</div>
               <div class="text-xs-center label__user_profile pb-2">
                 <a href="javascript:;" style="
@@ -236,7 +246,7 @@
               <div class="text-xs-center label__user_profile">
                 {{user['applicantAddress']}}
               </div>
-              <hr class="my-3" style="
+              <hr class="my-1" style="
                     border: 0;
                     border-top: 1px solid rgba(0,0,0,.1);
                   ">
@@ -264,23 +274,142 @@
         </v-flex>
       </v-layout>
     </v-form>
+    <div class="mt-2 mb-5" v-if="user['className'] === 'org.opencps.usermgt.model.Applicant'" style="
+      max-width: 1300px;
+      margin: 0 auto;
+    ">
+      <div class="row-header no__hidden_class">
+        <div class="background-triangle-big">
+          <span>DANH SÁCH GIẤY TỜ ĐÃ NỘP</span>
+        </div>
+      </div>
+      <v-data-table
+        :headers="headers"
+        :items="fileList"
+        hide-actions
+        class="table-landing table-bordered"
+        style="border-left: 1px solid #dedede;"
+      >
+        <template slot="items" slot-scope="props">
+          <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+            <td class="text-xs-center pt-2" width="50">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{filePage * 15 - 15 + props.index + 1}}</span><br>
+              </div>
+            </td>
+            <td class="text-xs-left pt-2">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.displayName}}</span>
+              </div>
+            </td>
+            <td class="text-xs-left pt-2" @click="viewDetail(props.item)" width="150">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>{{props.item.eForm ? 'Khai trực tuyến' : 'Đính kèm'}}</span>
+              </div>
+            </td>
+            <td class="text-xs-center pt-2" width="170">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <span>
+                  <span>{{props.item.modifiedDate}}</span>
+                </span>
+              </div>
+            </td>
+            <td class="text-xs-center pt-0" width="170">
+              <content-placeholders v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <div v-else>
+                <v-btn flat icon color="indigo" class="mr-2" @click="viewFile(props.item)" title="Xem trước">
+                  <v-icon>visibility</v-icon>
+                </v-btn>
+                <v-btn flat icon color="green" class="mr-2" @click="downloadFile(props.item)" title="Tải xuống">
+                  <v-icon>cloud_download</v-icon>
+                </v-btn>
+                <v-btn flat icon color="red" class="" @click="deleteFileApplicant(props.item)" title="Xóa">
+                  <v-icon>delete</v-icon>
+                </v-btn>
+              </div>
+            </td>
+          </tr>
+        </template>
+        <template slot="no-data">
+          <div class="text-xs-center mt-2">
+            Không có giấy tờ nào được tìm thấy
+          </div>
+        </template>
+      </v-data-table>
+      <div class="layout wrap mt-2" style="position: relative;" v-if="totalFileList > 0">
+        <div class="flex pagging-table px-2"> 
+          <tiny-pagination :total="totalFileList" :page="filePage" custom-class="custom-tiny-class" 
+            @tiny:change-page="paggingData" ></tiny-pagination> 
+        </div>
+      </div>
+    </div>
+    <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition" style="overflow: hidden;">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>{{titleDialogPdf}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <iframe v-show="!dialogPDFLoading" id="dialogPDFPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
   import Vue from 'vue'
+  import axios from 'axios'
   import AttachedFileAvatar from '../ext/AttachedFileAvatar.vue'
+  import TinyPagination from './Pagination.vue'
   import toastr from 'toastr'
   Vue.use(toastr)
   toastr.options = {
     'closeButton': true,
-    'timeOut': '5000'
+    'timeOut': '3000'
   }
   export default {
     components: {
-      AttachedFileAvatar
+      AttachedFileAvatar,
+      'tiny-pagination': TinyPagination
     },
     data: () => ({
+      zaloOaId: '1939207196454340331',
+      zaloOaid_token_access: '36ipLhREF2O1Qp5Vkyqv809gC5wrr4vnRZ06R93kNK1D6nzEgxfwRXDi267BibX016q0L-oHQKiDQGmxv91F1o9Z3JR-brOwHrGw5hxrOH574YykkC0jNsG5VKAep2rGPGjoJPp4E40X0aDuoy8GSIb_JshLkKSF11yL1kR1THHVE1qujVrY7cWY22A3z00oFnmB68F4PnftFMqrWEOVK4qlO2wGtYu-MGLW8UFy55euBHXLmSyHHmXf7rttonrAF2bJLSlR1qaV1cynZf0wIB7LEoq',
+      userAppZaloUid: '',
+      isFollowZalo: false,
+      titleDialogPdf: '',
+      dialogPDF: false,
+      dialogPDFLoading: false,
       changePassWordFail: false,
       snackbarsuccess: false,
       oldPassWord: '',
@@ -298,6 +427,9 @@
       cityItems: [],
       districtItems: [],
       wardItems: [],
+      fileList: [],
+      totalFileList: 0,
+      filePage: 1,
       item: {
         "model": "classPK",
         'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
@@ -325,7 +457,34 @@
       },
       e1: true,
       e2: true,
-      e3: true
+      e3: true,
+      headers: [
+        {
+          text: 'STT',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Tên giấy tờ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Loại giấy tờ',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Ngày tạo',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Thao tác',
+          align: 'center',
+          sortable: false
+        }
+      ]
     }),
     watch: {
       ngayCap(val) {
@@ -334,14 +493,35 @@
       },
       menuBirthDate (val) {
         val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
+      },
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentParams = newRoute.params
+        let currentQuery = newRoute.query
+        if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
+          let filter = {
+            applicantIdNo: vm.user['applicantIdNo'],
+            page: currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+          }
+          vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+            vm.fileList = result.data
+            vm.totalFileList = result.total
+            vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+          })
+        }
       }
     },
     created() {
       var vm = this
       vm.$nextTick(function() {
+        window.axios = axios
+        let current = vm.$router.history.current
+        let currentQuery = current.query
         vm.user = {}
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
+          window.callbackzalo = vm.callbackzalo
+          vm.getUserAppZaloInfo()
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
             vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
@@ -383,6 +563,15 @@
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
             vm.user['applicantIdDate'] = vm.parseDateInput(vm.user['applicantIdDate'])
+            let filter = {
+              applicantIdNo: vm.user['applicantIdNo'],
+              page: currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+            }
+            vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+              vm.fileList = result.data
+              vm.totalFileList = result.total
+              vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+            })
           }
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.user['employeeBirthDate'] = vm.parseDateInput(vm.user['employeeBirthDate'])
@@ -510,6 +699,121 @@
         } else {
           return ''
         }
+      },
+      viewFile (file) {
+        var vm = this
+        vm.titleDialogPdf = file.eForm ? 'Giấy tờ khai trực tuyến' : 'Giấy tờ đính kèm'
+        vm.dialogPDFLoading = true
+        vm.dialogPDF = true
+        document.getElementById('dialogPDFPreview').src = ''
+        vm.$store.dispatch('viewFile', file).then(result => {
+          vm.dialogPDFLoading = false
+          document.getElementById('dialogPDFPreview').src = result
+        })
+      },
+      downloadFile (file) {
+        let vm = this
+        vm.$store.dispatch('downloadFile', file)
+      },
+      deleteFileApplicant (file) {
+        let vm = this
+        let x = confirm('Bạn có chắc chắn xóa giấy tờ này?')
+        if (x) {
+          vm.$store.dispatch('deleteFileApplicant', file).then(function (result) {
+            toastr.success('Xóa giấy tờ thành công')
+            let current = vm.$router.history.current
+            let newQuery = current.query
+            let filter = {
+              applicantIdNo: vm.user['applicantIdNo'],
+              page: newQuery.hasOwnProperty('page') && newQuery.page ? newQuery.page : 1
+            }
+            vm.$store.dispatch('getDossierFilesApplicants', filter).then(function(result) {
+              vm.fileList = result.data
+              vm.totalFileList = result.total
+              vm.filePage = currentQuery.hasOwnProperty('page') && currentQuery.page ? currentQuery.page : 1
+            })
+          }).catch(function(reject) {
+            toastr.error('Xóa giấy tờ không thành công')
+          })
+        }
+      },
+      getUserAppZaloInfo () {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/ZALO_UID'
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            start: -1,
+            end: -1
+          }
+        }
+        window.axios.get(url, config).then(function (response) {
+          if (response.data && response.data.uid) {
+            vm.userAppZaloUid = response.data.uid
+            vm.getZaloIsFollowing(vm.userAppZaloUid)
+          } else {
+            vm.isFollowZalo = false
+          }
+        }).catch(function (error) {
+          vm.getZaloIsFollowing(vm.userAppZaloUid)
+        })
+      },
+      getZaloIsFollowing (uid) {
+        let vm = this
+        let zaloOaToken = vm.zaloOaid_token_access
+        let url = 'https://cors-anywhere.herokuapp.com/https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
+        // window.axios.get(url).then(function (response) {
+        //   console.log(response.data)
+        //   if (response.data && response.data['user_id']) {
+        //     vm.isFollowZalo = true
+        //   }
+        //   // vm.zaloOaId = response.data.message !== 'Success' ? vm.MSystemConfiguration.configuration.zalo.oaid : ''
+        // }).catch(function (error) {
+        //   console.log(error)
+        // })
+        // 
+        $.ajax({
+          url: url,
+          method: 'GET',
+          success: function(data){
+            console.log(data)
+            if (data['user_id']) {
+              vm.isFollowZalo = true
+            }
+          }
+        })
+      },
+      callbackzalo (responeFromZalo) {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/ZALO_UID'
+        const config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        let params = new URLSearchParams()
+        params.append('value', '{"uid":"' + responeFromZalo.userId + '"}')
+        window.axios.put(url, params, config).then(function (response) {
+        }).catch(function (error) {
+        })
+      },
+      paggingData (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + config.page
+        vm.$router.push({
+          path: current.path + queryString
+        })
       }
     }
   }

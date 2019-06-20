@@ -78,34 +78,34 @@ export const store = new Vuex.Store({
     },
     loadGovAgencys ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
             }
           }
-          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY' + '/dictitems', param).then(result => {
+          axios.get(state.endPointApi + '/dictcollections/GOVERNMENT_AGENCY/dictitems?sort=siblingSearch', param).then(result => {
             if (result.data) {
               resolve(result.data.data)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployees ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
               groupId: state.initData.groupId
+            },
+            params: {
+              start: data.start,
+              end: data.end
             }
           }
           axios.get(state.endPointApi + '/employees/publish/' + data.itemCode, param).then(result => {
@@ -114,23 +114,23 @@ export const store = new Vuex.Store({
               if (employees && employees.length > 0) {
                 for (let key in employees) {
                   employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
                 }
               }
-              resolve(employees)
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
     },
     loadEmployeesMotcua ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function () {
           let param = {
             headers: {
@@ -156,10 +156,8 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })

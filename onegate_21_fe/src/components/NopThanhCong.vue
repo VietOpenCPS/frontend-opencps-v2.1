@@ -19,7 +19,7 @@
 		  <v-flex xs12 v-html="thongTinChungHoSo.submissionNote">
       </v-flex>
       <v-flex xs12 sm12>
-        <v-btn color="primary" @click="goBack()">Quay lại danh sách &nbsp; <v-icon size="16">undo</v-icon></v-btn>
+        <v-btn color="primary" @click="goBack()"><v-icon size="16">reply</v-icon> &nbsp;Quay lại danh sách </v-btn>
       </v-flex>
 		</v-layout>
 	</div>

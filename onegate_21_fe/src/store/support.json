@@ -20,68 +20,7 @@
         "commentApi": "/o/rest/v2/comments"
     },
     "renderURLInit": "?p_p_id=OneGate&p_p_lifecycle=2&p_p_state=exclusive&p_p_mode=view&p_p_resource_id=renderURLInit",
-    "dossierTemplates": [
-        {
-            "partNo": "2",
-            "partName": "Giấy đăng ký hợp đồng xuất khẩu sản phẩm thủy sản (tải bản scan)",
-            "partTip": "",
-            "partType": 0,
-            "multiple": false,
-            "required": false,
-            "esign": false,
-            "fileTemplateNo": "",
-            "hasForm": true,
-            "fileType": 0
-        },
-        {
-            "partNo": "2",
-            "partName": "Giấy đăng ký hợp đồng xuất khẩu sản phẩm thủy sản (tải bản scan)",
-            "partTip": "",
-            "partType": 0,
-            "multiple": false,
-            "required": false,
-            "esign": false,
-            "fileTemplateNo": "",
-            "hasForm": true,
-            "fileType": 0
-        },
-        {
-            "partNo": "2",
-            "partName": "Giấy đăng ký hợp đồng xuất khẩu sản phẩm thủy sản (tải bản scan)",
-            "partTip": "",
-            "partType": 0,
-            "multiple": false,
-            "required": false,
-            "esign": false,
-            "fileTemplateNo": "",
-            "hasForm": true,
-            "fileType": 0
-        },
-        {
-            "partNo": "2",
-            "partName": "Giấy đăng ký hợp đồng xuất khẩu sản phẩm thủy sản (tải bản scan)",
-            "partTip": "",
-            "partType": 0,
-            "multiple": false,
-            "required": false,
-            "esign": false,
-            "fileTemplateNo": "",
-            "hasForm": true,
-            "fileType": 0
-        },
-        {
-            "partNo": "2",
-            "partName": "Giấy đăng ký hợp đồng xuất khẩu sản phẩm thủy sản (tải bản scan)",
-            "partTip": "",
-            "partType": 0,
-            "multiple": false,
-            "required": false,
-            "esign": false,
-            "fileTemplateNo": "",
-            "hasForm": true,
-            "fileType": 0
-        }
-    ],
+    "dossierTemplates": [],
     "advSearchTools": [
         {
             "index": 0,

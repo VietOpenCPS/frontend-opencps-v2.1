@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
+import saveAs from 'file-saver'
 // 
 
 Vue.use(toastr)
@@ -162,6 +163,76 @@ export const store = new Vuex.Store({
             reject(xhr)
             commit('setsnackbarerror', true)
           })
+        })
+      })
+    },
+    getDossierFilesApplicants ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            start: filter.page*15 - 15,
+            end: filter.page*15
+          }
+        }
+        axios.get('/o/rest/v2/dossiers/applicant/' + filter.applicantIdNo + '/fileDone/search', param).then(function (response) {
+          if (response.data) {
+            resolve(response.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
+    viewFile ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          responseType: 'blob'
+        }
+        axios.get('/o/rest/v2/dossiers/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    downloadFile ({commit, state}, data) {
+      let param = {
+        headers: {
+          groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+        },
+        responseType: 'blob'
+      }
+      axios.get('/o/rest/v2/dossiers/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
+        let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+        let serializable = response.data
+        saveAs(serializable, fileName)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+    deleteFileApplicant ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.delete('/o/rest/v2/dossiers/fileDone/' + data.dossierFileId, param).then(function (response) {
+          resolve(response)
+        })
+        .catch(function (error) {
+          reject(error)
         })
       })
     }

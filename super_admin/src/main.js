@@ -23,11 +23,11 @@ let groupId = window.themeDisplay !== undefined ? window.themeDisplay.getScopeGr
 let companyId = window.themeDisplay !== undefined ? window.themeDisplay.getCompanyId() : 0
 let userId = window.themeDisplay !== undefined ? window.themeDisplay.getUserId() : 0
 let userName = window.themeDisplay !== undefined ? window.themeDisplay.getUserName() : ''
-let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
+let portalURL = (window.themeDisplay !== undefined ) ? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
-
-Vue.use(VueNativeSock, 'ws://' + window.themeDisplay.getPortalURL().replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
+let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '')
+Vue.use(VueNativeSock, 'ws://' + portalUrlSocket.replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalURL
   + '&companyId=' + companyId
   + '&userId=' + userId
@@ -98,19 +98,19 @@ new Vue({
             end: -1
           }
         )
-        vm.$socket.sendObj(
-          {
-            type: 'api',
-            cmd: 'get',
-            respone: 'loginUser',
-            api: '/o/v1/opencps/users/login',
-            headers: {
-              'Token': vm.getAuthToken(),
-              'groupId': vm.getScopeGroupId(),
-              'USER_ID': vm.getUserId()
-            }
-          }
-        )
+        // vm.$socket.sendObj(
+        //   {
+        //     type: 'api',
+        //     cmd: 'get',
+        //     respone: 'loginUser',
+        //     api: '/o/v1/opencps/users/login',
+        //     headers: {
+        //       'Token': vm.getAuthToken(),
+        //       'groupId': vm.getScopeGroupId(),
+        //       'USER_ID': vm.getUserId()
+        //     }
+        //   }
+        // )
         if (window.location.href.endsWith('#/')) {
           vm.$router.push('/table/opencps_employee')
         }

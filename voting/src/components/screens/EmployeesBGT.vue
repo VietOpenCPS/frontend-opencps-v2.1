@@ -58,6 +58,11 @@
               circle
             ></v-pagination>
           </div>
+          <div v-if="!totalEmployee">
+            <v-alert class="mt-4 mx-3" :value="true" outline color="blue" icon="priority_high">
+              Không có danh sách cán bộ
+            </v-alert>
+          </div>
         </v-card>
       </v-flex>
     </v-layout>
@@ -108,10 +113,8 @@ export default {
   created () {
     let vm = this
     let currentQuery = vm.$router.history.current.query
-    vm.$nextTick(function () {
-      vm.employeePage = currentQuery.hasOwnProperty('page') ? Number(currentQuery.page) : 1
-      vm.getEmployee()
-    })
+    vm.employeePage = currentQuery.hasOwnProperty('page') ? Number(currentQuery.page) : 1
+    vm.getEmployee()
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -135,8 +138,9 @@ export default {
       let filter = {
         start: vm.employeePage * vm.numberPerPage - vm.numberPerPage,
         end: vm.employeePage * vm.numberPerPage,
+        itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+      vm.$store.dispatch('loadEmployees', filter).then(result => {
         vm.totalEmployee = result[0]
         vm.employeeItems = sortEmployee(result[1])     
         vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
@@ -225,8 +229,7 @@ export default {
       })
     },
     goBack () {
-      var vm = this
-      vm.dialog_voting = false
+      window.history.back()
     }
   }
 }

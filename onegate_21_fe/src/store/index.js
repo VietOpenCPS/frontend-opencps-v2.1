@@ -124,7 +124,8 @@ export const store = new Vuex.Store({
     dataCreateDossier: {},
     dataCreateFile: [],
     paymentProfile: '',
-    paymentFileName: ''
+    paymentFileName: '',
+    forGroupDossier: false
   },
   actions: {
     clearError ({commit}) {
@@ -198,9 +199,6 @@ export const store = new Vuex.Store({
             }
             axios.get(state.initData.menuConfigToDo, param).then(function (response) {
               let serializable = response.data
-              // if (typeof serializable === 'object' && serializable.constructor === Object) {
-              //   serializable = [serializable]
-              // }
               let menuData = []
               let index = 0
               for (let key in serializable.data) {
@@ -226,9 +224,10 @@ export const store = new Vuex.Store({
                   menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
                 }
                 if (current.hasOwnProperty('steps')) {
-                  if (current.steps.length > 1) {
+                  if (Array.isArray(current.steps) && current.steps.length > 1) {
                     menuDetail['items'] = current.steps
-                  } else {
+                  }
+                  if (current.steps && !Array.isArray(current.steps)) {
                     let stepsItems = []
                     stepsItems.push(current.steps)
                     menuDetail['items'] = stepsItems
@@ -306,6 +305,9 @@ export const store = new Vuex.Store({
           if (filter['originality']) {
             paramSearch['originality'] = filter.originality
           }
+          if (filter['follow']) {
+            paramSearch['follow'] = filter.follow
+          }
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -321,6 +323,34 @@ export const store = new Vuex.Store({
             commit('setLoadingTable', false)
             commit('setUserNextAction', [])
             console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getGroupDossier ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+            // service: filter.service ? filter.service : '',
+            // template: filter.template ? filter.template : '',
+            // agency: filter.agency ? filter.agency : '',
+            originality: 9
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramSearch
+          }
+          axios.get('/o/rest/v2/dossiers/todo', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(function (error) {
             reject(error)
           })
         })
@@ -481,7 +511,8 @@ export const store = new Vuex.Store({
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/marks', paramDossierMark).then(function (response) {
           let serializable = response.data
           if (serializable.data) {
-            resolve(serializable.data)
+            let marks = serializable.data
+            resolve(marks)
           } else {
             resolve([])
           }
@@ -651,56 +682,71 @@ export const store = new Vuex.Store({
     },
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
+        let dataOutPut = []
         let files = $('#file' + data.partNo)[0].files
-        let file = files[0]
-        let fileName = file['name']
-        if (file['name']) {
-          fileName = file['name'].replace(/\%/g, '')
-          fileName = fileName.replace(/\//g, '')
-          fileName = fileName.replace(/\\/g, '')
-        }
-        let formData = new FormData()
-        if (data.partType === 3) {
-          if (data['displayName']) {
-            fileName = data['displayName'].replace(/\%/g, '')
-            fileName = fileName.replace(/\//g, '')
-            fileName = fileName.replace(/\\/g, '')
-          }
-          formData.append('displayName', fileName)
-        } else {
-          formData.append('displayName', fileName)
-        }
-        formData.append('fileType', file.type)
-        formData.append('fileSize', file.size)
-        formData.append('isSync', 'false')
-        formData.append('file', file, fileName)
-        formData.append('dossierPartNo', data.partNo)
-        formData.append('dossierTemplateNo', data.dossierTemplateNo)
-        formData.append('fileTemplateNo', data.fileTemplateNo)
-        formData.append('formData', '')
-        formData.append('referenceUid', '')
-        let fileUpload = {
-          partTip: data.partTip,
-          file: file
-        }
-        store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
-        if (file && state.validFileUpload) {
-          axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
-            headers: {
-              'groupId': state.initData.groupId,
-              'Content-Type': 'multipart/form-data'
+        let countFiles = files.length
+        let count = 0
+        if (files) {
+          for (let index = 0; index < countFiles; index++) {
+            let file = files[index]
+            let fileName = file['name']
+            if (file['name']) {
+              fileName = file['name'].replace(/\%/g, '')
+              fileName = fileName.replace(/\//g, '')
+              fileName = fileName.replace(/\\/g, '')
             }
-          }).then(function (response) {
-            resolve(response.data)
-            console.log('upload file success!')
-          }).catch(function (xhr) {
-            console.log(xhr)
-            toastr.clear()
-            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            reject(xhr)
-          })
-        } else {
-          reject('error')
+            let formData = new FormData()
+            if (data.partType === 3) {
+              if (data['displayName']) {
+                fileName = data['displayName'].replace(/\%/g, '')
+                fileName = fileName.replace(/\//g, '')
+                fileName = fileName.replace(/\\/g, '')
+              }
+              formData.append('displayName', fileName)
+            } else {
+              formData.append('displayName', fileName)
+            }
+            formData.append('fileType', file.type)
+            formData.append('fileSize', file.size)
+            formData.append('isSync', 'false')
+            formData.append('file', file, fileName)
+            formData.append('dossierPartNo', data.partNo)
+            formData.append('dossierTemplateNo', data.dossierTemplateNo)
+            formData.append('fileTemplateNo', data.fileTemplateNo)
+            formData.append('formData', '')
+            formData.append('referenceUid', '')
+            let fileUpload = {
+              partTip: data.partTip,
+              file: file
+            }
+            store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
+            if (file && state.validFileUpload) {
+              axios.post(state.initData.dossierApi + '/' + data.dossierId + '/files', formData, {
+                headers: {
+                  'groupId': state.initData.groupId,
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(function (response) {
+                count += 1
+                dataOutPut.push(response.data)
+                if (count === countFiles) {
+                  resolve(dataOutPut)
+                }
+              }).catch(function (xhr) {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                count += 1
+                if (count === countFiles) {
+                  reject(dataOutPut)
+                }
+              })
+            } else {
+              count += 1
+              if (count === countFiles) {
+                reject(dataOutPut)
+              }
+            }
+          }
         }
       })
     },
@@ -731,7 +777,7 @@ export const store = new Vuex.Store({
         }).then(function (response) {
           resolve(response.data)
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
@@ -786,37 +832,32 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          console.log('run')
-          if (data > 0) {
-            commit('setLoading', true)
-            axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
-              let thongTinNguoiNop = {
-                delegateName: response.data.delegateName,
-                delegateCityCode: response.data.delegateCityCode,
-                delegateAddress: response.data.delegateAddress,
-                delegateDistrictCode: response.data.delegateDistrictCode,
-                delegateWardCode: response.data.delegateWardCode,
-                delegateEmail: response.data.delegateEmail,
-                delegateTelNo: response.data.delegateTelNo,
-                delegateIdNo: response.data.delegateIdNo
-              }
-              resolve(response.data)
-              commit('setLoading', false)
-              commit('setDossier', response.data)
-              commit('setThongTinChuHoSo', response.data)
-              commit('setLePhi', response.data)
-              commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
-              commit('setThongTinChungHoSo', response.data)
-              commit('setDichVuChuyenPhatKetQua', response.data)
-            }, error => {
-              commit('setLoading', false)
-              reject(error)
-            }).catch(function (xhr) {
-              console.log(xhr)
-            })
-          } else {
-            resolve()
-          }
+          commit('setLoading', true)
+          axios.get(state.initData.postDossierApi + '/' + data, param).then(function (response) {
+            let thongTinNguoiNop = {
+              delegateName: response.data.delegateName,
+              delegateCityCode: response.data.delegateCityCode,
+              delegateAddress: response.data.delegateAddress,
+              delegateDistrictCode: response.data.delegateDistrictCode,
+              delegateWardCode: response.data.delegateWardCode,
+              delegateEmail: response.data.delegateEmail,
+              delegateTelNo: response.data.delegateTelNo,
+              delegateIdNo: response.data.delegateIdNo
+            }
+            resolve(response.data)
+            commit('setLoading', false)
+            commit('setDossier', response.data)
+            commit('setThongTinChuHoSo', response.data)
+            commit('setLePhi', response.data)
+            commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
+            commit('setThongTinChungHoSo', response.data)
+            commit('setDichVuChuyenPhatKetQua', response.data)
+          }, error => {
+            commit('setLoading', false)
+            reject(error)
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
         })
       })
     },
@@ -873,7 +914,7 @@ export const store = new Vuex.Store({
           if (response.headers['content-disposition']) {
             commit('setPaymentFileName', response.headers['content-disposition'].split(';')[1].split('=')[1].replace(/\"/g, ''))
           } else {
-            commit('setPaymentFileName', 'file báo thanh toán')
+            commit('setPaymentFileName', 'payment_file')
           }
         }).catch(function (xhr) {
           console.log(xhr)
@@ -950,6 +991,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    downloadFileDocument ({commit, state, dispatch}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          responseType: 'blob'
+        }
+        axios.get(state.initData.dossierApi + '/' + data.dossierId + '/documents/' + data.referenceUid, param).then(function (response) {
+          // var url = window.URL.createObjectURL(response.data)
+          // window.open(url)
+          let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+          let serializable = response.data
+          saveAs(serializable, fileName)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     postDossier ({ commit, state }, data) {
       console.log('data-------------', data)
       return new Promise((resolve, reject) => {
@@ -959,7 +1019,7 @@ export const store = new Vuex.Store({
             'groupId': state.initData.groupId,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
+            'cps_auth': ''
           }
         }
         var dataPostdossier = new URLSearchParams()
@@ -967,6 +1027,9 @@ export const store = new Vuex.Store({
         dataPostdossier.append('govAgencyCode', data.govAgencyCode)
         dataPostdossier.append('dossierTemplateNo', data.templateNo)
         dataPostdossier.append('originality', data.originality)
+        if (data.j_captcha_response) {
+          dataPostdossier.append('j_captcha_response', data.j_captcha_response)
+        }
         console.log('dataPostdossier-------------', dataPostdossier)
         axios.post(state.initData.postDossierApi, dataPostdossier, options).then(function (response) {
           response.data.serviceConfig = state.serviceConfigObj
@@ -977,12 +1040,41 @@ export const store = new Vuex.Store({
           commit('setThongTinChungHoSo', response.data)
           // commit('setDichVuChuyenPhatKetQua', response.data)
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          resolve(response.data)
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          if (data.j_captcha_response) {
+            resolve(response)
+          } else {
+            resolve(response.data)
+          }
         }).catch(function (error) {
           reject(error)
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          commit('setLoading', false)
+        })
+      })
+    },
+    postDossierIntoGroup ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        var dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('dossierId', data.dossierId)
+        axios.post('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
+          toastr.clear()
+          toastr.success('Thêm hồ sơ vào nhóm thành công')
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
           commit('setLoading', false)
         })
       })
@@ -999,7 +1091,7 @@ export const store = new Vuex.Store({
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cloning', dataPostdossier, options).then(function (response) {
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -1021,7 +1113,7 @@ export const store = new Vuex.Store({
         var dataPostdossier = new URLSearchParams()
         axios.post(state.initData.postDossierApi + '/' + filter.dossierId + '/cancel', dataPostdossier, options).then(function (response) {
           toastr.clear()
-          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           resolve(response.data)
         }).catch(function (error) {
           reject(error)
@@ -1039,7 +1131,7 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
+            'cps_auth': ''
           }
         }
         var applicantType = ''
@@ -1054,24 +1146,24 @@ export const store = new Vuex.Store({
           isSameAsApplicant = data['sameUser']
         }
         var dataPutdossier = new URLSearchParams()
-        dataPutdossier.append('applicantName', data.applicantName)
+        dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
         dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
         dataPutdossier.append('applicantIdType', applicantType)
-        dataPutdossier.append('applicantIdNo', data.applicantIdNo)
-        dataPutdossier.append('address', data.address)
-        dataPutdossier.append('cityCode', data.cityCode)
-        dataPutdossier.append('districtCode', data.districtCode)
-        dataPutdossier.append('wardCode', data.wardCode)
-        dataPutdossier.append('contactTelNo', data.contactTelNo)
-        dataPutdossier.append('contactEmail', data.contactEmail)
-        dataPutdossier.append('delegateName', data.delegateName)
-        dataPutdossier.append('delegateIdNo', data.delegateIdNo)
-        dataPutdossier.append('delegateTelNo', data.delegateTelNo)
-        dataPutdossier.append('delegateEmail', data.delegateEmail)
-        dataPutdossier.append('delegateAddress', data.delegateAddress)
-        dataPutdossier.append('delegateCityCode', data.delegateCityCode)
-        dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode)
-        dataPutdossier.append('delegateWardCode', data.delegateWardCode)
+        dataPutdossier.append('applicantIdNo', data.applicantIdNo ? data.applicantIdNo : '')
+        dataPutdossier.append('address', data.address ? data.address : '')
+        dataPutdossier.append('cityCode', data.cityCode ? data.cityCode : '')
+        dataPutdossier.append('districtCode', data.districtCode ? data.districtCode : '')
+        dataPutdossier.append('wardCode', data.wardCode ? data.wardCode : '')
+        dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
+        dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
+        dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
+        dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
+        dataPutdossier.append('delegateTelNo', data.delegateTelNo ? data.delegateTelNo : '')
+        dataPutdossier.append('delegateEmail', data.delegateEmail ? data.delegateEmail : '')
+        dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress : '')
+        dataPutdossier.append('delegateCityCode', data.delegateCityCode ? data.delegateCityCode : '')
+        dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
+        dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
         dataPutdossier.append('applicantNote', state.applicantNote)
         if (data.originality !== 1) {
           dataPutdossier.append('dossierName', data.dossierName)
@@ -1082,10 +1174,10 @@ export const store = new Vuex.Store({
         }
         if (data.viaPostal) {
           dataPutdossier.append('viaPostal', data.viaPostal)
-          dataPutdossier.append('postalServiceCode', data.postalServiceCode)
-          dataPutdossier.append('postalAddress', data.postalAddress)
-          dataPutdossier.append('postalCityCode', data.postalCityCode)
-          dataPutdossier.append('postalTelNo', data.postalTelNo)
+          dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : '')
+          dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
+          dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
+          dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
           // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
           // dataPutdossier.append('postalWardCode', data.postalWardCode)
         }
@@ -1110,7 +1202,7 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
+            'cps_auth': ''
           }
         }
         var dataPutdossier = new URLSearchParams()
@@ -1225,7 +1317,7 @@ export const store = new Vuex.Store({
             'groupId': state.initData.groupId,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'cps_auth': state.initData.cps_auth
+            'cps_auth': ''
           }
         }
         var dataPostdossierMark = new URLSearchParams()
@@ -1237,10 +1329,14 @@ export const store = new Vuex.Store({
             dataPostdossierMark.append('fileComment', data.fileComment)
           }
         } else {
-          if (data.fileMark !== undefined && data.fileMark !== 'undefined' && data.fileMark !== null) {
+          if (data.fileMark !== undefined && data.fileMark !== 'undefined') {
             dataPostdossierMark.append('fileMark', data.fileMark)
           }
         }
+        if (!isNaN(data.recordCount) && data.recordCount !== undefined && data.recordCount !== 'undefined' && data.recordCount !== null) {
+          dataPostdossierMark.append('recordCount', data.recordCount)
+        }
+        console.log('dataChangeRecord', data.dossierId)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -1328,7 +1424,7 @@ export const store = new Vuex.Store({
         let options = {
           headers: {
             groupId: state.initData.groupId,
-            cps_auth: state.initData.cps_auth
+            cps_auth: ''
           }
         }
         let id = data['id'] ? data['id'] : 'nm'
@@ -1703,7 +1799,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    downloadFile ({commit, state}, data){
+    downloadFile ({commit, state}, data) {
       var vm = this
       let param = {
         headers: {
@@ -1712,8 +1808,11 @@ export const store = new Vuex.Store({
         responseType: 'blob'
       }
       axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.fileAttachId, param).then(function (response) {
-        var url = window.URL.createObjectURL(response.data)
-        window.open(url)
+        // var url = window.URL.createObjectURL(response.data)
+        // window.open(url)
+        let fileName = decodeURI(response.headers['content-disposition'].match(/filename="(.*)"/)[1])
+        let serializable = response.data
+        saveAs(serializable, fileName)
       })
       .catch(function (error) {
         console.log(error)
@@ -2389,7 +2488,8 @@ export const store = new Vuex.Store({
             applicantAddress: filter.applicantAddress ? filter.applicantAddress : '',
             applicantEmail: filter.applicantEmail ? filter.applicantEmail : '',
             applicantTelNo: filter.applicantTelNo ? filter.applicantTelNo : '',
-            employeeName: filter.employeeName ? filter.employeeName : ''
+            govAgencyCode: filter.govAgencyCode ? filter.govAgencyCode : '',
+            govAgencyName: filter.govAgencyName ? filter.govAgencyName : ''
           }
           if (filter.reportType) {
             paramGet['reportType'] = filter.reportType
@@ -3041,6 +3141,25 @@ export const store = new Vuex.Store({
           store.commit('setValidFileUpload', false)
         }
       }
+    },
+    makeImageCap ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/rest/v2/applicants/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
     }
     // ----End---------
   },
@@ -3288,6 +3407,9 @@ export const store = new Vuex.Store({
     },
     setApplicantId (state, payload) {
       state.applicantId = payload
+    },
+    setForGroupDossier (state, payload) {
+      state.forGroupDossier = payload
     }
   },
   getters: {
@@ -3466,6 +3588,9 @@ export const store = new Vuex.Store({
     },
     getApplicantBussinessExit (state) {
       return state.applicantBussinessExit
+    },
+    getForGroupDossier (state) {
+      return state.forGroupDossier
     }
   }
 })

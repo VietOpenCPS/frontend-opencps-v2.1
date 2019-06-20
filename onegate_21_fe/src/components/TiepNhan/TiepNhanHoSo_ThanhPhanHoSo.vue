@@ -6,8 +6,8 @@
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                <div class="mr-2" @click="onlyView && item.hasForm ? viewFile2(item) : loadAlpcaFormClick(item)" style="min-width: 18px; display: flex;">
-                  <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
+                <div class="mr-2" @click="onlyView && item.hasForm ? '' : loadAlpcaFormClick(item)" style="min-width: 20px; display: flex;">
+                  <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
                       <span slot="activator">
@@ -16,17 +16,17 @@
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
-                    <span v-else>{{item.partName}}</span>
-                    <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
+                    <span v-else>{{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span></span>
+                    <!-- <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
-                    </v-tooltip>
+                    </v-tooltip> -->
                     <!-- <v-tooltip top v-if="item.hasForm && !item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip> -->
                     &nbsp;&nbsp;
-                    <span v-if="item.hasForm">(Bản khai trực tuyến)</span>
+                    <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
                       <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -143,10 +143,19 @@
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
-                      <v-btn color="primary" @click="saveAlpacaForm(item, index)" 
-                      v-if="item.hasForm && !onlyView && checkInput !== 1">Lưu lại</v-btn>
-                      <v-btn color="primary" @click="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">Xóa</v-btn>
-                      <v-btn color="primary" @click="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">In</v-btn>
+                      <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" 
+                      v-if="item.hasForm && !onlyView && checkInput !== 1">
+                        <v-icon color="white">save</v-icon>&nbsp;
+                        Lưu lại
+                      </v-btn>
+                      <v-btn color="primary" @click.stop="previewFileEfom(item, index)" v-if="item.daKhai && item.hasForm">
+                        <v-icon color="white">print</v-icon>&nbsp;
+                        In
+                      </v-btn>
+                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">
+                        <v-icon color="white">delete</v-icon>&nbsp;
+                        Xóa
+                      </v-btn>
                     </div>
                     <div :id="'formAlpaca' + item.partNo + id" :class='{"no_acction__event": onlyView}' v-if="!onlyView || item.daKhai">
                     </div>
@@ -161,6 +170,17 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
+            <v-flex style="width: 100px;" class="layout wrap">
+              <span style="padding-top: 6px">Số lượng:</span>&nbsp;
+              <v-text-field
+              class="px-0 py-0 d-inline-block record_count"
+              style="width: 30px; max-width: 30px;"
+              v-model="dossierTemplateItems[index]['recordCount']"
+              @input="changeRecordCount(dossierTemplateItems[index])"
+              v-if="!onlyView"
+              ></v-text-field>
+              <span v-if="onlyView">{{dossierTemplateItems[index]['recordCount']}}</span>
+            </v-flex>
             <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
@@ -184,18 +204,25 @@
                 @change="changeFileCheck($event, index)"
               ></v-select>
             </v-flex>
-            <v-flex :style="{width: '20px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
+            <v-flex :style="{width: '40px', 'align-items': 'center', 'margin-left': '10px', 'margin-top': thongTinHoSo.online ? '10px' : '0px'}" class="layout wrap" v-else-if="item.fileCheck > 0">
               <v-tooltip top v-if="item.fileCheck === 1">
-                <v-icon slot="activator" size="16" class="mx-0" color="primary">done</v-icon>
+                <v-icon slot="activator" size="24" class="mx-0" color="primary">done</v-icon>
                 <span>Đạt</span>
               </v-tooltip>
               <v-tooltip top v-else-if="item.fileCheck === 2">
-                <v-icon slot="activator" size="16" class="mx-0" color="primary">close</v-icon>
+                <v-icon slot="activator" size="24" class="mx-0" color="primary">close</v-icon>
                 <span>Không đạt</span>
               </v-tooltip>
             </v-flex>
-            <v-flex :style="{width: !onlyView ? '90px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
-              <input
+            <v-flex :style="{width: !onlyView ? '120px' : 'auto'}" :class="{'text-xs-right' : onlyView}" v-if="checkInput !== 1">
+              <input v-if="item['multiple']"
+              type="file"
+              multiple
+              style="display: none"
+              :id="'file' + item.partNo"
+              @change="onUploadSingleFile($event, item, index)"
+              >
+              <input v-else
               type="file"
               style="display: none"
               :id="'file' + item.partNo"
@@ -214,19 +241,28 @@
               indeterminate
               v-if="progressUploadPart === item.partNo"
               ></v-progress-circular>
-              <v-tooltip left v-else-if="progressUploadPart !== item.partNo && !onlyView">
-                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+
+              <v-tooltip top v-if="progressUploadPart !== item.partNo && !onlyView & item.hasForm">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                   <v-badge>
-                    <v-icon size="18" style="font-weight: bold;" color="primary">arrow_upward</v-icon>
+                    <v-icon size="24" color="#004b94">edit</v-icon>
                   </v-badge>
                 </v-btn>
-                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải file lên</span>
-                <span v-else>Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB </span>
+                <span>Khai trực tuyến</span>
+              </v-tooltip>
+              <v-tooltip left v-if="progressUploadPart !== item.partNo && !onlyView">
+                <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
+                  <v-badge>
+                    <v-icon size="24" color="#004b94">cloud_upload</v-icon>
+                  </v-badge>
+                </v-btn>
+                <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
+                <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
               </v-tooltip>
               <v-tooltip top v-if="partNoApplicantHasFile(item.partNo) && !onlyView">
                 <v-btn slot="activator" icon class="mx-0 my-0" @click="showFilesApplicant(item.partNo)">
                   <v-badge>
-                    <v-icon size="16" color="orange darken-3">warning</v-icon>
+                    <v-icon size="24" color="orange darken-3">folder</v-icon>
                   </v-badge>
                 </v-btn>
                 <span>Giấy tờ đã nộp</span>
@@ -243,20 +279,20 @@
       </div>
       <div v-if="!partTypes.includes(2) && originality === 3">
         <v-card>
-          <v-card-text>
-            <div v-if="!onlyView">
+          <v-card-text class="py-0 px-3 pl-4">
+            <div v-if="!onlyView" class="my-2">
               <v-textarea class="py-0"
               box
               v-model="applicantNoteDossier"
               rows="3"
               @input="changeApplicantNote"
-              label="ghi chú..."
+              label="Ghi chú"
               ></v-textarea>
             </div>
-            <v-text-field
+            <v-text-field class="my-2"
               v-if="onlyView && applicantNoteDossier"
               v-model="applicantNoteDossier"
-              label="Ghi chú ..."
+              label="Ghi chú"
               readonly
               box
             ></v-text-field>
@@ -287,8 +323,9 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog">
+              <v-btn color="red darken-3" flat="flat" @click.native="cancelDialog" :loading="loadingAddOther">
                 Quay lại
+                <span slot="loader">Loading...</span>
               </v-btn>
               <v-btn color="primary" flat="flat" @click.native="addOtherTemplate" :loading="loadingAddOther">
                 Đồng ý
@@ -309,7 +346,7 @@
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-title>
-            <span v-if="pdfEform">Tài liệu khai trực tuyến</span>
+            <span v-if="pdfEform">Bản in đã khai trực tuyến</span>
             <span v-else>Tài liệu đính kèm</span>
           </v-toolbar-title>
           <v-spacer></v-spacer>
@@ -497,7 +534,7 @@ export default {
     initData (data) {
       var vm = this
       vm.thongTinHoSo = data
-      vm.applicantNoteDossier = data['applicantNote'] && data['applicantNote'].indexOf('<br>[') < 0 ? data['applicantNote'] : ''
+      vm.applicantNoteDossier = data['applicantNote'] && String(data['applicantNote']).indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
       if (data['sampleCount'] !== null && data['sampleCount'] !== undefined && data['sampleCount'] !== 'undefined') {
         vm.sampleCount = data['sampleCount']
@@ -660,10 +697,12 @@ export default {
             itemTemplate['fileMark'] = fileMarkFind.fileMark
             itemTemplate['fileComment'] = fileMarkFind.fileComment
             itemTemplate['fileCheck'] = fileMarkFind.fileCheck
+            itemTemplate['recordCount'] = fileMarkFind.recordCount
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
             itemTemplate['fileCheck'] = 0
+            itemTemplate['recordCount'] = ''
           }
           return itemTemplate
         })
@@ -718,6 +757,7 @@ export default {
           }
           if (resData) {
             formData = eval('(' + resData + ')')
+            item['loaded'] = true
           } else {
             formData = {}
           }
@@ -795,7 +835,6 @@ export default {
     },
     onUploadSingleFile (e, data, index) {
       var vm = this
-      console.log('vm.dossierTemplateItems[index]', vm.dossierTemplateItems[index])
       vm.dossierTemplatesItemSelect = data
       vm.progressUploadPart = data.partNo
       data['dossierId'] = vm.thongTinHoSo.dossierId
@@ -807,15 +846,16 @@ export default {
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
             vm.recountFileTemplates()
-            // var fileViewsTemp = vm.dossierFilesItems.filter(file => {
-            //   return file.dossierPartNo === vm.dossierTemplatesItemSelect.partNo && !file.eForm
-            // })
-            // if (fileViewsTemp) {
-            //   vm.fileViews = fileViewsTemp
-            // }
           })
-        }).catch(function (xhr) {
+        }).catch(function (data) {
+          if (data.length > 0) {
+            vm.dossierTemplateItems[index]['passRequired'] = true
+          }
           vm.progressUploadPart = ''
+          vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
+            vm.dossierFilesItems = result
+            vm.recountFileTemplates()
+          })
         })
       } else {
         if (window.$('#file' + data.partNo)[0].files.length === 0) {
@@ -874,7 +914,9 @@ export default {
         vm.dossierTemplateItems.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
-            vm.showAlpacaJSFORM(val)
+            if (!val['loaded']) {
+              vm.showAlpacaJSFORM(val)
+            }
           }
         })
       }
@@ -933,6 +975,11 @@ export default {
           } else {
             vm.$store.dispatch('viewFile', file).then(result => {
               vm.dialogPDFLoading = false
+              if (file['eForm']) {
+                vm.pdfEform = true
+              } else {
+                vm.pdfEform = false
+              }
               document.getElementById('dialogPDFPreview' + vm.id).src = result
             })
           }
@@ -1155,7 +1202,7 @@ export default {
       } else {
         let divPx = 0
         if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
-          divPx += 140
+          divPx += 240
         }
         if (item.fileCheck > 0 && !vm.thongTinHoSo.online) {
           divPx += 20
@@ -1369,6 +1416,15 @@ export default {
       } else {
         return false
       }
+    },
+    changeRecordCount (markRecord) {
+      var vm = this
+      setTimeout(function () {
+        console.log('markRecord', markRecord)
+        let item = Object.assign({}, markRecord, {dossierId: vm.thongTinHoSo.dossierId})  
+        console.log('item', item)
+        vm.$store.dispatch('postDossierMark', item)
+      }, 200)
     }
   }
 }

@@ -4,6 +4,7 @@ import Landing from '@/components/Landing'
 import LandingMobile from '@/components/LandingMobile'
 import TraCuuHoSo from '@/components/TraCuuHoSo'
 import TiepNhanHoSoDetail from '@/components/TiepNhanHoSoDetail'
+import TiepNhanNhomHoSo from '@/components/TiepNhanHoSoTheoNhom'
 import XemChiTietHoSoDetailCanBo from '@/components/XemChiTietHoSoDetailCanBo'
 import XuLyHoSo from '@/components/XuLyHoSo'
 import HoanThienBoSungHoSoDetail from '@/components/HoanThienBoSungHoSoDetail'
@@ -18,6 +19,7 @@ const routes = [
   { path: '/m/danh-sach-ho-so/:index', name: 'LandingMobile', component: LandingMobile, props: true },
   { path: '/tra-cuu-ho-so', name: 'TraCuuHoSo', component: TraCuuHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode', name: 'TiepNhanHoSoDetail', component: TiepNhanHoSoDetail, props: true },
+  { path: '/danh-sach-ho-so/:index/tiep-nhan-nhom-ho-so', name: 'TiepNhanNhomHoSo', component: TiepNhanNhomHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/chi-tiet-ho-so/:id', name: 'XemChiTietHoSoDetailCanBo', component: XemChiTietHoSoDetailCanBo, props: true },
   { path: '/danh-sach-ho-so/:index/xu-ly-ho-so', name: 'XuLyHoSo', component: XuLyHoSo, props: true },
   { path: '/danh-sach-ho-so/:index/bo-sung-ho-so/:id', name: 'HoanThienBoSungHoSoDetail', component: HoanThienBoSungHoSoDetail, props: true },
