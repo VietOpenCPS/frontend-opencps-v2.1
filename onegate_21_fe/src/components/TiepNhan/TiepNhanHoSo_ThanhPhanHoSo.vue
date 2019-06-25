@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <v-card flat>
       <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItems" v-if="partTypes.includes(item.partType) && checkVisibleTemp(item, index)" v-bind:key="item.partNo">
         <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
           <v-expansion-panel-content hide-actions>
@@ -10,13 +10,16 @@
                   <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
-                      <span slot="activator">
+                      <span slot="activator" style="text-align: justify;">
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
-                    <span v-else>{{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span></span>
+                    <span v-else style="text-align: justify;">
+                      {{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
+                      <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
+                    </span>
                     <!-- <v-tooltip top v-if="item.hasForm && item.daKhai && ((originality === 1 && item.partType !==2) || originality !== 1)">
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                       <span>Biểu mẫu trực tuyến (Đã khai)</span>
@@ -25,8 +28,6 @@
                       <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                       <span>Biểu mẫu trực tuyến (Chưa khai)</span>
                     </v-tooltip> -->
-                    &nbsp;&nbsp;
-                    <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                     &nbsp;&nbsp;
                     <v-tooltip top v-if="!item.hasForm && item.hasFileTemp">
                       <v-icon v-on:click.stop="downloadFileTemplate(item, index)" slot="activator" style="color: #0d71bb;" size="16" color="primary">save_alt</v-icon>
@@ -138,7 +139,7 @@
                 </div>
               </div>
             </div>
-            <v-card v-if="item.hasForm && !onlyView">
+            <v-card flat v-if="item.hasForm && !onlyView">
               <v-card-text style="background-color: rgba(244, 247, 213, 0.19)">
                 <v-layout wrap>
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
@@ -170,18 +171,35 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
-            <v-flex style="width: 100px;" class="layout wrap">
-              <span style="padding-top: 6px">Số lượng:</span>&nbsp;
+            <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1">
+              <!-- <span style="padding-top: 6px">Số lượng:</span>&nbsp;
               <v-text-field
               class="px-0 py-0 d-inline-block record_count"
               style="width: 30px; max-width: 30px;"
               v-model="dossierTemplateItems[index]['recordCount']"
               @input="changeRecordCount(dossierTemplateItems[index])"
               v-if="!onlyView"
+              ></v-text-field> -->
+              <v-text-field
+                title="Số lượng"
+                v-if="!onlyView"
+                style="width:100px;"
+                v-model="dossierTemplateItems[index]['recordCount']"
+                append-icon="add"
+                prepend-inner-icon="remove"
+                @click:append="increaseCounter(index)"
+                @click:prepend-inner="decreaseCounter(index)"
+                clear-icon="mdi-close-circle"
+                type="number"
+                solo
+                flat
+                height="32"
+                class="counter-up-down text-xs-center"
+                :style="onlyView ? 'pointer-events: none' : ''"
+                @input="changeRecordCount(index)"
               ></v-text-field>
-              <span v-if="onlyView">{{dossierTemplateItems[index]['recordCount']}}</span>
             </v-flex>
-            <v-flex style="width: 110px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
+            <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
                 <v-radio :value="1"></v-radio>
@@ -278,8 +296,8 @@
         </div>
       </div>
       <div v-if="!partTypes.includes(2) && originality === 3">
-        <v-card>
-          <v-card-text class="py-0 px-3 pl-4">
+        <v-card flat>
+          <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
               <v-textarea class="py-0"
               box
@@ -370,7 +388,7 @@
         <iframe v-show="!dialogPDFLoading" :id="'dialogPDFPreview' + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
       </v-card>
-    </v-dialog>
+    </v-dialog>   
   </div>
 </template>
 
@@ -435,6 +453,9 @@ export default {
     }, {
       text: 'Bản gốc',
       value: 3
+    }, {
+      text: 'Bản dịch',
+      value: 4
     }],
     fileCheckItems: [{
       text: 'Chưa kiểm tra',
@@ -454,7 +475,8 @@ export default {
     pstFixed: 0,
     pstEl: 0,
     endEl: 0,
-    applicantNoteDossier: ''
+    applicantNoteDossier: '',
+    doChange: ''
   }),
   computed: {
     loading () {
@@ -1417,15 +1439,51 @@ export default {
         return false
       }
     },
-    changeRecordCount (markRecord) {
-      var vm = this
-      setTimeout(function () {
-        console.log('markRecord', markRecord)
-        let item = Object.assign({}, markRecord, {dossierId: vm.thongTinHoSo.dossierId})  
-        console.log('item', item)
-        vm.$store.dispatch('postDossierMark', item)
-      }, 200)
-    }
+    changeRecordCount (index) {
+      let vm = this
+      vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
+      function changeRecord () {
+        vm.doChange = setTimeout(function () {
+          if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
+            let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+            vm.$store.dispatch('postDossierMark', item)
+          }
+        }, 3000)
+      }
+      clearTimeout(vm.doChange)
+      changeRecord()
+    },
+    increaseCounter (index) {
+      let vm = this
+      vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
+      vm.dossierTemplateItems[index]['recordCount'] = Number(vm.dossierTemplateItems[index]['recordCount']) + 1
+      function changeRecord () {
+        vm.doChange = setTimeout(function () {
+          if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
+            let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+            vm.$store.dispatch('postDossierMark', item)
+          }
+        }, 3000)
+      }
+      clearTimeout(vm.doChange)
+      changeRecord()
+    },
+    decreaseCounter (index) {
+      let vm = this
+      vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
+      vm.dossierTemplateItems[index]['recordCount'] = Number(vm.dossierTemplateItems[index]['recordCount']) - 1
+      function changeRecord () {
+        vm.doChange = setTimeout(function () {
+          if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
+            let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
+            vm.$store.dispatch('postDossierMark', item)
+          }
+        }, 3000)
+      }
+      clearTimeout(vm.doChange)
+      changeRecord()
+    },
+
   }
 }
 </script>

@@ -22,7 +22,7 @@
           v-for="(item, index) in trangThaiHoSoList"
           v-model="item.active"
           :key="index"
-          prepend-icon="description"
+          :prepend-icon="item['icon'] ? item['icon'] : 'description'"
           :append-icon="item.hasOwnProperty('items') ? '' : ''"
           no-action
           ref="listGroupCustom"
@@ -81,7 +81,7 @@
             v-for="(item, index) in trangThaiHoSoList"
             v-model="item.active"
             :key="index"
-            prepend-icon="description"
+            :prepend-icon="item['icon'] ? item['icon'] : 'description'"
             :append-icon="item.hasOwnProperty('items') ? '' : ''"
             no-action
             ref="listGroupCustom"

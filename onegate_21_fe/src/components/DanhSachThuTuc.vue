@@ -37,52 +37,55 @@
       </div> 
     </div>
     <v-layout wrap class="white pt-3">
-      <v-flex xs6 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="govAgencyList"
-          v-model="govAgencyFilter"
-          label="Chọn cơ quan"
-          item-text="govAgencyName"
-          item-value="govAgencyCode"
-          :hide-selected="true"
-          clearable
-          @change="changeFilterAgency"
-          box
-        ></v-autocomplete>
+      <v-flex style="width:calc(100% - 230px)">
+        <v-layout wrap class="">
+          <v-flex xs6 class="px-2">
+            <v-autocomplete
+              class="select-border"
+              :items="govAgencyList"
+              v-model="govAgencyFilter"
+              label="Chọn cơ quan"
+              item-text="govAgencyName"
+              item-value="govAgencyCode"
+              :hide-selected="true"
+              clearable
+              @change="changeFilterAgency"
+              box
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs6 class="px-2">
+            <v-autocomplete
+              class="select-border"
+              :items="domainList"
+              v-model="domainFilter"
+              label="Chọn lĩnh vực"
+              item-text="domainName"
+              item-value="domainCode"
+              :hide-selected="true"
+              clearable
+              @change="changeFilterDomain"
+              box
+            ></v-autocomplete>
+          </v-flex>
+        </v-layout>
       </v-flex>
-      <v-flex xs6 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="domainList"
-          v-model="domainFilter"
-          label="Chọn lĩnh vực"
-          item-text="domainName"
-          item-value="domainCode"
-          :hide-selected="true"
-          clearable
-          @change="changeFilterDomain"
-          box
-        ></v-autocomplete>
+      <v-flex style="width:230px" class="pl-2">
+        <v-chip label color="primary" class="my-0" text-color="white" style="height:48px;border-radius: 5px;">
+          <v-checkbox
+            class="mt-0"
+            v-model="serviceLastest"
+            color="white"
+            hide-details
+          >
+            <template slot="label">
+              <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
+            </template>
+          </v-checkbox>
+        </v-chip>
       </v-flex>
-      <!-- <v-flex xs4 class="px-2">
-        <v-autocomplete
-          class="select-border"
-          :items="levelList"
-          v-model="levelSelected"
-          placeholder="Chọn mức độ"
-          item-text="levelName"
-          item-value="level"
-          :hide-selected="true"
-          @change="changeLevel"
-          clearable
-          box
-        >
-        </v-autocomplete>
-      </v-flex> -->
     </v-layout>
     <v-divider class="my-0 py-0"></v-divider>
-    <v-expansion-panel v-if="!domainFilter && !activeFilterKey" class="expand__select__gov" v-model="panelAgency" expand>
+    <v-expansion-panel v-if="!domainFilter && !activeFilterKey && !serviceLastest" class="expand__select__gov" v-model="panelAgency" expand>
       <v-expansion-panel-content v-for='(itemGov, index) in govAgencyRender' :key='index'>
         <div slot='header' class="ml-3 text-bold">
           <v-icon style="
@@ -177,17 +180,18 @@
         </v-expansion-panel>
       </v-card-text>
     </v-card>
-    <v-card v-if="activeFilterKey">
+    <v-card v-if="activeFilterKey || serviceLastest">
       <div v-if="serviceConfigListRender.length > 0">
         <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
           <!-- Cap 3 -->
           <v-layout row wrap>
             <v-flex xs12 sm9 class="pt-1">
               <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-              <span>{{itemServiceConfig.serviceInfoName}}</span>
+              <span>{{itemServiceConfig.serviceName}}</span>&nbsp;
+              <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
             </v-flex>
             <v-flex xs12 sm1 class="text-xs-center pt-1">
-              <span>Mức {{itemServiceConfig.level}}</span>
+              <span>Mức {{serviceLastest ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}</span>
             </v-flex>
             <v-flex xs12 sm2 class="text-xs-center">
               <v-menu left offset-x>
@@ -257,9 +261,9 @@
   import Captcha from './Captcha.vue'
   import toastr from 'toastr'
   toastr.options = {
-  'closeButton': true,
-  'timeOut': '3000'
-}
+    'closeButton': true,
+    'timeOut': '3000'
+  }
   export default {
     props: ['serviceCode'],
     components: {
@@ -289,7 +293,8 @@
       serviceNameKey: '',
       activeFilterKey: false,
       loadingMutiple: true,
-      dataPostDossier: ''
+      dataPostDossier: '',
+      serviceLastest: false
     }),
     computed: {
       currentIndex () {
@@ -365,6 +370,17 @@
       '$route': function (newRoute, oldRoute) {
         let vm = this
         vm.filterAndSort()
+      },
+      serviceLastest (val) {
+        let vm = this
+        if (val) {
+          vm.govAgencyFilter = ''
+          vm.domainFilter = ''
+          vm.serviceNameKey = ''
+          vm.filterService()
+        } else {
+          vm.filterService()
+        }
       }
     },
     methods: {
@@ -373,6 +389,7 @@
         vm.domainFilter = ''
         vm.serviceNameKey = ''
         vm.activeFilterKey = false
+        vm.serviceLastest = false
         vm.filterService()
       },
       changeFilterDomain () {
@@ -380,6 +397,7 @@
         vm.govAgencyFilter = ''
         vm.serviceNameKey = ''
         vm.activeFilterKey = false
+        vm.serviceLastest = false
         vm.panelDomainList = [true]
         vm.filterService()
       },
@@ -388,12 +406,14 @@
         if (vm.serviceNameKey && vm.serviceNameKey.length > 3) {
           vm.govAgencyFilter = ''
           vm.domainFilter = ''
+          vm.serviceLastest = false
           vm.activeFilterKey = true
           vm.filterService()
         } else {
           vm.govAgencyFilter = ''
           vm.domainFilter = ''
           vm.serviceNameKey = ''
+          vm.serviceLastest = false
           vm.activeFilterKey = false
           vm.filterService()
         }
@@ -406,6 +426,7 @@
           let queryString = '?'
           newQuery['agency'] = vm.govAgencyFilter
           newQuery['domain'] = vm.domainFilter
+          newQuery['lastest'] = vm.serviceLastest
           newQuery['keyword'] = String(vm.serviceNameKey).trim()
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -441,6 +462,28 @@
           let keySearch = vm.convertString(newQuery.keyword)
           vm.serviceConfigListRender = vm.serviceConfigList.filter(function (item) {
             return vm.convertString(String(item['serviceInfoName'])).indexOf(keySearch) >= 0
+          })
+        }
+        if (newQuery.hasOwnProperty('lastest') && newQuery.lastest) {
+          vm.$store.dispatch('getServiceRecently').then(function (result) {
+            if (result.length > 0) {
+              let serviceConfigs = []
+              for (let index in result) {
+                if (Array.isArray(result[index]['serviceConfigs'])) {
+                  for (let key in result[index]['serviceConfigs']) {
+                    result[index]['serviceConfigs'][key].serviceInfoId = result[index]['serviceConfigs'][key]['serviceInfoId']
+                    result[index]['serviceConfigs'][key].serviceName = result[index]['serviceName']
+                    result[index]['serviceConfigs'][key].govAgencyNameRender = result[index]['serviceConfigs'][key]['govAgencyName']
+                    serviceConfigs.push(result[index]['serviceConfigs'][key])
+                  }
+                } else {
+                  result[index]['serviceConfigs'].serviceInfoId = result[index]['serviceInfoId']
+                  result[index]['serviceConfigs'].serviceName = result[index]['serviceName']
+                  serviceConfigs.push(result[index]['serviceConfigs'])
+                }
+              }
+              vm.serviceConfigListRender = serviceConfigs
+            }
           })
         }
         if (!vm.domainFilter && !vm.serviceNameKey) {

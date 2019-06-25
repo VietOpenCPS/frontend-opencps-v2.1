@@ -235,6 +235,25 @@ export const store = new Vuex.Store({
           reject(error)
         })
       })
+    },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {

@@ -284,7 +284,7 @@
         vm.$store.commit('setActiveDetailService', false)
         let queryString
         if (page === 'ketquahoso') {
-          queryString = '/'
+          queryString = '/ho-so-co-ket-qua'
         } else if (page === 'tiepnhanhoso') {
           queryString = '/tiep-nhan-ho-so'
         } else if (page === 'tracuuhoso') {

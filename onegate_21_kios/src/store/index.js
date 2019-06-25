@@ -463,6 +463,42 @@ export const store = new Vuex.Store({
         })
       })
     },
+    // phục vụ demo bộ ngoại giao
+    loadEmployeesBNG ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: filter.start,
+              end: filter.end
+            }
+          }
+          axios.get(state.endPoint + '/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    // 
     loadEmployeesMotcua ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         // commit('setLoading', true)

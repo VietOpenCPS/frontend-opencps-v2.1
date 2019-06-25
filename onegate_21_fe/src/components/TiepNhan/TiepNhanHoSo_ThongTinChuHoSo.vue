@@ -30,6 +30,8 @@
                         v-model="thongTinChuHoSo.applicantIdNo"
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
+                        :rules="[v => !!v || 'Thông tin bắt buộc']"
+                        required
                       ></v-text-field>
                       <suggestions
                         v-if="originality === 3 || originality === '3'"
@@ -204,7 +206,7 @@
                         <v-text-field
                         v-if="originality === 1 || originality === '1'"
                         v-model="thongTinNguoiNopHoSo.delegateIdNo"
-                        :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                        :rules="[v => !!v || 'Thông tin bắt buộc']"
                         required
                         ></v-text-field>
                         <!--  -->
@@ -235,6 +237,8 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
+                        :rules="[v => !!v || 'Thông tin bắt buộc']"
+                        required
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -419,6 +423,24 @@ export default {
   },
   props: ['showApplicant', 'showDelegate'],
   data: () => ({
+    requiredOptions: {
+      applicantIdNo: false,
+      applicantName: false,
+      address: false,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
+      contactTelNo: false,
+      contactEmail: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
+      delegateEmail: false
+    },
     valid_thongtinchuhoso: false,
     loadingVerify: false,
     citys: [],
@@ -482,7 +504,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     rules: {
-      required: (value) => !!value || 'Trường dữ liệu bắt buộc',
+      required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'

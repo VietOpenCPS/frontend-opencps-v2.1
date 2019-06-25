@@ -194,10 +194,10 @@
         <!-- content-right -->
         <v-flex class="xs12 sm4 px-3">
           <v-card style="border-radius: 4px;-webkit-box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;box-shadow: 0 0 2rem 0 rgba(136,152,170,.15)!important;">
-            <v-card-text class="my-0 py-0 px-0">
+            <v-card-text class="my-0 py-0 px-0" v-if="zaloOaId">
               <v-flex xs12 class="text-right" style="height: 30px;">
-                <v-tooltip top v-if="!isFollowZalo">
-                  <div class="zalo-follow-only-button" data-oaid="1939207196454340331" data-callback="callbackzalo"
+                <v-tooltip top v-if="isFollowZalo === false">
+                  <div class="zalo-follow-only-button" :data-oaid="zaloOaId" data-callback="callbackzalo"
                     slot="activator" style="width:90px">
                   </div>
                   <span>Nhấn Quan tâm để có thể nhận thông báo về tình hình xử lý hồ sơ trên ứng dụng Zalo </span>
@@ -403,8 +403,8 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
-      zaloOaId: '1939207196454340331',
-      zaloOaid_token_access: '36ipLhREF2O1Qp5Vkyqv809gC5wrr4vnRZ06R93kNK1D6nzEgxfwRXDi267BibX016q0L-oHQKiDQGmxv91F1o9Z3JR-brOwHrGw5hxrOH574YykkC0jNsG5VKAep2rGPGjoJPp4E40X0aDuoy8GSIb_JshLkKSF11yL1kR1THHVE1qujVrY7cWY22A3z00oFnmB68F4PnftFMqrWEOVK4qlO2wGtYu-MGLW8UFy55euBHXLmSyHHmXf7rttonrAF2bJLSlR1qaV1cynZf0wIB7LEoq',
+      zaloOaId: '',
+      zaloOaid_token_access: '',
       userAppZaloUid: '',
       isFollowZalo: false,
       titleDialogPdf: '',
@@ -521,7 +521,7 @@
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
           window.callbackzalo = vm.callbackzalo
-          vm.getUserAppZaloInfo()
+          vm.getServerConfig()
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
             vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
@@ -736,6 +736,22 @@
             toastr.error('Xóa giấy tờ không thành công')
           })
         }
+      },
+      getServerConfig () {
+        let vm = this
+        let filter = {
+          serverNo: 'ZALO'
+        }
+        vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+          try {
+            let zaloOAInfo = JSON.parse(result.configs)
+            vm.zaloOaId = zaloOAInfo['oaid']
+            vm.zaloOaid_token_access = zaloOAInfo['oaid_token_access']
+            console.log('zalo_info', vm.zaloOaId, vm.zaloOaid_token_access)
+            vm.getUserAppZaloInfo()
+          } catch (error) {
+          }
+        })
       },
       getUserAppZaloInfo () {
         let vm = this

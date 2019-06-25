@@ -28,7 +28,7 @@ let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '')
 Vue.use(VueNativeSock, 'ws://' + portalUrlSocket.replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
-  + '&portalURL=' + portalURL
+  + '&portalURL=' + portalUrlSocket
   + '&companyId=' + companyId
   + '&userId=' + userId
   + '&userName=' + userName

@@ -21,7 +21,7 @@
                           <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;"></div>
                           <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                         </v-flex>
-                        <v-flex xs8 style="word-wrap: break-word;">
+                        <v-flex xs8 class="pt-2" style="word-wrap: break-word;">
                           <div class="primary--text">{{employee.jobPosTitle}}</div>
                           <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
                           <div>{{employee.workingUnitName}}</div>
@@ -110,7 +110,7 @@ export default {
     lengthPage: 0,
     totalEmployee: 0,
     employeePage: 1,
-    numberPerPage: 10
+    numberPerPage: 12
   }),
   computed: {
     loading () {
@@ -166,7 +166,9 @@ export default {
       let newQuery = current.query
       if (newQuery.hasOwnProperty('agencyCode')) {
         filter.agencyCode = newQuery.agencyCode
-        vm.$store.dispatch('loadEmployees', filter).then(result => {
+        // vm.$store.dispatch('loadEmployees', filter).then(result => {
+          // phục vụ demo BNG
+        vm.$store.dispatch('loadEmployeesBNG', filter).then(result => {
           vm.totalEmployee = result[0]
           vm.employeeItems = sortEmployee(result[1])
           vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)

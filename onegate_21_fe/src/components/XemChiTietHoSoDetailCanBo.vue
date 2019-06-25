@@ -985,7 +985,13 @@ export default {
         fileAttachId: data,
         dossierId: vm.id
       }
-      this.$store.dispatch('downloadFile', dataCommit)
+      this.$store.dispatch('downloadFile', dataCommit).then(function (result) {
+        if (result) {
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = true
+          document.getElementById('dialogPDFPreview').src = result
+        }
+      })
     },
     downloadFileDocument(data) {
       var vm = this
@@ -993,7 +999,13 @@ export default {
         referenceUid: data,
         dossierId: vm.id
       }
-      this.$store.dispatch('downloadFileDocument', dataCommit)
+      vm.$store.dispatch('downloadFileDocument', dataCommit).then(function (result) {
+        if (result) {
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = true
+          document.getElementById('dialogPDFPreview').src = result
+        }
+      })
     },
     loadDossierActions (data) {
       var vm = this
