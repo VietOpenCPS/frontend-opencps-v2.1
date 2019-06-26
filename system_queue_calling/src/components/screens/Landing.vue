@@ -404,6 +404,7 @@ export default {
       let vm = this
       let gateNumber = isNaN(val) ? val : Number(val)
       vm.updateGateNumber(gateNumber)
+      vm.getBookingCalling()
     }
   },
   methods: {
@@ -687,7 +688,7 @@ export default {
         }
       })
     },
-    mergeBookingCalling (bookingDossier, bookingEform, index) {
+    mergeBookingCalling (bookingDossier, bookingEform) {
       let vm = this
       // console.log('booking', bookingEform, bookingDossier)
       if (bookingEform.length > 0 || bookingDossier.length > 0) {
@@ -706,6 +707,8 @@ export default {
         booking = sortBooking(booking)
         vm.currentBooking = booking[0]
         console.log('currentBooking', vm.currentBooking)
+      } else {
+        vm.currentBooking = ''
       }
     },
     callingBooking (item) {

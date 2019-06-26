@@ -1,7 +1,7 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card flat class="pb-2" style="">
+      <v-card color="transparent" flat class="pb-2" style="">
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
           {{agencies[0]['administrationName']}}
         </h4>
@@ -113,10 +113,10 @@
           </v-btn>
           <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
         </div>
-        <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+        <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
-        </v-btn>
+        </v-btn> -->
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>

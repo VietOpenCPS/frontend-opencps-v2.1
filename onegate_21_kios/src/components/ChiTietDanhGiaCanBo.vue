@@ -7,7 +7,7 @@
       indeterminate
     ></v-progress-circular>
   </div>
-  <div v-else class="px-2 pt-2" style="height: 100%; background-color: #ffff;">
+  <div v-else class="px-2 pt-2" style="height: 100%;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-container align-center row wrap>
         <v-flex xs12 lg10>
@@ -122,10 +122,10 @@
         </v-form>
       </v-dialog>
     </v-form>
-    <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+    <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon v-if="fullScreen" dark>fullscreen_exit</v-icon>
-    </v-btn>
+    </v-btn> -->
     <div class="virtual-keyboard" v-if="visible && !isMobile">
       <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
         <v-icon color="#fff">clear</v-icon>

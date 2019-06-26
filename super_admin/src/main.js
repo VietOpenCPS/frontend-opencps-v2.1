@@ -26,8 +26,8 @@ let userName = window.themeDisplay !== undefined ? window.themeDisplay.getUserNa
 let portalURL = (window.themeDisplay !== undefined ) ? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
-let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '')
-Vue.use(VueNativeSock, 'ws://' + portalUrlSocket.replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
+let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
+Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalUrlSocket
   + '&companyId=' + companyId
   + '&userId=' + userId

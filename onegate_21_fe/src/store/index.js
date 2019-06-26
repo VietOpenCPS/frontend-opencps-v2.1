@@ -2503,7 +2503,7 @@ export const store = new Vuex.Store({
             govAgencyCode: filter.govAgencyCode ? filter.govAgencyCode : '',
             govAgencyName: filter.govAgencyName ? filter.govAgencyName : '',
             applicantNote: filter.applicantNote ? filter.applicantNote : '',
-            typeCode: filter.type ? filter.type : ''
+            type: filter.type ? filter.type : ''
           }
           if (filter.type !== 'denied') {
             paramGet['partNo'] = filter.partNo ? filter.partNo : ''

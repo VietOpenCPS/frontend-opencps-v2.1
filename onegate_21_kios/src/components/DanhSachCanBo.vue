@@ -2,9 +2,9 @@
   <div>
     <v-layout justify-center>
       <v-flex xs12>
-        <v-card flat class="pb-3">
-          <h3 class="text-xs-center py-2" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h3>
-          <h3 class="text-xs-center pb-2" style="color:green" v-if="agencyName">{{agencyName}}</h3>
+        <v-card color="transparent" flat class="pb-3">
+          <h2 class="text-xs-center py-2 my-0" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h2>
+          <h2 class="text-xs-center pb-2 my-0" style="color:green" v-if="agencyName">{{agencyName}}</h2>
           <div v-if="employeeItems.length > 0">
             <v-container fluid grid-list-md>
               <v-layout row wrap>
@@ -14,7 +14,7 @@
                   :key="employee.employeeId"
                   class="px-2 py-2"
                 >
-                  <v-card flat hover color="#1a571b21" style="box-shadow: none;">
+                  <v-card flat hover color="#eaeaeaf0" style="box-shadow: none;">
                     <v-card-text class="py-2 px-1" @click.stop="viewDetailEmployee(employee)" style="overflow:hidden">
                       <v-layout wrap>
                         <v-flex xs4 style="text-align: center!important;">
@@ -69,10 +69,10 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+    <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
-    </v-btn>
+    </v-btn> -->
   </div>
 </template>
 

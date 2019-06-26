@@ -1,6 +1,6 @@
 <template>
   <div class="px-2 py-0 kios-item">
-    <v-card flat>
+    <v-card color="transparent" flat>
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="10" />
       </content-placeholders>
@@ -18,10 +18,10 @@
         </v-layout>
       </div>
     </v-card>
-    <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+    <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
-    </v-btn>
+    </v-btn> -->
   </div>
 </template>
 

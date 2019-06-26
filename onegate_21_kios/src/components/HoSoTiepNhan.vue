@@ -1,8 +1,8 @@
 <template>
   <div class="py-0 kios-item">
     <div>
-      <v-card flat class="mb-0" style="">
-        <div style="background-color: #ffffff">
+      <v-card color="transparent" flat class="mb-0" style="">
+        <div>
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
           </h4>
@@ -83,10 +83,10 @@
             </div>
           </div>
         </div>
-        <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+        <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
-        </v-btn>
+        </v-btn> -->
       </v-card>
       <div class="virtual-keyboard" v-if="visible && !isMobile">
         <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">

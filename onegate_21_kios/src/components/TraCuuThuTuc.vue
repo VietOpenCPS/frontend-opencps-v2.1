@@ -1,7 +1,7 @@
 <template>
   <div class="py-0 kios-item">
     <v-card flat style="">
-      <h4 class="pt-2 ml-2">
+      <h4 class="py-2 ml-2 text-xs-center">
         <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
       </h4>
       <v-layout wrap class="mt-2">
@@ -158,10 +158,10 @@
         </v-btn>
         <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
       </div>
-      <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+      <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
         <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
         <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-card>
   </div>
 </template>

@@ -6,6 +6,7 @@ import ChiTietHoSo from '@/components/ChiTietHoSo'
 import TraCuuHomePage from '@/components/TraCuuHomePage'
 import ChiTietHoSoHomePage from '@/components/ChiTietHoSoHomePage'
 import TraCuuThuTuc from '@/components/TraCuuThuTuc'
+import TraCuuThuTucBGT from '@/components/TraCuuThuTucBGT'
 import ChiTietThuTuc from '@/components/ChiTietThuTuc'
 import DanhGiaCanBo from '@/components/DanhGiaCanBo'
 import ChiTietDanhGiaCanBo from '@/components/ChiTietDanhGiaCanBo'
@@ -24,6 +25,7 @@ const routes = [
   { path: '/tra-cuu-ho-so-homepage', name: 'TraCuuHomePage', component: TraCuuHomePage, props: false },
   { path: '/thong-tin-ho-so/:index', name: 'ChiTietHoSoHomePage', component: ChiTietHoSoHomePage, props: true },
   { path: '/tra-cuu-thu-tuc', name: 'TraCuuThuTuc', component: TraCuuThuTuc, props: false },
+  { path: '/tra-cuu-thu-tuc-bgt', name: 'TraCuuThuTucBGT', component: TraCuuThuTucBGT, props: false },
   { path: '/tra-cuu-thu-tuc/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
   { path: '/danh-gia-can-bo', name: 'DanhGiaCanBo', component: DanhGiaCanBo, props: false },
   { path: '/danh-sach-can-bo/:id', component: ChiTietDanhGiaCanBo, props: true },

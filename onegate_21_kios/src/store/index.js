@@ -134,8 +134,8 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPoint + '/serviceinfos/statistics/domains', param).then(function (response) {
             let serializable = response.data
-            if (serializable.data) {
-              let dataReturn = serializable.data
+            if (serializable) {
+              let dataReturn = serializable
               resolve(dataReturn)
             } else {
               resolve([])

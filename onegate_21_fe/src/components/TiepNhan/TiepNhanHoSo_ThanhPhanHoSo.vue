@@ -209,7 +209,7 @@
               <v-select
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
-                :disabled="onlyView"
+                :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
               ></v-select>
             </v-flex>
@@ -1179,12 +1179,14 @@ export default {
     },
     changeFileMark (event, index) {
       var vm = this
-      let item = vm.dossierTemplateItems[index]
-      item['dossierId'] = vm.thongTinHoSo.dossierId
-      item['fileMark'] = event
-      item['checkInput'] = vm.checkInput
-      vm.$store.dispatch('postDossierMark', item)
-      vm.dossierTemplateItems[index].fileMark = event
+      if (!vm.onlyView) {
+        let item = vm.dossierTemplateItems[index]
+        item['dossierId'] = vm.thongTinHoSo.dossierId
+        item['fileMark'] = event
+        item['checkInput'] = vm.checkInput
+        vm.$store.dispatch('postDossierMark', item)
+        vm.dossierTemplateItems[index].fileMark = event
+      }
     },
     changeFileCheck (event, index) {
       var vm = this
