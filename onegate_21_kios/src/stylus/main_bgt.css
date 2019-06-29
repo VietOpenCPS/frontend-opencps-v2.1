@@ -1256,7 +1256,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     height: 40px !important;
     position: absolute !important;
     top: 0;
-    right: 0;
+    right: 5px;
 }
 .back-btn .icon {
     font-size: 26px !important;
@@ -1276,7 +1276,7 @@ div.table-tracuu::-webkit-scrollbar-thumb {
     border-bottom: 1px solid #d3d3d3;
 }
 .wrap-password {
-    max-width: 500px;
+    max-width: 700px;
     position: absolute;
     top: 50px;
     left: 50%;
@@ -1476,9 +1476,6 @@ table > thead > tr > th.column {
 .wrap-scroll-tabledossier {
     max-height: 380px
 }
-.wrap-scroll-tableservice {
-    max-height: 335px
-}
 .wrap-scroll-domain {
     border: 1px solid #d3d3d3;
     /* max-height: 335px */
@@ -1554,7 +1551,6 @@ header a {
 header a div>p{
     color: #00204f
 }
-
 header p {
 	margin-bottom: 0;
 }
@@ -1569,7 +1565,7 @@ header p {
 	height: 100%;
 }
 .tab-item .left {
-	width: 300px;
+	width: 400px;
 }
 .tab-item .left.smallScreen {
     display: none;
@@ -1613,14 +1609,12 @@ header p {
     background-color: rgba(0,0,0,0.2);
 }
 .tab-item .left a {
-	display: -webkit-box;
 	display: flex;
-	-webkit-align-items: center;
-	align-items: center;
-	padding: 15px 15px 15px 65px;
-	font-size: 22px;
-	color: white;
-	height: 75px;
+    align-items: center;
+    padding: 15px 15px 15px 65px;
+    font-size: 20px;
+    color: #fff;
+    height: 75px;
     position: relative;
     border-radius: 10px;
     font-weight: 500;
@@ -1630,14 +1624,14 @@ header p {
 .tab-item .left a p span:nth-child(3){
 	font-size: 16px !important;
 }
-.tab-item .left .item-menu:nth-child(1) a{
-    background-color: #1cbbb4;
+.tab-item .left .item-menu a{
+    background-color: #0080c7;
     margin: 0 0 8px 0;
 }
-.tab-item .left .item-menu:nth-child(1) a:hover {
-	background-color: #0090ff;
+.tab-item .left .item-menu a:hover {
+	background-color: #0080c7;
 }
-.tab-item .left .item-menu:nth-child(2) a{
+/* .tab-item .left .item-menu:nth-child(2) a{
     background-color: #f68e56;
     margin: 0 0 8px 0;
 }
@@ -1664,7 +1658,7 @@ header p {
 }
 .tab-item .left .item-menu:nth-child(5) a:hover {
 	background-color: #0090ff;
-}
+} */
 .mWrapper > header {
     display: none !important;
 }
@@ -1792,3 +1786,17 @@ header p {
     display: inline-block;
     background: #dedede;
 }
+.input_voting_fixed {
+    position: fixed;
+    bottom: 350px;
+    left: 0;
+    width: 100%;
+    max-width: 100% !important;
+    padding-left: 15px;
+    padding-right: 15px;
+    background: #fff;
+}
+main .v-content {
+    max-width: 1300px;
+    margin: 0 auto;
+ }

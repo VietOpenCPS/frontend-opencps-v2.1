@@ -1,11 +1,11 @@
 <template>
   <div class="py-0 kios-item">
     <v-card color="transparent" flat style="">
-      <h4 class="pt-2 ml-2">
-        <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
+      <h4 class="pt-2 pb-3 ml-2 text-xs-center">
+        <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
       </h4>
       <v-layout wrap class="mt-2">
-        <v-flex xs12 sm6 md4 class="pl-2 pr-2">
+        <!-- <v-flex xs12 sm6 md4 class="pl-2 pr-2">
           <v-autocomplete
             box
             :items="govAgencyList"
@@ -34,8 +34,8 @@
             clearable
             height="48"
           ></v-autocomplete>
-        </v-flex>
-        <v-flex xs12 sm12 md4 class="pl-2 pr-2">
+        </v-flex> -->
+        <v-flex xs12 sm12 md6 offset-md3 class="pl-2 pr-2" v-if="!activeDetailService">
           <!-- <v-text-field class="input-border input-search"
             label="Nhập tên thủ tục hành chính"
             v-model="serviceNameKey"
@@ -48,7 +48,23 @@
             <input id="serviceNameKey" type="text" @focus="show" @keyup.enter="filterServiceinfos('keyword')" required="required" />
             <span class="bar"></span>
             <label for="serviceNameKey">Tên thủ tục hành chính</label>
-            <v-icon class="icon-prepend text-bold" size="18" @click="filterServiceinfos('keyword')">search</v-icon>
+            <!-- <v-icon class="icon-prepend text-bold" size="18" @click="filterServiceinfos('keyword')">search</v-icon> -->
+            <v-btn color="primary"
+              :loading="loadingTable"
+              :disabled="loadingTable"
+              @click="filterServiceinfos('keyword')"
+              class="kios-btn"
+              style="top: -5px;
+              position: absolute;
+              right: -4px;
+              height: 48px !important;
+              border-bottom-left-radius: 0px;"
+            >
+              <v-icon size="20">search</v-icon>
+              &nbsp;
+              Tra cứu
+              <span slot="loader">Loading...</span>
+            </v-btn>
           </div>
         </v-flex>
       </v-layout>
@@ -83,7 +99,7 @@
         </div> -->
       </div>
       <!-- danh sách thủ tục -->
-      <div class="mt-4" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
+      <div class="mt-4 pr-2" v-if="!loading && !activeDetailService && showListThuTuc" :class="visible ? 'overlayActive': ''">
         <div class="wrap-scroll wrap-scroll-tableservice">
           <v-data-table
             :headers="headersTable"
@@ -158,9 +174,13 @@
         </v-btn>
         <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" :options="options" />
       </div>
-      <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
+      <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
         <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
         <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
+      </v-btn> -->
+      <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+        <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+        Quay lại 
       </v-btn>
     </v-card>
   </div>
@@ -308,21 +328,21 @@ export default {
         vm.$store.dispatch('getGovAgency', filter).then(function (result) {
           vm.govAgencyList = result
           vm.loading = false
-          if (vm.govAgencyList.length > 0) {
+          // if (vm.govAgencyList.length > 0) {
             vm.serviceNameKey = newQuery.hasOwnProperty('keyword') ? newQuery.keyword : ''
-            vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
-            vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
-            vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
+            // vm.levelSelected = newQuery.hasOwnProperty('level') ? Number(newQuery.level) : ''
+            // vm.linhVucSelected = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
+            // vm.govAgencySelected = newQuery.hasOwnProperty('administration') ? newQuery.administration : ''
             $('#serviceNameKey').val(vm.serviceNameKey)
-            if (vm.govAgencyList.length === 1) {
-              vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
-            }
-            vm.filterGovagency()
-          }
-          if (vm.linhVucSelected || vm.serviceNameKey !== '') {
+            // if (vm.govAgencyList.length === 1) {
+            //   vm.govAgencySelected = vm.govAgencyList[0]['administrationCode']
+            // }
+            // vm.filterGovagency()
+          // }
+          // if (vm.linhVucSelected || vm.serviceNameKey !== '') {
             vm.doLoadingThuTuc()
             vm.showListThuTuc = true
-          }
+          // }
         }).catch(reject => {
           vm.loading = false
         })
@@ -334,37 +354,37 @@ export default {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
+      // vm.govAgencySelected = currentQuery.hasOwnProperty('administration') ? currentQuery.administration : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       $('#serviceNameKey').val(vm.serviceNameKey)
-      vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
-      vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      if (vm.govAgencySelected && !vm.linhVucSelected) {
-        vm.loading = true
-        let filter = {
-          page: currentQuery.page ? currentQuery.page : 1,
-          administrationCode: vm.govAgencySelected
-        }
-        vm.$store.dispatch('getDomainLists', filter).then(function (result) {
-          vm.loading = false
-          if (result.data) {
-            vm.listLinhVuc = result.data
-            vm.totalPaggingLinhVuc = Number(result.total)
-          } else {
-            vm.listLinhVuc = []
-            vm.totalPaggingLinhVuc = 0
-          }
-          vm.pageListLinhVuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
-        }).catch(reject => {
-          vm.loading = false
-          vm.listLinhVuc = []
-          vm.totalPaggingLinhVuc = 0
-        })
-      }
-      if (vm.linhVucSelected || vm.serviceNameKey !== '') {
+      // vm.levelSelected = currentQuery.hasOwnProperty('level') ? Number(currentQuery.level) : ''
+      // vm.linhVucSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      // if (vm.govAgencySelected && !vm.linhVucSelected) {
+      //   vm.loading = true
+      //   let filter = {
+      //     page: currentQuery.page ? currentQuery.page : 1,
+      //     administrationCode: vm.govAgencySelected
+      //   }
+      //   vm.$store.dispatch('getDomainLists', filter).then(function (result) {
+      //     vm.loading = false
+      //     if (result.data) {
+      //       vm.listLinhVuc = result.data
+      //       vm.totalPaggingLinhVuc = Number(result.total)
+      //     } else {
+      //       vm.listLinhVuc = []
+      //       vm.totalPaggingLinhVuc = 0
+      //     }
+      //     vm.pageListLinhVuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
+      //   }).catch(reject => {
+      //     vm.loading = false
+      //     vm.listLinhVuc = []
+      //     vm.totalPaggingLinhVuc = 0
+      //   })
+      // }
+      // if (vm.linhVucSelected || vm.serviceNameKey !== '') {
         vm.doLoadingThuTuc()
         vm.showListThuTuc = true
-      }
+      // }
       if (currentQuery.hasOwnProperty('detail')) {
         vm.$store.commit('setActiveDetailService', true)
       } else {
@@ -387,9 +407,9 @@ export default {
       }
       vm.serviceNameKey = $('#serviceNameKey').val()
       newQuery['keyword'] = vm.serviceNameKey
-      newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
-      newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
-      newQuery['administration'] = vm.govAgencySelected ? vm.govAgencySelected : ''
+      // newQuery['level'] = vm.levelSelected ? vm.levelSelected : ''
+      // newQuery['domain'] = vm.linhVucSelected ? vm.linhVucSelected : ''
+      // newQuery['administration'] = vm.govAgencySelected ? vm.govAgencySelected : ''
       newQuery['page'] = 1
       for (let key in newQuery) {
         if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -407,14 +427,14 @@ export default {
       var vm = this
       vm.listThuTuc = []
       vm.loading = true
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       var filter = null
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
-        administration: currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencySelected,
+        // administration: currentQuery.hasOwnProperty('administration') ? currentQuery.administration : vm.govAgencySelected,
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
-        level: currentQuery.hasOwnProperty('level') ? currentQuery.level : vm.levelSelected,
-        domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.linhVucSelected
+        // level: currentQuery.hasOwnProperty('level') ? currentQuery.level : vm.levelSelected,
+        // domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : vm.linhVucSelected
       }
       vm.$store.dispatch('getServiceLists', filter).then(function (result) {
         vm.loading = false
@@ -593,6 +613,9 @@ export default {
     changeScreen () {
       var vm = this
       vm.$store.commit('setFullScreen', !vm.fullScreen)
+    },
+    goBack () {
+      window.history.back()
     },
     //
     show (e) {

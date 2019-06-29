@@ -498,6 +498,59 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadEmployeesBGT ({commit, state}, filter) {
+      let convertString = function (str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+        str = str.replace(/đ/g, 'd')
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+        str = str.replace(/Đ/g, 'D')
+        str = str.replace(/_/g, '')
+        str = str.toLocaleLowerCase().replace(/\s/g, '')
+        return str
+      }
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get(state.endPoint + '/employees', param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                employees = employees.filter(function (item) {
+                  return convertString(item['jobPosTitle']).indexOf('canbotiepnhan') >= 0
+                })
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [employees.length, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     // 
     loadEmployeesMotcua ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
@@ -527,10 +580,8 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
         })
       })
@@ -655,7 +706,6 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param
           param = {
-            // workingunit: filter.workingunit,
             employeeName: filter.employeeName,
             start: filter.start,
             end: filter.end

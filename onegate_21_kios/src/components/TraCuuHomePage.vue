@@ -52,7 +52,7 @@
           </v-flex>
         </v-layout>
         <div style="max-width:1300px;margin:0 auto">
-          <v-flex class="my-3 mx-3">
+          <v-flex class="mt-3 mx-3">
             <v-toolbar height="42" color="#0b72ba" dark flat>
               <v-toolbar-title v-if="!activeDetailDossier" style="font-size: 16px !important;">Kết quả tìm kiếm <span>: {{dossierList.length}} hồ sơ</span></v-toolbar-title>
               <v-toolbar-title v-else style="font-size: 16px !important;">Thông tin chi tiết hồ sơ</v-toolbar-title>
@@ -125,7 +125,7 @@
               </div>
             </div>
           </div>
-          <div class="mx-3 mt-3" v-if="validateTracuu === true && activeDetailDossier">
+          <div class="mx-3 mt-0" v-if="validateTracuu === true && activeDetailDossier" style="border: 1px solid #0b72ba;">
             <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
           </div>
         </div>
@@ -215,9 +215,6 @@ export default {
   computed: {
     filterDossierKey () {
       return this.$store.getters.getFilterDossierKey
-    },
-    fullScreen () {
-      return this.$store.getters.getFullScreen
     }
   },
   created () {
@@ -327,7 +324,7 @@ export default {
       var vm = this
       vm.hosoDatasPage += 1
       vm.loadingTable = true
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       var filter = null
       filter = {
         page: vm.hosoDatasPage,
@@ -347,8 +344,8 @@ export default {
       let vm = this
       vm.dossierList = []
       vm.loadingTable = true
-      let currentQuery = router.history.current.query
-      var filter = null
+      let currentQuery = vm.$router.history.current.query
+      let filter = null
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
         dossierNo: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',

@@ -120,8 +120,10 @@ export const store = new Vuex.Store({
                 groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
               },
               params: {
-                // start: state.questionPage * 20 - 20,
-                // end: state.questionPage * 20
+                start: state.questionPage * 20 - 20,
+                end: state.questionPage * 20,
+                govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+                keyword: filter.keyword ? filter.keyword : ''
               }
             }
           } else {
@@ -130,9 +132,11 @@ export const store = new Vuex.Store({
                 groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
               },
               params: {
-                // start: state.questionPage * 20 - 20,
-                // end: state.questionPage * 20,
-                publish: 1
+                start: state.questionPage * 20 - 20,
+                end: state.questionPage * 20,
+                publish: 1,
+                govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+                keyword: filter.keyword ? filter.keyword : ''
               }
             }
           }
@@ -185,6 +189,7 @@ export const store = new Vuex.Store({
           dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('email', filter.email ? filter.email : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
+          dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           axios.post(url, dataAdd, param).then(response => {
             if (response['status'] !== undefined && response['status'] === 203) {

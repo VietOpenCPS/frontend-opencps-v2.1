@@ -1,5 +1,5 @@
 <template>
-  <v-app @mousemove="stopInterval()" @click="stopInterval()" style="background-image: url(/o/opencps-store/js/kios/img/bg_trangchu.png);
+  <v-app @mousemove="stopInterval()" @click="stopInterval()" style="background-image: url(/o/opencps-store/js/kios/img/bg_content.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: 120% 110%;">
@@ -66,14 +66,28 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let elem = document.documentElement
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen()
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen()
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen()
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen()
+        }
+        $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 170px)" )
         $('.navbar-container').css('display', 'none')
-        vm.setInterval()
+        let hrefs = window.location.href
+        if (hrefs.indexOf('tra-cuu-ho-so-homepage') < 0) {
+          vm.setInterval()
+        }
         $(window).scroll(function () {
           vm.enableToTop = $(window).scrollTop() > 200
         })
         $('#navigation').css('display', 'none')
-        let current = vm.$router.history.current
-        let newQuery = current.query
         vm.$store.commit('setGroupid', newQuery.hasOwnProperty('groupIds') ? newQuery['groupIds'] : '')
         if (!newQuery.hasOwnProperty('secretKey')) {
           // vm.setInterval()
@@ -105,6 +119,17 @@
         $('#navigation').css('display', 'none')
         $('.navbar-container').css('display', 'none')
       })
+      let elem = document.documentElement
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen()
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen()
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen()
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen()
+      }
+      $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 170px)" )
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
     },

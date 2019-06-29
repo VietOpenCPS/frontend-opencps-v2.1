@@ -699,7 +699,7 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 class="px-2">
+              <v-flex xs12 class="px-2" style="position:relative">
                 <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
                 <v-text-field
                   placeholder="Nhập tên người làm thủ tục"
@@ -708,6 +708,10 @@
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
                 ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2 text-bold">Địa chỉ:</div>
@@ -844,7 +848,7 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 class="px-2">
+              <v-flex xs12 class="px-2" style="position:relative">
                 <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
                 <v-text-field
                   placeholder="Nhập tên người làm thủ tục"
@@ -853,6 +857,10 @@
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
                 ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
               </v-flex>
               <v-flex xs12 class="px-2">
                 <div class="my-2 text-bold">Địa chỉ:</div>
@@ -1206,7 +1214,8 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    applicantTypeGuide: true
   }),
   computed: {
     loadingDynamicBtn () {
@@ -2189,7 +2198,8 @@ export default {
           typeCode: 'DOC_03',
           partNo: partNoRequired.toString(),
           applicantNote: vm.applicantNoteGuide,
-          type: 'completed'
+          type: 'completed',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
         }
         if (type === 'doc') {
           filter['reportType'] = 'word'
@@ -2227,7 +2237,8 @@ export default {
           govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
           typeCode: 'DOC_03',
           applicantNote: vm.applicantNoteGuide,
-          type: 'denied'
+          type: 'denied',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
         }
         if (type === 'doc') {
           filter['reportType'] = 'word'

@@ -9,10 +9,10 @@
   </div>
   <div v-else class="px-2 pt-2" style="height: 100%;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
-      <v-container align-center row wrap>
-        <v-flex xs12 lg10>
+      <v-container align-center row wrap style="font-size:1.5em">
+        <v-flex xs12 style="border: 1px solid #0072bc">
           <v-layout row wrap>
-            <v-flex xs12 sm12>
+            <v-flex xs12 sm12 class="py-3">
               <v-layout wrap class="px-2">
                 <v-flex xs4 sm3 class="mt-1" style="text-align: center!important;max-height: 200px">
                   <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'"
@@ -22,10 +22,11 @@
                   style="width: 100%;max-width: 150px;height: 200px;object-fit: contain;opacity:0.6;background: #ddd"/>
                 </v-flex>
                 <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">
-                  <div class="text-bold primary--text" style="font-size:1.5em">{{employeeSelected.fullName}}</div>
-                  <div class="primary--text" v-if="employeeSelected.jobPosTitle || employeeSelected.workingUnitName">
-                    {{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}
+                  <div class="primary--text">
+                    Cán bộ tiếp nhận
                   </div>
+                  <div class="text-bold primary--text text-bold">{{employeeSelected.fullName}}</div>
+                  <div class="mb-2" v-if="employeeSelected.agencyName">{{employeeSelected.agencyName}}</div>
                   <div class="mb-2">Email: {{employeeSelected.email}}</div>
                   <!--  -->
                   <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
@@ -33,7 +34,7 @@
                     <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
                   </div>
                   <!--  -->
-                  <div v-if="!isMobile">
+                  <!-- <div v-if="!isMobile">
                     <div v-for="(item, index) in votingItems" :key="index" >
                       <div class="text-bold primary--text">* {{ item.subject }}</div>
                       <div class="ml-3">
@@ -44,7 +45,7 @@
                         </v-radio-group>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </v-flex>
               </v-layout>
               <div v-if="isMobile">
@@ -61,17 +62,56 @@
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex xs12 sm12 class="text-xs-center my-3">
-          <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">
+        <v-flex xs12 class="py-2 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0">
+          <div v-for="(item, index) in votingItems" :key="index" >
+            <div class="text-bold primary--text">* {{ item.subject }}</div>
+            <div class="ml-3">
+              <v-radio-group class="py-0" v-model="item.selected" height="10" row>
+                <v-radio class="mr-4" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                  <div :class="item.selected === indexChoise + 1 ? 'primary--text' : 'black--text'" slot="label"
+                  style="font-size: 16px;font-weight: bold;"
+                  >{{itemChoise}}</div>
+                </v-radio>
+              </v-radio-group>
+            </div>
+          </div>
+        </v-flex>
+        <v-flex xs12 row wrap v-if="!isSigned" class="py-3" :class="visible ? 'input_voting_fixed' : ''">
+          <!-- <v-form v-model="validFormVoting" ref="formVoting" lazy-validation> -->
+            <v-layout row wrap>
+              <v-flex xs12 sm6 class="pr-2">
+                <div>Nhập số CMND/ Hộ chiếu <span style="color:red">*</span></div>
+                <div class="input-custom">
+                  <input id="applicantIdNo" type="text" @focus="show" required="required" />
+                  <span class="bar"></span>
+                  <!-- <label for="applicantIdNo">Số CMND/ Hộ chiếu</label> -->
+                </div>
+              </v-flex>
+              <v-flex xs12 sm6 class="pl-2">
+                <div>Nhập mã hồ sơ <span style="color:red">*</span></div>
+                <div class="input-custom">
+                  <input id="dossierNo" type="text" @focus="show" required="required" />
+                  <span class="bar"></span>
+                  <!-- <label for="dossierNo">Mã hồ sơ</label> -->
+                </div>
+              </v-flex>
+            </v-layout>
+          <!-- </v-form> -->
+        </v-flex>
+        <v-flex xs12 class="text-xs-center my-3">
+          <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary" style="width: 150px;height: 36px;"
+          :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">
+            <v-icon size="16">done_all</v-icon>&nbsp;
             Gửi đánh giá
           </v-btn>
-          <v-btn @click="goBack" color="primary">
+          <v-btn @click="goBack" color="primary" style="width: 150px;height: 36px;">
             <v-icon size="16">reply</v-icon>&nbsp;
             Quay lại 
           </v-btn>
         </v-flex>
       </v-container>
-      <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
+
+      <!-- <v-dialog v-model="dialogShowApplicantIdNo" persistent max-width="400">
         <v-form v-model="validFormVoting" ref="formVoting" lazy-validation class="dialog-submit-voting">
           <v-card>
             <v-toolbar flat dark color="primary">
@@ -84,13 +124,6 @@
             <v-card-text>
               <v-layout row wrap>
                 <v-flex xs12 sm12>
-                  <!-- <v-text-field
-                  box
-                  label="Số chứng minh thư nhân dân"
-                  v-model="applicantIdNo"
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                  required
-                  ></v-text-field> -->
                   <div class="input-custom">
                     <input id="applicantIdNo" type="text" @focus="show" required="required" />
                     <span class="bar"></span>
@@ -98,13 +131,6 @@
                   </div>
                 </v-flex>
                 <v-flex xs12 sm12 class="mt-3">
-                  <!-- <v-text-field
-                  box
-                  label="Mã hồ sơ"
-                  v-model="dossierNo"
-                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
-                  required
-                  ></v-text-field> -->
                   <div class="input-custom">
                     <input id="dossierNo" type="text" @focus="show" required="required" />
                     <span class="bar"></span>
@@ -120,7 +146,8 @@
             </v-card-actions>
           </v-card>
         </v-form>
-      </v-dialog>
+      </v-dialog> -->
+      
     </v-form>
     <!-- <v-btn v-if="!isMobile" class="back-btn" @click="changeScreen" fab color="primary">
       <v-icon v-if="!fullScreen" dark>fullscreen</v-icon>
@@ -168,7 +195,8 @@ export default {
     options: {
       useKbEvents: true,
       preventClickEvent: false
-    }
+    },
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
   }),
   computed: {
     loading () {
@@ -230,14 +258,35 @@ export default {
       if (isSigned) {
         vm.doVottingResultSubmit()
       } else {
-        vm.dialogShowApplicantIdNo = true
+        vm.applicantIdNo = $('#applicantIdNo').val()
+        vm.dossierNo = $('#dossierNo').val()
+        console.log('xacthuc', vm.applicantIdNo, vm.dossierNo)
+        if (!vm.dossierNo || !vm.applicantIdNo) {
+          toastr.error('Vui lòng điền đầy đủ thông tin xác thực')
+        } else {
+          let filter = {
+            applicantIdNo: vm.applicantIdNo,
+            dossierNo: vm.dossierNo
+          }
+          vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
+            console.log('result', result)
+            if (result.hasPermission === true || result.hasPermission === 'true') {
+              vm.doVottingResultSubmit()
+            } else {
+              vm.visible = false
+              toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
+            }
+          }).catch(xhr => {
+            toastr.error('Lỗi hệ thống')
+          })
+        }
       }
     },
     doVottingSubmit () {
       var vm = this
       vm.applicantIdNo = $('#applicantIdNo').val()
       vm.dossierNo = $('#dossierNo').val()
-      if (!vm.dossierNo || !vm.dossierNo) {
+      if (!vm.dossierNo || !vm.applicantIdNo) {
         toastr.error('Vui lòng điền đầy đủ thông tin xác thực')
       } else {
         let filter = {
@@ -249,6 +298,7 @@ export default {
           if (result.hasPermission === true || result.hasPermission === 'true') {
             vm.doVottingResultSubmit()
           } else {
+            vm.visible = false
             toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
           }
         }).catch(xhr => {
@@ -265,11 +315,15 @@ export default {
         arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
       }
       Promise.all(arrAction).then(results => {
+        vm.visible = false
         toastr.success('Gửi đánh giá thành công')
-        vm.dialogShowApplicantIdNo = false
         vm.getVotingEmployee()
+        setTimeout(function () {
+          window.history.back()
+        }, 2000)
       }).catch(xhr => {
         toastr.error('Gửi đánh giá thất bại')
+        vm.visible = false
       })
     },
     changeScreen () {

@@ -3,17 +3,17 @@
     <div>
       <v-card color="transparent" flat class="mb-0" style="">
         <div>
-          <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
+          <!-- <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase;font-size: 1.2em !important;">
             {{agencies[0]['administrationName']}}
-          </h4>
+          </h4> -->
           <h4 class="py-2 mx-3 text-xs-center">
-            <span style="color:#065694">DANH SÁCH HỒ SƠ TIẾP NHẬN NGÀY {{fromDate()}} 
+            <span style="color:#065694;font-size: 1.2em !important;">DANH SÁCH HỒ SƠ TIẾP NHẬN NGÀY {{fromDate()}} 
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
           </h4>
           <div class="py-3 mx-3"> 
             <v-layout wrap class="mb-3">
-              <v-flex xs12 sm6 offset-sm6>
+              <v-flex xs12 sm6 offset-sm3>
                 <!-- <v-text-field class="input-border input-search"
                   label="Mã hồ sơ/ tên chủ hồ sơ"
                   v-model="dossierNoKey"
@@ -27,7 +27,21 @@
                   <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="searchKeyword" required="required" />
                   <span class="bar"></span>
                   <label for="dossierNoKey">Mã hồ sơ, tên chủ hồ sơ</label>
-                  <v-icon class="icon-prepend text-bold" size="18" @click="searchKeyword">search</v-icon>
+                  <!-- <v-icon class="icon-prepend text-bold" size="18" @click="searchKeyword">search</v-icon> -->
+                  <v-btn color="primary"
+                    @click="searchKeyword"
+                    class="kios-btn"
+                    style="top: -5px;
+                    position: absolute;
+                    right: -4px;
+                    height: 48px !important;
+                    border-bottom-left-radius: 0px;"
+                  >
+                    <v-icon size="20">search</v-icon>
+                    &nbsp;
+                    Tra cứu
+                    <span slot="loader">Loading...</span>
+                  </v-btn>
                 </div>
               </v-flex>
             </v-layout>
@@ -36,7 +50,7 @@
             </content-placeholders>
             <div v-else>
               <div v-if="dossierList.length > 0">
-                <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)">
+                <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" style="background: transparent;">
                   <v-carousel-item
                     v-for="i in totalPages"
                     :key="i"
@@ -87,6 +101,10 @@
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn> -->
+        <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+          <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+          Quay lại 
+        </v-btn>
       </v-card>
       <div class="virtual-keyboard" v-if="visible && !isMobile">
         <v-btn small fab color="#383533" @click="visible = false" style="position:absolute;right:0;top:0">
@@ -141,13 +159,13 @@ export default {
         text: 'Ngày nộp',
         align: 'center',
         sortable: false,
-        width: '100px'
+        width: '200px'
       },
       {
         text: 'Ngày tiếp nhận',
         align: 'center',
         sortable: false,
-        width: '130px'
+        width: '200px'
       }
     ],
     visible: false,
@@ -177,7 +195,9 @@ export default {
     let currentQuery = vm.$router.history.current.query
     let keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
     vm.dossierNoKey = keyword
-    $('#dossierNoKey').val(vm.dossierNoKey)
+    setTimeout (function () {
+      $('#dossierNoKey').val(vm.dossierNoKey)
+    }, 300)
     vm.$nextTick(function () {
       vm.$store.commit('setFullScreen', false)
       vm.$store.dispatch('agencies').then(function (result) {
@@ -200,10 +220,22 @@ export default {
       vm.searchDossier()
     }
   },
+  mounted () {
+    let vm = this
+    let currentQuery = vm.$router.history.current.query
+    let keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+    vm.dossierNoKey = keyword
+    setTimeout (function () {
+      $('#dossierNoKey').val(vm.dossierNoKey)
+    }, 300)
+  },
   methods: {
     changeItem (event) {
       let vm = this
       vm.pagination.page = event + 1
+    },
+    goBack () {
+      window.history.back()
     },
     /*
     doLoadingDataHoSo () {
@@ -257,6 +289,7 @@ export default {
     */
     searchKeyword () {
       let vm = this
+      vm.visible = false
       vm.dossierNoKey = $('#dossierNoKey').val()
       let keyword = vm.dossierNoKey !== null && vm.dossierNoKey !== 'null' ? vm.dossierNoKey : ''
       vm.$router.push({

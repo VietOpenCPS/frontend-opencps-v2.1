@@ -1,17 +1,20 @@
 <template>
-  <div>    
+  <div style="background-image: url(/o/opencps-store/js/kios/img/bg_kios_bgt.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 120% 110%;">    
     <v-content>
 			<div class="px-3 pt-2">
 				<img src="/o/opencps-store/js/kios/img/logo_banner.png" alt="">
 			</div>
       <section class="py-3" :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''"  style="height: calc(100vh - 170px)">
         <div :class="isKios ? 'tab-item' : ''">
-          <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
+          <div v-if="!fullScreen" class="left mt-5" :class="fullScreen ? 'smallScreen' : ''">
             <v-container class="px-3" grid-list-xl style="height: 100%;">
               <v-layout column style="height: 100%;">
                 <v-flex class="item-menu py-0" style="height: 85px">
                   <a href="javascript:;" class="active" @click="goPage('ketquahoso')" >
-                    <p class="icon px-2" ><img src="/o/opencps-store/js/kios/img/icons-document.png"></p>
+                    <p class="icon pl-3" ><img src="/o/opencps-store/js/kios/img/icons-document.png"></p>
                     <p class="ml-2 my-0">
                       <span class="">Tra cứu hồ sơ đã có kết quả</span>
                     </p>
@@ -19,7 +22,7 @@
                 </v-flex>
                 <v-flex class="item-menu py-0" style="height: 85px">
                   <a href="javascript:;" class="active" @click="goPage('tiepnhanhoso')">
-                    <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icons8-open-file-50.png"></p>
+                    <p class="icon pl-3"><img src="/o/opencps-store/js/kios/img/icons8-open-file-50.png"></p>
                     <p class="ml-2 my-0">
                       <span class="">Tra cứu hồ sơ đã tiếp nhận</span>
                     </p>
@@ -27,7 +30,7 @@
                 </v-flex>
                 <v-flex class="item-menu py-0" style="height: 85px">
                   <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-                    <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icons-search-50.png"></p>
+                    <p class="icon pl-3"><img src="/o/opencps-store/js/kios/img/icons-search-50.png"></p>
                     <p class="ml-2 my-0">
                       <span class="">Tra cứu thông tin hồ sơ</span>
                     </p>
@@ -35,7 +38,7 @@
                 </v-flex>
                 <v-flex class="item-menu py-0" style="height: 85px">
                   <a href="javascript:;" @click="goPage('tracuuthutuc')">
-                    <p class="icon px-2"><img src="/o/opencps-store/js/kios/img/icon-search-dc-50.png"></p>
+                    <p class="icon pl-3"><img src="/o/opencps-store/js/kios/img/icon-search-dc-50.png"></p>
                     <p class="ml-2 my-0">
                       <span class="">Tra cứu thủ tục</span>
                     </p>
@@ -43,7 +46,7 @@
                 </v-flex>
                 <v-flex class="item-menu py-0" style="height: 85px">
                   <a href="javascript:;" @click="goPage('danhgia')">
-                    <p class="icon pl-1 pr-2"><img src="/o/opencps-store/js/kios/img/icon-evaluation.png"></p>
+                    <p class="icon pl-3 pr-2"><img src="/o/opencps-store/js/kios/img/icon-evaluation.png"></p>
                     <p class="ml-2 my-0">
                       <span class="">Đánh giá cán bộ</span>
                     </p>
@@ -53,23 +56,28 @@
             </v-container>
           </div>
           <div class="right" :class="fullScreen ? 'fullScreen' : ''">
-            <div class="right-content" style="background-image: url('/o/opencps-store/js/kios/img/logo_trangchu.png');
+            <!-- <div class="right-content" style="background-image: url('/o/opencps-store/js/kios/img/logo_trangchu.png');
             background-position: right top;
             background-repeat: no-repeat;
             background-size: 95% 100%">
               
-            </div>
+            </div> -->
+            <v-flex class="px-3 pt-2 text-xs-center">
+              <img src="/o/opencps-store/js/kios/img/logo_kios_bgt.png" alt="" style="width:30%;margin-top: 150px;
+              box-shadow: 0px 0px 5px 5px #04407a;border-radius: 50%;">
+              <h2 class="white--text mt-4" style="">CHUNG TAY CẢI CÁCH THỦ TỤC HÀNH CHÍNH</h2>
+            </v-flex>
           </div>
         </div>
       </section>
       <div class="px-3" style="height:70px">
 				<v-flex class="px-0" style="color:#0669b2">
-          <div class="text-bold d-inline-block">
+          <!-- <div class="text-bold d-inline-block">
             BỘ GIAO THÔNG VẬN TẢI <br>
             TRUNG TÂM CÔNG NGHỆ THÔNG TIN
-          </div>
-          <div class="d-inline-block right">
-            Bản quyền thuộc về Bộ Giao thông vận tải
+          </div> -->
+          <div class="d-inline-block right white--text pt-4">
+            	&copy; TRUNG TÂM CÔNG NGHỆ THÔNG TIN - BỘ GIAO THÔNG VẬN TẢI
           </div>
         </v-flex>
 			</div>

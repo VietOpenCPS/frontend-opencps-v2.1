@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-card color="transparent" flat class="pb-3">
           <h2 class="text-xs-center py-2 my-0" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h2>
-          <h2 class="text-xs-center pb-2 my-0" style="color:green" v-if="agencyName">{{agencyName}}</h2>
+          <!-- <h2 class="text-xs-center pb-2 my-0" style="color:green" v-if="agencyName">{{agencyName}}</h2> -->
           <div v-if="employeeItems.length > 0">
             <v-container fluid grid-list-md>
               <v-layout row wrap>
@@ -22,9 +22,9 @@
                           <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                         </v-flex>
                         <v-flex xs8 class="pt-2" style="word-wrap: break-word;">
-                          <div class="primary--text">{{employee.jobPosTitle}}</div>
+                          <div class="primary--text">Cán bộ tiếp nhận</div>
                           <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
-                          <div>{{employee.workingUnitName}}</div>
+                          <div>{{agencyName}}</div>
                           <div >Email: {{employee.email}}</div>
                         </v-flex>
                       </v-layout>
@@ -73,6 +73,10 @@
       <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn> -->
+    <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+      <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+      Quay lại 
+    </v-btn>
   </div>
 </template>
 
@@ -218,6 +222,7 @@ export default {
     },
     viewDetailEmployee (item) {
       var vm = this
+      item.agencyName = vm.agencyName
       vm.$store.commit('setEmployeeSelected', item)
       vm.$router.push({
         path: '/danh-sach-can-bo/' + item.employeeId,

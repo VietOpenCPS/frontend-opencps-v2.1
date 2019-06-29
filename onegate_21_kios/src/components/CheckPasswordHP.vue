@@ -15,7 +15,6 @@
                     placeholder="Mã tra cứu"
                     v-model="secretKey"
                     prepend-inner-icon="vpn_key"
-                    @keyup.enter="submitPass"
                     height="42"
                     :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
                     required
@@ -139,6 +138,8 @@ export default {
       var vm = this
       if (vm.$refs.form.validate()) {
         vm.validPass = true
+        let newQuery = vm.$router.history.current.query
+        vm.targetCheckPass = newQuery['target']
         if (vm.targetCheckPass === 'tracuuhoso') {
           let payload = {
             dossierNo: vm.filterDossierKey.dossierNo ? vm.filterDossierKey.dossierNo : '',

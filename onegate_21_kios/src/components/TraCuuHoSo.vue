@@ -2,11 +2,11 @@
   <div class="py-0 kios-item">
     <div>
       <v-card color="transparent" flat class="pb-2" style="">
-        <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
+        <!-- <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase;font-size: 1.2em !important;">
           {{agencies[0]['administrationName']}}
-        </h4>
-        <h4 class="py-2 ml-2 text-xs-center">
-          <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
+        </h4> -->
+        <h4 class="py-4 ml-2 text-xs-center">
+          <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
           <div :style="!isMobile ? 'width: calc(100% - 120px)' : 'width: 100%'">
@@ -39,11 +39,12 @@
               :loading="loadingTable"
               :disabled="loadingTable"
               @click="filterDossier"
-              class="kios-btn mx-0"
+              class="kios-btn mx-0 my-0"
+              style="height: 48px !important;"
             >
-              <v-icon size="18">search</v-icon>
+              <v-icon style="font-size: 22px !important;">search</v-icon>
               &nbsp;
-              Tra Cứu
+              Tra cứu
               <span slot="loader">Loading...</span>
             </v-btn>
           </div>
@@ -117,6 +118,10 @@
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn> -->
+        <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+          <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+          Quay lại 
+        </v-btn>
       </v-card>
       <v-dialog v-model="dialogError" persistent max-width="290">
         <v-card>
@@ -405,7 +410,7 @@ export default {
       let vm = this
       vm.dossierList = []
       vm.loadingTable = true
-      let currentQuery = router.history.current.query
+      let currentQuery = vm.$router.history.current.query
       var filter = null
       let groupIds = vm.groupIdArr.length
       if (groupIds > 0) {
@@ -515,6 +520,9 @@ export default {
     changeScreen () {
       var vm = this
       vm.$store.commit('setFullScreen', !vm.fullScreen)
+    },
+    goBack () {
+      window.history.back()
     },
     paggingData (config) {
       let vm = this

@@ -70,7 +70,7 @@
               <v-expansion-panel-content style="border-radius:5px">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px">$vuetify.icons.expand</v-icon>
                 <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
-                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 10 - 10 + indexQuestion + 1}}: </span>
+                  <span class="text-bold primary--text">Câu hỏi {{questionPage * 20 - 20 + indexQuestion + 1}}: </span>
                   <div class="primary--text" v-html="itemQuestion.content.split('&&')[0]"></div>
                 </div>
                 <div v-if="loadingAnswer">
@@ -135,12 +135,12 @@
             </v-alert>
           </div>
         </div>
-        <!-- <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-2" style="position: relative;">
-          <div class="flex pagging-table px-2"> 
+        <div v-if="totalQuestion > 0" class="text-xs-right layout wrap mt-4" style="position: relative;">
+          <div class="flex pagging-table"> 
             <tiny-pagination :total="totalQuestion" :page="questionPage" custom-class="custom-tiny-class" 
               @tiny:change-page="paggingData" ></tiny-pagination> 
           </div>
-        </div> -->
+        </div>
       </v-flex>
       <v-flex xs12 sm5 v-if="!getUser('Administrator')">
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
@@ -223,7 +223,7 @@
                   required
                 ></v-textarea>
               </v-flex>
-              <v-flex xs12 v-if="captchaActive" style="margin:0 auto">
+              <v-flex xs12 style="margin:0 auto">
                 <captcha ref="captcha"></captcha>
               </v-flex>
               <v-flex xs12>
@@ -323,7 +323,7 @@
                     required
                   ></v-textarea>
                 </v-flex>
-                <v-flex xs12 v-if="captchaActive" style="margin:0 auto">
+                <v-flex xs12 style="margin:0 auto">
                   <captcha ref="captcha"></captcha>
                 </v-flex>
               </v-layout>
@@ -374,13 +374,8 @@ export default {
   data: () => ({
     agencyList: [
       {
-        agencyName: 'Cơ quan Bộ Giao thông vận tải',
-        agencyCode: 'BGTVT_VPB',
-        groupId: '63785'
-      },
-      {
         agencyName: 'Tổng Cục Đường bộ Việt Nam',
-        agencyCode: 'BGTVT_DB',
+        agencyCode: 'CDBVN',
         groupId: '35243'
       },
       {
@@ -390,22 +385,22 @@ export default {
       },
       {
         agencyName: 'Cục Đường thủy nội địa Việt Nam',
-        agencyCode: 'BGTVT_DTND',
+        agencyCode: 'CDTVN',
         groupId: '53152'
       },
       {
         agencyName: 'Cục Hàng hải Việt Nam',
-        agencyCode: 'BGTVT_HH',
+        agencyCode: 'CHHVN',
         groupId: '51801'
       },
       {
         agencyName: 'Cục Hàng không Việt Nam',
-        agencyCode: 'BGTVT_HK',
+        agencyCode: 'CHKVN',
         groupId: '51883'
       },
       {
         agencyName: 'Cục Đăng kiểm Việt Nam',
-        agencyCode: 'BGTVT_DK',
+        agencyCode: 'CDKVN',
         groupId: '53084'
       }
     ],
@@ -597,15 +592,14 @@ export default {
         toastr.error('Mã captcha không chính xác')
         return
       } else if (vm.content) {
-        let agencyCode = vm.agencySelected ? '&&' + vm.agencySelected.agencyCode : ''
         if (vm.$refs.form.validate()) {
           let filter = {
-            // groupId: vm.agencySelected.groupId,
-            content: vm.content + agencyCode,
+            content: vm.content,
             fullname: vm.fullName,
             email: vm.contactEmail,
             publish: 0,
-            j_captcha_response: vm.$refs.captcha.j_captcha_response
+            j_captcha_response: vm.$refs.captcha.j_captcha_response,
+            agencyCode: vm.agencyFilterSelected ? vm.agencyFilterSelected['agencyCode'] : ''
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
             toastr.success('Hệ thống đã tiếp nhận câu hỏi của bạn')

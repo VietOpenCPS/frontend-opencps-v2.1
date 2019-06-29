@@ -4,7 +4,7 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
-      <v-layout class="wrap">
+      <v-layout class="wrap pb-3">
         <div class="pb-2" style="width: 100px">
           <v-chip class="mx-0 my-0" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
             Mức độ {{serviceDetail.maxLevel}}
@@ -94,9 +94,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
         <v-icon dark>arrow_back</v-icon>
-      </v-btn>
+      </v-btn> -->
     </div>
   </div>
 </template>
