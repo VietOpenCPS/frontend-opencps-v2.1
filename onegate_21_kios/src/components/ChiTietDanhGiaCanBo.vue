@@ -8,6 +8,13 @@
     ></v-progress-circular>
   </div>
   <div v-else class="px-2 pt-2" style="height: 100%;">
+    <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+      <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
+    </v-btn>
+    <!-- <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+      <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+      Quay lại 
+    </v-btn> -->
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-container align-center row wrap style="font-size:1.5em">
         <v-flex xs12 style="border: 1px solid #0072bc">
@@ -23,7 +30,7 @@
                 </v-flex>
                 <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">
                   <div class="primary--text">
-                    Cán bộ tiếp nhận
+                    {{employeeSelected.titleJobpos ? employeeSelected.titleJobpos : 'Cán bộ tiếp nhận'}}
                   </div>
                   <div class="text-bold primary--text text-bold">{{employeeSelected.fullName}}</div>
                   <div class="mb-2" v-if="employeeSelected.agencyName">{{employeeSelected.agencyName}}</div>
@@ -82,7 +89,7 @@
               <v-flex xs12 sm6 class="pr-2">
                 <div>Nhập số CMND/ Hộ chiếu <span style="color:red">*</span></div>
                 <div class="input-custom">
-                  <input id="applicantIdNo" type="text" @focus="show" required="required" />
+                  <input id="applicantIdNo" type="text" @focus="show" />
                   <span class="bar"></span>
                   <!-- <label for="applicantIdNo">Số CMND/ Hộ chiếu</label> -->
                 </div>
@@ -90,7 +97,7 @@
               <v-flex xs12 sm6 class="pl-2">
                 <div>Nhập mã hồ sơ <span style="color:red">*</span></div>
                 <div class="input-custom">
-                  <input id="dossierNo" type="text" @focus="show" required="required" />
+                  <input id="dossierNo" type="text" @focus="show" />
                   <span class="bar"></span>
                   <!-- <label for="dossierNo">Mã hồ sơ</label> -->
                 </div>

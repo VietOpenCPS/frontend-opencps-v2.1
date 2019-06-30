@@ -22,7 +22,7 @@
                           <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                         </v-flex>
                         <v-flex xs8 class="pt-2" style="word-wrap: break-word;">
-                          <div class="primary--text">Cán bộ tiếp nhận</div>
+                          <div class="primary--text">{{employee.titleJobpos ? employee.titleJobpos : 'Cán bộ tiếp nhận'}}</div>
                           <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
                           <div>{{agencyName}}</div>
                           <div >Email: {{employee.email}}</div>
@@ -73,6 +73,9 @@
       <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
       <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
     </v-btn> -->
+    <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+      <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
+    </v-btn>
     <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
       <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
       Quay lại 

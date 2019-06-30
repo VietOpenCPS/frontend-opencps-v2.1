@@ -1800,3 +1800,10 @@ main .v-content {
     max-width: 1300px;
     margin: 0 auto;
  }
+ .back-home {
+    position: absolute !important;
+    top: 0;
+    left: 10px;
+    width: 48px !important;
+    height: 48px !important;
+}

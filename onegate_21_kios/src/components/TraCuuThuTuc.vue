@@ -45,7 +45,7 @@
             box
           ></v-text-field> -->
           <div class="input-custom">
-            <input id="serviceNameKey" type="text" @focus="show" @keyup.enter="filterServiceinfos('keyword')" required="required" />
+            <input id="serviceNameKey" type="text" @focus="show" @keyup.enter="filterServiceinfos('keyword')" />
             <span class="bar"></span>
             <label for="serviceNameKey">Tên thủ tục hành chính</label>
             <v-icon class="icon-prepend text-bold" size="18" @click="filterServiceinfos('keyword')">search</v-icon>

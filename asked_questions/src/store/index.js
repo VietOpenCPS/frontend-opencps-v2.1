@@ -18,38 +18,6 @@ export const store = new Vuex.Store({
     index: 0,
     indexQuestion: 0,
     questionListDefault: [
-      {
-        questionId: 101,
-        createDate: "30/01/2019 17:16:38",
-        fullname: "Nguyễn Văn A",
-        email: "nguyenvana@gmail.com",
-        content: 'Làm thế nào để nộp hồ sơ?',
-        publish: 1
-      },
-      {
-        questionId: 102,
-        createDate: "30/01/2019 17:16:38",
-        fullname: "Nguyễn Văn A",
-        email: "nguyenvana@gmail.com",
-        content: 'Làm thế nào để tra cứu hồ sơ sau khi đã nộp?',
-        publish: 1
-      },
-      {
-        questionId: 103,
-        createDate: "30/01/2019 17:16:38",
-        fullname: "Nguyễn Văn A",
-        email: "nguyenvana@gmail.com",
-        content: 'Cần chuẩn bị gì khi thực hiện giao dịch tại Trung tâm Hành Chính Công?',
-        publish: 1
-      },
-      {
-        questionId: 104,
-        createDate: "30/01/2019 17:16:38",
-        fullname: "Nguyễn Văn A",
-        email: "nguyenvana@gmail.com",
-        content: 'Sau bao lâu tôi nhận được kết quả giải quyết?',
-        publish: 1
-      }
     ],
     questionList: [],
     questionDetail: '',

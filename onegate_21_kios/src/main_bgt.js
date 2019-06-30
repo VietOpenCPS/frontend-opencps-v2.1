@@ -14,6 +14,12 @@ import axios from 'axios'
 axios.defaults.headers.common['Token'] = window.Liferay ? window.Liferay.authToken : ''
 Vue.mixin({
   methods: {
+    goHome () {
+      let vm = this
+      vm.$router.push({
+        path: '/'
+      })
+    },
     accept (text) {
       this.hide()
     },

@@ -375,7 +375,7 @@ export default {
     agencyList: [
       {
         agencyName: 'Tổng Cục Đường bộ Việt Nam',
-        agencyCode: 'CDBVN',
+        agencyCode: 'TCDB',
         groupId: '35243'
       },
       {

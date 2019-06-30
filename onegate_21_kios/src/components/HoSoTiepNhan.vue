@@ -24,7 +24,7 @@
                   clearable
                 ></v-text-field> -->
                 <div class="input-custom">
-                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="searchKeyword" required="required" />
+                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="searchKeyword" />
                   <span class="bar"></span>
                   <label for="dossierNoKey">Mã hồ sơ, tên chủ hồ sơ</label>
                   <!-- <v-icon class="icon-prepend text-bold" size="18" @click="searchKeyword">search</v-icon> -->
@@ -49,14 +49,16 @@
               <content-placeholders-text :lines="10" />
             </content-placeholders>
             <div v-else>
+
               <div v-if="dossierList.length > 0">
-                <v-carousel hide-delimiters hide-controls interval="10000" @input="changeItem($event)" style="background: transparent;">
+                <!-- <v-carousel hide-delimiters :hide-controls="dossierList.length <= pagination.rowsPerPage" @input="changeItem($event)"
+                style="height:auto;background:transparent">
                   <v-carousel-item
                     v-for="i in totalPages"
                     :key="i"
                     transition="fade"
                     reverse-transition="fade"
-                  >
+                  > -->
                     <v-data-table
                     :headers="headerTable"
                     :items="dossierList"
@@ -86,14 +88,20 @@
                         </tr>
                       </template>
                     </v-data-table>
-                  </v-carousel-item>
-                </v-carousel>
+                  <!-- </v-carousel-item>
+                </v-carousel> -->
               </div>
               <v-flex xs12 v-else>
                 <v-alert class="mt-3" :value="true" outline color="blue" icon="priority_high">
                   Không có hồ sơ tiếp nhận ngày {{fromDate()}}
                 </v-alert>
               </v-flex>
+              <div v-if="dossierList.length > 15" class="text-xs-center layout wrap mt-2" style="position: relative;">
+                <div class="flex pagging-table px-2">
+                  <tiny-pagination :total="dossierList.length" :page="pagination.page" custom-class="custom-tiny-class" 
+                    @tiny:change-page="paggingData" ></tiny-pagination> 
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -101,6 +109,9 @@
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn> -->
+        <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+          <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
+        </v-btn>
         <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
           <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
           Quay lại 
@@ -121,9 +132,11 @@ import router from '@/router'
 import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import VueTouchKeyBoard from './keyboard.vue'
+import TinyPagination from './pagination2.vue'
 export default {
   props: [],
   components: {
+    'tiny-pagination': TinyPagination,
     'vue-touch-keyboard': VueTouchKeyBoard
   },
   data: () => ({
@@ -134,7 +147,7 @@ export default {
     agencies: [],
     totalPages: 0,
     pagination: {
-      rowsPerPage: 5,
+      rowsPerPage: 15,
       page: 1
     },
     headerTable: [
@@ -230,9 +243,9 @@ export default {
     }, 300)
   },
   methods: {
-    changeItem (event) {
+    paggingData (config) {
       let vm = this
-      vm.pagination.page = event + 1
+      vm.pagination.page = config.page
     },
     goBack () {
       window.history.back()

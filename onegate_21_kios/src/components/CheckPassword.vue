@@ -247,11 +247,11 @@ export default {
         $('.keyboard .enter').unbind('click')
         if (type === 'search') {
           $('.keyboard .enter').bind('click', function () {
-            vm.filterDossier()
+            vm.submitPass()
           })
         } else if (type === 'view') {
           $('.keyboard .enter').bind('click', function () {
-            vm.submitViewDetail()
+            vm.submitPass()
           })
         }
       }, 300)

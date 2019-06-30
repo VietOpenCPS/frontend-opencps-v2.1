@@ -171,6 +171,7 @@
       })
     },
     beforeDestroy () {
+      $('html').removeClass('kios')
       if (typeof window !== 'undefined') {
         window.removeEventListener('resize', this.onResize, { passive: true })
 			}
@@ -178,6 +179,7 @@
 			$('footer').css('display', 'block')
     },
     mounted () {
+      $('html').addClass('kios')
 			$('header').css('display', 'none')
 			$('footer').css('display', 'none')
       this.onResize()

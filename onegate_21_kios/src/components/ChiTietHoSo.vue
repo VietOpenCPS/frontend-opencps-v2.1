@@ -170,9 +170,16 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
-        <v-icon dark>arrow_back</v-icon>
+      <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+        <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
       </v-btn>
+      <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+        <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+        Quay lại 
+      </v-btn>
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
+        <v-icon dark>arrow_back</v-icon>
+      </v-btn> -->
     </div>
   </div>
 </template>
@@ -236,20 +243,26 @@
         var vm = this
         vm.dossierDetail = this.$store.getters.getDetailDossier
         if (vm.dossierDetail.submissionNote) {
-          let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
-          let resultTemp = submissionNote ? submissionNote.data : ''
-          if (resultTemp) {
-            for (var i = 0; i < resultTemp.length; i++) {
-              if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
-                if (!Array.isArray(resultTemp[i]['actions'])) {
-                  let arrActionsTemp = []
-                  arrActionsTemp.push(resultTemp[i]['actions'])
-                  resultTemp[i]['actions'] = arrActionsTemp
+          try {
+            let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
+            let resultTemp = submissionNote ? submissionNote.data : ''
+            if (resultTemp) {
+              for (var i = 0; i < resultTemp.length; i++) {
+                if (resultTemp[i].hasOwnProperty('actions') && resultTemp[i]['actions'] !== null && resultTemp[i]['actions'] !== undefined) {
+                  if (!Array.isArray(resultTemp[i]['actions'])) {
+                    let arrActionsTemp = []
+                    arrActionsTemp.push(resultTemp[i]['actions'])
+                    resultTemp[i]['actions'] = arrActionsTemp
+                  }
                 }
               }
+              vm.dossierActions = resultTemp
             }
-            vm.dossierActions = resultTemp
+          } catch (error) {
+            vm.loadDossierActions()
           }
+        } else {
+          vm.loadDossierActions()
         }
       })
     },

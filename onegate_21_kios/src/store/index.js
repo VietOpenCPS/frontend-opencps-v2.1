@@ -535,6 +535,13 @@ export const store = new Vuex.Store({
                   return convertString(item['jobPosTitle']).indexOf('canbotiepnhan') >= 0
                 })
                 for (let key in employees) {
+                  if (employees[key]['employeeNo'] === 'EMPVPB101') {
+                    employees[key].titleJobpos = 'Trưởng bộ phận'
+                  } else if (employees[key]['employeeNo'] === 'EMPVPB102') {
+                    employees[key].titleJobpos = 'Phó trưởng bộ phận'
+                  } else if (employees[key]['employeeNo'] === 'EMPVPB103' || employees[key]['employeeNo'] === 'EMPVPB104' || employees[key]['employeeNo'] === 'EMPVPB105') {
+                    employees[key].titleJobpos = 'Cán bộ thường trực'
+                  }
                   employees[key].imgSrc = ''
                   employees[key].score = 0
                   employees[key].totalVoting = 0

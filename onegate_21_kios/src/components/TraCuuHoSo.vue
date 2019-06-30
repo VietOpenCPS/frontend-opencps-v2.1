@@ -20,14 +20,14 @@
                   box
                 ></v-text-field> -->
                 <div class="input-custom">
-                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                  <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" />
                   <span class="bar"></span>
                   <label for="dossierNoKey">Mã hồ sơ</label>
                 </div>
               </v-flex>
               <v-flex xs12 md6 class="px-2" :class="isMobile ? 'mt-3' : ''">
                 <div class="input-custom">
-                  <input id="applicantIdNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
+                  <input id="applicantIdNoKey" type="text" @focus="show" @keyup.enter="filterDossier" />
                   <span class="bar"></span>
                   <label for="applicantIdNoKey">Số CMND/ hộ chiếu</label>
                 </div>
@@ -118,6 +118,9 @@
           <v-icon size="20" v-if="!fullScreen" dark>fullscreen</v-icon>
           <v-icon size="20" v-if="fullScreen" dark>fullscreen_exit</v-icon>
         </v-btn> -->
+        <v-btn class="back-home" fab dark color="primary" @click="goHome"> 
+          <v-icon style="font-size: 24px !important;" class="white--text">home</v-icon>
+        </v-btn>
         <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
           <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
           Quay lại 
