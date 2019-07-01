@@ -35,6 +35,7 @@
                   <div class="text-bold primary--text text-bold">{{employeeSelected.fullName}}</div>
                   <div class="mb-2" v-if="employeeSelected.agencyName">{{employeeSelected.agencyName}}</div>
                   <div class="mb-2">Email: {{employeeSelected.email}}</div>
+                  <div class="mb-2">Số điện thoại: (024) 32 151184</div>
                   <!--  -->
                   <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
                     <star-rating read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
@@ -225,6 +226,12 @@ export default {
     vm.$nextTick(function () {
       vm.getVotingEmployee()
     })
+  },
+  beforeDestroy () {
+    $('html').removeClass('dgcb')
+  },
+  mounted () {
+    $('html').addClass('dgcb')
   },
   watch: {
   },

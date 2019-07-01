@@ -114,7 +114,15 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{pageListThuTuc * 10 - 10 + props.index + 1}}</span><br>
+                    <span>{{pageListThuTuc * 15 - 15 + props.index + 1}}</span><br>
+                  </div>
+                </td>
+                <td class="text-xs-left" >
+                  <content-placeholders v-if="loading">
+                    <content-placeholders-text :lines="1" />
+                  </content-placeholders>
+                  <div v-else>
+                    <span>{{props.item.serviceCode}}</span>
                   </div>
                 </td>
                 <td class="text-xs-left" >
@@ -157,7 +165,7 @@
             </template>
           </v-data-table>
         </div>
-        <div v-if="totalPaggingThuTuc > 10" class="text-xs-center layout wrap mt-2" style="position: relative;">
+        <div v-if="totalPaggingThuTuc > 15" class="text-xs-center layout wrap mt-2" style="position: relative;">
           <div class="flex pagging-table px-2">
             <tiny-pagination :total="totalPaggingThuTuc" :page="pageListThuTuc" custom-class="custom-tiny-class" 
               @tiny:change-page="paggingData" ></tiny-pagination> 
@@ -224,6 +232,11 @@ export default {
     headersTable: [
       {
         text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã thủ tục',
         align: 'center',
         sortable: false
       },
@@ -428,6 +441,26 @@ export default {
     },
     doLoadingThuTuc () {
       var vm = this
+      let sortName = function (service) {
+        function compare(a, b) {
+          if (a.domainName > b.domainName)
+            return -1
+          if (a.domainName < b.domainName)
+            return 1
+          return 0
+        }
+        return service.sort(compare)
+      }
+      let sortLevel = function (service) {
+        function compare(a, b) {
+          if (a.maxLevel < b.maxLevel)
+            return -1
+          if (a.maxLevel > b.maxLevel)
+            return 1
+          return 0
+        }
+        return service.sort(compare)
+      }
       vm.listThuTuc = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
@@ -443,6 +476,8 @@ export default {
         vm.loading = false
         if (result.data) {
           vm.listThuTuc = result.data
+          vm.listThuTuc = sortName(vm.listThuTuc)
+          vm.listThuTuc = sortLevel(vm.listThuTuc)
           vm.pageListThuTuc = Number(currentQuery.page) ? Number(currentQuery.page) : 1
           vm.totalPaggingThuTuc = result.total
         } else {

@@ -2,7 +2,7 @@
   <div>
     <v-layout justify-center>
       <v-flex xs12>
-        <v-card color="transparent" flat class="pb-3">
+        <v-card color="transparent" flat class="pb-3" v-if="loadingEmployee === false">
           <h2 class="text-xs-center py-2 my-0" style="color:#065694">ĐÁNH GIÁ CÁN BỘ</h2>
           <!-- <h2 class="text-xs-center pb-2 my-0" style="color:green" v-if="agencyName">{{agencyName}}</h2> -->
           <div v-if="employeeItems.length > 0">
@@ -25,7 +25,8 @@
                           <div class="primary--text">{{employee.titleJobpos ? employee.titleJobpos : 'Cán bộ tiếp nhận'}}</div>
                           <div class="text-bold primary--text mb-2">{{employee.fullName}}</div>
                           <div>{{agencyName}}</div>
-                          <div >Email: {{employee.email}}</div>
+                          <div class="">Email: {{employee.email}}</div>
+                          <div class="">Số điện thoại: (024) 32 151184</div>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
@@ -104,6 +105,7 @@ export default {
   },
   data: () => ({
     itemName: '',
+    loadingEmployee: false,
     employeeItems: [],
     btnLoading: false,
     dialog_voting: false,
@@ -139,6 +141,12 @@ export default {
       vm.getEmployee()
     })
   },
+  beforeDestroy () {
+    $('html').removeClass('dgcb')
+  },
+  mounted () {
+    $('html').addClass('dgcb')
+  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
@@ -152,6 +160,7 @@ export default {
     },
     getEmployee () {
       let vm = this
+      vm.loadingEmployee = true
       let sortEmployee = function (employeeList) {
         function compare (a, b) {
           if (a.employeeNo < b.employeeNo) {
@@ -174,6 +183,7 @@ export default {
       if (newQuery.hasOwnProperty('agencyCode')) {
         filter.agencyCode = newQuery.agencyCode
         vm.$store.dispatch('loadEmployeesBGT', filter).then(result => {
+          vm.loadingEmployee = false
           vm.totalEmployee = result[0]
           vm.employeeItems = sortEmployee(result[1])
           vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
@@ -184,9 +194,11 @@ export default {
             }
           }
         }).catch(xhr => {
+          vm.loadingEmployee = false
         })
       } else {
         vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+          vm.loadingEmployee = false
           vm.totalEmployee = result[0]
           vm.employeeItems = sortEmployee(result[1])
           vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
@@ -197,6 +209,7 @@ export default {
             }
           }
         }).catch(xhr => {
+          vm.loadingEmployee = false
         })
       }
     },

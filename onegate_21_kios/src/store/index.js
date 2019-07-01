@@ -273,8 +273,8 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              start: filter.page * 10 - 10,
-              end: filter.page * 10,
+              start: filter.page * 15 - 15,
+              end: filter.page * 15,
               administration: filter.administration ? filter.administration : '',
               keyword: filter.keyword ? filter.keyword : '',
               level: filter.level ? filter.level : 0,

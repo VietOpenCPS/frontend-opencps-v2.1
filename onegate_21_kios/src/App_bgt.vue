@@ -78,7 +78,7 @@
         } else if (elem.msRequestFullscreen) {
           elem.msRequestFullscreen()
         }
-        $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 186px)" )
+        $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 182px)" )
         $('.navbar-container').css('display', 'none')
         let hrefs = window.location.href
         if (hrefs.indexOf('tra-cuu-ho-so-homepage') < 0) {
@@ -129,7 +129,7 @@
       } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen()
       }
-      $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 186px)" )
+      $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 182px)" )
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
     },
