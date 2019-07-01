@@ -49,44 +49,53 @@
             </v-btn>
           </div>
         </v-layout>
-        <div class="mt-5 mx-5 px-2 py-2" v-if="validateTracuu === false && !activeDetailDossier"
+        <div class="mt-5 mx-2 px-4 py-2" v-if="validateTracuu === false && !activeDetailDossier"
         style="border: 1px solid #ff9800; border-radius: 5px"
         >
-          <p>
-            <span class="text-bold" style="color:#065694">Bước 1: </span>
-            <span>Nhập vào Mã hồ sơ hoặc Số CMND/Hộ chiếu</span>
+          <p class="py-2">
+            <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">HƯỚNG DẪN TRA CỨU THÔNG TIN HỒ SƠ: </span>
           </p>
-          <p>
-            <span class="text-bold" style="color:#065694">Bước 2: </span>
-            <span>Nhấn nút Tra cứu để xem danh sách các hồ sơ</span>
-          </p>
-          <p>
-            Ví dụ thông tin cơ bản của mỗi hồ sơ như sau:<br>
-              - Mã số hồ sơ: 000.00.06.G04.190701.0501<br>
-              - Người nộp: Nguyễn Văn A<br>
-              - Ngày nộp: 01/07/2019 15:56:26<br>
-          </p>
-          <p>
-            <span class="text-bold" style="color:#065694">Bước 3: </span>
-            <span>Nhấn vào một hồ sơ để xem chi tiết</span>
-          </p>
-          <p>
-            <span class="text-bold" style="color:#065694">Bước 4: </span>
-            <span>Nhập mã tra cứu</span>
-          </p>
-          <p>
-            <span class="text-bold" style="color:#065694">Bước 5: </span>
-            <span>Nhấn nút Tra cứu để xem chi tiết tình trạng xử lý hồ sơ</span>
-          </p>
-          <p>
-            Ví dụ thông tin chi tiết hồ sơ:<br>
-            - Mã hồ sơ: 000.00.06.G04.190701.0501<br>
-            - Cơ quan tiếp nhận: Cơ quan Bộ<br>
-            - Trạng thái: Đang giải quyết thụ lý<br>
-            - Ngày gửi: 01/07/2019 15:56:26<br>
-            - Ngày tiếp nhận: 01/07/2019 15:56:56<br>
-            - Ngày hẹn trả: 08/07/2019 16:00:00<br>
-          </p>
+          <div class="layout wrap">
+            <v-flex xs12 md4 class="pr-3">
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 1: </span>
+                <span style="font-size: 1.2em !important;">Nhập vào Mã hồ sơ hoặc Số CMND/Hộ chiếu</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 2: </span>
+                <span style="font-size: 1.2em !important;">Nhấn nút Tra cứu để xem danh sách các hồ sơ</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                Ví dụ thông tin cơ bản của mỗi hồ sơ như sau:<br>
+                  - Mã số hồ sơ: 000.00.06.G04.190701.0501<br>
+                  - Người nộp: Nguyễn Văn A<br>
+                  - Ngày nộp: 01/07/2019 15:56:26<br>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 3: </span>
+                <span style="font-size: 1.2em !important;">Nhấn vào một hồ sơ để xem chi tiết</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 4: </span>
+                <span style="font-size: 1.2em !important;">Nhập mã tra cứu</span>
+              </p>
+            </v-flex>
+            <v-flex xs12 md4 class="px-3">
+              <p style="font-size: 1.2em !important;">
+                <span class="text-bold" style="color:#065694;font-size: 1.2em !important;">Bước 5: </span>
+                <span style="font-size: 1.2em !important;">Nhấn nút Tra cứu để xem chi tiết tình trạng xử lý hồ sơ</span>
+              </p>
+              <p style="font-size: 1.2em !important;">
+                Ví dụ thông tin chi tiết hồ sơ:<br>
+                - Mã hồ sơ: 000.00.06.G04.190701.0501<br>
+                - Cơ quan tiếp nhận: Cơ quan Bộ<br>
+                - Trạng thái: Đang giải quyết thụ lý<br>
+                - Ngày gửi: 01/07/2019 15:56:26<br>
+                - Ngày tiếp nhận: 01/07/2019 15:56:56<br>
+                - Ngày hẹn trả: 08/07/2019 16:00:00<br>
+              </p>
+            </v-flex>
+          </div>
         </div>
         <!--  -->
         <div class="wrap-scroll wrap-scroll-tabledossier mx-2 mt-4" v-if="validateTracuu === true && !activeDetailDossier" :class="visible ? 'overlayActive': ''" style="position:relative">
