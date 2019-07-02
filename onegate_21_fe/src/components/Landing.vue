@@ -314,6 +314,11 @@
       >
         Khôi phục hồ sơ
       </v-btn>
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'IMPORT'}, 0, true)"
+      >
+        Import hồ sơ
+      </v-btn>
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -2029,6 +2034,17 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
           query: vm.$router.history.current.query
         })
+      } else if (String(item.form) === 'IMPORT') {
+        let isOpenDialog = true
+        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+          isOpenDialog = false
+        }
+        if (isOpenDialog) {
+          // vm.thuTucHanhChinhSelected = null
+          vm.dialogAction = true
+        } else {
+          vm.doImportDossier()
+        }
       } else if (String(item.form) === 'COPY') {
         vm.doCopy(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'CANCEL') {
@@ -3057,6 +3073,27 @@ export default {
         })
       }
       vm.doRedirectFilter()
+    },
+    doImportDossier () {
+      let vm = this
+      let data = {
+        serviceCode: vm.serviceCode,
+        govAgencyCode: vm.govAgencyCode,
+        templateNo: vm.templateNo,
+        originality: vm.getOriginality()
+      }
+      vm.$store.commit('setDataCreateDossier', data)
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        vm.$router.push({
+          path: '/import-ho-so/' + result.dossierId,
+          query: vm.$router.history.current.query
+        })
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
     },
     validate () {
       // validate your form , if you don't have validate prop , default validate pass .

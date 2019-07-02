@@ -1074,15 +1074,36 @@ export const store = new Vuex.Store({
         }
         let dataPostdossier = new URLSearchParams()
         dataPostdossier.append('dossierId', data.dossierId)
-        axios.post('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
-          toastr.clear()
-          toastr.success('Thêm hồ sơ vào nhóm thành công')
+        axios.put('/o/rest/v2/dossiers/' + data.groupDossierId + '/groupDossier', dataPostdossier, options).then(function (response) {
+          commit('setLoading', false)
+          // toastr.clear()
+          // toastr.success('Thêm hồ sơ vào nhóm thành công')
           resolve(response.data)
         }).catch(function (error) {
+          commit('setLoading', false)
           reject(error)
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
-          commit('setLoading', false)
+        })
+      })
+    },
+    getDossiersIntoGroup ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            groupDossierId: filter.groupDossierId ? filter.groupDossierId : ''
+          }
+        }
+        axios.get('/o/rest/v2/dossiers', param).then(function (response) {
+          if (response.data && response.data['data']) {
+            resolve(response.data['data'])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
         })
       })
     },

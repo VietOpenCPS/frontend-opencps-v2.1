@@ -1,5 +1,6 @@
 import 'idempotent-babel-polyfill'
 import Vue from 'vue'
+// import Vuejx from './plugins/globalComponents'
 import './plugins/vuetify'
 import App from './App.vue'
 import router from './router_dev'
@@ -12,6 +13,7 @@ import 'svg-pan-zoom/dist/svg-pan-zoom.min.js'
 import axios from 'axios'
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
+// Vue.use(Vuejx)
 Vue.use(VueContentPlaceholders)
 Vue.config.productionTip = true
 

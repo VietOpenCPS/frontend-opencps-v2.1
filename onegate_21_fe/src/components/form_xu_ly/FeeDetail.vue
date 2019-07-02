@@ -284,7 +284,7 @@ export default {
   methods: {
     changeFee () {
       var vm = this
-      console.log('changeFee')
+      // console.log('changeFee')
       let val = vm.data_payment
       let feeAmount = val.feeAmount ? Number(val.feeAmount.toString().replace(/\./g, '')) : 0
       if (val.requestPayment === 1) {
@@ -292,7 +292,7 @@ export default {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         vm.feeTong = feeAmount + serviceAmount
         vm.totalFee = feeAmount + serviceAmount
-        console.log('changeFee', vm.feeTong, vm.totalFee)
+        // console.log('changeFee', vm.feeTong, vm.totalFee)
       } else if (val.requestPayment === 2) {
         let serviceAmount = vm.payments.serviceAmount ? Number(vm.payments.serviceAmount.toString().replace(/\./g, '')) : 0
         let shipAmount = vm.payments.shipAmount ? Number(vm.payments.shipAmount.toString().replace(/\./g, '')) : 0

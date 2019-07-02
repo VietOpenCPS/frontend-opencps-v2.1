@@ -330,6 +330,26 @@ export const store = new Vuex.Store({
         })
       })
     },
+    loadingDataFormTiepNhan ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramSearch = {
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramSearch
+          }
+          axios.get(filter.queryParams, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
     getGroupDossier ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -553,6 +573,23 @@ export const store = new Vuex.Store({
               }
             }
             resolve(serializable.dossierParts)
+          }, error => {
+            reject(error)
+          })
+        })
+      })
+    },
+    loadDossierFormTemplates ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get(state.initData.dossierTemplatesApi + '/' + data.dossierTemplateNo, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
           }, error => {
             reject(error)
           })

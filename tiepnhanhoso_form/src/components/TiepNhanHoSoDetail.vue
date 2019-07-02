@@ -20,15 +20,20 @@
       </div> 
     </div>
     <div>
-      <tiep-nhan-ho-so ref="thongtintiepnhan"></tiep-nhan-ho-so>
+      <form-tiep-nhan v-if="vuejx !== null && vuejx !== undefined" :vuejx_form="vuejx"></form-tiep-nhan>
     </div>
   </v-form>
 </template>
 
 <script>
-import Vue from 'vue'
 import toastr from 'toastr'
 import $ from 'jquery'
+import FormTiepNhan from './FormTiepNhan.vue'
+import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
+import LePhi from './form_xu_ly/FeeDetail.vue'
+import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -36,8 +41,17 @@ toastr.options = {
 export default {
   props: ['index', 'id', 'formCode'],
   components: {
+    'form-tiep-nhan': FormTiepNhan,
+    'thong-tin-chu-ho-so': ThongTinChuHoSo,
+    'thanh-phan-ho-so': ThanhPhanHoSo,
+    'thong-tin-chung': ThongTinChung,
+    'thu-phi': LePhi,
+    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
+    vuejx: null,
+    formTemplate: '',
+    data_form_template: '',
     validTNHS: false,
     dossierId: '',
     mark: true,
@@ -56,32 +70,7 @@ export default {
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
-    loadingAction: false,
-    vuejx_form: {
-      template: `
-        <v-card>
-          <v-card-text color="red">
-            <v-text-field
-              label="Nhập mã hồ sơ"
-              v-model="nameRender"
-              @keyup.enter="viewLog"
-              append-icon="search"
-              box
-              @click:append="viewLog"
-            ></v-text-field>
-          </v-card-text>
-        </v-card>
-      `,
-      data: `{
-        nameRender: 'TRẦN DUẨN BD',
-        codeRender: 123123
-      }`,
-      methods: {
-        viewLog () {
-          console.log('OK CON DÊ')
-        }
-      }
-    }
+    loadingAction: false
   }),
   computed: {
     loading () {
@@ -99,25 +88,17 @@ export default {
     }
   },
   created () {
-    let vm = this
+    var vm = this
     vm.$nextTick(function () {
       vm.dossierId = vm.id
-      console.log('template', vm.vuejx_form['template'])
-      console.log('data', eval("(" + vm.vuejx_form['data'] + ")"))
-      console.log('methods', vm.vuejx_form['methods'])
-      Vue.component('tiep-nhan-ho-so', {
-        template: vm.vuejx_form['template'],
-        data: eval("(" + vm.vuejx_form['data'] + ")"),
-        methods: vm.vuejx_form['methods']
-      })
     })
   },
   beforeDestroy () {
-    // let viewport = $('meta[name="viewport"]')
-    // viewport.attr('content', 'initial-scale=1.0, width=device-width')
-    // if (typeof window !== 'undefined') {
-    //   window.removeEventListener('resize', this.onResize, { passive: true })
-    // }
+    let viewport = $('meta[name="viewport"]')
+    viewport.attr('content', 'initial-scale=1.0, width=device-width')
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
   },
   mounted () {
     this.onResize()
@@ -125,12 +106,12 @@ export default {
   },
   watch: {
     isMobile (val) {
-      // let viewport = $('meta[name="viewport"]')
-      // if (val) {
-      //   viewport.attr('content', '')
-      // } else {
-      //   viewport.attr('content', 'initial-scale=1.0, width=device-width')
-      // }
+      let viewport = $('meta[name="viewport"]')
+      if (val) {
+        viewport.attr('content', '')
+      } else {
+        viewport.attr('content', 'initial-scale=1.0, width=device-width')
+      }
     }
   },
   methods: {
@@ -142,59 +123,69 @@ export default {
     initData: function (data) {
       var vm = this
       vm.$store.dispatch('getDetailDossier', data).then(result => {
-        vm.dossierId = result.dossierId
-        vm.briefNote = result.dossierName ? result.dossierName : ''
-        result['editable'] = false
-        if (result.dossierStatus === '') {
-          vm.$store.dispatch('pullNextactions', result).then(result2 => {
-            if (result2) {
-              var actionDetail = result2.filter(function (item) {
-                return (item.actionCode === 1100 || item.actionCode === '1100')
-              })
-              vm.$store.dispatch('processPullBtnDetail', {
-                dossierId: result.dossierId,
-                actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
-              }).then(resAction => {
-                result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
-                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
-                vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
-                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
-                  vm.showThuPhi = true
-                  vm.payments = resAction.payment
-                }
-                // call initData thong tin chung ho so
-                if (vm.$refs.thongtinchunghoso) {
-                  vm.$refs.thongtinchunghoso.initData(result)
+        vm.$store.dispatch('loadDossierFormTemplates', result).then(function (result) {
+          if (result['newFormScript']) {
+            vm.vuejx = result['newFormScript']
+            setTimeout (function () {
+              vm.formTemplate = 'v-template'
+            }, 200)
+          } else {
+            vm.formTemplate = 'alpacal'
+            vm.dossierId = result.dossierId
+            vm.briefNote = result.dossierName ? result.dossierName : ''
+            result['editable'] = false
+            if (result.dossierStatus === '') {
+              vm.$store.dispatch('pullNextactions', result).then(result2 => {
+                if (result2) {
+                  var actionDetail = result2.filter(function (item) {
+                    return (item.actionCode === 1100 || item.actionCode === '1100')
+                  })
+                  vm.$store.dispatch('processPullBtnDetail', {
+                    dossierId: result.dossierId,
+                    actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                  }).then(resAction => {
+                    result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                    result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                    result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                    vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                    vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
+                      vm.showThuPhi = true
+                      vm.payments = resAction.payment
+                    }
+                    // call initData thong tin chung ho so
+                    if (vm.$refs.thongtinchunghoso) {
+                      vm.$refs.thongtinchunghoso.initData(result)
+                    }
+                  })
+                } else {
+                  // call initData thong tin chung ho so
+                  if (vm.$refs.thongtinchunghoso) {
+                    vm.$refs.thongtinchunghoso.initData(result)
+                  }
                 }
               })
             } else {
-              // call initData thong tin chung ho so
               if (vm.$refs.thongtinchunghoso) {
+                console.log('has thong tin chung ho so')
                 vm.$refs.thongtinchunghoso.initData(result)
               }
             }
-          })
-        } else {
-          if (vm.$refs.thongtinchunghoso) {
-            console.log('has thong tin chung ho so')
-            vm.$refs.thongtinchunghoso.initData(result)
+            vm.thongTinChiTietHoSo = result
+            vm.$refs.thongtinchuhoso.initData(result)
+            vm.$refs.thanhphanhoso.initData(result)
+            vm.viaPortalDetail = result.viaPostal
+            if (result.viaPostal > 0) {
+              let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
+              if (vm.formCode === 'NEW' && vm.originality === 1) {
+                result['postalAddress'] = postalAddress
+                result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+              }
+              vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+            }
           }
-        }
-        vm.thongTinChiTietHoSo = result
-        vm.$refs.thongtinchuhoso.initData(result)
-        vm.$refs.thanhphanhoso.initData(result)
-        vm.viaPortalDetail = result.viaPostal
-        if (result.viaPostal > 0) {
-          let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
-          if (vm.formCode === 'NEW' && vm.originality === 1) {
-            result['postalAddress'] = postalAddress
-            result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
-          }
-          vm.$store.commit('setDichVuChuyenPhatKetQua', result)
-        }
+        })
       }).catch(reject => {
       })
     },
@@ -497,5 +488,4 @@ export default {
     }
   }
 }
-
 </script>
