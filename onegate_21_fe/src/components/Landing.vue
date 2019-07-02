@@ -314,6 +314,13 @@
       >
         Khôi phục hồ sơ
       </v-btn>
+      
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'IMPORT'}, 0, true)"
+      >
+        Import hồ sơ
+      </v-btn>
+
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -1818,6 +1825,18 @@ export default {
           }
         }
         // console.log('isOpenDialog++++++++', isOpenDialog)
+      } else if (String(item.form) === 'IMPORT') {
+        let isOpenDialog = true
+        console.log('import++++++++++++++++')
+        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+          isOpenDialog = false
+        }
+        if (isOpenDialog) {
+          // vm.thuTucHanhChinhSelected = null
+          vm.dialogAction = true
+        } else {
+          vm.doImportDossier()
+        }
       } else if (String(item.form) === 'UPDATE') {
        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
@@ -2262,6 +2281,28 @@ export default {
         return false
       }
     },
+    doImportDossier () {
+      let vm = this
+      let data = {
+        serviceCode: vm.serviceCode,
+        govAgencyCode: vm.govAgencyCode,
+        templateNo: vm.templateNo,
+        originality: vm.getOriginality()
+      }
+      vm.$store.commit('setDataCreateDossier', data)
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        console.log('import-ho-so++++++++++')
+        vm.$router.push({
+          path: '/import-ho-so/' + result.dossierId,
+          query: vm.$router.history.current.query
+        })
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
+    },
     doCreateDossier () {
       let vm = this
       let data = {
@@ -2290,6 +2331,8 @@ export default {
       if (vm.$refs.form.validate()) {
         if (String(item.form) === 'NEW') {
           vm.doCreateDossier()
+        } else if (String(item.form) === 'IMPORT') {
+          vm.doImportDossier()
         } else {
           let queryString = ''
           let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
@@ -2563,15 +2606,7 @@ export default {
           }
         }
       } else {
-<<<<<<< HEAD
-        if (item.permission) {
-          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-        } else {
-          alert('Bạn không có quyền thao tác với hồ sơ này.')
-        }
-=======
         alert('Bạn không có quyền thao tác với hồ sơ này')
->>>>>>> upstream/bgt
       }
       // phục vụ khi import hồ sơ không lấy được quyền thao tác -> không check quyền với hs đã hoàn thành và từ chối.
     },

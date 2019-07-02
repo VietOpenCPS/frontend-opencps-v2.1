@@ -1,4 +1,5 @@
 <template>
+  <div>
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
     <div class="row-header">
       <div class="background-triangle-big"> 
@@ -168,6 +169,7 @@
       </v-tab>
     </v-tabs>
   </v-form>
+  </div>
 </template>
 
 <script>
@@ -211,7 +213,10 @@ export default {
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
-    loadingAction: false
+    loadingAction: false,
+    countDossierSuccess: 0,
+    dialogImportDosier: false,
+    listDossierImport: []
   }),
   computed: {
     loading () {

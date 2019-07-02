@@ -52,6 +52,12 @@ const routes = [
     props: true
   },
   {
+    path: '/import-ho-so/:id',
+    name: 'ImportHoSo',
+    component: () => import(/* webpackChunkName: "ImportHoSo" */ '@/components/ImportHoSo.vue'),
+    props: true
+  },
+  {
     path: '/add-dvc/:serviceCode',
     name: 'DanhSachThuTuc',
     component: () => import(/* webpackChunkName: "DanhSachThuTuc" */ '@/components/DanhSachThuTuc.vue'),

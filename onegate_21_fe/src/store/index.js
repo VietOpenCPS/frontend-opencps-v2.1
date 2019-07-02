@@ -824,6 +824,38 @@ export const store = new Vuex.Store({
         }
       })
     },
+    uploadDossierFileImport ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        let files = $('#' + data.selector)[0].files
+        let file = files[0]
+        let fileName = file['name']
+        let formData = new FormData()
+        formData.append('file', file, fileName)
+        let fileUpload = {
+          partTip: data['partTip'],
+          file: file
+        }
+        store.dispatch('validFileUpload', fileUpload) // check size, type tài liệu upload
+        if (file && state.validFileUpload) {
+          axios.post('/o/rest/v2/dossiers/createMutiplite/files', formData, {
+            headers: {
+              'groupId': state.initData.groupId,
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(function (response) {
+            resolve(response.data)
+            console.log('Tải file lên thành công')
+          }).catch(function (xhr) {
+            console.log(xhr)
+            toastr.clear()
+            toastr.error('Tải file lên thất bại')
+            reject(xhr)
+          })
+        } else {
+          reject('error')
+        }
+      })
+    },
     getDetailDossier ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -844,7 +876,6 @@ export const store = new Vuex.Store({
               delegateTelNo: response.data.delegateTelNo,
               delegateIdNo: response.data.delegateIdNo
             }
-            resolve(response.data)
             commit('setLoading', false)
             commit('setDossier', response.data)
             commit('setThongTinChuHoSo', response.data)
@@ -852,6 +883,7 @@ export const store = new Vuex.Store({
             commit('setThongTinNguoiNopHoSo', thongTinNguoiNop)
             commit('setThongTinChungHoSo', response.data)
             commit('setDichVuChuyenPhatKetQua', response.data)
+            resolve(response.data)
           }, error => {
             commit('setLoading', false)
             reject(error)
@@ -1190,6 +1222,81 @@ export const store = new Vuex.Store({
           commit('setThongTinChungHoSo', response.data)
           commit('setLePhi', response.data)
           commit('setDichVuChuyenPhatKetQua', response.data)
+        }).catch(rejectXhr => {
+          reject(rejectXhr)
+        })
+      })
+    },
+    importDossier ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', false)
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        // var applicantType = 'citizen'
+        //
+        // let isSameAsApplicant = true
+        // if (data['sameUser'] !== null && data['sameUser'] !== undefined && data['sameUser'] !== 'undefined') {
+        //   isSameAsApplicant = data['sameUser']
+        // }
+        var dataPutdossier = new URLSearchParams()
+        dataPutdossier.append('serviceCode', data['serviceCode'])
+        dataPutdossier.append('govAgencyCode', data['govAgencyCode'])
+        dataPutdossier.append('dossierTemplateNo', data['dossierTemplateNo'])
+        dataPutdossier.append('originality', data['originality'])
+        dataPutdossier.append('dossiers', data['dossiers'])
+        dataPutdossier.append('dossierFiles', data['dossierFiles'])
+        dataPutdossier.append('dossierMarks', data['dossierMarks'])
+        dataPutdossier.append('payment', data['payment'])
+        // dataPutdossier.append('dossierMarkArr', data['dossierMarkArr'])
+        // dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
+        // dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
+        // dataPutdossier.append('applicantIdType', applicantType)
+        // dataPutdossier.append('applicantIdNo', data.applicantIdNo ? data.applicantIdNo : '')
+        // dataPutdossier.append('address', data.address ? data.address : '')
+        // dataPutdossier.append('cityCode', data.cityCode ? data.cityCode : '')
+        // dataPutdossier.append('districtCode', data.districtCode ? data.districtCode : '')
+        // dataPutdossier.append('wardCode', data.wardCode ? data.wardCode : '')
+        // dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
+        // dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
+        // dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
+        // dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
+        // dataPutdossier.append('delegateTelNo', data.delegateTelNo ? data.delegateTelNo : '')
+        // dataPutdossier.append('delegateEmail', data.delegateEmail ? data.delegateEmail : '')
+        // dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress : '')
+        // dataPutdossier.append('delegateCityCode', data.delegateCityCode ? data.delegateCityCode : '')
+        // dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
+        // dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
+        // dataPutdossier.append('applicantNote', state.applicantNote)
+        // if (data.originality !== 1) {
+        //   dataPutdossier.append('dossierName', data.dossierName)
+        // }
+        // dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
+        // if (data.editable) {
+        //   dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
+        // }
+        // dataPutdossier.append('viaPostal', data.viaPostal ? data.viaPostal : 1)
+        // dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : 'VNPOST')
+        // dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
+        // dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
+        // dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
+        // if (data.viaPostal) {
+        //   dataPutdossier.append('viaPostal', data.viaPostal)
+        //   dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : '')
+        //   dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
+        //   dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
+        //   dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
+        //   // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
+        //   // dataPutdossier.append('postalWardCode', data.postalWardCode)
+        // }
+        // dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 1)
+        axios.put(state.initData.postDossierApi + '/cccc', dataPutdossier, options).then(function (response) {
+          resolve(response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)
         })

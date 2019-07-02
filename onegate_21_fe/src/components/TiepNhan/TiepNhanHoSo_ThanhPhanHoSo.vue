@@ -476,6 +476,7 @@ export default {
         })
         return filter
       }
+      return []
     },
     applicantBussinessExit () {
       return this.$store.getters.getApplicantBussinessExit
@@ -866,6 +867,10 @@ export default {
         vm.stateView = true
         vm.dialogAddOtherTemp = true
       }
+    },
+    changeDossierId (id) {
+      var vm = this
+      vm.thongTinHoSo['dossierId'] = id
     },
     loadAlpcaForm (data) {
       var vm = this

@@ -13,6 +13,7 @@ import DanhSachThuTuc from '@/components/DanhSachThuTuc'
 import NopThanhCong from '@/components/NopThanhCong'
 import ThanhToanThanhCong from '@/components/ThanhToanThanhCong'
 import NotFound from '@/components/NotFound'
+import ImportHoSo from '@/components/ImportHoSo'
 
 const routes = [
   { path: '/danh-sach-ho-so/:index', name: 'Landing', component: Landing, props: true },
@@ -27,7 +28,13 @@ const routes = [
   { path: '/add-dvc/:serviceCode', name: 'DanhSachThuTuc', component: DanhSachThuTuc, props: true },
   { path: '/danh-sach-ho-so/:index/nop-thanh-cong/:id', name: 'NopThanhCong', component: NopThanhCong, props: true },
   { path: '/thanh-toan-thanh-cong', name: 'ThanhToanThanhCong', component: ThanhToanThanhCong, props: true },
-  { path: '*', name: 'NotFound', component: NotFound }
+  { path: '*', name: 'NotFound', component: NotFound },
+  {
+    path: '/import-ho-so/:id',
+    name: 'ImportHoSo',
+    component: ImportHoSo,
+    props: true
+  }
 ]
 
 Vue.use(Router)
