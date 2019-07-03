@@ -205,7 +205,7 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="tiepNhanState && !activeAddGroup" class="px-0 py-0"> 
+        <!-- <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="tiepNhanState && !activeAddGroup" class="px-0 py-0"> 
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -214,9 +214,9 @@
             <span>Tiếp nhận và thêm mới</span>
             <span slot="loader">Loading...</span>
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <!--  -->
-        <v-tab href="#tab-3" @click="goBack" class="px-0 py-0">
+        <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
