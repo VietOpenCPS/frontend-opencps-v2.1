@@ -1,34 +1,36 @@
 <template>
-  <div class="py-0 kios-item">
+  <div class="py-0 kios-item" style="height: calc(100vh - 200px);">
+    <h2 class="pt-2 mx-2 text-xs-center">
+      <span style="color:#065694">XÁC THỰC TRA CỨU THÔNG TIN HỒ SƠ</span>
+    </h2>
     <v-card>
       <v-layout wrap class="wrap-password px-0 py-0">
-        <div style="width: calc(100% - 150px)">
-          <v-layout wrap class="text-xs-center">
-            <v-flex xs12 class="pr-2">
-              <div class="input-custom">
-                <input id="passCheck" type="text" @focus="show" @keyup.enter="submitPass" required="required" />
-                <span class="bar"></span>
-                <label for="passCheck">Mã tra cứu</label>
-              </div>
-            </v-flex>
-          </v-layout>
-        </div>
-        <div class="text-center" style="width: 150px;">
-          <v-btn color="primary"
-            :loading="loadingTable"
-            :disabled="loadingTable"
-            @click="submitPass"
-            class="kios-btn"
-          >
-            <v-icon size="20">search</v-icon>
-            &nbsp;
-            Tra Cứu
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </div>
-        <div class="text-center text-bold mt-3" style="color:#065694">
-          <p class="mb-1">Mã tra cứu là dãy số gồm 4 ký tự được in trên</p>
-          <p class="mb-1"> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
+        <v-flex xs12 class="pr-2">
+          <div class="input-custom">
+            <input id="passCheck" type="text" @focus="show" required="required" />
+            <span class="bar"></span>
+            <label for="passCheck">Mã tra cứu</label>
+            <v-btn color="primary"
+              :loading="loadingTable"
+              :disabled="loadingTable"
+              @click="submitPass"
+              class="kios-btn"
+              style="top: -5px;
+              position: absolute;
+              right: -4px;
+              height: 48px !important;
+              border-bottom-left-radius: 0px;"
+            >
+              <v-icon size="20">search</v-icon>
+              &nbsp;
+              Tra Cứu
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </div>
+        </v-flex>
+        <div class="text-xs-center text-bold mt-3" style="color:#065694">
+          <p class="mb-1 d-inline-block">Mã tra cứu là dãy số gồm 4 ký tự được in trên</p>
+          <p class="mb-1 d-inline-block"> GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ</p>
         </div>
       </v-layout>
       <div class="virtual-keyboard" v-if="visible && !isMobile">
@@ -50,8 +52,10 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-btn class="back-btn" @click="goBack" fab color="primary">
-      <v-icon dark>arrow_back</v-icon>
+
+    <v-btn class="back-btn" outline large color="primary" @click="goBack" style="width: 120px !important;">
+      <v-icon style="font-size: 24px !important;">reply</v-icon>&nbsp;
+      Quay lại 
     </v-btn>
   </div>
 </template>
@@ -243,11 +247,11 @@ export default {
         $('.keyboard .enter').unbind('click')
         if (type === 'search') {
           $('.keyboard .enter').bind('click', function () {
-            vm.filterDossier()
+            vm.submitPass()
           })
         } else if (type === 'view') {
           $('.keyboard .enter').bind('click', function () {
-            vm.submitViewDetail()
+            vm.submitPass()
           })
         }
       }, 300)

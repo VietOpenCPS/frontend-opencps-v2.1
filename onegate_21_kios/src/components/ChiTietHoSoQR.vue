@@ -7,12 +7,12 @@
     </v-flex>
     <v-flex xs12 v-if="isPermission && !loading">
       <div class="detailQR_desktop">
-        <h4 class="pt-2 ml-2">
+        <h2 class="pt-2 ml-2 text-xs-center">
           <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
-        </h4>
+        </h2>
         <v-layout class="wrap">
           <v-flex class="px-2 py-2 mt-2">
-            <span class="text-bold">{{dossierDetail.serviceName}}</span>
+            <span class="text-bold" style="font-size: 1.2em;color: #065694;">Tên hồ sơ: {{dossierDetail.serviceName}}</span>
           </v-flex>
         </v-layout>
         <div class="mt-4">
@@ -296,9 +296,6 @@
   export default {
     props: ['index'],
     components: {
-      fullScreen () {
-        return this.$store.getters.getFullScreen
-      }
     },
     data: () => ({
       loading: true,

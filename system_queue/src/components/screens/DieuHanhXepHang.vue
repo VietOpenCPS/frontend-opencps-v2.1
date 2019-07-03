@@ -99,6 +99,9 @@ export default {
     $('.navbar-container').css('display','none')
     $('#footer').css('display','none')
     vm.$nextTick(function () {
+      setInterval(function () {
+        window.location.reload()
+      }, 5*60*1000)
       let current = vm.$router.history.current
       let currentQuery = current.query
       setTimeout(function(){$('#footer').css('display','none')},500)
@@ -218,9 +221,9 @@ export default {
         vm.bookingList = bookingEform.concat(bookingDossier)
         let sortBooking = function (bookingList) {
           function compare(a, b) {
-            if (a.checkinDate > b.checkinDate)
+            if (a.modifiedDate > b.modifiedDate)
               return -1
-            if (a.checkinDate < b.checkinDate)
+            if (a.modifiedDate < b.modifiedDate)
               return 1
             return 0
           }

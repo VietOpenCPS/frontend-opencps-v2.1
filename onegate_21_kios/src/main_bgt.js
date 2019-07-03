@@ -1,9 +1,9 @@
 import 'vuetify/dist/vuetify.min.css'
 import 'toastr/build/toastr.min.css'
-import './stylus/main.css'
+import './stylus/main_bgt.css'
 import Vue from 'vue/dist/vue.min.js'
 import App from './App_bgt'
-import router from './router'
+import router from './router_bgt'
 import Vuetify from 'vuetify'
 import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
@@ -14,6 +14,12 @@ import axios from 'axios'
 axios.defaults.headers.common['Token'] = window.Liferay ? window.Liferay.authToken : ''
 Vue.mixin({
   methods: {
+    goHome () {
+      let vm = this
+      vm.$router.push({
+        path: '/'
+      })
+    },
     accept (text) {
       this.hide()
     },

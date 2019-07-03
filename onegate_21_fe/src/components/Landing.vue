@@ -314,6 +314,11 @@
       >
         Khôi phục hồ sơ
       </v-btn>
+      <v-btn color="red" dark
+        v-on:click.native="btnActionEvent(null, {form: 'IMPORT'}, 0, true)"
+      >
+        Import hồ sơ
+      </v-btn>
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"
@@ -653,6 +658,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Form phiếu hướng dẫn -->
     <v-dialog v-model="dialog_printGuide" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar flat dark color="primary">
@@ -666,7 +672,7 @@
           <v-form ref="formGuide" v-model="validGuide" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12 class="px-2">
-                <div class="my-2">Thủ tục hành chính:</div>
+                <div class="my-2 text-bold">Thủ tục hành chính <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -683,7 +689,7 @@
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Dịch vụ:</div>
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
                 <v-autocomplete
                   box
                   class="input-group--text-field-box"
@@ -698,8 +704,8 @@
                   required
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 class="px-2">
-                <div class="my-2">Tên người làm thủ tục:</div>
+              <v-flex xs12 class="px-2" style="position:relative">
+                <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
                 <v-text-field
                   placeholder="Nhập tên người làm thủ tục"
                   box
@@ -707,9 +713,13 @@
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                   required
                 ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Địa chỉ:</div>
+                <div class="my-2 text-bold">Địa chỉ:</div>
                 <v-text-field
                   placeholder="Nhập địa chỉ"
                   box
@@ -717,7 +727,7 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Thư điện tử:</div>
+                <div class="my-2 text-bold">Thư điện tử:</div>
                 <v-text-field
                   box
                   placeholder="Nhập thư điện tử"
@@ -725,11 +735,55 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 class="px-2">
-                <div class="my-2">Số điện thoại:</div>
+                <div class="my-2 text-bold">Số điện thoại:</div>
                 <v-text-field
                   box
                   v-model="applicantTelNoGuide"
                 ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thông tin thành phần hồ sơ:</div>
+                <v-data-table
+                  :headers="headersTphsGuide"
+                  :items="tphsGuide"
+                  hide-actions
+                  class="table-landing table-bordered"
+                  style="border-left: 1px solid #dedede"
+                >
+                  <template slot="items" slot-scope="props">
+                    <tr v-bind:class="{'active': props.index%2==1}" style="cursor: pointer;">
+                      <td class="text-xs-center" style="width:50px">
+                        <div>
+                          <span>{{props.index + 1}}</span><br>
+                        </div>
+                      </td>
+                      <td class="text-xs-left">
+                        <div>
+                          <span>{{props.item.partName}}</span>
+                        </div>
+                      </td>
+                      <td class="text-xs-center" style="width: 50px">
+                        <div>
+                          <v-checkbox
+                            v-model="props.item.fileMark"
+                            primary
+                            hide-details
+                            color="primary"
+                            style="display: inline-block;width: 25px"
+                          ></v-checkbox>
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Ghi chú:</div>
+                <v-textarea class="py-0"
+                box
+                v-model="applicantNoteGuide"
+                rows="3"
+                ></v-textarea>
               </v-flex>
             </v-layout>
           </v-form>
@@ -753,6 +807,120 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Form phiếu từ chối -->
+    <v-dialog v-model="dialog_denied" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Thông tin phiếu từ chối tiếp nhận</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_denied = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-form ref="formDenied" v-model="validDenied" lazy-validation>
+            <v-layout wrap class="py-1 align-center row-list-style">
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thủ tục hành chính <span style="color:red">*</span>:</div>
+                <v-autocomplete
+                  box
+                  class="input-group--text-field-box"
+                  :items="listThuTucHanhChinh"
+                  v-model="thuTucHanhChinhSelectedGuide"
+                  placeholder="Chọn thủ tục hành chính"
+                  item-text="serviceName"
+                  item-value="serviceConfigId"
+                  return-object
+                  :hide-selected="true"
+                  @change="changeServiceConfigsGuide"
+                  :rules="[v => !!v || 'Thủ tục bắt buộc phải chọn.']"
+                  required
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Dịch vụ <span style="color:red">*</span>:</div>
+                <v-autocomplete
+                  box
+                  class="input-group--text-field-box"
+                  :items="listDichVuGuide"
+                  v-model="dichVuSelectedGuide"
+                  placeholder="Chọn dịch vụ"
+                  item-text="optionName"
+                  item-value="processOptionId"
+                  return-object
+                  :hide-selected="true"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  required
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="px-2" style="position:relative">
+                <div class="my-2 text-bold">Tên người làm thủ tục <span style="color:red">*</span>:</div>
+                <v-text-field
+                  placeholder="Nhập tên người làm thủ tục"
+                  box
+                  v-model="applicantNameGuide"
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                  required
+                ></v-text-field>
+                <v-radio-group class="my-0" v-model="applicantTypeGuide" row style="position:absolute;right:0;top:0">
+                  <v-radio label="Công dân" :value="true"></v-radio>
+                  <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+                </v-radio-group>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Địa chỉ:</div>
+                <v-text-field
+                  placeholder="Nhập địa chỉ"
+                  box
+                  v-model="applicantAddressGuide"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Thư điện tử:</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập thư điện tử"
+                  v-model="applicantEmailGuide"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Số điện thoại:</div>
+                <v-text-field
+                  box
+                  v-model="applicantTelNoGuide"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="px-2">
+                <div class="my-2 text-bold">Lý do từ chối tiếp nhận:</div>
+                <v-textarea class="py-0"
+                box
+                v-model="applicantNoteGuide"
+                rows="3"
+                ></v-textarea>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-3" color="primary" @click="doDenied('doc')"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>save</v-icon> &nbsp;
+            Lưu phiếu từ chối
+            <span slot="loader">Loading...</span>
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click="doDenied('pdf')"
+          :loading="loadingAction"
+          :disabled="loadingAction">
+            <v-icon>print</v-icon> &nbsp;
+            In phiếu từ chối
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- Form điều chỉnh hồ sơ -->
     <v-dialog v-model="dialog_extraForm" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar flat dark color="primary">
@@ -948,16 +1116,20 @@ export default {
     statusFailed: 0,
     dialog_statusAction: false,
     dialog_printGuide: false,
+    dialog_denied: false,
     dialog_extraForm: false,
     validGuide: false,
+    validDenied: false,
     applicantNameGuide: '',
     applicantEmailGuide: '',
     applicantTelNoGuide: '',
+    applicantNoteGuide: '',
     applicantAddressGuide: '',
+    reasonNote: '',
     dossierSelected: [
       {
         dossierNo: '18ACE289',
-        serviceName: 'Đăng ký, cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất lần đầu đối với tài sản gắn liền với đất mà chủ sở hữu không đồng thời là người sử dụng đất',
+        serviceName: '',
         statusAction: false
       }
     ],
@@ -1029,7 +1201,26 @@ export default {
     filterForm: null,
     checkSelectAll: false,
     titleLanding: '',
-    currentQueryState: ''
+    currentQueryState: '',
+    tphsGuide: [],
+    headersTphsGuide: [
+      {
+        text: 'TT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên thành phần',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Đã có',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    applicantTypeGuide: true
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1237,6 +1428,21 @@ export default {
         // console.log('selectedDoAction', vm.selectedDoAction)
       },
       deep: true
+    },
+    dichVuSelectedGuide (val) {
+      let vm = this
+      if (val) {
+        val.dossierTemplateNo = val['templateNo']
+        console.log('val_dichVuSelectedGuide', val)
+        vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {
+          for (let key in result) {
+            result[key].fileMark = true
+          }
+          vm.tphsGuide = result.filter(function (item) {
+            return item['partType'] === 1
+          })
+        })
+      }
     }
   },
   methods: {
@@ -1828,6 +2034,17 @@ export default {
           path: '/danh-sach-ho-so/' + vm.index + '/bo-sung-ho-so/' + dossierItem.dossierId,
           query: vm.$router.history.current.query
         })
+      } else if (String(item.form) === 'IMPORT') {
+        let isOpenDialog = true
+        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+          isOpenDialog = false
+        }
+        if (isOpenDialog) {
+          // vm.thuTucHanhChinhSelected = null
+          vm.dialogAction = true
+        } else {
+          vm.doImportDossier()
+        }
       } else if (String(item.form) === 'COPY') {
         vm.doCopy(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'CANCEL') {
@@ -1843,7 +2060,11 @@ export default {
         vm.doPrint03(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'GUIDING') {
         vm.dialog_printGuide = true
-        // vm.doGuiding(dossierItem, item, index, isGroup)
+      } else if (String(item.form) === 'DENIED') {
+        vm.thuTucHanhChinhSelectedGuide = ''
+        vm.dichVuSelectedGuide = ''
+        vm.dialog_denied = true
+        vm.$refs.formDenied.resetValidation()
       } else if (String(item.form) === 'PREVIEW') {
         vm.doPreview(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'ACTIONS') {
@@ -1973,6 +2194,12 @@ export default {
       let vm = this
       if (vm.$refs.formGuide.validate()) {
         vm.loadingAction = true
+        let partNoRequired = []
+        for (let key in vm.tphsGuide) {
+          if (!vm.tphsGuide[key]['fileMark']) {
+            partNoRequired.push(vm.tphsGuide[key]['partNo'])
+          }
+        }
         let filter = {
           serviceConfigId: vm.thuTucHanhChinhSelectedGuide.serviceConfigId,
           serviceCode: vm.thuTucHanhChinhSelectedGuide.serviceCode,
@@ -1984,7 +2211,50 @@ export default {
           applicantTelNo: vm.applicantTelNoGuide,
           govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
           govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
-          typeCode: 'DOC_03'
+          typeCode: 'DOC_03',
+          partNo: partNoRequired.toString(),
+          applicantNote: vm.applicantNoteGuide,
+          type: 'completed',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
+        }
+        if (type === 'doc') {
+          filter['reportType'] = 'word'
+        }
+        if (type !== 'doc') {
+          vm.dialogPDFLoading = true
+          vm.dialogPDF = true
+        }
+        vm.$store.dispatch('doGuiding', filter).then(function (result) {
+          vm.loadingAction = false
+          vm.dialog_printGuide = false
+          vm.dialogPDFLoading = false
+          if (type !== 'doc') {
+            document.getElementById('dialogPDFPreview').src = result
+          }
+        }).catch(function () {
+          vm.loadingAction = false
+        })
+      }
+    },
+    doDenied (type) {
+      let vm = this
+      if (vm.$refs.formDenied.validate()) {
+        vm.loadingAction = true
+        let filter = {
+          serviceConfigId: vm.thuTucHanhChinhSelectedGuide.serviceConfigId,
+          serviceCode: vm.thuTucHanhChinhSelectedGuide.serviceCode,
+          serviceName: vm.thuTucHanhChinhSelectedGuide.serviceName,
+          templateNo: vm.templateNoGuide,
+          applicantName: vm.applicantNameGuide,
+          applicantAddress: vm.applicantAddressGuide,
+          applicantEmail: vm.applicantEmailGuide,
+          applicantTelNo: vm.applicantTelNoGuide,
+          govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
+          govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
+          typeCode: 'DOC_03',
+          applicantNote: vm.applicantNoteGuide,
+          type: 'denied',
+          applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
         }
         if (type === 'doc') {
           filter['reportType'] = 'word'
@@ -2552,6 +2822,7 @@ export default {
     },
     viewDetail (item, indexItem) {
       let vm = this
+      let currentQuery = vm.$router.history.current.query
       if (item.permission) {
        vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
       } else {
@@ -2802,6 +3073,27 @@ export default {
         })
       }
       vm.doRedirectFilter()
+    },
+    doImportDossier () {
+      let vm = this
+      let data = {
+        serviceCode: vm.serviceCode,
+        govAgencyCode: vm.govAgencyCode,
+        templateNo: vm.templateNo,
+        originality: vm.getOriginality()
+      }
+      vm.$store.commit('setDataCreateDossier', data)
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossier', data).then(function (result) {
+        vm.loadingAction = false
+        vm.indexAction = -1
+        vm.$router.push({
+          path: '/import-ho-so/' + result.dossierId,
+          query: vm.$router.history.current.query
+        })
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
     },
     validate () {
       // validate your form , if you don't have validate prop , default validate pass .

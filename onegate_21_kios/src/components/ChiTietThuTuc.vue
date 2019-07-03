@@ -4,7 +4,7 @@
       <content-placeholders-text :lines="10" />
     </content-placeholders>
     <div v-else>
-      <v-layout class="wrap">
+      <v-layout class="wrap pb-3">
         <div class="pb-2" style="width: 100px">
           <v-chip class="mx-0 my-0" label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
             Mức độ {{serviceDetail.maxLevel}}
@@ -32,6 +32,10 @@
                   <div class="table__overflow">
                     <table class="datatable table">
                       <tbody>
+                        <tr>
+                          <td class="pt-2"><span class="text-bold">Mã thủ tục</span></td>
+                          <td class="pt-2"><span>{{serviceDetail.serviceCode}}</span></td>
+                        </tr>
                         <tr>
                           <td class="pt-2"><span class="text-bold">Cơ quan quản lý</span></td>
                           <td class="pt-2"><span>{{serviceDetail.administrationName}}</span></td>
@@ -94,9 +98,9 @@
           </v-tab-item>
         </v-tabs>
       </div>
-      <v-btn class="back-btn" @click="goBack" fab color="primary">
+      <!-- <v-btn class="back-btn" @click="goBack" fab color="primary">
         <v-icon dark>arrow_back</v-icon>
-      </v-btn>
+      </v-btn> -->
     </div>
   </div>
 </template>

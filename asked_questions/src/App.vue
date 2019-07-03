@@ -73,13 +73,8 @@
       totalNotPublish: 0,
       agencyList: [
         {
-          agencyName: 'Cơ quan Bộ Giao thông vận tải',
-          agencyCode: 'BGTVT_VPB',
-          groupId: '63785'
-        },
-        {
           agencyName: 'Tổng Cục Đường bộ Việt Nam',
-          agencyCode: 'BGTVT_DB',
+          agencyCode: 'TCDB',
           groupId: '35243'
         },
         {
@@ -89,22 +84,22 @@
         },
         {
           agencyName: 'Cục Đường thủy nội địa Việt Nam',
-          agencyCode: 'BGTVT_DTND',
+          agencyCode: 'CDTVN',
           groupId: '53152'
         },
         {
           agencyName: 'Cục Hàng hải Việt Nam',
-          agencyCode: 'BGTVT_HH',
+          agencyCode: 'CHHVN',
           groupId: '51801'
         },
         {
           agencyName: 'Cục Hàng không Việt Nam',
-          agencyCode: 'BGTVT_HK',
+          agencyCode: 'CHKVN',
           groupId: '51883'
         },
         {
           agencyName: 'Cục Đăng kiểm Việt Nam',
-          agencyCode: 'BGTVT_DK',
+          agencyCode: 'CDKVN',
           groupId: '53084'
         }
       ]
@@ -157,11 +152,14 @@
         let vm = this
         let current = vm.$router.history.current
         let query = current.query
+        let filter = {
+          agencyCode: vm.agencyFilterSelected['agencyCode'] ? vm.agencyFilterSelected['agencyCode'] : '',
+          keyword: vm.keyword ? vm.keyword : ''
+        }
         vm.$store.commit('setLoading', true)
-        vm.$store.dispatch('getQuestions').then(function (result) {
+        vm.$store.dispatch('getQuestions', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
           let questionList = []
-          let keyword = vm.keyword ? vm.convertString(vm.keyword.toString()) : ''
           if (Array.isArray(result)) {
             questionList = result
             vm.totalAnswered = questionList.filter(function (item) {
@@ -188,16 +186,15 @@
                 return String(item['publish']) === String(query.publish)
               })
             }
-            if (vm.agencyFilterSelected) {
-              questionList = questionList.filter(function (item) {
-                return item['content'].toString().indexOf('&&' + vm.agencyFilterSelected.agencyCode) >= 0
-              })
-            }
-            if (vm.keyword && String(vm.keyword).length > 3) {
-              questionList = questionList.filter(function (item) {
-                return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
-              })
-            }
+            // if (vm.agencyFilterSelected) {
+            //   questionList = questionList
+            // }
+            // if (vm.keyword && String(vm.keyword).length > 3) {
+            //   questionList = questionList
+            //   questionList = questionList.filter(function (item) {
+            //     return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
+            //   })
+            // }
             vm.$store.commit('setQuestionList', questionList)
           } else {
             questionList = [result]
@@ -224,16 +221,14 @@
                 return String(item['publish']) === String(query.publish)
               })
             }
-            if (vm.agencyFilterSelected) {
-              questionList = questionList.filter(function (item) {
-                return item['content'].toString().indexOf('&&' + vm.agencyFilterSelected.agencyCode) >= 0
-              })
-            }
-            if (vm.keyword && String(vm.keyword).length > 3) {
-              questionList = questionList.filter(function (item) {
-                return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
-              })
-            }
+            // if (vm.agencyFilterSelected) {
+            //   questionList = questionList
+            // }
+            // if (vm.keyword && String(vm.keyword).length > 3) {
+            //   questionList = questionList.filter(function (item) {
+            //     return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
+            //   })
+            // }
             vm.$store.commit('setQuestionList', questionList)
           }
         }).catch(function (reject) {

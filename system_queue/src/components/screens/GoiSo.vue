@@ -84,7 +84,6 @@
 </template>
 
 <script>
-
 import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
@@ -279,7 +278,13 @@ export default {
         }
         if (vm.activeCalling && vm.called && Array.isArray(vm.queueList) && vm.queueList.length > 0) {
           vm.currentCalling = vm.queueList[0]
-          vm.callingApplicant(vm.currentCalling)
+          try {
+            vm.callingApplicant(vm.currentCalling)
+          }
+          catch(err) {
+            console.log('catch play audio 1')
+            vm.getDanhSachCho()
+          }
         } else {
           vm.loadData = !vm.loadData
         }
@@ -304,6 +309,14 @@ export default {
         let numberCalling = splitNumberCode[0] + splitNumberCode[1] + splitNumberCode[2]
         let srcAudioStart = splitNumberCode[0] === 'E' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
+        // 
+        let mainGateNumber = ''
+        let subGateNumber = ''
+        if (isNaN(String(item['gateNumber']).slice(-1))) {
+          mainGateNumber = item['gateNumber'].replace(item['gateNumber'].slice(-1), '')
+          subGateNumber = item['gateNumber'].slice(-1)
+        }
+        // 
         let audioStart = `
           <audio id="start">
             <source src="${srcAudioStart}" type="audio/mp3">
@@ -322,11 +335,23 @@ export default {
             </audio>
           `
         }
-        let gateAudio = `
-          <audio id="gateNumber">
-            <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${Number(item['gateNumber'])}.mp3" type="audio/mp3">
-          </audio>
-        `
+        let gateAudio
+        if (subGateNumber === '') {
+          gateAudio = `
+            <audio id="gateNumber">
+              <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${Number(item['gateNumber'])}.mp3" type="audio/mp3">
+            </audio>
+          `
+        } else {
+          gateAudio = `
+            <audio id="mainGateNumber">
+              <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${Number(mainGateNumber)}.mp3" type="audio/mp3">
+            </audio>
+            <audio id="subGateNumber">
+              <source src="/documents/${vm.groupId}/${vm.idVoicePortlet}/${String(subGateNumber)}.mp3" type="audio/mp3">
+            </audio>
+          `
+        }
         $('#audioCalling').html(audioStart + audioNumber + audioEnd + gateAudio)
         // 
         document.getElementById('start').onended = function () {
@@ -341,17 +366,36 @@ export default {
           document.getElementById('end').play()
         }
         document.getElementById('end').onended = function() {
-          document.getElementById('gateNumber').play()
+          if (!subGateNumber) {
+            document.getElementById('gateNumber').play()
+          } else {
+            document.getElementById('mainGateNumber').play()
+            setTimeout (function() {
+              document.getElementById('subGateNumber').play()
+            },600)
+          }
         }
-        document.getElementById('gateNumber').onended = function () {
-          vm.currentCalling = ''
-          vm.called = true
-          vm.loadData = !vm.loadData
-          // vm.updateStateBooking(item, false)
+        if (!subGateNumber) {
+          document.getElementById('gateNumber').onended = function () {
+            vm.currentCalling = ''
+            vm.called = true
+            vm.loadData = !vm.loadData
+          }
+        } else {
+          document.getElementById('subGateNumber').onended = function () {
+            vm.currentCalling = ''
+            vm.called = true
+            vm.loadData = !vm.loadData
+          }
         }
         // start audio
         setTimeout (function () {
-          document.getElementById('start').play()
+          try {
+            document.getElementById('start').play()
+          } catch (error) {
+            console.log('catch play audio')
+            vm.getDanhSachCho()
+          }
         }, 300)
       } else {
         vm.called = true

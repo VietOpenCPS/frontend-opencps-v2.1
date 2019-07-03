@@ -38,7 +38,7 @@
                     </v-select>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm2 class="my-2">
+                  <!-- <v-flex xs12 sm2 class="my-2">
                     <v-subheader class="pl-0 text-header">Tên nhóm hồ sơ: </v-subheader>
                   </v-flex>
                   <v-flex xs12 sm10 class="my-2">
@@ -46,7 +46,7 @@
                     v-model="groupDossierSelected.dossierName"
                     :disabled="groupDossierSelected ? false : true"
                     ></v-text-field>
-                  </v-flex>
+                  </v-flex> -->
                 </v-layout>
                 <v-flex xs12 class="text-right">
                   <v-btn v-if="groupDossierSelected && activeAddDossierIntoGroup && !activeAddGroup" color="primary" @click="updateGroupDossier" class="mr-3">
@@ -64,53 +64,121 @@
         </v-expansion-panel>
       </div>
       <!-- Thông tin nhóm hồ sơ -->
-      <thong-tin-chu-ho-so :showApplicant="true" :showDelegate="false" v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
-      <div style="position: relative;" v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup">
-        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-          <v-expansion-panel-content>
-            <div slot="header" style="display: flex; align-items: center;">
-              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              Thành phần hồ sơ theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
-            </div>
-            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+      <div class="row-header" v-if="!activeAddDossierIntoGroup && groupDossierSelected">
+        <div class="background-triangle-big">
+          <span>THÔNG TIN NHÓM</span> 
+        </div>
+        <div class="layout row wrap header_tools row-blue">
+          <!-- <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="processOptionSelected.processName">
+            {{processOptionSelected.processName}}
+          </div> -->
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0">
+              <v-icon size="20">add</v-icon>  &nbsp;
+              <span>Tạo hồ sơ trong nhóm</span>
+            </v-btn>
+          </div>
+        </div> 
       </div>
-      <v-flex xs12 class="text-right" v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup">
-        <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 mr-3">
-          <v-icon size="20">add</v-icon>  &nbsp;
-          <span>Thêm mới hồ sơ</span>
-        </v-btn>
-      </v-flex>
+      <div v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup">
+        <v-layout wrap>
+          <v-flex xs12 sm2 class="my-2">
+            <v-subheader class="pl-0 text-header pt-2">Tên nhóm hồ sơ: </v-subheader>
+          </v-flex>
+          <v-flex xs12 sm10 class="my-2">
+            <v-text-field class="mt-1"
+            v-model="groupDossierSelected.dossierName"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+        <thong-tin-chu-ho-so :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
+        <div style="position: relative;">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Thành phần hồ sơ theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-1 ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so-1>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <div style="position: relative;">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <div class="mb-3" v-if="dossiersIntoGroup.length > 0">
+                <v-data-table
+                  :headers="headers"
+                  :items="dossiersIntoGroup"
+                  hide-actions
+                  class="table-landing table-bordered"
+                  item-key="dossierId"
+                >
+                  <template slot="items" slot-scope="props">
+                    <tr @click="viewDetail(props.item, props.index)" style="cursor: pointer">
+                      <td class="text-xs-center" width="70px">
+                        <span>{{props.index + 1}}</span>
+                      </td>
+                      <td class="text-xs-left" width="250px">
+                        {{ props.item.dossierNo }}
+                      </td>
+                      <td class="text-xs-left">
+                        {{ props.item.applicantName }}
+                      </td>
+                      <td class="text-xs-left" width="250px">
+                        {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </div>
+              <div v-else class="pl-3 py-2">Chưa có hồ sơ nào</div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!-- <v-flex xs12 class="text-right">
+          <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 mr-3">
+            <v-icon size="20">add</v-icon>  &nbsp;
+            <span>Thêm mới hồ sơ</span>
+          </v-btn>
+        </v-flex> -->
+      </div>
       <!-- Thông tin hồ sơ trong nhóm -->
-      <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
-      <div style="position: relative;" v-if="activeAddDossierIntoGroup">
-        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-          <v-expansion-panel-content>
-            <div slot="header" style="display: flex; align-items: center;">
-              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
-            </div>
-            <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </div>
-      <!--  -->
-      <div style="position: relative;" v-if="viaPortalDetail !== 0">
-        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-          <v-expansion-panel-content hide-actions value="2">
-            <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
-            <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </div>
-      <!--  -->
-      <div style="position: relative;">
-        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-          <v-expansion-panel-content hide-actions value="2">
-            <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+      <div v-if="activeAddDossierIntoGroup">
+        <thong-tin-chu-ho-so :showApplicant="false" :showDelegate="true" v-if="activeAddDossierIntoGroup" ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+        <div style="position: relative;" v-if="activeAddDossierIntoGroup">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+        <div style="position: relative;" v-if="viaPortalDetail !== 0">
+          <v-expansion-panel :value="0"  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+              <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
+        <div style="position: relative;">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+            <v-expansion-panel-content hide-actions value="2">
+              <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!--  -->
       </div>
       <!--  -->
       <v-tabs icons-and-text centered class="mb-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
@@ -137,7 +205,7 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="tiepNhanState && !activeAddGroup" class="px-0 py-0"> 
+        <!-- <v-tab href="#tab-2" @click="tiepNhanHoSo('add')" v-if="tiepNhanState && !activeAddGroup" class="px-0 py-0"> 
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -146,9 +214,9 @@
             <span>Tiếp nhận và thêm mới</span>
             <span slot="loader">Loading...</span>
           </v-btn>
-        </v-tab>
+        </v-tab> -->
         <!--  -->
-        <v-tab href="#tab-3" @click="goBack" class="px-0 py-0">
+        <v-tab href="#tab-2" @click="goBack" class="px-0 py-0">
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -199,6 +267,7 @@ import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
@@ -211,6 +280,7 @@ export default {
   components: {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
+    'thanh-phan-ho-so-1': ThanhPhanHoSo1,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
@@ -218,6 +288,7 @@ export default {
   data: () => ({
     groupDossierList: [],
     groupDossierSelected: '',
+    dossiersIntoGroup: [],
     processOptionSelected: '',
     thongTinNhomHoSo: '',
     validTNHS: false,
@@ -243,7 +314,29 @@ export default {
     isMobile: false,
     loadingAction: false,
     dialogAddGroup: false,
-    activeAddDossierIntoGroup: false
+    activeAddDossierIntoGroup: false,
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tên chủ hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Trạng thái',
+        align: 'center',
+        sortable: false
+      }
+    ]
   }),
   computed: {
     loading () {
@@ -354,6 +447,12 @@ export default {
       setTimeout (function () {
         let id = vm.groupDossierSelected.dossierId
         vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
+          let filter = {
+            groupDossierId: id
+          }
+          vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
+            vm.dossiersIntoGroup = result
+          })
           vm.$refs.thongtinnguoinophoso.initData(resultDossier)
           vm.$refs.thanhphanhoso.initData(resultDossier)
         })
@@ -603,7 +702,7 @@ export default {
       vm.$store.commit('setPrintPH', false)
       let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      let thanhphanhoso = this.$refs.thanhphanhoso2.dossierTemplateItems
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
@@ -612,7 +711,7 @@ export default {
         let passValid = true
         if (passValid) {
           vm.loadingAction = true
-          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          if (!vm.$refs.thanhphanhoso2.validDossierTemplate()) {
             vm.loadingAction = false
             return
           }
@@ -620,7 +719,7 @@ export default {
             vm.loadingAction = false
             return
           }
-          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          let dossierFiles = vm.$refs.thanhphanhoso2.dossierFilesItems
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
@@ -680,6 +779,9 @@ export default {
                 if (!type) {
                   // vm.goBack()
                   // vm.tiepNhanState = false
+                  toastr.success('Thêm hồ sơ vào nhóm thành công')
+                  vm.onChangeGroupDossier()
+                  vm.activeAddDossierIntoGroup = false
                 } else {
                   // tạo hồ sơ mới
                   let current = vm.$router.history.current
@@ -800,6 +902,11 @@ export default {
         durationText = durationCount + ' giờ'
       }
       return durationText
+    },
+    viewDetail (item, indexItem) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      vm.$router.push('/danh-sach-ho-so/0/chi-tiet-ho-so/' + item['dossierId'])
     },
     goBack () {
       let vm = this

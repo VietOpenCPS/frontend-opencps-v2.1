@@ -3,14 +3,15 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-btn class="go-home-btn" @click="goHome" fab color="white" title="Trang chủ">
+    <!-- <v-btn class="go-home-btn" @click="goHome" fab color="white" title="Trang chủ">
       <v-icon size="32" color="primary">home</v-icon>
-    </v-btn>
+    </v-btn> -->
   </v-app>
 </template>
 
 <script>
   import GoTop from '@inotom/vue-go-top'
+  import axios from 'axios'
   export default {
     data: () => ({
     }),
@@ -53,9 +54,6 @@
         let vm = this
         let isMobile = window.innerWidth < 1024
         vm.$store.commit('setIsMobile', isMobile)
-      },
-      goHome () {
-        window.location.href = '/web/cong-dich-vu-cong-bo-ngoai-giao'
       }
     }
   }

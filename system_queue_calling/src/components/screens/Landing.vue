@@ -22,6 +22,7 @@
               clearable
               @change="changeGroup"
               box
+              return-object
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
@@ -78,7 +79,7 @@
                 :disabled="loadingCalling"
                 color="red"
                 class="white--text mb-1"
-                @click="ignoreBooking"
+                @click="ignoreBooking(currentBooking)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>clear</v-icon> &nbsp;
@@ -403,6 +404,7 @@ export default {
       let vm = this
       let gateNumber = isNaN(val) ? val : Number(val)
       vm.updateGateNumber(gateNumber)
+      vm.getBookingCalling()
     }
   },
   methods: {
@@ -429,7 +431,9 @@ export default {
       })
     },
     changeGroup () {
-
+      let vm = this
+      vm.serviceInfoSelected = ''
+      vm.filterBooking()
     },
     getGateLists () {
       let vm = this
@@ -444,7 +448,20 @@ export default {
         let current = vm.$router.history.current
         let newQuery = current.query
         let queryString = '?'
-        newQuery['service'] = vm.serviceInfoSelected
+        newQuery['service'] = vm.serviceInfoSelected ? vm.serviceInfoSelected : ''
+        if (vm.serviceGroupSelected['config'] && vm.serviceGroupSelected['key'] === 'booking') {
+          newQuery['service'] = vm.serviceGroupSelected['config']
+        }
+        if (vm.serviceGroupSelected['key'] === 'booking' && vm.serviceGroupSelected['className'] === 'DOSSIER') {
+          newQuery['service'] = ''
+          newQuery['keyBooking'] = ''
+          newQuery['className'] = vm.serviceGroupSelected['className']
+        }
+        if (vm.serviceGroupSelected['key'] === 'API') {
+          newQuery['service'] = ''
+          newQuery['className'] = ''
+          newQuery['keyBooking'] = vm.serviceGroupSelected['key']
+        }
         newQuery['state'] = vm.stateSelected
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
@@ -520,6 +537,8 @@ export default {
     },
     mergeBooking (bookingEform, bookingDossier) {
       let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
       vm.getBookingCalling()
       // ------>
       let bookingRelease = []
@@ -557,7 +576,14 @@ export default {
           bookingRelease = bookingDossierArray
           // merge
           if (bookingEform || bookingDossier || bookingRelease) {
-            vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            if (newQuery.hasOwnProperty('className') && newQuery.className === 'DOSSIER') {
+              vm.bookingList = [].concat(bookingDossier)
+            } else if (newQuery.hasOwnProperty('keyBooking') && newQuery.keyBooking === 'API') {
+              vm.bookingList = [].concat(bookingRelease)
+            } else {
+              vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+            }
+            // vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
             let sortBooking = function (bookingList) {
               function compare(a, b) {
                 if (a.checkinDate < b.checkinDate)
@@ -621,7 +647,7 @@ export default {
         className: 'EFORM',
         gateNumber: vm.currentGate
       }
-      console.log('vm.currentGate', vm.currentGate, filterEform)
+      // console.log('vm.currentGate', vm.currentGate, filterEform)
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
         count+=1
         vm.loading = false
@@ -662,7 +688,7 @@ export default {
         }
       })
     },
-    mergeBookingCalling (bookingDossier, bookingEform, index) {
+    mergeBookingCalling (bookingDossier, bookingEform) {
       let vm = this
       // console.log('booking', bookingEform, bookingDossier)
       if (bookingEform.length > 0 || bookingDossier.length > 0) {
@@ -670,9 +696,9 @@ export default {
         booking = bookingEform.concat(bookingDossier)
         let sortBooking = function (bookingList) {
           function compare(a, b) {
-            if (a.checkinDate < b.checkinDate)
+            if (a.modifiedDate > b.modifiedDate)
               return -1
-            if (a.checkinDate > b.checkinDate)
+            if (a.modifiedDate < b.modifiedDate)
               return 1
             return 0
           }
@@ -681,6 +707,8 @@ export default {
         booking = sortBooking(booking)
         vm.currentBooking = booking[0]
         console.log('currentBooking', vm.currentBooking)
+      } else {
+        vm.currentBooking = ''
       }
     },
     callingBooking (item) {
@@ -689,7 +717,11 @@ export default {
       item.speaking = false
       item.state = 2
       item.gateNumber = vm.currentGate
-      vm.updateStateBooking(item)
+      if (vm.currentGate) {
+        vm.updateStateBooking(item)
+      } else {
+        alert('Vui lòng chọn quầy trước khi gọi!')
+      }
     },
     callBack (item) {
       let vm = this
@@ -792,7 +824,8 @@ export default {
           vm.filterCreateDossier = {
             serviceCode: item.serviceCode,
             govAgencyCode: processDetail['govAgencyCode'],
-            dossierTemplateNo: ''
+            dossierTemplateNo: '',
+            serviceConfigId: processDetail['serviceConfigId']
           }
           if (processDetail['options'].length === 1) {
             vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
@@ -828,7 +861,8 @@ export default {
         }).catch (function (reject1) {
         })
         let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
-        window.open(urlRedirect, '_blank')
+        let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true'
+        window.open(urlRedirect + query, '_blank')
       }).catch (function (reject) {
       })
     },

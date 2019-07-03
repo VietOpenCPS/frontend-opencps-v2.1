@@ -1,103 +1,11 @@
 <template>
-  <v-app>
-    <v-btn v-if="isMobile" 
-      class="elevation-0"
-      color="grey"
-      dark
-      fab
-      fixed
-      style="top: 70px;width:56px;height:56px;
-      right:0px;border-radius: 6px;
-      border-bottom-right-radius: 0;
-      border-top-right-radius: 0;
-      background-color: #002c46d4!important;"
-      top
-      right
-      @click.stop="drawer = !drawer"
-    >
-      <v-icon size="32">list</v-icon>
-    </v-btn>
-    <v-navigation-drawer
-      style="background: #002c46d4;position:fixed;top:0px;left:0px"
-      v-if="isMobile"
-      v-model="drawer"
-      dark
-      temporary
-    >
-      <v-img
-        :src="image"
-        height="100%"
-      >
-        <v-layout
-          class="fill-height"
-          tag="v-list"
-          column
-        >
-          <v-list-tile
-            v-for="(item, index) in kiosItems"
-            :key="index"
-            @click="goPage(item.route, index)"
-            :class="active === index ? 'active_drawer' : ''"
-            avatar
-            class="v-list-item"
-          >
-            <v-list-tile-action class="mx-2">
-              <v-icon size="26">{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title style="font-size: 16px"
-              v-text="item.text"
-            />
-          </v-list-tile>
-        </v-layout>
-      </v-img>
-    </v-navigation-drawer>
-    <v-content v-if="isMobile">
+  <v-app @mousemove="stopInterval()" @click="stopInterval()" style="background-image: url(/o/opencps-store/js/kios/img/bg_content.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 120% 110%;">
+    <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()" >
       <router-view></router-view>
-    </v-content>
-    
-    <v-content v-else>
-      <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
-        <div :class="isKios ? 'tab-item' : ''">
-          <div v-if="!fullScreen" class="left" :class="fullScreen ? 'smallScreen' : ''">
-            <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-document.png"></p>
-              <p class="ml-2 my-0">
-                <span class="text-bold">Hồ sơ đã có kết quả</span>
-              </p>
-            </a>
-            <a href="javascript:;" class="active" @click="goPage('tiepnhanhoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons8-open-file-50.png"></p>
-              <p class="ml-2 my-0">
-                <span class="text-bold">Hồ sơ đã tiếp nhận</span>
-              </p>
-            </a>
-            <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icons-search-50.png"></p>
-              <p class="ml-2 my-0">
-                <span class="text-bold">Tra cứu hồ sơ</span>
-              </p>
-            </a>
-            <a href="javascript:;" @click="goPage('tracuuthutuc')">
-              <p class="icon px-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-search-dc-50.png"></p>
-              <p class="ml-2 my-0">
-                <span class="text-bold">Tra cứu thủ tục</span>
-              </p>
-            </a>
-            <a href="javascript:;" @click="goPage('danhgia')">
-              <p class="icon pl-1 pr-2"><img src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/icon-evaluation.png"></p>
-              <p class="ml-2 my-0">
-                <span class="text-bold">Đánh giá cán bộ</span>
-              </p>
-            </a>
-          </div>
-          <div class="right" :class="fullScreen ? 'fullScreen' : ''">
-            <div class="right-content">
-              <router-view></router-view>
-            </div>
-          </div>
-        </div>
-      </section>
-    </v-content>
+    </section>
     <v-btn v-if="enableToTop" fab fixed dark bottom right color="#002c46d4" style="width:56px;height:56px;"
       @click="$vuetify.goTo(0)">
       <v-icon dark size="40">keyboard_arrow_up</v-icon>
@@ -123,21 +31,22 @@
       isMobile: false,
       drawer: null,
       active: 0,
+      groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
       kiosItems: [
         {
           route: 'ketquahoso',
           icon: 'library_books',
-          text: 'Hồ sơ đã có kết quả'
+          text: 'Tra cứu hồ sơ đã có kết quả'
         },
         {
           route: 'tiepnhanhoso',
           icon: 'move_to_inbox',
-          text: 'Hồ sơ đã tiếp nhận'
+          text: 'Tra cứu hồ sơ đã tiếp nhận'
         },
         {
           route: 'tracuuhoso',
           icon: 'search',
-          text: 'Tra cứu hồ sơ'
+          text: 'Tra cứu thông tin hồ sơ'
         },
         {
           route: 'tracuuthutuc',
@@ -157,12 +66,28 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let elem = document.documentElement
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen()
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen()
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen()
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen()
+        }
+        $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 182px)" )
+        $('.navbar-container').css('display', 'none')
+        let hrefs = window.location.href
+        if (hrefs.indexOf('tra-cuu-ho-so-homepage') < 0) {
+          vm.setInterval()
+        }
         $(window).scroll(function () {
           vm.enableToTop = $(window).scrollTop() > 200
         })
         $('#navigation').css('display', 'none')
-        let current = vm.$router.history.current
-        let newQuery = current.query
         vm.$store.commit('setGroupid', newQuery.hasOwnProperty('groupIds') ? newQuery['groupIds'] : '')
         if (!newQuery.hasOwnProperty('secretKey')) {
           // vm.setInterval()
@@ -192,7 +117,19 @@
       let vm = this
       vm.$nextTick(function () {
         $('#navigation').css('display', 'none')
+        $('.navbar-container').css('display', 'none')
       })
+      let elem = document.documentElement
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen()
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen()
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen()
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen()
+      }
+      $( "section.kios-content-wrapper" ).parent().css( "min-height", "calc(100vh - 182px)" )
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
     },
@@ -206,6 +143,7 @@
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
+        $('.navbar-container').css('display', 'none')
         let vm = this
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
@@ -234,7 +172,7 @@
           vm.$router.push({
             path: '/'
           })
-        }, 5 * 60 * 1000)
+        }, 3 * 60 * 1000)
       },
       setInterval () {
         this.backKiosHome()
@@ -252,13 +190,13 @@
         vm.$store.commit('setActiveDetailService', false)
         let queryString
         if (page === 'ketquahoso') {
-          queryString = '/'
+          queryString = '/ho-so-co-ket-qua'
         } else if (page === 'tiepnhanhoso') {
           queryString = '/tiep-nhan-ho-so'
         } else if (page === 'tracuuhoso') {
           queryString = '/tra-cuu-ho-so'
         } else if (page === 'tracuuthutuc') {
-          queryString = '/tra-cuu-thu-tuc'
+          queryString = '/tra-cuu-thu-tuc-bgt'
         } else if (page === 'danhgia') {
           if (vm.isDvc) {
             queryString = '/danh-gia-can-bo'
