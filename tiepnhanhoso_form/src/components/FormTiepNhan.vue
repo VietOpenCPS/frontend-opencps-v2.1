@@ -19,7 +19,7 @@ export default {
     };
   },
   mounted() {
-    let vm = this;
+    let vm = this
     vm.render = false
     if (
       vm.vuejx_form !== null &&

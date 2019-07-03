@@ -855,15 +855,30 @@ export default {
     },
     postDossier () {
       let vm = this
-      vm.$store.dispatch('postDossier', vm.filterCreateDossier).then(function (result) {
-        vm.currentBooking.state = 4
-        vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
-        }).catch (function (reject1) {
-        })
-        let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
-        let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true'
-        window.open(urlRedirect + query, '_blank')
-      }).catch (function (reject) {
+      let filter = {
+        dossierTemplateNo: vm.filterCreateDossier.dossierTemplateNo
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+        if (result['newFormScript']) {
+          vm.currentBooking.state = 4
+          vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
+          }).catch (function (reject1) {
+          })
+          let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/0/NEW'
+          let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true&eformCode=' + vm.currentBooking['codeNumber']
+          window.open(urlRedirect + query, '_blank')
+        } else {
+          vm.$store.dispatch('postDossier', vm.filterCreateDossier).then(function (result) {
+            vm.currentBooking.state = 4
+            vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
+            }).catch (function (reject1) {
+            })
+            let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
+            let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true'
+            window.open(urlRedirect + query, '_blank')
+          }).catch (function (reject) {
+          })
+        }
       })
     },
     getGateNumber () {
