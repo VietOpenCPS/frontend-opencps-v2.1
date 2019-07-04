@@ -106,36 +106,54 @@
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text class="pt-0 pb-2 px-0 text-xs-center">
-          <!-- <v-progress-linear
-            color="success"
-            height="20"
-            :value="valueProgress"
-            class="text-xs-center"
-          >
-            {{countDossierProgress}} HS
-          </v-progress-linear> -->
-
-          <v-progress-circular
-            :rotate="-90"
-            :size="100"
-            :width="10"
-            :value="valueProgress"
-            color="primary"
-            class="my-2"
+        <v-card-text class="pt-0 pb-0 px-0">
+          <v-flex class="text-xs-center">
+            <v-progress-circular
+              :rotate="-90"
+              :size="70"
+              :width="10"
+              :value="valueProgress"
+              color="primary"
+              class="my-2"
+              >
+              <span style="font-size: 1.5em;font-weight: bold;">{{ countDossierProgress }}</span> 
+            </v-progress-circular>
+            <div class="pb-0" style="margin: 0 auto;">
+              <v-card class="py-0">
+                <span style="color: green;">Thành công: {{countDossierSuccess}} hồ sơ</span>
+                <p style="color: red;">Lỗi: {{dossierError.length}} hồ sơ</p>
+              </v-card>
+            </div>
+          </v-flex>
+          
+          <div class="px-2" v-if="dossierError.length && !loadingImportDossier" style="margin: 0 auto;">
+            <span style="font-size: 1.2em;font-weight: bold;">Danh sách hồ sơ bị lỗi:</span>
+            <v-data-table
+              :headers="headers"
+              :items="dossierError"
+              hide-actions
+              class="table-landing table-bordered mt-2"
+              item-key="dossierId"
+              style="border-left: 1px solid #dedede"
             >
-            {{ countDossierProgress }} HS
-          </v-progress-circular>
-          <div class="pb-2" style="max-width: 400px; margin: 0 auto;">
-            <v-card class="py-2">
-              <span style="color: green;">Thành công: {{countDossierSuccess}} hồ sơ</span>
-              <p style="color: red;">Lỗi: {{dossierError.length}} hồ sơ</p>
-            </v-card>
-          </div>
-
-          <div v-if="dossierError.length && !loadingImportDossier" style="max-width: 400px; margin: 0 auto;">
-            Danh sách hồ sơ bị lỗi:
-            <v-list two-line style="border: 1px solid #ccc; border-radius: 4px; max-height: 200px; overflow: auto;">
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center" width="">
+                    <span>{{props.index + 1}}</span>
+                  </td>
+                  <td class="text-xs-left" width="">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td class="text-xs-left">
+                    {{ props.item.applicantIdNo }}
+                  </td>
+                  <td class="text-xs-left" width="">
+                    {{ props.item.address}}
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <!-- <v-list two-line style="border: 1px solid #ccc; border-radius: 4px; max-height: 200px; overflow: auto;">
               <template v-for="(item, index) in dossierError">
                 <v-list-tile
                   :key="item.dossierId"
@@ -154,9 +172,9 @@
                   :key="index"
                 ></v-divider>
               </template>
-            </v-list>
+            </v-list> -->
           </div>
-          <div v-else-if="dossierError.length && loadingImportDossier" style="max-width: 400px; margin: 0 auto;">
+          <!-- <div v-else-if="dossierError.length && loadingImportDossier" style="max-width: 400px; margin: 0 auto;">
             Danh sách hồ sơ bị lỗi:
             <v-list two-line style="border: 1px solid #ccc; border-radius: 4px; max-height: 200px; overflow: auto;">
               <template v-for="(item, index) in 3">
@@ -176,9 +194,8 @@
                 ></v-divider>
               </template>
             </v-list>
-          </div>
+          </div> -->
         </v-card-text>
-        <v-divider light></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click.native="addDossierAgain()"
@@ -251,7 +268,29 @@ export default {
     dossierSuccess: [],
     totalDossier: 0,
     valueProgress: 0,
-    countDossierSuccess: 0
+    countDossierSuccess: 0,
+    headers: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Chủ hồ sơ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã CMND/CCCD',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Địa chỉ',
+        align: 'center',
+        sortable: false
+      }
+    ]
   }),
   computed: {
     loading () {
@@ -388,13 +427,13 @@ export default {
         let dataDossierPayment = ''
         let thongTinChungHS = vm.$refs.thongtinchuhoso
         let dichVuChuyenKetQua = vm.$refs.dichvuchuyenphatketqua
-        console.log('thongTinChungHS++++++++', thongTinChungHS)
+
         dataTotal['serviceCode'] = vm.thongTinChiTietHoSo['serviceCode']
         dataTotal['govAgencyCode'] = vm.thongTinChiTietHoSo['govAgencyCode']
         dataTotal['dossierTemplateNo'] = vm.thongTinChiTietHoSo['dossierTemplateNo']
         dataTotal['originality'] = vm.originality
         if (thanhphanhoso && thanhphanhoso.length) {
-          var tmp = thanhphanhoso.map(item => {
+          let tmp = thanhphanhoso.map(item => {
             return {
               partNo: item.partNo,
               partName: item.partName,
@@ -403,9 +442,9 @@ export default {
           })
           dataDossiermark = JSON.stringify(tmp)
         } else {
-          dataDossiermark = '[]'
+          dataDossiermark = ''
         }
-        dataTotal['dossierMarks'] = JSON.stringify(dataDossiermark)
+        dataTotal['dossierMarks'] = dataDossiermark
         if (thongTinChungHS && thongTinChungHS['thongTinNguoiNopHoSo']) {
           let thongTinNguoiNop = thongTinChungHS['thongTinNguoiNopHoSo']
           dataDossier = Object.assign(dataDossier, thongTinNguoiNop)
@@ -414,16 +453,45 @@ export default {
         dataTotal['dossiers'] = JSON.stringify(dataDossier)
         dataTotal['dossierFiles'] = JSON.stringify(dataDossierFile)
         dataTotal['payment'] = JSON.stringify(dataDossierPayment)
-        console.log('data put dossier cccccc -->', dataTotal)
+
         vm.$store.dispatch('importDossier', dataTotal).then(function (result) {
-          vm.countDossierProgress ++
-          vm.valueProgress += (100 / vm.totalDossier)
-          vm.listDossierImport[index]['flagError'] = false
-          if (vm.countDossierSuccess < vm.listDossierImport.length) {
-            vm.countDossierSuccess ++
+          // ---------
+          // vm.countDossierProgress ++
+          // vm.valueProgress += (100 / vm.totalDossier)
+          // vm.listDossierImport[index]['flagError'] = false
+          // if (vm.countDossierSuccess < vm.listDossierImport.length) {
+          //   vm.countDossierSuccess ++
+          // }
+          // vm.calDossierErrorSuccess()
+          // resolve(true)
+          // -----------
+          let dataPostAction = {
+            dossierId: result.dossierId,
+            actionCode: 1100,
+            actionNote: '',
+            actionUser: window.themeDisplay.getUserName(),
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: '',
+            createDossiers: ''
           }
-          vm.calDossierErrorSuccess()
-          resolve(true)
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            vm.countDossierProgress ++
+            vm.valueProgress += (100 / vm.totalDossier)
+            vm.listDossierImport[index]['flagError'] = false
+            if (vm.countDossierSuccess < vm.listDossierImport.length) {
+              vm.countDossierSuccess ++
+            }
+            vm.calDossierErrorSuccess()
+            resolve(true)
+          }).catch(reject => {
+            vm.countDossierProgress ++
+            vm.valueProgress += (100 / vm.totalDossier)
+            vm.listDossierImport[index]['flagError'] = true
+            vm.calDossierErrorSuccess()
+            reject(xhr)
+          })
         }).catch(xhr => {
           console.log(xhr)
           vm.countDossierProgress ++
@@ -474,11 +542,17 @@ export default {
     pickFile () {
       var vm = this
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
-      console.log(vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat())
-      console.log(validThongtinchuhoso['validForm'])
-      if (!vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat() || !validThongtinchuhoso['validForm']) {
-        toastr.error('Vui lòng kiểm tra lại các thông tin bắt buộc trước khi upload!')
-        return
+      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      if (dichvuchuyenphatketqua.viaPostal === 2) {
+        if (!vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat() || !validThongtinchuhoso['validForm']) {
+          toastr.error('Vui lòng kiểm tra lại các thông tin bắt buộc trước khi thực hiện!')
+          return
+        }
+      } else {
+        if (!validThongtinchuhoso['validForm']) {
+          toastr.error('Vui lòng kiểm tra lại các thông tin bắt buộc trước khi thực hiện!')
+          return
+        }
       }
       document.getElementById('dossierImport').value = ''
       document.getElementById('dossierImport').click()

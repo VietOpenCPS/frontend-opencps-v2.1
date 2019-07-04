@@ -2035,15 +2035,10 @@ export default {
           query: vm.$router.history.current.query
         })
       } else if (String(item.form) === 'IMPORT') {
-        let isOpenDialog = true
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
-          isOpenDialog = false
-        }
-        if (isOpenDialog) {
-          // vm.thuTucHanhChinhSelected = null
-          vm.dialogAction = true
-        } else {
           vm.doImportDossier()
+        } else {
+          alert('Chọn thủ tục thực hiện')
         }
       } else if (String(item.form) === 'COPY') {
         vm.doCopy(dossierItem, item, index, isGroup)

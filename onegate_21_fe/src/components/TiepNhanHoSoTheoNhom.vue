@@ -81,11 +81,11 @@
         </div> 
       </div>
       <div v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup">
-        <v-layout wrap>
+        <v-layout wrap style="background: #fff;">
           <v-flex xs12 sm2 class="my-2">
             <v-subheader class="pl-0 text-header pt-2">Tên nhóm hồ sơ: </v-subheader>
           </v-flex>
-          <v-flex xs12 sm10 class="my-2">
+          <v-flex xs12 sm10 class="my-2 pr-3">
             <v-text-field class="mt-1"
             v-model="groupDossierSelected.dossierName"
             ></v-text-field>
@@ -137,6 +137,12 @@
                 </v-data-table>
               </div>
               <div v-else class="pl-3 py-2">Chưa có hồ sơ nào</div>
+              <v-flex xs12 class="text-right mb-3 mr-3">
+                <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0" style="height:36px !important">
+                  <v-icon size="20">add</v-icon>  &nbsp;
+                  <span>Tạo hồ sơ trong nhóm</span>
+                </v-btn>
+              </v-flex>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -157,7 +163,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+              <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -309,6 +315,7 @@ export default {
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
+    inputTypesIntoGroup: [6, 7],
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
@@ -450,6 +457,7 @@ export default {
           let filter = {
             groupDossierId: id
           }
+          vm.dossiersIntoGroup = []
           vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
             vm.dossiersIntoGroup = result
           })

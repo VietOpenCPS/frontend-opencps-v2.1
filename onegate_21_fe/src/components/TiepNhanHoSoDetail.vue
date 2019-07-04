@@ -173,6 +173,7 @@
     <div v-if="formTemplate === 'version_2.0'">
       <div style="display: none">
         <input id="serviceCode_hidden" type="text" :value="serviceCode_hidden">
+        <input id="serviceName_hidden" type="text" :value="serviceName_hidden">
         <input id="govAgencyCode_hidden" type="text" :value="govAgencyCode_hidden">
         <input id="dossierTemplateNo_hidden" type="text" :value="dossierTemplateNo_hidden">
         <input id="eformCode_hidden" type="text" :value="eformCode_hidden">
@@ -196,53 +197,63 @@
           </div>
         </div> 
       </div>
-      <v-card flat color="#fff">
-        <div id="formAlpacaNewTemplate" class="mb-5 pt-0"></div>
-      </v-card>
-      <!--  -->
-      <v-tabs icons-and-text centered class="mb-4">
-        <v-tabs-slider color="primary"></v-tabs-slider>
-        <v-tab href="#tab-2" @click="tiepNhanHoSoNewTemplate()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
-          <v-btn flat class="" 
-            :loading="loadingAction"
-            :disabled="loadingAction"
-          >
-            <v-icon size="20">save</v-icon>  &nbsp;
-            <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-tab>
-        <v-tab href="#tab-4" @click="tiepNhanHoSoNewTemplate('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
-          <v-btn flat class=""
-            :loading="loadingAction"
-            :disabled="loadingAction"
-          >
-            <v-icon size="20">note_add</v-icon>  &nbsp;
-            <span>Tiếp nhận và thêm mới</span>
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-tab>
-        <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
-          <v-btn flat class=""
-            :loading="loadingAction"
-            :disabled="loadingAction"
-          >
-            <v-icon size="20">save</v-icon> &nbsp;
-            Lưu
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-tab>
-        <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
-          <v-btn flat class=""
-            :loading="loadingAction"
-            :disabled="loadingAction"
-          >
-            <v-icon size="18">reply</v-icon> &nbsp;
-            Quay lại
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-tab>
-      </v-tabs>
+      <div v-if="loadingForm" class="text-xs-center mt-5">
+        <v-progress-circular
+          :size="50"
+          color="#dedede"
+          indeterminate
+        ></v-progress-circular>
+      </div>
+      <div v-else>
+        <v-card flat color="#fff">
+          <div id="formAlpacaNewTemplate" class="mb-5 pt-0"></div>
+        </v-card>
+        <!--  -->
+        <v-tabs icons-and-text centered class="mb-4">
+          <v-tabs-slider color="primary"></v-tabs-slider>
+          <v-tab href="#tab-2" @click="tiepNhanHoSoNewTemplate()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+            <v-btn flat class="" 
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon>  &nbsp;
+              <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <!-- <v-tab href="#tab-4" @click="tiepNhanHoSoNewTemplate('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">note_add</v-icon>  &nbsp;
+              <span>Tiếp nhận và thêm mới</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab> -->
+          <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon> &nbsp;
+              Lưu
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="18">reply</v-icon> &nbsp;
+              Quay lại
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+        </v-tabs>
+      </div>
+      
     </div>
     <!--  -->
   </v-form>
@@ -276,6 +287,7 @@ export default {
     formTemplate: '',
     data_form_template: '',
     serviceCode_hidden: '',
+    serviceName_hidden: '',
     govAgencyCode_hidden: '',
     dossierTemplateNo_hidden: '',
     eformCode_hidden: '',
@@ -298,7 +310,8 @@ export default {
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
-    loadingAction: false
+    loadingAction: false,
+    loadingForm: false
   }),
   computed: {
     loading () {
@@ -360,10 +373,13 @@ export default {
           vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
           console.log('data_form_template', vm.data_form_template)
           vm.formTemplate = 'version_2.0'
+          vm.loadingForm = true
           let filterServiceConfig = {
             serviceConfigId: currentQuery.hasOwnProperty('service_config') && currentQuery.service_config ? currentQuery.service_config : ''
           }
           vm.$store.dispatch('getServiceConfigDetail', filterServiceConfig).then(function (data) {
+            vm.loadingForm = false
+            vm.serviceName_hidden = data.serviceName
             vm.serviceCode_hidden = data.serviceCode
             vm.govAgencyCode_hidden = data.govAgencyCode
             vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
@@ -730,35 +746,42 @@ export default {
     // 
     tiepNhanHoSoNewTemplate (type) {
       let vm = this
-      let actionUser = initData.user.userName ? initData.user.userName : ''
-      let data = {
+      let dataCreate = {
         originality: vm.getOriginality(),
         serviceCode: $('#serviceCode_hidden').val(),
         govAgencyCode: $('#govAgencyCode_hidden').val(),
-        templateNo: $('#dossierTemplateNo_hidden').val()
+        templateNo: $('#dossierTemplateNo_hidden').val(),
+        dossiers: ''
       }
       let dataFormTemplate = window.$('#formAlpacaNewTemplate').alpaca('get').getValue()
       let dataFilter = dataFormTemplate
       for (let i in dataFilter) {
-        if (String(i).indexOf('_') >= 0 || String(i) === 'dueDate' || String(i) === 'payment') {
+        if (String(i).indexOf('_') >= 0) {
           delete dataFilter[i]
         }
       }
-      let dataCreate = Object.assign({}, data, dataFilter)
+      dataCreate['dossiers'] = JSON.stringify(dataFilter)
       vm.loadingAction = true
-      vm.$store.dispatch('postDossier', dataCreate).then(function (result) {
+      vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+        let paymentsOut = ''
         if (dataFormTemplate['payment']) {
-          paymentsOut = JSON.parse(dataFormTemplate['payment'])
+          try {
+            paymentsOut = JSON.parse(dataFormTemplate['payment'])
+          } catch (error) {
+          }
         }
-        var payloadDate = {
-          dueDate: '',
-          receiveDate: ''
+        let payloadDate = ''
+        if (dataFormTemplate['dueDate']) {
+          payloadDate = {
+            dueDate: vm.parseDateToTimestamp(dataFormTemplate['dueDate']),
+            receiveDate: (new Date()).getTime()
+          }
         }
         let dataPostAction = {
           dossierId: result.dossierId,
           actionCode: 1100,
           actionNote: '',
-          actionUser: actionUser,
+          actionUser: window.themeDisplay.getUserName(),
           payload: payloadDate,
           security: '',
           assignUsers: '',
@@ -786,7 +809,11 @@ export default {
       }
       let [day, month, year] = `${date}`.split('/')
       let day2 = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      return (new Date (day2)).getTime()
+      if (new Date(day2) == 'Invalid Date') {
+        return ''
+      } else {
+        return (new Date(day2)).getTime()
+      }
     },
     goBack () {
       let vm = this

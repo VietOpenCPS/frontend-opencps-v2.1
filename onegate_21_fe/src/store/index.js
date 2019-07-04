@@ -1119,6 +1119,43 @@ export const store = new Vuex.Store({
         })
       })
     },
+    postDossierNewVersion ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        commit('setLoading', true)
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cps_auth': ''
+          }
+        }
+        let dataPostdossier = new URLSearchParams()
+        dataPostdossier.append('serviceCode', data.serviceCode)
+        dataPostdossier.append('govAgencyCode', data.govAgencyCode)
+        dataPostdossier.append('dossierTemplateNo', data.templateNo)
+        dataPostdossier.append('originality', data.originality)
+        dataPostdossier.append('dossiers', data.dossiers)
+        if (data.j_captcha_response) {
+          dataPostdossier.append('j_captcha_response', data.j_captcha_response)
+        }
+        axios.post('/o/rest/v2/dossiers/all', dataPostdossier, options).then(function (response) {
+          response.data.serviceConfig = state.serviceConfigObj
+          commit('setLoading', false)
+          toastr.clear()
+          if (data.j_captcha_response) {
+            resolve(response)
+          } else {
+            resolve(response.data)
+          }
+        }).catch(function (error) {
+          reject(error)
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          commit('setLoading', false)
+        })
+      })
+    },
     getDossiersIntoGroup ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -1278,8 +1315,8 @@ export const store = new Vuex.Store({
         dataPutdossier.append('dossierTemplateNo', data['dossierTemplateNo'])
         dataPutdossier.append('originality', data['originality'])
         dataPutdossier.append('dossiers', data['dossiers'])
-        dataPutdossier.append('dossierFiles', data['dossierFiles'])
-        dataPutdossier.append('dossierMarks', data['dossierMarks'])
+        dataPutdossier.append('dossierFileArr', data['dossierFiles'])
+        dataPutdossier.append('dossierMarkArr', data['dossierMarks'])
         dataPutdossier.append('payment', data['payment'])
         // dataPutdossier.append('dossierMarkArr', data['dossierMarkArr'])
         // dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
@@ -1323,7 +1360,7 @@ export const store = new Vuex.Store({
         //   // dataPutdossier.append('postalWardCode', data.postalWardCode)
         // }
         // dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 1)
-        axios.put(state.initData.postDossierApi + '/' + data['dossierId'], dataPutdossier, options).then(function (response) {
+        axios.post(state.initData.postDossierApi + '/all', dataPutdossier, options).then(function (response) {
           resolve(response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)

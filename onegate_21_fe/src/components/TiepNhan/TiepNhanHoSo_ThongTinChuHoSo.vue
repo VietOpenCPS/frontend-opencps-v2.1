@@ -228,7 +228,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red"></span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red">*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
