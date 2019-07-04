@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
-      <div class="row-header">
+      <div v-if="!detailGroup" class="row-header">
         <div class="background-triangle-big">
           <span>THÊM MỚI HỒ SƠ</span> 
         </div>
@@ -17,7 +17,7 @@
           </div>
         </div> 
       </div>
-      <div style="position: relative;border-bottom: 1px solid #dedede;">
+      <div v-if="!detailGroup" style="position: relative;border-bottom: 1px solid #dedede;">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <v-card>
@@ -49,7 +49,7 @@
                   </v-flex> -->
                 </v-layout>
                 <v-flex xs12 class="text-right">
-                  <v-btn v-if="groupDossierSelected && activeAddDossierIntoGroup && !activeAddGroup" color="primary" @click="updateGroupDossier" class="mr-3">
+                  <v-btn v-if="groupDossierSelected && !activeAddDossierIntoGroup && !activeAddGroup" color="primary" @click="updateGroupDossier" class="mr-3">
                     <v-icon size="20">edit</v-icon>  &nbsp;
                     <span>Cập nhật nhóm hồ sơ</span>
                   </v-btn>
@@ -66,12 +66,13 @@
       <!-- Thông tin nhóm hồ sơ -->
       <div class="row-header" v-if="!activeAddDossierIntoGroup && groupDossierSelected">
         <div class="background-triangle-big">
-          <span>THÔNG TIN NHÓM</span> 
+          <span v-if="!detailGroup">THÔNG TIN NHÓM</span>
+          <span v-else>THỦ TỤC</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
-          <!-- <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="processOptionSelected.processName">
-            {{processOptionSelected.processName}}
-          </div> -->
+          <div v-if="detailGroup" class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="groupDossierSelected.serviceName">
+            {{groupDossierSelected.serviceName}}
+          </div>
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0">
               <v-icon size="20">add</v-icon>  &nbsp;
@@ -111,7 +112,24 @@
                 Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
               <div class="mb-3" v-if="dossiersIntoGroup.length > 0">
+                <v-layout wrap v-if="stepList.length > 1" class="my-2">
+                  <v-flex style="width: 120px">
+                    <v-subheader class="pl-0 text-header">Chọn bước xử lý: </v-subheader>
+                  </v-flex>
+                  <v-flex class="pr-3" style="width: calc(100% - 120px)">
+                    <v-select
+                    :items="stepList"
+                    item-text="stepName"
+                    item-value="stepCode"
+                    v-model="stepSelected"
+                    return-object
+                    >
+                    </v-select>
+                  </v-flex>
+                </v-layout>
                 <v-data-table
+                  v-model="selected"
+                  select-all
                   :headers="headers"
                   :items="dossiersIntoGroup"
                   hide-actions
@@ -119,17 +137,24 @@
                   item-key="dossierId"
                 >
                   <template slot="items" slot-scope="props">
-                    <tr @click="viewDetail(props.item, props.index)" style="cursor: pointer">
-                      <td class="text-xs-center" width="70px">
+                    <tr style="cursor: pointer">
+                      <td class="text-xs-center" width="35px">
+                        <v-checkbox
+                          v-model="props.selected"
+                          primary
+                          hide-details
+                        ></v-checkbox>
+                      </td>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="70px">
                         <span>{{props.index + 1}}</span>
                       </td>
-                      <td class="text-xs-left" width="250px">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px">
                         {{ props.item.dossierNo }}
                       </td>
-                      <td class="text-xs-left">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left">
                         {{ props.item.applicantName }}
                       </td>
-                      <td class="text-xs-left" width="250px">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px">
                         {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
                       </td>
                     </tr>
@@ -292,9 +317,12 @@ export default {
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
+    detailGroup: false,
     groupDossierList: [],
     groupDossierSelected: '',
     dossiersIntoGroup: [],
+    stepList: [],
+    stepSelected: '',
     processOptionSelected: '',
     thongTinNhomHoSo: '',
     validTNHS: false,
@@ -322,6 +350,7 @@ export default {
     loadingAction: false,
     dialogAddGroup: false,
     activeAddDossierIntoGroup: false,
+    selected: [],
     headers: [
       {
         text: 'STT',
@@ -411,6 +440,7 @@ export default {
     },
     initData: function (data) {
       var vm = this
+      let query = vm.$router.history.current.query
       vm.$store.dispatch('getServiceOpionByProcess', data).then(result => {
         vm.processOptionSelected = result.filter(function(item) {
           return String(item.processOptionId) === String(data.processOptionId)
@@ -418,7 +448,18 @@ export default {
         vm.groupDossierNameCreate = vm.processOptionSelected.processName
       }).catch(reject => {
       })
-      vm.getGroupDossier()
+      if (query.hasOwnProperty('groupDossierId') && query['groupDossierId']) {
+        vm.detailGroup = true
+        let id = query.groupDossierId
+        vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
+          vm.activeAddDossierIntoGroup = false
+          vm.activeAddGroup = true
+          vm.groupDossierSelected = resultDossier
+        })
+      } else {
+        vm.detailGroup = false
+        vm.getGroupDossier()
+      }
     },
     getGroupDossier () {
       let vm = this
@@ -430,14 +471,14 @@ export default {
       }
       vm.$store.dispatch('getGroupDossier', filter).then(result => {
         vm.groupDossierList = result
-        if (query.hasOwnProperty('groupDossierId') && query.groupDossierId) {
-          let id = query.groupDossierId
-          vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
-            vm.activeAddDossierIntoGroup = false
-            vm.activeAddGroup = true
-            vm.groupDossierSelected = resultDossier
-          })
-        }
+        // if (query.hasOwnProperty('groupDossierId') && query.groupDossierId) {
+        //   let id = query.groupDossierId
+        //   vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
+        //     vm.activeAddDossierIntoGroup = false
+        //     vm.activeAddGroup = true
+        //     vm.groupDossierSelected = resultDossier
+        //   })
+        // }
       })
     },
     onChangeGroupDossier () {
@@ -460,6 +501,21 @@ export default {
           vm.dossiersIntoGroup = []
           vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
             vm.dossiersIntoGroup = result
+            if (vm.dossiersIntoGroup.length > 0) {
+              let steps = []
+              for (let index in vm.dossiersIntoGroup) {
+                if (steps.filter(function (item) {
+                  return String(item['stepCode']) === String(vm.dossiersIntoGroup[index]['stepCode'])
+                }).length === 0) {
+                  steps.push({
+                    stepCode: vm.dossiersIntoGroup[index]['stepCode'],
+                    stepName: vm.dossiersIntoGroup[index]['stepName']
+                  })
+                }
+              }
+              vm.stepList = steps
+              console.log('stepList', vm.stepList)
+            }
           })
           vm.$refs.thongtinnguoinophoso.initData(resultDossier)
           vm.$refs.thanhphanhoso.initData(resultDossier)
@@ -920,10 +976,15 @@ export default {
       let vm = this
       let currentParams = vm.$router.history.current.params
       let currentQuery = vm.$router.history.current.query
-      vm.$router.push({
-        path: '/danh-sach-ho-so/' + currentParams.index,
-        query: currentQuery
-      })
+      if (vm.activeAddDossierIntoGroup) {
+        vm.activeAddDossierIntoGroup = false
+        vm.onChangeGroupDossier()
+      } else {
+        vm.$router.push({
+          path: '/danh-sach-ho-so/' + currentParams.index,
+          query: currentQuery
+        })
+      }
     }
   }
 }

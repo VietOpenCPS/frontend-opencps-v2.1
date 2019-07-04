@@ -2038,7 +2038,7 @@ export default {
         if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
           vm.doImportDossier()
         } else {
-          alert('Chọn thủ tục thực hiện')
+          alert('Chọn thủ tục để thực hiện')
         }
       } else if (String(item.form) === 'COPY') {
         vm.doCopy(dossierItem, item, index, isGroup)

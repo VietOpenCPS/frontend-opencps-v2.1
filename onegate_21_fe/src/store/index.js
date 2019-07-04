@@ -1263,7 +1263,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
         dataPutdossier.append('applicantNote', state.applicantNote)
         if (data.originality !== 1) {
-          dataPutdossier.append('dossierName', data.dossierName)
+          dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
         }
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
