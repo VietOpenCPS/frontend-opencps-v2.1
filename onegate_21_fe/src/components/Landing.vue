@@ -2838,6 +2838,15 @@ export default {
         alert('Bạn không có quyền thao tác với hồ sơ này')
       }
     },
+    viewDetailGroupDossier (item, indexItem) {
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      if (item.permission) {
+       vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+      } else {
+        alert('Bạn không có quyền thao tác với hồ sơ này')
+      }
+    },
     keywordEventChange (data) {
       let vm = this
       vm.selectMultiplePage = []

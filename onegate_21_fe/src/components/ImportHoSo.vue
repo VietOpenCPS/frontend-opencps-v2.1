@@ -243,6 +243,7 @@ export default {
     validTNHS: false,
     dossierId: '',
     mark: true,
+    dossierFiles: '',
     stateEditSample: false,
     tiepNhanState: true,
     thongTinChiTietHoSo: {},
@@ -337,8 +338,22 @@ export default {
   methods: {
     uploadfileDossierImport: function (e) {
       var vm = this
+      let thanhphanhoso = vm.$refs.thanhphanhoso.dossierTemplateItems
+      thanhphanhoso = thanhphanhoso.filter(function (item) {
+        return item['hasForm'] === true && item['partType'] === 1
+      })
+      if (thanhphanhoso.length > 0) {
+        let tmp = thanhphanhoso.map(item => {
+          return {
+            partNo: item.partNo,
+            formData: window.$(`#formAlpaca${item.partNo}nm`).alpaca('get').getValue(),
+            eform: true
+          }
+        })
+        vm.dossierFiles = tmp
+      }
       vm.progressUploadFile = true
-      var data = {}
+      let data = {}
       vm.countDossierProgress = 0
       vm.valueProgress = 0
       vm.listDossierImport = []
@@ -427,7 +442,6 @@ export default {
         let dataDossierPayment = ''
         let thongTinChungHS = vm.$refs.thongtinchuhoso
         let dichVuChuyenKetQua = vm.$refs.dichvuchuyenphatketqua
-
         dataTotal['serviceCode'] = vm.thongTinChiTietHoSo['serviceCode']
         dataTotal['govAgencyCode'] = vm.thongTinChiTietHoSo['govAgencyCode']
         dataTotal['dossierTemplateNo'] = vm.thongTinChiTietHoSo['dossierTemplateNo']
@@ -450,48 +464,20 @@ export default {
           dataDossier = Object.assign(dataDossier, thongTinNguoiNop)
         }
         dataDossier = Object.assign(dataDossier, vm.dichVuChuyenPhatKetQua)
-        dataTotal['dossiers'] = JSON.stringify(dataDossier)
-        dataTotal['dossierFiles'] = JSON.stringify(dataDossierFile)
-        dataTotal['payment'] = JSON.stringify(dataDossierPayment)
+        dataTotal['dossiers'] = dataDossier ? JSON.stringify(dataDossier) : ''
+        dataTotal['dossierFiles'] = vm.dossierFiles ? JSON.stringify(vm.dossierFiles) : ''
+        dataTotal['payment'] = dataDossierPayment ? JSON.stringify(dataDossierPayment) : ''
 
         vm.$store.dispatch('importDossier', dataTotal).then(function (result) {
           // ---------
-          // vm.countDossierProgress ++
-          // vm.valueProgress += (100 / vm.totalDossier)
-          // vm.listDossierImport[index]['flagError'] = false
-          // if (vm.countDossierSuccess < vm.listDossierImport.length) {
-          //   vm.countDossierSuccess ++
-          // }
-          // vm.calDossierErrorSuccess()
-          // resolve(true)
-          // -----------
-          let dataPostAction = {
-            dossierId: result.dossierId,
-            actionCode: 1100,
-            actionNote: '',
-            actionUser: window.themeDisplay.getUserName(),
-            payload: '',
-            security: '',
-            assignUsers: '',
-            payment: '',
-            createDossiers: ''
+          vm.countDossierProgress ++
+          vm.valueProgress += (100 / vm.totalDossier)
+          vm.listDossierImport[index]['flagError'] = false
+          if (vm.countDossierSuccess < vm.listDossierImport.length) {
+            vm.countDossierSuccess ++
           }
-          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-            vm.countDossierProgress ++
-            vm.valueProgress += (100 / vm.totalDossier)
-            vm.listDossierImport[index]['flagError'] = false
-            if (vm.countDossierSuccess < vm.listDossierImport.length) {
-              vm.countDossierSuccess ++
-            }
-            vm.calDossierErrorSuccess()
-            resolve(true)
-          }).catch(reject => {
-            vm.countDossierProgress ++
-            vm.valueProgress += (100 / vm.totalDossier)
-            vm.listDossierImport[index]['flagError'] = true
-            vm.calDossierErrorSuccess()
-            reject(xhr)
-          })
+          vm.calDossierErrorSuccess()
+          resolve(true)
         }).catch(xhr => {
           console.log(xhr)
           vm.countDossierProgress ++

@@ -55,14 +55,14 @@
                       <span>{{props.item.wardName}}, {{props.item.districtName}}, {{props.item.cityName}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left">
+                  <!-- <td class="text-xs-left">
                     <div>
                       <span> Tiếp nhận: {{props.item.receiveDate}}<br>
                         Hẹn trả: {{props.item.receiveDate}}<br>
                         <span>{{props.item.dossierOverdue}}</span>
                       </span>
                     </div>
-                  </td>
+                  </td> -->
                 </tr>
               </template>
             </v-data-table>
@@ -234,12 +234,12 @@ export default {
         text: 'Địa chỉ',
         align: 'center',
         sortable: false
-      },
-      {
-        text: 'Thời gian',
-        align: 'center',
-        sortable: false
       }
+      // {
+      //   text: 'Thời gian',
+      //   align: 'center',
+      //   sortable: false
+      // }
     ],
     mutilpleAction: false,
     actionExits: [],
