@@ -295,7 +295,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2) && originality === 3">
+      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(6) && !partTypes.includes(7)">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">

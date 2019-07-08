@@ -706,7 +706,7 @@ export default {
         }
         booking = sortBooking(booking)
         vm.currentBooking = booking[0]
-        console.log('currentBooking', vm.currentBooking)
+        // console.log('currentBooking', vm.currentBooking)
       } else {
         vm.currentBooking = ''
       }

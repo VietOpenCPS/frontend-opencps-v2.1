@@ -228,7 +228,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red">*</span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red"></span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -237,8 +237,6 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
-                        :rules="[v => !!v || 'Thông tin bắt buộc']"
-                        required
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>

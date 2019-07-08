@@ -314,11 +314,11 @@
       >
         Khôi phục hồ sơ
       </v-btn>
-      <v-btn color="red" dark
+      <!-- <v-btn color="red" dark
         v-on:click.native="btnActionEvent(null, {form: 'IMPORT'}, 0, true)"
       >
         Import hồ sơ
-      </v-btn>
+      </v-btn> -->
       <v-btn color="primary" v-for="(item, indexBTN) in btnDynamics" v-bind:key="indexBTN"
         v-on:click.native="btnActionEvent(null, item, indexBTN, true)" 
         v-if="String(item.form).indexOf('VIEW') < 0 && menuType !== 3"

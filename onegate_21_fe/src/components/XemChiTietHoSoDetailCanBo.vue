@@ -632,8 +632,8 @@ export default {
   },
   data: () => ({
     isMobile: false,
-    inputTypes: [1, 3],
-    outputTypes: [2],
+    inputTypes: [1, 3, 6],
+    outputTypes: [2, 7],
     actionIdCurrent: 0,
     validateAction: true,
     btnIndex: -1,

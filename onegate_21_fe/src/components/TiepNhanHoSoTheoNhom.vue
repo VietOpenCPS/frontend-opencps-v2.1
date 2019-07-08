@@ -110,6 +110,17 @@
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="outputTypes"></thanh-phan-ho-so-2>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <div style="position: relative;">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Hồ sơ trong nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
@@ -339,6 +350,7 @@ import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo2 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
@@ -352,6 +364,7 @@ export default {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
     'thanh-phan-ho-so-1': ThanhPhanHoSo1,
+    'thanh-phan-ho-so-2': ThanhPhanHoSo2,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
@@ -385,7 +398,8 @@ export default {
     dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
-    inputTypes: [6, 7],
+    inputTypes: [6],
+    outputTypes: [7],
     inputTypesIntoGroup: [1, 3],
     outputTypes: [2],
     sampleCount: 0,

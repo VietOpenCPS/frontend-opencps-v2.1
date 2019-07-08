@@ -1136,6 +1136,9 @@ export const store = new Vuex.Store({
         dataPostdossier.append('dossierTemplateNo', data.templateNo)
         dataPostdossier.append('originality', data.originality)
         dataPostdossier.append('dossiers', data.dossiers)
+        dataPostdossier.append('dossierFileArr', data.dossierFileArr)
+        dataPostdossier.append('dossierMarkArr', data.dossierMarkArr)
+        dataPostdossier.append('payment', data.payment)
         if (data.j_captcha_response) {
           dataPostdossier.append('j_captcha_response', data.j_captcha_response)
         }
