@@ -163,38 +163,20 @@ export default {
       }
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (newQuery.hasOwnProperty('agencyCode')) {
-        filter.agencyCode = newQuery.agencyCode
-        vm.$store.dispatch('loadEmployees', filter).then(result => {
-          vm.totalEmployee = result[0]
-          vm.employeeItems = sortEmployee(result[1])
-          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
-          if (vm.employeeItems && vm.employeeItems.length > 0) {
-            for (let key in vm.employeeItems) {
-              vm.getAvatar(vm.employeeItems[key], key)
-              vm.getVotingEmployee(vm.employeeItems[key], key)
-            }
+      vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
+        vm.totalEmployee = result[0]
+        vm.employeeItems = sortEmployee(result[1])
+        vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+        if (vm.employeeItems && vm.employeeItems.length > 0) {
+          for (let key in vm.employeeItems) {
+            vm.getAvatar(vm.employeeItems[key], key)
+            vm.getVotingEmployee(vm.employeeItems[key], key)
           }
-        }).catch(xhr => {
-          vm.totalThuTuc = 0
-          vm.thutucPage = 1
-        })
-      } else {
-        vm.$store.dispatch('loadEmployeesMotcua', filter).then(result => {
-          vm.totalEmployee = result[0]
-          vm.employeeItems = sortEmployee(result[1])
-          vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
-          if (vm.employeeItems && vm.employeeItems.length > 0) {
-            for (let key in vm.employeeItems) {
-              vm.getAvatar(vm.employeeItems[key], key)
-              vm.getVotingEmployee(vm.employeeItems[key], key)
-            }
-          }
-        }).catch(xhr => {
-          vm.totalThuTuc = 0
-          vm.thutucPage = 1
-        })
-      }
+        }
+      }).catch(xhr => {
+        vm.totalThuTuc = 0
+        vm.thutucPage = 1
+      })
     },
     getAvatar (item, key) {
       let vm = this

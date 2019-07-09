@@ -26,6 +26,7 @@ let userName = window.themeDisplay !== undefined ? window.themeDisplay.getUserNa
 let portalURL = (window.themeDisplay !== undefined ) ? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
+// Cũ
 let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
 Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalUrlSocket
@@ -39,6 +40,37 @@ Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ 
     reconnection: true
   }
 )
+// Mới https
+// let portalURLInside = window.themeDisplay.getPortalURL()
+// let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
+// if (portalURLInside.indexOf('https') >= 0) {
+//   Vue.use(VueNativeSock, 'wss://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
+//     + '&portalURL=' + portalURLInside
+//     + '&companyId=' + companyId
+//     + '&userId=' + userId
+//     + '&userName=' + userName
+//     + '&Token=' + token, 
+//     {
+//       store: store,
+//       format: 'json',
+//       reconnection: true
+//     }
+//   )
+// } else {
+//   Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
+//     + '&portalURL=' + portalURLInside
+//     + '&companyId=' + companyId
+//     + '&userId=' + userId
+//     + '&userName=' + userName
+//     + '&Token=' + token, 
+//     {
+//       store: store,
+//       format: 'json',
+//       reconnection: true
+//     }
+//   )
+// }
+// 
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
