@@ -340,71 +340,83 @@ export default {
       var vm = this
       let thanhphanhoso = vm.$refs.thanhphanhoso.dossierTemplateItems
       thanhphanhoso = thanhphanhoso.filter(function (item) {
-        return item['hasForm'] === true && item['partType'] === 1
+        return item['partType'] === 1
       })
-      if (thanhphanhoso.length > 0) {
-        let tmp = thanhphanhoso.map(item => {
-          return {
-            partNo: item.partNo,
-            formData: window.$(`#formAlpaca${item.partNo}nm`).alpaca('get').getValue(),
-            eform: true
+      // console.log('thanhphanhoso', thanhphanhoso)
+      vm.$store.dispatch('loadDossierFiles', vm.thongTinChiTietHoSo['dossierId']).then(function (result) {
+        let files = []
+        for (let index in result) {
+          if (result[index]['dossierPartType'] === 1) {
+            files.push(result[index]['dossierFileId'])
           }
-        })
-        vm.dossierFiles = tmp
-      }
-      vm.progressUploadFile = true
-      let data = {}
-      vm.countDossierProgress = 0
-      vm.valueProgress = 0
-      vm.listDossierImport = []
-      vm.dossierError = []
-      vm.dossierSuccess = []
-      vm.countDossierSuccess = 0
-      data['dossierId'] = vm.thongTinChiTietHoSo['dossierId']
-      data['referenceUid'] = vm.thongTinChiTietHoSo['referenceUid']
-      data['selector'] = 'dossierImport'
-      data['partTip'] = {
-        tip: '',
-        maxSize: 10,
-        extensions: 'xlsx,xls'
-      }
-      let file = $('#dossierImport')[0].files[0]
-      vm.$store.dispatch('uploadDossierFileImport', data).then(function (result) {
-        vm.progressUploadFile = false
-        vm.totalDossier = result.total
-        if (result.total) {
-          let cf = confirm('Bạn có chắc chắn thực hiện hành động này?')
-          if (cf) {
-            vm.dialogImportDosier = true
-            vm.listDossierImport = result.data
-            console.log(result.data)
-            setTimeout(function () {
-              if (vm.listDossierImport.length) {
-                vm.loadingImportDossier = true
-                let action = []
-                vm.listDossierImport.forEach(function (item, index) {
-                  setTimeout(function () {
-                    action.push(vm.doCreateDossier(item, index))
-                    if (action.length === vm.listDossierImport.length) {
-                      Promise.all(action).then(function (result) {
-                        vm.loadingImportDossier = false
-                      }).catch(function (xhr) {
-                        vm.loadingImportDossier = false
-                      })
-                    }
-                  }, index * 1000);
-                })
-              }
-            }, 300);
-          }
-        } else {
-          vm.listDossierImport = []
-          toastr.error('Dữ liệu bị lỗi, vui lòng kiểm tra lại!')
         }
-      }).catch(function (xhr) {
-        vm.dialogImportDosier = false
-        vm.progressUploadFile = false
-        toastr.error('Tải file lỗi, vui lòng thử lại!')
+        vm.dossierFiles = files ? files.toString() : ''
+        // if (thanhphanhoso.length > 0) {
+        //   let tmp = thanhphanhoso.map(item => {
+        //     return {
+        //       partNo: item.partNo,
+        //       formData: item['files'] ? item['files'].toString() : '',
+        //       eform: item['hasForm'] === true ? true : false
+        //     }
+        //   })
+        //   vm.dossierFiles = tmp
+        // }
+        vm.progressUploadFile = true
+        let data = {}
+        vm.countDossierProgress = 0
+        vm.valueProgress = 0
+        vm.listDossierImport = []
+        vm.dossierError = []
+        vm.dossierSuccess = []
+        vm.countDossierSuccess = 0
+        data['dossierId'] = vm.thongTinChiTietHoSo['dossierId']
+        data['referenceUid'] = vm.thongTinChiTietHoSo['referenceUid']
+        data['selector'] = 'dossierImport'
+        data['partTip'] = {
+          tip: '',
+          maxSize: 10,
+          extensions: 'xlsx,xls'
+        }
+        let file = $('#dossierImport')[0].files[0]
+        vm.$store.dispatch('uploadDossierFileImport', data).then(function (result) {
+          vm.progressUploadFile = false
+          vm.totalDossier = result.total
+          if (result.total) {
+            let cf = confirm('Bạn có chắc chắn thực hiện hành động này?')
+            if (cf) {
+              vm.dialogImportDosier = true
+              vm.listDossierImport = result.data
+              console.log(result.data)
+              setTimeout(function () {
+                if (vm.listDossierImport.length) {
+                  vm.loadingImportDossier = true
+                  let action = []
+                  vm.listDossierImport.forEach(function (item, index) {
+                    setTimeout(function () {
+                      action.push(vm.doCreateDossier(item, index))
+                      if (action.length === vm.listDossierImport.length) {
+                        Promise.all(action).then(function (result) {
+                          vm.loadingImportDossier = false
+                        }).catch(function (xhr) {
+                          vm.loadingImportDossier = false
+                        })
+                      }
+                    }, index * 1000);
+                  })
+                }
+              }, 300);
+            }
+          } else {
+            vm.listDossierImport = []
+            toastr.error('Dữ liệu bị lỗi, vui lòng kiểm tra lại!')
+          }
+        }).catch(function (xhr) {
+          vm.dialogImportDosier = false
+          vm.progressUploadFile = false
+          toastr.error('Tải file lỗi, vui lòng thử lại!')
+        })
+      }).catch(function (reject) {
+
       })
     },
     addDossierAgain () {
@@ -465,7 +477,7 @@ export default {
         }
         dataDossier = Object.assign(dataDossier, vm.dichVuChuyenPhatKetQua)
         dataTotal['dossiers'] = dataDossier ? JSON.stringify(dataDossier) : ''
-        dataTotal['dossierFiles'] = vm.dossierFiles ? JSON.stringify(vm.dossierFiles) : ''
+        dataTotal['dossierFiles'] = vm.dossierFiles ? vm.dossierFiles : ''
         dataTotal['payment'] = dataDossierPayment ? JSON.stringify(dataDossierPayment) : ''
 
         vm.$store.dispatch('importDossier', dataTotal).then(function (result) {

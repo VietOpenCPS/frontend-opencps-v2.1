@@ -480,16 +480,16 @@ export default {
         viewport.attr('content', 'initial-scale=1.0, width=device-width')
       }
     },
-    // groupDossierSelected (val) {
-    //   let vm = this
-    //   if (val) {
-    //     vm.tiepNhanState = true
-    //     vm.thongTinNhomHoSo = val
-    //   } else {
-    //     vm.tiepNhanState = false
-    //     vm.thongTinNhomHoSo = ''
-    //   }
-    // },
+    groupDossierSelected (val) {
+      let vm = this
+      if (val) {
+        // vm.tiepNhanState = true
+        vm.thongTinNhomHoSo = val
+      } else {
+        // vm.tiepNhanState = false
+        vm.thongTinNhomHoSo = ''
+      }
+    },
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query

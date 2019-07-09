@@ -1142,7 +1142,7 @@ export const store = new Vuex.Store({
         if (data.j_captcha_response) {
           dataPostdossier.append('j_captcha_response', data.j_captcha_response)
         }
-        axios.post('/o/rest/v2/dossiers/all', dataPostdossier, options).then(function (response) {
+        axios.post('/o/rest/v2/dossiers/create/all', dataPostdossier, options).then(function (response) {
           response.data.serviceConfig = state.serviceConfigObj
           commit('setLoading', false)
           toastr.clear()
@@ -1363,7 +1363,7 @@ export const store = new Vuex.Store({
         //   // dataPutdossier.append('postalWardCode', data.postalWardCode)
         // }
         // dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 1)
-        axios.post(state.initData.postDossierApi + '/all', dataPutdossier, options).then(function (response) {
+        axios.post(state.initData.postDossierApi + '/import/all', dataPutdossier, options).then(function (response) {
           resolve(response.data)
         }).catch(rejectXhr => {
           reject(rejectXhr)
