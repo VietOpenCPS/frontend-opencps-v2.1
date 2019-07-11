@@ -101,7 +101,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Thành phần hồ sơ theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so-1 ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so-1>
+              <thanh-phan-ho-so-1 ref="thanhphanhoso1" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so-1>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -112,7 +112,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so-2 ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="outputTypes"></thanh-phan-ho-so-2>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypes"></thanh-phan-ho-so-2>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -239,7 +239,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
+              <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypesIntoGroup"></thanh-phan-ho-so>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -616,7 +616,8 @@ export default {
         })
         setTimeout(function () {
           vm.$refs.thongtinnguoinophoso.initData(resultDossier)
-          vm.$refs.thanhphanhoso.initData(resultDossier)
+          vm.$refs.thanhphanhoso1.initData(resultDossier)
+          vm.$refs.thanhphanhoso2.initData(resultDossier)
         }, 200)
       })
     },
@@ -712,7 +713,8 @@ export default {
           vm.groupDossierList.unshift(result)
           vm.groupDossierSelected = vm.groupDossierList[0]
           vm.$refs.thongtinnguoinophoso.initData(result)
-          vm.$refs.thanhphanhoso.initData(result)
+          vm.$refs.thanhphanhoso1.initData(result)
+          vm.$refs.thanhphanhoso2.initData(result)
         }).catch(function (xhr) {
         })
         // 
@@ -722,7 +724,6 @@ export default {
     putGroupDossier () {
       let vm = this
       let thongtinnguoinophoso = this.$refs.thongtinnguoinophoso ? this.$refs.thongtinnguoinophoso.thongTinNguoiNopHoSo : {}
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let validThongtinnguoinophoso = vm.$refs.thongtinnguoinophoso.showValid()
       if (validThongtinnguoinophoso['validForm']) {
         let passValid = false
@@ -733,24 +734,20 @@ export default {
           }
         } else { passValid = true }
         if (passValid) {
-          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
-            return
-          }
-          // if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+          // if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
           //   return
           // }
-          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
-          let dossierTemplates = thanhphanhoso
-          let listAction = []
-          let listDossierMark = []
-          if (dossierFiles) {
-            dossierFiles.forEach(function (value, index) {
-              if (value.eForm) {
-                value['dossierId'] = vm.thongTinNhomHoSo.dossierId
-                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-              }
-            })
-          }
+          // let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          // let listAction = []
+          // let listDossierMark = []
+          // if (dossierFiles) {
+          //   dossierFiles.forEach(function (value, index) {
+          //     if (value.eForm) {
+          //       value['dossierId'] = vm.thongTinNhomHoSo.dossierId
+          //       listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          //     }
+          //   })
+          // }
           let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
           tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
           tempData['originality'] = vm.thongTinNhomHoSo.originality

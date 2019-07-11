@@ -2035,7 +2035,7 @@ export default {
           query: vm.$router.history.current.query
         })
       } else if (String(item.form) === 'IMPORT') {
-        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined && vm.listDichVu.length === 1) {
+        if (vm.dichVuSelected !== null && vm.dichVuSelected !== undefined && vm.dichVuSelected !== 'undefined' && vm.listDichVu !== null && vm.listDichVu !== undefined) {
           vm.doImportDossier()
         } else {
           alert('Chọn thủ tục để thực hiện')

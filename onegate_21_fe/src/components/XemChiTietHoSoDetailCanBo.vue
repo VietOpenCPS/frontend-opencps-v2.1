@@ -105,7 +105,7 @@
                     </span>
                   </v-flex>
                   <v-flex v-if="showReasign" class="text-xs-right" style="width:80px">
-                    <v-btn class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" @click="reAsign" small color="primary" style="height:26px">
+                    <v-btn @click="reAsign" class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                       <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
                         <span v-if="checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                         <span v-else>Phân công lại</span>
@@ -153,6 +153,16 @@
                 {{item.pluginName}}
                 <span slot="loader">Loading...</span>
               </v-btn>
+              <!-- Thao tác thu hồi hồ sơ -->
+              <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)"
+                v-on:click.native="rollBack()" 
+                :loading="loadingAction"
+                :disabled="loadingAction"
+              >
+                Thu hồi hồ sơ
+                <span slot="loader">Loading...</span>
+              </v-btn>
+              <!--  -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                 <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                 <v-list>
@@ -175,7 +185,7 @@
             <!--  -->
             <v-layout wrap v-if="dialogActionProcess && !loadingAction">
               <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
-              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign"></phan-cong>
+              <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
               <tai-lieu-ket-qua ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
               <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
@@ -1536,11 +1546,16 @@ export default {
       let params = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
+      vm.loadingAction = true
       vm.$store.dispatch('rollBack', params).then(resRollBack => {
-        vm.getNextActions()
-        vm.rollbackable = false
-        vm.btnStateVisible = true
+        setTimeout(function () {
+          vm.loadingAction = false
+          vm.getNextActions()
+          vm.rollbackable = false
+          vm.btnStateVisible = true
+        }, 500)
       }).catch(reject => {
+        vm.loadingAction = false
         vm.alertObj = {
           icon: 'error',
           color: 'error',
@@ -1754,6 +1769,18 @@ export default {
             vm.loadingAction = false
             vm.loadingActionProcess = false
           })
+          // Thực hiện ủy quyền trong phân công
+          if (vm.showPhanCongNguoiThucHien && (vm.type_assign === 3 || vm.type_assign === 4)) {
+            let data_delegacy = vm.$refs.phancong.getDataDelegacy()
+            console.log('data_delegacy', data_delegacy)
+            let filter = {
+              'dossierId': vm.thongTinChiTietHoSo.dossierId,
+              'users': data_delegacy
+            }
+            vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
+            }).catch(function (error) {
+            })
+          }
         } else {
           return false
         }
@@ -1915,6 +1942,18 @@ export default {
             vm.loadingAction = false
             vm.loadingActionProcess = false
           })
+          // Thực hiện ủy quyền trong phân công
+          if (vm.showPhanCongNguoiThucHien && (vm.type_assign === 3 || vm.type_assign === 4)) {
+            let data_delegacy = vm.$refs.phancong.getDataDelegacy()
+            console.log('data_delegacy', data_delegacy)
+            let filter = {
+              'dossierId': vm.thongTinChiTietHoSo.dossierId,
+              'users': data_delegacy
+            }
+            vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
+            }).catch(function (error) {
+            })
+          }
         }
       }
     },

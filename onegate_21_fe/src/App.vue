@@ -100,7 +100,7 @@
       </div>
     </div>
     <v-content>
-      <router-view></router-view>
+      <router-view v-if="isSigned"></router-view>
       <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>

@@ -397,6 +397,12 @@ export default {
                       if (action.length === vm.listDossierImport.length) {
                         Promise.all(action).then(function (result) {
                           vm.loadingImportDossier = false
+                          if (vm.dossierError.length === 0) {
+                            toastr.success('Import hồ sơ thành công')
+                            setTimeout (function () {
+                              vm.goBack()
+                            }, 1000)
+                          }
                         }).catch(function (xhr) {
                           vm.loadingImportDossier = false
                         })
@@ -435,6 +441,12 @@ export default {
             if (action.length === vm.dossierError.length) {
               Promise.all(action).then(function (result) {
                 vm.loadingImportDossier = false
+                if (vm.dossierError.length === 0) {
+                  toastr.success('Import hồ sơ thành công')
+                  setTimeout (function () {
+                    vm.goBack()
+                  }, 1000)
+                }
               }).catch(function (xhr) {
                 vm.loadingImportDossier = false
               })
@@ -524,7 +536,7 @@ export default {
         vm.$refs.thanhphanhoso.initData(result)
         vm.$refs.thongtinchuhoso.initData(result)
         let dataDichVuChuyenPhatKetQua = {
-          viaPostal: 2,
+          viaPostal: 1,
           postalServiceCode: 'VNPOST',
           postalAddress: '',
           postalCityCode: '',

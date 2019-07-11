@@ -1,14 +1,38 @@
 <template>  
   <div class="phancong" style="background-color: white;width:100%">
+    <v-expansion-panel v-if="type === 3 || type === 4" :value="[true]" expand  class="expansion-pl">
+      <v-expansion-panel-content>
+        <div slot="header">
+          <div class="background-triangle-small"> 
+            <v-icon size="18" color="white">star_rate</v-icon> 
+          </div>Ủy quyền
+        </div>
+        <v-card >
+          <div class="px-4 py-1">
+            <v-layout wrap>
+              <v-checkbox v-for="(item, index) in data_uyquyen" v-bind:key="item.userId"
+              slot="activator"
+              v-model="item.assigned"
+              :label="item.userName"
+              @change = 'changeDelegacy($event, index)'
+              style="display:inline-block;min-width:190px;max-width:190px"
+              :title="item.userName"
+              ></v-checkbox>
+            </v-layout>
+          </div>
+        </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+    <!--  -->
     <v-expansion-panel :value="[true]" expand  class="expansion-pl">
       <v-expansion-panel-content>
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>Chọn người thực hiện
+          </div>Phân công người thực hiện
         </div>
         <v-card >
-          <div v-if="type === 1" class="px-4 py-1">
+          <div v-if="type === 1 || type === 3" class="px-4 py-1">
             <v-layout wrap>
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               slot="activator"
@@ -22,7 +46,7 @@
             <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
           </div>
           <!--  -->
-          <v-card-text v-else class="px-4 py-1">
+          <v-card-text v-if="type === 2 || type === 4" class="px-4 py-1">
             <v-layout wrap class="my-1">
               <div class="ml-3" v-for="(item, index) in data_phancong" v-bind:key="item.userId">
                 <v-layout wrap>
@@ -65,6 +89,10 @@ export default {
   },
   props: {
     assign_items: {
+      type: Array,
+      default: () => []
+    },
+    data_uyquyen: {
       type: Array,
       default: () => []
     },
@@ -115,11 +143,21 @@ export default {
   methods: {
     changeAssigned (event, index) {
       var vm = this
-      if (vm.type === 1) {
+      if (vm.type !== 0) {
         if (event === true) {
           vm.assign_items[index].assigned = 1
         } else {
           vm.assign_items[index].assigned = 0
+        }
+      }
+    },
+    changeDelegacy (event, index) {
+      var vm = this
+      if (vm.type === 3 || vm.type === 4) {
+        if (event === true) {
+          vm.data_uyquyen[index].assigned = 1
+        } else {
+          vm.data_uyquyen[index].assigned = 0
         }
       }
     },
@@ -157,6 +195,10 @@ export default {
         vm.assignValidate = true
         return vm.assignValidate
       }
+    },
+    getDataDelegacy () {
+      let vm = this
+      return vm.data_uyquyen
     }
   }
 }

@@ -283,8 +283,13 @@ export default {
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       telNo: (value) => {
-        const pattern = /^(([0-9]{0,}))$/
-        return pattern.test(value) || 'Gồm các ký tự 0-9'
+        // const pattern = /^(([0-9]{0,}))$/
+        const pattern = /^0(1\d{9}|9\d{8})$/
+        if (value) {
+          return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+        } else {
+          return []
+        }
       },
       passWord: (value) => {
         const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
