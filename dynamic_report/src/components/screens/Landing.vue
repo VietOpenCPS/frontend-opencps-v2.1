@@ -762,6 +762,7 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+              /** TODO: Call API
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -773,6 +774,11 @@ export default {
                 };
                 reader.readAsArrayBuffer(fileToExcel)
               }
+              */
+              vm.$store.dispatch('getExcelReportFromServer', {
+                data: docDString,
+                fileName: new Date().getTime() + '.xls'
+              })
             }
           })
         } else {
@@ -1152,6 +1158,7 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+              /** TODO: Call API
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -1163,6 +1170,11 @@ export default {
                 };
                 reader.readAsArrayBuffer(fileToExcel)
               }
+              */
+              vm.$store.dispatch('getExcelReportFromServer', {
+                data: docDString,
+                fileName: new Date().getTime() + '.xls'
+              })
             }
           })
         } else {
