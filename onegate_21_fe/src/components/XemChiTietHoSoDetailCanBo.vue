@@ -154,12 +154,13 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Thao tác thu hồi hồ sơ -->
-              <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)"
+              <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
+              && thongTinChiTietHoSo['dossierStatus'] !== 'new'"
                 v-on:click.native="rollBack()" 
                 :loading="loadingAction"
                 :disabled="loadingAction"
               >
-                Thu hồi hồ sơ
+                Quay lại bước trước
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!--  -->
@@ -1552,6 +1553,7 @@ export default {
           vm.loadingAction = false
           vm.getNextActions()
           vm.rollbackable = false
+          vm.dialogActionProcess = false
           vm.btnStateVisible = true
         }, 500)
       }).catch(reject => {

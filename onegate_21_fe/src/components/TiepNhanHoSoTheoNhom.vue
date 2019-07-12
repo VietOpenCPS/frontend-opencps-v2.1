@@ -1,78 +1,14 @@
 <template>
   <div>
     <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
-      <div v-if="!detailGroup" class="row-header">
-        <div class="background-triangle-big">
-          <span>THÊM MỚI HỒ SƠ</span> 
-        </div>
-        <div class="layout row wrap header_tools row-blue">
-          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="processOptionSelected.processName">
-            {{processOptionSelected.processName}}
-          </div>
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
-              <v-icon size="18">reply</v-icon> &nbsp;
-              Quay lại
-            </v-btn>
-          </div>
-        </div> 
-      </div>
-      <div v-if="!detailGroup" style="position: relative;border-bottom: 1px solid #dedede;">
-        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-          <v-expansion-panel-content>
-            <v-card>
-              <v-card-text class="pb-0 mb-3">
-                <v-layout wrap>
-                  <v-flex xs12 sm2>
-                    <v-subheader class="pl-0 text-header">Chọn nhóm hồ sơ: </v-subheader>
-                  </v-flex>
-                  <v-flex xs12 sm10>
-                    <v-select
-                    :items="groupDossierList"
-                    item-text="dossierName"
-                    item-value="dossierId"
-                    v-model="groupDossierSelected"
-                    :placeholder="groupDossierList.length === 0 ? 'Chưa có nhóm hồ sơ nào được tạo' : ''"
-                    @change="onChangeGroupDossier"
-                    return-object
-                    >
-                    </v-select>
-                  </v-flex>
-                  <!--  -->
-                  <!-- <v-flex xs12 sm2 class="my-2">
-                    <v-subheader class="pl-0 text-header">Tên nhóm hồ sơ: </v-subheader>
-                  </v-flex>
-                  <v-flex xs12 sm10 class="my-2">
-                    <v-text-field class="mt-1"
-                    v-model="groupDossierSelected.dossierName"
-                    :disabled="groupDossierSelected ? false : true"
-                    ></v-text-field>
-                  </v-flex> -->
-                </v-layout>
-                <v-flex xs12 class="text-right">
-                  <v-btn v-if="groupDossierSelected && !activeAddDossierIntoGroup && !activeAddGroup" color="primary" @click="updateGroupDossier" class="mr-3">
-                    <v-icon size="20">edit</v-icon>  &nbsp;
-                    <span>Cập nhật nhóm hồ sơ</span>
-                  </v-btn>
-                  <v-btn color="primary" @click="doSubmitAddGroupDialog" class="mx-0">
-                    <v-icon size="20">add</v-icon>  &nbsp;
-                    <span>Thêm nhóm hồ sơ</span>
-                  </v-btn>
-                </v-flex>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </div>
       <!-- Thông tin nhóm hồ sơ -->
-      <div class="row-header" v-if="!activeAddDossierIntoGroup && groupDossierSelected">
+      <div class="row-header">
         <div class="background-triangle-big">
-          <span v-if="!detailGroup">THÔNG TIN NHÓM</span>
-          <span v-else>THỦ TỤC</span>
+          <span>THÔNG TIN NHÓM HỒ SƠ</span>
         </div>
         <div class="layout wrap header_tools row-blue">
-          <div v-if="detailGroup" class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="groupDossierSelected.serviceName">
-            {{groupDossierSelected.serviceName}}
+          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
+            {{thongTinNhomHoSo.serviceName}}
           </div>
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0">
@@ -82,19 +18,19 @@
           </div>
         </div> 
       </div>
-      <div v-if="(tiepNhanState || activeAddGroup) && !activeAddDossierIntoGroup">
-        <v-layout wrap style="background: #fff;">
+      <div v-if="!activeAddDossierIntoGroup">
+        <v-layout wrap style="background: #fff;border-bottom: 1px solid #dedede;">
           <v-flex xs12 sm2 class="my-2">
             <v-subheader class="pl-0 text-header pt-2">Tên nhóm hồ sơ: </v-subheader>
           </v-flex>
           <v-flex xs12 sm10 class="my-2 pr-3">
             <v-text-field class="mt-1"
-            v-model="groupDossierSelected.dossierName"
+            v-model="thongTinNhomHoSo.dossierName"
             ></v-text-field>
           </v-flex>
         </v-layout>
         <thong-tin-chu-ho-so :showApplicant="true" :showDelegate="false" ref="thongtinnguoinophoso"></thong-tin-chu-ho-so>
-        <div style="position: relative;">
+        <div style="position: relative;border-top: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -105,18 +41,8 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        <div style="position: relative;">
-          <v-expansion-panel :value="0" class="expansion-pl">
-            <v-expansion-panel-content>
-              <div slot="header" style="display: flex; align-items: center;">
-                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
-              </div>
-              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypes"></thanh-phan-ho-so-2>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </div>
-        <div style="position: relative;">
+        
+        <div style="position: relative;border-bottom: 1px solid #dedede;">
           <v-expansion-panel :value="0" class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -126,7 +52,7 @@
               <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
                 <v-layout wrap class="my-2">
                   <v-flex style="width: 120px">
-                    <v-subheader class="pl-0 text-header">Chọn bước xử lý: </v-subheader>
+                    <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
                   </v-flex>
                   <v-flex class="pr-3" style="width: calc(100% - 120px)">
                     <v-select
@@ -222,12 +148,18 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        <!-- <v-flex xs12 class="text-right">
-          <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 mr-3">
-            <v-icon size="20">add</v-icon>  &nbsp;
-            <span>Thêm mới hồ sơ</span>
-          </v-btn>
-        </v-flex> -->
+        
+        <div style="position: relative;">
+          <v-expansion-panel :value="0" class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
@@ -263,7 +195,7 @@
         <!--  -->
       </div>
       <!--  -->
-      <v-tabs icons-and-text centered class="mb-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
+      <v-tabs icons-and-text centered class="mb-0 mt-4" v-if="activeAddDossierIntoGroup || activeAddGroup">
         <!-- <v-tabs-slider color="primary"></v-tabs-slider> -->
         <!-- Cập nhật thông tin nhóm -->
         <v-tab href="#tab-1" @click="putGroupDossier()" v-if="activeAddGroup" class="px-0 py-0"> 
@@ -310,36 +242,6 @@
         </v-tab>
       </v-tabs>
     </v-form>
-    <v-dialog v-model="dialogAddGroup" max-width="500" transition="fade-transition" persistent>
-      <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-toolbar dark color="primary">
-            <v-toolbar-title>Tên nhóm hồ sơ</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon dark @click.native="dialogAddGroup = false">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-card-text class="pb-0 pt-2">
-            <v-text-field v-model="groupDossierNameCreate" box placeholder="Nhập tên nhóm hồ sơ">
-            </v-text-field>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="red darken-3" flat="flat" @click.native="dialogAddGroup = false"
-            >
-              <v-icon>reply</v-icon>&nbsp;
-              Quay lại
-            </v-btn>
-            <v-btn color="primary" flat="flat" @click.native="doSubmitAddGroup"
-            >
-              <v-icon>save</v-icon>&nbsp;
-              Đồng ý
-            </v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -399,8 +301,8 @@ export default {
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [6],
-    outputTypes: [7],
-    inputTypesIntoGroup: [1, 3],
+    outputTypesGroup: [7],
+    inputTypesIntoGroup: [1, 3, 6],
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
@@ -453,11 +355,10 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
-      let filter = {
-        serviceConfigId: query.hasOwnProperty('service_config') ? query.service_config : '',
-        processOptionId: query.hasOwnProperty('processOptionId') ? query.processOptionId : ''
+      let id = vm.id
+      if (id) {
+        vm.getDetaiGroup(id)
       }
-      vm.initData(filter)
     })
   },
   beforeDestroy () {
@@ -468,8 +369,13 @@ export default {
     }
   },
   mounted () {
-    this.onResize()
-    window.addEventListener('resize', this.onResize, { passive: true })
+    let vm = this
+    if (vm.thongTinNhomHoSo) {
+      console.log('run mounted')
+      vm.$refs.thongtinnguoinophoso.initData(vm.thongTinNhomHoSo)
+      vm.$refs.thanhphanhoso1.initData(vm.thongTinNhomHoSo)
+      vm.$refs.thanhphanhoso2.initData(vm.thongTinNhomHoSo)
+    }
   },
   watch: {
     isMobile (val) {
@@ -480,22 +386,21 @@ export default {
         viewport.attr('content', 'initial-scale=1.0, width=device-width')
       }
     },
-    groupDossierSelected (val) {
-      let vm = this
-      if (val) {
-        // vm.tiepNhanState = true
-        vm.thongTinNhomHoSo = val
-      } else {
-        // vm.tiepNhanState = false
-        vm.thongTinNhomHoSo = ''
-      }
-    },
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentQuery = newRoute.query
-      let id = currentQuery.hasOwnProperty('groupDossierId') ? currentQuery.groupDossierId : ''
+      let id = vm.id
       if (id) {
-        vm.getDetaiDossierIntoGroup(id)
+        vm.getDetaiGroup(id)
+      }
+    },
+    thongTinNhomHoSo (val) {
+      let vm = this
+      if (val) {
+        console.log('run watch thongtinnhom')
+        vm.$refs.thongtinnguoinophoso.initData(val)
+        vm.$refs.thanhphanhoso1.initData(val)
+        vm.$refs.thanhphanhoso2.initData(val)
       }
     }
   },
@@ -505,30 +410,30 @@ export default {
       let isMobile = window.innerWidth < 1024
       vm.isMobile = isMobile
     },
-    initData: function (data) {
-      var vm = this
-      let query = vm.$router.history.current.query
-      vm.$store.dispatch('getServiceOpionByProcess', data).then(result => {
-        vm.processOptionSelected = result.filter(function(item) {
-          return String(item.processOptionId) === String(data.processOptionId)
-        })[0]
-        vm.groupDossierNameCreate = vm.processOptionSelected.processName
-      }).catch(reject => {
-      })
-      if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && query.hasOwnProperty('detailGroup')) {
-        vm.detailGroup = true
-        let id = query.groupDossierId
-        vm.getDetaiDossierIntoGroup(id)
-      } else if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && !query.hasOwnProperty('detailGroup')) {
-        vm.detailGroup = false
-        vm.getGroupDossier()
-        let id = query.groupDossierId
-        vm.getDetaiDossierIntoGroup(id)
-      } else {
-        vm.detailGroup = false
-        vm.getGroupDossier()
-      }
-    },
+    // initData: function (data) {
+    //   var vm = this
+    //   let query = vm.$router.history.current.query
+    //   vm.$store.dispatch('getServiceOpionByProcess', data).then(result => {
+    //     vm.processOptionSelected = result.filter(function(item) {
+    //       return String(item.processOptionId) === String(data.processOptionId)
+    //     })[0]
+    //     vm.groupDossierNameCreate = vm.processOptionSelected.processName
+    //   }).catch(reject => {
+    //   })
+    //   if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && query.hasOwnProperty('detailGroup')) {
+    //     vm.detailGroup = true
+    //     let id = query.groupDossierId
+    //     vm.getDetaiGroup(id)
+    //   } else if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && !query.hasOwnProperty('detailGroup')) {
+    //     vm.detailGroup = false
+    //     vm.getGroupDossier()
+    //     let id = query.groupDossierId
+    //     vm.getDetaiGroup(id)
+    //   } else {
+    //     vm.detailGroup = false
+    //     vm.getGroupDossier()
+    //   }
+    // },
     getGroupDossier () {
       let vm = this
       let query = vm.$router.history.current.query
@@ -549,28 +454,7 @@ export default {
         // }
       })
     },
-    onChangeGroupDossier () {
-      let vm = this
-      vm.activeAddDossierIntoGroup = false
-      vm.activeAddGroup = true
-      let current = vm.$router.history.current
-      let currentQuery = current.query
-      setTimeout (function () {
-        let id = vm.groupDossierSelected.dossierId
-        currentQuery['groupDossierId'] = id
-        console.log('url----', current.path, currentQuery)
-        let queryString = '?'
-        for (let key in currentQuery) {
-          if (currentQuery[key] !== '' && currentQuery[key] !== 'undefined' && currentQuery[key] !== undefined) {
-            queryString += key + '=' + currentQuery[key] + '&'
-          }
-        }
-        vm.$router.push({
-          path: current.path + queryString
-        })
-      }, 200)
-    },
-    getDetaiDossierIntoGroup (id) {
+    getDetaiGroup (id) {
       let vm = this
       vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
         vm.thongTinNhomHoSo = resultDossier
@@ -603,6 +487,9 @@ export default {
                 if (result.hasOwnProperty('buttonConfig') && result.buttonConfig) {
                   try {
                     vm.btnDynamics = JSON.parse(result['buttonConfig'])['buttons']
+                    vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+                      return item['form'] === 'ACTIONS'
+                    })
                   } catch (error) {
                     vm.btnDynamics = []
                   }
@@ -614,11 +501,6 @@ export default {
           }
           vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
         })
-        setTimeout(function () {
-          vm.$refs.thongtinnguoinophoso.initData(resultDossier)
-          vm.$refs.thanhphanhoso1.initData(resultDossier)
-          vm.$refs.thanhphanhoso2.initData(resultDossier)
-        }, 200)
       })
     },
     changeStep () {
@@ -656,21 +538,6 @@ export default {
         })
       }, 200)
     },
-    updateGroupDossier () {
-      let vm = this
-      vm.activeAddDossierIntoGroup = false
-      vm.activeAddGroup = true
-      let id = vm.groupDossierSelected.dossierId
-      vm.$store.dispatch('getDetailDossier', id).then(resultDossier => {
-        vm.$refs.thongtinnguoinophoso.initData(resultDossier)
-        vm.$refs.thanhphanhoso.initData(resultDossier)
-      })
-    },
-    doSubmitAddGroupDialog () {
-      let vm = this
-      vm.dialogAddGroup = true
-      vm.groupDossierNameCreate = vm.processOptionSelected.processName
-    },
     btnActionEvent (item, index) {
       let vm = this
       if (!vm.selected) {
@@ -692,33 +559,6 @@ export default {
             query: query
           })
         })
-      })
-    },
-    doSubmitAddGroup () {
-      let vm = this
-      vm.activeAddDossierIntoGroup = false
-      let query = vm.$router.history.current.query
-      let data = {
-        serviceCode: query.hasOwnProperty('serviceCode') ? query.serviceCode : '',
-        govAgencyCode: query.hasOwnProperty('govAgencyCode') ? query.govAgencyCode : '',
-        templateNo: query.hasOwnProperty('template_no') ? query.template_no : '',
-        originality: 9
-      }
-      vm.$store.dispatch('postDossier', data).then(function (result) {
-        // 
-        result.dossierName = vm.groupDossierNameCreate
-        vm.$store.dispatch('putDossier', result).then(function (result) {
-          vm.dialogAddGroup = false
-          vm.activeAddGroup = true
-          vm.groupDossierList.unshift(result)
-          vm.groupDossierSelected = vm.groupDossierList[0]
-          vm.$refs.thongtinnguoinophoso.initData(result)
-          vm.$refs.thanhphanhoso1.initData(result)
-          vm.$refs.thanhphanhoso2.initData(result)
-        }).catch(function (xhr) {
-        })
-        // 
-      }).catch(reject => {
       })
     },
     putGroupDossier () {
@@ -751,7 +591,7 @@ export default {
           let tempData = Object.assign(vm.thongTinNhomHoSo, thongtinnguoinophoso)
           tempData['dossierId'] = vm.thongTinNhomHoSo.dossierId
           tempData['originality'] = vm.thongTinNhomHoSo.originality
-          tempData['dossierName'] = vm.groupDossierSelected.dossierName
+          tempData['dossierName'] = vm.thongTinNhomHoSo.dossierName
           console.log('data put groupDossier -->', tempData)
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -766,14 +606,15 @@ export default {
       }
     },
     createDossierIntoGroup () {
+      // Tạo hồ sơ -> add vào nhóm
       let vm = this
       let query = vm.$router.history.current.query
       vm.activeAddGroup = false
       vm.activeAddDossierIntoGroup = true
       let data = {
-        serviceCode: query.hasOwnProperty('serviceCode') ? query.serviceCode : '',
-        govAgencyCode: query.hasOwnProperty('govAgencyCode') ? query.govAgencyCode : '',
-        templateNo: query.hasOwnProperty('template_no') ? query.template_no : '',
+        serviceCode: vm.thongTinNhomHoSo.serviceCode,
+        govAgencyCode: vm.thongTinNhomHoSo.govAgencyCode,
+        templateNo: vm.thongTinNhomHoSo.dossierTemplateNo,
         originality: vm.originality,
         groupDossierId: vm.thongTinNhomHoSo.dossierId,
         dossierId: ''
@@ -781,8 +622,6 @@ export default {
       vm.$store.dispatch('postDossier', data).then(function (result) {
         vm.currentDossierIntoGroup = result
         data.dossierId = result.dossierId
-        vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
-        })
         setTimeout (function () {
           result['editable'] = false
           if (result.dossierStatus === '') {
@@ -816,7 +655,7 @@ export default {
             }
           }
           vm.$refs.thongtinchuhoso.initData(result)
-          vm.$refs.thanhphanhoso2.initData(result)
+          vm.$refs.thanhphanhoso.initData(result)
           vm.viaPortalDetail = result.viaPostal
           if (result.viaPostal > 0) {
             let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
@@ -827,33 +666,31 @@ export default {
             vm.$store.commit('setDichVuChuyenPhatKetQua', result)
           }
         }, 300)
+        vm.$store.dispatch('postDossierIntoGroup', data).then(function (result) {
+        })
       }).catch(reject => {
       })
     },
-    luuHoSo () {
+    tiepNhanHoSo (type) {
       var vm = this
-      console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
-      let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo : {}
+      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       if (validThongtinchuhoso['validForm']) {
-        let passValid = false
-        if (!validThongtinchuhoso['validApplicant']) {
-          let x = confirm(validThongtinchuhoso['message'] + ' Bạn có muốn tiếp tục?')
-          if (x) {
-            passValid = true
-          }
-        } else { passValid = true }
+        let passValid = true
         if (passValid) {
+          vm.loadingAction = true
           if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+            vm.loadingAction = false
             return
           }
           if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+            vm.loadingAction = false
             return
           }
           let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
@@ -868,89 +705,20 @@ export default {
               }
             })
           }
-          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
-          tempData['dossierId'] = vm.dossierId
-          tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
-          tempData['originality'] = vm.originality
-          console.log('data put dossier -->', tempData)
-          setTimeout(function () {
-            vm.$store.dispatch('putDossier', tempData).then(function (result) {
-              // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-              if (vm.formCode === 'UPDATE') {
-                vm.goBack()
-              } else {
-                var initData = vm.$store.getters.loadingInitData
-                let actionUser = initData.user.userName ? initData.user.userName : ''
-                let dataPostAction = {
-                  dossierId: vm.dossierId,
-                  actionCode: 1100,
-                  actionNote: '',
-                  actionUser: actionUser,
-                  payload: '',
-                  security: '',
-                  assignUsers: '',
-                  payment: vm.payments,
-                  createDossiers: '',
-                  dueDate: tempData.dueDate
-                }
-                vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-                  // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-                  let currentQuery = vm.$router.history.current.query
-                  vm.$router.push({
-                    path: '/danh-sach-ho-so/4/chi-tiet-ho-so/' + result.dossierId,
-                    query: {
-                      activeTab: 'tabs-1'
-                    }
-                  })
-                  vm.tiepNhanState = false
-                })
-              }
-            }).catch(function (xhr) {
-              toastr.clear()
-              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            })
-          }, 500)
-        }
-      }
-    },
-    tiepNhanHoSo (type) {
-      var vm = this
-      console.log('luu Ho So--------------------')
-      vm.$store.commit('setPrintPH', false)
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
-      let thanhphanhoso = this.$refs.thanhphanhoso2.dossierTemplateItems
-      // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
-      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
-      let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
-      if (validThongtinchuhoso['validForm']) {
-        let passValid = true
-        if (passValid) {
-          vm.loadingAction = true
-          if (!vm.$refs.thanhphanhoso2.validDossierTemplate()) {
-            vm.loadingAction = false
-            return
-          }
-          if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
-            vm.loadingAction = false
-            return
-          }
-          let dossierFiles = vm.$refs.thanhphanhoso2.dossierFilesItems
-          let dossierTemplates = thanhphanhoso
-          let listAction = []
-          let listDossierMark = []
-          if (dossierFiles) {
-            dossierFiles.forEach(function (value, index) {
-              if (value.eForm) {
-                value['dossierId'] = vm.dossierId
-                listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-              }
-            })
-          }
           // if (vm.$refs.thanhphanhoso) {
           //   vm.$refs.thanhphanhoso.saveMark()
           // }
+          thongtinnguoinophoso = {
+            sameUser: false,
+            delegateName: vm.thongTinNhomHoSo['delegateName'],
+            delegateCityCode: vm.thongTinNhomHoSo['delegateCityCode'],
+            delegateAddress: vm.thongTinNhomHoSo['delegateAddress'],
+            delegateDistrictCode: vm.thongTinNhomHoSo['delegateDistrictCode'],
+            delegateWardCode: vm.thongTinNhomHoSo['delegateWardCode'],
+            delegateEmail: vm.thongTinNhomHoSo['delegateEmail'],
+            delegateTelNo: vm.thongTinNhomHoSo['delegateTelNo'],
+            delegateIdNo: vm.thongTinNhomHoSo['delegateIdNo']
+          }
           var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua)
           tempData['dossierId'] = vm.currentDossierIntoGroup.dossierId
           tempData['sampleCount'] = vm.currentDossierIntoGroup.sampleCount
@@ -994,10 +762,8 @@ export default {
               vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
                 vm.loadingAction = false
                 if (!type) {
-                  // vm.goBack()
-                  // vm.tiepNhanState = false
                   toastr.success('Thêm hồ sơ vào nhóm thành công')
-                  vm.onChangeGroupDossier()
+                  vm.getDetaiGroup(vm.id)
                   vm.activeAddDossierIntoGroup = false
                 } else {
                   // tạo hồ sơ mới
@@ -1032,67 +798,10 @@ export default {
             }
           }).catch(rejectXhr => {
             vm.loadingAction = false
-            console.log('rejectXhr==========', rejectXhr)
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
-      }
-    },
-    boSungHoSo () {
-      var vm = this
-      console.log('luu Ho So--------------------')
-      vm.$store.commit('setPrintPH', false)
-      let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
-      let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
-      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
-      let lephi = this.$refs.lephi.lePhi
-      let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
-      if (vm.$refs.thongtinchuhoso.showValid()) {
-        let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
-        let dossierTemplates = thanhphanhoso
-        let listAction = []
-        let listDossierMark = []
-        if (dossierTemplates) {
-          dossierTemplates.forEach(function (val, index) {
-            if (val.partType === 1) {
-              val['dossierId'] = vm.dossierId
-              listDossierMark.push(vm.$store.dispatch('postDossierMark', val))
-            }
-          })
-          dossierFiles.forEach(function (value, index) {
-            if (value.eForm) {
-              value['dossierId'] = vm.dossierId
-              listAction.push(vm.$store.dispatch('putAlpacaForm', value))
-            }
-          })
-        }
-        Promise.all(listDossierMark).then(values => {
-        }).catch(function (xhr) {
-        })
-        Promise.all(listAction).then(values => {
-          console.log(values)
-          let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua, thongtinchunghoso)
-          console.log('data put dossier -->', tempData)
-          tempData['dossierId'] = vm.dossierId
-          vm.$store.dispatch('putDossier', tempData).then(function (result) {
-            let dataPostAction = {
-              dossierId: vm.dossierId,
-              actionCode: 7100,
-              payload: '',
-              security: '',
-              assignUsers: {},
-              payment: {},
-              createDossiers: {},
-              dueDate: tempData.dueDate
-            }
-            vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-            })
-          })
-        }).catch(reject => {
-        })
       }
     },
     changeViapostal (viapostal) {
@@ -1139,7 +848,6 @@ export default {
       let currentQuery = vm.$router.history.current.query
       if (vm.activeAddDossierIntoGroup) {
         vm.activeAddDossierIntoGroup = false
-        vm.onChangeGroupDossier()
       } else {
         vm.$router.push({
           path: '/danh-sach-ho-so/' + currentParams.index,

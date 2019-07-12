@@ -6,6 +6,7 @@
           <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
           <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
           <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
+          <span v-else-if="formCode === 'NEW_GROUP'">THÊM NHÓM HỒ SƠ</span>
           <span v-else>THÊM MỚI HỒ SƠ</span> 
         </div>
         <div class="layout row wrap header_tools row-blue">
@@ -20,14 +21,14 @@
           </div>
         </div> 
       </div>
-      <div style="position: relative;" v-if="originality !== 1">
+      <div style="position: relative;" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
-      <div style="position: relative;" v-else>
+      <div style="position: relative;" v-if="originality === 1">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <div slot="header">
@@ -43,14 +44,16 @@
         </v-expansion-panel>
       </div>
       <!--  -->
-      <thong-tin-chu-ho-so ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+      <thong-tin-chu-ho-so ref="thongtinchuhoso" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
       <!--  -->
       <div v-if="originality !== 1">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              Tên hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+              <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
+              <span v-else>Tên hồ sơ</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
             </div>
             <div>
               <v-card>
@@ -59,7 +62,7 @@
                     v-model="briefNote"
                     :rows="2"
                     box
-                    label="Nhập tên hồ sơ"
+                    :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
                   ></v-textarea>
                 </v-card-text>
               </v-card>
@@ -73,7 +76,9 @@
           <v-expansion-panel-content>
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-              Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+              <span v-if="formCode === 'NEW_GROUP'">Thành phần hồ sơ dùng chung</span>
+              <span v-else>Thành phần hồ sơ</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
               <v-text-field
               class="px-0 py-0"
@@ -85,7 +90,7 @@
               <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
               <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
             </div>
-            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
@@ -115,7 +120,17 @@
             <v-icon>save</v-icon>
           </v-btn>
         </v-tab> -->
-        <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+        <v-tab href="#tab-2" @click="tiepNhanNhomHoSo()" v-if="formCode === 'NEW_GROUP' && originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Tạo nhóm</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="formCode !== 'NEW_GROUP' && originality !== 1 && tiepNhanState" class="px-0 py-0"> 
           <v-btn flat class="" 
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -125,7 +140,7 @@
             <span slot="loader">Loading...</span>
           </v-btn>
         </v-tab>
-        <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
+        <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && formCode !== 'NEW_GROUP' && tiepNhanState" class="px-0 py-0"> 
           <v-btn flat class=""
             :loading="loadingAction"
             :disabled="loadingAction"
@@ -307,6 +322,7 @@ export default {
     viaPortalDetail: 0,
     showThuPhi: false,
     inputTypes: [1, 3],
+    inputTypesGroup: [6],
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
@@ -742,6 +758,89 @@ export default {
       } else {
         this.viaPortalDetail = 1
       }
+    },
+    // 
+    tiepNhanNhomHoSo (type) {
+      var vm = this
+      vm.$store.commit('setPrintPH', false)
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
+      vm.loadingAction = true
+      if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+        vm.loadingAction = false
+        return
+      }
+      let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+      let dossierTemplates = thanhphanhoso
+      let listAction = []
+      let listDossierMark = []
+      if (dossierFiles) {
+        dossierFiles.forEach(function (value, index) {
+          if (value.eForm) {
+            value['dossierId'] = vm.dossierId
+            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          }
+        })
+      }
+      // if (vm.$refs.thanhphanhoso) {
+      //   vm.$refs.thanhphanhoso.saveMark()
+      // }
+      var tempData = Object.assign(thongtinnguoinophoso, dichvuchuyenphatketqua)
+      tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
+      tempData['dossierName'] = vm.briefNote
+      console.log('data put dossier -->', tempData)
+      let dataCreateGroup = {
+        serviceCode: vm.thongTinChiTietHoSo.serviceCode,
+        govAgencyCode: vm.thongTinChiTietHoSo.govAgencyCode,
+        templateNo: vm.thongTinChiTietHoSo.dossierTemplateNo,
+        originality: 9
+      }
+      vm.$store.dispatch('postDossier', dataCreateGroup).then(function (result) {
+        tempData['dossierId'] = result.dossierId
+        vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          vm.loadingAction = false
+          var initData = vm.$store.getters.loadingInitData
+          let actionUser = initData.user.userName ? initData.user.userName : ''
+          //
+          var paymentsOut = {}
+          if (vm.showThuPhi) {
+            paymentsOut = {
+              requestPayment: vm.payments['requestPayment'],
+              paymentNote: vm.payments['paymentNote'],
+              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+            }
+          }
+          let dataPostAction = {
+            dossierId: result.dossierId,
+            actionCode: 1100,
+            actionNote: '',
+            actionUser: actionUser,
+            payload: '',
+            security: '',
+            assignUsers: '',
+            payment: paymentsOut,
+            createDossiers: ''
+          }
+          vm.loadingAction = true
+          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+            vm.loadingAction = false
+            vm.$router.push({
+              path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+              query: vm.$router.history.current.query
+            })
+          }).catch(reject => {
+            vm.loadingAction = false
+          })
+        }).catch(rejectXhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
+        })
+      })
     },
     // 
     tiepNhanHoSoNewTemplate (type) {

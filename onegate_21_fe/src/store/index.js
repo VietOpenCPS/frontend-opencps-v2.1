@@ -303,12 +303,12 @@ export const store = new Vuex.Store({
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
             paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
           }
-          if (filter['originality']) {
-            paramSearch['originality'] = filter.originality
-          }
           if (filter['follow']) {
             paramSearch['follow'] = filter.follow
             paramSearch['originality'] = 0
+          }
+          if (filter['originality']) {
+            paramSearch['originality'] = filter.originality
           }
           let param = {
             headers: {
@@ -928,7 +928,7 @@ export const store = new Vuex.Store({
           }
         }).catch(function (xhr) {
           console.log(xhr)
-          reject([])
+          resolve([])
         })
       })
     },

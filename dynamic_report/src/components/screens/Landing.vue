@@ -777,7 +777,7 @@ export default {
               */
               vm.$store.dispatch('getExcelReportFromServer', {
                 data: docDString,
-                fileName: new Date().getTime() + '.xls'
+                fileName: 'baocaothongke' + '.xls'
               })
             }
           })

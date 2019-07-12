@@ -1799,6 +1799,7 @@ export default {
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         }
+        console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -2010,18 +2011,18 @@ export default {
           // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
-          if (String(item.form) === 'NEW') {
+          // if (String(item.form) === 'NEW') {
             vm.doCreateDossier()
-          } else {
-            let queryString = ''
-            let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
-            queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
-            '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
-            console.log('queryString', queryString)
-            vm.$router.push({
-              path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
-            })
-          }
+          // } else {
+          //   let queryString = ''
+          //   let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
+          //   queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
+          //   '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
+          //   console.log('queryString', queryString)
+          //   vm.$router.push({
+          //     path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
+          //   })
+          // }
         }
         // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
@@ -2833,16 +2834,14 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       if (item.permission) {
-       vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
-      } else {
-        alert('Bạn không có quyền thao tác với hồ sơ này')
-      }
-    },
-    viewDetailGroupDossier (item, indexItem) {
-      let vm = this
-      let currentQuery = vm.$router.history.current.query
-      if (item.permission) {
-       vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        if (item['originality'] === 9) {
+          vm.$router.push({
+            path: '/danh-sach-ho-so/'+ this.index +'/nhom-ho-so/' + item.dossierId,
+            query: vm.$router.history.current.query
+          })
+        } else {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        }
       } else {
         alert('Bạn không có quyền thao tác với hồ sơ này')
       }

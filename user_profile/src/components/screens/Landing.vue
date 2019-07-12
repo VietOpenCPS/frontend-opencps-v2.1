@@ -229,11 +229,12 @@
                   <v-subheader>{{user['employeeTelNo']}}</v-subheader>
                 </v-flex>
               </v-layout>
-              <v-layout row wrap>
+              <!-- Đổi mật khẩu -->
+              <!-- <v-layout row wrap>
                 <v-flex xs12 class="mx-3">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
                 </v-flex>
-              </v-layout>
+              </v-layout> -->
             </v-card-text>
             <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
               <div class="text-bold text-xs-center label__user_profile">{{user['applicantName']}}</div>

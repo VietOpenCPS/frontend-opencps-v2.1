@@ -269,7 +269,7 @@
         //   }
         // }
         console.log('queryString++++++++22222222+++', queryString)
-       vm.$router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,

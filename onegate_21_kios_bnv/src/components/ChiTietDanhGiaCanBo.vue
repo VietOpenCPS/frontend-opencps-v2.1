@@ -18,7 +18,7 @@
                   <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'"
                   style="width: 100%;max-width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;">
                   </div>
-                  <img v-else src="/o/opencps-store/js/kios_bng/img/avatar_contacts.png" 
+                  <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" 
                   style="width: 100%;max-width: 150px;height: 200px;object-fit: contain;opacity:0.6;background: #ddd"/>
                 </v-flex>
                 <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">

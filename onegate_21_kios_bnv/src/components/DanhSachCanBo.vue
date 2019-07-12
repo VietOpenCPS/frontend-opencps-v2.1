@@ -19,7 +19,7 @@
                       <v-layout wrap>
                         <v-flex xs4 style="text-align: center!important;">
                           <div v-if="employee['imgSrc']" class="mt-1" :style="'background-image: url(' + employee['imgSrc'] + ');'" style="max-width: 100px;height: 150px;margin: 0 auto;background-position: center;background-size: cover;"></div>
-                          <img v-else src="/o/opencps-store/js/kios_bng/img/avatar_contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
+                          <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" style="max-width: 100%;height: 150px;object-fit: contain;background: #ddd;opacity:0.6"/>
                         </v-flex>
                         <v-flex xs8 style="word-wrap: break-word;">
                           <div class="primary--text">{{employee.jobPosTitle}}</div>
