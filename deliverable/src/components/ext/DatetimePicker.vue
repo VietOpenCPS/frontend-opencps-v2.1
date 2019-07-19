@@ -13,10 +13,11 @@
             box
             append-icon="event"
             @blur="toDate = parseDate(toDateFormatted)"
-            :label="item.required ? item['label'] + ' 💥': item['label']" 
             :rules="processRules(item.rules)"
             :value="formatDate(dataValue)"
-        ></v-text-field>
+        >
+          <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
+        </v-text-field>
         <v-date-picker v-model="toDate" no-title></v-date-picker>
     </v-menu>
 </template>

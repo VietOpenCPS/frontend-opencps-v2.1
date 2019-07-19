@@ -210,9 +210,7 @@
     </v-layout>
     <v-layout v-else row wrap>
       <v-flex xs12>
-        <div id="video-preloader" class="video-preloader">
-          <video loop id="editor-video-preloader" width="100%" height="350" muted="true" src="https://editorassets.parastorage.com/video-preloader/editor-video-preloader-2-@2x.mp4"></video>
-        </div>
+        <div id="formDelivert" class="mb-5 pt-0"></div>
       </v-flex>
     </v-layout>
 
@@ -253,13 +251,15 @@
             const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             return pattern.test(value) || 'Sai định dạng thư điện tử.'
           }
-        }
+        },
+        formTempalate: ''
       }
     },
     computed: {
       detailForm () {
+        let vm = this
         let detailDynamic = this.$store.getters.getContentFile
-        console.log('detailDynamic', detailDynamic)
+        vm.formTempalate = detailDynamic
         if (detailDynamic === '') {
           return []
         } else {
@@ -299,6 +299,24 @@
             }, 1000)
           }, 500)
         }
+      })
+    },
+    mounted () {
+      let vm = this
+      vm.$nextTick(function () {
+        console.log('formTempalate 1', vm.formTempalate)
+        let formScript, formData
+        /* eslint-disable */
+        if (vm.formTempalate) {
+          formScript = vm.formTempalate
+        } else {
+          formScript = {}
+        }
+        formData = {}
+        /* eslint-disable */
+        formScript.data = formData
+        window.$('#formDelivert').alpaca(formScript)
+        // 
       })
     },
     methods: {
@@ -364,6 +382,16 @@
               }
             )
           }
+        }
+      },
+      getFormData () {
+        let vm = this
+        let control = window.$('#formDelivert').alpaca('get')
+        let formData = control.getValue()
+        if (formData) {
+          return formData
+        } else {
+          return {}
         }
       }
     }

@@ -3,7 +3,7 @@
     <v-expansion-panel-content>
       <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>
       <!-- <span v-if="configNote && configNote.labelYKien">{{configNote.labelYKien}}</span> -->
-      <span>Ý kiến cán bộ</span> <span v-if="user_note === 2" class="red--text text--darken-3">*</span>
+      <span>Ý kiến chính thức</span> <span v-if="user_note === 2" class="red--text text--darken-3">*</span>
       </div>
       <v-card>
         <v-card-text class="py-2 px-4">

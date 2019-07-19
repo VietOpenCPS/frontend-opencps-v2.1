@@ -125,7 +125,8 @@ export const store = new Vuex.Store({
     dataCreateFile: [],
     paymentProfile: '',
     paymentFileName: '',
-    forGroupDossier: false
+    forGroupDossier: false,
+    dossierIntoGroup: []
   },
   actions: {
     clearError ({commit}) {
@@ -304,11 +305,11 @@ export const store = new Vuex.Store({
             paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
           }
           if (filter['follow']) {
-            paramSearch['follow'] = filter.follow
-            paramSearch['originality'] = 0
+            paramSearch.follow = filter.follow
+            paramSearch.originality = 0
           }
           if (filter['originality']) {
-            paramSearch['originality'] = filter.originality
+            paramSearch.originality = filter.originality
           }
           let param = {
             headers: {
@@ -2455,6 +2456,7 @@ export const store = new Vuex.Store({
             }
             let dataPost = new URLSearchParams()
             dataPost.append('assignUsers', filter.users?JSON.stringify(filter.users):'')
+            dataPost.append('delegacy', filter.delegacy)
             axios.post(state.initData.dossierApi + '/' + filter.dossierId + '/users', dataPost, param).then(function (response) {
               resolve(response)
             }).catch(function (error) {
@@ -3430,6 +3432,23 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getPreAction ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dossiers/'+ data.dossierId + '/delegacy', param).then(result => {
+            let serializable = result.data
+            resolve(serializable)
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
     }
     // ----End---------
   },
@@ -3680,7 +3699,10 @@ export const store = new Vuex.Store({
     },
     setForGroupDossier (state, payload) {
       state.forGroupDossier = payload
-    }
+    },
+    setSelectDossierGroup (state, payload) {
+      state.dossierIntoGroup = payload
+    },
   },
   getters: {
     loading (state) {
@@ -3861,6 +3883,9 @@ export const store = new Vuex.Store({
     },
     getForGroupDossier (state) {
       return state.forGroupDossier
+    },
+    getDossierIntoGroup (state) {
+      return state.dossierIntoGroup
     }
   }
 })

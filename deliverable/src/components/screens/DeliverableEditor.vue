@@ -8,9 +8,6 @@
             {{deName}}
           </div>
           <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-            <v-btn icon class="my-0 mx-0 btn-border-left">
-              <v-icon size="16">more_vert</v-icon>
-            </v-btn>
             <v-btn icon class="ml-0 btn-border-left mr-3 my-0" @click="backToList" active-class="temp_active">
               <v-icon size="16">reply</v-icon>
             </v-btn>
@@ -49,12 +46,12 @@
             TẢI GIẤY PHÉP TỪ MÁY TÍNH
           </v-btn>
         </v-tab>
-        <v-tab :key="4" href="#tab-4" 
+        <!-- <v-tab :key="4" href="#tab-4" 
           v-if="String(id) !== '0'"> 
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             LỊCH SỬ CẬP NHẬT GIẤY PHÉP
           </v-btn>
-        </v-tab>
+        </v-tab> -->
 
         <v-tabs-items reverse-transition="fade-transition" transition="fade-transition">
           <v-tab-item
@@ -93,14 +90,17 @@
       <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>
         <v-flex xs12 class="text-right pt-0 ml-1 px-0 pr-1">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
-          <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
+          <!-- <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark  v-on:click.native="saveToData(-1)"
             :loading="loading"
             :disabled="loading"
-          >Ghi lại và thêm mới</v-btn>
+          >Ghi lại và thêm mới</v-btn> -->
           <v-btn color="blue darken-3" class="mr-0" dark  v-on:click.native="saveToData(0)"
             :loading="loading"
             :disabled="loading"
-          >Ghi lại</v-btn>
+          >
+          <v-icon>save</v-icon> &nbsp;
+          Ghi lại
+          </v-btn>
           <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
             <v-icon>reply</v-icon> &nbsp;
             Quay lại
@@ -129,7 +129,7 @@
         offsetCheck: 400,
         deName: '',
         valid: false,
-        active: 0,
+        active: -1,
         loading: false,
         dataSocket: {},
         tempCounter: 0,
@@ -149,22 +149,9 @@
             vm.detail = result
             vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
+            vm.$store.dispatch('getContentFileSimple')
+            vm.tempCounter = vm.pullCounter
           })
-          vm.$store.dispatch('getContentFileSimple')
-          vm.tempCounter = vm.pullCounter
-          vm.$socket.onmessage = function (data) {
-            let dataObj = eval('( ' + data.data + ' )')
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            console.log('vm.dataSocket', vm.dataSocket)
-            vm.$store.commit('setdataSocket', vm.dataSocket)
-            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-              vm.tempCounter = vm.tempCounter - 1
-              if (vm.tempCounter < 0) {
-                vm.tempCounter = 0
-              }
-              vm.$store.commit('setpullCounter', vm.tempCounter)
-            }
-          }
         }, 100)
       })
     },
@@ -181,22 +168,23 @@
             vm.detail = result
             vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
+            vm.$store.dispatch('getContentFileSimple')
+            vm.tempCounter = vm.pullCounter
           })
-          vm.$store.dispatch('getContentFileSimple')
-          vm.tempCounter = vm.pullCounter
-          vm.$socket.onmessage = function (data) {
-            let dataObj = eval('( ' + data.data + ' )')
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            console.log('vm.dataSocket', vm.dataSocket)
-            vm.$store.commit('setdataSocket', vm.dataSocket)
-            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-              vm.tempCounter = vm.tempCounter - 1
-              if (vm.tempCounter < 0) {
-                vm.tempCounter = 0
-              }
-              vm.$store.commit('setpullCounter', vm.tempCounter)
-            }
-          }
+          
+          // vm.$socket.onmessage = function (data) {
+          //   let dataObj = eval('( ' + data.data + ' )')
+          //   vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+          //   console.log('vm.dataSocket', vm.dataSocket)
+          //   vm.$store.commit('setdataSocket', vm.dataSocket)
+          //   if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+          //     vm.tempCounter = vm.tempCounter - 1
+          //     if (vm.tempCounter < 0) {
+          //       vm.tempCounter = 0
+          //     }
+          //     vm.$store.commit('setpullCounter', vm.tempCounter)
+          //   }
+          // }
         }
       }
     },
@@ -261,18 +249,25 @@
           let bbatForm = vm.$refs.bbatForm
           let submitDataObject = {}
           if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
+            console.log('bbatFormSimple', bbatFormSimple.data)
             submitDataObject = bbatFormSimple.data
           }
           if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
             submitDataObject['formData'] = {}
-            console.log('bbatForm', bbatForm.data)
-            submitDataObject['formData'] = bbatForm.data
+            console.log('formData', bbatForm.getFormData())
+            submitDataObject['formData'] = bbatForm.getFormData()
           }
           submitDataObject['deliverableType'] = vm.items[vm.index]['typeCode']
           console.log('submitDataObject', submitDataObject)
           if (cmd === -1) {
             vm.detail = {}
           } else {
+            if (submitDataObject.hasOwnProperty('govAgenciesItems')) {
+              delete submitDataObject.govAgenciesItems
+            }
+            if (submitDataObject.hasOwnProperty('applicantIdNoItems')) {
+              delete submitDataObject.applicantIdNoItems
+            }
             vm.$store.dispatch('createDeliverable', submitDataObject).then(function (data) {
               vm.loading = false
               if (String(vm.id) === '0') {

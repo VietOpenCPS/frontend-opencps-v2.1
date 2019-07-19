@@ -193,7 +193,7 @@ export const store = new Vuex.Store({
       })
     },
     getContentFileSimple ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -205,9 +205,11 @@ export const store = new Vuex.Store({
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           state.getContentFileSimple = eval('( ' + response.data['getAdminConfig']['detailColumns'] + ' )')
           console.log('state.getContentFileSimple', state.getContentFileSimple)
+          resolve(state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
           commit('setsnackbarerror', true)
+          reject(state.getContentFileSimple)
         })
       })
     },
@@ -237,8 +239,10 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + id + '/detail', options).then(function (response) {
-          if (response.data['hits']['hits'].length > 0) {
-            resolve(response.data['hits']['hits'][0]['_source'])
+          if (response.data) {
+            response.data.govAgenciesItems = []
+            response.data.applicantIdNoItems = []
+            resolve(response.data)
           } else {
             resolve({})
           }

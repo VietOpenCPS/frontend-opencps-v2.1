@@ -433,12 +433,28 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
-          isPopup = true
-          vm.showThuPhi = true
-          vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+        // Add thu phí
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+          // add thanh toán điện tử
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
+            isPopup = true
+            vm.showThanhToanDienTu = true
+            let filter = {
+              dossierId: vm.dossierId,
+              referenceUid: dossierItem.referenceUid
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
         }
+        // add Thu phí
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
           vm.checkInput = result.checkInput
           if (result.checkInput === 2) {

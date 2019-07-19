@@ -5,7 +5,7 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>Ủy quyền
+          </div>Phân công chỉ đạo
         </div>
         <v-card >
           <div class="px-4 py-1">
@@ -20,6 +20,12 @@
               ></v-checkbox>
             </v-layout>
           </div>
+          <!-- <v-flex class="pl-4 pb-3">
+            <v-btn color="primary" @click="doReAsign" class="mx-0 my-0">
+              <v-icon class="white--text">supervisor_account</v-icon>&nbsp;
+              Ủy quyền
+            </v-btn>
+          </v-flex> -->
         </v-card>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -43,7 +49,7 @@
               :title="item.userName"
               ></v-checkbox>
             </v-layout>
-            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
+            <!-- <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span> -->
           </div>
           <!--  -->
           <v-card-text v-if="type === 2 || type === 4" class="px-4 py-1">
@@ -61,7 +67,7 @@
                     <span class="pl-0"> {{item.userName}} </span>
                   </v-tooltip>
                   
-                  <toggle-button class="mx-1 btn-tgl"
+                  <!-- <toggle-button class="mx-1 btn-tgl"
                   :id="`btn-${index}`"                                           
                   v-model="presenterAddGroup"
                   title_checked = "Thực hiện"
@@ -69,11 +75,11 @@
                   :labels="{checked: 'TH', unchecked: 'PH'}"
                   :color="{checked: '#7DCE94', unchecked: '#82C7EB'}"
                   :width="50"
-                  @change="changeTypeAssign($event, index)"/>
+                  @change="changeTypeAssign($event, index)"/> -->
                 </v-layout>
               </div>
             </v-layout>
-            <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
+            <!-- <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span> -->
           </v-card-text>
         </v-card>
       </v-expansion-panel-content>
@@ -82,6 +88,11 @@
 </template>
 <script>
 // import $ from 'jquery'
+import toastr from 'toastr'
+toastr.options = {
+  'closeButton': true,
+  'timeOut': '2000'
+}
 import toggleButton from '../toggleButton.vue'
 export default {
   components: {
@@ -101,6 +112,10 @@ export default {
       default: () => 1
     },
     configNote: {
+      type: Object,
+      default: () => {}
+    },
+    detailDossier : {
       type: Object,
       default: () => {}
     }
@@ -182,6 +197,17 @@ export default {
         window.$(`#btn-${index}`).addClass('btn-hidden')
       }
       // console.log('vm.assign_items', vm.assign_items)
+    },
+    doReAsign () {
+      let vm = this
+      let filter = {
+        'dossierId': vm.detailDossier.dossierId,
+        'users': vm.data_uyquyen
+      }
+      vm.$store.dispatch('postDossierUserAsign', filter).then(function (result) {
+        toastr.success('Yêu cầu của bạn thực hiện thành công')
+      }).catch(function (error) {
+      })
     },
     doExport () {
       var vm = this

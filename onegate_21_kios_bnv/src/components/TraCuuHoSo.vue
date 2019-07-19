@@ -12,13 +12,6 @@
           <div :style="!isMobile ? 'width: calc(100% - 120px)' : 'width: 100%'">
             <v-layout wrap>
               <v-flex xs12 md6 class="px-2">
-                <!-- <v-text-field class="input-border input-search"
-                  label="Mã hồ sơ"
-                  v-model="dossierNoKey"
-                  @keyup.enter="filterDossier"
-                  @click:append="filterDossier"
-                  box
-                ></v-text-field> -->
                 <div class="input-custom">
                   <input id="dossierNoKey" type="text" @focus="show" @keyup.enter="filterDossier" required="required" />
                   <span class="bar"></span>

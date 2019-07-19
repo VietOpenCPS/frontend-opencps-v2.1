@@ -11,49 +11,44 @@
         </div>
       </div>
     </v-flex>
-    <v-flex xs12 sm7 class="tai_giay_to">
-      <div class="my-3 mx-3 text-center">Giấy tờ đã tải lên</div>
-      <div class="e-upload-done-list" v-if="fileTemplateTotal > 0">
+    <v-flex xs12 sm7 class="tai_giay_to" v-if="fileTemplateTotal > 0">
+      <div class="mt-3 mb-1 mx-3 text-center text-bold">Giấy tờ đã tải lên</div>
+      <div class="e-upload-done-list">
         <ul class="e-upload-files">
-          <li class="e-upload-file-list" v-for="(item, index) in fileTemplateData" v-bind:key="index">
-            <div class='container' style="position: relative;min-height: 75px;">
-              <span class='wrapper' style="
-                line-height: 10px;
-              ">
-              <span :class="['icon sf-icon-' + item['extension']]"></span>
-              <div class='name file-name'>
-                <span>{{item['fileName']}}</span>
-                <p style="
-                  margin-top: 10px;
-                  font-size: 10px;
-                  margin-bottom: 0;
-                ">
-                  ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
-                </p>
-              </div>
-              <v-btn flat icon color="primary" 
-                v-on:click.native="processDownloadFileAttach(item)"
-                :loading="loading"
-                :disabled="loading"
-                style="
-                  position: absolute;
-                  right: 5px;
-                  top: 0;
-                ">
-                <v-icon size="14">link</v-icon>
-              </v-btn>
-              <v-btn flat icon color="red darken-3" 
-                v-on:click.native="processDeleteFileAttach(item)"
-                :loading="loadingRemove"
-                :disabled="loadingRemove"
-                style="
-                  position: absolute;
-                  right: 5px;
-                  margin-top: -10px;
-                ">
-                <v-icon size="14">delete</v-icon>
-              </v-btn>
-              </span>
+          <li class="e-upload-file-list" >
+            <div class='container pt-2' style="position: relative;min-height: 75px;">
+              <v-layout wrap v-for="(item, index) in fileTemplateData" v-bind:key="index"
+               class="pl-2 py-1 mb-1" style="background: #f3f3f3;">
+                <span :class="['icon sf-icon-' + item['extension']]"></span>
+                <v-flex style="width: calc(100% - 100px)">
+                  <div class='name file-name'>
+                    <span>{{item['fileName']}}</span>
+                    <p style="
+                      margin-top: 5px;
+                      font-size: 10px;
+                      margin-bottom: 0;
+                    ">
+                      ( {{(item['size']/(1024*1024)).toFixed(2)}} MB )
+                    </p>
+                  </div>
+                </v-flex>
+                <v-flex style="width: 90px">
+                  <v-btn flat icon color="primary" title="Tải xuống"
+                    v-on:click.native="processDownloadFileAttach(item)"
+                    :loading="loading"
+                    :disabled="loading"
+                    >
+                    <v-icon size="14">save_alt</v-icon>
+                  </v-btn>
+                  <v-btn flat icon color="red darken-3" class="mx-0" title="Xóa"
+                    v-on:click.native="processDeleteFileAttach(item)"
+                    :loading="loadingRemove"
+                    :disabled="loadingRemove"
+                    >
+                    <v-icon size="14">delete</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
             </div>
           </li>
         </ul>

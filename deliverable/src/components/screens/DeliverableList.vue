@@ -137,10 +137,13 @@
     </div>
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
       <v-card>
-        <v-card-title class="headline">Giấy phép</v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" v-on:click.native="dialogPDF = false">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Giấy phép</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <div v-if="dialogPDFLoading" style="
             min-height: 600px;
             text-align: center;

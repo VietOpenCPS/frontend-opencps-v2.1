@@ -1743,7 +1743,7 @@ export default {
       console.log('currentQuery======', currentQuery)
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
-        if (currentQuery.q.indexOf('step') > 0) {
+        if (currentQuery.q.indexOf('step') > 0 || currentQuery.q.indexOf('originality') > 0) {
           querySet = currentQuery.q
           // console.log('querySet------', querySet)
         } else {
@@ -1771,7 +1771,8 @@ export default {
             register: currentQuery.hasOwnProperty('register') ? currentQuery.register : '',
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
-            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
+            originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -2534,7 +2535,7 @@ export default {
         serviceCode: vm.serviceCode,
         govAgencyCode: vm.govAgencyCode,
         templateNo: vm.templateNo,
-        originality: vm.getOriginality()
+        originality: vm.itemAction['form'] === 'NEW_GROUP' ? 9 : vm.getOriginality()
       }
       // add new template
       let filter = {
@@ -2568,18 +2569,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       if (vm.$refs.form.validate()) {
-        if (String(item.form) === 'NEW') {
-          vm.doCreateDossier()
-        } else {
-          let queryString = ''
-          let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
-          queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
-          '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
-          console.log('queryString', queryString)
-          vm.$router.push({
-            path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
-          })
-        }
+        vm.doCreateDossier()
       }
     },
     processPullBtnDynamics (item) {
