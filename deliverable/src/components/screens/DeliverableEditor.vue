@@ -140,19 +140,23 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
-        setTimeout(() => {
-          let formId = vm.items[vm.index]['formScriptFileId']
-          vm.deName = ''
-          vm.$store.dispatch('getContentFile', formId)
-          vm.showComponent = false
-          vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
-            vm.detail = result
-            vm.deName = vm.detail['deliverableName']
-            vm.showComponent = true
-            vm.$store.dispatch('getContentFileSimple')
-            vm.tempCounter = vm.pullCounter
-          })
-        }, 100)
+        vm.$store.dispatch('getDeliverableTypes').then(function (result) {
+          setTimeout(() => {
+            let formId = vm.items[vm.index]['formScriptFileId']
+            vm.deName = ''
+            vm.$store.dispatch('getContentFile', formId)
+            vm.showComponent = false
+            vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+              if (String(vm.id) !== '0') {
+                vm.detail = result
+              }
+              vm.deName = vm.detail['deliverableName']
+              vm.showComponent = true
+              vm.$store.dispatch('getContentFileSimple')
+              vm.tempCounter = vm.pullCounter
+            })
+          }, 100)
+        })
       })
     },
     watch: {
@@ -272,8 +276,8 @@
               vm.loading = false
               if (String(vm.id) === '0') {
                 vm.$refs.attachedObj.doUploadLate(data['createDeliverable']['deliverableId'])
+                vm.backToList()
               }
-              vm.backToList()
             })
           }
         }

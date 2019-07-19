@@ -52,7 +52,7 @@
           @change="processChangeDataSource($event, item)"
           :chips="item['chips']"
           :multiple="item['multiple']"
-          clearable
+          :style="item['disable'] ? 'pointer-events: none' : ''"
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-autocomplete>
@@ -215,6 +215,8 @@
       let vm = this
       if (String(vm.id) !== '0') {
         vm.data = vm.datainput
+      } else {
+        vm.processDataSource()
       }
     },
     computed: {
@@ -309,8 +311,15 @@
             }
             axios.get(apiURL, param).then(function (response) {
               let seriable = response.data
-              vm.data[vm.detailForm[key]['datasource_key']] = seriable
-              // console.log('detailForm', vm.detailForm[key]['datasource_key'], vm.data[vm.detailForm[key]['datasource_key']])
+              if (seriable['data']) {
+                vm.data[vm.detailForm[key]['datasource_key']] = seriable['data']
+              } else {
+                vm.data[vm.detailForm[key]['datasource_key']] = seriable
+              }
+              if (vm.detailForm[key]['value'] && String(vm.id) === '0') {
+                vm.data[vm.detailForm[key]['model']] = vm.detailForm[key]['value']
+              }
+              console.log('detailForm model 3', vm.detailForm[key]['model'], vm.data[vm.detailForm[key]['model']])
               vm.processDataSourceVerify()
             }).catch(function (xhr) {
             })

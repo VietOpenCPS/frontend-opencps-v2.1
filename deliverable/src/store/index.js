@@ -160,7 +160,7 @@ export const store = new Vuex.Store({
       })
     },
     getDeliverableTypes ({ commit, state }) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -171,9 +171,11 @@ export const store = new Vuex.Store({
         let body = DeliverableTypes.getDeliverableTypes
         axios.post('/o/v1/opencps/deliverable', body, options).then(function (response) {
           state.getDeliverableTypes = response.data['getDeliverableTypes']
+          resolve(response.data['getDeliverableTypes'])
         }).catch(function () {
           state.getDeliverableTypes = []
           commit('setsnackbarerror', true)
+          reject(state.getDeliverableTypes)
         })
       })
     },
@@ -225,6 +227,25 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/v1/opencps/deliverable/' + filter['type'] + '?' + filter['q'], options).then(function (response) {
+          resolve(response.data)
+        }).catch(function (error) {
+          reject(error)
+        })
+      })
+    },
+    searchDeliverables ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.groupId
+          },
+          params: {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            keyword: filter.keyword ? filter.keyword : ''
+          }
+        }
+        axios.get('/o/v1/opencps/deliverable/' + filter['type'], options).then(function (response) {
           resolve(response.data)
         }).catch(function (error) {
           reject(error)

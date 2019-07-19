@@ -19,7 +19,7 @@
                 append-icon="search"
                 @click:append="() => ( 
                   this.$router.push({
-                    path: vm.urlHome + '/kios#/tra-cuu-ho-so-homepage',
+                    path: urlHome + '/kios#/tra-cuu-ho-so-homepage',
                     query: {
                       keyword: this.keyword
                     }

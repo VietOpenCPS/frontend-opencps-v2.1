@@ -6,19 +6,13 @@
           <div class="about" style="margin-bottom: 25px;">
             <p>Giới thiệu</p>
             <span>Hệ thống Dịch vụ công trực tuyến Tỉnh Phú Thọ<br>
-    là hệ thống giao dịch điện tử các thủ tục hành chính<br>
-    giữa Công dân, Doanh nghiệp và các Cơ quan nhà nước.</span></div>
+            là hệ thống giao dịch điện tử các thủ tục hành chính<br>
+            giữa Công dân, Doanh nghiệp và các Cơ quan nhà nước.</span>
+          </div>
   
           <div class="search">
             <div class="search-wrapper">
-              <v-text-field v-model="keyword" solo placeholder="Nhập mã hồ sơ" append-icon="search" @click:append="() => ( 
-                    this.$router.push({
-                      path: '/tra-cuu-ho-so',
-                      query: {
-                        keyword: this.keyword
-                      }
-                    }) 
-                  )"></v-text-field>
+              <v-text-field v-model="keyword" solo placeholder="Nhập mã hồ sơ" append-icon="search" @click:append="goToSearch"></v-text-field>
               <v-btn v-on:click.native="goToNopHoSo" class="mx-0" block color="amber darken-2" dark style="color: #fff;">Ấn vào đây để nộp hồ sơ trực tuyến
                 <v-icon style="
                     position: absolute;
@@ -149,6 +143,7 @@
   export default {
     props: [],
     data: () => ({
+      urlHome: '',
       keyword: '',
       daTiepNhan: 0,
       daGiaiQuyet: 0,
@@ -197,9 +192,14 @@
       vm.$nextTick(function () {
         console.log('build chart')
         vm.doStaticsReport1()
+        vm.urlHome = window.themeDisplay.getSiteAdminURL().split('~')[0].replace('group','web')
       })
     },
     methods: {
+      goToSearch () {
+        let vm = this
+        window.location.href = vm.urlHome + '/kios#/tra-cuu-ho-so-homepage?keyword=' + vm.keyword
+      },
       doStaticsReport1 () {
         let vm = this
         let filter = {

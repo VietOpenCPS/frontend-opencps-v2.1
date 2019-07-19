@@ -4,6 +4,28 @@
       <div class="background-triangle-big"> <span>{{items[index] !== undefined ? items[index]['typeName'] : ''}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field
+            v-model="deliverableKey"
+            placeholder="Tìm kiếm theo tên giấy phép, mã giấy phép ..."
+            solo
+            chips
+            multiple
+            deletable-chips
+            item-value="value"
+            item-text="text"
+            @keyup.enter="searchDeliverable"
+            content-class="adv__search__select"
+            return-object
+          ></v-text-field>
+        </div>
+        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+          <v-btn icon class="my-0 mx-2" v-on:click.native="searchDeliverable">
+            <v-icon size="16">search</v-icon>
+          </v-btn>
+        </div>
+      </div> 
+      <!-- <div class="layout row wrap header_tools row-blue">
+        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-combobox
             v-model="advSearchItems"
             placeholder="Tìm kiếm ..."
@@ -75,7 +97,7 @@
             </v-flex>
           </v-layout>
         </div>
-      </v-fade-transition>
+      </v-fade-transition> -->
     </div>
     <div style="text-align: right;">
       <v-btn color="blue darken-3" dark
@@ -188,42 +210,49 @@
         hosoDatasPage: 1,
         dataSocket: {},
         filters: [],
-        advSearchItems: []
+        advSearchItems: [],
+        deliverableKey: ''
       }
     },
     created () {
       var vm = this
       vm.$nextTick(function () {
-        setTimeout(() => {
-          if (vm.items[vm.index]['dataConfig'] !== '') {
-            vm.filters = eval('( ' + vm.items[vm.index]['dataConfig'] + ' )')
-          }
-          if (vm.items[vm.index]['tableConfig'] !== '') {
-            vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
-          } else {
-            vm.headers = []
-            vm.hosoDatas = []
-            vm.hosoDatasTotal = 0
-            vm.hosoDatasPage = 1
-            vm.loadingTable = true
-            setTimeout(() => {
-              vm.loadingTable = false
-            }, 100)
-          }
-          vm.pullData(vm.items[vm.index]['typeCode'])
-        }, 100)
+        vm.$store.dispatch('getDeliverableTypes').then(function (result) {
+          setTimeout(() => {
+            if (vm.items[vm.index]['dataConfig'] !== '') {
+              vm.filters = eval('( ' + vm.items[vm.index]['dataConfig'] + ' )')
+            }
+            if (vm.items[vm.index]['tableConfig'] !== '') {
+              vm.headers = eval('( ' + vm.items[vm.index]['tableConfig'] + ' )')['headers']
+            } else {
+              vm.headers = []
+              vm.hosoDatas = []
+              vm.hosoDatasTotal = 0
+              vm.hosoDatasPage = 1
+              vm.loadingTable = true
+              setTimeout(() => {
+                vm.loadingTable = false
+              }, 100)
+            }
+            vm.pullData(vm.items[vm.index]['typeCode'])
+          }, 100)
+        })
       })
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
         let currentQuery = newRoute.query
+        if (currentQuery.hasOwnProperty('keyword')) {
+          vm.deliverableKey = currentQuery['keyword']
+        }
         if (currentQuery.hasOwnProperty('page')) {
           vm.hosoDatasPage = parseInt(currentQuery.page)
         } else {
           vm.hosoDatasPage = 1
         }
-        vm.pullData(vm.items[vm.index]['typeCode'])
+        // vm.pullData(vm.items[vm.index]['typeCode'])
+        vm.filterDeliverable()
       },
       index (val) {
         var vm = this
@@ -351,13 +380,14 @@
         let newQuery = current.query
         let queryString = '?'
         newQuery['page'] = ''
+        newQuery['keyword'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
             queryString += key + '=' + newQuery[key] + '&'
           }
         }
         // console.log('queryString=====', queryString)
-        queryString += 'page=' + config.page
+        queryString += 'page=' + config.page + '&keyword=' + vm.deliverableKey
         vm.$router.push({
           path: current.path + queryString
         })
@@ -408,6 +438,46 @@
             break
           }
         }
+      },
+      searchDeliverable () {
+        let vm = this
+        setTimeout(function () {
+          let current = vm.$router.history.current
+          let newQuery = current.query
+          let queryString = '?'
+          newQuery['page'] = 1
+          newQuery['keyword'] = vm.deliverableKey
+          for (let key in newQuery) {
+            if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+              queryString += key + '=' + newQuery[key] + '&'
+            }
+          }
+          vm.$router.push({
+            path: current.path + queryString,
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }, 100)
+      },
+      filterDeliverable () {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let filter = {
+          type: vm.items[vm.index]['typeCode'],
+          page: newQuery.hasOwnProperty('page') ? newQuery['page'] : 1,
+          keyword: newQuery.hasOwnProperty('keyword') ? newQuery['keyword'] : vm.deliverableKey
+        }
+        vm.loadingTable = true
+        vm.$store.dispatch('searchDeliverables', filter).then(function (result) {
+          vm.hosoDatasTotal = result['hits']['total']
+          vm.hosoDatas = result['hits']['hits']
+          vm.loadingTable = false
+        }).catch(function (reject) {
+          vm.loadingTable = false
+          console.log(reject)
+        })
       }
     }
   }

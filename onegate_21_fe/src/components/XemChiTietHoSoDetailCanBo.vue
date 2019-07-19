@@ -1980,6 +1980,9 @@ export default {
                 })
               } else {
                 toastr.success('Yêu cầu thực hiện thành công')
+                setTimeout (function () {
+                  vm.goBack()
+                }, 300)
               }
               
             }).catch(function (error) {
