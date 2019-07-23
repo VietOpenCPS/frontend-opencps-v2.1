@@ -360,6 +360,7 @@
   import AttachedFileAvatar from './AttachedFileAvatar.vue'
   import AttachedFileForm from './AttachedFileForm.vue'
   import AttachedFileJasper from './AttachedFileJasper.vue'
+  import axios from 'axios'
 
   export default {
     props: ['tableConfig', 'detailData', 'id', 'tableName'],
@@ -450,6 +451,7 @@
           }
           vm.processDataSource()
         } else {
+          /*
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -474,9 +476,70 @@
                   'type': 'number'
                 }
               ]
+            }        )
+          */
+          let dataPost = new URLSearchParams()
+          let textPost = {
+            'type': 'admin',
+            'cmd': 'get',
+            'config': 'true',
+            'code': vm.$router.history.current.params.tableName,
+            'respone': 'tableConfig'
+          }
+          dataPost.append('text', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+            let dataObj = response.data
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+              vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+              console.log('load tableConfig')
+              vm.processDataSource()
             }
-          )
+            textPost = {
+              'type': 'admin',
+              'cmd': 'get',
+              'code': vm.$router.history.current.params.tableName,
+              'respone': 'detail',
+              'responeType': 'detail',
+              'filter': [
+                {
+                  'key': 'id',
+                  'value_filter': vm.id,
+                  'compare': '=',
+                  'type': 'number'
+                }
+              ]
+            }
+            dataPost = new URLSearchParams();
+
+            dataPost.append('text', JSON.stringify(textPost))
+            axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+              let dataObj = response.data
+              vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+
+              if (dataObj.respone === 'detail') {
+                if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+                  if (vm.dataSocket['detail'].length === 0) {
+                    vm.data = {}
+                  } else {
+                    vm.data = vm.dataSocket[dataObj.respone][0]
+                  }
+                  vm.processDataSourceVerify()
+                } else {
+                  vm.data = {}
+                }
+              } else if (dataObj.respone === 'loginUser') {
+                vm.$store.commit('setloginUser', dataObj['loginUser'])
+              } 
+            }).catch(function (error) {
+
+            })
+          }).catch(function (error) {
+
+          })
         }
+        /*
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
@@ -527,6 +590,7 @@
             }
           }
         }
+        */
       })
     },
     methods: {
@@ -555,6 +619,7 @@
         let vm = this
         if (vm.isConnected) {
           vm.isConnected = false
+          /*
           vm.$socket.onmessage = function (data) {
             let dataObj = eval('( ' + data.data + ' )')
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
@@ -605,6 +670,7 @@
               }
             }
           }
+          */
         }
         if (vm.$refs.form.validate()) {
           vm.loading = true
@@ -617,6 +683,71 @@
           if (newQuery.hasOwnProperty('col') && newQuery.hasOwnProperty('pk')) {
             dataPOST[newQuery['col']] = newQuery['pk']
           }
+          let dataPost = new URLSearchParams()
+          let textPost = {
+            'type': 'admin',
+            'cmd': cmdText,
+            'respone': 'detail',
+            'id': vm.id,
+            'code': vm.$router.history.current.params.tableName,
+            'data': dataPOST
+          }
+          dataPost.append('text', JSON.stringify(textPost))
+
+          axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+            let dataObj = response.data
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (dataObj.respone === 'detail') {
+              if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
+                if (vm.dataSocket['detail'].length === 0) {
+                  vm.data = {}
+                } else {
+                  vm.data = vm.dataSocket[dataObj.respone][0]
+                }
+                vm.processDataSourceVerify()
+              } else {
+                vm.data = {}
+              }
+            } else if (dataObj.respone === 'loginUser') {
+              vm.$store.commit('setloginUser', dataObj['loginUser'])
+            } 
+            if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
+              vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
+              console.log('load tableConfig')
+              vm.processDataSource()
+            }
+            vm.loading = false
+            if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+              let current = vm.$router.history.current
+              let newQuery = current.query
+              let currentPath = current.path
+              let queryString = '?'
+              newQuery['state_change'] = '0'
+              newQuery['renew'] = ''
+              for (let key in newQuery) {
+                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                  queryString += key + '=' + newQuery[key] + '&'
+                }
+              }
+              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              vm.$router.push({
+                path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+              })
+            } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
+              vm.snackbarsuccess = true
+              vm.data = {}
+            }
+            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+              vm.pullCounter = vm.pullCounter - 1
+              if (vm.pullCounter === 0) {
+                vm.pullOk = true
+              }
+            }
+          }).catch(function (error) {
+
+          })
+          /*
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -627,6 +758,7 @@
               data: dataPOST
             }
           )
+          */
         }
       },
       processRules (rulesStr) {
@@ -639,6 +771,54 @@
           vm.pullCounter = vm.pullCounter + 1
           // comment send login user
           if (item.concatina['datasource_key'] !== 'loginUser') {
+            let dataPost = new URLSearchParams()
+            let textPost = {
+              'type': 'api',
+              'cmd': 'get',
+              'respone': item.concatina['datasource_key'],
+              'api': item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
+              'headers': {
+                'Token': vm.getAuthToken(),
+                'groupId': vm.getScopeGroupId(),
+                'USER_ID': vm.getUserId()
+              }
+            }
+            dataPost.append('text', JSON.stringify(textPost))
+
+            axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+              let dataObj = response.data
+              vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+
+              if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+                let current = vm.$router.history.current
+                let newQuery = current.query
+                let currentPath = current.path
+                let queryString = '?'
+                newQuery['state_change'] = '0'
+                newQuery['renew'] = ''
+                for (let key in newQuery) {
+                  if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                    queryString += key + '=' + newQuery[key] + '&'
+                  }
+                }
+                queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                vm.$router.push({
+                  path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+                })
+              } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
+                vm.snackbarsuccess = true
+                vm.data = {}
+              }
+              if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+                vm.pullCounter = vm.pullCounter - 1
+                if (vm.pullCounter === 0) {
+                  vm.pullOk = true
+                }
+              }
+            }).catch(function (error) {
+
+            })
+            /*
             vm.$socket.sendObj(
               {
                 type: 'api',
@@ -652,6 +832,7 @@
                 }
               }
             )
+            */
           }
         }
       },
@@ -677,6 +858,54 @@
             }
             // comment send login user
             if (vm.detailForm[key]['datasource_key'] !== 'loginUser') {
+              let dataPost = new URLSearchParams()
+              let textPost = {
+                'type': 'api',
+                'cmd': 'get',
+                'respone': vm.detailForm[key]['datasource_key'],
+                'api': apiURL,
+                'headers': {
+                  'Token': vm.getAuthToken(),
+                  'groupId': vm.getScopeGroupId(),
+                  'USER_ID': vm.getUserId()
+                }
+              }
+              dataPost.append('text', JSON.stringify(textPost))
+
+              axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+                let dataObj = response.data
+                vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+
+                if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
+                  let current = vm.$router.history.current
+                  let newQuery = current.query
+                  let currentPath = current.path
+                  let queryString = '?'
+                  newQuery['state_change'] = '0'
+                  newQuery['renew'] = ''
+                  for (let key in newQuery) {
+                    if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                      queryString += key + '=' + newQuery[key] + '&'
+                    }
+                  }
+                  queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  vm.$router.push({
+                    path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
+                  })
+                } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
+                  vm.snackbarsuccess = true
+                  vm.data = {}
+                }
+                if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
+                  vm.pullCounter = vm.pullCounter - 1
+                  if (vm.pullCounter === 0) {
+                    vm.pullOk = true
+                  }
+                }
+              }).catch(function (error) {
+
+              })
+              /*
               vm.$socket.sendObj(
                 {
                   type: 'api',
@@ -690,6 +919,7 @@
                   }
                 }
               )
+              */
             }
           }
         }
