@@ -11,7 +11,7 @@ import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/mode/javascript/javascript.js'
-import VueNativeSock from 'vue-native-websocket'
+//import VueNativeSock from 'vue-native-websocket'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
 import axios from 'axios'
@@ -27,6 +27,7 @@ let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPor
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
+/*
 Vue.use(VueNativeSock, 'ws://' + window.themeDisplay.getPortalURL().replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
   + '&portalURL=' + portalURL
   + '&companyId=' + companyId
@@ -39,6 +40,7 @@ Vue.use(VueNativeSock, 'ws://' + window.themeDisplay.getPortalURL().replace('htt
     reconnection: true
   }
 )
+*/
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
@@ -87,6 +89,7 @@ new Vue({
     var vm = this
     vm.$nextTick(function() {
       setTimeout(() => {
+        /*
         vm.$socket.sendObj(
           {
             type: 'admin',
@@ -111,6 +114,7 @@ new Vue({
             }
           }
         )
+        */
         if (window.location.href.endsWith('#/')) {
           vm.$router.push('/table/opencps_employee')
         }

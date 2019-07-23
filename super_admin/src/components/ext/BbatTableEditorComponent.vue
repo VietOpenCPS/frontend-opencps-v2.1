@@ -450,6 +450,7 @@
           }
           vm.processDataSource()
         } else {
+          /*
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -476,7 +477,9 @@
               ]
             }
           )
+          */
         }
+        /*
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
@@ -527,6 +530,7 @@
             }
           }
         }
+        */
       })
     },
     methods: {
@@ -555,6 +559,7 @@
         let vm = this
         if (vm.isConnected) {
           vm.isConnected = false
+          /*
           vm.$socket.onmessage = function (data) {
             let dataObj = eval('( ' + data.data + ' )')
             vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
@@ -605,6 +610,7 @@
               }
             }
           }
+          */
         }
         if (vm.$refs.form.validate()) {
           vm.loading = true
@@ -617,6 +623,7 @@
           if (newQuery.hasOwnProperty('col') && newQuery.hasOwnProperty('pk')) {
             dataPOST[newQuery['col']] = newQuery['pk']
           }
+          /*
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -627,6 +634,7 @@
               data: dataPOST
             }
           )
+          */
         }
       },
       processRules (rulesStr) {
@@ -637,6 +645,7 @@
         if (item.hasOwnProperty('concatina')) {
           vm.pullOk = false
           vm.pullCounter = vm.pullCounter + 1
+          /*
           vm.$socket.sendObj(
             {
               type: 'api',
@@ -650,6 +659,7 @@
               }
             }
           )
+          */
         }
       },
       processDataSourceVerify () {
@@ -672,6 +682,7 @@
             if (vm.detailForm[key]['dependency'] && vm.detailForm[key].hasOwnProperty('pk')) {
               apiURL = apiURL + '?pk' + '=' + vm.id + '&col=' + vm.detailForm[key]['pk']
             }
+            /*
             vm.$socket.sendObj(
               {
                 type: 'api',
@@ -685,6 +696,7 @@
                 }
               }
             )
+            */
           }
         }
       },

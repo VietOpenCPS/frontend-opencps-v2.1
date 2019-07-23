@@ -97,7 +97,8 @@
 
 <script>
   import TinyPagination from './TinyPagination.vue'
-
+  import axios from 'axios'
+  
   export default {
     props: ['tableName'],
     components: {
@@ -175,6 +176,7 @@
         vm.showLoadingTable = true
         if (vm.isConnected) {
           vm.isConnected = false
+          /*
           vm.$socket.onmessage = function (data) {
             let dataObj = eval('( ' + data.data + ' )')
             if (dataObj['status'] === '200') {
@@ -218,6 +220,7 @@
               alert('Yêu cầu thực hiện thất bại.')
             }
           } 
+        */
         }
         setTimeout(() => {
           vm.getData()
@@ -237,6 +240,7 @@
         if (videoElement !== null && videoElement !== undefined) {
           videoElement.play()
         }
+        /*
         vm.$socket.onmessage = function (data) {
           let dataObj = eval('( ' + data.data + ' )')
           if (dataObj['status'] === '200') {
@@ -279,6 +283,7 @@
             alert('Yêu cầu thực hiện thất bại')
           }
         }
+        */
         setTimeout(() => {
           vm.getData()
         }, 10)
@@ -343,6 +348,109 @@
             type: pk_type
           })
         }
+        let dataPost = new URLSearchParams()
+        //dataPost.append('delegacy', filter.delegacy)
+        let textPost = {
+          'type': 'admin',
+          'cmd': 'get',
+          'config': 'true',
+          'code': vm.$router.history.current.params.tableName,
+          'respone': 'tableConfig'
+        }
+        dataPost.append('text', JSON.stringify(textPost))
+
+        axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+          let dataObj = response.data
+          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+            if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && dataObj.respone === 'tableConfig') {              
+              vm.nameScreen = vm.dataSocket['tableConfig']['name']
+              vm.backTableName = vm.dataSocket['tableConfig']['dependency_title']
+              if (vm.dataSocket['tableConfig'].hasOwnProperty('dependency_title')) {
+                vm.depen = true
+              } else {
+                vm.depen = false
+              }
+
+              textPost = {
+                'type': 'admin',
+                'cmd': 'get',
+                'code': vm.$router.history.current.params.tableName,
+                'respone': 'tableData',
+                'filter': vm.columnsDataFilter,
+                'start': vm.page * 10 - 10,
+                'end': vm.page * 10
+              }
+              dataPost = new URLSearchParams();
+
+              dataPost.append('text', JSON.stringify(textPost))
+              axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+                let dataObj = response.data
+                vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+                  if (vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined && vm.dataSocket['tableData'] !== null && vm.dataSocket['tableData'] !== undefined && (dataObj.respone === 'tableData' || dataObj.respone === 'tableConfig')) {
+                    vm.nameScreen = vm.dataSocket['tableConfig']['name']
+                    vm.backTableName = vm.dataSocket['tableConfig']['dependency_title']
+                    if (vm.dataSocket['tableConfig'].hasOwnProperty('dependency_title')) {
+                      vm.depen = true
+                    } else {
+                      vm.depen = false
+                    }
+                    vm.generateTable()
+                    vm.showLoadingTable = false
+                  }
+
+              }).catch(function (error) {
+
+              })
+
+              textPost = {
+                'type': 'admin',
+                'cmd': 'get',
+                'counter': 'true',
+                'code': vm.$router.history.current.params.tableName,
+                'respone': 'pageTotalCounter',
+                'filter': vm.columnsDataFilter
+              }
+              dataPost = new URLSearchParams();
+
+              dataPost.append('text', JSON.stringify(textPost))
+              axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+                let dataObj = response.data
+                vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+                if (dataObj.respone === 'pageTotalCounter') {
+                  vm.pageTotalCounter = parseInt(vm.dataSocket['pageTotalCounter'])
+                  vm.showLoadingTable = false
+                } else if (dataObj.respone === 'loginUser') {
+                  vm.$store.commit('setloginUser', dataObj['loginUser'])
+                } else if (dataObj.respone === 'listTableMenu') {
+                  vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+                }
+                if (dataObj['cmd'] !== 'get') {
+                  let current = vm.$router.history.current
+                  let newQuery = current.query
+                  let queryString = '?'
+                  newQuery['state_change'] = '0'
+                  newQuery['renew'] = ''
+                  for (let key in newQuery) {
+                    if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+                      queryString += key + '=' + newQuery[key] + '&'
+                    }
+                  }
+                  queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                  vm.$router.push({
+                    path: current.path.substring(0, current.path.indexOf('/editor/')) + queryString
+                  })
+                }
+              }).catch(function (error) {
+
+              })
+
+            }
+
+        }).catch(function (error) {
+
+        })
+
+        /*
         vm.$socket.sendObj(
           {
             type: 'admin',
@@ -373,6 +481,7 @@
             filter: vm.columnsDataFilter
           }
         )
+        */
         vm.problem = true
       },
       show (e) {
@@ -519,6 +628,7 @@
           let idEditor = 0
           let tempTableData = vm.dataSocket['tableData']
           idEditor = tempTableData[vm.currentIndex][0]
+          /*
           vm.$socket.sendObj(
             {
               type: 'admin',
@@ -528,6 +638,7 @@
               code: vm.$router.history.current.params.tableName
             }
           )
+          */
         }
       },
       toBieuDoQuyTrinh() {
