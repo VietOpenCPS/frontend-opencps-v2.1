@@ -34,8 +34,8 @@
           href="#tab-2"
           :key="2"
         >
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            FORM NHẬP GIẤY PHÉP
+          <v-btn flat class="px-0 py-0 mx-0 my-0" @click="">
+            THÔNG TIN MỞ RỘNG
           </v-btn>
         </v-tab>
         <v-tab
@@ -60,14 +60,14 @@
             reverse-transition="fade-transition" transition="fade-transition"
             v-if="String(id) !== '0'"
           >
-            <view-pdf v-if="showComponent" :id="id" :datainput="detail"></view-pdf>
+            <view-pdf ref="viewpdf" v-if="showComponent" :id="id" :datainput="detail"></view-pdf>
           </v-tab-item>
           <v-tab-item
             value="tab-2"
             :key="2"
             reverse-transition="fade-transition" transition="fade-transition"
           >
-            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :datainput="detail['formData']"></bbat-table-editor-component>
+            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
           </v-tab-item>
 
           <v-tab-item
@@ -113,7 +113,7 @@
 
 <script>
   import { BbatTableEditorComponent, BbatTableEditorComponentSimple, ViewPdf, ViewLogs, AttachedFileTemplate } from '@/components'
-
+  import toastr from 'toastr'
   export default {
     props: ['index', 'id'],
     components: {
@@ -134,7 +134,8 @@
         dataSocket: {},
         tempCounter: 0,
         detail: {},
-        showComponent: false
+        showComponent: false,
+        formId: ''
       }
     },
     created () {
@@ -142,9 +143,9 @@
       vm.$nextTick(function () {
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
-            let formId = vm.items[vm.index]['formScriptFileId']
+            vm.formId = vm.items[vm.index]['formScriptFileId']
             vm.deName = ''
-            vm.$store.dispatch('getContentFile', formId)
+            // vm.$store.dispatch('getContentFile', formId)
             vm.showComponent = false
             vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
               if (String(vm.id) !== '0') {
@@ -163,13 +164,16 @@
       '$route': function (newRoute, oldRoute) {
         let vm = this
         if (vm.isConnected) {
+          console.log('watch editor')
           vm.isConnected = false
           let formId = vm.items[vm.index]['formScriptFileId']
           vm.deName = ''
-          vm.$store.dispatch('getContentFile', formId)
+          // vm.$store.dispatch('getContentFile', formId)
           vm.showComponent = false
           vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
-            vm.detail = result
+            if (String(vm.id) !== '0') {
+              vm.detail = result
+            }
             vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
             vm.$store.dispatch('getContentFileSimple')
@@ -277,6 +281,14 @@
               if (String(vm.id) === '0') {
                 vm.$refs.attachedObj.doUploadLate(data['createDeliverable']['deliverableId'])
                 vm.backToList()
+              } else {
+                toastr.success('Cập nhật thành công')
+                setTimeout(function () {
+                  vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
+                    vm.detail = result
+                    vm.$refs.viewpdf.pullPDF(vm.detail['fileEntryId'])
+                  })
+                }, 3000)
               }
             })
           }

@@ -22,7 +22,7 @@
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
-        console.log('current', current)
+        console.log('current 11', current)
         console.log('newQuery', newQuery)
       })
     },

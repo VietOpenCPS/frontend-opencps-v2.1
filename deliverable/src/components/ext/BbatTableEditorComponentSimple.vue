@@ -241,19 +241,20 @@
       },
       pullCounterOrg () {
         return this.$store.getters.pullCounter
+      },
+      activeBindFormData () {
+        return this.$store.getters.getActiveBindFormData
       }
     },
-    updated() {
+    updated () {
       var vm = this
       vm.$nextTick(function () {
         if (vm.isCallBack) {
           vm.isCallBack = false
           vm.processDataSource()
           setTimeout(() => {
-            // vm.processDataSourceVerify()
             if (String(vm.id) !== '0') {
               vm.data = vm.datainput
-              console.log('vm.data----', vm.data)
             }
             if (vm.pullCounterOrg === 0) {
               vm.pullOk = true
@@ -267,7 +268,18 @@
     },
     mounted () {
       let vm = this
-      // vm.processDataSource()
+      vm.processDataSource()
+    },
+    watch: {
+      data: {
+        handler (val) {
+          // console.log('watch data', val)
+          let vm = this
+          vm.$store.commit('setChangeFormData', val)
+          vm.$store.commit('setActiveBindFormData', !vm.activeBindFormData)
+        },
+        deep: true
+      }
     },
     methods: {
       clearLoading () {
@@ -290,6 +302,12 @@
             if (vm.data.hasOwnProperty(vm.detailForm[key]['model']) && String(vm.data[vm.detailForm[key]['model']]).startsWith("[")) {
               vm.data[vm.detailForm[key]['model']] = JSON.parse(vm.data[vm.detailForm[key]['model']])
             }
+          }
+          if (String(vm.id) === '0' && vm.detailForm[key]['model'] === 'subject') {
+            vm.detailForm[key]['model'] = '  '
+            setTimeout (function () {
+              vm.detailForm[key]['model'] = 'subject'
+            }, 200)
           }
         }
       },
@@ -319,7 +337,6 @@
               if (vm.detailForm[key]['value'] && String(vm.id) === '0') {
                 vm.data[vm.detailForm[key]['model']] = vm.detailForm[key]['value']
               }
-              console.log('detailForm model 3', vm.detailForm[key]['model'], vm.data[vm.detailForm[key]['model']])
               vm.processDataSourceVerify()
             }).catch(function (xhr) {
             })

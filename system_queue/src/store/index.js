@@ -179,7 +179,6 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId,
               Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
             }
           }

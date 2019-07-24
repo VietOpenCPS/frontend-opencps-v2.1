@@ -44,20 +44,40 @@
     props: ['value', 'item', 'dataValue'],
     watch: {
         toDate (val) {
-            this.toDateFormatted = this.formatDate(parseInt(val))
-            this.$emit('input', new Date(val).getTime())
+          let vm = this
+          setTimeout(function () {
+            // console.log('val toDate', val)
+            vm.toDateFormatted = vm.formatDate(val)
+            vm.$emit('input', new Date(val).getTime())
+            // console.log('toDateFormatted 123', vm.toDateFormatted)
+          }, 300)
         }
     },
     methods: {
         formatDate (date) {
             if (!date) return null
-            let dateObj = new Date(parseInt(date))
+            let dateFormat
+            if (isNaN(date)) {
+              if (String(date).indexOf('-') >= 0) {
+                dateFormat = date
+              } else {
+                return date
+              }
+            } else {
+              dateFormat = parseInt(date)
+            }
+            let dateObj = new Date(dateFormat)
             return dateObj.getDate() + '/' + (dateObj.getMonth() + 1) + '/' + dateObj.getFullYear()
         },
         parseDate (date) {
-            if (!date) return null
-            const [day, month, year] = date.split('/')
-            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+          let vm = this
+          let dateFormat = date
+          if (!date) return null
+          if (!isNaN(date)) {
+            dateFormat = vm.formatDate(date)
+          }
+          const [day, month, year] = dateFormat.split('/')
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
         },
         processRules (rulesStr) {
             return eval('( ' + rulesStr + ' )')

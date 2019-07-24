@@ -13,7 +13,7 @@
           </v-list-tile-action>
 
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.typeName }}</v-list-tile-title>
+            <v-list-tile-title :title="item.typeName">{{ item.typeName }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>

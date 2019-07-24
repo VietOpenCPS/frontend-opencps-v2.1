@@ -109,7 +109,7 @@
                       <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
                         <span>Phân công lại</span>
                       </span> -->
-                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new'">Ủy quyền</span>
+                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new' && !checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                       <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
                     </v-btn>
                   </v-flex>

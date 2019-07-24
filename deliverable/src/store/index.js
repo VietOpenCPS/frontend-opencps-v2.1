@@ -41,7 +41,9 @@ export const store = new Vuex.Store({
     // endPointApi: 'http://127.0.0.1:8081/api',
     getDeliverableTypes: [],
     getContentFile: '',
-    getContentFileSimple: []
+    getContentFileSimple: [],
+    changeFormData: '',
+    activeBindFormData: false
   },
   actions: {
     loadInitResource ({state}) {
@@ -180,7 +182,7 @@ export const store = new Vuex.Store({
       })
     },
     getContentFile ({ commit, state }, fileEntryId) {
-      return new Promise(() => {
+      return new Promise((resolve, reject) => {
         let options = {
           headers: {
             'groupId': state.groupId,
@@ -189,8 +191,10 @@ export const store = new Vuex.Store({
         }
         axios.get('/o/v1/opencps/fileattach/' + fileEntryId + '/text', options).then(function (response) {
           state.getContentFile = eval('( ' + response.data + ' )')
+          resolve(state.getContentFile)
         }).catch(function () {
           state.getContentFile = ''
+          reject(state.getContentFile)
         })
       })
     },
@@ -206,7 +210,6 @@ export const store = new Vuex.Store({
         let body = AdminConfig.getAdminConfig
         axios.post('/o/v1/opencps/adminconfig', body, options).then(function (response) {
           state.getContentFileSimple = eval('( ' + response.data['getAdminConfig']['detailColumns'] + ' )')
-          console.log('state.getContentFileSimple', state.getContentFileSimple)
           resolve(state.getContentFileSimple)
         }).catch(function () {
           state.getContentFileSimple = []
@@ -355,6 +358,12 @@ export const store = new Vuex.Store({
     },
     setisConnected (state, payload) {
       state.isConnected = payload
+    },
+    setChangeFormData (state, payload) {
+      state.changeFormData = payload
+    },
+    setActiveBindFormData (state, payload) {
+      state.activeBindFormData = payload
     }
   },
   getters: {
@@ -382,5 +391,11 @@ export const store = new Vuex.Store({
     getisConnected (state) {
       return state.isConnected
     },
+    getChangeFormData (state) {
+      return state.changeFormData
+    },
+    getActiveBindFormData (state) {
+      return state.activeBindFormData
+    }
   }
 })

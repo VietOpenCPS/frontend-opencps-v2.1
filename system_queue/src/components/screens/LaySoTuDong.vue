@@ -34,7 +34,11 @@
       </v-flex>
       <v-flex v-if="isActive" xs12 class="mt-3 text-xs-center" style="color:yellow">
         <div v-if="checkinFail">
-          <span >
+          <span v-if="overTime">
+            Thời gian làm việc ...<br>
+            Vui lòng quét lại sau
+          </span>
+          <span v-else>
             Lỗi. Quý khách vui lòng quét lại <br>
             ERROR. Please again!
           </span>
@@ -75,7 +79,8 @@ export default {
     isActive: false,
     checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-    loadData: false
+    loadData: false,
+    overTime: false
   }),
   computed: {
     isMobile () {
@@ -89,6 +94,7 @@ export default {
     $('.navbar-container').css('display','none')
     $('#footer').css('display','none')
     vm.$nextTick(function () {
+      vm.getWorkingTime()
       vm.getBooking()
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -120,74 +126,57 @@ export default {
   methods: {
     submitQueue () {
       let vm = this
+      let currentTime = `${(new Date()).getHours()}:${(new Date()).getMinutes()}`
+      let currentTimeFull = (new Date(`1970-01-01 ${currentTime}`)).getTime()
+      console.log('currentTimeFull', currentTimeFull)
+      console.log('workingTime', vm.workingTime)
+      let onTime = true
+      if (!(Number(currentTime) >= Number(vm.workingTime[0]) && Number(currentTime) <= Number(vm.workingTime[1]))) {
+        onTime = false
+      }
+      if (!(Number(vm.workingTime[2]) && Number(currentTime) >= Number(vm.workingTime[2]) && Number(currentTime) <= Number(vm.workingTime[3]))) {
+        onTime = false
+      }
       if (!vm.isActive) {
-        if (String(vm.eformInformation).indexOf('-') > 0) {
-          let keySearch = String(vm.eformInformation).split('-')
-          vm.codeShow = vm.eformInformation
-          if (keySearch.length !== 3) {
-            vm.isActive = true
-            vm.checkinFail = true
-            setTimeout(function() {
-              vm.isActive = false
-            }, 5000)
-            vm.eformInformation = ''
-          }
-          let filterBooking = {
-            className: '',
-            classPK: '',
-            serviceCode: '',
-            gateNumber: '',
-            state: 1,
-            codeNumber: vm.eformInformation,
-            bookingName: ''
-          }
-          if (keySearch[0] === 'E' && keySearch.length === 3) {
-            let filterEform = {
-              eFormId: keySearch[2]
-            }
-            vm.$store.dispatch('getEform', filterEform).then(function (result) {
-              let bookingName = ''
-              if (result['eFormId']) {
-                try {
-                  let name = JSON.parse(result['eFormData'])
-                  bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
-                } catch (e) {
-                }
-                vm.checkinFail = false
-                filterBooking.className = 'EFORM'
-                filterBooking.classPK = result.eFormId
-                filterBooking.serviceCode = result.serviceCode
-                filterBooking.bookingName = bookingName
-                vm.createBooking(filterBooking)
-              } else {
-                vm.isActive = true
-                vm.checkinFail = true
-                setTimeout(function() {
-                  vm.isActive = false
-                }, 5000)
-                vm.eformInformation = ''
-              }
-            }).catch (function (reject) {
+        if (onTime) {
+          vm.overTime = false
+          if (String(vm.eformInformation).indexOf('-') > 0) {
+            let keySearch = String(vm.eformInformation).split('-')
+            vm.codeShow = vm.eformInformation
+            if (keySearch.length !== 3) {
               vm.isActive = true
               vm.checkinFail = true
               setTimeout(function() {
                 vm.isActive = false
               }, 5000)
               vm.eformInformation = ''
-            })
-          } else if (keySearch[0] === 'D' && keySearch.length === 3) {
-            let filterDossier = {
-              dossierId: keySearch[2]
             }
-            vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
-              if (result) {
-                vm.checkinFail = false
-                filterBooking.className = 'DOSSIER'
-                filterBooking.classPK = result.dossierId
-                filterBooking.serviceCode = result.serviceCode
-                filterBooking.bookingName = result.applicantName
-                if (result['stepCode'] && '404,600,300'.indexOf(String(result['stepCode'])) >= 0) {
-                  console.log('createBK', result['stepCode'], filterBooking)
+            let filterBooking = {
+              className: '',
+              classPK: '',
+              serviceCode: '',
+              gateNumber: '',
+              state: 1,
+              codeNumber: vm.eformInformation,
+              bookingName: ''
+            }
+            if (keySearch[0] === 'E' && keySearch.length === 3) {
+              let filterEform = {
+                eFormId: keySearch[2]
+              }
+              vm.$store.dispatch('getEform', filterEform).then(function (result) {
+                let bookingName = ''
+                if (result['eFormId']) {
+                  try {
+                    let name = JSON.parse(result['eFormData'])
+                    bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
+                  } catch (e) {
+                  }
+                  vm.checkinFail = false
+                  filterBooking.className = 'EFORM'
+                  filterBooking.classPK = result.eFormId
+                  filterBooking.serviceCode = result.serviceCode
+                  filterBooking.bookingName = bookingName
                   vm.createBooking(filterBooking)
                 } else {
                   vm.isActive = true
@@ -197,26 +186,65 @@ export default {
                   }, 5000)
                   vm.eformInformation = ''
                 }
-              } else {
+              }).catch (function (reject) {
                 vm.isActive = true
                 vm.checkinFail = true
                 setTimeout(function() {
                   vm.isActive = false
                 }, 5000)
                 vm.eformInformation = ''
+              })
+            } else if (keySearch[0] === 'D' && keySearch.length === 3) {
+              let filterDossier = {
+                dossierId: keySearch[2]
               }
-            }).catch (function (reject) {
-              vm.isActive = true
-              vm.checkinFail = true
-              setTimeout(function() {
-                vm.isActive = false
-              }, 5000)
-              vm.eformInformation = ''
-            })
+              vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
+                if (result) {
+                  vm.checkinFail = false
+                  filterBooking.className = 'DOSSIER'
+                  filterBooking.classPK = result.dossierId
+                  filterBooking.serviceCode = result.serviceCode
+                  filterBooking.bookingName = result.applicantName
+                  if (result['stepCode'] && '404,600,300'.indexOf(String(result['stepCode'])) >= 0) {
+                    console.log('createBK', result['stepCode'], filterBooking)
+                    vm.createBooking(filterBooking)
+                  } else {
+                    vm.isActive = true
+                    vm.checkinFail = true
+                    setTimeout(function() {
+                      vm.isActive = false
+                    }, 5000)
+                    vm.eformInformation = ''
+                  }
+                } else {
+                  vm.isActive = true
+                  vm.checkinFail = true
+                  setTimeout(function() {
+                    vm.isActive = false
+                  }, 5000)
+                  vm.eformInformation = ''
+                }
+              }).catch (function (reject) {
+                vm.isActive = true
+                vm.checkinFail = true
+                setTimeout(function() {
+                  vm.isActive = false
+                }, 5000)
+                vm.eformInformation = ''
+              })
+            }
+          } else {
+            vm.isActive = true
+            vm.checkinFail = true
+            setTimeout(function() {
+              vm.isActive = false
+            }, 5000)
+            vm.eformInformation = ''
           }
         } else {
           vm.isActive = true
           vm.checkinFail = true
+          vm.overTime = true
           setTimeout(function() {
             vm.isActive = false
           }, 5000)
@@ -246,6 +274,35 @@ export default {
         vm.loadData = !vm.loadData
       }).catch(reject => {
         vm.loadData = !vm.loadData
+      })
+    },
+    getWorkingTime () {
+      let vm = this
+      let filter = {
+        serverNo: 'EFORM_DVC'
+      }
+      vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+        console.log('config eform', JSON.parse(result.configs)['workTime'])
+        try {
+          let workTime = JSON.parse(result.configs)['workTime']
+          let parse = function (min) {
+            return (new Date(`1970-01-01 ${min}`)).getTime()
+          }
+          let s1, s2, c1, c2
+          if (workTime) {
+            s1 = parse(workTime.split(';')[0].split('-')[0])
+            s2 = parse(workTime.split(';')[0].split('-')[1])
+            if (workTime.split(';')[1]) {
+              c1 = parse(workTime.split(';')[1].split('-')[0])
+              c2 = parse(workTime.split(';')[1].split('-')[1])
+            }
+          }
+          let stringTime = `${s1},${s2},${c1},${c2}`
+          vm.workingTime = stringTime.split(',')
+          console.log('workingTime', vm.workingTime)
+        } catch (error) {
+          vm.workingTime = []
+        }
       })
     }
   }
