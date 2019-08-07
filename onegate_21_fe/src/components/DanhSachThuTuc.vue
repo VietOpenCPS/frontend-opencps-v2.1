@@ -187,7 +187,7 @@
           <v-layout row wrap>
             <v-flex xs12 sm9 class="pt-1">
               <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-              <span>{{itemServiceConfig.serviceName}}</span>&nbsp;
+              <span>{{itemServiceConfig.serviceInfoName}}</span>&nbsp;
               <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
             </v-flex>
             <v-flex xs12 sm1 class="text-xs-center pt-1">
@@ -463,8 +463,9 @@
           vm.serviceConfigListRender = vm.serviceConfigList.filter(function (item) {
             return vm.convertString(String(item['serviceInfoName'])).indexOf(keySearch) >= 0
           })
+          console.log('serviceConfigListRender 1', vm.serviceConfigListRender)
         }
-        if (newQuery.hasOwnProperty('lastest') && newQuery.lastest) {
+        if (newQuery.hasOwnProperty('lastest') && newQuery.lastest && String(newQuery.lastest) !== 'false') {
           vm.$store.dispatch('getServiceRecently').then(function (result) {
             if (result.length > 0) {
               let serviceConfigs = []
@@ -472,17 +473,18 @@
                 if (Array.isArray(result[index]['serviceConfigs'])) {
                   for (let key in result[index]['serviceConfigs']) {
                     result[index]['serviceConfigs'][key].serviceInfoId = result[index]['serviceConfigs'][key]['serviceInfoId']
-                    result[index]['serviceConfigs'][key].serviceName = result[index]['serviceName']
+                    result[index]['serviceConfigs'][key].serviceInfoName = result[index]['serviceName']
                     result[index]['serviceConfigs'][key].govAgencyNameRender = result[index]['serviceConfigs'][key]['govAgencyName']
                     serviceConfigs.push(result[index]['serviceConfigs'][key])
                   }
                 } else {
                   result[index]['serviceConfigs'].serviceInfoId = result[index]['serviceInfoId']
-                  result[index]['serviceConfigs'].serviceName = result[index]['serviceName']
+                  result[index]['serviceConfigs'].serviceInfoName = result[index]['serviceName']
                   serviceConfigs.push(result[index]['serviceConfigs'])
                 }
               }
               vm.serviceConfigListRender = serviceConfigs
+              console.log('serviceConfigListRender 2', vm.serviceConfigListRender)
             }
           })
         }

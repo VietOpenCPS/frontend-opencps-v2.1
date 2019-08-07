@@ -88,11 +88,11 @@
                 <div class="primary--text" slot="label">Ghi nhớ tài khoản</div>
               </v-checkbox>
             </div>
-            <div class="d-inline-block primary--text right" style="cursor: pointer;">
+            <!-- <div class="d-inline-block primary--text right" style="cursor: pointer;">
               <p @click="getPassword" >
               Quên mật khẩu?
               </p>
-            </div>
+            </div> -->
           </v-flex>
           <v-flex class="py-2" xs12 style="
             display: none;
@@ -183,7 +183,12 @@ export default {
         j_captcha_response: vm.j_captcha_response
       }
       if (vm.npmreactlogin_login && vm.npmreactlogin_password) {
-        vm.$store.dispatch('goToDangNhap', filter)
+        vm.loading = true
+        vm.$store.dispatch('goToDangNhap', filter).then(function() {
+          vm.loading = false
+        }).catch(function() {
+          vm.loading = false
+        })
       }
     },
     doLogOut () {

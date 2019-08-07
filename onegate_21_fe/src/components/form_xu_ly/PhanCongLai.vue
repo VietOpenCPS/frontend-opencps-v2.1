@@ -9,7 +9,9 @@
         @change = 'changeAssigned($event, index)'
         style="display:inline-block;min-width:190px;max-width:190px"
         :title="item.userName ? item.userName : item['fullName']"
-        ></v-checkbox>
+        >
+          <template slot="label"><span class="black--text">{{item.userName ? item.userName : item['fullName']}}</span></template>
+        </v-checkbox>
       </v-layout>
       <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
     </div>

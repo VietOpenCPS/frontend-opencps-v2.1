@@ -10,12 +10,12 @@
           <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinNhomHoSo.serviceName">
             {{thongTinNhomHoSo.serviceName}}
           </div>
-          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+          <!-- <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
             <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0">
               <v-icon size="20">add</v-icon>  &nbsp;
               <span>Tạo hồ sơ trong nhóm</span>
             </v-btn>
-          </div>
+          </div> -->
         </div> 
       </div>
       <div v-if="!activeAddDossierIntoGroup">
@@ -41,7 +41,17 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
-        
+        <div style="position: relative;">
+          <v-expansion-panel :value="[true]" expand class="expansion-pl">
+            <v-expansion-panel-content :key="1">
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
         <div style="position: relative;border-bottom: 1px solid #dedede;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
@@ -82,6 +92,7 @@
                   select-all
                   :headers="headers"
                   :items="dossiersIntoGroupRender"
+                  :pagination.sync="pagination"
                   hide-actions
                   class="table-landing table-bordered"
                   item-key="dossierId"
@@ -114,46 +125,53 @@
                   <!--  -->
                   <template slot="items" slot-scope="props">
                     <tr style="cursor: pointer">
-                      <td class="text-xs-center pl-3" width="32px">
+                      <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
                         <v-checkbox
                           v-model="props.selected"
                           primary
                           hide-details
                         ></v-checkbox>
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px">
-                        <span>{{props.index + 1}}</span>
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
+                        <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
                         {{ props.item.dossierNo }}
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
                         {{ props.item.applicantName }}
                       </td>
-                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px">
+                      <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
                         {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
                       </td>
                     </tr>
                   </template>
                 </v-data-table>
+
+                <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+                  <div class="flex pagging-table px-2">
+                    <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                      @tiny:change-page="paggingData" ></tiny-pagination> 
+                  </div>
+                </div>
               </div>
               <div v-else class="pl-4 py-2">Chưa có hồ sơ nào</div>
               <v-flex xs12 class="text-right mb-3 mr-2">
                 <input type="file" id="dossierImport" @change="uploadfileDossierImport($event)" style="display:none">
                 <v-btn color="primary" @click="createDossierIntoGroup" class="mx-0 my-0 mr-2" style="height:36px !important">
                   <v-icon size="20">add</v-icon>  &nbsp;
-                  <span>Tạo hồ sơ trong nhóm</span>
+                  <span>Thêm hồ sơ vào nhóm</span>
                 </v-btn>
                 <v-btn color="primary" @click="importIntoGroup" class="mx-0 my-0 mr-1" style="height:36px !important">
                   <v-icon size="20">cloud_upload</v-icon>  &nbsp;
-                  <span>Import hồ sơ</span>
+                  <span>Import hồ sơ vào nhóm</span>
                 </v-btn>
               </v-flex>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
         
-        <div style="position: relative;">
+        <!-- <div style="position: relative;">
           <v-expansion-panel :value="[true]" expand class="expansion-pl">
             <v-expansion-panel-content :key="1">
               <div slot="header" style="display: flex; align-items: center;">
@@ -163,7 +181,7 @@
               <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
             </v-expansion-panel-content>
           </v-expansion-panel>
-        </div>
+        </div> -->
       </div>
       <!-- Thông tin hồ sơ trong nhóm -->
       <div v-if="activeAddDossierIntoGroup">
@@ -326,6 +344,118 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogSelectDosier" max-width="1000" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn hồ sơ đính kèm tài liệu</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="cancelAddFile">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <div class="mb-3" v-if="dossiersIntoGroupRender.length > 0">
+            <v-layout wrap class="my-2">
+              <v-flex style="width: 120px">
+                <v-subheader class="pl-0 text-header">Bước xử lý: </v-subheader>
+              </v-flex>
+              <v-flex class="pr-3" style="width: calc(100% - 120px)">
+                <v-select
+                :items="stepList"
+                item-text="stepName"
+                item-value="stepCode"
+                v-model="stepSelected"
+                @change="changeStep"
+                return-object
+                clearable
+                >
+                </v-select>
+              </v-flex>
+            </v-layout>
+            <v-data-table
+              v-model="selectedAttach"
+              select-all
+              :headers="headers"
+              :items="dossiersIntoGroupRender"
+              :pagination.sync="pagination"
+              hide-actions
+              class="table-landing table-bordered"
+              item-key="dossierId"
+            >
+              <!--  -->
+              <template slot="headers" slot-scope="props">
+                <tr>
+                  <th width="32px" class="v_data_table_check_all" style="padding-left: 14px !important;">
+                    <v-checkbox
+                      :input-value="props.all"
+                      :indeterminate="props.indeterminate"
+                      primary
+                      hide-details
+                      @click.native="toggleAllSelectDialog"
+                    ></v-checkbox>
+                  </th>
+                  <th
+                    v-for="header in headers"
+                    :key="header.text"
+                    :class="header['class'] ? header['class'] : ''"
+                    :width="header['width'] ? header['width'] + 'px' : ''"
+                  >
+                    <v-tooltip bottom>
+                      <span slot="activator">{{ header.text }}</span>
+                      <span>{{ header.text }}</span>
+                    </v-tooltip>
+                  </th>
+                </tr>
+              </template>
+              <!--  -->
+              <template slot="items" slot-scope="props">
+                <tr style="cursor: pointer">
+                  <td class="text-xs-center pl-3" width="32px" style="height: 40px !important">
+                    <v-checkbox
+                      v-model="props.selected"
+                      primary
+                      hide-details
+                    ></v-checkbox>
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-center" width="50px" style="height: 40px !important">
+                    <span>{{pagination.page * pagination.rowsPerPage - pagination.rowsPerPage + props.index + 1}}</span>
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="250px" style="height: 40px !important">
+                    {{ props.item.dossierNo }}
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" style="height: 40px !important">
+                    {{ props.item.applicantName }}
+                  </td>
+                  <td @click="viewDetail(props.item, props.index)" class="text-xs-left" width="200px" style="height: 40px !important">
+                    {{ props.item.dossierSubStatusText ? props.item.dossierSubStatusText : props.item.dossierStatusText }}
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+
+            <div v-if="dossiersIntoGroupRender.length > 10" class="text-xs-center layout wrap mt-2 pr-1" style="position: relative;">
+              <div class="flex pagging-table px-2">
+                <tiny-pagination :total="dossiersIntoGroupRender.length" :currentLimit="10" :page="pagination.page" custom-class="custom-tiny-class" 
+                  @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="addFileToDossier()">
+            <v-icon>send</v-icon>&nbsp;
+            Xác nhận
+          </v-btn>
+          <v-btn color="red" style="color: #fff;" @click.native="cancelAddFile"
+            >
+            <v-icon>close</v-icon>&nbsp;
+            Bỏ qua
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -334,12 +464,13 @@
 import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhom.vue'
-import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhom.vue'
-import ThanhPhanHoSo2 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhom.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
+import ThanhPhanHoSo1 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
+import ThanhPhanHoSo2 from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNhomNew.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
+import TinyPagination from './pagging/hanghai_pagination.vue'
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -353,16 +484,19 @@ export default {
     'thanh-phan-ho-so-2': ThanhPhanHoSo2,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
-    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
+    'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua,
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
     detailGroup: false,
     dialogImportDosier: false,
+    dialogSelectDosier: false,
     groupDossierList: [],
     groupDossierSelected: '',
     dossiersIntoGroup: [],
     dossiersIntoGroupRender: [],
     selected: [],
+    selectedAttach: [],
     stepList: [],
     stepSelected: '',
     btnDynamics: [],
@@ -430,7 +564,11 @@ export default {
     dossierSuccess: [],
     totalDossier: 0,
     valueProgress: 0,
-    countDossierSuccess: 0
+    countDossierSuccess: 0,
+    pagination: {
+      rowsPerPage: 10,
+      page: 1
+    }
   }),
   computed: {
     loading () {
@@ -445,6 +583,12 @@ export default {
     },
     thongTinChuHoSo () {
       return this.$store.getters.thongTinChuHoSo
+    },
+    filesAdd () {
+      return this.$store.getters.getFilesAdd
+    },
+    activeAddFileGroup () {
+      return this.$store.getters.activeAddFileGroup
     }
   },
   created () {
@@ -507,7 +651,13 @@ export default {
     },
     selected (val) {
       let vm = this
-      vm.$store.commit('setSelectDossierGroup', val)
+      // vm.$store.commit('setSelectDossierGroup', val)
+    },
+    activeAddFileGroup (val) {
+      let vm = this
+      console.log('val activeAddFileGroup', val)
+      vm.stepSelected = ''
+      vm.dialogSelectDosier = val
     }
   },
   methods: {
@@ -516,30 +666,10 @@ export default {
       let isMobile = window.innerWidth < 1024
       vm.isMobile = isMobile
     },
-    // initData: function (data) {
-    //   var vm = this
-    //   let query = vm.$router.history.current.query
-    //   vm.$store.dispatch('getServiceOpionByProcess', data).then(result => {
-    //     vm.processOptionSelected = result.filter(function(item) {
-    //       return String(item.processOptionId) === String(data.processOptionId)
-    //     })[0]
-    //     vm.groupDossierNameCreate = vm.processOptionSelected.processName
-    //   }).catch(reject => {
-    //   })
-    //   if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && query.hasOwnProperty('detailGroup')) {
-    //     vm.detailGroup = true
-    //     let id = query.groupDossierId
-    //     vm.getDetaiGroup(id)
-    //   } else if (query.hasOwnProperty('groupDossierId') && query['groupDossierId'] && !query.hasOwnProperty('detailGroup')) {
-    //     vm.detailGroup = false
-    //     vm.getGroupDossier()
-    //     let id = query.groupDossierId
-    //     vm.getDetaiGroup(id)
-    //   } else {
-    //     vm.detailGroup = false
-    //     vm.getGroupDossier()
-    //   }
-    // },
+    paggingData (config) {
+      let vm = this
+      vm.pagination.page = config.page
+    },
     getGroupDossier () {
       let vm = this
       let query = vm.$router.history.current.query
@@ -574,6 +704,7 @@ export default {
         vm.dossiersIntoGroupRender = []
         vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
           vm.dossiersIntoGroup = result
+          vm.$store.commit('setSelectDossierGroup', vm.dossiersIntoGroup)
           if (vm.dossiersIntoGroup.length > 0) {
             let steps = []
             for (let index in vm.dossiersIntoGroup) {
@@ -612,36 +743,41 @@ export default {
     changeStep () {
       let vm = this
       setTimeout(function () {
-        vm.dossiersIntoGroupRender = vm.dossiersIntoGroup.filter(function(item) {
-          return String(item['stepCode']) === String(vm.stepSelected['stepCode'])
-        })
-        vm.$store.dispatch('pullProcessSteps', vm.stepSelected).then(function (result) {
-          if (result.hasOwnProperty('menuGroup') && result.menuGroup) {
-            vm.$store.dispatch('getDetailMenuConfig', result).then(function (result2) {
-              if (result2.hasOwnProperty('buttonConfig') && result2.buttonConfig) {
-                try {
-                  vm.btnDynamics = JSON.parse(result2['buttonConfig'])['buttons']
-                  vm.btnDynamics = vm.btnDynamics.filter(function(item) {
-                    return item['form'] === 'ACTIONS'
-                  })
-                  vm.btnDynamics = vm.btnDynamics.filter(function(item) {
-                    return (!item.hasOwnProperty('onlySteps') ||
-                      (item.hasOwnProperty('onlySteps') && item['onlySteps'].filter(function(item2) {
-                        return String(item2) === String(vm.stepSelected['stepCode']) 
-                      }) > 0)
-                    )
-                  })
-                } catch (error) {
+        if (vm.stepSelected) {
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup.filter(function(item) {
+            return String(item['stepCode']) === String(vm.stepSelected['stepCode'])
+          })
+          vm.$store.dispatch('pullProcessSteps', vm.stepSelected).then(function (result) {
+            if (result.hasOwnProperty('menuGroup') && result.menuGroup) {
+              vm.$store.dispatch('getDetailMenuConfig', result).then(function (result2) {
+                if (result2.hasOwnProperty('buttonConfig') && result2.buttonConfig) {
+                  try {
+                    vm.btnDynamics = JSON.parse(result2['buttonConfig'])['buttons']
+                    vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+                      return item['form'] === 'ACTIONS'
+                    })
+                    vm.btnDynamics = vm.btnDynamics.filter(function(item) {
+                      return (!item.hasOwnProperty('onlySteps') ||
+                        (item.hasOwnProperty('onlySteps') && item['onlySteps'].filter(function(item2) {
+                          return String(item2) === String(vm.stepSelected['stepCode']) 
+                        }) > 0)
+                      )
+                    })
+                  } catch (error) {
+                    vm.btnDynamics = []
+                  }
+                } else {
                   vm.btnDynamics = []
                 }
-              } else {
-                vm.btnDynamics = []
-              }
-            })
-          } else {
-            vm.btnDynamics = []
-          }
-        })
+              })
+            } else {
+              vm.btnDynamics = []
+            }
+          })
+        } else {
+          vm.dossiersIntoGroupRender = vm.dossiersIntoGroup
+          vm.btnDynamics = []
+        }
       }, 200)
     },
     btnActionEvent (item, index) {
@@ -761,34 +897,40 @@ export default {
             }
           }
           vm.$refs.thongtinchuhoso.initData(result)
-          // 
-          let filterCopyFile = {
-            dossierId: result.dossierId,
-            dossierTemplateNo: '',
-            dossierPartNo: '',
-            dossierFileId: ''
-          }
+          // copy file 
           let count = 0
           let files = vm.filesGroupDossier.filter(function(item) {
-            return item['dossierPartType'] === 6
+            return (item['dossierPartType'] === 6 || item['dossierPartType'] === 7)
           })
           if (files.length > 0) {
-            for (let key in files) {
-              filterCopyFile.dossierTemplateNo = files[key]['dossierTemplateNo']
-              filterCopyFile.dossierPartNo = files[key]['dossierPartNo']
-              filterCopyFile.dossierFileId = files[key]['dossierFileId']
-              vm.$store.dispatch('copyFile', filterCopyFile).then(function(resultFile) {
-                count += 1
-                if (count === files.length) {
-                  vm.$refs.thanhphanhoso.initData(result)
-                }
-              }).catch(function(reject) {
-                count += 1
-                if (count === files.length) {
-                  vm.$refs.thanhphanhoso.initData(result)
-                }
-              })
+            // for (let key in files) {
+            //   filterCopyFile.dossierTemplateNo = files[key]['dossierTemplateNo']
+            //   filterCopyFile.dossierPartNo = files[key]['dossierPartNo']
+            //   filterCopyFile.dossierFileId = files[key]['dossierFileId']
+            //   vm.$store.dispatch('copyFile', filterCopyFile).then(function(resultFile) {
+            //     count += 1
+            //     if (count === files.length) {
+            //       vm.$refs.thanhphanhoso.initData(result)
+            //     }
+            //   }).catch(function(reject) {
+            //     count += 1
+            //     if (count === files.length) {
+            //       vm.$refs.thanhphanhoso.initData(result)
+            //     }
+            //   })
+            // }
+            let dossierFileIds = files.map(obj =>{ 
+              return obj.dossierFileId
+            }).toString()
+            let filterCopyFile = {
+              dossierIds: result.dossierId,
+              dossierFileId: dossierFileIds
             }
+            vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (resultFile) {
+              setTimeout(function () {
+                vm.$refs.thanhphanhoso.initData(result)
+              }, 300)
+            })
           } else {
             vm.$refs.thanhphanhoso.initData(result)
           }
@@ -860,22 +1002,25 @@ export default {
                         Promise.all(action).then(function (result) {
                           vm.loadingImportDossier = false
                           // add dossier into group
-                          console.log('dossierSuccess', vm.dossierSuccess)
+                          console.log('dossierSuccess 1123412', vm.dossierSuccess)
                           let dataAddGroup = {
                             groupDossierId: vm.thongTinNhomHoSo.dossierId,
                             dossierId: ''
                           }
                           let dossierIdArr = []
                           for (let key in vm.dossierSuccess) {
-                            dossierIdArr = dossierIdArr.push(vm.dossierSuccess[key]['dossierId'])
-                            dataAddGroup['dossierId'] = dossierIdArr.toString()
+                            dossierIdArr.push(vm.dossierSuccess[key]['dossierId'])
                           }
+                          dataAddGroup['dossierId'] = dossierIdArr.toString()
+                          console.log('dataAddGroup', dataAddGroup)
                           vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                            if (vm.dossierError.length === 0) {
+                              toastr.success('Import hồ sơ thành công')
+                              vm.getDetaiGroup(vm.thongTinNhomHoSo.dossierId)
+                              vm.dialogImportDosier = false
+                            }
                           })
                           // 
-                          if (vm.dossierError.length === 0) {
-                            toastr.success('Import hồ sơ thành công')
-                          }
                         }).catch(function (xhr) {
                           vm.loadingImportDossier = false
                         })
@@ -930,11 +1075,13 @@ export default {
                   dataAddGroup['dossierId'] = dossierIdArr.toString()
                 }
                 vm.$store.dispatch('postDossierIntoGroup', dataAddGroup).then(function (result) {
+                  if (vm.dossierError.length === 0) {
+                    toastr.success('Import hồ sơ thành công')
+                    vm.getDetaiGroup(vm.thongTinNhomHoSo.dossierId)
+                    vm.dialogImportDosier = false
+                  }
                 })
                 // 
-                if (vm.dossierError.length === 0) {
-                  toastr.success('Import hồ sơ thành công')
-                }
               }).catch(function (xhr) {
                 vm.loadingImportDossier = false
               })
@@ -984,6 +1131,7 @@ export default {
           // ---------
           vm.countDossierProgress ++
           vm.valueProgress += (100 / vm.totalDossier)
+          vm.listDossierImport[index]['dossierId'] = result['dossierId']
           vm.listDossierImport[index]['flagError'] = false
           if (vm.countDossierSuccess < vm.listDossierImport.length) {
             vm.countDossierSuccess ++
@@ -1149,6 +1297,31 @@ export default {
       let currentQuery = vm.$router.history.current.query
       vm.$router.push('/danh-sach-ho-so/0/chi-tiet-ho-so/' + item['dossierId'])
     },
+    addFileToDossier () {
+      let vm = this
+      // add file cho thành phần hồ sơ con
+      let dossierIds = vm.selectedAttach.map(obj =>{
+        return obj.dossierId
+      }).toString()
+      let dossierFileIds = vm.filesAdd.map(obj =>{
+        return obj.dossierFileId
+      }).toString()
+      let filterCopyFile = {
+        dossierIds: dossierIds,
+        dossierFileId: dossierFileIds
+      }
+      // for (let index in vm.filesAdd) {
+      //   filterCopyFile.dossierFileId = vm.filesAdd[index]['dossierFileId']
+        vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (result) {
+          toastr.success('Đính kèm tài liệu thành công')
+          vm.$store.commit('setActiveAddFileGroup', false)
+        })
+      // }
+    },
+    cancelAddFile () {
+      let vm = this
+      vm.$store.commit('setActiveAddFileGroup', false)
+    },
     toggleAll () {
       var vm = this
       if (vm.selected.length) {
@@ -1156,6 +1329,16 @@ export default {
       } else {
         vm.selected = vm.dossiersIntoGroupRender
       }
+    },
+    toggleAllSelectDialog () {
+      var vm = this
+      console.log('toggleAllSelectDialog', vm.dossiersIntoGroupRender, vm.selectedAttach)
+      if (vm.selectedAttach.length) {
+        vm.selectedAttach = []
+      } else {
+        vm.selectedAttach = vm.dossiersIntoGroupRender
+      }
+      console.log('toggleAllSelectDialog 2', vm.selectedAttach)
     },
     goBack () {
       let vm = this

@@ -254,9 +254,9 @@
                   </div>
                   Văn bản hành chính
                 </div>
-                <div v-for="(item, index) in documents" v-bind:key="index">
+                <div v-for="(item, index) in documents" v-bind:key="index" style="border-bottom: 1px solid #dedede;">
                   <v-card>
-                    <v-layout wrap class="px-4 py-1 align-center row-list-style"> 
+                    <v-layout wrap class="pl-4 pr-2 py-1 align-center row-list-style"> 
                       <v-flex xs11>
                         <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
                         <div style="margin-left: 20px;">{{item.documentName}}</div>
@@ -615,9 +615,9 @@ import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
-import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQuaNew.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'

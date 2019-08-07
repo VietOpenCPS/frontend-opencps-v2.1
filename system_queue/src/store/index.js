@@ -18,7 +18,8 @@ export const store = new Vuex.Store({
     agencyList: [],
     domainList: [],
     levelList: [],
-    isMobile: false
+    isMobile: false,
+    serverConfig: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -69,7 +70,7 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: state.serverConfig['groupId'] ? state.serverConfig['groupId'] : window.themeDisplay.getScopeGroupId()
             },
             params: {}
           }
@@ -255,6 +256,9 @@ export const store = new Vuex.Store({
     },
     setIsMobile (state, payload) {
       state.isMobile = payload
+    },
+    setServerConfig (state, payload) {
+      state.serverConfig = payload
     }
   },
   getters: {
@@ -272,6 +276,9 @@ export const store = new Vuex.Store({
     },
     getLevelList (state) {
       return state.levelList
+    },
+    getServerConfig (state) {
+      return state.serverConfig
     },
     getIsMobile (state) {
       return state.isMobile

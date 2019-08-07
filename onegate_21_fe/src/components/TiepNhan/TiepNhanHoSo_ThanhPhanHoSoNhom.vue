@@ -8,15 +8,15 @@
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="onlyView && item.hasForm ? '' : loadAlpcaFormClick(item)" style="min-width: 20px; display: flex;">
                   <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                  <div class="header__tphs">
+                  <div class="header__tphs" style="text-align: justify;">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
-                      <span slot="activator" style="text-align: justify;">
+                      <span slot="activator" >
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
-                    <span v-else style="text-align: justify;">
+                    <span v-else>
                       {{item.partName}} <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
                       <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                     </span>
@@ -172,14 +172,6 @@
           </content-placeholders>
           <v-layout row wrap v-else>
             <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1">
-              <!-- <span style="padding-top: 6px">Số lượng:</span>&nbsp;
-              <v-text-field
-              class="px-0 py-0 d-inline-block record_count"
-              style="width: 30px; max-width: 30px;"
-              v-model="dossierTemplateItems[index]['recordCount']"
-              @input="changeRecordCount(dossierTemplateItems[index])"
-              v-if="!onlyView"
-              ></v-text-field> -->
               <v-text-field
                 title="Số lượng"
                 v-if="!onlyView"
@@ -853,15 +845,11 @@ export default {
       vm.$store.commit('setApplicantNote', vm.applicantNoteDossier)
     },
     pickFile (item) {
-      var vm = this
+      let vm = this
       vm.stateAddFileOther = false
       document.getElementById('file' + item.partNo).value = ''
-      if (item['partType'] === 7) {
-        if (vm.dossierIntoGroup.length === 0) {
-          alert('Vui lòng chọn hồ sơ muốn gán kết quả trước khi thực hiện')
-        } else {
-          document.getElementById('file' + item.partNo).click()
-        }
+      if (item['partType'] === 6 || item['partType'] === 7) {
+        document.getElementById('file' + item.partNo).click()
       } else {
         document.getElementById('file' + item.partNo).click()
       }
@@ -874,22 +862,11 @@ export default {
       data['dossierTemplateNo'] = vm.thongTinHoSo.dossierTemplateNo
       if (data.partType !== 3) {
         vm.$store.dispatch('uploadSingleFile', data).then(function (result) {
-          console.log('result uploadFile', result)
-          // add file cho thành phần hồ sơ con
-          let filterCopyFile = {
-            dossierId: '',
-            dossierTemplateNo: result[0]['dossierTemplateNo'],
-            dossierPartNo: result[0]['dossierPartNo'],
-            dossierFileId: ''
+          console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', result)
+            vm.$store.commit('setActiveAddFileGroup', true)
           }
-          for (let index in result) {
-            filterCopyFile['dossierFileId'] = result[index]['dossierFileId']
-            for (let index1 in vm.dossierIntoGroup) {
-              filterCopyFile['dossierId'] = vm.dossierIntoGroup[index1]['dossierId']
-              vm.$store.dispatch('copyFile', filterCopyFile)
-            }
-          }
-          // 
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
@@ -1293,7 +1270,7 @@ export default {
       var vm = this
       if (vm.dossierFilesItems.length > 0) {
         let index = vm.dossierFilesItems.findIndex(file => {
-          return file.dossierPartType === 2
+          return (file.dossierPartType === 2 || file.dossierPartType === 7)
         })
         if (index !== -1) {
           vm.$emit('tp:change-state-view-result', true)
@@ -1301,7 +1278,7 @@ export default {
           vm.$emit('tp:change-state-view-result', false)
         }
       } else {
-        if (vm.partTypes.includes(2)) {
+        if (vm.partTypes.includes(2) || vm.partTypes.includes(7)) {
           vm.$emit('tp:change-state-view-result', false)
         }
       }

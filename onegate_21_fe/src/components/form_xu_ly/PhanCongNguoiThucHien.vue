@@ -13,11 +13,12 @@
               <v-checkbox v-for="(item, index) in data_uyquyen" v-bind:key="item.userId"
               slot="activator"
               v-model="item.assigned"
-              :label="item.userName"
               @change = 'changeDelegacy($event, index)'
               style="display:inline-block;min-width:190px;max-width:190px"
               :title="item.userName"
-              ></v-checkbox>
+              >
+                <template slot="label"><span class="black--text">{{item.userName}}</span></template>
+              </v-checkbox>
             </v-layout>
           </div>
           <!-- <v-flex class="pl-4 pb-3">
@@ -43,11 +44,12 @@
               <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
               slot="activator"
               v-model="item.assigned"
-              :label="item.userName"
               @change = 'changeAssigned($event, index)'
               style="display:inline-block;min-width:190px;max-width:190px"
               :title="item.userName"
-              ></v-checkbox>
+              >
+                <template slot="label"><span class="black--text">{{item.userName}}</span></template>
+              </v-checkbox>
             </v-layout>
             <!-- <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span> -->
           </div>

@@ -1,11 +1,11 @@
 <template>
   <div>
     <v-layout row wrap class="mx-2 py-2" id="contentFaq">
-      <v-flex xs12 :class="!getUser('Administrator') ? 'sm7' : ''" class="pr-3">
-        <h3 v-if="!getUser('Administrator')" class="text-bold mb-3" style="color:#034687">
+      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'sm7' : ''" class="pr-3">
+        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data')" class="text-bold mb-3" style="color:#034687">
           NHỮNG CÂU HỎI THƯỜNG GẶP
         </h3>
-        <h3 v-if="getUser('Administrator')" class="text-bold mb-3 text-xs-center" style="color:#034687">
+        <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-bold mb-3 text-xs-center" style="color:#034687">
           DANH SÁCH CÂU HỎI
         </h3>
         <content-placeholders v-if="loading" class="mt-3">
@@ -13,14 +13,14 @@
         </content-placeholders>
         <div v-else>
           <v-layout wrap class="mt-2 pb-3">
-            <v-flex xs12 sm6 class="pr-2">
+            <v-flex xs12 sm6 class="pr-2" v-if="!agencyCodeSiteExits">
               <v-autocomplete
                 class="select-border"
                 :items="agencyList"
                 v-model="agencyFilterSelected"
                 placeholder="Cơ quan tiếp nhận câu hỏi"
-                item-text="agencyName"
-                item-value="agencyCode"
+                item-text="itemName"
+                item-value="itemCode"
                 return-object
                 :hide-selected="true"
                 box
@@ -28,7 +28,7 @@
                 @change="changeAdministration"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="pl-2">
+            <v-flex xs12 :class="!agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
               <v-text-field
                 box
                 placeholder="Nội dung câu hỏi"
@@ -43,7 +43,7 @@
           <div v-if="questionList.length > 0">
             <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
               :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px;position:relative;">
-              <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
+              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
                 <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                   <v-icon>settings</v-icon>
                 </v-btn>
@@ -56,13 +56,13 @@
                       <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
                     </v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile>
+                  <v-list-tile v-if="getUser('Administrator')">
                     <v-list-tile-title @click.stop="changePublic(itemQuestion, indexQuestion)">
                       <v-icon color="primary" size="16px">{{ itemQuestion.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
                       {{ itemQuestion.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                     </v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile @click.stop="deleteQuestion(itemQuestion)">
+                  <v-list-tile v-if="getUser('Administrator')" @click.stop="deleteQuestion(itemQuestion)">
                     <v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>
                   </v-list-tile>
                 </v-list>
@@ -81,7 +81,7 @@
                 <div v-else>
                   <v-card flat v-if="itemQuestion['answers'].length > 0">
                     <div class="ml-2 py-1">
-                      <span class="primary--text text-bold">Trả lời: </span>
+                      <span class="green--text text-bold">Trả lời: </span>
                     </div>
                     <v-card-text class="mx-2 my-0 py-0">
                       <div
@@ -92,7 +92,7 @@
                         <div>
                           <div style="position:relative">
                             <div class="" v-html="itemAnswer.content"></div>
-                            <v-menu offset-y v-if="getUser('Administrator')" style="display:inline-block;position:absolute;right:18px;top:-15px">
+                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
                               </v-btn>
@@ -129,7 +129,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
-          <div class="py-2" v-else>
+          <div class="px-2 py-2" v-else>
             <v-alert outline color="warning" icon="priority_high" :value="true">
               Không có câu hỏi nào
             </v-alert>
@@ -142,7 +142,7 @@
           </div>
         </div>
       </v-flex>
-      <v-flex xs12 sm5 v-if="!getUser('Administrator')">
+      <v-flex xs12 sm5 v-if="!getUser('Administrator') && !getUser('Administrator_data')">
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
           <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
             <div class="head-title">
@@ -158,8 +158,8 @@
                   :items="agencyList"
                   v-model="agencySelected"
                   placeholder="Chọn cơ quan tiếp nhận câu hỏi"
-                  item-text="agencyName"
-                  item-value="agencyCode"
+                  item-text="itemName"
+                  item-value="itemCode"
                   return-object
                   :hide-selected="true"
                   box
@@ -176,23 +176,23 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12>
+              <!-- <v-flex xs12>
                 <div class="mb-1">Địa chỉ</div>
                 <v-text-field
                   box
                   placeholder="Ghi rõ số nhà, tên đường, quận/ huyện, tỉnh thành."
                   v-model="address"
                 ></v-text-field>
-              </v-flex>
-              <v-flex xs6 class="pr-1">
+              </v-flex> -->
+              <!-- <v-flex xs6 class="pr-1">
                 <div class="mb-1">Số điện thoại</div>
                 <v-text-field
                   box
                   placeholder="Nhập số điện thoại"
                   v-model="telNo"
                 ></v-text-field>
-              </v-flex>
-              <v-flex xs6 class="pl-1">
+              </v-flex> -->
+              <v-flex xs12 class="pl-1">
                 <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   placeholder="Nhập thư điện tử"
@@ -204,14 +204,14 @@
                   min="6"
                 ></v-text-field>
               </v-flex>
-              <v-flex xs12>
+              <!-- <v-flex xs12>
                 <div class="mb-1">Tiêu đề</div>
                 <v-text-field
                   box
                   placeholder="Nhập tiêu đề"
                   v-model="titleQuestion"
                 ></v-text-field>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs12>
                 <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
                 <v-textarea
@@ -239,7 +239,7 @@
           </v-form>
         </v-card>
       </v-flex>
-      <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="700px">
+      <!-- <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="700px">
         <v-card>
           <v-toolbar flat dark color="primary">
             <v-toolbar-title>Thêm mới câu hỏi</v-toolbar-title>
@@ -344,7 +344,7 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-      </v-dialog>
+      </v-dialog> -->
     </v-layout>
   </div>
 </template>
@@ -405,6 +405,7 @@ export default {
       }
     ],
     dialog_addQuestion: false,
+    agencyCodeSiteExits: '',
     agencySelected: '',
     agencyFilterSelected: '',
     keyword: '',
@@ -481,6 +482,9 @@ export default {
     },
     agencyFilter () {
       return this.$store.getters.getAgencyFilter
+    },
+    activeCounter () {
+      return this.$store.getters.getCounter
     }
   },
   created () {
@@ -489,12 +493,20 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
+      vm.$store.dispatch('getGovAgency').then(function(result) {
+        vm.agencyList = result
+      })
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
     })
+  },
+  mounted () {
+    let vm = this
+    vm.agencyCodeSiteExits = agencyCodeSite ? agencyCodeSite : ''
+    $('.v-expansion-panel__header').css('background', '#f1f1f1')
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -571,7 +583,8 @@ export default {
             email: vm.contactEmail,
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
-            agencyCode: vm.agencyFilterSelected ? vm.agencyFilterSelected['agencyCode'] : ''
+            agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+            questionType: ''
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
             toastr.success('Hệ thống đã tiếp nhận câu hỏi của bạn')
@@ -636,6 +649,7 @@ export default {
         }
         vm.$store.dispatch('deleteQuestion', filter).then(function (result) {
           toastr.success('Xóa câu hỏi thành công')
+          vm.$store.commit('setCounter', !vm.activeCounter)
           vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
         }).catch(function (reject) {
           console.log(reject)
@@ -651,10 +665,12 @@ export default {
         publish: vm.questionList[index]['publish'] === 1 ? 0 : 1,
         content: item['content'],
         email: item['email'],
-        fullname: item['fullname']
+        fullname: item['fullname'],
+        govAgencyCode: item['govAgencyCode']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
+        vm.$store.commit('setCounter', !vm.activeCounter)
         if (vm.questionList[index]['publish'] === 1) {
           vm.questionList[index]['publish'] = 0
         } else {

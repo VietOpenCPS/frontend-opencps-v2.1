@@ -279,7 +279,7 @@
 import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
@@ -321,7 +321,7 @@ export default {
     dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
-    inputTypes: [1, 3],
+    inputTypes: [1, 3, 6],
     inputTypesGroup: [6],
     outputTypes: [2],
     sampleCount: 0,
@@ -800,41 +800,45 @@ export default {
         tempData['dossierId'] = result.dossierId
         vm.$store.dispatch('putDossier', tempData).then(function (result) {
           vm.loadingAction = false
-          var initData = vm.$store.getters.loadingInitData
-          let actionUser = initData.user.userName ? initData.user.userName : ''
-          //
-          var paymentsOut = {}
-          if (vm.showThuPhi) {
-            paymentsOut = {
-              requestPayment: vm.payments['requestPayment'],
-              paymentNote: vm.payments['paymentNote'],
-              advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
-              feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
-              serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
-              shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
-            }
-          }
-          let dataPostAction = {
-            dossierId: result.dossierId,
-            actionCode: 1100,
-            actionNote: '',
-            actionUser: actionUser,
-            payload: '',
-            security: '',
-            assignUsers: '',
-            payment: paymentsOut,
-            createDossiers: ''
-          }
-          vm.loadingAction = true
-          vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-            vm.loadingAction = false
-            vm.$router.push({
-              path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
-              query: vm.$router.history.current.query
-            })
-          }).catch(reject => {
-            vm.loadingAction = false
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+            query: vm.$router.history.current.query
           })
+          // var initData = vm.$store.getters.loadingInitData
+          // let actionUser = initData.user.userName ? initData.user.userName : ''
+          // //
+          // var paymentsOut = {}
+          // if (vm.showThuPhi) {
+          //   paymentsOut = {
+          //     requestPayment: vm.payments['requestPayment'],
+          //     paymentNote: vm.payments['paymentNote'],
+          //     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+          //     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+          //     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+          //     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          //   }
+          // }
+          // let dataPostAction = {
+          //   dossierId: result.dossierId,
+          //   actionCode: 1100,
+          //   actionNote: '',
+          //   actionUser: actionUser,
+          //   payload: '',
+          //   security: '',
+          //   assignUsers: '',
+          //   payment: paymentsOut,
+          //   createDossiers: ''
+          // }
+          // vm.loadingAction = true
+          // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+          //   vm.loadingAction = false
+          //   vm.$router.push({
+          //     path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+          //     query: vm.$router.history.current.query
+          //   })
+          // }).catch(reject => {
+          //   vm.loadingAction = false
+          // })
         }).catch(rejectXhr => {
           vm.loadingAction = false
           toastr.clear()

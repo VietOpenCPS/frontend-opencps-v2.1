@@ -126,7 +126,9 @@ export const store = new Vuex.Store({
     paymentProfile: '',
     paymentFileName: '',
     forGroupDossier: false,
-    dossierIntoGroup: []
+    dossierIntoGroup: [],
+    filesAdd: [],
+    activeAddFileGroup: false
   },
   actions: {
     clearError ({commit}) {
@@ -753,6 +755,24 @@ export const store = new Vuex.Store({
         }
       })
     },
+    uploadFileDossierGroup ({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('dossierIds', filter.dossierIds ? filter.dossierIds : '')
+        dataPost.append('dossierFileId', filter.dossierFileId ? filter.dossierFileId : '')
+        axios.post(state.initData.dossierApi + '/dossierfiles', dataPost, param).then(function (response) {
+          resolve(response)
+        }).catch(function (xhr) {
+          console.log(xhr)
+          reject(xhr)
+        })
+      })
+    },
     uploadSingleOtherFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let formData = new FormData()
@@ -906,7 +926,7 @@ export const store = new Vuex.Store({
             sort: 'sibling'
           }
         }
-        axios.get(state.initData.regionApi + '/GOVERMENT_AGENCY/dictitems', paramGetGovAgency).then(function (response) {
+        axios.get(state.initData.regionApi + '/GOVERNMENT_AGENCY/dictitems', paramGetGovAgency).then(function (response) {
           resolve(response.data.data)
         }).catch(function (xhr) {
           console.log(xhr)
@@ -1576,7 +1596,6 @@ export const store = new Vuex.Store({
       })
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
-      console.log('alpaca')
       let id = data['id'] ? data['id'] : 'nm'
       window.$('#formAlpaca' + data.dossierPartNo + id).empty()
       /* eslint-disable */
@@ -3703,6 +3722,12 @@ export const store = new Vuex.Store({
     setSelectDossierGroup (state, payload) {
       state.dossierIntoGroup = payload
     },
+    setFilesAdd (state, payload) {
+      state.filesAdd = payload
+    },
+    setActiveAddFileGroup (state, payload) {
+      state.activeAddFileGroup = payload
+    }
   },
   getters: {
     loading (state) {
@@ -3886,6 +3911,12 @@ export const store = new Vuex.Store({
     },
     getDossierIntoGroup (state) {
       return state.dossierIntoGroup
+    },
+    getFilesAdd (state) {
+      return state.filesAdd
+    },
+    activeAddFileGroup (state) {
+      return state.activeAddFileGroup
     }
   }
 })

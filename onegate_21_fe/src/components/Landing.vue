@@ -466,7 +466,7 @@
           @tiny:change-page="paggingData" ></tiny-pagination> 
       </div>
     </div>
-    <v-dialog v-model="dialogAction" max-width="400" transition="fade-transition" persistent>
+    <v-dialog v-model="dialogAction" max-width="700" transition="fade-transition" persistent>
       <v-card>
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-toolbar dark color="primary">
@@ -482,9 +482,9 @@
                 <v-autocomplete
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelected"
-                  :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Thủ tục hành chính bắt buộc phải chọn']"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
@@ -503,7 +503,7 @@
                   return-object
                   :hide-selected="true"
                   v-if="thuTucHanhChinhSelected && listDichVu.length > 1"
-                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn.']"
+                  :rules="[v => !!v || 'Dịch vụ bắt buộc phải chọn']"
                   @change="changeDichVuConfigs"
                   required
                   box

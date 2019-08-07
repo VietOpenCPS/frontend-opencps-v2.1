@@ -63,6 +63,10 @@ export default {
     customClass: {
       type: String
     },
+    currentLimit: {
+      type: Number,
+      default: 15
+    },
     limits: {
       type: Array,
       default () {
@@ -78,7 +82,6 @@ export default {
     return {
       version: '0.2.1',
       currentPage: 1,
-      currentLimit: 15,
       translations: {
         en: {
           prev: 'Previous',

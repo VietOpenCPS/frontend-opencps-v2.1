@@ -91,10 +91,9 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm4>
-                    <div class="xs12 sm12 pb-1">
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
-                      <span class="pl-0 text-bold" v-else> Một cửa </span>
                     </div>
                     <!--  -->
                     <div class="xs12 sm12 pb-1">

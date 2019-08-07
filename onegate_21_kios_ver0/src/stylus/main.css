@@ -282,14 +282,14 @@ table .stt_column , table .action_column {
 table .action_column {
     width: 125px;
 }
-.table-bordered table.table thead tr {
+.table-bordered table.v-table thead tr {
     height: 42px;
     background: #ffffff;
 }
-.table-bordered table.table tr.active {
+.table-bordered table.v-table tr.active {
     background-color: #eee !important;
 }
-.application .theme--light.table thead th, .theme--light .table thead th {
+.application .theme--light.v-table thead th, .theme--light .v-table thead th {
     color: #201c1c;
     /* font-size: 13px; */
 }
@@ -298,7 +298,7 @@ body .table-bordered {
     border-bottom: 1px solid #dddddd;
     border-left: 1px solid #dddddd;
 }
-body .table__overflow .table > thead > tr > th {
+body .v-table__overflow .v-table > thead > tr > th {
     border-right: 1px solid lightgray;
     border-top: 1px solid lightgray;
     color: #065694 !important;
@@ -308,28 +308,28 @@ body .table-bordered tbody > tr > td {
     border-right: 1px solid lightgray;
     vertical-align: top;
 }
-body table.table tbody td, body table.table tbody th {
+body table.v-table tbody td, body table.v-table tbody th {
     height: 38px;
 }
 body .datatable__actions .btn, body .datatable__actions .input-group--select{
     margin-bottom: 0 !important;
     margin-top: 0 !important;
 }
-.table-bordered table.table tbody td:first-child, .table-bordered table.table tbody td:not(:first-child), .table-bordered table.table tbody th:first-child, .table-bordered table.table tbody th:not(:first-child), .table-bordered table.table thead td:first-child, .table-bordered table.table thead td:not(:first-child), .table-bordered table.table thead th:first-child, .table-bordered table.table thead th:not(:first-child) {
+.table-bordered table.v-table tbody td:first-child, .table-bordered table.v-table tbody td:not(:first-child), .table-bordered table.v-table tbody th:first-child, .table-bordered table.v-table tbody th:not(:first-child), .table-bordered table.v-table thead td:first-child, .table-bordered table.v-table thead td:not(:first-child), .table-bordered table.v-table thead th:first-child, .table-bordered table.v-table thead th:not(:first-child) {
     padding: 2px 5px;
 }
-table.table tbody .input-group--selection-controls.checkbox .icon {
+table.v-table tbody .input-group--selection-controls.checkbox .icon {
     align-items: start;
     padding-top: 4px;
     font-size: 15px;
 }
-table.table .input-group--selection-controls.checkbox .icon {
+table.v-table .input-group--selection-controls.checkbox .icon {
     font-size: 15px;
 }
-body table.table tbody td[colspan="9"] {
+body table.v-table tbody td[colspan="9"] {
     padding-top: 10px !important;
 }
-.table-detail-domain table.table tbody tr td:first-child {
+.table-detail-domain table.v-table tbody tr td:first-child {
     min-width: 150px !important;
     max-width: 200px;
 }
@@ -1192,7 +1192,7 @@ body .menu__content--select .text--disabled {
 .table-tracuu tbody tr {
     height: 45px;
 }
-.table-tracuu table.table tr .active {
+.table-tracuu table.v-table tr .active {
     background-color: #eee !important;
 }
 div.table-tracuu > div > table > thead > tr:nth-child(1) > th:nth-child(1),
@@ -1293,20 +1293,20 @@ div.table-tracuu::-webkit-scrollbar-thumb {
 .menu__content .list>div .list__tile {
     font-size: 16px !important
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(1),
+.table-thu-tuc .v-table > thead > tr:nth-child(1) > th:nth-child(1),
 .table-thu-tuc .table > tbody > tr > td:nth-child(1) {
     width: 50px;
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(2),
-.table-thu-tuc .table > tbody > tr > td:nth-child(2) {
+.table-thu-tuc .v-table > thead > tr:nth-child(1) > th:nth-child(2),
+.table-thu-tuc .v-table > tbody > tr > td:nth-child(2) {
     width: calc(100% - 360px);
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(3),
-.table-thu-tuc .table > tbody > tr > td:nth-child(3) {
+.table-thu-tuc .v-table > thead > tr:nth-child(1) > th:nth-child(3),
+.table-thu-tuc .v-table > tbody > tr > td:nth-child(3) {
     width: 200px;
 }
-.table-thu-tuc .table > thead > tr:nth-child(1) > th:nth-child(4),
-.table-thu-tuc .table > tbody > tr > td:nth-child(4) {
+.table-thu-tuc .v-table > thead > tr:nth-child(1) > th:nth-child(4),
+.table-thu-tuc .v-table > tbody > tr > td:nth-child(4) {
     width: 110px;
 }
 .table-thu-tuc thead tr:first-child th{
@@ -1335,6 +1335,12 @@ table > thead > tr > th.column {
 .kios-item .select-border .input-group__input .icon,.kios-item .input-border .input-group__input .icon{
     font-size: 24px !important;
     color: #0b72ba !important
+}
+.select-border .v-input__slot {
+    min-height: 48px !important
+}
+.select-border .v-select__selections {
+    padding-top: 12px !important
 }
 .kios-item * {
     font-size: 16px !important;
@@ -1766,7 +1772,7 @@ header span {
     display: inline-block;
     background: #dedede;
 }
-body .table__overflow .table > thead > tr > th {
+body .v-table__overflow .v-table > thead > tr > th {
     border-right: 1px solid lightgray;
     border-top: 1px solid lightgray;
     color: #065694 !important;

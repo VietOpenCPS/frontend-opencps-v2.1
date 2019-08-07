@@ -26,50 +26,20 @@ let userName = window.themeDisplay !== undefined ? window.themeDisplay.getUserNa
 let portalURL = (window.themeDisplay !== undefined ) ? window.themeDisplay.getPortalURL().replace('http://', '') : 'localhost:8080'
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
-// Cũ
-  let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
-  Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
-    + '&portalURL=' + portalUrlSocket
-    + '&companyId=' + companyId
-    + '&userId=' + userId
-    + '&userName=' + userName
-    + '&Token=' + token, 
-    {
-      store: store,
-      format: 'json',
-      reconnection: true
-    }
-  )
-// Mới https
-  // let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
-  // if (window.location.href.indexOf('https') >= 0) {
-  //   Vue.use(VueNativeSock, 'wss://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
-  //     + '&portalURL=' + 'https://' + portalUrlSocket
-  //     + '&companyId=' + companyId
-  //     + '&userId=' + userId
-  //     + '&userName=' + userName
-  //     + '&Token=' + token, 
-  //     {
-  //       store: store,
-  //       format: 'json',
-  //       reconnection: true
-  //     }
-  //   )
-  // } else {
-  //   Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
-  //     + '&portalURL=' + 'http://' + portalUrlSocket
-  //     + '&companyId=' + companyId
-  //     + '&userId=' + userId
-  //     + '&userName=' + userName
-  //     + '&Token=' + token, 
-  //     {
-  //       store: store,
-  //       format: 'json',
-  //       reconnection: true
-  //     }
-  //   )
-  // }
-// 
+
+// let portalUrlSocket = window.themeDisplay.getPortalURL().replace('https://', '').replace('http://', '')
+// Vue.use(VueNativeSock, 'ws://' + portalUrlSocket + '/o/v1/socket/web?groupId='+ groupId
+//   + '&portalURL=' + portalUrlSocket
+//   + '&companyId=' + companyId
+//   + '&userId=' + userId
+//   + '&userName=' + userName
+//   + '&Token=' + token, 
+//   {
+//     store: store,
+//     format: 'json',
+//     reconnection: true
+//   }
+// )
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId
@@ -118,7 +88,7 @@ new Vue({
     var vm = this
     vm.$nextTick(function() {
       setTimeout(() => {
-        vm.$socket.sendObj(
+        /* vm.$socket.sendObj(
           {
             type: 'admin',
             cmd: 'get',
@@ -142,9 +112,58 @@ new Vue({
         //     }
         //   }
         // )
-        if (window.location.href.endsWith('#/')) {
-          vm.$router.push('/table/opencps_employee')
-        }
+        */
+       vm.dataSocket = {}
+       let dataPost = new URLSearchParams()
+       
+       let textPost = {
+         'type': 'api',
+         'cmd': 'get',
+         'respone': 'loginUser',
+         'api': '/o/v1/opencps/users/login',
+         'headers': {
+           'Token': vm.getAuthToken(),
+           'groupId': vm.getScopeGroupId(),
+           'USER_ID': vm.getUserId()
+         }
+       }
+       dataPost = new URLSearchParams();
+
+       dataPost.append('text', JSON.stringify(textPost))
+       axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+         let dataObj = response.data
+         vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+         if (dataObj.respone === 'loginUser') {
+           vm.$store.commit('setloginUser', dataObj['loginUser'])
+         }
+
+         dataPost = new URLSearchParams();
+         textPost = {
+           'type': 'admin',
+           'cmd': 'get',
+           'responeType': 'menu',
+           'code': 'opencps_adminconfig',
+           'respone': 'listTableMenu',
+           'start': -1,
+           'end': -1              
+         }
+         dataPost.append('text', JSON.stringify(textPost))
+         axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+           let dataObj = response.data
+           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+           if (dataObj.respone === 'listTableMenu') {
+             vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+           }  
+         }).catch(function (error) {
+
+         })
+       }).catch(function (error) {
+
+       })
+
+       if (window.location.href.endsWith('#/')) {
+         vm.$router.push('/table/opencps_employee')
+       }
       }, 100)
     })
   },

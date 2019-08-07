@@ -20,7 +20,7 @@
         <v-flex xs12 sm6 class="pr-3">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
-            <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+            <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
               <!-- <div class="input-group__input">
                 <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
                 <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
@@ -39,7 +39,7 @@
         <v-flex xs12 sm6 class="pl-3">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
-            <div style="width:calc(100%-110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+            <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
               <!-- <div class="input-group__input">
                 <input id="applicantIdNo" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                 <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>

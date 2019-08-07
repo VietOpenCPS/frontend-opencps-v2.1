@@ -164,7 +164,7 @@
               <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
                 <span class="pr-2">Nhóm hồ sơ: </span>
                 <span class="pl-0 text-bold" title="Chi tiết nhóm hồ sơ" @click="detailGroup" style="cursor: pointer; color: #0072bc">
-                  {{groupDossierNo}} - {{groupDossierName}}
+                  {{groupDossierName}}
                 </span>
               </div>
               <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
