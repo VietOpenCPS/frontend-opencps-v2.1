@@ -43,6 +43,9 @@
           <div v-if="questionList.length > 0">
             <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList"
               :key="indexQuestion" class="mb-2" style="border: 1px solid #ddd;border-radius:5px;position:relative;">
+            <!-- <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList" :value="[false]" expand class="expansion-pl mb-2"
+              :key="indexQuestion" style="border: 1px solid #ddd;border-radius:5px;position:relative;"
+            > -->
               <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
                 <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                   <v-icon>settings</v-icon>
@@ -67,15 +70,15 @@
                   </v-list-tile>
                 </v-list>
               </v-menu>
-              <v-expansion-panel-content style="border-radius:5px">
+              <v-expansion-panel-content :key="indexQuestion" style="border-radius:5px">
                 <v-icon slot="actions" color="primary" style="position:absolute;right:5px;top:10px" @click="getAnswers(itemQuestion, indexQuestion)">$vuetify.icons.expand</v-icon>
                 <div class="ml-2" slot="header" @click="getAnswers(itemQuestion, indexQuestion)">
                   <span class="text-bold primary--text">Câu hỏi {{questionPage * 20 - 20 + indexQuestion + 1}}: </span>
                   <div class="primary--text" v-html="itemQuestion.content"></div>
                 </div>
-                <div v-if="loadingAnswer">
-                  <content-placeholders v-if="loading" class="mt-3">
-                    <content-placeholders-text :lines="10" />
+                <div v-if="itemQuestion['loading']">
+                  <content-placeholders class="mt-3">
+                    <content-placeholders-text :lines="3" />
                   </content-placeholders>
                 </div>
                 <div v-else>
@@ -125,7 +128,6 @@
                     </v-alert>
                   </div>
                 </div>
-                
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
@@ -491,6 +493,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      console.log('run1 run1 run1')
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('getGovAgency').then(function(result) {
@@ -535,12 +538,12 @@ export default {
       } else {
         vm.openQuestion = index
       }
-      vm.loadingAnswer = true
+      item['loading'] = true
       let filter = {
         questionId: item.questionId
       }
       vm.$store.dispatch('getAnswers', filter).then(function (result) {
-        vm.loadingAnswer = false
+        item['loading'] = false
         let answers = []
         if (Array.isArray(result)) {
           answers = result
@@ -553,7 +556,7 @@ export default {
           vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
         }
       }).catch(function (reject) {
-        vm.loadingAnswer = false
+        item['loading'] = false
         vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
       })
     },
@@ -588,7 +591,11 @@ export default {
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
             toastr.success('Hệ thống đã tiếp nhận câu hỏi của bạn')
-            vm.$refs.captcha.makeImageCap()
+            setTimeout(function() {
+              vm.$refs.captcha.makeImageCap()
+              vm.$refs.form.reset()
+              vm.$refs.form.resetValidation()
+            }, 200)
             vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
             vm.$store.commit('setActiveAddQuestion', false)
           }).catch(function (reject) {

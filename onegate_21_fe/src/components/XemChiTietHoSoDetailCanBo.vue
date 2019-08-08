@@ -615,7 +615,7 @@ import ChiTietThanhToan from './ChiTietThanhToan.vue'
 import ThucHienThanhToanDienTu from './form_xu_ly/ThucHienThanhToanDienTu.vue'
 import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
-import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQuaNew.vue'
+import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
@@ -1829,6 +1829,7 @@ export default {
               vm.dataEsign = resultAction
               let resultCreateFile = vm.$refs.kypheduyettailieu.checkCreateFile(vm.dataEsign)
               if (resultCreateFile) {
+                // chưa có file, tự động tạo
                 if (vm.dataEsign.createFiles) {
                   var fileArr
                   if (Array.isArray(vm.dataEsign.createFiles)) {

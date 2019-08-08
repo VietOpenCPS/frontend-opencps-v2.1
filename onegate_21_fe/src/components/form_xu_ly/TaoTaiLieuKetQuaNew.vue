@@ -8,7 +8,7 @@
           </div> Kết quả xử lý
         </div>
         <v-card>
-          <div class="form_alpaca" style="position: relative;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
+          <div class="form_alpaca" style="position: relative;overflow: hidden;" v-for="(item, index) in createFiles" v-bind:key="item.partNo + 'cr'">
             <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
               <v-expansion-panel-content hide-actions>
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
@@ -497,11 +497,13 @@
       },
       editFormAlpaca (item) {
         let vm = this
+        console.log('editForm', item, vm.dossierFilesItems)
         item['editForm'] = true
         setTimeout (function () {
           let fileFind = vm.dossierFilesItems.find(itemFile => {
             return itemFile.dossierPartNo === item.partNo && itemFile.eForm
           })
+          console.log('fileFind', fileFind)
           fileFind['id'] = vm.id
           vm.$store.dispatch('loadAlpcaForm', fileFind)
         }, 200)
@@ -571,7 +573,7 @@
         let vm = this
         vm.dossierFilesItems.forEach(file => {
           if (file.dossierPartNo === item.partNo && file.eForm && !file.removed) {
-            file['dossierId'] = vm.thongTinHoSo.dossierId
+            file['dossierId'] = vm.detailDossier.dossierId
             if (!vm.onlyView) {
               file['id'] = vm.id
               vm.$store.dispatch('putAlpacaForm', file).then(resData => {

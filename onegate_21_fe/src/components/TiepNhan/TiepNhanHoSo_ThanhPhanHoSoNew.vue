@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card flat>
-      <div class="form_alpaca" style="position: relative;" v-for="(item, index) in dossierTemplateItemsFilter" v-bind:key="item.partNo">
+      <div class="form_alpaca" style="position: relative;overflow: hidden;" v-for="(item, index) in dossierTemplateItemsFilter" v-bind:key="item.partNo">
         <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">

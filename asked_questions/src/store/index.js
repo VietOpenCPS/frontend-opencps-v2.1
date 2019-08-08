@@ -146,12 +146,14 @@ export const store = new Vuex.Store({
               if (dataOutput && dataOutput.length > 0) {
                 for (let key in dataOutput) {
                   dataOutput[key].answers = []
+                  dataOutput[key].loading = false
                 }
               }
             } else {
               dataOutput = state.questionListDefault
               for (let key in dataOutput) {
                 dataOutput[key].answers = []
+                dataOutput[key].loading = false
               }
             }
             resolve(dataOutput)
