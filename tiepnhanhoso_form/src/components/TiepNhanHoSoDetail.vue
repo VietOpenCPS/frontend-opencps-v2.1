@@ -19,9 +19,148 @@
         </div>
       </div> 
     </div>
-    <div>
-      <form-tiep-nhan v-if="vuejx !== null && vuejx !== undefined" :vuejx_form="vuejx"></form-tiep-nhan>
+    <div v-if="formTemplate === 'version_1.0'">
+      <!--  -->
+      <thong-tin-chu-ho-so ref="thongtinchuhoso"></thong-tin-chu-ho-so>
+      <!--  -->
+      <div v-if="originality !== 1">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header" style="display: flex; align-items: center;">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              Tên hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div>
+              <v-card>
+                <v-card-text>
+                  <v-textarea
+                    v-model="briefNote"
+                    :rows="2"
+                    box
+                    label="Nhập tên hồ sơ"
+                  ></v-textarea>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header" style="display: flex; align-items: center;">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+              <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+              <v-text-field
+              class="px-0 py-0"
+              style="width: 90px; max-width: 90px;"
+              v-else-if="originality !== 1"
+              v-model="thongTinChiTietHoSo.sampleCount"
+              type="number"
+              ></v-text-field> &nbsp;
+              <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+              <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+            </div>
+            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;" v-if="viaPortalDetail !== 0">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content hide-actions value="2">
+            <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+            <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content hide-actions value="2">
+            <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <v-tabs icons-and-text centered class="mb-4">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <!-- <v-tab href="#tab-1" @click="luuHoSo">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Lưu &nbsp;
+            <v-icon>save</v-icon>
+          </v-btn>
+        </v-tab> -->
+        <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">note_add</v-icon>  &nbsp;
+            <span>Tiếp nhận và thêm mới</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon> &nbsp;
+            Lưu
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <!-- <v-tab href="#tab-3" @click="boSungHoSo">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Bổ sung &nbsp;
+            <v-icon>save</v-icon>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-4">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Trả kết quả &nbsp;
+            <v-icon>send</v-icon>
+          </v-btn>
+        </v-tab> -->
+        <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="18">reply</v-icon> &nbsp;
+            Quay lại
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+      </v-tabs>
     </div>
+    <!-- add new template -->
+    <div v-if="formTemplate === 'version_2.0'">
+      <div style="display: none">
+        <input id="serviceCode_hidden" type="text" :value="serviceCode_hidden">
+        <input id="govAgencyCode_hidden" type="text" :value="govAgencyCode_hidden">
+        <input id="dossierTemplateNo_hidden" type="text" :value="dossierTemplateNo_hidden">
+        <input id="eformId_hidden" type="text" :value="eformId_hidden">
+      </div>
+      <v-card flat color="#fff">
+        <h3 class="text-xs-center pb-2 pt-3" style="text-transform: uppercase;">{{templateName}}</h3>
+        <div id="formAlpacaNewTemplate" class="mb-5 pt-0"></div>
+      </v-card>
+    </div>
+    <!--  -->
   </v-form>
 </template>
 
@@ -49,9 +188,15 @@ export default {
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
-    vuejx: null,
+    // add new template
+    templateName: '',
     formTemplate: '',
     data_form_template: '',
+    serviceCode_hidden: '',
+    govAgencyCode_hidden: '',
+    dossierTemplateNo_hidden: '',
+    eformId_hidden: '',
+    // 
     validTNHS: false,
     dossierId: '',
     mark: true,
@@ -121,16 +266,43 @@ export default {
       vm.isMobile = isMobile
     },
     initData: function (data) {
-      var vm = this
-      vm.$store.dispatch('getDetailDossier', data).then(result => {
-        vm.$store.dispatch('loadDossierFormTemplates', result).then(function (result) {
-          if (result['newFormScript']) {
-            vm.vuejx = result['newFormScript']
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let filter = {
+        dossierTemplateNo: currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+        vm.templateName = result['templateName']
+        if (result['newFormScript']) {
+          vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
+          console.log('data_form_template', vm.data_form_template)
+          vm.formTemplate = 'version_2.0'
+          let filterServiceConfig = {
+            serviceConfigId: currentQuery.hasOwnProperty('service_config') && currentQuery.service_config ? currentQuery.service_config : ''
+          }
+          vm.$store.dispatch('getServiceConfigDetail', filterServiceConfig).then(function (data) {
+            vm.serviceCode_hidden = data.serviceCode
+            vm.govAgencyCode_hidden = data.govAgencyCode
+            vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
             setTimeout (function () {
-              vm.formTemplate = 'v-template'
+              if (vm.data_form_template) {
+                let formScript, formData
+                /* eslint-disable */
+                if (vm.data_form_template) {
+                  formScript = vm.data_form_template
+                } else {
+                  formScript = {}
+                }
+                formData = {}
+                /* eslint-disable */
+                formScript.data = formData
+                window.$('#formAlpacaNewTemplate').alpaca(formScript)
+              }
             }, 200)
-          } else {
-            vm.formTemplate = 'alpacal'
+          })
+        } else {
+          vm.formTemplate = 'version_1.0'
+          vm.$store.dispatch('getDetailDossier', data).then(result => {
             vm.dossierId = result.dossierId
             vm.briefNote = result.dossierName ? result.dossierName : ''
             result['editable'] = false
@@ -184,9 +356,8 @@ export default {
               }
               vm.$store.commit('setDichVuChuyenPhatKetQua', result)
             }
-          }
-        })
-      }).catch(reject => {
+          })
+        }
       })
     },
     luuHoSo () {

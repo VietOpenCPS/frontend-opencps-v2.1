@@ -64,7 +64,7 @@
 <script>
 
 import thongtinchunghoso from './form_xu_ly/ThongTinChungHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 export default {
   components: {
     'thongtinchunghoso': thongtinchunghoso,

@@ -14,8 +14,8 @@
               <div class="xs12 sm12 pb-1 overHidden">
                 <span class="pr-2">Địa chỉ: </span>
                 <v-tooltip top>
-                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
-                  <span class="pl-0"> {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
+                  <span slot="activator" class="text-bold ">{{ thongTinChiTietHoSo.address }} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
+                  <span class="pl-0"> {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}<span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span></span>
                 </v-tooltip>
               </div>
               <!--  -->
@@ -45,10 +45,12 @@
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Địa chỉ:</span>
                       <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
-                        {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}
+                        {{thongTinChiTietHoSo.address}} {{thongTinChiTietHoSo.wardName}}
+                        <span v-if="thongTinChiTietHoSo.wardName">, {{thongTinChiTietHoSo.districtName}}, {{thongTinChiTietHoSo.cityName}}</span>
                       </span>
                       <span class="pl-0 text-bold" v-else> 
-                        {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}
+                        {{thongTinChiTietHoSo.delegateAddress}} {{thongTinChiTietHoSo.delegateWardName}}
+                        <span v-if="thongTinChiTietHoSo.delegateWardName">, {{thongTinChiTietHoSo.delegateDistrictName}}, {{thongTinChiTietHoSo.delegateCityName}}</span>
                       </span>
                     </div>
                     <div class="xs12 sm12 py-1">
@@ -158,6 +160,18 @@
                   <span class="pl-0"> {{thongTinChiTietHoSo.dossierNote}} </span>
                 </v-tooltip>
               </div>
+              <!--  -->
+              <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
+                <span class="pr-2">Nhóm hồ sơ: </span>
+                <span class="pl-0 text-bold" title="Chi tiết nhóm hồ sơ" @click="detailGroup" style="cursor: pointer; color: #0072bc">
+                  {{groupDossierName}}
+                </span>
+              </div>
+              <div class="xs12 sm12 pb-1" style="color:#0b72ba" 
+                v-if="thongTinChiTietHoSo.dossierNote&&thongTinChiTietHoSo.dossierNote!=='null'&&
+                thongTinChiTietHoSo.dossierNote.indexOf('<br/>') < 0 &&thongTinChiTietHoSo.dossierNote.indexOf('</br>') < 0">
+                Ghi chú:
+              </div>
               <!-- brief note -->
               <!-- <div class="xs12 sm12 pb-1 overHidden">
                 <span class="pr-2">Nội dung: </span>
@@ -201,14 +215,22 @@
     },
     watch: {
       detailDossier(val) {
-        console.log('watch', val)
+        // console.log('watch', val)
         var vm = this
         vm.thongTinChiTietHoSo = val
+        if (vm.thongTinChiTietHoSo['groupDossierId']) {
+          vm.$store.dispatch('getDetailDossier', vm.thongTinChiTietHoSo['groupDossierId']).then(resultDossier => {
+            vm.groupDossierNo = resultDossier['dossierNo']
+            vm.groupDossierName = resultDossier['dossierName']
+          })
+        }
       }
     },
     components: {},
     data: () => ({
       thongTinChiTietHoSo: {},
+      groupDossierNo: '',
+      groupDossierName: '',
       showContactDetail: false
     }),
     computed: {
@@ -223,6 +245,12 @@
     created() {
       var vm = this
       vm.thongTinChiTietHoSo = vm.detailDossier
+      if (vm.thongTinChiTietHoSo['groupDossierId']) {
+        vm.$store.dispatch('getDetailDossier', vm.thongTinChiTietHoSo['groupDossierId']).then(resultDossier => {
+          vm.groupDossierNo = resultDossier['dossierNo']
+          vm.groupDossierName = resultDossier['dossierName']
+        })
+      }
     },
     mounted() {
       var vm = this
@@ -256,6 +284,10 @@
           durationText = durationCount + ' giờ'
         }
         return durationText
+      },
+      detailGroup () {
+        let vm = this
+        vm.$router.push('/danh-sach-ho-so/0/nhom-ho-so/' + vm.thongTinChiTietHoSo['groupDossierId'])
       }
     },
     filters: {

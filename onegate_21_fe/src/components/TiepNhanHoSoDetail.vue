@@ -1,172 +1,276 @@
 <template>
   <v-form v-model="validTNHS" ref="formTiepNhanHoSo" lazy-validation>
-    <div class="row-header">
-      <div class="background-triangle-big"> 
-        <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
-        <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
-        <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
-        <span v-else>THÊM MỚI HỒ SƠ</span> 
-      </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
-          {{thongTinChiTietHoSo.serviceName}}
+    <div v-if="formTemplate === 'version_1.0'">
+      <div class="row-header">
+        <div class="background-triangle-big"> 
+          <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
+          <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
+          <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
+          <span v-else-if="formCode === 'NEW_GROUP'">THÊM NHÓM HỒ SƠ</span>
+          <span v-else>THÊM MỚI HỒ SƠ</span> 
         </div>
-        <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
-          <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+            {{thongTinChiTietHoSo.serviceName}}
+          </div>
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+              <v-icon size="18">reply</v-icon> &nbsp;
+              Quay lại
+            </v-btn>
+          </div>
+        </div> 
+      </div>
+      <div style="position: relative;" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <div style="position: relative;" v-if="originality === 1">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
+            </div>
+            <v-layout row wrap>
+              <v-flex xs12 sm12>
+                <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
+              </v-flex>
+            </v-layout>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <thong-tin-chu-ho-so ref="thongtinchuhoso" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
+      <!--  -->
+      <div v-if="originality !== 1">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header" style="display: flex; align-items: center;">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
+              <span v-else>Tên hồ sơ</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div>
+              <v-card>
+                <v-card-text>
+                  <v-textarea
+                    v-model="briefNote"
+                    :rows="2"
+                    box
+                    :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
+                  ></v-textarea>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content>
+            <div slot="header" style="display: flex; align-items: center;">
+              <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+              <span v-if="formCode === 'NEW_GROUP'">Thành phần hồ sơ dùng chung</span>
+              <span v-else>Thành phần hồ sơ</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
+              <v-text-field
+              class="px-0 py-0"
+              style="width: 90px; max-width: 90px;"
+              v-else-if="originality !== 1"
+              v-model="thongTinChiTietHoSo.sampleCount"
+              type="number"
+              ></v-text-field> &nbsp;
+              <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
+              <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
+            </div>
+            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;" v-if="viaPortalDetail !== 0">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content hide-actions value="2">
+            <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
+            <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <div style="position: relative;">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content hide-actions value="2">
+            <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
+      <v-tabs icons-and-text centered class="mb-4">
+        <v-tabs-slider color="primary"></v-tabs-slider>
+        <!-- <v-tab href="#tab-1" @click="luuHoSo">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Lưu &nbsp;
+            <v-icon>save</v-icon>
+          </v-btn>
+        </v-tab> -->
+        <v-tab href="#tab-2" @click="tiepNhanNhomHoSo()" v-if="formCode === 'NEW_GROUP' && originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span>Tạo nhóm</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="formCode !== 'NEW_GROUP' && originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class="" 
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon>  &nbsp;
+            <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && formCode !== 'NEW_GROUP' && tiepNhanState" class="px-0 py-0"> 
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">note_add</v-icon>  &nbsp;
+            <span>Tiếp nhận và thêm mới</span>
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
+            <v-icon size="20">save</v-icon> &nbsp;
+            Lưu
+            <span slot="loader">Loading...</span>
+          </v-btn>
+        </v-tab>
+        <!-- <v-tab href="#tab-3" @click="boSungHoSo">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Bổ sung &nbsp;
+            <v-icon>save</v-icon>
+          </v-btn>
+        </v-tab>
+        <v-tab href="#tab-4">
+          <v-btn flat class="px-0 py-0 mx-0 my-0">
+            Trả kết quả &nbsp;
+            <v-icon>send</v-icon>
+          </v-btn>
+        </v-tab> -->
+        <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+          <v-btn flat class=""
+            :loading="loadingAction"
+            :disabled="loadingAction"
+          >
             <v-icon size="18">reply</v-icon> &nbsp;
             Quay lại
+            <span slot="loader">Loading...</span>
           </v-btn>
+        </v-tab>
+      </v-tabs>
+    </div>
+    <!-- add new template -->
+    <div v-if="formTemplate === 'version_2.0'">
+      <div style="display: none">
+        <input id="serviceCode_hidden" type="text" :value="serviceCode_hidden">
+        <input id="serviceName_hidden" type="text" :value="serviceName_hidden">
+        <input id="govAgencyCode_hidden" type="text" :value="govAgencyCode_hidden">
+        <input id="dossierTemplateNo_hidden" type="text" :value="dossierTemplateNo_hidden">
+        <input id="eformCode_hidden" type="text" :value="eformCode_hidden">
+      </div>
+      <div class="row-header">
+        <div class="background-triangle-big"> 
+          <span v-if="formCode === 'UPDATE'">SỬA HỒ SƠ</span>
+          <span v-else-if="formCode === 'COPY'">SAO CHÉP HỒ SƠ</span>
+          <span v-else-if="isOffLine">NỘP HỒ SƠ TRỰC TUYẾN</span>
+          <span v-else>THÊM MỚI HỒ SƠ</span> 
         </div>
-      </div> 
-    </div>
-    <div style="position: relative;" v-if="originality !== 1">
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content>
-          <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <div style="position: relative;" v-else>
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content>
-          <div slot="header">
-            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            HƯỚNG DẪN &nbsp;&nbsp;&nbsp;&nbsp; 
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="templateName">
+            {{templateName}}
           </div>
-          <v-layout row wrap>
-            <v-flex xs12 sm12>
-              <div class="ml-3 mr-3 pt-1" v-html="thongTinChiTietHoSo.dossierNote"></div>
-            </v-flex>
-          </v-layout>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <!--  -->
-    <thong-tin-chu-ho-so ref="thongtinchuhoso"></thong-tin-chu-ho-so>
-    <!--  -->
-    <div v-if="originality !== 1">
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content>
-          <div slot="header" style="display: flex; align-items: center;">
-            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            Tên hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
+          <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+              <v-icon size="18">reply</v-icon> &nbsp;
+              Quay lại
+            </v-btn>
           </div>
-          <div>
-            <v-card>
-              <v-card-text>
-                <v-textarea
-                  v-model="briefNote"
-                  :rows="2"
-                  box
-                  label="Nhập tên hồ sơ"
-                ></v-textarea>
-              </v-card-text>
-            </v-card>
-          </div>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
+        </div> 
+      </div>
+      <div v-if="loadingForm" class="text-xs-center mt-5">
+        <v-progress-circular
+          :size="50"
+          color="#dedede"
+          indeterminate
+        ></v-progress-circular>
+      </div>
+      <div v-else>
+        <v-card flat color="#fff">
+          <div id="formAlpacaNewTemplate" class="mb-5 pt-0"></div>
+        </v-card>
+        <!--  -->
+        <v-tabs icons-and-text centered class="mb-4">
+          <v-tabs-slider color="primary"></v-tabs-slider>
+          <v-tab href="#tab-2" @click="tiepNhanHoSoNewTemplate()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
+            <v-btn flat class="" 
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon>  &nbsp;
+              <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <!-- <v-tab href="#tab-4" @click="tiepNhanHoSoNewTemplate('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">note_add</v-icon>  &nbsp;
+              <span>Tiếp nhận và thêm mới</span>
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab> -->
+          <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="20">save</v-icon> &nbsp;
+              Lưu
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+          <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
+            <v-btn flat class=""
+              :loading="loadingAction"
+              :disabled="loadingAction"
+            >
+              <v-icon size="18">reply</v-icon> &nbsp;
+              Quay lại
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-tab>
+        </v-tabs>
+      </div>
+      
     </div>
     <!--  -->
-    <div style="position: relative;">
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content>
-          <div slot="header" style="display: flex; align-items: center;">
-            <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
-            Thành phần hồ sơ &nbsp;&nbsp;&nbsp;&nbsp;
-            <span v-if="!stateEditSample && originality !== 1">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-            <v-text-field
-            class="px-0 py-0"
-            style="width: 90px; max-width: 90px;"
-            v-else-if="originality !== 1"
-            v-model="thongTinChiTietHoSo.sampleCount"
-            type="number"
-            ></v-text-field> &nbsp;
-            <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
-            <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
-          </div>
-          <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="false" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <!--  -->
-    <div style="position: relative;" v-if="viaPortalDetail !== 0">
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="2">
-          <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Dịch vụ chuyển phát kết quả</div>
-          <dich-vu-chuyen-phat-ket-qua ref="dichvuchuyenphatketqua" @changeViapostal="changeViapostal"></dich-vu-chuyen-phat-ket-qua>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <!--  -->
-    <div style="position: relative;">
-      <v-expansion-panel :value="[true]" expand  class="expansion-pl">
-        <v-expansion-panel-content hide-actions value="2">
-          <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </div>
-    <!--  -->
-    <v-tabs icons-and-text centered class="mb-4">
-      <v-tabs-slider color="primary"></v-tabs-slider>
-      <!-- <v-tab href="#tab-1" @click="luuHoSo">
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
-          Lưu &nbsp;
-          <v-icon>save</v-icon>
-        </v-btn>
-      </v-tab> -->
-      <v-tab href="#tab-2" @click="tiepNhanHoSo()" v-if="originality !== 1 && tiepNhanState" class="px-0 py-0"> 
-        <v-btn flat class="" 
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          <v-icon size="20">save</v-icon>  &nbsp;
-          <span v-if="formCode === 'UPDATE'">Lưu hồ sơ</span> <span v-else>Tiếp nhận</span>
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </v-tab>
-      <v-tab href="#tab-4" @click="tiepNhanHoSo('add')" v-if="originality !== 1 &&  formCode !== 'UPDATE' && formCode !== 'COPY' && tiepNhanState" class="px-0 py-0"> 
-        <v-btn flat class=""
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          <v-icon size="20">note_add</v-icon>  &nbsp;
-          <span>Tiếp nhận và thêm mới</span>
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </v-tab>
-      <v-tab href="#tab-3" @click="luuHoSo" v-if="originality === 1" class="px-0 py-0"> 
-        <v-btn flat class=""
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          <v-icon size="20">save</v-icon> &nbsp;
-          Lưu
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </v-tab>
-      <!-- <v-tab href="#tab-3" @click="boSungHoSo">
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
-          Bổ sung &nbsp;
-          <v-icon>save</v-icon>
-        </v-btn>
-      </v-tab>
-      <v-tab href="#tab-4">
-        <v-btn flat class="px-0 py-0 mx-0 my-0">
-          Trả kết quả &nbsp;
-          <v-icon>send</v-icon>
-        </v-btn>
-      </v-tab> -->
-      <v-tab href="#tab-5" @click="goBack" class="px-0 py-0">
-        <v-btn flat class=""
-          :loading="loadingAction"
-          :disabled="loadingAction"
-        >
-          <v-icon size="18">reply</v-icon> &nbsp;
-          Quay lại
-          <span slot="loader">Loading...</span>
-        </v-btn>
-      </v-tab>
-    </v-tabs>
   </v-form>
 </template>
 
@@ -175,7 +279,7 @@
 import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
@@ -193,6 +297,16 @@ export default {
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
+    // add new template
+    templateName: '',
+    formTemplate: '',
+    data_form_template: '',
+    serviceCode_hidden: '',
+    serviceName_hidden: '',
+    govAgencyCode_hidden: '',
+    dossierTemplateNo_hidden: '',
+    eformCode_hidden: '',
+    // 
     validTNHS: false,
     dossierId: '',
     mark: true,
@@ -207,11 +321,13 @@ export default {
     dueDateEdit: '',
     viaPortalDetail: 0,
     showThuPhi: false,
-    inputTypes: [1, 3],
+    inputTypes: [1, 3, 6],
+    inputTypesGroup: [6],
     outputTypes: [2],
     sampleCount: 0,
     isMobile: false,
-    loadingAction: false
+    loadingAction: false,
+    loadingForm: false
   }),
   computed: {
     loading () {
@@ -263,61 +379,102 @@ export default {
     },
     initData: function (data) {
       var vm = this
-      vm.$store.dispatch('getDetailDossier', data).then(result => {
-        vm.dossierId = result.dossierId
-        vm.briefNote = result.dossierName ? result.dossierName : ''
-        result['editable'] = false
-        if (result.dossierStatus === '') {
-          vm.$store.dispatch('pullNextactions', result).then(result2 => {
-            if (result2) {
-              var actionDetail = result2.filter(function (item) {
-                return (item.actionCode === 1100 || item.actionCode === '1100')
-              })
-              vm.$store.dispatch('processPullBtnDetail', {
-                dossierId: result.dossierId,
-                actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
-              }).then(resAction => {
-                result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
-                result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
-                result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
-                vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
-                vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
-                  vm.showThuPhi = true
-                  vm.payments = resAction.payment
+      let currentQuery = vm.$router.history.current.query
+      let filter = {
+        dossierTemplateNo: currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
+        vm.templateName = result['templateName']
+        if (result['newFormScript']) {
+          vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
+          console.log('data_form_template', vm.data_form_template)
+          vm.formTemplate = 'version_2.0'
+          vm.loadingForm = true
+          let filterServiceConfig = {
+            serviceConfigId: currentQuery.hasOwnProperty('service_config') && currentQuery.service_config ? currentQuery.service_config : ''
+          }
+          vm.$store.dispatch('getServiceConfigDetail', filterServiceConfig).then(function (data) {
+            vm.loadingForm = false
+            vm.serviceName_hidden = data.serviceName
+            vm.serviceCode_hidden = data.serviceCode
+            vm.govAgencyCode_hidden = data.govAgencyCode
+            vm.dossierTemplateNo_hidden = currentQuery.hasOwnProperty('template_no') && currentQuery.template_no ? currentQuery.template_no : ''
+            vm.eformCode_hidden = currentQuery.hasOwnProperty('eformCode') && currentQuery.eformCode ? currentQuery.eformCode : ''
+            setTimeout (function () {
+              if (vm.data_form_template) {
+                let formScript, formData
+                /* eslint-disable */
+                if (vm.data_form_template) {
+                  formScript = vm.data_form_template
+                } else {
+                  formScript = {}
                 }
-                // call initData thong tin chung ho so
-                if (vm.$refs.thongtinchunghoso) {
-                  vm.$refs.thongtinchunghoso.initData(result)
+                formData = {}
+                /* eslint-disable */
+                formScript.data = formData
+                window.$('#formAlpacaNewTemplate').alpaca(formScript)
+              }
+            }, 200)
+          })
+        } else {
+          vm.formTemplate = 'version_1.0'
+          vm.$store.dispatch('getDetailDossier', data).then(result => {
+            vm.dossierId = result.dossierId
+            vm.briefNote = result.dossierName ? result.dossierName : ''
+            result['editable'] = false
+            if (result.dossierStatus === '') {
+              vm.$store.dispatch('pullNextactions', result).then(result2 => {
+                if (result2) {
+                  var actionDetail = result2.filter(function (item) {
+                    return (item.actionCode === 1100 || item.actionCode === '1100')
+                  })
+                  vm.$store.dispatch('processPullBtnDetail', {
+                    dossierId: result.dossierId,
+                    actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                  }).then(resAction => {
+                    result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
+                    result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
+                    result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
+                    vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
+                    vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
+                      vm.showThuPhi = true
+                      vm.payments = resAction.payment
+                    }
+                    // call initData thong tin chung ho so
+                    if (vm.$refs.thongtinchunghoso) {
+                      vm.$refs.thongtinchunghoso.initData(result)
+                    }
+                  })
+                } else {
+                  // call initData thong tin chung ho so
+                  if (vm.$refs.thongtinchunghoso) {
+                    vm.$refs.thongtinchunghoso.initData(result)
+                  }
                 }
               })
             } else {
-              // call initData thong tin chung ho so
               if (vm.$refs.thongtinchunghoso) {
+                console.log('has thong tin chung ho so')
                 vm.$refs.thongtinchunghoso.initData(result)
               }
             }
+            vm.thongTinChiTietHoSo = result
+            vm.$refs.thongtinchuhoso.initData(result)
+            vm.$refs.thanhphanhoso.initData(result)
+            vm.viaPortalDetail = result.viaPostal
+            if (result.viaPostal > 0) {
+              let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
+              if (vm.formCode === 'NEW' && vm.originality === 1) {
+                result['postalAddress'] = postalAddress
+                result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
+              }
+              vm.$store.commit('setDichVuChuyenPhatKetQua', result)
+            }
+          }).catch(reject => {
           })
-        } else {
-          if (vm.$refs.thongtinchunghoso) {
-            console.log('has thong tin chung ho so')
-            vm.$refs.thongtinchunghoso.initData(result)
-          }
         }
-        vm.thongTinChiTietHoSo = result
-        vm.$refs.thongtinchuhoso.initData(result)
-        vm.$refs.thanhphanhoso.initData(result)
-        vm.viaPortalDetail = result.viaPostal
-        if (result.viaPostal > 0) {
-          let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
-          if (vm.formCode === 'NEW' && vm.originality === 1) {
-            result['postalAddress'] = postalAddress
-            result['postalTelNo'] = vm.thongTinChuHoSo['contactTelNo']
-          }
-          vm.$store.commit('setDichVuChuyenPhatKetQua', result)
-        }
-      }).catch(reject => {
       })
     },
     luuHoSo () {
@@ -600,6 +757,171 @@ export default {
         this.viaPortalDetail = 2
       } else {
         this.viaPortalDetail = 1
+      }
+    },
+    // 
+    tiepNhanNhomHoSo (type) {
+      var vm = this
+      vm.$store.commit('setPrintPH', false)
+      let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
+      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
+      vm.loadingAction = true
+      if (dichvuchuyenphatketqua.viaPostal === 2 && !vm.$refs.dichvuchuyenphatketqua.validDichVuChuyenPhat()) {
+        vm.loadingAction = false
+        return
+      }
+      let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+      let dossierTemplates = thanhphanhoso
+      let listAction = []
+      let listDossierMark = []
+      if (dossierFiles) {
+        dossierFiles.forEach(function (value, index) {
+          if (value.eForm) {
+            value['dossierId'] = vm.dossierId
+            listAction.push(vm.$store.dispatch('putAlpacaForm', value))
+          }
+        })
+      }
+      // if (vm.$refs.thanhphanhoso) {
+      //   vm.$refs.thanhphanhoso.saveMark()
+      // }
+      var tempData = Object.assign(thongtinnguoinophoso, dichvuchuyenphatketqua)
+      tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
+      tempData['dossierName'] = vm.briefNote
+      console.log('data put dossier -->', tempData)
+      let dataCreateGroup = {
+        serviceCode: vm.thongTinChiTietHoSo.serviceCode,
+        govAgencyCode: vm.thongTinChiTietHoSo.govAgencyCode,
+        templateNo: vm.thongTinChiTietHoSo.dossierTemplateNo,
+        originality: 9
+      }
+      vm.$store.dispatch('postDossier', dataCreateGroup).then(function (result) {
+        tempData['dossierId'] = result.dossierId
+        vm.$store.dispatch('putDossier', tempData).then(function (result) {
+          vm.loadingAction = false
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+            query: vm.$router.history.current.query
+          })
+          // var initData = vm.$store.getters.loadingInitData
+          // let actionUser = initData.user.userName ? initData.user.userName : ''
+          // //
+          // var paymentsOut = {}
+          // if (vm.showThuPhi) {
+          //   paymentsOut = {
+          //     requestPayment: vm.payments['requestPayment'],
+          //     paymentNote: vm.payments['paymentNote'],
+          //     advanceAmount: Number(vm.payments['advanceAmount'].toString().replace(/\./g, '')),
+          //     feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
+          //     serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
+          //     shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+          //   }
+          // }
+          // let dataPostAction = {
+          //   dossierId: result.dossierId,
+          //   actionCode: 1100,
+          //   actionNote: '',
+          //   actionUser: actionUser,
+          //   payload: '',
+          //   security: '',
+          //   assignUsers: '',
+          //   payment: paymentsOut,
+          //   createDossiers: ''
+          // }
+          // vm.loadingAction = true
+          // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+          //   vm.loadingAction = false
+          //   vm.$router.push({
+          //     path: '/danh-sach-ho-so/0/nhom-ho-so/' + result.dossierId,
+          //     query: vm.$router.history.current.query
+          //   })
+          // }).catch(reject => {
+          //   vm.loadingAction = false
+          // })
+        }).catch(rejectXhr => {
+          vm.loadingAction = false
+          toastr.clear()
+          toastr.error('Yêu cầu của bạn thực hiện thất bại')
+        })
+      })
+    },
+    // 
+    tiepNhanHoSoNewTemplate (type) {
+      let vm = this
+      let dataCreate = {
+        originality: vm.getOriginality(),
+        serviceCode: $('#serviceCode_hidden').val(),
+        govAgencyCode: $('#govAgencyCode_hidden').val(),
+        templateNo: $('#dossierTemplateNo_hidden').val(),
+        dossiers: ''
+      }
+      let dataFormTemplate = window.$('#formAlpacaNewTemplate').alpaca('get').getValue()
+      let dataFilter = dataFormTemplate
+      for (let i in dataFilter) {
+        if (String(i).indexOf('_') >= 0) {
+          delete dataFilter[i]
+        }
+      }
+      dataCreate['dossiers'] = JSON.stringify(dataFilter['dossiers'])
+      dataCreate['dossierFileArr'] = JSON.stringify(dataFilter['dossierFileArr'])
+      dataCreate['dossierMarkArr'] = JSON.stringify(dataFilter['dossierMarkArr'])
+      dataCreate['payment'] = JSON.stringify(dataFilter['payment'])
+
+      vm.loadingAction = true
+      vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+        vm.loadingAction = false
+        vm.goBack()
+        // let paymentsOut = ''
+        // if (dataFormTemplate['payment']) {
+        //   try {
+        //     paymentsOut = JSON.parse(dataFormTemplate['payment'])
+        //   } catch (error) {
+        //   }
+        // }
+        // let payloadDate = ''
+        // if (dataFormTemplate['dueDate']) {
+        //   payloadDate = {
+        //     dueDate: vm.parseDateToTimestamp(dataFormTemplate['dueDate']),
+        //     receiveDate: (new Date()).getTime()
+        //   }
+        // }
+        // let dataPostAction = {
+        //   dossierId: result.dossierId,
+        //   actionCode: 1100,
+        //   actionNote: '',
+        //   actionUser: window.themeDisplay.getUserName(),
+        //   payload: payloadDate,
+        //   security: '',
+        //   assignUsers: '',
+        //   payment: paymentsOut,
+        //   createDossiers: ''
+        // }
+        // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+        //   vm.loadingAction = false
+        //   if (!type) {
+        //     vm.goBack()
+        //   } else {
+        //   }
+        // }).catch(reject => {
+        //   vm.loadingAction = false
+        // })
+        
+      }).catch(reject => {
+        vm.loadingAction = false
+      })
+    },
+    // 
+    parseDateToTimestamp (date) {
+      if (!date) {
+        return null
+      }
+      let [day, month, year] = `${date}`.split('/')
+      let day2 = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      if (new Date(day2) == 'Invalid Date') {
+        return ''
+      } else {
+        return (new Date(day2)).getTime()
       }
     },
     goBack () {

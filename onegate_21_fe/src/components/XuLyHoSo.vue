@@ -55,14 +55,14 @@
                       <span>{{props.item.wardName}}, {{props.item.districtName}}, {{props.item.cityName}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left">
+                  <!-- <td class="text-xs-left">
                     <div>
                       <span> Tiếp nhận: {{props.item.receiveDate}}<br>
                         Hẹn trả: {{props.item.receiveDate}}<br>
                         <span>{{props.item.dossierOverdue}}</span>
                       </span>
                     </div>
-                  </td>
+                  </td> -->
                 </tr>
               </template>
             </v-data-table>
@@ -193,7 +193,7 @@ import KyDuyet from './form_xu_ly/KyPheDuyetTaiLieu.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
-import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSo.vue'
+import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import ThongTinBuuChinh from './form_xu_ly/ThongTinGuiBuuChinh.vue'
@@ -234,12 +234,12 @@ export default {
         text: 'Địa chỉ',
         align: 'center',
         sortable: false
-      },
-      {
-        text: 'Thời gian',
-        align: 'center',
-        sortable: false
       }
+      // {
+      //   text: 'Thời gian',
+      //   align: 'center',
+      //   sortable: false
+      // }
     ],
     mutilpleAction: false,
     actionExits: [],
@@ -433,12 +433,28 @@ export default {
           vm.showTraKetQua = true
           vm.returnFiles = result.returnFiles
         }
-        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment === 5) {
-          isPopup = true
-          vm.showThuPhi = true
-          vm.payments = result.payment
-          vm.viaPortalDetail = dossierItem.viaPostal
+        // Add thu phí
+        if (result.hasOwnProperty('payment') && result.payment !== null && result.payment !== undefined && result.payment !== 'undefined' && result.payment.requestPayment > 0) {
+          // add thanh toán điện tử
+          if ((result.payment.requestPayment === 3 || result.payment.requestPayment === '3')) {
+            isPopup = true
+            vm.showThanhToanDienTu = true
+            let filter = {
+              dossierId: vm.dossierId,
+              referenceUid: dossierItem.referenceUid
+            }
+            vm.$store.dispatch('loadDossierPayments', filter).then(result => {
+              vm.paymentProfile = result
+            }).catch(reject => {
+            })
+          } else {
+            isPopup = true
+            vm.showThuPhi = true
+            vm.payments = result.payment
+            vm.viaPortalDetail = dossierItem.viaPostal
+          }
         }
+        // add Thu phí
         if (result.hasOwnProperty('checkInput') && result.checkInput !== null && result.checkInput !== undefined && result.checkInput !== 'undefined') {
           vm.checkInput = result.checkInput
           if (result.checkInput === 2) {

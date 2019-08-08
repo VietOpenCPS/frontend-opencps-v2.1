@@ -1,15 +1,17 @@
 <template>  
   <div class="phancong" style="background-color: white;width:100%">
-    <div v-if="type === 1">
+    <div v-if="type > 0">
       <v-layout wrap>
         <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
         slot="activator"
         v-model="item.assigned"
-        :label="item.userName"
+        :label="item.userName ? item.userName : item['fullName']"
         @change = 'changeAssigned($event, index)'
         style="display:inline-block;min-width:190px;max-width:190px"
-        :title="item.userName"
-        ></v-checkbox>
+        :title="item.userName ? item.userName : item['fullName']"
+        >
+          <template slot="label"><span class="black--text">{{item.userName ? item.userName : item['fullName']}}</span></template>
+        </v-checkbox>
       </v-layout>
       <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
     </div>
@@ -22,11 +24,11 @@
               <v-checkbox 
                 slot="activator"
                 v-model="item.assigned"
-                :label="item.userName"
+                :label="item.userName ? item.userName : item['fullName']"
                 @change = 'checkAsign($event, index)'
                 style="min-width:150px"
               ></v-checkbox>
-              <span class="pl-0"> {{item.userName}} </span>
+              <span class="pl-0"> {{item.userName ? item.userName : item['fullName']}} </span>
             </v-tooltip>
             
             <toggle-button class="mx-1 btn-tgl"

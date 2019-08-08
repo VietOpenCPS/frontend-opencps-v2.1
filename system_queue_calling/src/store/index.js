@@ -354,6 +354,24 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    // add new template
+    loadDossierFormTemplates ({ commit, state }, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dossiertemplates/' + data.dossierTemplateNo, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }, error => {
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {

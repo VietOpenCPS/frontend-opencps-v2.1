@@ -3237,7 +3237,31 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    // add new template
+    getServiceConfigDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/serviceconfigs/' + filter.serviceConfigId, param).then(result => {
+            let serializable = result.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
     }
+
     // ----End---------
   },
   mutations: {

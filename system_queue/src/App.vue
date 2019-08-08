@@ -24,6 +24,9 @@
       },
       isMobile () {
         return this.$store.getters.getIsMobile
+      },
+      serverConfig () {
+        return this.$store.getters.getServerConfig
       }
     },
     beforeDestroy () {
@@ -36,10 +39,24 @@
       window.addEventListener('resize', this.onResize, { passive: true })
     },
     created () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        let filter = {
+          serverNo: 'EFORM_DVC'
+        }
+        vm.$store.dispatch('getServerConfig', filter).then(function (result) {
+          try {
+            let config = JSON.parse(result.configs)
+            vm.$store.commit('setServerConfig', config)
+            console.log('serverConfig', vm.serverConfig)
+          } catch (error) {
+          }
+        }).catch(function (reject) {
+          let config = ''
+          vm.$store.commit('setServerConfig', config)
+        })
       })
     },
     watch: {

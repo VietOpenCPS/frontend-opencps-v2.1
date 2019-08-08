@@ -100,7 +100,7 @@
       </div>
     </div>
     <v-content>
-      <router-view></router-view>
+      <router-view v-if="isSigned"></router-view>
       <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && isSigned" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
@@ -269,7 +269,7 @@
         //   }
         // }
         console.log('queryString++++++++22222222+++', queryString)
-       vm.$router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -303,15 +303,27 @@
               vm.trangThaiHoSoList[key]['counter'] = parentCount
             } else {
               if (vm.trangThaiHoSoList[key].queryParams.indexOf('step') >= 0) {
-                let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
-                let countParent = 0
-                for (let countKey in vm.counterData) {
-                  if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
-                    countParent = vm.counterData[countKey].totalCount
-                    break
+                if (vm.trangThaiHoSoList[key]['menuType'] === 2) {
+                  let filter = {
+                    queryParams: vm.trangThaiHoSoList[key].queryParams
                   }
+                  vm.$store.dispatch('loadingCounterNotStep', filter).then(function (result) {
+                    vm.trangThaiHoSoList[key]['counter'] = result.total
+                  }).catch(function () {
+                    vm.trangThaiHoSoList[key]['counter'] = 0
+                  })
+                } else {
+                  let stepParent = vm.trangThaiHoSoList[key].queryParams.split('step=')
+                  let countParent = 0
+                  for (let countKey in vm.counterData) {
+                    if (String(vm.counterData[countKey].stepCode) === String(stepParent[1])) {
+                      countParent = vm.counterData[countKey].totalCount
+                      break
+                    }
+                  }
+                  vm.trangThaiHoSoList[key]['counter'] = countParent
                 }
-                vm.trangThaiHoSoList[key]['counter'] = countParent
+                
               } else {
                 let filter = {
                   queryParams: vm.trangThaiHoSoList[key].queryParams

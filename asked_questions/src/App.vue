@@ -1,20 +1,20 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
-    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator')">
-      <div class="">
+    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data')">
+      <!-- <div class="">
         <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
           style="height:36px"
         >
           <v-icon size="22" color="white">add</v-icon>&nbsp;
           Thêm mới câu hỏi
         </v-btn>
-      </div>
+      </div> -->
       <v-list class="pt-0">
         <v-list-tile :style="activeTab === 0 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(0, 'all')">
             <v-list-tile-title>Tất cả câu hỏi</v-list-tile-title>
             <span class="status__counter" style="color:#0b72ba!important">
-              {{totalQuestion}}
+              {{totalQuestionCounter}}
             </span>
           </v-list-tile-content>
         </v-list-tile>
@@ -57,7 +57,7 @@
         <v-divider class="my-0"></v-divider>
       </v-list>
     </v-navigation-drawer>
-    <v-content :style="!getUser('Administrator') ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
+    <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -67,42 +67,12 @@
   export default {
     data: () => ({
       activeTab: 0,
+      totalQuestionCounter: 0,
       totalAnswered: 0,
       totalNotAnswer: 0,
       totalPublished: 0,
       totalNotPublish: 0,
-      agencyList: [
-        {
-          agencyName: 'Tổng Cục Đường bộ Việt Nam',
-          agencyCode: 'TCDB',
-          groupId: '35243'
-        },
-        {
-          agencyName: 'Cục Đường sắt Việt Nam',
-          agencyCode: 'CDSVN',
-          groupId: '35219'
-        },
-        {
-          agencyName: 'Cục Đường thủy nội địa Việt Nam',
-          agencyCode: 'CDTVN',
-          groupId: '53152'
-        },
-        {
-          agencyName: 'Cục Hàng hải Việt Nam',
-          agencyCode: 'CHHVN',
-          groupId: '51801'
-        },
-        {
-          agencyName: 'Cục Hàng không Việt Nam',
-          agencyCode: 'CHKVN',
-          groupId: '51883'
-        },
-        {
-          agencyName: 'Cục Đăng kiểm Việt Nam',
-          agencyCode: 'CDKVN',
-          groupId: '53084'
-        }
-      ]
+      agencyList: []
     }),
     computed: {
       loading () {
@@ -117,14 +87,14 @@
       activeGetQuestion () {
         return this.$store.getters.getActiveGetQuestion
       },
-      totalQuestion () {
-        return this.$store.getters.getTotalQuestion
-      },
       keyword () {
         return this.$store.getters.getKeywordFilter
       },
       agencyFilterSelected () {
         return this.$store.getters.getAgencyFilter
+      },
+      activeCounter () {
+        return this.$store.getters.getCounter
       }
     },
     created () {
@@ -133,6 +103,7 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.getQuestionList()
+        vm.getCounter()
       })
     },
     watch: {
@@ -145,6 +116,12 @@
       activeGetQuestion () {
         let vm = this
         vm.getQuestionList()
+        vm.getCounter()
+      },
+      activeCounter () {
+        let vm = this
+        vm.getQuestionList()
+        vm.getCounter()
       }
     },
     methods: {
@@ -153,8 +130,13 @@
         let current = vm.$router.history.current
         let query = current.query
         let filter = {
-          agencyCode: vm.agencyFilterSelected['agencyCode'] ? vm.agencyFilterSelected['agencyCode'] : '',
-          keyword: vm.keyword ? vm.keyword : ''
+          agencyCode: vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          keyword: vm.keyword ? vm.keyword : '',
+          publish: query.hasOwnProperty('publish') ? query['publish'] : '',
+          answered: query.hasOwnProperty('answered') ? query['answered'] : ''
+        }
+        if (agencyCodeSite) {
+          filter.agencyCode = agencyCodeSite
         }
         vm.$store.commit('setLoading', true)
         vm.$store.dispatch('getQuestions', filter).then(function (result) {
@@ -162,78 +144,72 @@
           let questionList = []
           if (Array.isArray(result)) {
             questionList = result
-            vm.totalAnswered = questionList.filter(function (item) {
-              return String(item['answered']) === 'true'
-            }).length
-            vm.totalNotAnswer = questionList.filter(function (item) {
-              return String(item['answered']) === 'false'
-            }).length
-
-            vm.totalPublished = questionList.filter(function (item) {
-              return String(item['publish']) === '1'
-            }).length
-            vm.totalNotPublish = questionList.filter(function (item) {
-              return String(item['publish']) === '0'
-            }).length
-
-            if (query.hasOwnProperty('answered')) {
-              questionList = questionList.filter(function (item) {
-                return String(item['answered']) === String(query.answered)
-              })
-            }
-            if (query.hasOwnProperty('publish')) {
-              questionList = questionList.filter(function (item) {
-                return String(item['publish']) === String(query.publish)
-              })
-            }
-            // if (vm.agencyFilterSelected) {
-            //   questionList = questionList
-            // }
-            // if (vm.keyword && String(vm.keyword).length > 3) {
-            //   questionList = questionList
-            //   questionList = questionList.filter(function (item) {
-            //     return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
-            //   })
-            // }
             vm.$store.commit('setQuestionList', questionList)
           } else {
             questionList = [result]
-            vm.totalAnswered = questionList.filter(function (item) {
-              return String(item['answered']) === 'true'
-            }).length
-            vm.totalNotAnswer = questionList.filter(function (item) {
-              return String(item['answered']) === 'false'
-            }).length
-
-            vm.totalPublished = questionList.filter(function (item) {
-              return String(item['publish']) === '1'
-            }).length
-            vm.totalNotPublish = questionList.filter(function (item) {
-              return String(item['publish']) === '0'
-            }).length
-            if (query.hasOwnProperty('answered')) {
-              questionList = questionList.filter(function (item) {
-                return String(item['answered']) === String(query.answered)
-              })
-            }
-            if (query.hasOwnProperty('publish')) {
-              questionList = questionList.filter(function (item) {
-                return String(item['publish']) === String(query.publish)
-              })
-            }
-            // if (vm.agencyFilterSelected) {
-            //   questionList = questionList
-            // }
-            // if (vm.keyword && String(vm.keyword).length > 3) {
-            //   questionList = questionList.filter(function (item) {
-            //     return vm.convertString(item['content'].toString()).indexOf(keyword) >= 0
-            //   })
-            // }
             vm.$store.commit('setQuestionList', questionList)
           }
         }).catch(function (reject) {
           vm.$store.commit('setLoading', false)
           vm.$store.commit('setQuestionList', reject)
+        })
+      },
+      getCounter () {
+        let vm = this
+        let current = vm.$router.history.current
+        let query = current.query
+        let filter = {
+          agencyCode: '',
+          publish: '',
+          answered: ''
+        }
+        // vm.$store.commit('setLoading', true)
+        if (agencyCodeSite) {
+          filter.agencyCode = agencyCodeSite
+        }
+        vm.$store.dispatch('getQuestionsCounter', filter).then(function (result) {
+          vm.$store.commit('setLoading', false)
+          vm.totalQuestionCounter = result['total']
+          // 
+          let filter1 = {
+            agencyCode: '',
+            publish: 1,
+            answered: ''
+          }
+          if (agencyCodeSite) {
+            filter1.agencyCode = agencyCodeSite
+          }
+          console.log('filterCounter 1', filter1)
+          vm.$store.dispatch('getQuestionsCounter', filter1).then(function (result1) {
+            vm.totalPublished = result1['total']
+            vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
+          }).catch(function(reject) {
+            vm.totalPublished = 0
+            vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
+          })
+          //
+          let filter2 = {
+            agencyCode: '',
+            publish: '',
+            answered: true
+          }
+          if (agencyCodeSite) {
+            filter2.agencyCode = agencyCodeSite
+          }
+          console.log('filterCounter 2', filter2)
+          vm.$store.dispatch('getQuestionsCounter', filter2).then(function (result2) {
+            vm.totalAnswered = result2['total']
+            vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
+          }).catch(function(reject) {
+            vm.totalAnswered = 0
+            vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
+          })
+        }).catch(function (reject) {
+          vm.totalQuestionCounter = 0
+          vm.totalPublished = 0
+          vm.totalNotPublish = 0
+          vm.totalAnswered = 0
+          vm.totalNotAnswer = 0
         })
       },
       filterQuestion (index, target) {

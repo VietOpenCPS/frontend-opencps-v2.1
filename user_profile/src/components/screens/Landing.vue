@@ -229,6 +229,7 @@
                   <v-subheader>{{user['employeeTelNo']}}</v-subheader>
                 </v-flex>
               </v-layout>
+              <!-- Đổi mật khẩu -->
               <v-layout row wrap>
                 <v-flex xs12 class="mx-3">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>

@@ -121,33 +121,37 @@ export const store = new Vuex.Store({
       })
     },
     goToDangNhap({ commit, state }, filter) {
-      store.dispatch('loadInitResource').then(function (result) {
-        let configs = {
-          headers: {
-            'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
-          }
-        }
-        var dataPostApplicant = new URLSearchParams()
-        // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
-        axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
-          console.log(response.data)
-          if (response.data !== '' && response.data !== 'ok') {
-            if (response.data === 'pending') {
-              window.location.href = window.themeDisplay.getURLHome() +
-              "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                "&redirectURL=" + window.themeDisplay.getURLHome()
-            } else {
-              window.location.href = response.data
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
             }
-          } else if (response.data === 'ok') {
-            window.location.href = window.themeDisplay.getURLHome()
-          } else if (response.data === 'captcha') {
-            toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
-          } else {
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
           }
-        }).catch(function (error) {
-          toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          var dataPostApplicant = new URLSearchParams()
+          // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            console.log(response.data)
+            resolve(response)
+            if (response.data !== '' && response.data !== 'ok') {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              window.location.href = window.themeDisplay.getURLHome()
+            } else if (response.data === 'captcha') {
+              toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+            }
+          }).catch(function (error) {
+            reject(error)
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          })
         })
       })
     },

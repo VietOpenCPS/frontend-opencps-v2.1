@@ -7,7 +7,7 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
 import { UploaderPlugin } from '@syncfusion/ej2-vue-inputs'
-import VueNativeSock from 'vue-native-websocket'
+// import VueNativeSock from 'vue-native-websocket'
 
 Vue.use(UploaderPlugin)
 Vue.use(VueContentPlaceholders)
@@ -20,18 +20,18 @@ let portalURL = (window.themeDisplay !== undefined )? window.themeDisplay.getPor
 let token = window.themeDisplay !== undefined ? window.Liferay.authToken : ''
 let portalURLSock = portalURL.indexOf(':') > 0 ? portalURL.substr(0, portalURL.indexOf(':')) : portalURL
 
-Vue.use(VueNativeSock, 'ws://' + window.themeDisplay.getPortalURL().replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
-  + '&portalURL=' + portalURL
-  + '&companyId=' + companyId
-  + '&userId=' + userId
-  + '&userName=' + userName
-  + '&Token=' + token, 
-  {
-    store: store,
-    format: 'json',
-    reconnection: true
-  }
-)
+// Vue.use(VueNativeSock, 'ws://' + window.themeDisplay.getPortalURL().replace('http://', '') + '/o/v1/socket/web?groupId='+ groupId
+//   + '&portalURL=' + portalURL
+//   + '&companyId=' + companyId
+//   + '&userId=' + userId
+//   + '&userName=' + userName
+//   + '&Token=' + token, 
+//   {
+//     store: store,
+//     format: 'json',
+//     reconnection: true
+//   }
+// )
 
 axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.Liferay.authToken : ''
 axios.defaults.headers.common['groupId'] = groupId

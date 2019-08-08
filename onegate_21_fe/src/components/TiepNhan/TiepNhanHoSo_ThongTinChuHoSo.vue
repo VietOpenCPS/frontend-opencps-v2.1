@@ -237,8 +237,6 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
-                        :rules="[v => !!v || 'Thông tin bắt buộc']"
-                        required
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>

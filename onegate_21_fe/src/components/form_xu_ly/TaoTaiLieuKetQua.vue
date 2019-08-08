@@ -18,7 +18,7 @@
                       <div class="header__tphs">
                         {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
                         &nbsp;&nbsp;
-                        <v-tooltip top v-if="item.eForm && item.daKhai">
+                        <!-- <v-tooltip top v-if="item.eForm && item.daKhai">
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
                           <span>Đã khai</span>
                         </v-tooltip>
@@ -26,7 +26,7 @@
                           <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-o"></i>
                           <span>Chưa khai</span>
                         </v-tooltip>
-                        &nbsp;&nbsp;
+                        &nbsp;&nbsp; -->
                         <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                         &nbsp;&nbsp;
                         <!-- <v-tooltip top v-if="!item.eForm && item.hasFileTemp">
@@ -314,6 +314,7 @@
           createFiles.forEach(template => {
             var itemFind = dossierFiles.find(file => {
               return template.partNo === file.dossierPartNo && file.eForm && file.fileSize !== 0
+              // return template.partNo === file.dossierPartNo && file.eForm
             })
             if (itemFind) {
               template['daKhai'] = true
@@ -358,12 +359,14 @@
         var vm = this
         console.log('itemSave', item)
         var fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize !== 0
+          // return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize !== 0
+          return itemFile.dossierPartNo === item.partNo && itemFile.eForm
         })
         if (fileFind) {
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+            toastr.success('Yêu cầu của bạn thực hiện thành công')
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
@@ -376,6 +379,7 @@
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
+            toastr.success('Yêu cầu của bạn thực hiện thành công')
             vm.createFiles[index].daKhai = true
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles

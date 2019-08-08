@@ -19,7 +19,7 @@
                 append-icon="search"
                 @click:append="() => ( 
                   this.$router.push({
-                    path: '/tra-cuu-ho-so',
+                    path: urlHome + '/kios#/tra-cuu-ho-so-homepage',
                     query: {
                       keyword: this.keyword
                     }
@@ -98,6 +98,7 @@
   export default {
     props: [],
     data: () => ({
+      urlHome: '',
       keyword: '',
       daTiepNhan: 0,
       daGiaiQuyet: 0,
@@ -165,6 +166,7 @@
         $('.mWrapper > footer > .container > .right').css('width', '100%')
         $('body').css('min-width', 'unset')
         vm.doStaticsReport1()
+        vm.urlHome = window.themeDisplay.getSiteAdminURL().split('~')[0].replace('group','web')
       })
     },
     methods: {

@@ -92,7 +92,7 @@
     </v-layout>
     <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
       <v-flex class="mx-2" v-for="(item, index) in itemsReportsConfig" v-bind:key="index">
-        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" v-model="selected" :label="item.text" :value="item.value"></v-checkbox>
+        <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
       </v-flex>
     </v-layout>
     <v-layout row wrap class="mx-2 my-2">
@@ -614,6 +614,7 @@ export default {
       vm.isShowLoading = true
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null && result !== undefined) {
+          vm.showErrorData = false
           let dataReport = result
           let dossierRaw = {}
           let dataReportCurrent = {}
@@ -762,6 +763,7 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+              /** TODO: Call API
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -773,6 +775,11 @@ export default {
                 };
                 reader.readAsArrayBuffer(fileToExcel)
               }
+              */
+              vm.$store.dispatch('getExcelReportFromServer', {
+                data: docDString,
+                fileName: 'baocaothongke' + '.xls'
+              })
             }
           })
         } else {
@@ -844,6 +851,7 @@ export default {
       let subKey = vm.itemsReports[vm.index]['filterConfig']['subKey']
       vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
         if (result !== null) {
+          vm.showErrorData = false
           let index = 1
           let dataRowTotal = []
           let totalText = 'Tổng số'
@@ -1152,6 +1160,7 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
+              /** TODO: Call API
               let currentTimestemp = new Date().getTime()
               let fileToExcel = new File([blob], currentTimestemp + '.pdf')
               {
@@ -1163,6 +1172,11 @@ export default {
                 };
                 reader.readAsArrayBuffer(fileToExcel)
               }
+              */
+              vm.$store.dispatch('getExcelReportFromServer', {
+                data: docDString,
+                fileName: new Date().getTime() + '.xls'
+              })
             }
           })
         } else {
@@ -1189,15 +1203,17 @@ export default {
     },
     changeConfig (index) {
       let vm = this
-      if (vm.itemsReportsConfig[index].hasOwnProperty('selected')) {
-        if (vm.itemsReportsConfig[index]['selected']) {
-          vm.itemsReportsConfig[index]['selected'] = false
-        } else {
-          vm.itemsReportsConfig[index]['selected'] = true
-        }
-      } else {
-        vm.itemsReportsConfig[index]['selected'] = true
-      }
+      // if (vm.itemsReportsConfig[index].hasOwnProperty('selected')) {
+      //   if (vm.itemsReportsConfig[index]['selected']) {
+      //     vm.itemsReportsConfig[index]['selected'] = false
+      //   } else {
+      //     vm.itemsReportsConfig[index]['selected'] = true
+      //   }
+      // } else {
+      //   vm.itemsReportsConfig[index]['selected'] = true
+      // }
+      console.log('itemsReportsConfig index', vm.itemsReportsConfig[index])
+      console.log('itemsReportsConfig', vm.itemsReportsConfig)
     },
     doChotSoLieu (dataSelect, button) {
       let vm = this

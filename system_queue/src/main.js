@@ -18,6 +18,9 @@ axios.defaults.headers.common['groupId'] = groupId
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+    workingTime: []
+  }),
   methods: {
     getScopeGroupId: function () {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

@@ -2524,18 +2524,32 @@ export default {
         templateNo: vm.templateNo,
         originality: vm.getOriginality()
       }
-      vm.$store.commit('setDataCreateDossier', data)
-      vm.loadingAction = true
-      vm.$store.dispatch('postDossier', data).then(function (result) {
-        vm.loadingAction = false
-        vm.indexAction = -1
-        vm.$router.push({
-          path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
-          query: vm.$router.history.current.query
-        })
-      }).catch(reject => {
-        vm.loadingAction = false
+      // add new template
+      let filter = {
+        dossierTemplateNo: vm.templateNo
+      }
+      vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result1) {
+        if (result1['newFormScript']) {
+          vm.$router.push({
+            path: '/danh-sach-ho-so/0/ho-so/0/' + vm.itemAction.form,
+            query: vm.$router.history.current.query
+          })
+        } else {
+          vm.$store.commit('setDataCreateDossier', data)
+          vm.loadingAction = true
+          vm.$store.dispatch('postDossier', data).then(function (result) {
+            vm.loadingAction = false
+            vm.indexAction = -1
+            vm.$router.push({
+              path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + result.dossierId + '/' + vm.itemAction.form,
+              query: vm.$router.history.current.query
+            })
+          }).catch(reject => {
+            vm.loadingAction = false
+          })
+        }
       })
+      // 
     },
     doSubmitDialogAction (item) {
       let vm = this
