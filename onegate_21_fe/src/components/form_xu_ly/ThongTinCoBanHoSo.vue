@@ -163,7 +163,8 @@
               <!--  -->
               <div class="xs12 sm12 pb-1" v-if="thongTinChiTietHoSo['groupDossierId']">
                 <span class="pr-2">Nhóm hồ sơ: </span>
-                <span class="pl-0 text-bold" title="Chi tiết nhóm hồ sơ" @click="detailGroup" style="cursor: pointer; color: #0072bc">
+                <span class="pl-0 text-bold" :title="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'Chi tiết nhóm hồ sơ' : ''" @click="detailGroup" 
+                  :style="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? 'cursor: pointer; color: #0072bc' : ''">
                   {{groupDossierName}}
                 </span>
               </div>
@@ -287,7 +288,9 @@
       },
       detailGroup () {
         let vm = this
-        vm.$router.push('/danh-sach-ho-so/0/nhom-ho-so/' + vm.thongTinChiTietHoSo['groupDossierId'])
+        if (vm.thongTinChiTietHoSo['permission'].indexOf('write') >= 0) {
+          vm.$router.push('/danh-sach-ho-so/0/nhom-ho-so/' + vm.thongTinChiTietHoSo['groupDossierId'])
+        }
       }
     },
     filters: {

@@ -321,7 +321,11 @@ export const store = new Vuex.Store({
                 let serializable = response.data
                 if (serializable.data) {
                   //test
-                  resolve(serializable.data)
+                  if (Array.isArray(serializable.data)) {
+                    resolve(serializable.data)
+                  } else {
+                    resolve([serializable.data])
+                  }
                 } else {
                   console.log('docu', filter.document === 'STATISTIC_05')
                   if (filter.document === 'STATISTIC_05') {

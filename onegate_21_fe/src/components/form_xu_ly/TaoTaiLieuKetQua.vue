@@ -40,13 +40,18 @@
                     <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                         <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
-                          <v-icon v-if="itemFileView.eForm">border_color</v-icon>
-                          <v-icon v-else>attach_file</v-icon>
+                          <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
+                            :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
+                            {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
+                          </v-icon>
                           {{itemFileView.displayName}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
-                        <v-btn icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
+                        <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
                           <v-icon style="color: red">delete_outline</v-icon>
+                        </v-btn>
+                        <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
+                          <v-icon color="primary" size="13">fas fa fa-clone</v-icon>
                         </v-btn>
                       </div>
                     </div>
@@ -159,12 +164,61 @@
         </v-dialog>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <v-dialog v-model="dialogConfirm" hide-overlay persistent max-width="350" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="#1867c0">
+          <v-toolbar-title style="font-size:16px">{{labelConfirm}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+        <!-- <v-card-text class="pt-0 pb-0 px-0">
+          {{labelConfirm}}
+        </v-card-text> -->
+        <v-card-actions class="mt-3">
+          <v-flex class="text-xs-center">
+            <v-btn class="mr-2" color="primary" @click.native="confirmAction">
+              <v-icon>send</v-icon>&nbsp;
+              Đồng ý
+            </v-btn>
+            <v-btn class="ml-2" color="red" style="color: #fff;" @click.native="dialogConfirm = false">
+              <v-icon>close</v-icon>&nbsp;
+              Bỏ qua
+            </v-btn>
+          </v-flex>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogSelectDosier" max-width="1000" transition="fade-transition">
+      <v-card flat>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Chọn hồ sơ</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="cancelAddFile">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="pt-0 pb-0 px-0">
+          <ho-so-nhom :dossiersgroup="dossierIntoGroup"></ho-so-nhom>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click.native="addFileToDossier()">
+            <v-icon>send</v-icon>&nbsp;
+            Xác nhận
+          </v-btn>
+          <v-btn color="red" style="color: #fff;" @click.native="cancelAddFile">
+            <v-icon>close</v-icon>&nbsp;
+            Bỏ qua
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
   // import $ from 'jquery'
   import toastr from 'toastr'
+  import HoSoTrongNhom from '.././TiepNhan/HoSoTrongNhom'
   toastr.options = {
     'closeButton': true,
     'timeOut': '5000'
@@ -184,7 +238,12 @@
         default: () => []
       }
     },
+    components: {
+      'ho-so-nhom': HoSoTrongNhom
+    },
     data: () => ({
+      dialogConfirm: false,
+      labelConfirm: '',
       dossierTemplateItems: [],
       dossierMarksItems: [],
       dossierFilesItems: [],
@@ -209,7 +268,10 @@
       currentFormView: '',
       pstFixed: 0,
       pstEl: 0,
-      endEl: 0
+      endEl: 0,
+      dialogSelectDosier: false,
+      dossierIntoGroup: [],
+      filesAdd: []
     }),
     computed: {
       loading () {
@@ -221,6 +283,9 @@
       },
       initDataResource () {
         return this.$store.getters.loadingInitData
+      },
+      dossierIntoGroupSelect () {
+        return this.$store.getters.getDossierIntoGroup
       }
     },
     created () {
@@ -249,6 +314,10 @@
               })
             }
           })
+          // danh sách hồ sơ cùng group
+          if (vm.detailDossier['groupDossierId']) {
+            vm.getDossierIntoGroup(vm.detailDossier['groupDossierId'])
+          }
         }
       })
     },
@@ -367,6 +436,11 @@
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
             toastr.success('Yêu cầu của bạn thực hiện thành công')
+            if (vm.dossierIntoGroup.length > 0) {
+              vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+              vm.dialogConfirm = true
+              vm.filesAdd = [resData]
+            }
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
@@ -380,6 +454,11 @@
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
             toastr.success('Yêu cầu của bạn thực hiện thành công')
+            if (vm.dossierIntoGroup.length > 0) {
+              vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+              vm.dialogConfirm = true
+              vm.filesAdd = [resData]
+            }
             vm.createFiles[index].daKhai = true
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
@@ -424,6 +503,14 @@
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
             vm.dossierFilesItems = result
           })
+          // add hồ sơ cùng nhóm
+          console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
+          if (vm.dossierIntoGroup.length > 0) {
+            // vm.dialogSelectDosier = true
+            vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
+            vm.dialogConfirm = true
+            vm.filesAdd = result
+          }
         }).catch(function (xhr) {
           vm.progressUploadPart = ''
         })
@@ -650,6 +737,102 @@
           return true
         } else {
           return true
+        }
+      },
+      getDossierIntoGroup (dossierIdGroup) {
+        let vm = this
+        let filter = {
+          groupDossierId: dossierIdGroup
+        }
+        vm.dossierIntoGroup = []
+        vm.$store.dispatch('getDossiersIntoGroup', filter).then(function (result) {
+          vm.dossierIntoGroup = result
+          vm.dossierIntoGroup = vm.dossierIntoGroup.filter(function(item) {
+            return (String(item['stepCode']) === String(vm.detailDossier['stepCode'])
+              && String(item['dossierId']) !== String(vm.detailDossier['dossierId'])
+            )
+          })
+        })
+      },
+      addFileToDossier () {
+        let vm = this
+        // add file cho thành phần hồ sơ con
+        let dossierIds = vm.dossierIntoGroupSelect.map(obj =>{
+          return obj.dossierId
+        }).toString()
+        let dossierFileIds = vm.filesAdd.map(obj =>{
+          return obj.dossierFileId
+        }).toString()
+        let filterCopyFile = {
+          dossierIds: dossierIds,
+          dossierFileId: dossierFileIds
+        }
+        vm.$store.dispatch('uploadFileDossierGroup', filterCopyFile).then(function (result) {
+          toastr.success('Đính kèm tài liệu thành công')
+          vm.dialogSelectDosier = false
+          vm.filesAdd = []
+          vm.$store.commit('setSelectDossierGroup', [])
+        })
+      },
+      attachOtherDossier (files) {
+        let vm = this
+        vm.filesAdd = [files]
+        vm.dialogSelectDosier = true
+      },
+      cancelAddFile () {
+        let vm = this
+        vm.dialogSelectDosier = false
+        vm.filesAdd = []
+        vm.$store.commit('setSelectDossierGroup', [])
+      },
+      confirmAction (type) {
+        let vm = this
+        vm.dialogConfirm = false
+        vm.dialogSelectDosier = true
+      },
+      getDocumentTypeIcon (type) {
+        let vm = this
+        let typeDoc = 'doc,docx'
+        let typeExcel = 'xls,xlsx'
+        let typeImage = 'png,jpg,jpeg'
+        if (type) {
+          if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-word-o',
+              color: 'blue',
+              size: 14
+            }
+          } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-excel-o',
+              color: 'green',
+              size: 14
+            }
+          } else if (type.toLowerCase() === 'pdf') {
+            return {
+              icon: 'fa fa-file-pdf-o',
+              color: 'red',
+              size: 14
+            }
+          } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-image-o',
+              color: 'primary',
+              size: 14
+            }
+          } else {
+            return {
+              icon: 'fas fa fa-paperclip',
+              color: '',
+              size: 14
+            }
+          }
+        } else {
+          return {
+            icon: 'attach_file',
+            color: 'primary',
+            size: 14
+          }
         }
       }
     }

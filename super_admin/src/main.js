@@ -134,7 +134,7 @@ new Vue({
          let dataObj = response.data
          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
          if (dataObj.respone === 'loginUser') {
-           vm.$store.commit('setloginUser', dataObj['loginUser'])
+          vm.$store.commit('setloginUser', dataObj['loginUser'])
          }
 
          dataPost = new URLSearchParams();
@@ -155,12 +155,49 @@ new Vue({
              vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
            }  
          }).catch(function (error) {
-
          })
        }).catch(function (error) {
-
+         dataPost = new URLSearchParams();
+         textPost = {
+           'type': 'admin',
+           'cmd': 'get',
+           'responeType': 'menu',
+           'code': 'opencps_adminconfig',
+           'respone': 'listTableMenu',
+           'start': -1,
+           'end': -1              
+         }
+         dataPost.append('text', JSON.stringify(textPost))
+         axios.post('/o/rest/v2/socket/web', dataPost, {}).then(function (response) {
+           let dataObj = response.data
+           vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+           if (dataObj.respone === 'listTableMenu') {
+             vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+           }  
+         }).catch(function (error) {
+         })
        })
-
+      //  
+      let dataPost1 = new URLSearchParams()
+      let textPost1 = {
+        'type': 'admin',
+        'cmd': 'get',
+        'responeType': 'menu',
+        'code': 'opencps_adminconfig',
+        'respone': 'listTableMenu',
+        'start': -1,
+        'end': -1
+      }
+      dataPost1.append('text', JSON.stringify(textPost1))
+      axios.post('/o/rest/v2/socket/web', dataPost1, {}).then(function (response) {
+        let dataObj = response.data
+        vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
+        if (dataObj.respone === 'listTableMenu') {
+          vm.$store.commit('setlistTableMenu', vm.dataSocket[dataObj.respone])
+        }  
+      }).catch(function (error) {
+      })
+      // 
        if (window.location.href.endsWith('#/')) {
          vm.$router.push('/table/opencps_employee')
        }

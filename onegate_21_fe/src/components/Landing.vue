@@ -679,7 +679,7 @@
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
@@ -828,7 +828,7 @@
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
@@ -1432,6 +1432,7 @@ export default {
     dichVuSelectedGuide (val) {
       let vm = this
       if (val) {
+        vm.templateNoGuide = val['templateNo']
         val.dossierTemplateNo = val['templateNo']
         console.log('val_dichVuSelectedGuide', val)
         vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {

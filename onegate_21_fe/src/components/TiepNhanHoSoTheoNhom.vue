@@ -48,7 +48,7 @@
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 Kết quả xử lý theo nhóm&nbsp;&nbsp;&nbsp;&nbsp;
               </div>
-              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="false" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
+              <thanh-phan-ho-so-2 ref="thanhphanhoso2" :onlyView="true" :id="'nm'" :partTypes="outputTypesGroup"></thanh-phan-ho-so-2>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>

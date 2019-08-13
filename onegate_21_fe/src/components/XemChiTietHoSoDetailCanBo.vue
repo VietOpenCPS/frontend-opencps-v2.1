@@ -162,15 +162,15 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Thao tác thu hồi hồ sơ -->
-              <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
-              && thongTinChiTietHoSo['dossierStatus'] !== 'new'"
+              <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
+              && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
                 v-on:click.native="rollBack()"
                 :loading="loadingAction"
                 :disabled="loadingAction"
               >
                 Quay lại bước trước
                 <span slot="loader">Loading...</span>
-              </v-btn> -->
+              </v-btn>
               <!--  -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                 <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -2333,9 +2333,9 @@ export default {
       let vm = this
       let filter = {
         className: 'dossier',
-        classPK: vm.id
+        dossierDetail: vm.thongTinChiTietHoSo
       }
-      vm.$store.dispatch('loadVoting', filter).then(function (result) {
+      vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
         vm.votingItems = result
         console.log('votingItems', vm.votingItems)
       }).catch(function (reject) {
@@ -2359,6 +2359,7 @@ export default {
         for (var index in vm.votingItems) {
           vm.votingItems[index]['className'] = 'dossier'
           vm.votingItems[index]['classPk'] = vm.id
+          vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.thongTinChiTietHoSo['govAgencyCode']
           arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
         }
         Promise.all(arrAction).then(results => {

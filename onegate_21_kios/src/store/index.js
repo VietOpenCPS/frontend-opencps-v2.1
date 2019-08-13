@@ -613,7 +613,6 @@ export const store = new Vuex.Store({
     // voting
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        // commit('setLoading', true)
         store.dispatch('loadInitResource').then(function (result1) {
           let param = {
             headers: {
@@ -626,32 +625,81 @@ export const store = new Vuex.Store({
             } else {
               resolve([])
             }
-            // commit('setLoading', false)
           }).catch(xhr => {
             reject(xhr)
-            // commit('setLoading', false)
           })
+        })
+      })
+    },
+    loadVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
+          dataPost.append('data', '')
+          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
+            if (result1.data) {
+              resolve(result1.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(xhr => {
         })
       })
     },
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
-          var params = new URLSearchParams()
-          const config = {
+          // var params = new URLSearchParams()
+          // const config = {
+          //   headers: {
+          //     'groupId': state.initData.groupId
+          //   }
+          // }
+          // params.append('className', data.className)
+          // params.append('classPk', data.classPk)
+          // params.append('selected', data.selected)
+          // if (data.className === 'dossier') {
+          //   params.append('votingCode', data.votingCode ? data.votingCode : '')
+          // }
+          // axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          //   resolve(result.data)
+          // }).catch(xhr => {
+          //   toastr.clear()
+          //   toastr.error('Gửi đánh giá thất bại')
+          //   reject(xhr)
+          // })
+
+          // api đồng bộ sang một cửa
+          let config = {
             headers: {
               'groupId': state.initData.groupId
             }
           }
-          params.append('className', data.className)
-          params.append('classPk', data.classPk)
-          params.append('selected', data.selected)
-          if (data.className === 'dossier') {
-            params.append('votingCode', data.votingCode ? data.votingCode : '')
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected
           }
-          // test local
-          // axios.post('http://127.0.0.1:8081/api/votings/' + data.votingId, params, config).then(result => {
-          axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          if (data.className === 'dossier') {
+            textPost['votingCode'] = data.votingCode ? data.votingCode : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
             resolve(result.data)
           }).catch(xhr => {
             toastr.clear()
@@ -748,6 +796,25 @@ export const store = new Vuex.Store({
             commit('setTotalEmployee', 0)
             reject(error)
           })
+        })
+      })
+    },
+    loadDetailDossierMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers/' + data['referenceUid'])
+        dataPost.append('data', '')
+        dataPost.append('serverCode', 'SERVER_' + data['govAgencyCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     }

@@ -803,14 +803,18 @@ export default {
       })
     },
     saveAlpacaForm (item, index) {
-      var vm = this
-      var fileFind = vm.dossierFilesItems.find(itemFile => {
+      let vm = this
+      let fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -825,7 +829,10 @@ export default {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.dossierTemplateItems[index].daKhai = true
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {

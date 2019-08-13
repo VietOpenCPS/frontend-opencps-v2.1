@@ -3278,47 +3278,115 @@ export const store = new Vuex.Store({
         })
       })
     },
-    loadVoting ({commit, state}, data) {
+    // loadVoting ({commit, state}, data) {
+    //   return new Promise((resolve, reject) => {
+    //     store.dispatch('loadInitResource').then(function (result1) {
+    //       let param = {
+    //         headers: {
+    //           groupId: state.initData.groupId
+    //         }
+    //       }
+    //       // test local
+    //       axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
+    //       // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
+    //         let serializable = result.data
+    //         if (serializable && serializable.data) {
+    //           resolve(serializable.data)
+    //         } else {
+    //           resolve([])
+    //         }
+    //       }).catch(xhr => {
+    //         reject(xhr)
+    //       })
+    //     })
+    //   })
+    // },
+    loadVotingMC ({commit, state}, data) {
       return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result1) {
-          let param = {
+        store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {
+          let config = {
             headers: {
-              groupId: state.initData.groupId
+              'groupId': state.initData.groupId
             }
           }
-          // test local
-          axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
-          // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
-            let serializable = result.data
-            if (serializable && serializable.data) {
-              resolve(serializable.data)
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
+          dataPost.append('data', '')
+          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
+            if (result1.data) {
+              resolve(result1.data.data)
             } else {
               resolve([])
             }
           }).catch(xhr => {
             reject(xhr)
           })
+        }).catch(xhr => {
+        })
+      })
+    },
+    loadDetailDossierMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers/' + data['referenceUid'])
+        dataPost.append('data', '')
+        dataPost.append('serverCode', 'SERVER_' + data['govAgencyCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     },
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
-          let params = new URLSearchParams()
-          const config = {
+          // let params = new URLSearchParams()
+          // const config = {
+          //   headers: {
+          //     'groupId': state.initData.groupId
+          //   }
+          // }
+          // params.append('className', data.className)
+          // params.append('classPk', data.classPk)
+          // params.append('votingCode', data.votingCode ? data.votingCode : '')
+          // params.append('selected', data.selected)
+          // axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          //   resolve(result.data)
+          // }).catch(xhr => {
+          //   reject(xhr)
+          // })
+
+          // api đồng bộ sang một cửa
+          let config = {
             headers: {
               'groupId': state.initData.groupId
             }
           }
-          params.append('className', data.className)
-          params.append('classPk', data.classPk)
-          params.append('votingCode', data.votingCode ? data.votingCode : '')
-          params.append('selected', data.selected)
-          // test local
-          // axios.post('http://127.0.0.1:8080/api/votings/' + data.votingId, params, config).then(result => {
-          axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected,
+            votingCode: data.votingCode ? data.votingCode : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
             resolve(result.data)
           }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
           })
         })

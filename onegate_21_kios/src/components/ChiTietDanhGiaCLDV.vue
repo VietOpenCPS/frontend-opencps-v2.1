@@ -5,14 +5,14 @@
         <div class="text-bold">
           {{index + 1}}.&nbsp; {{ item.subject }}
         </div>
-        <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+        <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
           <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
         </v-radio-group>
-        <v-layout wrap class="ml-3" style="margin-top:-10px">
+        <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
           <v-flex style="margin-left:45px" v-for="(item2, index2) in item.answers" :key="index2">
             <span class="text-bold" style="color:green">{{item2}}/{{item.answersCount}}</span>
           </v-flex>
-        </v-layout>
+        </v-layout> -->
       </div>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
@@ -101,7 +101,7 @@ export default {
       vm.validPass2 = true
       let filter = {
         className: 'govagency',
-        classPK: vm.administration
+        classPk: vm.administration
       }
       vm.$store.dispatch('loadVoting', filter).then(function (result) {
         vm.votingItems = result

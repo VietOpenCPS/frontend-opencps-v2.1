@@ -54,7 +54,9 @@
                     <span>Gửi</span>
                   </v-tooltip>
                 </div>
-                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <span class="ml-2">
+                  <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                </span>
                 <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa ý kiến</span>
