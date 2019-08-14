@@ -3278,29 +3278,29 @@ export const store = new Vuex.Store({
         })
       })
     },
-    // loadVoting ({commit, state}, data) {
-    //   return new Promise((resolve, reject) => {
-    //     store.dispatch('loadInitResource').then(function (result1) {
-    //       let param = {
-    //         headers: {
-    //           groupId: state.initData.groupId
-    //         }
-    //       }
-    //       // test local
-    //       axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
-    //       // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
-    //         let serializable = result.data
-    //         if (serializable && serializable.data) {
-    //           resolve(serializable.data)
-    //         } else {
-    //           resolve([])
-    //         }
-    //       }).catch(xhr => {
-    //         reject(xhr)
-    //       })
-    //     })
-    //   })
-    // },
+    loadVoting ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
+          // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
+            let serializable = result.data
+            if (serializable && serializable.data) {
+              resolve(serializable.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     loadVotingMC ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {

@@ -620,7 +620,7 @@ input::-webkit-input-placeholder, input::placeholder{
 body .theme--light .list .list__tile--highlighted {
     background: none;
 }
-body .card__title.headline {
+body .v-card__title.headline {
     padding: 5px 16px;
     font-size: 16px !important;
     font-weight: bold;

@@ -241,7 +241,7 @@
                   </div>
                 </div>
               </v-layout>
-              <v-layout wrap class="mx-2 my-3" v-if="detailSync">
+              <v-layout wrap class="mx-0 my-3" v-if="detailSync">
                 <v-card flat>
                   <v-card-text class="px-0 py-0">
                     <div>
@@ -394,6 +394,9 @@
           vm.isPermission = false
         }
       })
+    },
+    mounted () {
+      $('#content').css('padding-left', '0')
     },
     watch: {},
     methods: {

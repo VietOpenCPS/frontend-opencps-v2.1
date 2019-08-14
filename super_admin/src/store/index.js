@@ -1334,7 +1334,7 @@ export const store = new Vuex.Store({
       state.snackbarsocket = payload
     },
     setloginUser (state, payload) {
-      if (payload !== null && payload !== undefined) {
+      if (payload) {
         let currentLogin = payload[0]
         if (currentLogin['role'] === 'Administrator') {
           console.log('admin login')

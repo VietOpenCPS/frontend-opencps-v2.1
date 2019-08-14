@@ -162,7 +162,7 @@
                 <span slot="loader">Loading...</span>
               </v-btn>
               <!-- Thao tác thu hồi hồ sơ -->
-              <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
+              <!-- <v-btn color="primary" class="ml-0 mr-2" v-if="String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId)
               && thongTinChiTietHoSo['dossierStatus'] !== 'new' && originality === 3"
                 v-on:click.native="rollBack()"
                 :loading="loadingAction"
@@ -170,7 +170,7 @@
               >
                 Quay lại bước trước
                 <span slot="loader">Loading...</span>
-              </v-btn>
+              </v-btn> -->
               <!--  -->
               <v-menu bottom offset-y v-if="btnStepsDynamics.length > 0 && thongTinChiTietHoSo['permission'].indexOf('write') >= 0" style="display: inline-block;position:relative !important">
                 <v-btn slot="activator" class="" color="primary" dark>Khác &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
@@ -2333,14 +2333,26 @@ export default {
       let vm = this
       let filter = {
         className: 'dossier',
-        dossierDetail: vm.thongTinChiTietHoSo
+        classPk: vm.id
       }
-      vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+      vm.$store.dispatch('loadVoting', filter).then(function (result) {
         vm.votingItems = result
         console.log('votingItems', vm.votingItems)
       }).catch(function (reject) {
       })
     },
+    // loadVoting () {
+    //   let vm = this
+    //   let filter = {
+    //     className: 'dossier',
+    //     dossierDetail: vm.thongTinChiTietHoSo
+    //   }
+    //   vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+    //     vm.votingItems = result
+    //     console.log('votingItems', vm.votingItems)
+    //   }).catch(function (reject) {
+    //   })
+    // },
     getPreAction () {
       let vm = this
       let filter = {
