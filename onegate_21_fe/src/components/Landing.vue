@@ -3006,7 +3006,9 @@ export default {
       let newQuery = current.query
       let queryString = '?'
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
           key !== 'top' && key !== 'status' && key !== 'substatus' && key !== 'agency' && key !== 'service' && key !== 'domain' &&
           key !== 'register' && key !== 'year' && key !== 'month' && key !== 'day' && key !== 'adv_renew' && key !== 'keyword') {
           queryString += key + '=' + newQuery[key] + '&'

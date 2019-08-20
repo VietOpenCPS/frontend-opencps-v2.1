@@ -132,29 +132,47 @@
                   <v-subheader class="pl-0 text-right">Mẫu số hóa đơn : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{payments.invoiceTemplateNo}}</p>
+                  <p class="pt-2 mb-0">{{eInvoiceInfo && eInvoiceInfo['supplierTaxCode'] ? eInvoiceInfo['invoiceTemplateNo'] : payments.invoiceTemplateNo}}</p>
                 </v-flex>
-                <!-- <v-flex xs12 sm2>
-                  <v-subheader class="pl-0 text-right">Ký hiệu hóa đơn : </v-subheader>
-                </v-flex>
-                <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{payments.invoiceIssueNo}}</p>
-                </v-flex>
-                <v-flex xs12 sm2></v-flex> -->
                 <v-flex xs12 sm2>
                   <v-subheader class="pl-0 text-right">Số hóa đơn trên hệ thống : </v-subheader>
                 </v-flex>
                 <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{getEinvoiceNo(payments.einvoice)}}</p>
+                  <!-- <p class="pt-2 mb-0">{{getEinvoiceNo(payments.einvoice)}}</p> -->
+                  <p class="pt-2 mb-0">{{eInvoiceInfo && eInvoiceInfo['supplierTaxCode'] ? eInvoiceInfo['invoiceNo'] : payments.invoiceNo}}</p>
                 </v-flex>
                 <v-flex xs12 sm2></v-flex>
-                <v-flex xs12 sm2>
-                  <v-subheader class="pl-0 text-right">Mã tra cứu trên hệ thống : </v-subheader>
+                <!-- Hóa đơn điện tử Vietel -->
+                <v-flex xs12 v-if="eInvoiceInfo && eInvoiceInfo['supplierTaxCode']">
+                  <v-layout wrap>
+                    <v-flex xs12 sm2>
+                      <v-subheader class="pl-0 text-right">Mã số thuế: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm3>
+                      <p class="pt-2 mb-0">{{eInvoiceInfo['supplierTaxCode']}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm2>
+                      <v-subheader class="pl-0 text-right">Mã bí mật tra cứu hóa đơn: </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm3>
+                      <p class="pt-2 mb-0">{{eInvoiceInfo['reservationCode']}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm2></v-flex>
+                  </v-layout>
                 </v-flex>
-                <v-flex xs12 sm3>
-                  <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
+                
+                <v-flex xs12 v-else>
+                  <v-layout wrap>
+                    <v-flex xs12 sm2>
+                      <v-subheader class="pl-0 text-right">Mã tra cứu trên hệ thống : </v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm3>
+                      <p class="pt-2 mb-0">{{getEinvoiceCode(payments.einvoice)}}</p>
+                    </v-flex>
+                    <v-flex xs12 sm7></v-flex>
+                  </v-layout>
                 </v-flex>
-                <v-flex xs12 sm7></v-flex>
+                <!--  -->
                 <v-flex xs12 sm12 class="ml-3 mb-3">
                   <v-btn color="primary" @click="tracuuhoadon()">
                     <v-icon>search</v-icon> 
@@ -237,6 +255,15 @@ export default {
     ePaymentProfile () {
       let vm = this
       return vm.getEPaymentProfile(vm.payments['epaymentProfile'])
+    },
+    eInvoiceInfo () {
+      let vm = this
+      try {
+        return JSON.parse(vm.payments['einvoice'])
+      } catch (error) {
+        console.log('Không có thông tin hóa đơn - einvoice')
+        return ''
+      }
     }
   },
   created () {
@@ -342,7 +369,14 @@ export default {
       }
     },
     tracuuhoadon () {
-      window.open('http://tracuu.cmcsoft.com', '_blank')
+      let vm = this
+      let urlRedirect
+      if (vm.eInvoiceInfo && vm.eInvoiceInfo['supplierTaxCode']) {
+        urlRedirect = vm.eInvoiceInfo['sInvoiceUrl']
+      } else {
+        urlRedirect = 'http://tracuu.cmcsoft.com'
+      }
+      window.open(urlRedirect, '_blank')
     },
     getPaymentStatus (code) {
       if (code === 1 || code === '1') {

@@ -1,11 +1,11 @@
 <template>
   <div>
     <v-layout row wrap class="mx-2 py-2" id="contentFaq">
-      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'sm7' : ''" class="pr-3">
-        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data')" class="text-bold mb-3" style="color:#034687">
+      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')) ? 'sm7' : ''" class="pr-3">
+        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')" class="text-bold mb-3" style="color:#034687">
           NHỮNG CÂU HỎI THƯỜNG GẶP
         </h3>
-        <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-bold mb-3 text-xs-center" style="color:#034687">
+        <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" class="text-bold mb-3 text-xs-center" style="color:#034687">
           DANH SÁCH CÂU HỎI
         </h3>
         <content-placeholders v-if="loading" class="mt-3">
@@ -46,7 +46,7 @@
             <!-- <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList" :value="[false]" expand class="expansion-pl mb-2"
               :key="indexQuestion" style="border: 1px solid #ddd;border-radius:5px;position:relative;"
             > -->
-              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
+              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
                 <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                   <v-icon>settings</v-icon>
                 </v-btn>
@@ -54,7 +54,7 @@
                   <v-list-tile @click.stop="addAnswer(itemQuestion, indexQuestion)">
                     <v-list-tile-title><v-icon color="primary" size="16px">notes</v-icon>&nbsp; Chi tiết</v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile v-if="!itemQuestion['answered']">
+                  <v-list-tile v-if="!itemQuestion['answered'] && (getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap'))">
                     <v-list-tile-title @click.stop="addAnswer(itemQuestion, indexQuestion)">
                       <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
                     </v-list-tile-title>
@@ -95,13 +95,13 @@
                         <div>
                           <div style="position:relative">
                             <div class="" v-html="itemAnswer.content"></div>
-                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:18px;top:-15px">
+                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
                               </v-btn>
                               <v-list>
                                 <v-list-tile>
-                                  <v-list-tile-title @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
+                                  <v-list-tile-title v-if="getUser('Administrator') || getUser('Administrator_data')" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
                                     <v-icon color="primary" size="16px">{{ itemAnswer.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
                                     {{ itemAnswer.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                                   </v-list-tile-title>
@@ -144,7 +144,7 @@
           </div>
         </div>
       </v-flex>
-      <v-flex xs12 sm5 v-if="!getUser('Administrator') && !getUser('Administrator_data')">
+      <v-flex xs12 sm5 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('tra_loi_hoi_dap')">
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
           <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
             <div class="head-title">

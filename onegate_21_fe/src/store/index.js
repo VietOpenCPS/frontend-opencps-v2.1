@@ -1597,9 +1597,7 @@ export const store = new Vuex.Store({
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       let id = data['id'] ? data['id'] : 'nm'
-      console.log('dataaaaa 2222', data)
       window.$('#formAlpaca' + data.dossierPartNo + id).empty()
-      console.log('dataaaaa', data)
       /* eslint-disable */
       let formScript, formData
       if (data.formScript) {

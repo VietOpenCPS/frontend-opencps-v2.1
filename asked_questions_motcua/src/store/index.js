@@ -84,7 +84,7 @@ export const store = new Vuex.Store({
           if (!roles) {
             admin = false
           } else {
-            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data'))
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'tra_loi_hoi_dap'))
             if (roleExits >= 0) {
               admin = true
             }
@@ -96,7 +96,8 @@ export const store = new Vuex.Store({
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
               keyword: filter.keyword ? filter.keyword : '',
               publish: filter.publish,
-              answered: filter.answered
+              answered: filter.answered,
+              questionType: 'FAQ'
             }
           } else {
             params = {
@@ -104,7 +105,8 @@ export const store = new Vuex.Store({
               end: state.questionPage * 20,
               publish: 1,
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
-              keyword: filter.keyword ? filter.keyword : ''
+              keyword: filter.keyword ? filter.keyword : '',
+              questionType: 'FAQ'
             }
           }
           let dataPost = new URLSearchParams()
@@ -158,7 +160,7 @@ export const store = new Vuex.Store({
           if (!roles) {
             admin = false
           } else {
-            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data'))
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'tra_loi_hoi_dap'))
             if (roleExits >= 0) {
               admin = true
             }
@@ -175,7 +177,8 @@ export const store = new Vuex.Store({
               end: 1,
               govAgencyCode: filter['agencyCode'] ? filter['agencyCode'] : '',
               publish: filter['publish'] ? filter['publish'] : '',
-              answered: filter['answered'] ? filter['answered'] : ''
+              answered: filter['answered'] ? filter['answered'] : '',
+              questionType: 'FAQ'
             }
             let dataPost = new URLSearchParams()
             let textPost = params

@@ -587,7 +587,7 @@ export default {
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
             agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
-            questionType: ''
+            questionType: 'FAQ'
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {
             toastr.success('Hệ thống đã tiếp nhận câu hỏi của bạn')

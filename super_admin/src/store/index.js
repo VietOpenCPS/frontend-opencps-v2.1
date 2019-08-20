@@ -753,6 +753,7 @@ export const store = new Vuex.Store({
           dataPostProcess.append('durationUnit', data.durationUnit)
           dataPostProcess.append('generateDossierNo', data.generateDossierNo)
           dataPostProcess.append('dossierNoPattern', data.dossierNoPattern)
+          dataPostProcess.append('dossierGroupPattern', data.dossierGroupPattern ? data.dossierGroupPattern : '')
           dataPostProcess.append('generateDueDate', data.generateDueDate)
           dataPostProcess.append('dueDatePattern', data.dueDatePattern)
           dataPostProcess.append('generatePassword', data.generatePassword)

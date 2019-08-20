@@ -130,10 +130,14 @@ export const store = new Vuex.Store({
             domain: filter.domain ? filter.domain : '',
             sort: ''
           }
+          // if (filter.domain) {
+          //   paramGet.sort = "siblingSearch"
+          // } else {
+          //   paramGet.sort = "siblingDomain"
+          // }
+
           if (filter.domain) {
             paramGet.sort = "siblingSearch"
-          } else {
-            paramGet.sort = "siblingDomain"
           }
           let param = {
             headers: {

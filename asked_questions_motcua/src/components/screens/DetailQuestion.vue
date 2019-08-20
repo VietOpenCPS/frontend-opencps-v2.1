@@ -52,7 +52,7 @@
                   <div style="position:relative">
                     <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
                     <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
-                    <div v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:10px;top:0">
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top>
                         <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
                           <v-icon color="primary">edit</v-icon>
@@ -65,7 +65,7 @@
                         </v-btn>
                         <span>Xóa</span>
                       </v-tooltip>
-                      <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
+                      <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(answerList[0], 0)"
                         label="Công khai"
                         v-model="answerList[0]['publish']"
                       ></v-checkbox>
@@ -85,7 +85,7 @@
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
                     <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
-                    <div v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:10px;top:0">
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top >
                         <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
                           <v-icon color="primary">edit</v-icon>
@@ -98,7 +98,7 @@
                         </v-btn>
                         <span>Xóa</span>
                       </v-tooltip>
-                      <v-checkbox class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
+                      <v-checkbox v-if="getUser('Administrator') || getUser('Administrator_data')" class="mt-1" style="display: inline-block" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)"
                         label="Công khai"
                         v-model="itemAnswer['publish']"
                       ></v-checkbox>
@@ -114,7 +114,7 @@
             </div>
           </div>
           
-          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator') || getUser('Administrator_data')">
+          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')">
             <div class="mx-3">
               <span class="mr-2"><v-icon class="blue--text">announcement</v-icon> </span>
               <span class="text-bold primary--text">NỘI DUNG TRẢ LỜI:</span>
