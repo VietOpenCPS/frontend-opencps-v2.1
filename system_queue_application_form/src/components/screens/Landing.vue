@@ -5,10 +5,10 @@
         <span>DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</span>
       </div>
       <div class="layout row wrap header_tools row-blue">
-        <!-- <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           <v-text-field
             v-model="eformNoSearch"
-            placeholder="Tìm kiếm tờ khai đã tạo theo mã"
+            placeholder="Tìm kiếm tờ khai đã tạo"
             solo
             chips
             multiple
@@ -18,13 +18,14 @@
             @keyup.enter="searchEform"
             content-class="adv__search__select"
             return-object
+            autofocus
           ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
           <v-btn icon class="my-0 mx-2" v-on:click.native="searchEform">
             <v-icon size="16">search</v-icon>
           </v-btn>
-        </div> -->
+        </div>
       </div> 
     </div>
     <v-card flat class="">
@@ -69,6 +70,10 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from '../../store/support.json'
+toastr.options = {
+  "positionClass": "toast-top-center"
+}
+
 Vue.use(toastr)
 export default {
   props: [],
@@ -78,7 +83,8 @@ export default {
     serviceInfoList: [],
     eformNoSearch: '',
     panelServiceList: [],
-    serviceInfoListRender: []
+    serviceInfoListRender: [],
+    formTemplateList: []
   }),
   computed: {
     serviceinfoSelected () {
@@ -118,6 +124,7 @@ export default {
     doLoadingThuTuc () {
       var vm = this
       vm.serviceInfoList = []
+      vm.formTemplateList = []
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
       var filter = null
@@ -144,6 +151,9 @@ export default {
       vm.$store.dispatch('getFileTemplateEform', item).then(response => {
         if (response.data) {
           vm.serviceInfoList[index].templateList = response.data
+          for (let index in response.data) {
+            vm.formTemplateList.push(response.data[index])
+          }
         }
         vm.panelServiceList.push(true)
       })
@@ -161,6 +171,36 @@ export default {
       })
     },
     searchEform () {
+      let vm = this
+      if (vm.eformNoSearch) {
+        if (vm.eformNoSearch.indexOf('-') > 0) {
+          let filter = {
+            eFormId: String(vm.eformNoSearch).split('-')[2]
+          }
+          vm.$store.dispatch('getEform', filter).then(function(result) {
+            if (result && result !== 'secretFail') {
+              console.log('result getEformData', result, vm.formTemplateList)
+              let templateFile = vm.formTemplateList.filter(function (item) {
+                return item.fileTemplateNo === result.fileTemplateNo
+              })
+              if (templateFile.length > 0) {
+                vm.$store.commit('setFileTemplateSelected', templateFile[0])
+              }
+              vm.$store.commit('setEformDetail', result)
+              vm.$router.push({
+                path: '/tao-to-khai-thanh-cong/1',
+                query: {
+                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+                }
+              })
+            }
+          }).catch(function(error) {
+          })
+        } else {
+          toastr.clear()
+          toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại')
+        }
+      }
     },
     goBack () {
       window.history.back()

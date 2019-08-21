@@ -5,7 +5,9 @@ import axios from 'axios'
 import saveAs from 'file-saver'
 import support from './support.json'
 // 
-
+toastr.options = {
+  "positionClass": "toast-top-center"
+}
 Vue.use(toastr)
 Vue.use(Vuex)
 
@@ -171,8 +173,10 @@ export const store = new Vuex.Store({
             // window.open(url)
             let serializable = response.data
             saveAs(serializable, 'ToKhaiTrucTuyen.pdf')
+            resolve('')
           }).catch(function (xhr) {
             console.log(xhr)
+            reject(xhr)
           })
         })
       })
@@ -190,7 +194,7 @@ export const store = new Vuex.Store({
             let url = window.URL.createObjectURL(response.data)
             resolve(url)
           }).catch(function (xhr) {
-            console.log(xhr)
+            reject(xhr)
           })
         })
       })
@@ -226,15 +230,44 @@ export const store = new Vuex.Store({
             }
           }
           axios.get('/o/rest/v2/eforms/' + data.eFormId + '/data/' + data.secret, param).then(function (response) {
-            let serializable = response.data
-            if (typeof (serializable) === 'object') {
-              resolve(JSON.stringify(serializable))
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại.')
+              resolve('secretFail')
             } else {
+              let serializable = response.data
+              if (typeof (serializable) === 'object') {
+                resolve(JSON.stringify(serializable))
+              } else {
+                resolve(serializable)
+              }
+            }
+          }).catch(function (xhr) {
+            toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại.')
+          })
+        })
+      })
+    },
+    getEform ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {}
+          }
+          axios.get('/o/rest/v2/eforms/' + filter.eFormId, param).then(function (response) {
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại.')
+              resolve('secretFail')
+            } else {
+              let serializable = response.data
               resolve(serializable)
             }
-            
           }).catch(function (xhr) {
-            toastr.error('Thực hiện thất bại. Vui lòng kiểm tra lại mã tờ khai.')
+            reject(xhr)
           })
         })
       })

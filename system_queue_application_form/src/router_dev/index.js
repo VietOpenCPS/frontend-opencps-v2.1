@@ -8,7 +8,7 @@ import TaoFormThanhCong from '@/components/screens/TaoFormThanhCong'
 const routes = [
   { path: '/', name: 'Landing', component: Landing, props: true },
   { path: '/thong-tin-to-khai', name: 'ChiTietToKhai', component: ChiTietToKhai, props: true },
-  { path: '/tao-to-khai-thanh-cong', name: 'TaoFormThanhCong', component: TaoFormThanhCong, props: true },
+  { path: '/tao-to-khai-thanh-cong/:index', name: 'TaoFormThanhCong', component: TaoFormThanhCong, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

@@ -59,6 +59,7 @@
                   label="Mã tờ khai"
                   :rules="[v => !!v || 'Mã tờ khai là bắt buộc']"
                   required
+                  placeholder="E-xxx-xxx, D-xxx-xxx"
                   @keyup.enter="submitSearchEform"
                 ></v-text-field>
               </v-flex>
@@ -82,6 +83,10 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import axios from 'axios'
 import support from '../../store/support.json'
+toastr.options = {
+  "positionClass": "toast-top-center"
+}
+
 Vue.use(toastr)
 export default {
   props: [],
@@ -204,7 +209,7 @@ export default {
         }
         vm.dataCheck = filter
         vm.$store.dispatch('getEformData', filter).then(function(result) {
-          if (result) {
+          if (result && result !== 'secretFail') {
             toastr.success('Lấy thông tin tờ khai thành công')
             vm.$store.commit('setEformDetail', result)
             vm.dialogSecret = false
@@ -224,6 +229,9 @@ export default {
           }
         }).catch(function(error) {
         })
+      } else {
+        toastr.clear()
+        toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại')
       }
     },
     postEform () {
@@ -255,7 +263,7 @@ export default {
         axios.post('/o/rest/v2/eforms', dataCreateEform, options).then(function (response) {
           vm.$store.commit('setEformDetail', response.data)
           vm.$router.push({
-            path: '/tao-to-khai-thanh-cong',
+            path: '/tao-to-khai-thanh-cong/0',
             query: {
               renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
             }
