@@ -55,7 +55,7 @@
       </v-btn>
     </v-flex> -->
     <!--  -->
-    <v-dialog max-width="1000px" v-model="dialogPDF" transition="fade-transition">
+    <v-dialog max-width="1200px" v-model="dialogPDF" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>Tờ khai trực tuyến</v-toolbar-title>

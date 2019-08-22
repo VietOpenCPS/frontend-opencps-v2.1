@@ -11,7 +11,7 @@
         >
           <v-list-tile slot="activator" @click="item.mappingCode === 'all' ? filterAll() : activeAll = false ">
             <v-list-tile-title>{{item.name}}</v-list-tile-title>
-            <span v-if="item.mappingCode === 'all'" class="status__counter" style="color:#0b72ba!important">
+            <span v-if="item.mappingCode === 'all'" class="status__counter" style="color:#0b72ba">
               {{countAllService}}
             </span>
           </v-list-tile>

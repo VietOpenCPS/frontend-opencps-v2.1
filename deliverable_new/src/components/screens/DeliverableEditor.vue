@@ -121,22 +121,22 @@
             :loading="loading"
             :disabled="loading"
           >Ghi lại và thêm mới</v-btn> -->
-          <v-btn v-if="editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="saveToData(0)"
+          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="saveToData(0)"
             :loading="loading"
             :disabled="loading"
           >
-          <v-icon>save</v-icon> &nbsp;
-          <span v-if="String(id) === '0'">Tạo giấy phép</span>
-          <span v-else>Cập nhật</span>
+            <v-icon>save</v-icon> &nbsp;
+            <span v-if="String(id) === '0'">Tạo giấy phép</span>
+            <span v-else>Cập nhật</span>
           </v-btn>
-          <v-btn v-if="!editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
+          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
             :loading="loading"
             :disabled="loading"
           >
           <v-icon>cloud_upload</v-icon> &nbsp;
           Tải giấy phép từ máy tính
           </v-btn>
-          <v-btn v-if="!editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
+          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && !editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
             :loading="loading"
             :disabled="loading"
           >
@@ -387,6 +387,15 @@
         let vm = this
         document.getElementsByClassName('e-file-select-wrap')[0].querySelector('button').click()
         return false
+      },
+      getUser (roleItem) {
+        let vm = this
+        let roles = vm.$store.getters.getUser.role
+        if (!roles) {
+          return false
+        }
+        let roleExits = roles.findIndex(item => item === roleItem)
+        return (roleExits >= 0)
       }
     }
   }

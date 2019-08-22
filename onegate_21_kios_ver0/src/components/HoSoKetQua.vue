@@ -9,8 +9,8 @@
           <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
             {{agencies[0]['administrationName']}}
           </h4>
-          <h4 class="py-2 ml-3">
-            <span style="color:#065694">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ NGÀY {{fromDate()}} 
+          <h4 class="py-2 mx-3 text-xs-center">
+            <span style="color:#065694;font-size: 1.2em !important;">DANH SÁCH HỒ SƠ CÓ KẾT QUẢ NGÀY {{fromDate()}} 
               <span v-if="dossierList.length > 0">(Tổng số: {{dossierList.length}} hồ sơ)</span>
             </span>
           </h4>

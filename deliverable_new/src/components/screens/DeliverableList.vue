@@ -99,7 +99,7 @@
         </div>
       </v-fade-transition> -->
     </div>
-    <div style="text-align: right;">
+    <div style="text-align: right;" v-if="getUser('QUAN_LY_GIAY_PHEP')">
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
@@ -478,6 +478,15 @@
           vm.loadingTable = false
           console.log(reject)
         })
+      },
+      getUser (roleItem) {
+        let vm = this
+        let roles = vm.$store.getters.getUser.role
+        if (!roles) {
+          return false
+        }
+        let roleExits = roles.findIndex(item => item === roleItem)
+        return (roleExits >= 0)
       }
     }
   }

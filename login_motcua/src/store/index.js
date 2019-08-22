@@ -135,9 +135,10 @@ export const store = new Vuex.Store({
             resolve(response)
             if (response.data !== '' && response.data !== 'ok') {
               if (response.data === 'pending') {
-                window.location.href = window.themeDisplay.getURLHome() +
+                let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+                window.location.href = url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                  "&redirectURL=" + window.themeDisplay.getURLHome()
+                  "&redirectURL=" + url
               } else {
                 window.location.href = response.data
               }

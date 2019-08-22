@@ -106,21 +106,23 @@
         let href = window.location.search
         let dataParams = new URLSearchParams(href)
         let paramsValue = dataParams.get('QRSCAN')
-        let dossierNoParam = paramsValue.split('-')[0]
-        let secretKeyParam = paramsValue.split('-')[1]
-        if (href.indexOf('QRSCAN') >=0 && paramsValue) {
-          if (vm.interVal) {
-            clearInterval(vm.interVal)
-          }
-          let queryString
-          queryString = '/tra-cuu-thong-tin-ho-so/' + dossierNoParam + '?secretKey=' + secretKeyParam
-          vm.$router.push({
-            path: queryString,
-            query: {
-              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        if (paramsValue) {
+          let dossierNoParam = paramsValue.split('-')[0]
+          let secretKeyParam = paramsValue.split('-')[1]
+          if (href.indexOf('QRSCAN') >= 0 && paramsValue) {
+            if (vm.interVal) {
+              clearInterval(vm.interVal)
             }
-          })
-          console.log('newQuery KIOS 2', queryString)
+            let queryString
+            queryString = '/tra-cuu-thong-tin-ho-so/' + dossierNoParam + '?secretKey=' + secretKeyParam
+            vm.$router.push({
+              path: queryString,
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+            console.log('newQuery KIOS 2', queryString)
+          }
         }
         // 
         vm.$store.dispatch('getGovAgency').then(function (result) {

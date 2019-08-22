@@ -10,7 +10,7 @@
   <div v-else class="px-2 pt-2" style="height: 100%; background-color: #ffff;">
     <v-form v-model="validFormVoting" ref="formVoting" lazy-validation>
       <v-layout row wrap>
-        <v-flex xs12 sm1 lg2>
+        <!-- <v-flex xs12 sm1 lg2>
         </v-flex>
         <v-flex xs12 sm10 lg8>
           <v-layout row wrap>
@@ -29,12 +29,12 @@
                     {{employeeSelected.jobPosTitle}} - {{employeeSelected.workingUnitName}}
                   </div>
                   <div class="mb-2">Email: {{employeeSelected.email}}</div>
-                  <!--  -->
+
                   <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
                     <star-rating class="mt-2" read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
                     <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
                   </div>
-                  <!--  -->
+
                   <div v-if="!isMobile">
                     <div v-for="(item, index) in votingItems" :key="index" >
                       <div class="text-bold primary--text">* {{ item.subject }}</div>
@@ -64,7 +64,65 @@
           </v-layout>
         </v-flex>
         <v-flex xs12 sm1 lg2>
-        </v-flex>
+        </v-flex> -->
+
+        <v-container align-center row wrap class="px-5" style="font-size:1.25em">
+          <v-flex xs12 style="border: 1px solid #0072bc">
+            <v-layout row wrap>
+              <v-flex xs12 sm12 class="py-3">
+                <v-layout wrap class="px-2">
+                  <v-flex xs4 sm3 class="mt-1" style="text-align: center!important;max-height: 200px">
+                    <div v-if="employeeSelected['imgSrc']" class="mt-1" :style="'background-image: url(' + employeeSelected['imgSrc'] + ');'"
+                    style="width: 100%;max-width: 150px;height: 200px;margin: 0 auto;background-position: center;background-size: cover;">
+                    </div>
+                    <img v-else src="https://img.icons8.com/windows/150/000000/contacts.png" 
+                    style="width: 100%;max-width: 150px;height: 200px;object-fit: contain;opacity:0.6;background: #ddd"/>
+                  </v-flex>
+                  <v-flex class="pl-2" xs8 sm9 style="word-wrap: break-word;position:relative">
+                    <div class="primary--text">
+                      {{employeeSelected.titleJobpos ? employeeSelected.titleJobpos : 'Cán bộ tiếp nhận'}}
+                    </div>
+                    <div class="text-bold primary--text text-bold">{{employeeSelected.fullName}}</div>
+                    <div class="mb-2" v-if="employeeSelected.agencyName">{{employeeSelected.agencyName}}</div>
+                    <div class="mb-2">Email: {{employeeSelected.email}}</div>
+                    <!--  -->
+                    <div :style="isMobile ? '' : 'position:absolute;top:0;right:0'">
+                      <star-rating read-only :rating="employeeSelected['score']" :increment="0.1" :max-rating="5" :show-rating="false" :star-size="30" :title="employeeSelected['score'] + '/5*'"></star-rating>
+                      <div class="text-bold primary--text pl-2">{{employeeSelected['totalVoting']}} lượt đánh giá</div>
+                    </div>
+                    <!--  -->
+                </v-flex>
+              </v-layout>
+              <div v-if="isMobile">
+                <div class="px-2 mt-3" v-for="(item, index) in votingItems" :key="index" >
+                  <div class="text-bold primary--text">{{index + 1}}. {{ item.subject }}</div>
+                  <div class="ml-3">
+                    <v-radio-group v-model="item.selected" height="10" row>
+                      <v-radio :label="itemChoise" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                      </v-radio>
+                    </v-radio-group>
+                  </div>
+                </div>
+              </div>
+              </v-flex>
+            </v-layout>
+          </v-flex>
+          <v-flex xs12 class="py-3 px-2 pl-5" v-if="!isMobile" style="border: 1px solid #0072bc; border-top: 0">
+            <div v-for="(item, index) in votingItems" :key="index" class="mb-2">
+              <div class="text-bold primary--text">* {{ item.subject }}</div>
+              <div class="ml-3">
+                <v-radio-group class="py-0" v-model="item.selected" height="10" row>
+                  <v-radio class="mr-4" height="10" :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
+                    <div :class="item.selected === indexChoise + 1 ? 'primary--text' : 'black--text'" slot="label"
+                    style="font-size: 16px;font-weight: bold;"
+                    >{{itemChoise}}</div>
+                  </v-radio>
+                </v-radio-group>
+              </div>
+            </div>
+          </v-flex>
+        </v-container>
+
         <v-flex xs12 sm12 class="text-xs-center my-3">
           <v-btn v-if="Array.isArray(votingItems) && votingItems.length > 0" @click="submitResultVoting" color="primary" :loading="votingDialog_hidden_loading" :disabled="votingDialog_hidden_loading">
             Gửi đánh giá
@@ -225,7 +283,7 @@ export default {
           if (result.hasPermission === true || result.hasPermission === 'true') {
             vm.doVottingResultSubmit()
           } else {
-            toastr.error('Số CMTND hoặc Số hồ sơ không chính xác')
+            toastr.error('Số CMTND hoặc Mã hồ sơ không chính xác')
           }
         }).catch(xhr => {
           toastr.error('Lỗi hệ thống')

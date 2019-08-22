@@ -103,7 +103,7 @@ export default {
     lengthPage: 0,
     totalEmployee: 0,
     employeePage: 1,
-    numberPerPage: 10
+    numberPerPage: 12
   }),
   computed: {
     loading () {

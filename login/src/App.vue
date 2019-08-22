@@ -518,12 +518,13 @@ export default {
             response.data !== "captcha"
           ) {
             if (response.data === "pending") {
+              let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
               window.location.href =
-                window.themeDisplay.getURLHome() +
+                url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" +
                 window.themeDisplay.getUserId() +
                 "&redirectURL=" +
-                window.themeDisplay.getURLHome();
+                url;
             } else {
               window.location.href = response.data;
             }

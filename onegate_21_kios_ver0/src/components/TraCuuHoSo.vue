@@ -5,8 +5,8 @@
         <h4 v-if="agencies.length === 1" class="py-1 text-xs-center" style="color:green; text-transform:uppercase">
           {{agencies[0]['administrationName']}}
         </h4>
-        <h4 class="py-2 ml-2">
-          <span style="color:#065694">TRA CỨU THÔNG TIN HỒ SƠ </span>
+        <h4 class="py-4 ml-2 text-xs-center">
+          <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THÔNG TIN HỒ SƠ </span>
         </h4>
         <v-layout wrap class="px-0 py-0">
           <div style="width: calc(100% - 150px)">

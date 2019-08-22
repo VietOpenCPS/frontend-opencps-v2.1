@@ -3,7 +3,7 @@
     <div class="keyboard">
       <div class="line" v-for="(line, index) in keySet" :key="index">
         <span v-for="(key, index) in line" :key="index" 
-        :class="getClassesOfKey(key)" v-text="getCaptionOfKey(key)" @click="e =&gt; clickKey(e, key)"
+        :class="getClassesOfKey(key)" v-html="getCaptionOfKey(key)" @click="e =&gt; clickKey(e, key)"
         @mousedown="mousedown" :style="getKeyStyle(key)">
         </span>
       </div>
@@ -41,31 +41,33 @@ export default {
             'tab': {key: '\t', text: 'Tab', width: 60, classes: 'control'},
             'shiftl': {keySet: 'shifted', text: '123#%', width: 100, classes: 'control'},
             'shiftr': {keySet: 'default', text: 'abc', width: 100, classes: 'control'},
-            'caps': {keySet: 'capsed', text: 'ABC', width: 80, classes: 'control'},
+            'caps': {keySet: 'capsed', text: 'ABC', width: 100, classes: 'control'},
             'space': {key: ' ', text: 'Space', width: 100},
-            'enter': {key: '\r\n', text: 'Enter', width: 80, classes: 'control'},
-            'backspace': {func: 'backspace', text: 'Xóa', classes: 'control backspace', width: 65},
-            'accept': {func: 'accept', text: 'Đóng', classes: 'control featured'},
-            'next': {func: 'next', text: 'Next', classes: 'control featured'}
+            'enter': {key: '\r\n', text: 'Enter', width: 80, classes: 'control enter'},
+            'backspace': {func: 'backspace', text: '&#8592;  Xóa', classes: 'control backspace', width: 65},
+            'accept': {func: 'accept', text: 'Close', classes: 'control featured', width: 30},
+            'next': {func: 'next', text: 'Next', classes: 'control featured'},
+            'emty': {key: '', text: '', width: 60, classes: 'control emty'}
           },
 
           default: [
-            'q w e r t y u i o p {backspace}',
-            'a s d f g h j k l {enter}',
-            '{caps} z x c v b n m {shiftl}',
-            '{next} {space} , . {accept}'
+            // '1 2 3 4 5 6 7 8 9 0 - [ ]',
+            'q w e r t y u i o p _ {backspace}',
+            'a s d f g h j k l : ; {enter}',
+            'z x c v b n m , . {caps} {shiftl}',
+            '{next} {space} {accept}'
           ],
           shifted: [
             '1 2 3 4 5 6 7 8 9 0 {backspace}',
-            '! @ # $ % & * ( ) {enter}',
-            '- / : ; _ < > | + {shiftr}',
-            '{next} {space} ? = {accept}'
+            '! @ # $ % & * ( ) ? {enter}',
+            '- / : ; _ < > | + = {shiftr}',
+            '{next} {space} {accept}'
           ],
           capsed: [
-            'Q W E R T Y U I O P {backspace}',
-            'A S D F G H J K L {enter}',
-            '{shiftr} Z X C V B N M {shiftl}',
-            '{next} {space} , . {accept}'
+            'Q W E R T Y U I O P _ {backspace}',
+            'A S D F G H J K L : ; {enter}',
+            'Z X C V B N M , . {shiftr} {shiftl}',
+            '{next} {space} {accept}'
           ]
         },
         'compact': {
@@ -260,7 +262,7 @@ export default {
               break
             }
             case 'accept': {
-              if (this.accept) this.accept(text)
+              if (this.accept) this.cancel()
               return
             }
             case 'cancel': {
@@ -291,12 +293,13 @@ export default {
             text = this.insertChar(caret, text, addChar)
           }
         }
-
         // if (this.currentKeySet === 'shifted') this.changeKeySet('default')
       }
       this.input.value = text
       this.setFocusToInput(caret)
-      if (this.change) this.change(text, addChar)
+      if (this.change) {
+        this.change(text, addChar)
+      }
       if (this.input.maxLength > 0 && text.length >= this.input.maxLength) {
         // The value reached the maxLength
         if (this.next) this.next()
@@ -308,6 +311,9 @@ export default {
         this.input.selectionStart = caret.start
         this.input.selectionEnd = caret.end
       }
+    },
+    closeKeyboard () {
+      this.cancel()
     }
   },
   mounted () {
