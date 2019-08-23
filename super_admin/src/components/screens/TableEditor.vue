@@ -10,6 +10,15 @@
           <v-form ref="formCloneServiceProcess" v-model="validForm" lazy-validation>
             <v-layout wrap class="py-1 align-center row-list-style">
               <v-flex xs12>
+                  <v-text-field
+                    label="Số hiệu quy trình"
+                    box
+                    v-model="processNo"
+                    :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
+                    :required="true"
+                  ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
                 <v-text-field
                   label="Tên quy trình"
                   box
@@ -56,13 +65,13 @@
         dialog_cloneServiceProcess: false,
         validForm: false,
         processName: '',
+        processNo: '',
         oldProcessName: ''
       }
     },
     methods: {
       cloneProcessEmitted (id, processNo, processName) {
         this.serviceProcessId = id
-        this.processNo = processNo
         this.oldProcessName = processName
         this.dialog_cloneServiceProcess = true
       },
