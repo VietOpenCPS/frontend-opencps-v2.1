@@ -179,7 +179,7 @@ export const store = new Vuex.Store({
                 roles.push(serializable[key]['role'])
               }
             }
-            console.log('roles', roles)
+            // console.log('roles', roles)
             resolve(roles)
           } else {
             resolve(['default'])
@@ -624,8 +624,8 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        console.log('data -delete-----', data)
-        console.log('data-- dossier file-------', state.dossierFiles)
+        // console.log('data -delete-----', data)
+        // console.log('data-- dossier file-------', state.dossierFiles)
         let dataPut = new URLSearchParams()
         if (data.hasForm || data.eform) {
           axios.put(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/resetformdata', dataPut, param).then(function (response) {
@@ -835,7 +835,7 @@ export const store = new Vuex.Store({
             }
           }).then(function (response) {
             resolve(response.data)
-            console.log('Tải file lên thành công')
+            // console.log('Tải file lên thành công')
           }).catch(function (xhr) {
             console.log(xhr)
             toastr.clear()
@@ -1071,7 +1071,7 @@ export const store = new Vuex.Store({
       })
     },
     postDossier ({ commit, state }, data) {
-      console.log('data-------------', data)
+      // console.log('data-------------', data)
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
@@ -1090,7 +1090,7 @@ export const store = new Vuex.Store({
         if (data.j_captcha_response) {
           dataPostdossier.append('j_captcha_response', data.j_captcha_response)
         }
-        console.log('dataPostdossier-------------', dataPostdossier)
+        // console.log('dataPostdossier-------------', dataPostdossier)
         axios.post(state.initData.postDossierApi, dataPostdossier, options).then(function (response) {
           response.data.serviceConfig = state.serviceConfigObj
           commit('setLoading', false)
@@ -1532,7 +1532,7 @@ export const store = new Vuex.Store({
         if (!isNaN(data.recordCount) && data.recordCount !== undefined && data.recordCount !== 'undefined' && data.recordCount !== null) {
           dataPostdossierMark.append('recordCount', data.recordCount)
         }
-        console.log('dataChangeRecord', data.dossierId)
+        // console.log('dataChangeRecord', data.dossierId)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -1861,10 +1861,10 @@ export const store = new Vuex.Store({
           ]).then( axios.spread(function (urlResponesFormScript, urlResponesFormData) {
             let responseScript = urlResponesFormScript.data
             let responseData = urlResponesFormData.data
-            console.log('responseScript==============', responseScript)
+            // console.log('responseScript==============', responseScript)
             item.plugin = true
             if(responseScript.indexOf('#preview@pdf') !== -1){
-              console.log('view pdf')
+              // console.log('view pdf')
               let url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/preview' 
               let config_blob =  {
                 headers: {
@@ -1905,10 +1905,10 @@ export const store = new Vuex.Store({
                 let dossierFileId = serializable.dossierFileId
                 let formReport = eval('(' + serializable.formReport + ')')
                 let formData = eval('(' + serializable.formData + ')')
-                console.log('formReport======', formReport)
-                console.log('formData======', formData)
+                // console.log('formReport======', formReport)
+                // console.log('formData======', formData)
                 formReport.data = formData
-                console.log('formReport_____FINAL=======', formReport)
+                // console.log('formReport_____FINAL=======', formReport)
                 window.$('#alpacajs_form_plugin').alpaca(formReport)
                 window.$('.dossierFilePartNo').val('')
                 window.$('.dossierFilePartNo').attr('id', 'dossierFileId' + partNo)
@@ -2138,7 +2138,7 @@ export const store = new Vuex.Store({
         params.append('pings', strPings)
         params.append('content', data.content)
         // params.append('upvoteCount', data.upvoteCount != null ? data.upvoteCount : 0)
-        console.log('dataPut', data)
+        // console.log('dataPut', data)
         axios.put(state.initData.commentApi + '/' + data.commentId, params, config)
         .then(function (response) {
           let resPutCmt = {}
@@ -2256,10 +2256,10 @@ export const store = new Vuex.Store({
               }
               let nextactions = serializableNextActionConvert
               let plugins = serializablePluginsConvert
-              console.log('nextactions++++++++++++', nextactions)
-              console.log('plugins++++++++++++', plugins)
+              // console.log('nextactions++++++++++++', nextactions)
+              // console.log('plugins++++++++++++', plugins)
               nextactions.push(...plugins);
-              console.log('nextactions2++++++++++++', nextactions)
+              // console.log('nextactions2++++++++++++', nextactions)
               resolve(nextactions)
             }))
             .catch(function (xhr) {
@@ -3827,7 +3827,7 @@ export const store = new Vuex.Store({
       })
     },
     loadingInitData (state) {
-      console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
+      // console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
       return state.initData
     },
     loadingDynamicBtn (state) {

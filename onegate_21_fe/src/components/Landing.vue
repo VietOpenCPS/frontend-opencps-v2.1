@@ -1434,7 +1434,7 @@ export default {
       if (val) {
         vm.templateNoGuide = val['templateNo']
         val.dossierTemplateNo = val['templateNo']
-        console.log('val_dichVuSelectedGuide', val)
+        // console.log('val_dichVuSelectedGuide', val)
         vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {
           for (let key in result) {
             result[key].fileMark = true
@@ -1801,7 +1801,7 @@ export default {
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
           }
         }
-        console.log('filter doLoadingData', filter)
+        // console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
@@ -1819,7 +1819,7 @@ export default {
               }
               vm.selectMultiplePage.push(item)
             }
-            console.log('selectMultiplePage', vm.selectMultiplePage)
+            // console.log('selectMultiplePage', vm.selectMultiplePage)
           }
           vm.selected = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
         }).catch(reject => {
@@ -2153,7 +2153,7 @@ export default {
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
-      console.log('vm.selectedDoAction', vm.selectedDoAction)
+      // console.log('vm.selectedDoAction', vm.selectedDoAction)
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
@@ -2467,7 +2467,7 @@ export default {
             let filter = {
               dossierId: vm.selectedDoAction[key]['dossierId']
             }
-            console.log('filter Restore', filter)
+            // console.log('filter Restore', filter)
             if (vm.selectedDoAction[key]['originality']) {
               vm.$store.dispatch('restoreDossier', filter).then(function (result) {
                 restoreCounter += 1
@@ -2840,7 +2840,7 @@ export default {
     keywordEventChange (data) {
       let vm = this
       vm.selectMultiplePage = []
-      console.log('keywordEventChange', data)
+      // console.log('keywordEventChange', data)
       vm.advObjectSearch = {}
       for (let key in data) {
         if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
@@ -2908,7 +2908,7 @@ export default {
           vm.advSearchTools[keyTool].disabled = true
         }
       }
-      console.log('vm.advSearchItems', vm.advSearchItems)
+      // console.log('vm.advSearchItems', vm.advSearchItems)
       vm.doRedirectFilter()
     },
     selectedAdvFilter (item) {
@@ -2962,7 +2962,7 @@ export default {
     },
     changeAdvFilterData (data, spec, index) {
       let vm = this
-      console.log('data change advSearch', data, spec, index)
+      // console.log('data change advSearch', data, spec, index)
       if (spec === 'status') {
         let filter = {
           itemCode: data
@@ -2989,9 +2989,9 @@ export default {
         vm.itemFilterSupport[spec] = data
       }
       for (let key in vm.advSearchItems) {
-        console.log('adv Search index', vm.advSearchItems[key].index)
+        // console.log('adv Search index', vm.advSearchItems[key].index)
         if (vm.advSearchItems[key].index === index) {
-          console.log('vm.itemFilterSupport2', vm.itemFilterSupport)
+          // console.log('vm.itemFilterSupport2', vm.itemFilterSupport)
           vm.advSearchItems[key].value = spec + ':' + valueFilter
           vm.advSearchItems[key].text = spec + ':' + valueFilter
           break
@@ -3021,7 +3021,7 @@ export default {
           const [year, month, day] = currentYearMonth.split('_')
           queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&' + 'day' + '=' + day + '&'
         } else {
-          console.log('currentItemFilter.spec', currentItemFilter.text.replace(currentItemFilter.spec + ':', ''))
+          // console.log('currentItemFilter.spec', currentItemFilter.text.replace(currentItemFilter.spec + ':', ''))
           queryString += currentItemFilter.spec + '=' + currentItemFilter.text.replace(currentItemFilter.spec + ':', '') + '&'
         }
       }

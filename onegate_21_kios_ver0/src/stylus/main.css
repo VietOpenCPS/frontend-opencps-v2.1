@@ -1544,12 +1544,12 @@ table > thead > tr > th.column {
 /* style kios home */
 * {margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 a, a:hover, a:focus {text-decoration: none}
-header {
+/* header {
     background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/bg-banner.jpg') center center no-repeat;
     background-size: auto 100%;
 	padding: 10px 15px;
 	border-bottom: 1px solid #ddd;
-}
+} */
 header a {
 	display: -webkit-box;
 	display: flex;
@@ -1680,7 +1680,7 @@ header span {
 .tab-item .left a:nth-child(5):hover {
 	background-color: #e4d538;
 }
-.mWrapper > header {
+/* .mWrapper > header {
     display: none !important;
 }
 .mWrapper > nav {
@@ -1688,7 +1688,7 @@ header span {
 }
 .mWrapper > footer {
     display: none !important;
-}
+} */
 .mWrapper > section {
     padding: 0 !important
 }
@@ -1795,4 +1795,17 @@ body .v-table__overflow .v-table > thead > tr > th {
     color: #0b72ba;
     padding-left: 15px;
     border-bottom: 1px solid #d3d3d3
+}
+.back-btn {
+    position: absolute !important;
+  }
+  .table-detail-domain table.table tbody tr td:first-child {
+    min-width: 150px!important;
+    max-width: 200px;
+}
+.table-bordered tbody tr td:not(:last-child) {
+    border-right: 1px solid #d3d3d3;
+}
+.table-bordered tbody tr:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,.12);
 }

@@ -5,32 +5,34 @@
     </h4>
     <v-layout wrap class="mt-2">
       <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
+        <v-autocomplete
           :items="govAgencyList"
           v-model="govAgencySelected"
-          placeholder="Chọn cơ quan"
+          label="Cơ quan"
           item-text="administrationName"
           item-value="administrationCode"
           :hide-selected="true"
           @change="changeAdministration"
           box
           height="48"
-        ></v-select>
+          color="primary"
+          clearable
+        ></v-autocomplete>
       </v-flex>
       <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
+        <v-autocomplete
           :items="listLinhVuc"
           v-model="linhVucSelected"
-          placeholder="Chọn lĩnh vực"
+          label="Lĩnh vực"
           item-text="domainName"
           item-value="domainCode"
           :hide-selected="true"
           @change="changeDomain"
           box
           height="48"
-        ></v-select>
+          color="primary"
+          clearable
+        ></v-autocomplete>
       </v-flex>
       <!-- <v-flex xs3 class="pl-2 pr-2">
         <v-select

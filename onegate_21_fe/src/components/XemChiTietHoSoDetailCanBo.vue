@@ -105,7 +105,7 @@
                     </span>
                   </v-flex>
                   <v-flex id="reAssign" v-if="showReasign && checkPemissionPhanCongLai(currentUser)" class="text-xs-right" style="width:100px">
-                    <v-btn @click="reAsign" class="mx-0 my-0" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
+                    <v-btn @click="reAsign" class="mx-0 my-0 right" :disabled="checkPemissionPhanCongLai(currentUser) === false && String(currentUser['userId']) !== String(thongTinChiTietHoSo.lastActionUserId)" small color="primary" style="height:26px">
                       <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
                         <span>Phân công lại</span>
                       </span> -->

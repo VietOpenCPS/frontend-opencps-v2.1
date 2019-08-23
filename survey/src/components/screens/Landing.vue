@@ -4,9 +4,7 @@
       <v-flex xs12 sm9 v-if="votingItems.length > 0">
         <v-layout row wrap>
           <v-flex xs12 sm12 class="mb-4 px-2">
-            <div class="text-bold" style="color:#034687">
-              Để nâng cao chất lượng và tiến độ giải quyết thủ tục hành chính của Bộ Giao thông vận tải, đề nghị quý vị
-              tham gia đánh giá theo phiếu khảo sát sau:
+            <div id="title" class="text-bold" style="color:#034687">
             </div>
           </v-flex>
           <v-flex xs12 sm12>
@@ -39,7 +37,7 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs12 sm7 v-else>
+      <v-flex xs12 sm9 v-else>
         <div class="px-3">
           <v-alert outline color="warning" icon="priority_high" :value="true">
             Chưa có câu hỏi khảo sát
