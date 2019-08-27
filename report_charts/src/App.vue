@@ -51,7 +51,7 @@
         <v-icon>replay</v-icon>
       </v-btn>
     </v-snackbar>
-    <go-top :size="42" bg-color="#0064c7"></go-top>
+    <!-- <go-top :size="42" bg-color="#0064c7"></go-top> -->
   </v-app>
 </template>
 

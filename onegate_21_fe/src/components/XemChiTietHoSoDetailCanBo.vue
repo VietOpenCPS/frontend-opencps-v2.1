@@ -58,7 +58,7 @@
             <span v-if="thongTinChiTietHoSo.finishDate">THÀNH PHẦN HỒ SƠ VÀ KẾT QUẢ</span> <span v-else>THÀNH PHẦN HỒ SƠ</span>
           </v-btn>
         </v-tab>
-        <v-tab v-if="paymentDetail" :key="3" href="#tabs-3" @click="loadThanhToan()">
+        <v-tab v-if="paymentDetail" :key="3" href="#tabs-3" @click="loadPaymentFile()">
           <v-btn flat class="px-0 py-0 mx-0 my-0">
             THANH TOÁN
           </v-btn>
@@ -226,7 +226,7 @@
             <!--  -->
           </v-tab-item>
           <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form">
+            <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> I.</div>
@@ -236,7 +236,7 @@
                 <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel :value="[true]" expand   class="expansion-pl ext__form" v-if="stateViewResult">
+            <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form" v-if="stateViewResult">
               <v-expansion-panel-content :key="1">
                 <div slot="header" class="text-bold">
                   <div class="background-triangle-small"> II.</div>
@@ -948,14 +948,16 @@ export default {
           vm.activeTab2 = 'tabs-3b'
           vm.loadDossierLogs()
         }
-        vm.runComment()
-        vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
-          if (Array.isArray(resultDocuments)) {
-            vm.documents = resultDocuments
-          } else {
-            vm.documents.push(resultDocuments)
-          }
-        })
+        if (vm.originality === 3) {
+          vm.runComment()
+        }
+        // vm.$store.dispatch('loadDossierDocuments', resultDossier).then(resultDocuments => {
+        //   if (Array.isArray(resultDocuments)) {
+        //     vm.documents = resultDocuments
+        //   } else {
+        //     vm.documents.push(resultDocuments)
+        //   }
+        // })
         vm.$store.dispatch('getListDossierFiles', data).then(result => {
           vm.listDossierFiles = result
           // console.log('listDossierFiles', vm.listDossierFiles)
@@ -963,12 +965,12 @@ export default {
         if (vm.$refs.thanhphanhoso) {
           vm.$refs.thanhphanhoso.initData(resultDossier)
         }
-        if (vm.$refs.thanhphanhoso1) {
-          vm.$refs.thanhphanhoso1.initData(resultDossier)
-        }
-        if (vm.$refs.thanhphanhoso2) {
-          vm.$refs.thanhphanhoso2.initData(resultDossier)
-        }
+        // if (vm.$refs.thanhphanhoso1) {
+        //   vm.$refs.thanhphanhoso1.initData(resultDossier)
+        // }
+        // if (vm.$refs.thanhphanhoso2) {
+        //   vm.$refs.thanhphanhoso2.initData(resultDossier)
+        // }
       })
     },
     recountFileTemplates () {
@@ -2175,7 +2177,10 @@ export default {
       }).catch(xhr => {
         vm.btnPlugins = []
       })
-      vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
+      if (vm.thongTinChiTietHoSo.online && !vm.thongTinChiTietHoSo.originDossierNo && 
+        ((vm.originality === 1 && vm.thongTinChiTietHoSo['dossierStatus'] !== 'new') || vm.originality === 3)) {
+        vm.loadDossierSyncs(vm.thongTinChiTietHoSo.dossierId)
+      }
     },
     showAlpacaJSFORM (item) {
       var vm = this
@@ -2308,6 +2313,13 @@ export default {
           vm.$refs.thanhphanhoso2.initData(vm.thongTinChiTietHoSo)
         }, 150)
       }
+      vm.$store.dispatch('loadDossierDocuments', vm.thongTinChiTietHoSo).then(resultDocuments => {
+        if (Array.isArray(resultDocuments)) {
+          vm.documents = resultDocuments
+        } else {
+          vm.documents.push(resultDocuments)
+        }
+      })
     },
     loadThanhToan () {
       var vm = this
@@ -2316,9 +2328,15 @@ export default {
       }
       vm.$store.dispatch('loadDossierPayments', filter).then(result => {
         vm.paymentDetail = result
-        vm.$refs.thongtinthanhtoan.getPaymentFiles()
+        // vm.$refs.thongtinthanhtoan.getPaymentFiles()
       }).catch(reject => {
       })
+    },
+    loadPaymentFile () {
+      let vm = this
+      if (vm.$refs.thongtinthanhtoan) {
+        vm.$refs.thongtinthanhtoan.getPaymentFiles()
+      }
     },
     loadHoSoLienThong () {
       var vm = this

@@ -121,7 +121,7 @@
             :loading="loading"
             :disabled="loading"
           >Ghi lại và thêm mới</v-btn> -->
-          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="saveToData(0)"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="saveToData(0)"
             :loading="loading"
             :disabled="loading"
           >
@@ -129,14 +129,14 @@
             <span v-if="String(id) === '0'">Tạo giấy phép</span>
             <span v-else>Cập nhật</span>
           </v-btn>
-          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable && String(id) !== '0'" color="blue darken-3" class="mr-1" dark  v-on:click.native="uploadFileDeliverable"
             :loading="loading"
             :disabled="loading"
           >
           <v-icon>cloud_upload</v-icon> &nbsp;
           Tải giấy phép từ máy tính
           </v-btn>
-          <v-btn v-if="getUser('QUAN_LY_GIAY_PHEP') && !editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
+          <v-btn v-if="(getUser('QUAN_LY_GIAY_PHEP') || userPermission) && !editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = true"
             :loading="loading"
             :disabled="loading"
           >
@@ -204,6 +204,11 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+        }
+        // 
         vm.editDeliverable = String(vm.id) === '0' ? true : false
         vm.$store.dispatch('getDeliverableTypes').then(function (result) {
           setTimeout(() => {
@@ -245,11 +250,22 @@
           })
           
         }
+      },
+      items (val) {
+        var vm = this
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+        }
+        // 
       }
     },
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
+      },
+      userPermission () {
+        return this.$store.getters.getUserPermission
       },
       pullCounter: {
         // getter
@@ -331,6 +347,21 @@
       saveToData (cmd) {
         let vm = this
         if (vm.$refs.form.validate()) {
+          // 
+          try {
+            let field = window.$('#formDelivert').alpaca('get').childrenByPropertyId
+            if (field) {
+              for (let prop in field) {
+                if (field[prop].isRequired() && field[prop].getValue() === '') {
+                  toastr.clear()
+                  toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                  return
+                }
+              }
+            }
+          } catch (error) {
+          }
+          // 
           vm.loading = true
           // let bbatFormSimple = vm.$refs.bbatFormSimple
           let bbatForm = vm.$refs.bbatForm
@@ -394,7 +425,7 @@
         if (!roles) {
           return false
         }
-        let roleExits = roles.findIndex(item => item === roleItem)
+        let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
         return (roleExits >= 0)
       }
     }

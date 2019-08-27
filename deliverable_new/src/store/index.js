@@ -16,6 +16,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    userPermission: false,
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
     snackbarerror: false,
     snackbarsocket: false,
@@ -391,6 +392,9 @@ export const store = new Vuex.Store({
     setInitData (state, payload) {
       state.initData = payload
     },
+    setUserPermission (state, payload) {
+      state.userPermission = payload
+    },
     setsnackbarerror (state, payload) {
       state.snackbarerror = payload
     },
@@ -416,6 +420,9 @@ export const store = new Vuex.Store({
   getters: {
     getUser (state) {
       return state.user
+    },
+    getUserPermission (state) {
+      return state.userPermission
     },
     getsnackbarerror (state) {
       return state.snackbarerror

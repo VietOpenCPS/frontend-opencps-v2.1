@@ -275,7 +275,7 @@ export default {
   watch: {
     dossierDetail (val) {
       var vm = this
-      vm.getPaymentFiles()
+      // vm.getPaymentFiles()
     },
     payments (val) {
       // lấy thông tin tra cứu trên keypay

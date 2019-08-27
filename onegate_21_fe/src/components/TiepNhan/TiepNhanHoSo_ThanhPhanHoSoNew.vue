@@ -182,7 +182,7 @@
             <content-placeholders-text :lines="1" />
           </content-placeholders>
           <v-layout row wrap v-else>
-            <!-- <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1 && !onlyView">
+            <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1 && !onlyView">
               <v-text-field
                 title="Số lượng"
                 style="width:100px;"
@@ -200,7 +200,7 @@
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @input="changeRecordCount(index)"
               ></v-text-field>
-            </v-flex> -->
+            </v-flex>
             <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
               <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
                 <v-radio :value="0"></v-radio>
@@ -1292,7 +1292,7 @@ export default {
         let divPx = 0
         if (vm.originality !== 1 && item.partType === 1 && !vm.thongTinHoSo.online && vm.checkInput !== 1) {
           if (!vm.onlyView) {
-            divPx += 140
+            divPx += 240
           } else {
             divPx += 140
           }
