@@ -484,6 +484,15 @@ export default {
       }
     },
     doExitApp() {
+      let vm = this
+      if (typeof(Storage) !== 'undefined') {
+        sessionStorage.removeItem('userLogout')
+        if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+          sessionStorage.setItem('userLogout', 'employee')
+        } else {
+          sessionStorage.setItem('userLogout', 'applicant')
+        }
+      }
       window.location.href = "/c/portal/logout";
     },
     goToDangKyPage() {

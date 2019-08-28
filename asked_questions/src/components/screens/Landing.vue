@@ -131,7 +131,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </div>
-          <div class="px-2 py-2" v-else>
+          <div class="px-0 py-2" v-else>
             <v-alert outline color="warning" icon="priority_high" :value="true">
               Không có câu hỏi nào
             </v-alert>
@@ -194,7 +194,7 @@
                   v-model="telNo"
                 ></v-text-field>
               </v-flex> -->
-              <v-flex xs12 class="pl-1">
+              <v-flex xs12 class="">
                 <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   placeholder="Nhập thư điện tử"
