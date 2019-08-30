@@ -14,7 +14,7 @@
           <v-flex xs12>
             <v-text-field
               box
-              placeholder="địa chỉ Email"
+              placeholder="Địa chỉ Email"
               v-model="confirmCode"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required

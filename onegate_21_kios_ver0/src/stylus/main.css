@@ -1367,6 +1367,7 @@ table > thead > tr > th.column {
 }
 .virtual-keyboard .vue-touch-keyboard {
     width: 85% !important;
+    max-width: 1000px;
     position: relative;
     left: 50%;
     transform: translateX(-50%);

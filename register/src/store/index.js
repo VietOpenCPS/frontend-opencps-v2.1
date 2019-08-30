@@ -315,7 +315,7 @@ export const store = new Vuex.Store({
             } else {
               resolve(response.data)
               toastr.clear()
-              toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
+              toastr.success('Xác thực thành công. Vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
               setTimeout(function () {
                 let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
                 window.open(redirectURL, '_self')

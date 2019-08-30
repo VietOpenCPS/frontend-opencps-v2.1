@@ -1,5 +1,14 @@
 <template>
   <div id="login_container">
+    <div class="header_login">
+      <div class="logo"> 
+        <a href=""> 
+          <img src=""> 
+          <div class="text-logo">
+          </div> 
+        </a> 
+      </div>
+    </div>
     <v-layout class="mt-4" wrap style="max-width:550px;margin: 0 auto">
       <v-flex xs12 v-if="isSigned">
         <v-card flat class="px-2 py-3" style="border: 1px solid #dddddd;">
@@ -111,6 +120,7 @@
         </v-flex>
       </v-flex>
     </v-layout>
+    <div class="footer_login"></div>
   </div>
 </template>
 
