@@ -104,6 +104,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
+              jobposCode: 'DANHGIA_' + data.itemCode,
               start: data.start,
               end: data.end
             }

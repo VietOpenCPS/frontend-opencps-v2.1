@@ -379,6 +379,7 @@
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+            toastr.success('Thực hiện thành công')
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
@@ -391,7 +392,10 @@
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
-            vm.createFiles[index].daKhai = true
+            toastr.success('Thực hiện thành công')
+            setTimeout(function () {
+              vm.createFiles[index].daKhai = true
+            }, 3000)
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {

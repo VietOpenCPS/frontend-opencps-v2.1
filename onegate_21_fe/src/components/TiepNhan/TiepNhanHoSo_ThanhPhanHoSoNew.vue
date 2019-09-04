@@ -148,20 +148,29 @@
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
                       <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" 
-                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1">
-                        <v-icon color="white">save</v-icon>&nbsp;
+                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>save</v-icon>&nbsp;
                         Lưu lại
                       </v-btn>
-                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm">
-                        <v-icon color="white">print</v-icon>&nbsp;
+                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
                       </v-btn>
                       <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView">
                         <v-icon color="white">edit</v-icon>&nbsp;
                         Sửa
                       </v-btn>
-                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">
-                        <v-icon color="white">delete</v-icon>&nbsp;
+                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>delete</v-icon>&nbsp;
                         Xóa
                       </v-btn>
                     </div>
@@ -405,7 +414,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 toastr.options = {
   'closeButton': true,
-  'timeOut': '20000'
+  'timeOut': '5000'
 }
 export default {
   props: {
@@ -435,6 +444,7 @@ export default {
     stateView: false,
     dialogAddOtherTemp: false,
     loadingAddOther: false,
+    loadingApacal: false,
     otherDossierTemplate: '',
     sheet: false,
     partView: '',
@@ -807,23 +817,32 @@ export default {
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
+        vm.loadingApacal = true
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          setTimeout(function () {
+            vm.loadingApacal = false
+            toastr.success('Thực hiện thành công')
+          }, 3000)
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
           })
           vm.dossierTemplateItems[index]['passRequired'] = true
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
+          vm.loadingApacal = false
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
+        vm.loadingApacal = true
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          vm.dossierTemplateItems[index].daKhai = true
+          setTimeout(function () {
+            vm.loadingApacal = false
+            toastr.success('Thực hiện thành công')
+            vm.dossierTemplateItems[index].daKhai = true
+          }, 3000)
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
@@ -832,6 +851,7 @@ export default {
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }).catch(reject => {
+          vm.loadingApacal = false
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
