@@ -102,6 +102,13 @@
               <v-flex xs12 sm4>
                 <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box disabled></v-text-field>
               </v-flex>
+              <v-flex xs12 sm6>
+                <!-- <v-text-field label="Giới tính"  box></v-text-field> -->
+                <v-autocomplete v-model="userInfoSet['gioi_tinh']" :items="sexItems" label="Giới tính" item-text="itemName" item-value="itemCode" :hide-selected="true" box ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field v-model="userInfoSet['ngay_sinh']" label="Ngày sinh" box></v-text-field>
+              </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
                 <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box disabled></v-text-field>
               </v-flex>
@@ -433,6 +440,20 @@
       fileList: [],
       totalFileList: 0,
       filePage: 1,
+      userInfoSet: {
+        ngay_sinh: '',
+        gioi_tinh: ''
+      },
+      sexItems: [
+        {
+          itemCode: '1',
+          itemName: 'Nam'
+        },
+        {
+          itemCode: '2',
+          itemName: 'Nữ'
+        }
+      ],
       item: {
         "model": "classPK",
         'upload_api': '/o/v1/opencps/users/upload/opencps_applicant/org.opencps.usermgt.model.ApplicantAvatar',
@@ -524,6 +545,10 @@
         vm.$store.dispatch('getUserInfo').then(function(data) {
           vm.user = data
           window.callbackzalo = vm.callbackzalo
+          if (vm.user['className'] === 'org.opencps.usermgt.model.Applicant') {
+            vm.getUserInfoSex()
+            vm.getUserInfoDate()
+          }
           vm.getServerConfig()
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
@@ -595,6 +620,14 @@
       }
     },
     methods: {
+      getInfo (info) {
+        let vm = this
+        try {
+          return JSON.parse(info)
+        } catch (error) {
+          return ''
+        }
+      },
       formatDate(date) {
         if (!date) return null
         const [year, month, day] = date.split('-')
@@ -754,6 +787,40 @@
             vm.getUserAppZaloInfo()
           } catch (error) {
           }
+        })
+      },
+      getUserInfoSex () {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/gioi_tinh'
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+          }
+        }
+        axios.get(url, config).then(function (response) {
+          if (response.data) {
+            vm.userInfoSet['gioi_tinh'] = String(response.data)
+          }
+        }).catch(function (error) {
+        })
+      },
+      getUserInfoDate () {
+        let vm = this
+        let url = '/o/rest/v2/users/' + vm.user['userId'] + '/preferences/ngay_sinh'
+        let config = {
+          headers: {
+            'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+          }
+        }
+        axios.get(url, config).then(function (response) {
+          if (response.data) {
+            vm.userInfoSet['ngay_sinh'] = response.data
+          }
+        }).catch(function (error) {
         })
       },
       getUserAppZaloInfo () {

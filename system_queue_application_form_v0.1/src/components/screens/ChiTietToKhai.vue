@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="border: 1px solid #dedede;border-top:0;">
     <div class="row-header no__hidden_class">
       <div class="background-triangle-big">
         <span>TỜ KHAI TRỰC TUYẾN</span>
@@ -8,12 +8,12 @@
         <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
           {{serviceinfoSelected.serviceName}}
         </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 150px;height:37px">
+        <!-- <div class="flex text-right" style="margin-left: auto;max-width: 150px;height:37px">
           <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
             <v-icon size="16">search</v-icon> &nbsp;
             Tìm kiếm tờ khai
           </v-btn>
-        </div>
+        </div> -->
       </div> 
     </div>
     <div>

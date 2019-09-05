@@ -818,50 +818,60 @@ export default {
       if (query.trim().length === 0) {
         return null
       }
-      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
       // test local
       // const url = 'http://127.0.0.1:8081/api/applicants'
-      return new Promise(resolve => {
-        vm.$store.dispatch('loadInitResource').then(result => {
-          let param = {
-            headers: {
+      if (vm.functionTimeOutApplicant) {
+        clearTimeout(vm.functionTimeOutApplicant)
+      }
+      vm.functionTimeOutApplicant = setTimeout(function () {
+        return new Promise(resolve => {
+          vm.$store.dispatch('loadInitResource').then(result => {
+            let param = {
+              headers: {
+              }
             }
-          }
-          axios.get(url, param).then(response => {
-            let items = []
-            if (response.data.hasOwnProperty('data')) {
-              items = response.data.data
-            } else {
-            }
-            resolve(items)
+            axios.get(url, param).then(response => {
+              let items = []
+              if (response.data.hasOwnProperty('data')) {
+                items = response.data.data
+              } else {
+              }
+              resolve(items)
+            })
           })
         })
-      })
+      }, 1000)
     },
     onInputChange1 (query) {
       let vm = this
       if (query.trim().length === 0) {
         return null
       }
-      const url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
+      let url = `/o/rest/v2/applicants?start=0&end=5&idNo=${query}`
       // test local
       // const url = 'http://127.0.0.1:8081/api/applicants'
-      return new Promise(resolve => {
-        vm.$store.dispatch('loadInitResource').then(result => {
-          let param = {
-            headers: {
+      if (vm.functionTimeOutApplicant) {
+        clearTimeout(vm.functionTimeOutApplicant)
+      }
+      vm.functionTimeOutApplicant = setTimeout(function () {
+        return new Promise(resolve => {
+          vm.$store.dispatch('loadInitResource').then(result => {
+            let param = {
+              headers: {
+              }
             }
-          }
-          axios.get(url, param).then(response => {
-            let items = []
-            if (response.data.hasOwnProperty('data')) {
-              items = response.data.data
-            } else {
-            }
-            resolve(items)
+            axios.get(url, param).then(response => {
+              let items = []
+              if (response.data.hasOwnProperty('data')) {
+                items = response.data.data
+              } else {
+              }
+              resolve(items)
+            })
           })
         })
-      })
+      }, 1000)
     },
     onSearchItemSelected (item) {
       var vm = this

@@ -1,30 +1,5 @@
 <template>
-  <v-app id="app_application_form" style="border: 1px solid #dedede;border-top:0;max-width:1200px;margin:0 auto">
-    <!-- <v-navigation-drawer app clipped floating width="265">
-      <v-list class="py-0">
-        <v-list-group
-          v-for="(item, index) in menuServiceInfos"
-          :key="index"
-          prepend-icon="insert_drive_file"
-          append-icon="expand_less"
-          :value="index === activeTab"
-        >
-          <v-list-tile slot="activator">
-            <v-list-tile-title class="">{{item.name}}</v-list-tile-title>
-          </v-list-tile>
-          <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
-            <v-list-tile-action>
-              <v-icon color="#00aeef" 
-                v-if="activeService === item1.serviceInfoId"
-              >play_arrow</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content @click="getEformServiceInfo(index, item1)">
-              <v-list-tile-title class="" v-text="item1.serviceName" style="width: calc(100% - 45px)" :title="item1.serviceName"></v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list-group>
-      </v-list>
-    </v-navigation-drawer> -->
+  <v-app id="app_application_form" style="max-width:1200px;margin:0 auto">
     <v-content>
       <router-view></router-view>
     </v-content>
