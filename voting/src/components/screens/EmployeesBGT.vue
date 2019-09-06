@@ -144,6 +144,8 @@ export default {
         vm.totalEmployee = result[0]
         vm.employeeItems = sortEmployee(result[1])     
         vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+
+        vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
         if (vm.employeeItems && vm.employeeItems.length > 0) {
           for (let key in vm.employeeItems) {
             vm.getAvatar(vm.employeeItems[key], key)

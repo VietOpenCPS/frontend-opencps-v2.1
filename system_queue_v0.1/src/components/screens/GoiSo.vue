@@ -301,13 +301,15 @@ export default {
     },
     callingApplicant (item) {
       let vm = this
+      if (idDocumentVoicePortlet) {
+        vm.idVoicePortlet = idDocumentVoicePortlet
+      }
       vm.updateStateBooking(item, true)
       if (item) {
         vm.called = false
         $('#audioCalling').html('')
-        let splitNumberCode = item['codeNumber'].split('-')
-        let numberCalling = splitNumberCode[0] + splitNumberCode[1] + splitNumberCode[2]
-        let srcAudioStart = splitNumberCode[0] === 'E' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
+        let numberCalling = item['codeNumber']
+        let srcAudioStart = item['className'] === 'EFORM' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
         // 
         let mainGateNumber = ''
