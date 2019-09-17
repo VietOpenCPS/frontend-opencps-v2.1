@@ -155,6 +155,12 @@ export const store = new Vuex.Store({
             state: filter.state ? filter.state : '',
             gateNumber: filter.gateNumber ? filter.gateNumber : ''
           }
+          if (filter['bookingFrom']) {
+            paramGet.bookingFrom = filter['bookingFrom']
+          }
+          if (filter['bookingTo']) {
+            paramGet.bookingTo = filter['bookingTo']
+          }
           let param = {
             headers: {
               groupId: window.themeDisplay.getScopeGroupId()

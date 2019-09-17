@@ -102,13 +102,12 @@
               <v-flex xs12 sm4>
                 <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box disabled></v-text-field>
               </v-flex>
-              <v-flex xs12 sm6>
-                <!-- <v-text-field label="Giới tính"  box></v-text-field> -->
+              <!-- <v-flex xs12 sm6>
                 <v-autocomplete v-model="userInfoSet['gioi_tinh']" :items="sexItems" label="Giới tính" item-text="itemName" item-value="itemCode" :hide-selected="true" box ></v-autocomplete>
               </v-flex>
               <v-flex xs12 sm6>
                 <v-text-field v-model="userInfoSet['ngay_sinh']" label="Ngày sinh" box></v-text-field>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
                 <v-text-field label="Mã số thuế" v-model="user['applicantIdNo']" box disabled></v-text-field>
               </v-flex>

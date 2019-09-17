@@ -105,6 +105,14 @@
       >
         Thêm giấy phép
       </v-btn>
+      <!-- import -->
+      <v-btn color="primary" class="white--text"
+        :loading="loadingImport"
+        :disabled="loadingImport"
+        @click="doImportData">
+        <v-icon>exit_to_app</v-icon> &nbsp;
+        Import giấy phép
+      </v-btn>
     </div>
     <v-data-table
         :headers="headers"
@@ -183,12 +191,22 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <input
+      type="file"
+      ref="importData"
+      name="importData"
+      accept="text/xml,application/zip"
+      @change="onFilePicked"
+      v-show="false"
+    >
   </div>
 </template>
 
 <script>
   import { TinyPagination } from '@/components'
   import TemplateRendering from './template_rendering.vue'
+  import axios from 'axios'
+  import toastr from 'toastr'
 
   export default {
     props: ['index'],
@@ -202,6 +220,7 @@
         menusss: false,
         loadingTable: false,
         dialogPDFLoading: false,
+        loadingImport: false,
         dialogPDF: false,
         headers: [],
         hideAction: false,
@@ -499,6 +518,39 @@
           vm.loadingTable = false
           console.log(reject)
         })
+      },
+      doImportData () {
+        let vm = this
+        vm.$refs.importData.click()
+      },
+      onFilePicked(event) {
+        let vm = this
+        let files = event.target.files || event.dataTransfer.files
+        if (files && files[0]) {
+          vm.loadingImport = true
+          let bodyFormData = new FormData()
+          bodyFormData.append('file', files[0])
+          axios({
+            method: 'post',
+            url: '/o/rest/v2/deliverables/import/files',
+            data: bodyFormData,
+            config: { headers: {
+                'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          })
+          .then(function (response) {
+            setTimeout(function () {
+              vm.loadingImport = false
+              toastr.success('Import giấy phép thành công')
+              vm.pullData(vm.items[vm.index]['typeCode'])
+            }, 1000)
+          })
+          .catch(function (response) {
+            vm.loadingImport = false
+          })
+        }
       },
       getUser (roleItem) {
         let vm = this

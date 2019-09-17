@@ -280,10 +280,9 @@ export default {
           vm.currentCalling = vm.queueList[0]
           try {
             vm.callingApplicant(vm.currentCalling)
-          }
-          catch(err) {
+          } catch(err) {
             console.log('catch play audio 1')
-            vm.getDanhSachCho()
+            // vm.getDanhSachCho()
           }
         } else {
           vm.loadData = !vm.loadData
@@ -301,8 +300,12 @@ export default {
     },
     callingApplicant (item) {
       let vm = this
-      if (idDocumentVoicePortlet) {
-        vm.idVoicePortlet = idDocumentVoicePortlet
+      try {
+        if (idDocumentVoicePortlet) {
+          vm.idVoicePortlet = idDocumentVoicePortlet
+        }
+      } catch (error) {
+        console.log('not config')
       }
       vm.updateStateBooking(item, true)
       if (item) {

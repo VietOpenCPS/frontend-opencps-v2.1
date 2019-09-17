@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout wrap class="mt-4" style="max-width:550px;margin: 0 auto">
+    <v-layout wrap class="fogot-pass mt-4" style="max-width:550px;margin: 0 auto">
       <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
         <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
           <span class="text-bold">CẤP LẠI MẬT KHẨU</span>
@@ -14,7 +14,7 @@
           <v-flex xs12>
             <v-text-field
               box
-              placeholder="địa chỉ Email"
+              placeholder="Địa chỉ Email"
               v-model="confirmCode"
               :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
               required
@@ -61,6 +61,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
     })

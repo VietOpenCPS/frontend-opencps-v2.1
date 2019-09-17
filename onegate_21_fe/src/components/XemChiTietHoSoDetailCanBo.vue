@@ -92,7 +92,7 @@
                   </span>
                 </p>
                 <v-layout wrap xs12 class="mb-0"> 
-                  <v-flex style="width: calc(100% - 110px)">
+                  <v-flex style="width: calc(100% - 110px); text-align: justify;">
                     <span>Người thực hiện: &nbsp;</span>
                     <span v-if="usersNextAction && Array.isArray(usersNextAction) && usersNextAction.length > 0">
                       <span v-for="(item, index) in usersNextAction" :key="item.userId">
@@ -109,8 +109,10 @@
                       <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus !== 'new'">
                         <span>Phân công lại</span>
                       </span> -->
-                      <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && thongTinChiTietHoSo.dossierStatus === 'new' && !checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
-                      <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
+                      Ủy quyền
+                      <!-- <span v-if="(String(currentUser['userId']) === String(thongTinChiTietHoSo.lastActionUserId) || getUser('Administrator_data') || getUser('Administrator')) && 
+                        thongTinChiTietHoSo.dossierStatus === 'new' && !checkPemissionPhanCongLai(currentUser)">Ủy quyền</span>
+                      <span v-if="!getUser('Administrator_data') && !getUser('Administrator') && checkPemissionPhanCongLai(currentUser)">Ủy quyền</span> -->
                     </v-btn>
                   </v-flex>
                 </v-layout>

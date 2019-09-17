@@ -140,7 +140,7 @@ export default {
         end: vm.employeePage * vm.numberPerPage,
         itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadEmployees', filter).then(result => {
+      vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
         vm.totalEmployee = result[0]
         vm.employeeItems = sortEmployee(result[1])     
         vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)

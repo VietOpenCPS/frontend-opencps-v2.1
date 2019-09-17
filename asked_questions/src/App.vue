@@ -130,7 +130,7 @@
         let current = vm.$router.history.current
         let query = current.query
         let filter = {
-          agencyCode: vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
           answered: query.hasOwnProperty('answered') ? query['answered'] : ''

@@ -80,7 +80,7 @@
                     </v-btn>
                   </div>
                 </div>
-                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow-y:scroll;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
+                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">

@@ -278,7 +278,7 @@
         return this.$store.getters.loading
       },
       originality () {
-        var vm = this
+        let vm = this
         return vm.getOriginality()
       },
       initDataResource () {
@@ -289,7 +289,7 @@
       }
     },
     created () {
-      var vm = this
+      let vm = this
       vm.page = 1
       vm.$nextTick(function () {
         // console.log('vm.detailDossier------------', vm.detailDossier)
@@ -378,11 +378,11 @@
         }
       },
       mergeDossierTemplateVsDossierFiles (createFiles, dossierFiles) {
-        var vm = this
+        let vm = this
         if (dossierFiles.length !== 0) {
           createFiles.forEach(template => {
-            var itemFind = dossierFiles.find(file => {
-              return template.partNo === file.dossierPartNo && file.eForm && file.fileSize !== 0
+            let itemFind = dossierFiles.find(file => {
+              return template.partNo === file.dossierPartNo && file.fileSize !== 0
               // return template.partNo === file.dossierPartNo && file.eForm
             })
             if (itemFind) {
@@ -436,6 +436,7 @@
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
             toastr.success('Yêu cầu của bạn thực hiện thành công')
+            vm.createFiles[index].daKhai = true
             if (vm.dossierIntoGroup.length > 0) {
               vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
               vm.dialogConfirm = true
@@ -453,13 +454,15 @@
           item['dossierId'] = vm.detailDossier.dossierId
           item['id'] = vm.id
           vm.$store.dispatch('postEform', item).then(resPostEform => {
-            toastr.success('Yêu cầu của bạn thực hiện thành công')
             if (vm.dossierIntoGroup.length > 0) {
               vm.labelConfirm = 'Đính kèm giấy tờ này cho hồ sơ khác?'
               vm.dialogConfirm = true
               vm.filesAdd = [resData]
             }
-            vm.createFiles[index].daKhai = true
+            setTimeout(function () {
+              toastr.success('Yêu cầu của bạn thực hiện thành công')
+              vm.createFiles[index].daKhai = true
+            }, 3000)
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
             }).catch(reject => {
@@ -502,6 +505,8 @@
           vm.progressUploadPart = ''
           vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
             vm.dossierFilesItems = result
+            vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
+            console.log('createFiles', vm.createFiles)
           })
           // add hồ sơ cùng nhóm
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
@@ -632,6 +637,7 @@
             vm.partView = item.dossierPartNo
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
               vm.dossierFilesItems = result
+              vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
             })
           }).catch(reject => {
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')

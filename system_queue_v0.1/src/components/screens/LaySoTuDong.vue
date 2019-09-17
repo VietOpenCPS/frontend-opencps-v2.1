@@ -36,18 +36,28 @@
         <div v-if="checkinFail">
           <span v-if="overTime">
             Quý khách vui lòng đăng ký xếp hàng trong thời gian <br>
-            Buổi sáng: {{timeMorning}} <br>
+            Buổi sáng: {{timeMorning ? timeMorning : '--:--'}} <br>
             Buổi chiều: {{timeAfternoon ? timeAfternoon : '--:--'}}
           </span>
           <span v-else>
-            Lỗi. Quý khách vui lòng quét lại <br>
-            ERROR. Please again!
+            <span v-if="isScaned">
+              Mã số không hợp lệ. Vui lòng kiểm tra lại <br>
+            </span>
+            <span v-else>
+              Lỗi. Quý khách vui lòng quét lại <br>
+              Error. Please again!
+            </span>
           </span>
         </div>
         <div v-else>
-          <span>
+          <span v-if="overMax">
             Mã {{codeShow}} của quý khách đã được xếp hàng<br>
-            COMPLETED!
+            Số thứ tự: <span style="color: white !important; font-size: 36px">{{countBooking}}</span> <br>
+            {{notifyOverMax}}
+          </span>
+          <span v-else>
+            Mã {{codeShow}} của quý khách đã được xếp hàng<br>
+            Số thứ tự: <span style="color: white !important; font-size: 36px">{{countBooking}}</span>
           </span>
         </div>
       </v-flex>
@@ -75,10 +85,17 @@ export default {
   components: {
   },
   data: () => ({
+    groupDvc: '',
     bookingGroups: '',
+    stepDossierRelease: '',
     dossierStepsAllow: '',
+    overMax: false,
+    notifyOverMax: '',
+    maxCounter: '',
+    currentGroup: '',
     eformInformation: '',
     codeShow: '',
+    countBooking: '', 
     isActive: false,
     checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -86,7 +103,8 @@ export default {
     timeMorning: '',
     timeAfternoon: '',
     onTime: true,
-    overTime: false
+    overTime: false,
+    isScaned: false
   }),
   computed: {
     isMobile () {
@@ -141,6 +159,9 @@ export default {
   methods: {
     submitQueue () {
       let vm = this
+      vm.maxCounter = ''
+      vm.countBooking = ''
+      vm.currentGroup = ''
       vm.checkOntime()
       console.log('onTime 1, isActive', vm.onTime, vm.isActive)
       console.log('checkinFail 1, overTime', vm.checkinFail, vm.overTime)
@@ -164,26 +185,41 @@ export default {
               serviceCode: '',
               gateNumber: '',
               state: 1,
-              codeNumber: keySearch.length === 1 ? vm.eformInformation : keySearch[3],
-              bookingName: ''
+              codeNumber: '',
+              bookingName: '',
+              serviceGroupCode: ''
+            }
+            if (keySearch.length === 1) {
+              filterBooking['codeNumber'] = vm.eformInformation
+            } else {
+              filterBooking['codeNumber'] = vm.maBienNhan(vm.eformInformation)
             }
             if (keySearch.length === 1) {
               let filterEform = {
-                eFormNo: vm.eformInformation
+                eFormNo: vm.eformInformation,
+                endPoint: '/eforms/' + vm.eformInformation + '/barcode'
               }
               vm.$store.dispatch('getEformBarcode', filterEform).then(function (result) {
                 let bookingName = ''
                 if (result['eFormId']) {
+                  // 
+                  vm.currentGroup = vm.bookingGroups.filter(function (item) {
+                    return (item['config'] && item['config'].split(',').indexOf(result['serviceCode']) >= 0)
+                  })[0]
+                  console.log('currentGroup', vm.currentGroup)
+                  // 
                   try {
                     let name = JSON.parse(result['eFormData'])
                     bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
                   } catch (e) {
+                    console.log('lỗi parse eFormData get bookingName')
                   }
                   vm.checkinFail = false
                   filterBooking.className = 'EFORM'
                   filterBooking.classPK = result.eFormId
                   filterBooking.serviceCode = result.serviceCode
                   filterBooking.bookingName = bookingName
+                  filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                   vm.createBooking(filterBooking)
                 } else {
                   vm.isActive = true
@@ -208,13 +244,20 @@ export default {
               }
               vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
                 if (result) {
+                  vm.currentGroup = vm.bookingGroups.filter(function (item) {
+                    return (item['className'] === 'DOSSIER')
+                  })[0]
                   vm.checkinFail = false
                   filterBooking.className = 'DOSSIER'
                   filterBooking.classPK = result.dossierId
                   filterBooking.serviceCode = result.serviceCode
                   filterBooking.bookingName = result.applicantName
+                  filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                   if (result['stepCode'] && vm.dossierStepsAllow.indexOf(String(result['stepCode'])) >= 0) {
                     console.log('createBK', result['stepCode'], filterBooking)
+                    if (vm.stepDossierRelease.indexOf(String(result['stepCode']) >= 0)) {
+                      filterBooking.state = 4
+                    }
                     vm.createBooking(filterBooking)
                   } else {
                     vm.isActive = true
@@ -264,9 +307,28 @@ export default {
       let vm = this
       vm.$store.dispatch('createBooking', filter).then(function (result) {
         vm.isActive = true
+        vm.checkinFail = false
+        vm.isScaned = false
+        vm.countBooking = result['count']
+        // 
+        let timeDelay = 5000
+        if (String(result['state']) === '4') {
+          vm.checkinFail = true
+          vm.isScaned = true
+        } else {
+          vm.overMax = false
+          if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
+            && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
+          ) {
+            vm.overMax = true
+            timeDelay = 10000
+          }
+        }
+        
+        // 
         setTimeout(function() {
           vm.isActive = false
-        }, 5000)
+        }, timeDelay)
         vm.eformInformation = ''
       }).catch (function (reject) {
         vm.eformInformation = ''
@@ -294,7 +356,10 @@ export default {
         try {
           let configs = JSON.parse(result.configs)
           vm.dossierStepsAllow = configs['dossierStepsAllow']
+          vm.stepDossierRelease = configs['stepDossierRelease']
           vm.bookingGroups = configs['bookings']
+          vm.groupDvc = configs['groupId']
+          vm.notifyOverMax = configs['notifyMax']
           console.log('bookingGroups', vm.bookingGroups)
           // thời gian làm việc
           let workTime = configs['workTime'] ? configs['workTime'] : '08:00-11:00;13:00-16:00'
@@ -357,6 +422,20 @@ export default {
         vm.checkinFail = false
         vm.overTime = false
       }
+    },
+    maBienNhan (str) {
+      let index = 0
+      let pstBN = 0
+      for (i=0; i<str.length; i++) {
+        if (str.charAt(i) === '-') {
+          index += 1
+        }
+        if (index === 3) {
+          pstBN = i
+          break;
+        }
+      }
+      return str.substr(pstBN + 1)
     }
   }
 }

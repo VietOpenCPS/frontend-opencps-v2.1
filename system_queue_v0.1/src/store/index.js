@@ -92,14 +92,20 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+	            Token: window.Liferay ? window.Liferay.authToken : ''
             },
             params: {}
           }
-          axios.get(state.endPoint + '/eforms/' + filter.eFormNo + '/barcode', param).then(function (response) {
-            let serializable = response.data
-            if (serializable) {
-              resolve(serializable)
+          let endPoint = filter['endPoint']
+          let dataPost = new URLSearchParams()
+          let textPost = {}
+          dataPost.append('method', 'GET')
+          dataPost.append('url', endPoint)
+          dataPost.append('data', JSON.stringify(textPost))
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+            if (response.data) {
+              resolve(response.data)
             } else {
               resolve('')
             }
@@ -109,7 +115,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDossier ({commit, state}, filter) {
+    getDossierDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
@@ -138,12 +144,18 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
+              Token: window.Liferay ? window.Liferay.authToken : ''
             },
             params: {
               state: filter.state ? filter.state : '',
               service: filter.service ? filter.service : ''
             }
+          }
+          if (filter['bookingFrom']) {
+            param['params'].bookingFrom = filter['bookingFrom']
+          }
+          if (filter['bookingTo']) {
+            param['params'].bookingTo = filter['bookingTo']
           }
           axios.get(state.endPoint + '/bookings/' + filter.className, param).then(function (response) {
             let serializable = response.data
@@ -180,30 +192,31 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getDossierDetail ({commit, state}, filter) {
-      return new Promise((resolve, reject) => {
-        store.dispatch('loadInitResource').then(function (result) {
-          let param = {
-            headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
-            }
-          }
-          axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
-            let serializable = response.data
-            resolve(serializable)
-          }).catch(function (xhr) {
-            reject()
-          })
-        })
-      })
-    },
+    // getDossierDetail ({commit, state}, filter) {
+    //   return new Promise((resolve, reject) => {
+    //     store.dispatch('loadInitResource').then(function (result) {
+    //       let param = {
+    //         headers: {
+    //           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+    //           Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
+    //         }
+    //       }
+    //       axios.get('/o/rest/v2/dossiers/' + filter.dossierId, param).then(function (response) {
+    //         let serializable = response.data
+    //         resolve(serializable)
+    //       }).catch(function (xhr) {
+    //         reject()
+    //       })
+    //     })
+    //   })
+    // },
     getServerConfig ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
             }
           }
           let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
@@ -223,7 +236,7 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-              Authorization: "BASIC YWRtaW5fY2xzQGRpY2h2dWNvbmcudm46MTIzNDU="
+              Token: window.Liferay ? window.Liferay.authToken : ''
             }
           }
           let dataCreateBooking = new URLSearchParams()
@@ -234,8 +247,13 @@ export const store = new Vuex.Store({
           dataCreateBooking.append('state', filter.state)
           dataCreateBooking.append('gateNumber', '')
           dataCreateBooking.append('bookingName', filter.bookingName)
+          dataCreateBooking.append('serviceGroupCode', filter.serviceGroupCode)
           axios.post('/o/rest/v2/bookings', dataCreateBooking, param).then(function (response) {
-            resolve(response)
+            if (response.data) {
+              resolve(response.data)
+            } else {
+              resolve(response)
+            }
           }).catch(function (xhr) {
             reject(xhr)
           })
