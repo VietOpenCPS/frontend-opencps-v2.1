@@ -277,6 +277,27 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    updateBookingAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataUpdateBooking = new URLSearchParams()
+          dataUpdateBooking.append('state', filter.state)
+          dataUpdateBooking.append('gateNumber', filter.gateNumber)
+          dataUpdateBooking.append('speaking', filter.speaking)
+          axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
     }
   },
   mutations: {

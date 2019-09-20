@@ -195,7 +195,7 @@
       type="file"
       ref="importData"
       name="importData"
-      accept="text/xml,application/zip"
+      accept=""
       @change="onFilePicked"
       v-show="false"
     >
@@ -530,6 +530,7 @@
           vm.loadingImport = true
           let bodyFormData = new FormData()
           bodyFormData.append('file', files[0])
+          bodyFormData.append('deliverableType', vm.items[vm.index]['typeCode'])
           axios({
             method: 'post',
             url: '/o/rest/v2/deliverables/import/files',

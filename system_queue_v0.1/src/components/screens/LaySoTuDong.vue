@@ -163,8 +163,6 @@ export default {
       vm.countBooking = ''
       vm.currentGroup = ''
       vm.checkOntime()
-      console.log('onTime 1, isActive', vm.onTime, vm.isActive)
-      console.log('checkinFail 1, overTime', vm.checkinFail, vm.overTime)
       if (!vm.isActive) {
         if (vm.onTime) {
           vm.overTime = false
@@ -187,7 +185,8 @@ export default {
               state: 1,
               codeNumber: '',
               bookingName: '',
-              serviceGroupCode: ''
+              serviceGroupCode: '',
+              dossierRelease: false
             }
             if (keySearch.length === 1) {
               filterBooking['codeNumber'] = vm.eformInformation
@@ -237,7 +236,7 @@ export default {
                 }, 5000)
                 vm.eformInformation = ''
               })
-            } else if (keySearch[0] === 'D' && keySearch.length === 4) {
+            } else if (keySearch[0] === 'D' && keySearch.length !== 1) {
               let filterDossier = {
                 dossierId: keySearch[2],
                 secretCode: keySearch[1]
@@ -254,9 +253,10 @@ export default {
                   filterBooking.bookingName = result.applicantName
                   filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                   if (result['stepCode'] && vm.dossierStepsAllow.indexOf(String(result['stepCode'])) >= 0) {
-                    console.log('createBK', result['stepCode'], filterBooking)
-                    if (vm.stepDossierRelease.indexOf(String(result['stepCode']) >= 0)) {
-                      filterBooking.state = 4
+                    if (vm.stepDossierRelease.indexOf(String(result['stepCode'])) >= 0) {
+                      filterBooking.dossierRelease = true
+                    } else {
+                      filterBooking.dossierRelease = false
                     }
                     vm.createBooking(filterBooking)
                   } else {
@@ -305,6 +305,7 @@ export default {
     },
     createBooking (filter) {
       let vm = this
+      console.log('filter create booking', filter)
       vm.$store.dispatch('createBooking', filter).then(function (result) {
         vm.isActive = true
         vm.checkinFail = false
@@ -316,6 +317,12 @@ export default {
           vm.checkinFail = true
           vm.isScaned = true
         } else {
+          // 
+          if (filter.dossierRelease) {
+            result.state = 4
+            console.log('filter update', result)
+            vm.updateStateBooking(result)
+          }
           vm.overMax = false
           if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
             && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
@@ -324,7 +331,6 @@ export default {
             timeDelay = 10000
           }
         }
-        
         // 
         setTimeout(function() {
           vm.isActive = false
@@ -391,6 +397,13 @@ export default {
         vm.checkOntime()
       })
     },
+    updateStateBooking (item) {
+      let vm = this
+      let filter = item
+      vm.$store.dispatch('updateBookingAll', filter).then(function (result) {
+      }).catch (function (reject) {
+      })
+    },
     checkOntime () {
       let vm = this
       let currentTime = `${(new Date()).getHours()}:${(new Date()).getMinutes()}`
@@ -426,7 +439,7 @@ export default {
     maBienNhan (str) {
       let index = 0
       let pstBN = 0
-      for (i=0; i<str.length; i++) {
+      for (var i=0; i<str.length; i++) {
         if (str.charAt(i) === '-') {
           index += 1
         }

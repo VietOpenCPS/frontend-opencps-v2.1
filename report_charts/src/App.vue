@@ -5,52 +5,6 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-snackbar
-      v-model="snackbarerror"
-      :bottom="false"
-      :left="false"
-      :multi-line="false"
-      :right="true"
-      :timeout="2000"
-      :top="true"
-      :vertical="false"
-      color="red darken-3"
-    >
-      Yêu cầu thực hiện thất bại
-      <v-btn
-        icon
-        @click="closeError()"
-      >
-        <v-icon>clear</v-icon>
-      </v-btn>
-    </v-snackbar>
-    <v-snackbar
-      v-model="snackbarsocket"
-      :bottom="true"
-      :left="false"
-      :multi-line="true"
-      :right="false"
-      :timeout="0"
-      :top="true"
-      :vertical="false"
-      color="red darken-3"
-    >
-      <v-progress-circular
-        :size="20"
-        :width="1"
-        color="white"
-        indeterminate
-      ></v-progress-circular>
-      &nbsp;
-      Mất kết nối, tự động kết nối lại trong giây lát ... 
-      
-      <v-btn
-        icon
-        @click="reloadPage()"
-      >
-        <v-icon>replay</v-icon>
-      </v-btn>
-    </v-snackbar>
     <!-- <go-top :size="42" bg-color="#0064c7"></go-top> -->
   </v-app>
 </template>

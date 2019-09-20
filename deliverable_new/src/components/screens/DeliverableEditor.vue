@@ -41,79 +41,7 @@
         </v-toolbar>
         <bbat-table-editor-component-simple ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple>
       </v-navigation-drawer>
-      <!-- <bbat-table-editor-component-simple v-if="showComponent" ref="bbatFormSimple" :id="id" :datainput="detail"></bbat-table-editor-component-simple> -->
-      <!-- <v-tabs
-        icons-and-text centered
-        v-model="active"
-      >
-        <v-tabs-slider></v-tabs-slider>
-    
-        <v-tab
-          href="#tab-1"
-          :key="1"
-          v-if="String(id) !== '0'"
-        >
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            XEM GIẤY PHÉP
-          </v-btn>
-        </v-tab>
-        <v-tab
-          href="#tab-2"
-          :key="2"
-        >
-          <v-btn flat class="px-0 py-0 mx-0 my-0" @click="">
-            THÔNG TIN MỞ RỘNG
-          </v-btn>
-        </v-tab>
-        <v-tab
-          href="#tab-3"
-          :key="3"
-        >
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            TẢI GIẤY PHÉP TỪ MÁY TÍNH
-          </v-btn>
-        </v-tab>
-        <v-tab :key="4" href="#tab-4" 
-          v-if="String(id) !== '0'"> 
-          <v-btn flat class="px-0 py-0 mx-0 my-0">
-            LỊCH SỬ CẬP NHẬT GIẤY PHÉP
-          </v-btn>
-        </v-tab>
-
-        <v-tabs-items reverse-transition="fade-transition" transition="fade-transition">
-          <v-tab-item
-            value="tab-1"
-            :key="1"
-            reverse-transition="fade-transition" transition="fade-transition"
-            v-if="String(id) !== '0'"
-          >
-            <view-pdf ref="viewpdf" v-if="showComponent" :id="id" :datainput="detail"></view-pdf>
-          </v-tab-item>
-          <v-tab-item
-            value="tab-2"
-            :key="2"
-            reverse-transition="fade-transition" transition="fade-transition"
-          >
-            <bbat-table-editor-component v-if="showComponent" ref="bbatForm" :id="id" :formid="formId" :datainput="detail['formData']"></bbat-table-editor-component>
-          </v-tab-item>
-
-          <v-tab-item
-            value="tab-3"
-            :key="3"
-            reverse-transition="fade-transition" transition="fade-transition"
-          >
-            <attached-file-template ref="attachedObj" :pk="id" :auto="String(id) === '0' ? false : true"></attached-file-template>
-          </v-tab-item>
-          <v-tab-item
-            value="tab-4"
-            :key="4"
-            reverse-transition="fade-transition" transition="fade-transition"
-            v-if="String(id) !== '0'"
-          >
-            <view-logs v-if="showComponent" :id="id" :datainput="detail"></view-logs>
-          </v-tab-item>
-        </v-tabs-items>
-      </v-tabs> -->
+      
       <v-layout row wrap :class='{"fix_tool_bottom": offsetCheck > 300}'>
         <v-flex xs12 class="text-right pt-0 mt-4 ml-1 px-0 pr-3">
           <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
@@ -143,6 +71,13 @@
           <v-icon>edit</v-icon> &nbsp;
           Sửa giấy phép
           </v-btn>
+          <v-btn v-if="String(id) !== '0' && !editDeliverable && detail['fileAttachs']" color="blue darken-3" class="mr-1" dark  v-on:click.native="viewFileAttach(detail)"
+            :loading="loading"
+            :disabled="loading"
+          >
+          <v-icon>visibility</v-icon> &nbsp;
+            Tài liệu đính kèm
+          </v-btn>
           <v-btn v-if="String(id) !== '0' && editDeliverable" color="blue darken-3" class="mr-1" dark  v-on:click.native="editDeliverable = false"
             :loading="loading"
             :disabled="loading"
@@ -162,6 +97,47 @@
         </ejs-uploader>
       </v-layout>
     </v-form>
+    <v-dialog v-model="dialogPDF" max-width="1200" transition="fade-transition" fullscreen>
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Tài liệu đính kèm</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogPDF = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <div v-if="dialogPDFLoading" style="
+            min-height: 600px;
+            text-align: center;
+            margin: auto;
+            padding: 25%;
+        ">
+          <v-progress-circular
+            :size="100"
+            :width="1"
+            color="primary"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+        <v-card-text class="px-0 py-0 my-0 py-0">
+          <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+          </iframe>
+        </v-card-text>
+        
+        <v-card-actions v-if="fileEntryIdAttachs.length > 0" class="py-0">
+          <span class="left primary--text text-bold" style="font-size: 1.25em">Tổng số: <span class="red--text">{{fileEntryIdAttachs.length}}</span> tài liệu</span>
+          <div class="text-xs-center" style="width: calc(100% - 150px);">
+            <v-pagination
+              v-model="pageAttachs"
+              :length="fileEntryIdAttachs.length"
+              circle
+              @input="changePage(pageAttachs)"
+              :total-visible="5"
+            ></v-pagination>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -198,7 +174,11 @@
         showComponent: false,
         formId: '',
         editDeliverable: false,
-        extensions: '.pdf'
+        extensions: '.pdf',
+        dialogPDF: false,
+        dialogPDFLoading: false,
+        fileEntryIdAttachs: [],
+        pageAttachs: 1
       }
     },
     created () {
@@ -219,6 +199,9 @@
             vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
               if (String(vm.id) !== '0') {
                 vm.detail = result
+                // test multiple fileAttachs
+                // vm.detail['fileAttachs'] = '1300487,1289275'
+                // 
               }
               vm.deName = vm.detail['deliverableName']
               vm.showComponent = true
@@ -242,6 +225,9 @@
           vm.$store.dispatch('getDeliverableById', vm.id).then(function (result) {
             if (String(vm.id) !== '0') {
               vm.detail = result
+              // test multiple fileAttachs
+              // vm.detail['fileAttachs'] = '1300487,1289275'
+              // 
             }
             vm.deName = vm.detail['deliverableName']
             vm.showComponent = true
@@ -413,6 +399,32 @@
             })
           }
         }
+      },
+      viewFileAttach (detail) {
+        let vm = this
+        vm.fileEntryIdAttachs = String(detail['fileAttachs']).split(',')
+        vm.loading = true
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[0]).then(function (result) {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = true
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+        })
+      },
+      changePage(page) {
+        let vm = this
+        let index = Number(page) - 1
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[index]).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.dialogPDFLoading = false
+        })
       },
       uploadFileDeliverable () {
         let vm = this

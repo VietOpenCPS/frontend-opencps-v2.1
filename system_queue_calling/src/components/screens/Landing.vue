@@ -546,7 +546,7 @@ export default {
         }
       })
     },
-    mergeBooking (bookingEform, bookingDossier) {
+    mergeBooking (bookingDossier, bookingEform) {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -746,9 +746,7 @@ export default {
       let vm = this
       vm.bookingCalling = item
       item.state = 2
-      setTimeout(function () {
-        item.speaking = false
-      }, 10000)
+      item.speaking = false
       vm.updateStateBooking(item)
     },
     callingApplicant (item) {

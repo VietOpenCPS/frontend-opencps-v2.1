@@ -311,7 +311,7 @@ export default {
       if (item) {
         vm.called = false
         $('#audioCalling').html('')
-        let numberCalling = item['codeNumber']
+        let numberCalling = String(item['codeNumber']).replace(/[^a-zA-Z0-9]/g,'')
         let srcAudioStart = item['className'] === 'EFORM' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
         // 
