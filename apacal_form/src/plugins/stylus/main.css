@@ -1,0 +1,48 @@
+header {
+    display: none !important
+}
+nav:not(.v-toolbar) {
+    display: none !important
+}
+footer {
+    display: none !important
+}
+div.jsoneditor {
+    border: none !important
+}
+div.jsoneditor {
+    height: calc(100vh - 36px) !important;
+    height: -moz-calc(100vh - 36px);
+    height: -webkit-calc(100vh - 36px);
+    height: -o-calc(100vh - 36px);
+}
+.form-script, .form-data {
+    position: relative;
+}
+.jsoneditor-menu {
+    display: none !important
+}
+div.jsoneditor-outer.has-main-menu-bar {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+}
+.max-btn {
+    display: none !important
+}
+.toolbar-script {
+    border-right: 1px solid #cccccc !important;
+}
+.full-screen {
+    width: calc(100% - 150px) !important;
+    width: -moz-calc(100% - 150px);
+    width: -webkit-calc(100% - 150px);
+    width: -o-calc(100% - 150px);
+}
+.small-screen {
+    width: 150px !important;
+}
+.v-dialog--fullscreen {
+    background: #fff !important;
+    padding-bottom: 30px !important
+}
+

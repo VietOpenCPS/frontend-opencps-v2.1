@@ -420,7 +420,7 @@
             }
             /* eslint-disable */
             formScript.data = formData
-            window.$('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
+            window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').alpaca(formScript)
           })
         })
       },

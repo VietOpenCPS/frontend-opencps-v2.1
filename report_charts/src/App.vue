@@ -1,7 +1,5 @@
 <template>
   <v-app id="app_report_charts">
-    <v-navigation-drawer app clipped floating width="310" v-if="false">
-    </v-navigation-drawer>
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -16,6 +14,7 @@
     props: ['index'],
     data: () => ({
       dialog: false,
+      loadingDelay: false,
       drawer: null,
       dataSocket: {}
     }),

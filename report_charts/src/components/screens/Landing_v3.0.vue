@@ -1,90 +1,32 @@
 <template>
   <div class="form-chitiet">
-    <!-- <div class="row-header">
-      <div class="background-triangle-big"> <span>BÁO CÁO</span> </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex xs12 pl-3 text-ellipsis text-bold">
-          <v-layout wrap class="chart__report">
-            <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="years"
-                v-model="year"
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeYear"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs6 sm2 class="px-2">
-              <v-select
-                :items="months"
-                v-model="month"
-                item-text="name"
-                item-value="value"
-                :hide-selected="true"
-                @change="changeMonth"
-                >
-              </v-select>
-            </v-flex>
-            <v-flex xs12 sm8 class="px-2 text-right" style="    padding-top: 1px;">
-              <v-btn v-if="govAgencyCode === ''" flat class="mx-0 my-0" v-on:click.native="toNativeViewType()">
-                <span v-if="chartView">Lĩnh vực</span>
-                <span v-else>Đơn vị</span>
-              </v-btn>
-              <v-btn icon class="mx-0 my-0" v-on:click.native="toNativeView(0,'lineChart')">
-                <v-icon size="14">show_chart</v-icon>
-              </v-btn>
-              <v-btn v-if="reportGovName.length > 0 && String(index) !== '1'" flat class="mx-0 my-0" v-on:click.native="toNativeViewBack(index)">
-                <v-icon class="mr-2">undo</v-icon> Quay lại 
-              </v-btn>
-              <v-tooltip bottom>
-                <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
-                  <v-icon size="14">pie_chart</v-icon>
-                </v-btn>
-                <span>Xem dạng biểu đồ</span>
-              </v-tooltip>
-              <v-tooltip bottom>
-                <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(1)">
-                  <v-icon size="14">grid_on</v-icon>
-                </v-btn>
-                <span>Xem dạng bảng biểu</span>
-              </v-tooltip>
-            </v-flex>
-          </v-layout>
-        </div>
-      </div>
-    </div> -->
     <div class="run-down mt-3">
       <div class="box-title">Tình hình xử lý các năm</div>
       <div class="in-time">
-        <span>68%</span>
+        <span>{{itemTotal['ontimePercentage'] ? Math.round(itemTotal['ontimePercentage']) : 0}} %</span>
         Sớm và đúng hạn
       </div>
       <div class="fake-line"></div>
       <div class="total-solved">
-        <span>3037</span>
+        <span>{{itemTotal['processCount']}}</span>
         Tổng giải quyết
       </div>
       <div class="finished">
-        <span>913</span>
+        <span>{{itemTotal['releaseCount']}}</span>
         Hoàn thành
       </div>
       <div class="processing">
-        <span>541</span>
+        <span>{{itemTotal['processingCount']}}</span>
         Đang xử lý
       </div>
       <div class="take-back">
-        <span>0</span>
+        <span>{{itemTotal['cancelledCount']}}</span>
         Rút hồ sơ
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
       <v-flex xs12 sm6 class="mt-3 pr-2">
         <v-card class="wrap_report" style="border-radius: 0;">
-          <!-- <v-card-title class="headline">
-            Thống kê thủ tục hành chính
-          </v-card-title> -->
           <div class="row-header">
             <div class="background-triangle-big"> <span>THỐNG KÊ THỦ TỤC HÀNH CHÍNH</span> </div>
             <div class="layout row wrap header_tools row-blue">
@@ -170,7 +112,11 @@
             <!-- <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public> -->
             <apexchart type=donut width=380 height=270 :options="chartDonutOptions" :series="seriesDonut" />
             <span class="d-inline-block total-pie-text">
-              <p class="blue--text mb-0 text-bold" style="font-size: 1.25em">TỔNG SỐ HỒ SƠ: <span style="font-size: 32px">1354</span></p>
+              <p class="blue--text mb-0 text-bold" style="font-size: 1.25em">TỔNG SỐ HỒ SƠ: 
+                <span style="font-size: 32px">
+                  {{itemTotal.undueCount + itemTotal.overdueCount + itemTotal.waitingCount + itemTotal.betimesCount + itemTotal.ontimeCount + itemTotal.overtimeCount + itemTotal.cancelledCount}}
+                </span>
+              </p>
             </span>
           </v-card-text>
         </v-card>
@@ -186,7 +132,66 @@
           </v-flex>
         </v-card-text>
       </v-card>
+      <!-- filter navigation -->
+      <v-layout wrap class="mt-4 ml-0">
+        <v-flex xs12 >
+          <div class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+            <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
+             class="mr-2" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
+            <v-btn @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
+            :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
+          </div>
 
+          <div class="d-inline-block ml-3 px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+            <v-btn small color="#0054a6" depressed class="mr-2 white--text" style="height: 24px;">Tất cả các hệ thống</v-btn>
+            <v-btn flat small color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
+            <v-btn flat small color="#0054a6" class="" style="height: 24px;">Hệ thống khác</v-btn>
+          </div>
+
+          <v-layout wrap class="right date-filter">
+            <v-flex class="mr-2" style="width:125px">
+              <v-select
+                :items="years"
+                v-model="year"
+                item-text="name"
+                item-value="value"
+                @change="changeYear"
+                class="d-inline-block text-bold"
+                solo
+                flat
+                background-color="#fff"
+                style="border: 1px solid #0054a6; border-radius: 3px;height:36px"
+                hide-details
+                >
+                <template v-slot:selection="{ item, index }">
+                  <span style="color: #0054a6 !important">{{item ? item['name'] : ''}}</span>
+                </template>
+              </v-select>
+            </v-flex>
+            <v-flex class="" style="width:125px">
+              <v-select
+                :items="months"
+                v-model="month"
+                item-text="name"
+                item-value="value"
+                :hide-selected="true"
+                @change="changeMonth"
+                class="d-inline-block text-bold"
+                solo
+                flat
+                background-color="#fff"
+                style="border: 1px solid #0054a6; border-radius: 3px; height:36px"
+                hide-details
+                >
+                <template v-slot:selection="{ item, index }">
+                  <span style="color: #0054a6 !important">{{item ? item['name'] : ''}}</span>
+                </template>
+              </v-select>
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+      <!--  -->
       <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header" v-if="String(month) !== '0'">
@@ -204,7 +209,29 @@
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
-              style="margin-top: -30px;"
+              style="margin-top: -30px"
+            ></apexchart>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+
+      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar">
+        <v-card class="wrap_report" style="border-radius: 0;">
+          <div class="row-header" v-if="String(month) !== '0'">
+            <div class="background-triangle-big"> <span>TỔNG SỐ HỒ SƠ TIẾP NHẬN THÁNG {{month}} NĂM {{year}}</span> </div>
+            <div class="layout row wrap header_tools row-blue">
+            </div> 
+          </div>
+          <div class="row-header" v-else>
+            <div class="background-triangle-big"> <span>TỔNG SỐ HỒ SƠ TIẾP NHẬN NĂM {{year}}</span> </div>
+            <div class="layout row wrap header_tools row-blue">
+            </div> 
+          </div>
+          <v-card-text class="pt-2 pb-0 px-0">
+            <apexchart type="bar" height="500"
+              :options="dossierTypeChartOption" 
+              :series="seriesDossierTypeChart" 
+              style="margin-top: -30px"
             ></apexchart>
           </v-card-text>
         </v-card>
@@ -229,17 +256,17 @@
             ></apexchart>
           </v-card-text>
         </v-card>
-      </v-flex> -->
+      </v-flex> --> 
 
       <v-flex xs12 class="mt-4 ml-0" v-if="!reloadLine" id="lineChartID">
-        <v-card class="wrap_report" style="border-radius: 0;">
+        <v-card class="wrap_report" style="border-radius: 0">
           <div class="row-header">
             <div class="background-triangle-big"> <span>THỐNG KÊ TỔNG SỐ HỒ SƠ ĐÃ TIẾP NHẬN NĂM {{year}}</span> </div>
             <div class="layout row wrap header_tools row-blue">
-            </div> 
+            </div>
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="line" height="450"
+            <apexchart type="line" height="500"
               :options="chartOptions" 
               :series="seriesChart"
               style="margin-top: -30px;"
@@ -441,51 +468,51 @@ export default {
       },
       {
         'value': '1',
-        'name': 'tháng 1'
+        'name': 'Tháng 1'
       },
       {
         'value': '2',
-        'name': 'tháng 2'
+        'name': 'Tháng 2'
       },
       {
         'value': '3',
-        'name': 'tháng 3'
+        'name': 'Tháng 3'
       },
       {
         'value': '4',
-        'name': 'tháng 4'
+        'name': 'Tháng 4'
       },
       {
         'value': '5',
-        'name': 'tháng 5'
+        'name': 'Tháng 5'
       },
       {
         'value': '6',
-        'name': 'tháng 6'
+        'name': 'Tháng 6'
       },
       {
         'value': '7',
-        'name': 'tháng 7'
+        'name': 'Tháng 7'
       },
       {
         'value': '8',
-        'name': 'tháng 8'
+        'name': 'Tháng 8'
       },
       {
         'value': '9',
-        'name': 'tháng 9'
+        'name': 'Tháng 9'
       },
       {
         'value': '10',
-        'name': 'tháng 10'
+        'name': 'Tháng 10'
       },
       {
         'value': '11',
-        'name': 'tháng 11'
+        'name': 'Tháng 11'
       },
       {
         'value': '12',
-        'name': 'tháng 12'
+        'name': 'Tháng 12'
       }
     ],
     month: ((new Date()).getMonth() + 1) + '',
@@ -497,12 +524,13 @@ export default {
       xaxis: {
         categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
       },
-      colors: ['#77B6EA', '#545454'],
+      // colors: ['#77B6EA', '#545454'],
       dataLabels: {
         enabled: true
       },
       stroke: {
-        curve: 'smooth'
+        curve: 'straight',
+        width: 4
       },
       grid: {
         borderColor: '#e7e7e7',
@@ -510,6 +538,9 @@ export default {
           colors: ['#f3f3f3', 'transparent'],
           opacity: 0.5
         }
+      },
+      markers: {
+        size: 4
       }
     },
     chartDonutOptions: {
@@ -545,10 +576,8 @@ export default {
                 label: 'Sớm và đúng hạn',
                 color: '#00E396',
                 formatter: function (w) {
-                  let total = w.globals.seriesTotals.reduce((a, b) => {
-                    return a + b
-                  }, 0)
-                  return Math.round(((w.globals.series[3] + w.globals.series[4])/total)*100)+' %'
+                  let totalRelelase = w.globals.series[3] + w.globals.series[4] + w.globals.series[5]
+                  return Math.round(((w.globals.series[3] + w.globals.series[4])/totalRelelase)*100)+' %'
                 }
               }
             }
@@ -620,7 +649,7 @@ export default {
         }
       }
     },
-    seriesDonut: [30, 40, 45, 50, 10, 5, 15],
+    seriesDonut: [],
     toolbar: {
       show: false
     },
@@ -639,6 +668,61 @@ export default {
     chartOptionsBarTotal: {
     },
     seriesChartBarTotal: [],
+    dossierTypeChartOption: {
+      plotOptions: {
+        bar: {
+          // barHeight: '100%',
+          columnWidth: '50%',
+          horizontal: false
+        },
+      },
+      chart: {
+        stacked: true
+      },
+      colors: ['#008FFB', '#00E396'],
+      stroke: {
+        width: 1,
+        colors: ['#fff']
+      },
+      xaxis: {
+        categories: ['Cục Đăng kiểm Việt Nam', 'Cục Hàng hải Việt Nam', 'Cục Hàng không Việt Nam', 'Tổng cục Đường bộ Việt Nam', 'Cơ quan Bộ'],
+        labels: {
+          formatter: function(val) {
+            return val
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: undefined
+        }
+      },
+      dataLabels: {
+        formatter: function(val) {
+          if (val) {return val}
+          return ''
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val
+          }
+        }
+      }
+    },
+    seriesDossierTypeChart: [
+      {
+        name: 'Hồ sơ nộp trực tiếp',
+        data: [300,150,20,100,5]
+      },{
+        name: 'Hồ sơ nộp trực tuyến',
+        data: [12,24,12,32,1]
+      }
+    ],
     labelOfLine: [],
     showTableTotal: false
   }),
@@ -657,6 +741,39 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      let currentYear = (new Date()).getFullYear()
+      vm.years = []
+      try {
+        if (yearsFilterConfig) {
+          let yearsFilter = yearsFilterConfig.split(',') /**Năm báo cáo theo cấu hình */
+          for (let i = 0; i<yearsFilter.length; i++) {
+            vm.years.push(
+              {
+                'value': String(yearsFilter[i]),
+                'name': 'Năm ' + String(yearsFilter[i])
+              }
+            )
+          }
+        } else {
+          for (let j = 0; j<=2; j++) {
+            vm.years.push(
+              {
+                'value': String(Number(currentYear) - j),
+                'name': 'Năm ' + String(Number(currentYear) - j)
+              }
+            )
+          }
+        }
+      } catch (error) {
+        for (let i = 0; i<=2; i++) {
+          vm.years.push(
+            {
+              'value': String(Number(currentYear) - i),
+              'name': 'Năm ' + String(Number(currentYear) - i)
+            }
+          )
+        }
+      }
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -697,7 +814,7 @@ export default {
           vm.totalTTHC = totalXXX
         })
         vm.showTableTotal = false
-        vm.itemTotal = null
+        vm.itemTotal = ''
         vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
           let agencyListsTotal = result
           for (let key in agencyListsTotal) {
@@ -708,7 +825,7 @@ export default {
               break
             }
           }
-          if (vm.itemTotal === null) {
+          if (vm.itemTotal === '') {
             vm.showTableTotal = false
           }
         })
@@ -717,6 +834,7 @@ export default {
   },
   mounted () {
     let vm = this
+
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -766,25 +884,37 @@ export default {
           vm.$vuetify.goTo('#lineChartID', vm.options)
         }, 300)
       }
+    },
+    itemTotal (val) {
+      let vm = this
+      if (val) {
+        vm.seriesDonut[0] = val['undueCount'] /**Đang xử lý còn hạn */
+        vm.seriesDonut[1] = val['overdueCount'] /**Đang xử lý quá hạn */
+        vm.seriesDonut[2] = val['waitingCount'] /**Đang bổ sung điều kiện */
+        vm.seriesDonut[3] = val['betimesCount'] /**Đã giải quyết sớm hạn */
+        vm.seriesDonut[4] = val['ontimeCount'] /**Đã giải quyết đúng hạn */
+        vm.seriesDonut[5] = val['overtimeCount'] /**Đã giải quyết quá hạn */
+        vm.seriesDonut[6] = val['cancelledCount'] /**Rút không giải quyết */
+      }
     }
   },
   methods: {
-    toNativeViewType () {
+    toNativeViewType (type) {
       let vm = this
-      let currentQuerys = vm.$router.history.current.query
-      if (currentQuerys.hasOwnProperty('chartView')) {
-        let changTypeCHK = (currentQuerys.chartView === 'true' || currentQuerys.chartView)
-        console.log('changTypeCHK', changTypeCHK)
-        if (String(changTypeCHK) === 'true') {
-          vm.chartView = false
-          console.log('changTypeCHK1', vm.chartView)
-        } else {
-          vm.chartView = true
-          console.log('changTypeCHK2', vm.chartView)
-        }
-      } else {
-        vm.chartView = !vm.chartView
-      }
+      // let currentQuerys = vm.$router.history.current.query
+      // if (currentQuerys.hasOwnProperty('chartView')) {
+      //   let changTypeCHK = (currentQuerys.chartView === 'true' || currentQuerys.chartView)
+      //   console.log('changTypeCHK', changTypeCHK)
+      //   if (String(changTypeCHK) === 'true') {
+      //     vm.chartView = false
+      //     console.log('changTypeCHK1', vm.chartView)
+      //   } else {
+      //     vm.chartView = true
+      //     console.log('changTypeCHK2', vm.chartView)
+      //   }
+      // } else {
+        vm.chartView = type
+      // }
       console.log('toNativeViewType', vm.chartView)
       vm.$router.push({
         path: '/bao-cao/' + vm.index,
@@ -949,7 +1079,7 @@ export default {
       let vm = this
       vm.year = item
       vm.showTableTotal = false
-      vm.itemTotal = null
+      vm.itemTotal = ''
       vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
         let agencyListsTotal = result
         for (let key in agencyListsTotal) {
@@ -960,7 +1090,7 @@ export default {
             break
           }
         }
-        if (vm.itemTotal === null) {
+        if (vm.itemTotal === '') {
           vm.showTableTotal = false
         }
       })

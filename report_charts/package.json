@@ -24,7 +24,7 @@
     "chart.js": "^2.7.2",
     "chart.piecelabel.js": "^0.12.0",
     "roboto-fontface": "*",
-    "vue-apexcharts": "^1.2.6",
+    "vue-apexcharts": "^1.5.0",
     "vue-chartjs": "^3.4.0",
     "vue-friendly-iframe": "^0.9.0"
   },

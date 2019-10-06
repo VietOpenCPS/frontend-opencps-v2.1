@@ -688,7 +688,7 @@ export const store = new Vuex.Store({
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let dataOutPut = []
-        let files = $('#file' + data.partNo)[0].files
+        let files = $('input[id="file' + data.partNo + '"]')[0].files
         let countFiles = files.length
         let count = 0
         if (files) {
@@ -1597,7 +1597,7 @@ export const store = new Vuex.Store({
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       let id = data['id'] ? data['id'] : 'nm'
-      window.$('#formAlpaca' + data.dossierPartNo + id).empty()
+      window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').empty()
       /* eslint-disable */
       let formScript, formData
       if (data.formScript) {
@@ -1612,7 +1612,7 @@ export const store = new Vuex.Store({
       }
       /* eslint-disable */
       formScript.data = formData
-      window.$('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
+      window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca(formScript)
     },
     putAlpacaForm ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
@@ -1624,9 +1624,9 @@ export const store = new Vuex.Store({
         }
         let id = data['id'] ? data['id'] : 'nm'
         try {
-          let control = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
+          let control = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get')
           let formData = control.getValue()
-          let field = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get').childrenByPropertyId
+          let field = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
@@ -1705,11 +1705,11 @@ export const store = new Vuex.Store({
         try {
           let id = data['id'] ? data['id'] : 'nm'
           let dataPostEform = new FormData()
-          let control = window.$('#formAlpaca' + data.partNo + id).alpaca('get')
+          let control = window.$('div[id="formAlpaca' + data.partNo + id + '"]').alpaca('get')
           let formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
-          let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
+          let field = window.$('div[id="formAlpaca' + data.partNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {

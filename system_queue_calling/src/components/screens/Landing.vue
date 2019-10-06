@@ -19,7 +19,6 @@
               item-text="title"
               item-value="sibling"
               :hide-selected="true"
-              clearable
               @change="changeGroup"
               box
               return-object
@@ -498,53 +497,57 @@ export default {
       let currentQuery = vm.$router.history.current.query
       let bookingDossier = []
       let bookingEform = []
-      let filterEform = {
-        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
-        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
-        className: 'EFORM',
-        bookingFrom: vm.getCurrentDate(),
-        bookingTo: vm.getCurrentDate()
+      if (vm.serviceGroupSelected) {
+        let filterEform = {
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+          state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+          className: 'EFORM',
+          bookingFrom: vm.getCurrentDate(),
+          bookingTo: vm.getCurrentDate()
+        }
+        vm.$store.dispatch('getBooking', filterEform).then(function (result) {
+          count+=1
+          vm.loading = false
+          if (result.data) {
+            bookingEform = result.data
+          }
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        }).catch(reject => {
+          count+=1
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+          vm.loading = false
+        })
+        // 
+        let filterDossier = {
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+          state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+          className: 'DOSSIER',
+          bookingFrom: vm.getCurrentDate(),
+          bookingTo: vm.getCurrentDate()
+        }
+        vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
+          count+=1
+          vm.loading = false
+          if (result.data) {
+            bookingDossier = result.data
+          }
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        }).catch(reject => {
+          count+=1
+          vm.loading = false
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        })
+      } else {
+        vm.bookingList = []
       }
-      vm.$store.dispatch('getBooking', filterEform).then(function (result) {
-        count+=1
-        vm.loading = false
-        if (result.data) {
-          bookingEform = result.data
-        }
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      }).catch(reject => {
-        count+=1
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-        vm.loading = false
-      })
-      // 
-      let filterDossier = {
-        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
-        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
-        className: 'DOSSIER',
-        bookingFrom: vm.getCurrentDate(),
-        bookingTo: vm.getCurrentDate()
-      }
-      vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
-        count+=1
-        vm.loading = false
-        if (result.data) {
-          bookingDossier = result.data
-        }
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      }).catch(reject => {
-        count+=1
-        vm.loading = false
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      })
     },
     mergeBooking (bookingDossier, bookingEform) {
       let vm = this
@@ -594,7 +597,7 @@ export default {
             } else if (newQuery.hasOwnProperty('keyBooking') && newQuery.keyBooking === 'API') {
               vm.bookingList = [].concat(bookingRelease)
             } else {
-              vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+              vm.bookingList = [].concat(bookingEform)
             }
             // vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
             let sortBooking = function (bookingList) {

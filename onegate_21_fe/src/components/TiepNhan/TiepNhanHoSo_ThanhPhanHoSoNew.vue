@@ -789,7 +789,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
         vm.$store.dispatch('loadFormData', item).then(resData => {
-          window.$('#formAlpaca' + item.partNo + vm.id).empty()
+          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').empty()
           var formScript, formData
           /* eslint-disable */
           if (resScript) {
@@ -805,7 +805,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          window.$('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
+          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').alpaca(formScript)
         })
       })
     },
@@ -821,6 +821,7 @@ export default {
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
           setTimeout(function () {
             vm.loadingApacal = false
+            toastr.clear()
             toastr.success('Thực hiện thành công')
           }, 3000)
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
@@ -840,6 +841,7 @@ export default {
         vm.$store.dispatch('postEform', item).then(resPostEform => {
           setTimeout(function () {
             vm.loadingApacal = false
+            toastr.clear()
             toastr.success('Thực hiện thành công')
             vm.dossierTemplateItems[index].daKhai = true
           }, 3000)
@@ -910,7 +912,7 @@ export default {
           })
         })
       } else {
-        if (window.$('#file' + data.partNo)[0].files.length === 0) {
+        if (window.$('input[id="file' + data.partNo + '"]')[0].files.length === 0) {
           vm.progressUploadPart = ''
           return
         }
@@ -947,9 +949,9 @@ export default {
       }
       vm.pstEl = vm.endEl = 0
       setTimeout(function () {
-        if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
-          vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
-          vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
+        if (window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height() > 200) {
+          vm.pstEl = window.$('div[id="wrapForm' + data.partNo + vm.id + '"]').offset().top
+          vm.endEl = window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height()
           $(window).scroll(function () {
             vm.pstFixed = $(window).scrollTop()
           })
@@ -997,7 +999,6 @@ export default {
           if (file.dossierPartNo === item.partNo && file.eForm) {
             file['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
-              console.log('success!')
               vm.dossierTemplateItems[index].daKhai = false
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
@@ -1005,7 +1006,6 @@ export default {
                 // 
                 item['editForm'] = true
                 setTimeout(function () {
-                  console.log('item --1--', item)
                   vm.loadAlpcaForm(item)
                 }, 200)
                 // 
@@ -1101,7 +1101,7 @@ export default {
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.fileViews.splice(index, 1)
-          vm.stateView = true
+          // vm.stateView = true
           vm.partView = item.dossierPartNo
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
