@@ -1,22 +1,43 @@
 <template>  
   <div class='phancong' style='background-color: white;width:100%'>
-    <v-expansion-panel :value="[true]" expand  class='expansion-pl'>
-      <v-expansion-panel-content hide-actions value='1'>
+    <v-expansion-panel :value="[true]" expand  class='expansion-pl ext__form'>
+      <v-expansion-panel-content :key="1">
         <div slot='header' v-if="esignType !== '' && esignType !== 'digital' && esignType !== 'plugin'">
           <div class='background-triangle-small'> 
             <v-icon size='18' color='white'>star_rate</v-icon> 
-          </div>Duyệt hồ sơ
+          </div>
+          <span>Duyệt hồ sơ</span>
         </div>
-        <div slot='header' v-if="esignType === 'plugin'">
+        <!-- <div slot='header' v-if="esignType === 'plugin'">
           <div class='background-triangle-small'> 
             <v-icon size='18' color='white'>star_rate</v-icon> 
-          </div>Tài liệu ký duyệt, đóng dấu
-        </div>
+          </div>
+          <span>Tài liệu ký duyệt, đóng dấu</span>
+          <v-btn class="ml-2 my-0" flat icon color="indigo" title="Cấu hình hệ thống ký số" @click.stop="showConfigSignService">
+            <v-icon size="16">fa fa-cog</v-icon>
+          </v-btn>
+        </div> -->
         <v-card >
           <v-card-text class='px-0 py-0'>
-            <v-flex xs12 sm12 v-if="esignType === 'plugin'">
-
-            </v-flex>
+            <!--  -->
+            <!-- <v-flex xs12 sm12 v-if="esignType === 'plugin'" class="pl-5 py-2">
+              <div v-for="(item, index) in filesPdfSignPlugin" :key="index">
+                <span @click="viewFileKySo(item, index)" class="ml-3" style="cursor: pointer;">
+                  <v-icon class="mr-1" color="red" v-if="!item.fileSigned" size="14">
+                    fa fa-file-pdf-o
+                  </v-icon>
+                  <v-icon v-else class="mr-1" color="green" size="16">
+                    fa-check-square-o
+                  </v-icon>
+                  {{item.fileName}} - 
+                  <i>{{item.time}}</i>
+                </span>
+                <v-btn flat icon color="indigo" title="Ký duyệt, đóng dấu" v-on:click.stop="signAction(item, index)" class="ml-2 my-0">
+                  <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                </v-btn>
+              </div>
+            </v-flex> -->
+            <!--  -->
             <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
               <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
               <v-captcha ref="captcha"></v-captcha>
@@ -56,7 +77,11 @@ var plugin = plugin0
 export default {
   props: {
     detailDossier: {},
-    dataEsign: {}
+    dataEsign: {},
+    filesPdfSignPlugin: {
+      type: Array,
+      default: () => []
+    }
   },
   components: {
     'v-captcha': VueCaptcha
@@ -126,6 +151,31 @@ export default {
         waitingFiles = true
       }
       return waitingFiles
+    },
+    showConfigSignService () {
+      vgca_show_config()
+    },
+    viewFileKySo (item, index) {},
+    signAction (item, index) {
+      let vm = this
+      let signFileCallBack = function (rv) {
+        let received_msg = JSON.parse(rv)
+        console.log(received_msg)
+        if (received_msg.Status === 0) {
+          // document.getElementById('_signature').value = received_msg.FileName + ':' + received_msg.FileServer + ':' + received_msg.DocumentNumber + ':' + received_msg.DocumentDate
+          // document.getElementById('file1').value = received_msg.FileServer
+          // document.getElementById('file2').value = received_msg.FileServer
+        } else {
+          // document.getElementById('_signature').value = received_msg.Message
+        }
+      }
+      let prms = {}
+      prms['FileUploadHandler'] = ''
+      prms['SessionId'] = ''
+      prms['FileName'] = item['url']
+
+      let json_prms = JSON.stringify(prms)
+      vgca_sign_approved(json_prms, signFileCallBack)
     },
     kySo (item) {
       console.log('run ky so data payload', item)

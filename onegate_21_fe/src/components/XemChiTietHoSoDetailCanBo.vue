@@ -202,7 +202,9 @@
               <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
               <!-- thanh toán điện tử -->
               <thanh-toan-dien-tu ref="epayment" v-if="showThanhToanDienTu" :paymentProfile="paymentProfile" :detailDossier="thongTinChiTietHoSo"></thanh-toan-dien-tu>
-              <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo" :dataEsign="dataEsign" v-if="showKyPheDuyetTaiLieu"></ky-duyet>
+              <ky-duyet :style="dataEsign['signatureType'] === '' ? 'display:none' : ''" ref="kypheduyettailieu" :detailDossier="thongTinChiTietHoSo"
+               :dataEsign="dataEsign" v-if="showKyPheDuyetTaiLieu" :filesPdfSignPlugin="filesPdfSign">
+              </ky-duyet>
               <ngay-gia-han ref="ngaygiahan" v-if="showExtendDateEdit" :type="typeExtendDate" :extendDateEdit="extendDateEdit"></ngay-gia-han>
               <ngay-hen-tra ref="ngayhentra" v-if="showEditDate" :dueDateEdit="dueDateEdit"></ngay-hen-tra>
               <thong-tin-buu-chinh v-if="showPostalService" :postalService="thongTinChiTietHoSo"></thong-tin-buu-chinh>
@@ -701,6 +703,10 @@ export default {
     showTaoTaiLieuKetQua: false,
     showKyPheDuyetTaiLieu: false,
     dataEsign: '',
+    filesPdfSign: [
+      {fileName: 'Tài liệu ký duyệt 001', time: '20/08/2019 11:20:30', url: 'http://103.101.163.17:8080/documents/35166/0/testKS.pdf', fileSigned: false},
+      {fileName: 'Tài liệu ký duyệt 002', time: '21/08/2019 10:10:13',url: 'http://103.101.163.17:8080/documents/35166/0/testKS.pdf', fileSigned: false}
+    ],
     typeEsign: '',
     showTraKetQua: false,
     showThuPhi: false,
