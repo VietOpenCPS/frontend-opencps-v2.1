@@ -1234,7 +1234,8 @@
           signatureType: 'digital'
         },
         esignatureTypeList: [
-          { text: 'Sử dụng chữ kí số', value: 'digital' },
+          { text: 'Sử dụng chữ ký số', value: 'digital' },
+          { text: 'Sử dụng plugin ký số', value: 'plugin' },
           { text: 'Sử dụng captcha', value: 'captcha' },
           { text: 'Nhập mật khẩu người dùng', value: 'password' },
           { text: 'Nhập mã pin', value: 'pin' }          

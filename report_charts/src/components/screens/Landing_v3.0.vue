@@ -25,8 +25,8 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
-      <v-flex xs12 sm6 class="mt-3 pr-2">
-        <v-card class="wrap_report" style="border-radius: 0;">
+      <v-flex xs12 lg6 class="mt-3 pr-2">
+        <v-card class="wrap_report" style="border-radius: 0;height: 100%">
           <div class="row-header">
             <div class="background-triangle-big"> <span>THỐNG KÊ THỦ TỤC HÀNH CHÍNH</span> </div>
             <div class="layout row wrap header_tools row-blue">
@@ -98,7 +98,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-flex xs12 sm6 class="mt-3 pl-2">
+      <v-flex xs12 lg6 class="mt-3 pl-2">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header">
             <div class="background-triangle-big two-line"> 
@@ -205,7 +205,7 @@
             </div> 
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar" height="500" 
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -521,6 +521,17 @@ export default {
     reportGovName: '',
     govAgencyCode: '',
     chartOptions: {
+      chart: {
+        locales: [{
+          "name": "en",
+          "options": {
+            "toolbar": {
+                "exportToSVG": "Tải xuống SVG",
+                "exportToPNG": "Tải xuống PNG"
+            }
+          }
+        }]
+      },
       xaxis: {
         categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
       },
@@ -529,8 +540,8 @@ export default {
         enabled: true
       },
       stroke: {
-        curve: 'straight',
-        width: 4
+        curve: 'smooth',
+        width: 2
       },
       grid: {
         borderColor: '#e7e7e7',
@@ -540,7 +551,11 @@ export default {
         }
       },
       markers: {
-        size: 4
+        size: 3,
+        hover: {
+          size: 4,
+          sizeOffset: 4
+        }
       }
     },
     chartDonutOptions: {
@@ -622,7 +637,7 @@ export default {
       legend: {
         position: 'left',
         offsetY: 0,
-        height: 150,
+        height: 155,
         fontFamily: 'Roboto, Arial, sans-serif',
         formatter: function(seriesName, opts) {
           return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
@@ -677,7 +692,16 @@ export default {
         },
       },
       chart: {
-        stacked: true
+        stacked: true,
+        locales: [{
+          "name": "en",
+          "options": {
+            "toolbar": {
+                "exportToSVG": "Tải xuống SVG",
+                "exportToPNG": "Tải xuống PNG"
+            }
+          }
+        }]
       },
       colors: ['#008FFB', '#00E396'],
       stroke: {
@@ -699,7 +723,7 @@ export default {
       },
       dataLabels: {
         formatter: function(val) {
-          if (val) {return val}
+          if (Number(val) > 2) {return val}
           return ''
         }
       },
@@ -740,6 +764,7 @@ export default {
   },
   created () {
     var vm = this
+    $('html').addClass('report')
     vm.$nextTick(function () {
       let currentYear = (new Date()).getFullYear()
       vm.years = []
@@ -834,7 +859,6 @@ export default {
   },
   mounted () {
     let vm = this
-
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
@@ -874,10 +898,6 @@ export default {
     },
     reloadLine (val) {
       let vm = this
-      setTimeout(function() {
-        $('.apexcharts-menu > .apexcharts-menu-item.exportSVG').text('Tải xuống SVG')
-        $('.apexcharts-menu > .apexcharts-menu-item.exportPNG').text('Tải xuống PNG')
-      }, 300)
       let currentQuerys = vm.$router.history.current.query
       if (!val && String(vm.index) !== '0' && currentQuerys.hasOwnProperty('lineChart') && currentQuerys['lineChart']) {
         setTimeout(function () {
@@ -1355,12 +1375,24 @@ export default {
       vm.chartOptionsBarTotal = {
         plotOptions: {
           bar: {
-            // barHeight: '100%',
-            horizontal: true
+            barHeight: '100%',
+            horizontal: true,
+            dataLabels: {
+              hideOverflowingLabels: true
+            }
           },
         },
         chart: {
-          stacked: true
+          stacked: true,
+          locales: [{
+            "name": "en",
+            "options": {
+              "toolbar": {
+                  "exportToSVG": "Tải xuống SVG",
+                  "exportToPNG": "Tải xuống PNG"
+              }
+            }
+          }]
         },
         colors: ['#008FFB', '#FF4560', '#FEB019', '#00E396', '#775DD0', '#546E7A'],
         stroke: {
@@ -1381,9 +1413,15 @@ export default {
           }
         },
         dataLabels: {
+          enabled: true,
           formatter: function(val) {
-            if (val) {return val}
+            if (Number(val) > 2) {return val}
             return ''
+          },
+          style: {
+            fontSize: '11px',
+            fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+            colors: ['white']
           }
         },
         fill: {

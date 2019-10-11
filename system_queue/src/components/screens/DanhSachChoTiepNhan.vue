@@ -61,16 +61,6 @@ export default {
   data: () => ({
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     applicantList: [
-      {
-        formCode: 143983123,
-        applicantName: 'Trần Văn Duẩn',
-        counter: '02'
-      },
-      {
-        formCode: 123983123,
-        applicantName: 'Trần Viết Lãm',
-        counter: '04'
-      }
     ],
     columnList: [],
     loadData: false
@@ -122,8 +112,11 @@ export default {
         serverNo: 'BOOKING_CONFIG'
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
-        vm.columnList = JSON.parse(result.configs)
-        // console.log('columnList', vm.columnList)
+        try {
+          let configs = JSON.parse(result.configs)
+          vm.columnList = configs['bookings']
+        } catch (error) {
+        }
         vm.getDanhSachCho()
       })
     },
@@ -133,57 +126,67 @@ export default {
       if (vm.columnList.length > 0) {
         for (let index in vm.columnList) {
           if (vm.columnList[index]['key'] === 'booking') {
-            let filterEform = {
-              state: 1,
-              className: 'EFORM',
-              service: vm.columnList[index]['config']
-            }
-            let bookingDossier = ''
-            let bookingEform = ''
-            let count = 0
-            vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
-              count+=1
-              vm.loading = false
-              if (result) {
-                bookingEform = result
-              } else {
+            if (vm.columnList[index]['className'] === '' || vm.columnList[index]['className'] === 'EFORM') {
+              let filterEform = {
+                state: 1,
+                className: 'EFORM',
+                service: vm.columnList[index]['config'],
+                bookingFrom: vm.getCurrentDate(),
+                bookingTo: vm.getCurrentDate()
+              }
+              // console.log('filterEform', filterEform)
+              let bookingDossier = []
+              let bookingEform = []
+              let count = 0
+              vm.$store.dispatch('getBookingDangGoi', filterEform).then(function (result) {
+                // count+=1
+                vm.loading = false
+                if (result) {
+                  bookingEform = result
+                } else {
+                  bookingEform = []
+                }
+                // if (count === 2) {
+                  vm.mergeBooking(bookingDossier, bookingEform, index)
+                // }
+              }).catch(reject => {
+                // count+=1
                 bookingEform = []
+                // if (count === 2) {
+                  vm.mergeBooking(bookingDossier, bookingEform, index)
+                // }
+                vm.loading = false
+              })
+            } else if (vm.columnList[index]['className'] === 'DOSSIER') {
+              let filterDossier = {
+                state: 1,
+                className: 'DOSSIER',
+                service: vm.columnList[index]['config'],
+                bookingFrom: vm.getCurrentDate(),
+                bookingTo: vm.getCurrentDate()
               }
-              if (count === 2) {
-                vm.mergeBooking(bookingDossier, bookingEform, index)
-              }
-            }).catch(reject => {
-              count+=1
-              bookingEform = []
-              if (count === 2) {
-                vm.mergeBooking(bookingDossier, bookingEform, index)
-              }
-              vm.loading = false
-            })
-            let filterDossier = {
-              state: 1,
-              className: 'DOSSIER',
-              service: vm.columnList[index]['config']
-            }
-            vm.$store.dispatch('getBookingDangGoi', filterDossier).then(function (result) {
-              count+=1
-              vm.loading = false
-              if (result) {
-                bookingDossier = result
-              } else {
+              let bookingDossier = []
+              let bookingEform = []
+              vm.$store.dispatch('getBookingDangGoi', filterDossier).then(function (result) {
+                // count+=1
+                vm.loading = false
+                if (result) {
+                  bookingDossier = result
+                } else {
+                  bookingDossier = []
+                }
+                // if (count === 2) {
+                  vm.mergeBooking(bookingDossier, bookingEform, index)
+                // }
+              }).catch(reject => {
+                // count+=1
                 bookingDossier = []
-              }
-              if (count === 2) {
-                vm.mergeBooking(bookingDossier, bookingEform, index)
-              }
-            }).catch(reject => {
-              count+=1
-              bookingDossier = []
-              vm.loading = false
-              if (count === 2) {
-                vm.mergeBooking(bookingDossier, bookingEform, index)
-              }
-            })
+                vm.loading = false
+                // if (count === 2) {
+                  vm.mergeBooking(bookingDossier, bookingEform, index)
+                // }
+              })
+            }
           } else if (vm.columnList[index]['key'] === 'API') {
             let bookingDossierRealease = []
             let filter = {
@@ -196,7 +199,9 @@ export default {
                 let filter = {
                   state: '',
                   className: 'DOSSIER',
-                  service: vm.columnList[index]['config']
+                  service: vm.columnList[index]['config'],
+                  bookingFrom: vm.getCurrentDate(),
+                  bookingTo: vm.getCurrentDate()
                 }
                 vm.$store.dispatch('getBookingDangGoi', filter).then(function (resultBooking) {
                   if (resultBooking) {
@@ -207,7 +212,7 @@ export default {
                   if (bookingDossierRealease.length > 0) {
                     let lengthBooking = bookingDossierRealease.length
                     for (let i = 0; i < lengthBooking; i++) {
-                      let dossierId = bookingDossierRealease[i]['codeNumber'].split('-')[2]
+                      let dossierId = bookingDossierRealease[i]['classPK']
                       let lengthDossier = result.length
                       for (let j = 0; j < lengthDossier; j++) {
                         if (String(dossierId) === String(result[j]['dossierId'])) {
@@ -221,7 +226,7 @@ export default {
                 })
               }
               // -----
-              vm.columnList[index]['content'] = result
+              // vm.columnList[index]['content'] = result
             }).catch(function (reject) {
             })
           }

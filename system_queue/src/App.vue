@@ -44,7 +44,7 @@
         let current = vm.$router.history.current
         let newQuery = current.query
         let filter = {
-          serverNo: 'EFORM_DVC'
+          serverNo: 'BOOKING_CONFIG'
         }
         vm.$store.dispatch('getServerConfig', filter).then(function (result) {
           try {

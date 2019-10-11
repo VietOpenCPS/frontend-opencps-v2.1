@@ -136,10 +136,10 @@
           <span>Bản chụp</span>
           <span>Công chứng</span>
         </div> -->
-        <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition" style="overflow: hidden;">
+        <v-dialog v-model="dialogPDF" max-width="1000" transition="fade-transition" style="overflow: hidden;">
           <v-card>
             <v-toolbar dark color="primary">
-              <v-toolbar-title>File đính kèm</v-toolbar-title>
+              <v-toolbar-title>{{documentType}}</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon dark @click.native="dialogPDF = false">
                 <v-icon>close</v-icon>
@@ -271,7 +271,8 @@
       endEl: 0,
       dialogSelectDosier: false,
       dossierIntoGroup: [],
-      filesAdd: []
+      filesAdd: [],
+      documentType: 'Tài liệu đính kèm'
     }),
     computed: {
       loading () {
@@ -612,6 +613,7 @@
           if (file.dossierPartNo === item.partNo && file.eForm) {
             file['dossierId'] = vm.detailDossier.dossierId
             vm.dialogPDFLoading = true
+            vm.documentType = 'Tài liệu khai trực tuyến'
             vm.dialogPDF = true
             file['id'] = vm.id
             vm.$store.dispatch('putAlpacaForm', file).then(resData => {
@@ -660,6 +662,7 @@
           window.open(url)
         } else {
           vm.dialogPDFLoading = true
+          vm.documentType = 'Tài liệu đính kèm'
           vm.dialogPDF = true
           data['dossierId'] = vm.detailDossier.dossierId
           vm.$store.dispatch('viewFile', data).then(result => {

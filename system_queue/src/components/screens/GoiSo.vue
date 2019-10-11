@@ -280,10 +280,9 @@ export default {
           vm.currentCalling = vm.queueList[0]
           try {
             vm.callingApplicant(vm.currentCalling)
-          }
-          catch(err) {
+          } catch(err) {
             console.log('catch play audio 1')
-            vm.getDanhSachCho()
+            // vm.getDanhSachCho()
           }
         } else {
           vm.loadData = !vm.loadData
@@ -301,13 +300,19 @@ export default {
     },
     callingApplicant (item) {
       let vm = this
+      try {
+        if (idDocumentVoicePortlet) {
+          vm.idVoicePortlet = idDocumentVoicePortlet
+        }
+      } catch (error) {
+        console.log('not config')
+      }
       vm.updateStateBooking(item, true)
       if (item) {
         vm.called = false
         $('#audioCalling').html('')
-        let splitNumberCode = item['codeNumber'].split('-')
-        let numberCalling = splitNumberCode[0] + splitNumberCode[1] + splitNumberCode[2]
-        let srcAudioStart = splitNumberCode[0] === 'E' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
+        let numberCalling = String(item['codeNumber']).replace(/[^a-zA-Z0-9]/g,'')
+        let srcAudioStart = item['className'] === 'EFORM' ? `/documents/${vm.groupId}/${vm.idVoicePortlet}/eformStart1.mp3` : `/documents/${vm.groupId}/${vm.idVoicePortlet}/dossierStart1.mp3`
         let numberArr = String(numberCalling).split('')
         // 
         let mainGateNumber = ''

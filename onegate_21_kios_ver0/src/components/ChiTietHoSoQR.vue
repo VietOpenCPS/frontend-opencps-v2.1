@@ -133,9 +133,9 @@
             </v-tab-item>
           </v-tabs>
         </div>
-        <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
+        <!-- <v-btn class="back-btn" title="Trang chủ" @click="goHome" fab color="primary">
           <v-icon dark>home</v-icon>
-        </v-btn>
+        </v-btn> -->
       </div>
       <div class="detailQR_mobile">
         <v-layout row wrap>
@@ -380,7 +380,12 @@
               vm.isPermission = true
               vm.dossierDetail = resultDossier.data
               if (vm.dossierDetail.submissionNote) {
-                let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
+                let submissionNote = ''
+                try {
+                  submissionNote = JSON.parse(vm.dossierDetail.submissionNote)
+                } catch (error) {
+                  console.log('không có tiến trình')
+                }
                 let resultTemp = submissionNote ? submissionNote.data : ''
                 if (resultTemp) {
                   for (var i = 0; i < resultTemp.length; i++) {
@@ -405,7 +410,14 @@
         }
       })
     },
-    watch: {},
+    watch: {
+      '$route': function (newRoute, oldRoute) {
+        let vm = this
+        let currentParams = newRoute.params
+        let currentQuery = newRoute.query
+        vm.$store.commit('setFullScreen', true)
+      }
+    },
     methods: {
       loadDossierActions () {
         var vm = this

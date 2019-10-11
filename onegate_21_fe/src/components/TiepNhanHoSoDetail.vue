@@ -107,7 +107,7 @@
       <div style="position: relative;">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content hide-actions value="2">
-            <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
+            <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
@@ -438,7 +438,7 @@ export default {
                     vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
                     vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                     vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
-                    if (resAction && resAction.payment && resAction.payment.requestPayment > 0 && resAction.payment.requestPayment !== 5) {
+                    if (resAction && resAction.payment && resAction.payment.requestPayment > 0) {
                       vm.showThuPhi = true
                       vm.payments = resAction.payment
                     }

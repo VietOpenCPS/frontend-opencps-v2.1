@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="border: 1px solid #dedede;border-top:0;">
     <div class="row-header no__hidden_class">
       <div class="background-triangle-big">
         <span>DANH SÁCH MẪU TỜ KHAI TRỰC TUYẾN</span>
@@ -21,9 +21,15 @@
             autofocus
           ></v-text-field>
         </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+        <!-- <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
           <v-btn icon class="my-0 mx-2" v-on:click.native="searchEform">
             <v-icon size="16">search</v-icon>
+          </v-btn>
+        </div> -->
+        <div class="flex text-right" style="margin-left: auto;max-width: 100px;height:37px">
+          <v-btn color="primary" class="my-0 mx-0 white--text" v-on:click.native="searchEform" style="height:100%">
+            <v-icon size="16">search</v-icon> &nbsp;
+            Tìm kiếm
           </v-btn>
         </div>
       </div> 
@@ -60,6 +66,46 @@
         </v-expansion-panel>
       </v-card-text>
     </v-card>
+    <!--  -->
+    <v-dialog v-model="dialogSecret" persistent max-width="400">
+      <v-form v-model="validSecret" ref="formSecret" lazy-validation>
+        <v-card>
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Mã bí mật tra cứu tờ khai</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialogSecret = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text>
+            <v-layout row wrap>
+              <v-flex xs12 sm12>
+                <v-text-field
+                  box
+                  v-model="secretSearch"
+                  label="Mã bí mật"
+                  :rules="[v => !!v || 'Mã bí mật là bắt buộc']"
+                  required
+                  @keyup.enter.prevent="submitSearchEform"
+                  autofocus
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions class="mx-2">
+            <v-spacer></v-spacer>
+            <v-btn color="primary" class="white--text" @click.native="submitSearchEform">
+              <v-icon>save</v-icon> &nbsp;
+              Đồng ý
+            </v-btn>
+            <v-btn color="red" class="white--text" @click.native="() => dialogSecret = false">
+              <v-icon>clear</v-icon> &nbsp;
+              Thoát
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </div>
 </template>
 
@@ -82,9 +128,11 @@ export default {
   data: () => ({
     serviceInfoList: [],
     eformNoSearch: '',
+    secretSearch: '',
     panelServiceList: [],
     serviceInfoListRender: [],
-    formTemplateList: []
+    formTemplateList: [],
+    dialogSecret: false
   }),
   computed: {
     serviceinfoSelected () {
@@ -172,34 +220,47 @@ export default {
     },
     searchEform () {
       let vm = this
-      if (vm.eformNoSearch) {
-        if (vm.eformNoSearch.indexOf('-') > 0) {
-          let filter = {
-            eFormId: String(vm.eformNoSearch).split('-')[2]
-          }
-          vm.$store.dispatch('getEform', filter).then(function(result) {
-            if (result && result !== 'secretFail') {
-              console.log('result getEformData', result, vm.formTemplateList)
-              let templateFile = vm.formTemplateList.filter(function (item) {
-                return item.fileTemplateNo === result.fileTemplateNo
-              })
-              if (templateFile.length > 0) {
-                vm.$store.commit('setFileTemplateSelected', templateFile[0])
-              }
-              vm.$store.commit('setEformDetail', result)
-              vm.$router.push({
-                path: '/tao-to-khai-thanh-cong/1',
-                query: {
-                  renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-                }
-              })
-            }
-          }).catch(function(error) {
-          })
-        } else {
-          toastr.clear()
-          toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại')
+      if (String(vm.eformNoSearch).trim().length === 9) {
+        vm.secretSearch = ''
+        vm.$refs.formSecret.reset()
+        vm.dialogSecret = true
+      } else {
+        toastr.clear()
+        toastr.warning('Mã tờ khai gồm 9 chữ số 0-9')
+      }
+    },
+    submitSearchEform () {
+      let vm = this
+      if (vm.$refs.formSecret.validate()) {
+        let filter = {
+          eFormNo: String(vm.eformNoSearch).trim(),
+          secret: vm.secretSearch
         }
+        vm.$store.dispatch('getEformSecret', filter).then(function(result) {
+          if (result && result.hasOwnProperty('eFormId')) {
+            vm.dialogSecret = false
+            let templateFile = vm.formTemplateList.filter(function (item) {
+              return item.fileTemplateNo === result.fileTemplateNo
+            })
+            if (templateFile.length > 0) {
+              vm.$store.commit('setFileTemplateSelected', templateFile[0])
+            }
+
+            vm.$store.commit('setEformDetail', result)
+            vm.$router.push({
+              path: '/tao-to-khai-thanh-cong/1',
+              query: {
+                renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+              }
+            })
+          } else {
+            toastr.clear()
+            toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
+          }
+        }).catch(function(error) {
+          toastr.clear()
+          toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
+        })
       }
     },
     goBack () {

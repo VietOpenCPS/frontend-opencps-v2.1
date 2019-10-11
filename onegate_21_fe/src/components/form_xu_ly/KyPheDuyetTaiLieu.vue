@@ -2,13 +2,21 @@
   <div class='phancong' style='background-color: white;width:100%'>
     <v-expansion-panel :value="[true]" expand  class='expansion-pl'>
       <v-expansion-panel-content hide-actions value='1'>
-        <div slot='header' v-if="esignType !== '' && esignType !== 'digital'">
+        <div slot='header' v-if="esignType !== '' && esignType !== 'digital' && esignType !== 'plugin'">
           <div class='background-triangle-small'> 
             <v-icon size='18' color='white'>star_rate</v-icon> 
           </div>Duyệt hồ sơ
         </div>
+        <div slot='header' v-if="esignType === 'plugin'">
+          <div class='background-triangle-small'> 
+            <v-icon size='18' color='white'>star_rate</v-icon> 
+          </div>Tài liệu ký duyệt, đóng dấu
+        </div>
         <v-card >
           <v-card-text class='px-0 py-0'>
+            <v-flex xs12 sm12 v-if="esignType === 'plugin'">
+
+            </v-flex>
             <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
               <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
               <v-captcha ref="captcha"></v-captcha>
@@ -55,6 +63,7 @@ export default {
   },
   data: () => ({
     tabActive: 'tabs-1',
+    filesSign: [],
     activeKS: false,
     noteReason: '',
     thongTinHoSo: {},

@@ -395,33 +395,40 @@ export default {
     },
     markReadEventId (configOBJ) {
       let vm = this
+      let userType = ''
+      if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+        userType = 'employee'
+      } else {
+        userType = 'applicant'
+      }
+      let urlCurrent = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
       axios
       .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
         //send redirect
-        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        let urlRedirect =  urlCurrent + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (userType === 'employee') {
+          urlRedirect = urlCurrent + '#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+        // if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
           window.location.href = urlRedirect
-        } else {
-          window.location.href = urlRedirect
-          window.location.reload()
-        }
+        // } else {
+        //   window.location.href = urlRedirect
+        //   window.location.reload()
+        // }
       })
       .catch(function(error) {
         //send redirect
-        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        let urlRedirect =  urlCurrent + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (userType === 'employee') {
+          urlRedirect = urlCurrent + '#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+        // if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
             window.location.href = urlRedirect
-          } else {
-            window.location.href = urlRedirect
-            window.location.reload()
-          }
+          // } else {
+          //   window.location.href = urlRedirect
+          //   window.location.reload()
+          // }
       })
     },
     pullNotificationCount() {

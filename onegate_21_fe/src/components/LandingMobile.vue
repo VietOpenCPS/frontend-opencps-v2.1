@@ -594,11 +594,7 @@ export default {
   components: {
     'tiny-pagination': TinyPagination,
     'phan-cong': PhanCong,
-    'tra-ket-qua': TraKetQua,
-    'xac-nhan-thu-phi': XacNhanThuPhi,
-    'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
-    'template-rendering': TemplateRendering,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan
   },
   data: () => ({

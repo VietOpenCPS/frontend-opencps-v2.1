@@ -42,6 +42,10 @@ Vue.mixin({
       } else {
         return 0
       }
+    },
+    getCurrentDate: function () {
+      let date = new Date()
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     }
   }
 })

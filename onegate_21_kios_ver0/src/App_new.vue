@@ -2,13 +2,6 @@
   <v-app>
     <v-content>
       <header id="header_kios">
-        <!-- <a href="/web/cong-dich-vu-cong" :class="!isKios?'mobile':''">
-          <img src="/o/opencps-store/js/kios_ver0/img/logo.png">
-          <div>
-            <p class="text-bold">TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG TỈNH PHÚ THỌ</p>
-            <span class="text-bold">HỆ THỐNG MỘT CỬA ĐIỆN TỬ VÀ DỊCH VỤ CÔNG TRỰC TUYẾN</span>
-          </div>
-        </a> -->
       </header>
       <section :class="isKios && wrapStyle ? 'kios-content-wrapper' : ''" @mousemove="stopInterval()" @click="stopInterval()">
         <div :class="isKios ? 'tab-item' : ''">

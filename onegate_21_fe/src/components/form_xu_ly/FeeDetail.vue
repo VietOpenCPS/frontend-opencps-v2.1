@@ -6,7 +6,7 @@
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
           </div>
-          <span v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 5">{{data_payment.paymentFee}}</span>
+          <span v-if="data_payment.requestPayment === 1 || data_payment.requestPayment === 4 || data_payment.requestPayment === 5">{{data_payment.paymentFee}}</span>
           <span v-if="data_payment.requestPayment === 2">Lập phiếu thanh toán</span>
         </div>
         <v-card>
@@ -76,29 +76,34 @@
               </v-flex>
               <v-flex xs12 sm1 v-if="data_payment.requestPayment === 2"></v-flex>
               <!-- requestPayment === 5" -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 4 || data_payment.requestPayment === 5">
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Tổng: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 4 || data_payment.requestPayment === 5" style="padding-top:7px">
                 <span>{{currency(feeTong.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
               <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 class="pt-1" sm2 v-if="data_payment.requestPayment === 4">
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Đã tạm nộp: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
-                <!-- <span>{{data_payment.advanceAmount}} vnđ</span> -->
-                <span>{{currency((Number(data_payment.advanceAmount.toString().replace(/\./g, ''))).toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
+              <v-flex xs12 sm3 class="pt-1" v-if="data_payment.requestPayment === 4" style="padding-top:7px">
+                <v-text-field
+                  @keyup="changeFee"
+                  v-model="data_payment.advanceAmount"
+                  v-money="money"
+                  suffix="vnđ"
+                  v-if="data_payment.editable === 1 || data_payment.editable === 3"
+                ></v-text-field>
+                <span v-else>{{currency((Number(data_payment.advanceAmount.toString().replace(/\./g, ''))).toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
-              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
-              <!--  -->
-              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 5">
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 4"></v-flex>
+              <v-flex xs12 sm2 v-if="data_payment.requestPayment === 4 ">
                 <v-subheader class="pl-0 text-right"><span class="text-bold">Còn phải nộp: </span></v-subheader>
               </v-flex>
-              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 5" style="padding-top:7px">
+              <v-flex xs12 sm3 v-if="data_payment.requestPayment === 4 " style="padding-top:7px">
                 <span>{{currency(totalFee.toString().replace(/\./g, ''))}} &nbsp;&nbsp; vnđ</span>
               </v-flex>
-              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 5"></v-flex>
+              <v-flex xs12 sm1 v-if="data_payment.requestPayment === 4"></v-flex>
             </v-layout>
             <!-- <p class="mt-2" style="margin-left: 100px" v-if="data_payment.paymentNote">
               <span class="red--text">* </span>&nbsp;&nbsp; {{data_payment.paymentNote}}
@@ -263,6 +268,10 @@ export default {
   computed: {
     paymentFileName () {
       return this.$store.getters.getPaymentFileName
+    },
+    originality () {
+      let vm = this
+      return vm.getOriginality()
     }
   },
   watch: {

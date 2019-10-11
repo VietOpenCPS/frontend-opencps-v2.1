@@ -1,15 +1,44 @@
 <template>
   <div>
     <v-layout wrap>
-      <v-flex xs12 class="form-script" :class="fullScreenScript ? 'sm8' : 'sm4'">
-        <v-toolbar class="toolbar-script" flat height="36" dark color="#222">
-          <v-btn class="mr-0" icon @click="formatScript(true)" title="Json viewer">
-            <v-icon size="16" :class="formatS === '1' ? 'blue--text' : 'white--text'">format_align_right</v-icon>
-          </v-btn>
-          <v-btn class="ml-0" icon @click="formatScript(false)" title="String viewer">
-            <v-icon size="16" :class="formatS === '-1' ? 'blue--text' : 'white--text'">format_align_left</v-icon>
-          </v-btn>
-          <v-toolbar-title class="white--text">Form script</v-toolbar-title>
+      <v-flex xs12 class="form-script" :class="fullScreenScript ? 'sm3' : 'sm6'">
+        <div :class="scriptShow ? '' : 'd-none'">
+          <v-toolbar class="toolbar-script" flat height="36" dark color="#222">
+            <v-btn class="mr-0" icon @click="formatScript(true)" title="Json viewer">
+              <v-icon size="16" :class="formatS === '1' ? 'blue--text' : 'white--text'">format_align_right</v-icon>
+            </v-btn>
+            <v-btn class="ml-0" icon @click="formatScript(false)" title="String viewer">
+              <v-icon size="16" :class="formatS === '-1' ? 'blue--text' : 'white--text'">format_align_left</v-icon>
+            </v-btn>
+            <v-toolbar-title class="white--text">Form script</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn round dark small color="blue" @click="scriptShow = false">
+              <v-icon size="18" class="white--text">swap_horiz</v-icon> &nbsp; Form Data
+            </v-btn>
+          </v-toolbar>
+          <v-jsoneditor class="content-script" ref="editorScript" v-model="form_script" :options="options" :plus="true" height="100%" @error="onError">
+        </div>
+        <div :class="scriptShow ? 'd-none' : ''">
+          <v-toolbar class="toolbar-data" flat height="36" dark color="#222">
+            <v-btn class="mr-0" icon @click="formatData(true)" title="Json viewer">
+              <v-icon size="16" :class="formatD === '1' ? 'blue--text' : 'white--text'">format_align_right</v-icon>
+            </v-btn>
+            <v-btn class="ml-0" icon @click="formatData(false)" title="String viewer">
+              <v-icon size="16" :class="formatD === '-1' ? 'blue--text' : 'white--text'">format_align_left</v-icon>
+            </v-btn>
+            <v-toolbar-title class="white--text">Form data</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn round dark small color="blue" @click="scriptShow = true">
+              <v-icon size="18" class="white--text">swap_horiz</v-icon> &nbsp; Form Script
+            </v-btn>
+          </v-toolbar>
+          <v-jsoneditor class="content-data" ref="editorData" v-model="form_data" :options="options" :plus="true" height="100%" @error="onError">
+        </div>
+      </v-flex>
+
+      <v-flex xs12 sm4 class="form-report" :class="fullScreenScript ? 'sm9' : 'sm6'">
+        <v-toolbar class="toolbar-report" flat height="36" dark color="#222">
+          <v-toolbar-title class="white--text">Form report</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn round dark small color="blue" @click="viewForm"
             :loading="loading"
@@ -24,28 +53,14 @@
             <v-icon size="16" class="white--text">fa fa-file-pdf-o</v-icon> &nbsp; View pdf
             <span slot="loader">Loading...</span>
           </v-btn>
-        </v-toolbar>
-        <v-jsoneditor class="content-script" ref="editorScript" v-model="form_script" :options="options" :plus="true" height="100%" @error="onError">
-      </v-flex>
-      <v-flex xs12 sm4 class="form-data" :class="fullScreenScript ? 'sm4' : 'sm8'">
-        <v-toolbar class="toolbar-data" flat height="36" dark color="#222">
-          <v-btn class="mr-0" icon @click="formatData(true)" title="Json viewer">
-            <v-icon size="16" :class="formatD === '1' ? 'blue--text' : 'white--text'">format_align_right</v-icon>
-          </v-btn>
-          <v-btn class="ml-0" icon @click="formatData(false)" title="String viewer">
-            <v-icon size="16" :class="formatD === '-1' ? 'blue--text' : 'white--text'">format_align_left</v-icon>
-          </v-btn>
-          <v-toolbar-title class="white--text">Form data</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon v-if="!fullScreenScript" @click="fullScreenScript = !fullScreenScript">
+          <v-btn icon v-if="fullScreenScript" @click="fullScreenScript = !fullScreenScript">
             <v-icon>fullscreen_exit</v-icon>
           </v-btn>
           <v-btn icon v-else @click="fullScreenScript = !fullScreenScript">
             <v-icon>zoom_out_map</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-jsoneditor class="content-data" ref="editorData" v-model="form_data" :options="options" :plus="true" height="100%" @error="onError">
-        
+        <codemirror v-model="form_report" :options="cmOptions"></codemirror>
       </v-flex>
     </v-layout>
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
@@ -62,7 +77,7 @@
           >
             <v-icon size="18" class="white--text">description</v-icon> &nbsp; View form
           </v-btn>
-          <v-btn v-else round dark small color="green" @click="viewPdf" class="mr-2"
+          <v-btn v-else round dark small color="green" @click="viewPdf(form)" class="mr-2"
             :loading="loading"
             :disabled="loading"
           >
@@ -74,7 +89,7 @@
           </v-btn>
         </v-toolbar>
         <div v-if="viewFormInput === true" id="formInput"></div>
-        <iframe v-else id="pdfPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;" frameborder="0">
+        <iframe v-else id="pdfPreview" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;height: 100vh" frameborder="0">
         </iframe>
       </div>
     </v-dialog>
@@ -88,29 +103,52 @@ import $ from 'jquery'
 import VJsoneditor from 'v-jsoneditor'
 import toastr from 'toastr'
 import axios from 'axios'
+import { codemirror } from 'vue-codemirror'
+
 Vue.use(toastr)
 Vue.use(VJsoneditor)
+
 export default {
   props: [],
   components: {
-    VJsoneditor
+    VJsoneditor,
+    codemirror
   },
   data: () => ({
     loading: false,
+    scriptShow: true,
     form_script: {
-      "hello": "alpaca editor"
+      "Name": "trinhtc@fds.vn",
+      "Age": "28",
+      "Number": "200OK",
+      "FC": "FDS Corp",
+      "Position": "Midfielder",
+      "Attacking Prowess": "99",
+      "Defend Prowess": "75",
+      "Ball Winning": "98",
+      "Speed": "95",
+      "Agility": "100",
+      "Acceleration": "99",
+      "Response" : "100"
     },
     form_data: {
-      "hello": "alpaca editor"
     },
+    form_report: '',
     formatS: 0,
     formatD: 0,
-    fullScreenScript: true,
+    fullScreenScript: false,
     fullScreenData: false,
     dialog: false,
     viewFormInput: true, 
     options: {
-      mode: 'code' 
+      mode: 'code'
+    },
+    cmOptions: {
+      tabSize: 4,
+      mode: 'text/javascript',
+      theme: 'base16-light',
+      lineNumbers: true,
+      line: true
     }
   }),
   computed: {
@@ -118,14 +156,6 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
-      if (typeof(Storage) !== 'undefined') {
-        // vm.form_script = localStorage.getItem('formScript') ? localStorage.getItem('formScript') : ''
-        // vm.form_data = localStorage.getItem('formData') ? localStorage.getItem('formData') : ''
-        // setInterval(() => {
-        //   localStorage.setItem('formScript', vm.form_script)
-        //   localStorage.setItem('formData', vm.form_data)
-        // }, 3000)
-      }
     })
   },
   updated () {
@@ -140,9 +170,9 @@ export default {
   methods: {
     formatScript (active) {
       let vm = this
+      console.log('editorScript', vm.$refs.editorScript)
       if (active) {
         vm.formatS = '1'
-        console.log('run', vm.$refs.editorScript.editor.getText())
         vm.$refs.editorScript.editor.format()
       } else {
         vm.formatS = '-1'
@@ -195,20 +225,19 @@ export default {
       }
       
     },
-    viewPdf () {
+    viewPdf (t) {
       let vm = this
-      let formScript, formData
-      if (vm.$refs.editorScript.editor.getText() === '') {
+      let formData
+      if (vm.form_report === '') {
         return
       }
       try {
-        formScript = vm.$refs.editorScript.editor.get()
-      } catch (error) {
-        console.log('formScript error')
-        return
-      }
-      try {
-        formData = vm.$refs.editorData.editor.getText() ? vm.$refs.editorData.editor.get() : {}
+        if (t) {
+          let control = window.$('#formInput').alpaca('get')
+          formData = control.getValue()
+        } else {
+          formData = vm.$refs.editorData.editor.getText() ? vm.$refs.editorData.editor.get() : {}
+        }
       } catch (error) {
         if (vm.$refs.editorData.editor.getText()) {
           console.log('formData error')
@@ -219,13 +248,12 @@ export default {
       let options = {
         headers: {
           groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic dGVzdEBsaWZlcmF5LmNvbTpraG9uZ2JpZXQ=',
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
         responseType: 'blob'
       }
       let dataCreate = new URLSearchParams()
-      dataCreate.append('scriptStr', JSON.stringify(formScript))
+      dataCreate.append('scriptStr', vm.form_report)
       dataCreate.append('jsonDataStr', JSON.stringify(formData))
       axios.post('/o/rest/v2/jaspers/preview', dataCreate, options).then(function (response) {
         vm.loading = false
@@ -236,17 +264,10 @@ export default {
         let file = window.URL.createObjectURL(serializable)
         setTimeout(() => {
           document.getElementById('pdfPreview').src = file
-        }, 200);
+        }, 200)
       }).catch(function (response) {
         vm.loading = false
-        vm.dialog = true
-        vm.viewFormInput = false
-        console.log('respond create pdf 2', response.data)
-        let serializable = response.data
-        let file = window.URL.createObjectURL(serializable)
-        setTimeout(() => {
-          document.getElementById('pdfPreview').src = file
-        }, 200);
+        console.log('respond create pdf 2', response)
       })
     },
     closeDialog () {

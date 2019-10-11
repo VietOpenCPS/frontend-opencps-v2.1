@@ -36,18 +36,28 @@
         <div v-if="checkinFail">
           <span v-if="overTime">
             Quý khách vui lòng đăng ký xếp hàng trong thời gian <br>
-            Buổi sáng: {{timeMorning}} <br>
+            Buổi sáng: {{timeMorning ? timeMorning : '--:--'}} <br>
             Buổi chiều: {{timeAfternoon ? timeAfternoon : '--:--'}}
           </span>
           <span v-else>
-            Lỗi. Quý khách vui lòng quét lại <br>
-            ERROR. Please again!
+            <span v-if="isScaned">
+              Mã số không hợp lệ. Vui lòng kiểm tra lại <br>
+            </span>
+            <span v-else>
+              Lỗi. Quý khách vui lòng quét lại <br>
+              Error. Please again!
+            </span>
           </span>
         </div>
         <div v-else>
-          <span>
+          <span v-if="overMax">
             Mã {{codeShow}} của quý khách đã được xếp hàng<br>
-            COMPLETED!
+            Số thứ tự: <span style="color: white !important; font-size: 36px">{{countBooking}}</span> <br>
+            {{notifyOverMax}}
+          </span>
+          <span v-else>
+            Mã {{codeShow}} của quý khách đã được xếp hàng<br>
+            Số thứ tự: <span style="color: white !important; font-size: 36px">{{countBooking}}</span>
           </span>
         </div>
       </v-flex>
@@ -75,8 +85,17 @@ export default {
   components: {
   },
   data: () => ({
+    groupDvc: '',
+    bookingGroups: '',
+    stepDossierRelease: '',
+    dossierStepsAllow: '',
+    overMax: false,
+    notifyOverMax: '',
+    maxCounter: '',
+    currentGroup: '',
     eformInformation: '',
     codeShow: '',
+    countBooking: '', 
     isActive: false,
     checkinFail: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
@@ -84,7 +103,8 @@ export default {
     timeMorning: '',
     timeAfternoon: '',
     onTime: true,
-    overTime: false
+    overTime: false,
+    isScaned: false
   }),
   computed: {
     isMobile () {
@@ -101,13 +121,13 @@ export default {
     $('.navbar-container').css('display','none')
     $('#footer').css('display','none')
     vm.$nextTick(function () {
-      vm.getWorkingTime()
+      vm.getBookingConfigs()
       vm.getBooking()
       setInterval(function () {
         vm.checkOntime()
       }, 1*60*1000)
       setInterval(function () {
-        vm.getWorkingTime()
+        vm.getBookingConfigs()
       }, 5*60*1000)
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -139,49 +159,66 @@ export default {
   methods: {
     submitQueue () {
       let vm = this
+      vm.maxCounter = ''
+      vm.countBooking = ''
+      vm.currentGroup = ''
       vm.checkOntime()
-      console.log('onTime 1, isActive', vm.onTime, vm.isActive)
-      console.log('checkinFail 1, overTime', vm.checkinFail, vm.overTime)
       if (!vm.isActive) {
         if (vm.onTime) {
           vm.overTime = false
-          if (String(vm.eformInformation).indexOf('-') > 0) {
+          if (String(vm.eformInformation).length > 0) {
             let keySearch = String(vm.eformInformation).split('-')
             vm.codeShow = vm.eformInformation
-            if (keySearch.length !== 3) {
-              vm.isActive = true
-              vm.checkinFail = true
-              setTimeout(function() {
-                vm.isActive = false
-              }, 5000)
-              vm.eformInformation = ''
-            }
+            // if (keySearch.length !== 3) {
+            //   vm.isActive = true
+            //   vm.checkinFail = true
+            //   setTimeout(function() {
+            //     vm.isActive = false
+            //   }, 5000)
+            //   vm.eformInformation = ''
+            // }
             let filterBooking = {
               className: '',
               classPK: '',
               serviceCode: '',
               gateNumber: '',
               state: 1,
-              codeNumber: vm.eformInformation,
-              bookingName: ''
+              codeNumber: '',
+              bookingName: '',
+              serviceGroupCode: '',
+              dossierRelease: false
             }
-            if (keySearch[0] === 'E' && keySearch.length === 3) {
+            if (keySearch.length === 1) {
+              filterBooking['codeNumber'] = vm.eformInformation
+            } else {
+              filterBooking['codeNumber'] = vm.maBienNhan(vm.eformInformation)
+            }
+            if (keySearch.length === 1) {
               let filterEform = {
-                eFormId: keySearch[2]
+                eFormNo: vm.eformInformation,
+                endPoint: '/eforms/' + vm.eformInformation + '/barcode'
               }
-              vm.$store.dispatch('getEform', filterEform).then(function (result) {
+              vm.$store.dispatch('getEformBarcode', filterEform).then(function (result) {
                 let bookingName = ''
                 if (result['eFormId']) {
+                  // 
+                  vm.currentGroup = vm.bookingGroups.filter(function (item) {
+                    return (item['config'] && item['config'].split(',').indexOf(result['serviceCode']) >= 0)
+                  })[0]
+                  console.log('currentGroup', vm.currentGroup)
+                  // 
                   try {
                     let name = JSON.parse(result['eFormData'])
                     bookingName = name !== 'undefined' && name !== undefined ? name['bookingName'] : ''
                   } catch (e) {
+                    console.log('lỗi parse eFormData get bookingName')
                   }
                   vm.checkinFail = false
                   filterBooking.className = 'EFORM'
                   filterBooking.classPK = result.eFormId
                   filterBooking.serviceCode = result.serviceCode
                   filterBooking.bookingName = bookingName
+                  filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
                   vm.createBooking(filterBooking)
                 } else {
                   vm.isActive = true
@@ -199,19 +236,28 @@ export default {
                 }, 5000)
                 vm.eformInformation = ''
               })
-            } else if (keySearch[0] === 'D' && keySearch.length === 3) {
+            } else if (keySearch[0] === 'D' && keySearch.length !== 1) {
               let filterDossier = {
-                dossierId: keySearch[2]
+                dossierId: keySearch[2],
+                secretCode: keySearch[1]
               }
               vm.$store.dispatch('getDossierDetail', filterDossier).then(function (result) {
                 if (result) {
+                  vm.currentGroup = vm.bookingGroups.filter(function (item) {
+                    return (item['className'] === 'DOSSIER')
+                  })[0]
                   vm.checkinFail = false
                   filterBooking.className = 'DOSSIER'
                   filterBooking.classPK = result.dossierId
                   filterBooking.serviceCode = result.serviceCode
                   filterBooking.bookingName = result.applicantName
-                  if (result['stepCode'] && vm.serverConfig['dossierStepsAllow'].indexOf(String(result['stepCode'])) >= 0) {
-                    console.log('createBK', result['stepCode'], filterBooking)
+                  filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
+                  if (result['stepCode'] && vm.dossierStepsAllow.indexOf(String(result['stepCode'])) >= 0) {
+                    if (vm.stepDossierRelease.indexOf(String(result['stepCode'])) >= 0) {
+                      filterBooking.dossierRelease = true
+                    } else {
+                      filterBooking.dossierRelease = false
+                    }
                     vm.createBooking(filterBooking)
                   } else {
                     vm.isActive = true
@@ -259,11 +305,36 @@ export default {
     },
     createBooking (filter) {
       let vm = this
+      console.log('filter create booking', filter)
       vm.$store.dispatch('createBooking', filter).then(function (result) {
         vm.isActive = true
+        vm.checkinFail = false
+        vm.isScaned = false
+        vm.countBooking = result['count']
+        // 
+        let timeDelay = 5000
+        if (String(result['state']) === '4') {
+          vm.checkinFail = true
+          vm.isScaned = true
+        } else {
+          // 
+          if (filter.dossierRelease) {
+            result.state = 4
+            console.log('filter update', result)
+            vm.updateStateBooking(result)
+          }
+          vm.overMax = false
+          if (vm.currentGroup.hasOwnProperty('maxRecord') && vm.currentGroup['maxRecord'] 
+            && Number(result['count']) > Number(vm.currentGroup['maxRecord'])
+          ) {
+            vm.overMax = true
+            timeDelay = 10000
+          }
+        }
+        // 
         setTimeout(function() {
           vm.isActive = false
-        }, 5000)
+        }, timeDelay)
         vm.eformInformation = ''
       }).catch (function (reject) {
         vm.eformInformation = ''
@@ -281,15 +352,23 @@ export default {
         vm.loadData = !vm.loadData
       })
     },
-    getWorkingTime () {
+    getBookingConfigs () {
       let vm = this
       let filter = {
-        serverNo: 'EFORM_DVC'
+        serverNo: 'BOOKING_CONFIG'
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
-        console.log('config eform', JSON.parse(result.configs)['workTime'])
+        // nhóm thủ tục, step dossier
         try {
-          let workTime = JSON.parse(result.configs)['workTime']
+          let configs = JSON.parse(result.configs)
+          vm.dossierStepsAllow = configs['dossierStepsAllow']
+          vm.stepDossierRelease = configs['stepDossierRelease']
+          vm.bookingGroups = configs['bookings']
+          vm.groupDvc = configs['groupId']
+          vm.notifyOverMax = configs['notifyMax']
+          console.log('bookingGroups', vm.bookingGroups)
+          // thời gian làm việc
+          let workTime = configs['workTime'] ? configs['workTime'] : '08:00-11:00;13:00-16:00'
           let parse = function (min) {
             return (new Date(`1970-01-01 ${min}`)).getTime()
           }
@@ -308,14 +387,21 @@ export default {
           } else {
             vm.workingTime = ''
           }
-          console.log('workingTime', vm.workingTime)
         } catch (error) {
-          vm.workingTime = ''
+          console.log('bookings parseError')
+          vm.dossierStepsAllow = 600
         }
         vm.checkOntime()
       }).catch(function (reject) {
         vm.workingTime = ''
         vm.checkOntime()
+      })
+    },
+    updateStateBooking (item) {
+      let vm = this
+      let filter = item
+      vm.$store.dispatch('updateBookingAll', filter).then(function (result) {
+      }).catch (function (reject) {
       })
     },
     checkOntime () {
@@ -349,6 +435,20 @@ export default {
         vm.checkinFail = false
         vm.overTime = false
       }
+    },
+    maBienNhan (str) {
+      let index = 0
+      let pstBN = 0
+      for (var i=0; i<str.length; i++) {
+        if (str.charAt(i) === '-') {
+          index += 1
+        }
+        if (index === 3) {
+          pstBN = i
+          break;
+        }
+      }
+      return str.substr(pstBN + 1)
     }
   }
 }

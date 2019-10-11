@@ -825,7 +825,7 @@ export default {
     typeTienTrinh: 1,
     votingItems: [],
     loadingVoting: false,
-    titleDialogPdf: 'File đính kèm'
+    titleDialogPdf: 'Tài liệu đính kèm'
   }),
   computed: {
     loading () {
@@ -1385,7 +1385,7 @@ export default {
       if (item && item.title) {
         vm.titleDialogPdf = item.title;
       } else {
-        vm.titleDialogPdf = "File đính kèm";
+        vm.titleDialogPdf = "Tài liệu đính kèm"
       }
       console.log('vm.titleDialogPdf++++++++++', vm.titleDialogPdf)
       if (String(item.form) === 'UPDATE') {
@@ -2295,6 +2295,7 @@ export default {
     viewFileDocument (item) {
       var vm = this
       vm.dialogPDFLoading = true
+      vm.titleDialogPdf = 'Văn bản hành chính'
       vm.dialogPDF = true
       item['dossierId'] = vm.thongTinChiTietHoSo.dossierId
       vm.$store.dispatch('viewDocument', item).then(result => {

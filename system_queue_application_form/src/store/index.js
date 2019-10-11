@@ -172,7 +172,7 @@ export const store = new Vuex.Store({
             // var url = window.URL.createObjectURL(response.data)
             // window.open(url)
             let serializable = response.data
-            saveAs(serializable, 'ToKhaiTrucTuyen.pdf')
+            saveAs(serializable, 'ToKhaiTrucTuyen-' + data.eFormNo + '.pdf')
             resolve('')
           }).catch(function (xhr) {
             console.log(xhr)
@@ -209,6 +209,28 @@ export const store = new Vuex.Store({
             params: {}
           }
           axios.get(state.endPoint + '/eforms/' + filter.eFormId, param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getEformSecret ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/eforms/' + filter.eFormNo + '/password/' + filter.secret, param).then(function (response) {
             let serializable = response.data
             if (serializable) {
               resolve(serializable)
