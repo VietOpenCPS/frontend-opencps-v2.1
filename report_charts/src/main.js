@@ -7,7 +7,6 @@ import { store } from './store'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
 import VueApexCharts from 'vue-apexcharts'
-
 Vue.component('apexchart', VueApexCharts)
 Vue.use(VueContentPlaceholders)
 

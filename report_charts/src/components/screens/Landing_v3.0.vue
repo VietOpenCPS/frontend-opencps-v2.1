@@ -3,24 +3,24 @@
     <div class="run-down mt-3">
       <div class="box-title">Tình hình xử lý các năm</div>
       <div class="in-time">
-        <span>{{itemTotal['ontimePercentage'] ? Math.round(itemTotal['ontimePercentage']) : 0}} %</span>
+        <span>{{itemTotalAllYear['ontimePercentage'] ? Math.round(itemTotalAllYear['ontimePercentage']) : 0}} %</span>
         Sớm và đúng hạn
       </div>
       <div class="fake-line"></div>
       <div class="total-solved">
-        <span>{{itemTotal['processCount']}}</span>
+        <span>{{itemTotalAllYear['processCount']}}</span>
         Tổng giải quyết
       </div>
       <div class="finished">
-        <span>{{itemTotal['releaseCount']}}</span>
+        <span>{{itemTotalAllYear['releaseCount']}}</span>
         Hoàn thành
       </div>
       <div class="processing">
-        <span>{{itemTotal['processingCount']}}</span>
+        <span>{{itemTotalAllYear['processingCount']}}</span>
         Đang xử lý
       </div>
       <div class="take-back">
-        <span>{{itemTotal['cancelledCount']}}</span>
+        <span>{{itemTotalAllYear['cancelledCount']}}</span>
         Rút hồ sơ
       </div>
     </div>
@@ -64,7 +64,7 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pt-3 pb-4">
+              <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
                 <v-card color="red lighten-1" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -79,8 +79,8 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pt-3 pb-4">
-                <v-card color="blue lighten-1" class="white--text" height="70px">
+              <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
+                <v-card color="#00bcd5" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
@@ -103,7 +103,8 @@
           <div class="row-header">
             <div class="background-triangle-big two-line"> 
               <span>TỔNG HỢP TÌNH HÌNH</span> <br>
-              <span>GIẢI QUYẾT HỒ SƠ NĂM {{year}}</span>
+              <span v-if="String(year) !== '0'">GIẢI QUYẾT HỒ SƠ NĂM {{year}}</span>
+              <span v-else>GIẢI QUYẾT HỒ SƠ CÁC NĂM</span>
             </div>
             <div class="layout row wrap header_tools row-blue">
             </div> 
@@ -114,7 +115,7 @@
             <span class="d-inline-block total-pie-text">
               <p class="blue--text mb-0 text-bold" style="font-size: 1.25em">TỔNG SỐ HỒ SƠ: 
                 <span style="font-size: 32px">
-                  {{itemTotal.undueCount + itemTotal.overdueCount + itemTotal.waitingCount + itemTotal.betimesCount + itemTotal.ontimeCount + itemTotal.overtimeCount + itemTotal.cancelledCount}}
+                  {{itemTotal.processingCount + itemTotal.waitingCount + itemTotal.releaseCount}}
                 </span>
               </p>
             </span>
@@ -143,13 +144,14 @@
           </div>
 
           <div class="d-inline-block ml-3 px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
-            <v-btn small color="#0054a6" depressed class="mr-2 white--text" style="height: 24px;">Tất cả các hệ thống</v-btn>
-            <v-btn flat small color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
-            <v-btn flat small color="#0054a6" class="" style="height: 24px;">Hệ thống khác</v-btn>
+            <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mr-2" style="height: 24px;">Tất cả các hệ thống</v-btn>
+            <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
+            <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" style="height: 24px;">NSW</v-btn>
+            <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
           </div>
 
           <v-layout wrap class="right date-filter">
-            <v-flex class="mr-2" style="width:125px">
+            <v-flex class="mr-2" :style="String(year) !== '0' ? 'width:125px' : 'width:155px'">
               <v-select
                 :items="years"
                 v-model="year"
@@ -182,6 +184,7 @@
                 background-color="#fff"
                 style="border: 1px solid #0054a6; border-radius: 3px; height:36px"
                 hide-details
+                :disabled="String(year) === '0'"
                 >
                 <template v-slot:selection="{ item, index }">
                   <span style="color: #0054a6 !important">{{item ? item['name'] : ''}}</span>
@@ -200,12 +203,25 @@
             </div> 
           </div>
           <div class="row-header" v-else>
-            <div class="background-triangle-big"> <span>TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM {{year}}</span> </div>
+            <div class="background-triangle-big">
+              <span v-if="String(year) !== '0'">TÌNH HÌNH GIẢI QUYẾT HỒ SƠ NĂM {{year}}</span> 
+              <span v-else>TÌNH HÌNH GIẢI QUYẾT HỒ SƠ CÁC NĂM </span> 
+            </div>
             <div class="layout row wrap header_tools row-blue">
             </div> 
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="500" 
+            <div v-if="noReportData" class="py-3">
+              <v-alert
+                :value="true"
+                color="info"
+                icon="info"
+                outline
+              >
+                Không có dữ liệu báo cáo
+              </v-alert>
+            </div>
+            <apexchart v-else type="bar" height="500" 
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -214,8 +230,8 @@
           </v-card-text>
         </v-card>
       </v-flex>
-
-      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar">
+      <!--  -->
+      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar && !noReportData">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header" v-if="String(month) !== '0'">
             <div class="background-triangle-big"> <span>TỔNG SỐ HỒ SƠ TIẾP NHẬN THÁNG {{month}} NĂM {{year}}</span> </div>
@@ -223,7 +239,10 @@
             </div> 
           </div>
           <div class="row-header" v-else>
-            <div class="background-triangle-big"> <span>TỔNG SỐ HỒ SƠ TIẾP NHẬN NĂM {{year}}</span> </div>
+            <div class="background-triangle-big"> 
+              <span v-if="String(year) !== '0'">TỔNG SỐ HỒ SƠ TIẾP NHẬN NĂM {{year}}</span>
+              <span v-else>THỐNG KÊ TỔNG SỐ HỒ SƠ TIẾP NHẬN CÁC NĂM</span> 
+            </div>
             <div class="layout row wrap header_tools row-blue">
             </div> 
           </div>
@@ -258,15 +277,28 @@
         </v-card>
       </v-flex> --> 
 
-      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadLine" id="lineChartID">
+      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadLine && year !== '0'" id="lineChartID">
         <v-card class="wrap_report" style="border-radius: 0">
           <div class="row-header">
-            <div class="background-triangle-big"> <span>THỐNG KÊ TỔNG SỐ HỒ SƠ ĐÃ TIẾP NHẬN NĂM {{year}}</span> </div>
+            <div class="background-triangle-big"> 
+              <span v-if="String(year) !== '0'">THỐNG KÊ TỔNG SỐ HỒ SƠ ĐÃ TIẾP NHẬN NĂM {{year}}</span> 
+              <span v-else>THỐNG KÊ TỔNG SỐ HỒ SƠ ĐÃ TIẾP NHẬN CÁC NĂM</span> 
+            </div>
             <div class="layout row wrap header_tools row-blue">
             </div>
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="line" height="500"
+            <div v-if="noReportDataLine" class="py-3">
+              <v-alert
+                :value="true"
+                color="info"
+                icon="info"
+                outline
+              >
+                Không có dữ liệu báo cáo
+              </v-alert>
+            </div>
+            <apexchart v-else type="line" height="500"
               :options="chartOptions" 
               :series="seriesChart"
               style="margin-top: -30px;"
@@ -274,11 +306,13 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <content-placeholders class="my-4 flex xs12 px-2" v-else>
+      <!--  -->
+      <!-- <content-placeholders class="my-4 flex xs12 px-2" v-else>
         <content-placeholders-heading />
         <content-placeholders-img />
-      </content-placeholders>
+      </content-placeholders> -->
     </v-layout>
+    <!--  -->
     <div v-if="String(index) === '1'">
       <v-card class="py-4" style="border-radius: 0;box-shadow: none;
         border-bottom: 1px solid #ddd;">
@@ -425,7 +459,9 @@ export default {
     PieChartReportPublic
   },
   data: () => ({
+    systemReport: '',
     showDetailReport: false,
+    itemTotalAllYear: {},
     itemTotal: {},
     levelList: [
       {level: 2, count: "0", levelName: 2},
@@ -438,6 +474,7 @@ export default {
     currentDay: (new Date()).getDate() < 10 ? '0' + (new Date()).getDate() : (new Date()).getDate(),
     agencyGroups: [],
     noReportData: false,
+    noReportDataLine: false,
     isCallBack: true,
     reloadPie: true,
     reloadBar: true,
@@ -526,8 +563,8 @@ export default {
           "name": "en",
           "options": {
             "toolbar": {
-                "exportToSVG": "Tải xuống SVG",
-                "exportToPNG": "Tải xuống PNG"
+              "exportToSVG": "Tải xuống SVG",
+              "exportToPNG": "Tải xuống PNG"
             }
           }
         }]
@@ -559,8 +596,8 @@ export default {
       }
     },
     chartDonutOptions: {
-      labels: ['Đang xử lý còn hạn', 'Đang xử lý quá hạn', 'Đang bổ sung điều kiện', 'Đã giải quyết sớm hạn', 'Đã giải quyết đúng hạn', 'Đã giải quyết quá hạn', 'Rút không giải quyết'],
-      colors: ['#008FFB', '#FF4560', '#FEB019', '#00E396', '#775DD0', '#8D5B4C', '#546E7A'],
+      labels: ['Đang xử lý', 'Đang chờ bổ sung', 'Đã giải quyết'],
+      colors: ['#8BC34A', '#FFC107', '#2196F3'],
       plotOptions: {
         pie: {
           donut: {
@@ -589,10 +626,8 @@ export default {
               total: {
                 show: true,
                 label: 'Sớm và đúng hạn',
-                color: '#00E396',
+                color: '#ff5c24',
                 formatter: function (w) {
-                  let totalRelelase = w.globals.series[3] + w.globals.series[4] + w.globals.series[5]
-                  return Math.round(((w.globals.series[3] + w.globals.series[4])/totalRelelase)*100)+' %'
                 }
               }
             }
@@ -637,7 +672,7 @@ export default {
       legend: {
         position: 'left',
         offsetY: 0,
-        height: 155,
+        height: 120,
         fontFamily: 'Roboto, Arial, sans-serif',
         formatter: function(seriesName, opts) {
           return '<span class="text-bold" style="color:' + opts.w.globals.colors[opts.seriesIndex]+ '">' +
@@ -703,13 +738,13 @@ export default {
           }
         }]
       },
-      colors: ['#008FFB', '#00E396'],
+      colors: ['#4FC3F7', '#B3E5FC'],
       stroke: {
         width: 1,
         colors: ['#fff']
       },
       xaxis: {
-        categories: ['Cục Đăng kiểm Việt Nam', 'Cục Hàng hải Việt Nam', 'Cục Hàng không Việt Nam', 'Tổng cục Đường bộ Việt Nam', 'Cơ quan Bộ'],
+        categories: [],
         labels: {
           formatter: function(val) {
             return val
@@ -741,10 +776,10 @@ export default {
     seriesDossierTypeChart: [
       {
         name: 'Hồ sơ nộp trực tiếp',
-        data: [300,150,20,100,5]
+        data: []
       },{
         name: 'Hồ sơ nộp trực tuyến',
-        data: [12,24,12,32,1]
+        data: []
       }
     ],
     labelOfLine: [],
@@ -799,6 +834,10 @@ export default {
           )
         }
       }
+      vm.years.unshift({
+        'value': '0',
+        'name': 'Tất cả các năm'
+      })
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -823,6 +862,9 @@ export default {
         if (currentQuerys.hasOwnProperty('chartView')) {
           vm.chartView = (currentQuerys.chartView === 'true')
         }
+        if (currentQuerys.hasOwnProperty('system')) {
+          vm.systemReport = currentQuerys.system
+        }
         vm.doStaticsReport()
         vm.$store.dispatch('getLevelList').then(function (result) {
           let totalXXX = 0
@@ -846,6 +888,20 @@ export default {
             let currentData = agencyListsTotal[key]
             if (currentData.domainName === '' && currentData.domainName === '') {
               vm.itemTotal = currentData
+              vm.showTableTotal = true
+              break
+            }
+          }
+          if (vm.itemTotal === '') {
+            vm.showTableTotal = false
+          }
+        })
+        vm.$store.dispatch('getReportTotal', '0').then(function (result) {
+          let agencyListsTotal = result
+          for (let key in agencyListsTotal) {
+            let currentData = agencyListsTotal[key]
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.itemTotalAllYear = currentData
               vm.showTableTotal = true
               break
             }
@@ -894,6 +950,9 @@ export default {
           vm.chartView = false
         }
       }
+      if (currentQuerys.hasOwnProperty('system')) {
+        vm.systemReport = currentQuerys.system
+      }
       vm.doStaticsReport()
     },
     reloadLine (val) {
@@ -908,13 +967,46 @@ export default {
     itemTotal (val) {
       let vm = this
       if (val) {
-        vm.seriesDonut[0] = val['undueCount'] /**Đang xử lý còn hạn */
-        vm.seriesDonut[1] = val['overdueCount'] /**Đang xử lý quá hạn */
-        vm.seriesDonut[2] = val['waitingCount'] /**Đang bổ sung điều kiện */
-        vm.seriesDonut[3] = val['betimesCount'] /**Đã giải quyết sớm hạn */
-        vm.seriesDonut[4] = val['ontimeCount'] /**Đã giải quyết đúng hạn */
-        vm.seriesDonut[5] = val['overtimeCount'] /**Đã giải quyết quá hạn */
-        vm.seriesDonut[6] = val['cancelledCount'] /**Rút không giải quyết */
+        vm.seriesDonut[0] = val['processingCount'] /**Đang xử lý còn hạn */
+        vm.seriesDonut[1] = val['waitingCount'] /**Đang xử lý quá hạn */
+        vm.seriesDonut[2] = val['releaseCount'] /**Đang bổ sung điều kiện */
+        vm.chartDonutOptions.plotOptions = {
+          pie: {
+            donut: {
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+                  fontSize: '12px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 5
+                },
+                value: {
+                  show: true,
+                  fontSize: '24px',
+                  fontFamily: 'Roboto, Arial, sans-serif',
+                  color: undefined,
+                  offsetY: 20,
+                  formatter: function (val, w) {
+                    let total = w.globals.seriesTotals.reduce((a, b) => {
+                      return a + b
+                    }, 0)
+                    return Math.round((val/total)*100)+' %'
+                  }
+                },
+                total: {
+                  show: true,
+                  label: 'Sớm và đúng hạn',
+                  color: '#00E396',
+                  formatter: function (w) {
+                    return val['ontimePercentage']+' %'
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -942,7 +1034,22 @@ export default {
           year: vm.year,
           month: vm.month,
           group: vm.group,
-          chartView: vm.chartView
+          chartView: vm.chartView,
+          system: vm.systemReport
+        }
+      })
+    },
+    changeSystem (type) {
+      let vm = this
+      vm.systemReport = type
+      vm.$router.push({
+        path: '/bao-cao/' + vm.index,
+        query: {
+          year: vm.year,
+          month: vm.month,
+          group: vm.group,
+          chartView: vm.chartView,
+          system: vm.systemReport
         }
       })
     },
@@ -983,7 +1090,8 @@ export default {
         group: vm.group,
         reporting: true,
         agency: vm.govAgencyCode,
-        report: vm.chartView ? false : 'linemonth'
+        report: vm.chartView ? false : 'linemonth',
+        system: vm.systemReport
       }
       let tempGov = vm.govAgencyCode
       if (vm.chartView) {
@@ -1035,68 +1143,86 @@ export default {
           vm.noReportData = false
           vm.agencyLists = result
         }
-        console.log('agencyLists', vm.agencyLists)
-        vm.doProcessReport2(vm.agencyLists)
-        for (let key in vm.agencyLists) {
-          let currentData = vm.agencyLists[key]
-          console.log('currentData', currentData)
-          if (currentData.domainName === '' && currentData.domainName === '') {
-            vm.totalCounter['total_3'] = currentData.processCount
-            vm.totalCounter['total_4'] = currentData.remainingCount
-            vm.totalCounter['total_5'] = currentData.receivedCount
-            vm.totalCounter['total_6'] = currentData.onegateCount
-            vm.totalCounter['total_7'] = currentData.onlineCount
-            vm.totalCounter['total_8'] = currentData.releaseCount
-            vm.totalCounter['total_9'] = currentData.betimesCount
-            vm.totalCounter['total_10'] = currentData.ontimeCount
-            vm.totalCounter['total_11'] = currentData.overtimeCount
-            vm.totalCounter['total_12'] = currentData.unresolvedCount
-            vm.totalCounter['total_13'] = currentData.doneCount
-            vm.totalCounter['total_14'] = currentData.releasingCount
-            vm.totalCounter['total_15'] = currentData.processingCount
-            vm.totalCounter['total_16'] = currentData.undueCount
-            vm.totalCounter['total_17'] = currentData.overdueCount
-            vm.totalCounter['total_18'] = currentData.waitingCount
-            vm.totalCounter['total_19'] = currentData.cancelledCount
-            vm.totalCounter['total_20'] = currentData.ontimePercentage
-            vm.showTable = true
-            break
+        // console.log('agencyLists', vm.agencyLists)
+        if (!vm.noReportData) {
+          vm.doProcessReport2(vm.agencyLists)
+          vm.doProcessReportTypeDossiers(vm.agencyLists)
+          for (let key in vm.agencyLists) {
+            let currentData = vm.agencyLists[key]
+            console.log('currentData', currentData)
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.totalCounter['total_3'] = currentData.processCount
+              vm.totalCounter['total_4'] = currentData.remainingCount
+              vm.totalCounter['total_5'] = currentData.receivedCount
+              vm.totalCounter['total_6'] = currentData.onegateCount
+              vm.totalCounter['total_7'] = currentData.onlineCount
+              vm.totalCounter['total_8'] = currentData.releaseCount
+              vm.totalCounter['total_9'] = currentData.betimesCount
+              vm.totalCounter['total_10'] = currentData.ontimeCount
+              vm.totalCounter['total_11'] = currentData.overtimeCount
+              vm.totalCounter['total_12'] = currentData.unresolvedCount
+              vm.totalCounter['total_13'] = currentData.doneCount
+              vm.totalCounter['total_14'] = currentData.releasingCount
+              vm.totalCounter['total_15'] = currentData.processingCount
+              vm.totalCounter['total_16'] = currentData.undueCount
+              vm.totalCounter['total_17'] = currentData.overdueCount
+              vm.totalCounter['total_18'] = currentData.waitingCount
+              vm.totalCounter['total_19'] = currentData.cancelledCount
+              vm.totalCounter['total_20'] = currentData.ontimePercentage
+              vm.showTable = true
+              break
+            }
           }
         }
+        
         vm.reloadPie = true
       })
-      setTimeout(() => {
-        filter = {
-          year: vm.year,
-          group: vm.group,
-          agency: tempGov,
-          report: vm.chartView ? true : 'linemonth'
-        }
-        if (!vm.chartView) {
-          filter.agency = 'total'
-          filter.report = 'linemonth'
-        } else {
-          if (tempGov !== '') {
-            filter.agency = tempGov
-            filter.report = false
-          } else {
-            filter.agency = ''
-            filter.report = true
+      // report line
+      if (vm.year !== '0') {
+        setTimeout(() => {
+          filter = {
+            year: vm.year,
+            group: vm.group,
+            agency: tempGov,
+            report: vm.chartView ? true : 'linemonth',
+            system: vm.systemReport
           }
-        }
-        vm.reloadLine = true
-        vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-          let dataReport1 = []
-          if (result === null || result === undefined || result === 'undefined') {
+          if (!vm.chartView) {
+            filter.agency = 'total'
+            filter.report = 'linemonth'
           } else {
-            dataReport1 = result
+            if (tempGov !== '') {
+              filter.agency = tempGov
+              filter.report = false
+            } else {
+              filter.agency = ''
+              filter.report = true
+            }
           }
-          vm.doProcessReport1(dataReport1)
-        })
-      }, 200)
+          vm.reloadLine = true
+          vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+            let dataReport1 = []
+            if (result === null || result === undefined || result === 'undefined') {
+              vm.noReportDataLine = true
+              vm.reloadLine = false
+            } else {
+              vm.noReportDataLine = false
+              dataReport1 = result
+            }
+            if (!vm.noReportDataLine) {
+              vm.doProcessReport1(dataReport1)
+            }
+          })
+        }, 200)
+      } else {
+        vm.reloadLine = false
+      }
     },
     changeYear (item) {
       let vm = this
+      if (String(item) === '0') {
+        vm.month = '0'
+      }
       vm.year = item
       vm.showTableTotal = false
       vm.itemTotal = ''
@@ -1121,7 +1247,8 @@ export default {
           month: vm.month,
           group: vm.group,
           reportGovName: vm.reportGovName,
-          govAgencyCode: vm.govAgencyCode
+          govAgencyCode: vm.govAgencyCode,
+          system: vm.systemReport
         }
       })
     },
@@ -1136,7 +1263,8 @@ export default {
           month: vm.month,
           group: vm.group,
           reportGovName: vm.reportGovName,
-          govAgencyCode: vm.govAgencyCode
+          govAgencyCode: vm.govAgencyCode,
+          system: vm.systemReport
         }
       })
     },
@@ -1226,12 +1354,9 @@ export default {
       let vm = this
       let datasetsCustom = []
       let labelsCustomMonth = {}
-      let undueCountData = []
-      let overdueCountData = []
+      let processingCountData = []
       let waitingCountData = []
-      let betimesCountData = []
-      let ontimeCountData = []
-      let overtimeCountData = []
+      let releaseCountData = []
       let currentQuerys = vm.$router.history.current.query
       console.log('dataReport2', data)
       // Bind data report THÁNG
@@ -1241,16 +1366,13 @@ export default {
           // if (data[key].month > 0) {
             // if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
             if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
-              labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+              labelsCustomMonth[data[key].domainName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
             } else {
-              labelsCustomMonth[data[key].govAgencyName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+              labelsCustomMonth[data[key].govAgencyName] = data[key].processingCount + data[key].waitingCount + data[key].releaseCount
             }
-            undueCountData.push(data[key].undueCount)
-            overdueCountData.push(data[key].overdueCount)
+            processingCountData.push(data[key].processingCount)
             waitingCountData.push(data[key].waitingCount)
-            betimesCountData.push(data[key].betimesCount)
-            ontimeCountData.push(data[key].ontimeCount)
-            overtimeCountData.push(data[key].overtimeCount)
+            releaseCountData.push(data[key].releaseCount)
           // }
         }
       }
@@ -1353,23 +1475,14 @@ export default {
       // report 3
       vm.seriesChartBarTotal = []
       vm.seriesChartBarTotal = [{
-        name: 'Đang xử lý còn hạn',
-        data: undueCountData
+        name: 'Đang xử lý',
+        data: processingCountData
       },{
-        name: 'Đang xử lý quá hạn',
-        data: overdueCountData
-      },{
-        name: 'Đang bổ sung điều kiện',
+        name: 'Đang chờ bổ sung',
         data: waitingCountData
       },{
-        name: 'Đã giải quyết sớm hạn',
-        data: betimesCountData
-      },{
-        name: 'Đã giải quyết đúng hạn',
-        data: ontimeCountData
-      },{
-        name: 'Đã giải quyết quá hạn',
-        data: overtimeCountData
+        name: 'Đã giải quyết',
+        data: releaseCountData
       }]
       vm.chartOptionsBarTotal = {}
       vm.chartOptionsBarTotal = {
@@ -1388,13 +1501,13 @@ export default {
             "name": "en",
             "options": {
               "toolbar": {
-                  "exportToSVG": "Tải xuống SVG",
-                  "exportToPNG": "Tải xuống PNG"
+                "exportToSVG": "Tải xuống SVG",
+                "exportToPNG": "Tải xuống PNG"
               }
             }
           }]
         },
-        colors: ['#008FFB', '#FF4560', '#FEB019', '#00E396', '#775DD0', '#546E7A'],
+        colors: ['#8BC34A', '#FFC107', '#2196F3'],
         stroke: {
           width: 1,
           colors: ['#fff']
@@ -1435,6 +1548,29 @@ export default {
           }
         }
       }
+    },
+    doProcessReportTypeDossiers (data) {
+      let vm = this
+      let onlineCountData = []
+      let onegateCountData = []
+      let labelDomain = []
+      let labelAgency = []
+      // Bind data report THÁNG
+      for (let key in data) {
+        if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
+        } else {
+          if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
+            labelDomain.push(data[key].domainName)
+          } else {
+            labelAgency.push(data[key].govAgencyName)
+          }
+          onlineCountData.push(data[key].onlineCount)
+          onegateCountData.push(data[key].onegateCount)
+        }
+      }
+      vm.seriesDossierTypeChart[0]['data'] = onegateCountData
+      vm.seriesDossierTypeChart[1]['data'] = onlineCountData
+      vm.dossierTypeChartOption.xaxis.categories = vm.chartView ? labelAgency : labelDomain
     },
     hashCode (str) {
       var hash = 0

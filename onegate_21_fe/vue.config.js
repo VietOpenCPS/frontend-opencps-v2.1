@@ -23,16 +23,7 @@ if (process.env.NODE_ENV === 'production') {
       output: {
         filename: '../../docs/o/opencps-frontend-cli/motcua/app/js/[name].js',
         chunkFilename: '../../docs/o/opencps-frontend-cli/motcua/app/js/[name].js'
-      },
-      // optimization: {
-      //   splitChunks: {
-      //     chunks: 'all',
-      //   },
-      // },
-      // plugins: [new HtmlWebpackPlugin({
-      //     inject: 'body'
-      //   })
-      // ]
+      }
     }
   }
 } else {
