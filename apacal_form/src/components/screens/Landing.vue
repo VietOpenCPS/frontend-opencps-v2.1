@@ -46,7 +46,7 @@
           >
             <v-icon size="18" class="white--text">description</v-icon> &nbsp; View form
           </v-btn>
-          <v-btn round dark small color="green" @click="viewPdf"
+          <v-btn round dark small color="green" @click="viewPdf(false)"
             :loading="loading"
             :disabled="loading"
           >
@@ -77,7 +77,7 @@
           >
             <v-icon size="18" class="white--text">description</v-icon> &nbsp; View form
           </v-btn>
-          <v-btn v-else round dark small color="green" @click="viewPdf(form)" class="mr-2"
+          <v-btn v-else round dark small color="green" @click="viewPdf(true)" class="mr-2"
             :loading="loading"
             :disabled="loading"
           >
@@ -170,7 +170,7 @@ export default {
   methods: {
     formatScript (active) {
       let vm = this
-      console.log('editorScript', vm.$refs.editorScript)
+      // console.log('editorScript', vm.$refs.editorScript)
       if (active) {
         vm.formatS = '1'
         vm.$refs.editorScript.editor.format()
@@ -198,6 +198,7 @@ export default {
         formScript =  eval('(' + vm.$refs.editorScript.editor.getText() + ')')
       } catch (error) {
         formScript = {}
+        toastr.error('Lỗi form script!')
         console.log('formScript emty or error parse')
         return
       }
@@ -227,10 +228,10 @@ export default {
     },
     viewPdf (t) {
       let vm = this
-      let formData
       if (vm.form_report === '') {
         return
       }
+      var formData = {}
       try {
         if (t) {
           let control = window.$('#formInput').alpaca('get')
@@ -251,6 +252,9 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         responseType: 'blob'
+      }
+      if (!formData) {
+        formData = {}
       }
       let dataCreate = new URLSearchParams()
       dataCreate.append('scriptStr', vm.form_report)

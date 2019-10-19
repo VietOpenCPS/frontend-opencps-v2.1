@@ -1,5 +1,5 @@
 <template>
-  <v-app :data-app="false" id="app_login">
+  <v-app :data-app="true" class="application theme--light">
     <div
       @click="drawerLogin = false"
       v-if="drawerLogin"

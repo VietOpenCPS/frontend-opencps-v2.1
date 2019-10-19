@@ -8,5 +8,6 @@ axios.defaults.headers.common['Token'] = window.Liferay !== undefined ? window.L
 Vue.config.productionTip = true
 
 new Vue({
-  render: function (h) { return h(App) }
+  render: function (h) { 
+    return h(App) }
 }).$mount('#app_login')
