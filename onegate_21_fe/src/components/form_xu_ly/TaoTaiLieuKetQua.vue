@@ -659,7 +659,7 @@
         var vm = this
         if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
           var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
-          window.open(url)
+          window.location.assign(url)
         } else {
           vm.dialogPDFLoading = true
           vm.documentType = 'Tài liệu đính kèm'
@@ -703,7 +703,7 @@
           })
           if (fileFind) {
             let url = vm.initDataResource.serviceInfoApi + '/' + fileFind.serviceCode + '/filetemplates/' + fileFind.fileTemplateNo
-            window.open(url)
+            window.location.assign(url)
           } else {
             console.log('ko thay file')
           }

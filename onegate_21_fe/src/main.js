@@ -26,7 +26,6 @@ Vue.mixin({
 new Vue({
   router,
   store,
-  eSign,
   beforeCreate () {
     var vm = this
     vm.$store.dispatch('loadInitResource')

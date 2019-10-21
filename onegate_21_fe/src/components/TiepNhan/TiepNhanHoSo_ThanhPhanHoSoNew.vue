@@ -1167,7 +1167,7 @@ export default {
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
         var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
-        window.open(url)
+        window.location.assign(url)
       } else {
         data['dossierId'] = vm.thongTinHoSo.dossierId
         if (data.referenceUid) {
@@ -1214,7 +1214,7 @@ export default {
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
         var url = vm.initDataResource.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid
-        window.open(url)
+        window.location.assign(url)
       } else {
         if (data.referenceUid) {
           vm.dialogPDFLoading = true
@@ -1420,7 +1420,7 @@ export default {
         })
         if (fileFind) {
           let url = vm.initDataResource.serviceInfoApi + '/' + vm.serviceInfoId + '/filetemplates/' + fileFind.fileTemplateNo
-          window.open(url)
+          window.location.assign(url)
         } else {
           console.log('ko thay file')
         }
