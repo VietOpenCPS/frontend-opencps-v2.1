@@ -26,6 +26,7 @@ export const store = new Vuex.Store({
     questionPage: 1,
     totalQuestion: 0,
     agencyFilter: '',
+    lvdsFilter: '',
     keywordFilter: '',
     user: {
       'role': ''
@@ -112,6 +113,7 @@ export const store = new Vuex.Store({
                 keyword: filter.keyword ? filter.keyword : '',
                 publish: filter.publish,
                 answered: filter.answered,
+                lvdsCode: filter.lvdsCode ? filter.lvdsCode : ''
               }
             }
           } else {
@@ -124,7 +126,8 @@ export const store = new Vuex.Store({
                 end: state.questionPage * 20,
                 publish: 1,
                 govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
-                keyword: filter.keyword ? filter.keyword : ''
+                keyword: filter.keyword ? filter.keyword : '',
+                lvdsCode: filter.lvdsCode ? filter.lvdsCode : ''
               }
             }
           }
@@ -459,6 +462,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getLvdsList ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/LVDS/dictitems', paramGetGovAgency).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     getServerConfig ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -509,6 +533,9 @@ export const store = new Vuex.Store({
     setAgencyFilter (state, payload) {
       state.agencyFilter = payload
     },
+    setAgencyFilter (state, payload) {
+      state.lvdsFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -556,13 +583,16 @@ export const store = new Vuex.Store({
     getUser (state) {
       return state.user
     },
-    getAgencyFilter (state, payload) {
+    getAgencyFilter (state) {
       return state.agencyFilter
     },
-    getKeywordFilter (state, payload) {
+    getLvdsFilter (state) {
+      return state.lvdsFilter
+    },
+    getKeywordFilter (state) {
       return state.keywordFilter
     },
-    getCounter (state, payload) {
+    getCounter (state) {
       return state.counter
     }
   }

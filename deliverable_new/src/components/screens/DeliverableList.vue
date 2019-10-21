@@ -152,8 +152,11 @@
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-btn flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
+            <v-btn title="Xem giấy phép" flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
               <v-icon>picture_as_pdf</v-icon>
+            </v-btn>
+            <v-btn title="Xem tài liệu đính kèm" flat icon class="mx-0 my-0 ml-2" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
+              <v-icon>attach_file</v-icon>
             </v-btn>
           </td>
         </tr>
@@ -168,7 +171,10 @@
     <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
       <v-card>
         <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Giấy phép</v-toolbar-title>
+          <v-toolbar-title>
+           <span v-if="!viewAttach">Giấy phép</span>
+           <span v-else>Tài liệu đính kèm</span>
+          </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon dark @click.native="dialogPDF = false">
             <v-icon>close</v-icon>
@@ -189,6 +195,18 @@
         </div>
         <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
         </iframe>
+        <v-card-actions v-if="viewAttach && fileEntryIdAttachs.length > 0" class="py-0">
+          <span class="left primary--text text-bold" style="font-size: 1.25em">Tổng số: <span class="red--text">{{fileEntryIdAttachs.length}}</span> tài liệu</span>
+          <div class="text-xs-center" style="width: calc(100% - 150px);">
+            <v-pagination
+              v-model="pageAttachs"
+              :length="fileEntryIdAttachs.length"
+              circle
+              @input="changePage(pageAttachs)"
+              :total-visible="5"
+            ></v-pagination>
+          </div>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <input
@@ -230,7 +248,10 @@
         dataSocket: {},
         filters: [],
         advSearchItems: [],
-        deliverableKey: ''
+        deliverableKey: '',
+        pageAttachs: 1,
+        viewAttach: false,
+        fileEntryIdAttachs: []
       }
     },
     created () {
@@ -407,11 +428,39 @@
       },
       showPDFG (item) {
         let vm = this
+        vm.viewAttach = false
         vm.dialogPDF = true
         vm.dialogPDFLoading = true
         vm.$store.dispatch('viewPDF', item['fileEntryId']).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('pdfViewerListComponent').src = result
+        })
+      },
+      viewFileAttach (detail) {
+        let vm = this
+        vm.viewAttach = true
+        vm.fileEntryIdAttachs = String(detail['fileAttachs']).split(',')
+        vm.loading = true
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[0]).then(function (result) {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+          vm.dialogPDF = true
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+        })
+      },
+      changePage(page) {
+        let vm = this
+        let index = Number(page) - 1
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[index]).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.dialogPDFLoading = false
         })
       },
       paggingData (config) {
