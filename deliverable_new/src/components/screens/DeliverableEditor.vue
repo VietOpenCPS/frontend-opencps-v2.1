@@ -107,10 +107,10 @@
           </v-btn>
         </v-toolbar>
         <div v-if="dialogPDFLoading" style="
-            min-height: 600px;
-            text-align: center;
-            margin: auto;
-            padding: 25%;
+          min-height: 650px;
+          text-align: center;
+          margin: auto;
+          padding: 25%;
         ">
           <v-progress-circular
             :size="100"
@@ -120,11 +120,11 @@
           ></v-progress-circular>
         </div>
         <v-card-text class="px-0 py-0 my-0 py-0">
-          <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+          <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 650px;" frameborder="0">
           </iframe>
         </v-card-text>
         
-        <v-card-actions v-if="fileEntryIdAttachs.length > 0" class="py-0">
+        <v-card-actions v-if="fileEntryIdAttachs.length > 1" class="py-0">
           <span class="left primary--text text-bold" style="font-size: 1.25em">Tổng số: <span class="red--text">{{fileEntryIdAttachs.length}}</span> tài liệu</span>
           <div class="text-xs-center" style="width: calc(100% - 150px);">
             <v-pagination

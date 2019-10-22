@@ -28,7 +28,7 @@
                 @change="changeAdministration"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 class="pr-2" :class="!agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
+            <v-flex xs12 sm6 :class="!agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
               <v-autocomplete
                 class="select-border"
                 :items="lvdsList"
@@ -180,6 +180,21 @@
                   return-object
                   :hide-selected="true"
                   box
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Lĩnh vực đời sống <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvdsList"
+                  v-model="lvdsSelected"
+                  placeholder="Chọn lĩnh vực đời sống"
+                  item-text="itemName"
+                  item-value="itemCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
                 ></v-autocomplete>
               </v-flex>
               <v-flex xs12>
@@ -394,6 +409,7 @@ export default {
     dialog_addQuestion: false,
     agencyCodeSiteExits: '',
     agencySelected: '',
+    lvdsSelected: '',
     lvdsFilterSelected: '',
     agencyFilterSelected: '',
     keyword: '',
@@ -490,22 +506,6 @@ export default {
       })
       vm.$store.dispatch('getLvdsList').then(function(result) {
         vm.lvdsList = result
-        if (vm.lvdsList.length === 0) {
-          vm.lvdsList = [
-          {
-            itemCode: "LVDS1",
-            itemName: "Lĩnh vực đời sống 1"
-          },
-          {
-            itemCode: "LVDS2",
-            itemName: "Lĩnh vực đời sống 1"
-          },
-          {
-            itemCode: "LVDS3",
-            itemName: "Lĩnh vực đời sống 2"
-          }
-        ]
-        }
       })
     })
   },
@@ -599,6 +599,8 @@ export default {
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
             agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+            subDomainCode: vm.lvdsSelected ? vm.lvdsSelected['itemCode'] : '',
+            subDomainName: vm.lvdsSelected ? vm.lvdsSelected['itemName'] : '',
             questionType: 'FAQ'
           }
           vm.$store.dispatch('addQuestion', filter).then(function (result) {

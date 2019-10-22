@@ -21,6 +21,7 @@ export const store = new Vuex.Store({
     ],
     questionList: [],
     questionDetail: '',
+    lvdsFilter: '',
     activeAddQuestion: false,
     activeGetQuestion: false,
     questionPage: 1,
@@ -97,7 +98,8 @@ export const store = new Vuex.Store({
               keyword: filter.keyword ? filter.keyword : '',
               publish: filter.publish,
               answered: filter.answered,
-              questionType: 'FAQ'
+              questionType: 'FAQ',
+              subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
             }
           } else {
             params = {
@@ -106,7 +108,8 @@ export const store = new Vuex.Store({
               publish: 1,
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
               keyword: filter.keyword ? filter.keyword : '',
-              questionType: 'FAQ'
+              questionType: 'FAQ',
+              subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
             }
           }
           let dataPost = new URLSearchParams()
@@ -498,6 +501,9 @@ export const store = new Vuex.Store({
     setAgencyFilter (state, payload) {
       state.agencyFilter = payload
     },
+    setLvdsFilter (state, payload) {
+      state.lvdsFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -523,6 +529,9 @@ export const store = new Vuex.Store({
     },
     getQuestionList (state) {
       return state.questionList
+    },
+    getLvdsFilter (state) {
+      return state.lvdsFilter
     },
     getQuestionDetail (state) {
       return state.questionDetail

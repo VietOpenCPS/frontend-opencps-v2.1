@@ -148,14 +148,14 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0" v-if="!hideAction">
+          <td class="text-xs-center px-0 py-0" v-if="!hideAction" style="width:80px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <v-btn title="Xem giấy phép" flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
               <v-icon>picture_as_pdf</v-icon>
             </v-btn>
-            <v-btn title="Xem tài liệu đính kèm" flat icon class="mx-0 my-0 ml-2" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
+            <v-btn title="Xem tài liệu đính kèm" flat icon class="mx-0 my-0" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
               <v-icon>attach_file</v-icon>
             </v-btn>
           </td>
@@ -168,7 +168,7 @@
           @tiny:change-page="paggingData" ></tiny-pagination>
       </div>
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDFList" max-width="1200" transition="fade-transition" fullscreen>
       <v-card>
         <v-toolbar flat dark color="primary">
           <v-toolbar-title>
@@ -176,12 +176,12 @@
            <span v-else>Tài liệu đính kèm</span>
           </v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialogPDF = false">
+          <v-btn icon dark @click.native="dialogPDFList = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <div v-if="dialogPDFLoading" style="
-            min-height: 600px;
+            min-height: 650px;
             text-align: center;
             margin: auto;
             padding: 25%;
@@ -193,9 +193,9 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 650px;" frameborder="0">
         </iframe>
-        <v-card-actions v-if="viewAttach && fileEntryIdAttachs.length > 0" class="py-0">
+        <v-card-actions v-if="viewAttach && fileEntryIdAttachs.length > 1" class="py-0">
           <span class="left primary--text text-bold" style="font-size: 1.25em">Tổng số: <span class="red--text">{{fileEntryIdAttachs.length}}</span> tài liệu</span>
           <div class="text-xs-center" style="width: calc(100% - 150px);">
             <v-pagination
@@ -239,7 +239,7 @@
         loadingTable: false,
         dialogPDFLoading: false,
         loadingImport: false,
-        dialogPDF: false,
+        dialogPDFList: false,
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -429,7 +429,7 @@
       showPDFG (item) {
         let vm = this
         vm.viewAttach = false
-        vm.dialogPDF = true
+        vm.dialogPDFList = true
         vm.dialogPDFLoading = true
         vm.$store.dispatch('viewPDF', item['fileEntryId']).then(function (result) {
           vm.dialogPDFLoading = false
@@ -445,7 +445,7 @@
         vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[0]).then(function (result) {
           vm.loading = false
           vm.dialogPDFLoading = false
-          vm.dialogPDF = true
+          vm.dialogPDFList = true
           document.getElementById('pdfViewerListComponent').src = result
         }).catch(function () {
           vm.loading = false

@@ -134,7 +134,7 @@
         let query = current.query
         let filter = {
           agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
-          lvdsCode: vm.lvdsFilterSelected,
+          subDomainCode: vm.lvdsFilterSelected,
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
           answered: query.hasOwnProperty('answered') ? query['answered'] : ''

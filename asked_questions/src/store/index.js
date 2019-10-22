@@ -113,7 +113,7 @@ export const store = new Vuex.Store({
                 keyword: filter.keyword ? filter.keyword : '',
                 publish: filter.publish,
                 answered: filter.answered,
-                lvdsCode: filter.lvdsCode ? filter.lvdsCode : ''
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
               }
             }
           } else {
@@ -127,7 +127,7 @@ export const store = new Vuex.Store({
                 publish: 1,
                 govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
                 keyword: filter.keyword ? filter.keyword : '',
-                lvdsCode: filter.lvdsCode ? filter.lvdsCode : ''
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
               }
             }
           }
@@ -235,6 +235,8 @@ export const store = new Vuex.Store({
           dataAdd.append('email', filter.email ? filter.email : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
           dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('subDomainCode', filter.subDomainCode ? filter.subDomainCode : '')
+          dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
           axios.post(url, dataAdd, param).then(response => {
@@ -472,7 +474,7 @@ export const store = new Vuex.Store({
             sort: 'sibling'
           }
         }
-        axios.get('/o/rest/v2/dictcollections/LVDS/dictitems', paramGetGovAgency).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/QUESTION_SUBDOMAIN_CODE/dictitems', paramGetGovAgency).then(function (response) {
           if (response.data.data) {
             resolve(response.data.data)
           } else {
@@ -533,7 +535,7 @@ export const store = new Vuex.Store({
     setAgencyFilter (state, payload) {
       state.agencyFilter = payload
     },
-    setAgencyFilter (state, payload) {
+    setLvdsFilter (state, payload) {
       state.lvdsFilter = payload
     },
     setKeywordFilter (state, payload) {

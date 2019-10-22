@@ -28,7 +28,22 @@
                 @change="changeAdministration"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 :class="!agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
+            <v-flex xs12 sm6>
+              <v-autocomplete
+                class="select-border"
+                :items="lvdsList"
+                v-model="lvdsFilterSelected"
+                placeholder="Lĩnh vực đời sống"
+                item-text="itemName"
+                item-value="itemCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeLvds"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 :class="agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
               <v-text-field
                 box
                 placeholder="Nội dung câu hỏi"
@@ -374,42 +389,13 @@ export default {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
-    agencyList: [
-      {
-        agencyName: 'Tổng Cục Đường bộ Việt Nam',
-        agencyCode: 'TCDB',
-        groupId: '35243'
-      },
-      {
-        agencyName: 'Cục Đường sắt Việt Nam',
-        agencyCode: 'CDSVN',
-        groupId: '35219'
-      },
-      {
-        agencyName: 'Cục Đường thủy nội địa Việt Nam',
-        agencyCode: 'CDTVN',
-        groupId: '53152'
-      },
-      {
-        agencyName: 'Cục Hàng hải Việt Nam',
-        agencyCode: 'CHHVN',
-        groupId: '51801'
-      },
-      {
-        agencyName: 'Cục Hàng không Việt Nam',
-        agencyCode: 'CHKVN',
-        groupId: '51883'
-      },
-      {
-        agencyName: 'Cục Đăng kiểm Việt Nam',
-        agencyCode: 'CDKVN',
-        groupId: '53084'
-      }
-    ],
+    agencyList: [],
+    lvdsList: [],
     dialog_addQuestion: false,
     agencyCodeSiteExits: '',
     agencySelected: '',
     agencyFilterSelected: '',
+    lvdsFilterSelected: '',
     keyword: '',
     answerList: [],
     content: '',
@@ -485,6 +471,10 @@ export default {
     agencyFilter () {
       return this.$store.getters.getAgencyFilter
     },
+    lvdsFilter (val) {
+      let vm = this
+      vm.lvdsFilterSelected = val
+    },
     activeCounter () {
       return this.$store.getters.getCounter
     }
@@ -498,6 +488,9 @@ export default {
       let newQuery = current.query
       vm.$store.dispatch('getGovAgency').then(function(result) {
         vm.agencyList = result
+      })
+      vm.$store.dispatch('getLvdsList').then(function(result) {
+        vm.lvdsList = result
       })
     })
   },
@@ -608,6 +601,13 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setAgencyFilter', vm.agencyFilterSelected)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeLvds () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setLvdsFilter', vm.lvdsFilterSelected)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
     },
