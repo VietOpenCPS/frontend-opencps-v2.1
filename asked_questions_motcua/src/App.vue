@@ -137,7 +137,7 @@
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
           answered: query.hasOwnProperty('answered') ? query['answered'] : '',
-          subDomainCode: vm.lvdsFilterSelected
+          subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : ''
         }
         if (agencyCodeSite) {
           filter.agencyCode = agencyCodeSite

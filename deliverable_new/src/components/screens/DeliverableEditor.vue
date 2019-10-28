@@ -216,7 +216,7 @@
       '$route': function (newRoute, oldRoute) {
         let vm = this
         if (vm.isConnected) {
-          console.log('watch editor')
+          // console.log('watch editor')
           vm.isConnected = false
           let formId = vm.items[vm.index]['formScriptFileId']
           vm.deName = ''
@@ -306,14 +306,14 @@
       onScroll (e) {
         this.offsetTop = window.pageYOffset || document.documentElement.scrollTop
         this.offsetCheck = document.getElementsByTagName('BODY')[0].offsetHeight - this.offsetTop
-        console.log('this.offsetCheck', this.offsetCheck)
+        // console.log('this.offsetCheck', this.offsetCheck)
       },
       goBack () {
         window.history.back()
       },
       backToList () {
         let vm = this
-        console.log('backToList')
+        // console.log('backToList')
         let current = vm.$router.history.current
         let newQuery = current.query
         let currentPath = current.path
@@ -349,28 +349,17 @@
           }
           // 
           vm.loading = true
-          // let bbatFormSimple = vm.$refs.bbatFormSimple
           let bbatForm = vm.$refs.bbatForm
           let submitDataObject = {}
-          // if (bbatFormSimple !== null && bbatFormSimple !== undefined && bbatFormSimple !== 'undefined') {
-          //   console.log('bbatFormSimple', bbatFormSimple.data)
-          //   submitDataObject = bbatFormSimple.data
-          // }
           if (bbatForm !== null && bbatForm !== undefined && bbatForm !== 'undefined') {
             submitDataObject['formData'] = {}
             submitDataObject['formData'] = bbatForm.getFormData()
           }
           submitDataObject['deliverableType'] = vm.items[vm.index]['typeCode']
-          console.log('submitDataObject', submitDataObject)
+          // console.log('submitDataObject', submitDataObject)
           if (cmd === -1) {
             vm.detail = {}
           } else {
-            // if (submitDataObject.hasOwnProperty('govAgenciesItems')) {
-            //   delete submitDataObject.govAgenciesItems
-            // }
-            // if (submitDataObject.hasOwnProperty('applicantIdNoItems')) {
-            //   delete submitDataObject.applicantIdNoItems
-            // }
             if (String(vm.id) !== '0') {
               submitDataObject['deliverableCode'] = vm.detail['deliverableCode']
               submitDataObject['deliverableId'] = vm.detail['deliverableId']

@@ -125,7 +125,7 @@
       >
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="text-xs-center px-0 py-0">
+          <td class="text-xs-center px-0 py-0 pt-1">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -134,13 +134,31 @@
             </span>
           </td>
 
-          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
+          <td class="pt-1" v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
-            <content-placeholders v-if="loadingTable">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
+            <div v-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
+              <span>
+                {{getState(props.item['_source'])}}
+              </span>
+            </div>
+            <div class="text-xs-center" v-else-if="itemHeader.value === 'mortgageable'" style="cursor: pointer;">
+              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && props.item['_source']['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+                  <v-icon class="green--text" size="24px">check_circle</v-icon>
+                </v-btn>
+                <span>{{props.item['_source']['mortgageInfo_data']}}</span>
+              </v-tooltip>
+              
+              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && !props.item['_source']['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+                  <v-icon style="color:#D32F2F" size="24px">remove_circle</v-icon>
+                </v-btn>
+                <span>Không có thông tin thế chấp</span>
+              </v-tooltip>
+              
+            </div>
             <div v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
@@ -148,16 +166,24 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0" v-if="!hideAction" style="width:80px">
+          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:80px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-btn title="Xem giấy phép" flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
-              <v-icon>picture_as_pdf</v-icon>
-            </v-btn>
-            <v-btn title="Xem tài liệu đính kèm" flat icon class="mx-0 my-0" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
-              <v-icon>attach_file</v-icon>
-            </v-btn>
+
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item['_source'])">
+                <v-icon>picture_as_pdf</v-icon>
+              </v-btn>
+              <span>Xem giấy phép</span>
+            </v-tooltip>
+            
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
+                <v-icon>attach_file</v-icon>
+              </v-btn>
+              <span>Xem tài liệu đính kèm</span>
+            </v-tooltip>
           </td>
         </tr>
       </template>
@@ -209,6 +235,45 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogMortgage" max-width="700" persistent transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>
+           Thông tin thế chấp
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogMortgage = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-textarea
+            v-model="mortGageInput"
+            placeholder="Nhập thông tin thế chấp"
+            class=""
+            box
+            rows="7"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="red" @click="dialogMortgage = false"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon class="white--text">clear</v-icon> &nbsp;
+            <span class="white--text">Thoát</span>
+          </v-btn>
+          <v-btn class="mr-2" color="primary" @click="changeMortgageInfo()"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <input
       type="file"
       ref="importData"
@@ -240,6 +305,8 @@
         dialogPDFLoading: false,
         loadingImport: false,
         dialogPDFList: false,
+        dialogMortgage: false,
+        mortGageInput: '',
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -251,7 +318,9 @@
         deliverableKey: '',
         pageAttachs: 1,
         viewAttach: false,
-        fileEntryIdAttachs: []
+        fileEntryIdAttachs: [],
+        deliverableSelected: '',
+        indexDeliverableSelected: ''
       }
     },
     created () {
@@ -452,6 +521,39 @@
           vm.dialogPDFLoading = false
         })
       },
+      showMortgage (detail, index) {
+        let vm = this
+        vm.deliverableSelected = detail
+        vm.indexDeliverableSelected = index
+        vm.mortGageInput = detail['mortgageInfo_data'] ? detail['mortgageInfo_data'] : ''
+        vm.dialogMortgage = true
+      },
+      changeMortgageInfo () {
+        let vm = this
+        var formDataObj
+        try {
+          formDataObj = JSON.parse(vm.deliverableSelected['formData'])
+          formDataObj.mortgageInfo = vm.mortGageInput
+        } catch (error) {
+          formDataObj = {
+            mortgageInfo: vm.mortGageInput
+          }
+        }
+        let filter = {
+          deliverableId: vm.deliverableSelected['deliverableId'],
+          formData: formDataObj
+        }
+        vm.loading = true
+        vm.$store.dispatch('putFormData', filter).then(function (data) {
+          toastr.success('Cập nhật thành công')
+          vm.hosoDatas[vm.indexDeliverableSelected]['_source']['mortgageInfo_data'] = vm.mortGageInput
+          vm.loading = false
+          vm.dialogMortgage = false
+        }).catch(function() {
+          vm.loading = false
+          toastr.error('Cập nhật thất bại')
+        })
+      },
       changePage(page) {
         let vm = this
         let index = Number(page) - 1
@@ -500,7 +602,7 @@
             index: item.index
           })
         }
-        console.log('vm.advSearchItems', vm.advSearchItems)
+        // console.log('vm.advSearchItems', vm.advSearchItems)
       },
       keywordEventChange (data) {
         let vm = this
@@ -600,6 +702,24 @@
           .catch(function (response) {
             vm.loadingImport = false
           })
+        }
+      },
+      getState (item) {
+        let currentDate = (new Date()).getTime()
+        let expireDate = Number(item['expireDate'])
+        if (expireDate < currentDate) {
+          return 'Hết hiệu lực'
+        } else {
+          let state = String(item['deliverableState'])
+          if (state === '0') {
+            return 'Không xác định'
+          } else if (state === '1') {
+            return 'Đang hiệu lực'
+          } else if (state === '2') {
+            return 'Gia hạn'
+          } else if (state === '4') {
+            return 'Xóa - Thu hồi'
+          }
         }
       },
       getUser (roleItem) {

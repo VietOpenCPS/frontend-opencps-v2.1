@@ -71,6 +71,27 @@ export const store = new Vuex.Store({
         }
       })
     },
+    getLvdsList ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/QUESTION_SUBDOMAIN_CODE/dictitems', paramGetGovAgency).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     getQuestions ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {

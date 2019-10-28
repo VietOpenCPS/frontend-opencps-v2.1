@@ -300,7 +300,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let files = window.$('#templateupload')[0].files
         let file = files[0]
-        console.log(file)
+        // console.log(file)
         let formData = new FormData()
         formData.append('UploadFiles', file)
         axios.post('/o/v1/opencps/users/upload/opencps_deliverable/org.opencps.deliverable.model.OpenCPSDeliverableFileEntryId/' + data['id'], formData, {
@@ -310,10 +310,10 @@ export const store = new Vuex.Store({
           }
         }).then(function (response) {
           resolve(response.data)
-          console.log('upload file success!')
+          // console.log('upload file success!')
         }).catch(function (xhr) {
           console.log(xhr)
-          toastr.error('Tải file thất bại.')
+          // toastr.error('Tải file thất bại.')
           reject(xhr)
         })
       })
@@ -337,6 +337,22 @@ export const store = new Vuex.Store({
         })
       })
     },
+    putFormData ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        let formDataUpdate = new URLSearchParams()
+        formDataUpdate.append('formdata', JSON.stringify(filter['formData']))
+        axios.put('/o/rest/v2/deliverables/' + filter['deliverableId'] + '/formdata', formDataUpdate, param).then(function (response) {
+          resolve(response)
+        }).catch(function(xhr) {
+          reject(xhr)
+        })
+      })
+    },
     getRoleUser ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -353,7 +369,7 @@ export const store = new Vuex.Store({
                 roles.push(serializable[key]['role'])
               }
             }
-            console.log('roles', roles)
+            // console.log('roles', roles)
             resolve(roles)
           } else {
             resolve(['default'])

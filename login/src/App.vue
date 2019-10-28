@@ -1,5 +1,5 @@
 <template>
-  <v-app :data-app="false" id="app_login">
+  <div id="app_login">
     <div
       @click="drawerLogin = false"
       v-if="drawerLogin"
@@ -278,7 +278,7 @@
         </article>
       </v-navigation-drawer>
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>

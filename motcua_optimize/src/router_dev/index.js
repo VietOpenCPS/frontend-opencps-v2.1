@@ -44,12 +44,12 @@ const routes = [
     component: () => import('@/components/LandingMobile.vue'),
     props: true
   },
-  {
-    path: '/tra-cuu-ho-so',
-    name: 'TraCuuHoSo',
-    component: () => import('@/components/TraCuuHoSo.vue'),
-    props: true
-  },
+  // {
+  //   path: '/tra-cuu-ho-so',
+  //   name: 'TraCuuHoSo',
+  //   component: () => import('@/components/TraCuuHoSo.vue'),
+  //   props: true
+  // },
   {
     path: '/danh-sach-ho-so/:index/tiep-nhan-ho-so/:id/:formCode',
     name: 'TiepNhanHoSoDetail',

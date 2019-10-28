@@ -622,6 +622,7 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setAgencyFilter', vm.agencyFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
     },
@@ -629,6 +630,7 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setLvdsFilter', vm.lvdsFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
     },

@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === 'production') {
         chunkFilename: '../../o/opencps-store/js/cli/serviceinfo/app/js/[name].js'
       }
     }
+    // '../../docs/o/opencps-frontend-cli/serviceinfo/app/js/[name].js'
   }
 } else {
   module.exports = {

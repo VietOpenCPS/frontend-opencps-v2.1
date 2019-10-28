@@ -111,6 +111,7 @@
           </div>
           <v-card-text class="pt-2 pb-0 px-0 pie-chart" v-if="showTableTotal">
             <!-- <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public> -->
+            <!-- report_1 -->
             <apexchart type=donut width=380 height=270 :options="chartDonutOptions" :series="seriesDonut" />
             <span class="d-inline-block total-pie-text">
               <p class="blue--text mb-0 text-bold" style="font-size: 1.25em">TỔNG SỐ HỒ SƠ: 
@@ -194,7 +195,7 @@
           </v-layout>
         </v-flex>
       </v-layout>
-      <!--  -->
+      <!-- Thống kê theo đơn vị, lĩnh vực -->
       <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header" v-if="String(month) !== '0'">
@@ -221,6 +222,7 @@
                 Không có dữ liệu báo cáo
               </v-alert>
             </div>
+            <!-- report_2 -->
             <apexchart v-else type="bar" height="500" 
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
@@ -230,7 +232,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <!--  -->
+      <!-- Thống kê theo hình thức nộp hồ sơ -->
       <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar && !noReportData">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header" v-if="String(month) !== '0'">
@@ -247,6 +249,7 @@
             </div> 
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
+            <!-- report_3 -->
             <apexchart type="bar" height="500"
               :options="dossierTypeChartOption" 
               :series="seriesDossierTypeChart" 
@@ -298,6 +301,7 @@
                 Không có dữ liệu báo cáo
               </v-alert>
             </div>
+            <!-- report_4 -->
             <apexchart v-else type="line" height="500"
               :options="chartOptions" 
               :series="seriesChart"
@@ -574,7 +578,7 @@ export default {
       },
       // colors: ['#77B6EA', '#545454'],
       dataLabels: {
-        enabled: true
+        enabled: false
       },
       stroke: {
         curve: 'smooth',
@@ -592,6 +596,15 @@ export default {
         hover: {
           size: 4,
           sizeOffset: 4
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+            if (value) {
+              return value
+            }
+          }
         }
       }
     },
@@ -965,6 +978,7 @@ export default {
       }
     },
     itemTotal (val) {
+      // data report_1
       let vm = this
       if (val) {
         vm.seriesDonut[0] = val['processingCount'] /**Đang xử lý còn hạn */
@@ -1149,7 +1163,7 @@ export default {
           vm.doProcessReportTypeDossiers(vm.agencyLists)
           for (let key in vm.agencyLists) {
             let currentData = vm.agencyLists[key]
-            console.log('currentData', currentData)
+            // console.log('currentData', currentData)
             if (currentData.domainName === '' && currentData.domainName === '') {
               vm.totalCounter['total_3'] = currentData.processCount
               vm.totalCounter['total_4'] = currentData.remainingCount
@@ -1287,7 +1301,7 @@ export default {
       let datasetsCustom = []
       let labelsCustomMonth = {}
       let monthData = {}
-      console.log('dataReport1', data)
+      // console.log('dataReport1', data)
       // Bind data report NĂM
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
@@ -1298,57 +1312,62 @@ export default {
               if (monthData[data[key].govAgencyName] !== null && monthData[data[key].govAgencyName] !== undefined) {
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                  total: data[key].receivedCount
                 })
               } else {
                 monthData[data[key].govAgencyName] = []
                 monthData[data[key].govAgencyName].push({
                   month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                  total: data[key].receivedCount
                 })
               }
             } else {
               if (monthData[data[key].domainName] !== null && monthData[data[key].domainName] !== undefined) {
                 monthData[data[key].domainName].push({
                   month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                  total: data[key].receivedCount
                 })
               } else {
                 monthData[data[key].domainName] = []
                 monthData[data[key].domainName].push({
                   month: data[key].month,
-                  total: data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
+                  total: data[key].receivedCount
                 })
               }
             }
           }
         }
       }
-      console.log('monthData', monthData)
+      console.log('monthData 19891', monthData)
+
       for (let key in monthData) {
         let lineProcessData = {
           label: key,
           borderColor: '#' + vm.intToRGB(vm.hashCode(key)),
           backgroundColor: 'transparent',
-          data: []
+          data: Array.from(Array(labelsCustomMonth.length), () => 0)
         }
         for (let keyArray in monthData[key]) {
-          lineProcessData.data.push(monthData[key][keyArray].total)
+          let month = monthData[key][keyArray].month
+          let firstKey = Object.keys(labelsCustomMonth)[0]
+          let index = month - firstKey
+          lineProcessData.data[index] = monthData[key][keyArray].total
         }
         datasetsCustom.push(lineProcessData)
       }
       vm.chartOptions.xaxis.categories = Object.values(labelsCustomMonth)
       vm.chartOptions.colors = []
       vm.seriesChart = []
+      // data report_4
       for (let key in datasetsCustom) {
         vm.seriesChart.push({
           name: datasetsCustom[key]['label'],
-          data: datasetsCustom[key]['data'].reverse()
+          data: datasetsCustom[key]['data']
         })
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
-      console.log('vm.seriesChart', vm.seriesChart)
+      // console.log('vm.seriesChart', vm.seriesChart)
     },
     doProcessReport2 (data) {
       let vm = this
@@ -1358,8 +1377,8 @@ export default {
       let waitingCountData = []
       let releaseCountData = []
       let currentQuerys = vm.$router.history.current.query
-      console.log('dataReport2', data)
-      // Bind data report THÁNG
+      // console.log('dataReport2', data)
+      // data report_2
       for (let key in data) {
         if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
         } else {
@@ -1377,7 +1396,7 @@ export default {
         }
       }
       vm.labelOfLine = []
-      console.log('labelsCustomMonth ---', labelsCustomMonth)
+      // console.log('labelsCustomMonth ---', labelsCustomMonth)
       for (let key in labelsCustomMonth) {
         if (key === '') {
           vm.labelOfLine.push('Toàn bộ lĩnh vực')
@@ -1395,14 +1414,13 @@ export default {
       if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '') {
         delete datasetsCustom[0]
       }
-     let colorDK = []
-     let seriesChartBarData = []
-     for (let key in datasetsCustom) {
-       console.log('datasetsCustom[key]', datasetsCustom[key])
+      let colorDK = []
+      let seriesChartBarData = []
+      for (let key in datasetsCustom) {
         seriesChartBarData.push(datasetsCustom[key]['data'])
         colorDK.push(datasetsCustom[key]['borderColor'])
       }
-      console.log('seriesChartBarData', seriesChartBarData)
+      // console.log('seriesChartBarData', seriesChartBarData)
       vm.seriesChartBar = []
       vm.seriesChartBar = [{
         data: seriesChartBarData
@@ -1472,7 +1490,7 @@ export default {
           }
         }
       }
-      // report 3
+      // data report_2
       vm.seriesChartBarTotal = []
       vm.seriesChartBarTotal = [{
         name: 'Đang xử lý',
@@ -1568,6 +1586,7 @@ export default {
           onegateCountData.push(data[key].onegateCount)
         }
       }
+      // data report_3
       vm.seriesDossierTypeChart[0]['data'] = onegateCountData
       vm.seriesDossierTypeChart[1]['data'] = onlineCountData
       vm.dossierTypeChartOption.xaxis.categories = vm.chartView ? labelAgency : labelDomain

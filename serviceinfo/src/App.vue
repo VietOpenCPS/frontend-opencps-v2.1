@@ -153,7 +153,7 @@
           vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           vm.menuServiceInfos[0].children = result
           vm.$store.commit('setAgencyList', result)
-          console.log('run app', vm.govAgencyList, current)
+          console.log('run app',  current)
           if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
           (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
           ) {
