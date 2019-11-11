@@ -660,52 +660,52 @@ export const store = new Vuex.Store({
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
-          // var params = new URLSearchParams()
-          // const config = {
-          //   headers: {
-          //     'groupId': state.initData.groupId
-          //   }
-          // }
-          // params.append('className', data.className)
-          // params.append('classPk', data.classPk)
-          // params.append('selected', data.selected)
-          // if (data.className === 'dossier') {
-          //   params.append('votingCode', data.votingCode ? data.votingCode : '')
-          // }
-          // axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
-          //   resolve(result.data)
-          // }).catch(xhr => {
-          //   toastr.clear()
-          //   toastr.error('Gửi đánh giá thất bại')
-          //   reject(xhr)
-          // })
-
-          // api đồng bộ sang một cửa
-          let config = {
+          var params = new URLSearchParams()
+          const config = {
             headers: {
-              'groupId': state.initData.groupId
+              'groupId': state.initData.groupId 
             }
           }
-          let textPost = {
-            className: data.className,
-            classPk: data.classPk,
-            selected: data.selected
-          }
+          params.append('className', data.className)
+          params.append('classPk', data.classPk)
+          params.append('selected', data.selected)
           if (data.className === 'dossier') {
-            textPost['votingCode'] = data.votingCode ? data.votingCode : ''
+            params.append('votingCode', data.votingCode ? data.votingCode : '')
           }
-          let dataPost = new URLSearchParams()
-          dataPost.append('method', 'POST')
-          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
-          dataPost.append('data', JSON.stringify(textPost))
-          dataPost.append('serverCode', data.serverCode)
-          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          axios.post(state.endPoint + '/postal/votings/' + data.votingId + '/results', params, config).then(result => {
             resolve(result.data)
           }).catch(xhr => {
             toastr.clear()
             toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
           })
+
+          // api đồng bộ sang một cửa
+          // let config = {
+          //   headers: {
+          //     'groupId': state.initData.groupId
+          //   }
+          // }
+          // let textPost = {
+          //   className: data.className,
+          //   classPk: data.classPk,
+          //   selected: data.selected
+          // }
+          // if (data.className === 'dossier') {
+          //   textPost['votingCode'] = data.votingCode ? data.votingCode : ''
+          // }
+          // let dataPost = new URLSearchParams()
+          // dataPost.append('method', 'POST')
+          // dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          // dataPost.append('data', JSON.stringify(textPost))
+          // dataPost.append('serverCode', data.serverCode)
+          // axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          //   resolve(result.data)
+          // }).catch(xhr => {
+          //   toastr.clear()
+          //   toastr.error('Gửi đánh giá thất bại')
+          //   reject(xhr)
+          // })
         })
       })
     },

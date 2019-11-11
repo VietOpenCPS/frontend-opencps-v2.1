@@ -1,41 +1,37 @@
 <template>
   <v-app id="app_home_page">
-    <v-navigation-drawer app clipped floating width="310" v-model="drawer">
-      <div class="mx-3 mt-3"><v-btn @click="goToHomePage" block color="primary" dark>Trang chủ</v-btn></div>
-      <div class="tab-item">
-        <div class="left">
-          <a href="javascript:;" @click="goPage('dangnhap')">
-            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-sign.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Đăng nhập</span>
-            </p>
-          </a>
-          <a href="javascript:;" class="active" @click="goPage('ketquahoso')">
-            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-document.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Kết quả hồ sơ</span>
-            </p>
-          </a>
-          <a href="javascript:;" class="active" @click="goPage('tracuuhoso')">
-            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icons-search-50.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Tra cứu hồ sơ</span>
-            </p>
-          </a>
-          <a href="javascript:;" @click="goPage('tracuuthutuc')">
-            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-search-dc-50.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Tra cứu thủ tục</span>
-            </p>
-          </a>
-          <a href="javascript:;" @click="goPage('danhgia')">
-            <p class="icon"><img width="32" class="mt-2" src="https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios_mobile/img/icon-evaluation.png"></p>
-            <p class="ml-2 my-0">
-              <span class="text-bold">Đánh giá</span>
-            </p>
-          </a>
-        </div>
-      </div>
+    <v-navigation-drawer app clipped floating width="310" v-model="drawer" dark temporary fixed style="background-color: #004d7ff0;position:fixed;top: 0">
+      <v-list class="px-2 py-2">
+        <v-list-tile>
+          <v-list-tile-content @click="goToHomePage">
+            <v-list-tile-title style="font-size: 14px">HỆ THỐNG DỊCH VỤ CÔNG TRỰC TUYẾN</v-list-tile-title>
+          </v-list-tile-content>
+          <v-list-tile-action>
+            <v-btn icon @click.stop="toogleDrw">
+              <v-icon size="24">chevron_left</v-icon>
+            </v-btn>
+          </v-list-tile-action>
+        </v-list-tile>
+      </v-list>
+      <!--  -->
+      <v-list class="pt-0" dense>
+        <v-divider light></v-divider>
+
+        <v-list-tile
+          v-for="item in items"
+          :key="item.title"
+          @click="goPage(item.page)"
+          class="px-2"
+        >
+          <v-list-tile-action class="mr-2">
+            <v-icon size="24">{{ item.icon }}</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title style="font-size: 14px">{{ item.title }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
     </v-navigation-drawer>
     <v-content>
       <router-view></router-view>
@@ -43,14 +39,14 @@
     <v-fab-transition>
     <v-btn
       v-if="ism"
-      color="pink"
+      color="#004d7ff0"
       fab
       dark
       small
       fixed
       top
       right
-      v-on:click.native="toogleDrw"
+      @click="toogleDrw"
     >
       <v-icon>menu</v-icon>
     </v-btn>
@@ -67,7 +63,15 @@
       toggle_exclusive: 0,
       workingUnitList: [],
       currentIndex: 0,
-      loading: true
+      loading: true,
+      items: [
+        {icon: 'how_to_reg', title: 'Đăng nhập', page: 'dangnhap'},
+        {icon: 'account_balance', title: 'Trang chủ', page: 'trangchu'},
+        {icon: 'move_to_inbox', title: 'Hồ sơ có kết quả', page: 'ketquahoso'},
+        {icon: 'find_in_page', title: 'Tra cứu hồ sơ', page: 'tracuuhoso'},
+        {icon: 'pageview', title: 'Tra cứu thủ tục', page: 'tracuuthutuc'},
+        {icon: 'insert_chart', title: 'Đánh giá', page: 'danhgia'}
+      ]
     }),
     computed: {
       fullScreen () {
@@ -110,6 +114,9 @@
           queryString = '/danh-gia-cldv'
         } else if (page === 'dangnhap') {
           queryString = '/dang-nhap'
+        } else if (page === 'trangchu') {
+          window.location.href = '/'
+          return
         }
         vm.$router.push({
           path: queryString

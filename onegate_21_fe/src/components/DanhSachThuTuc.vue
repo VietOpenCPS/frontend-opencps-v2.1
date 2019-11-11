@@ -1,265 +1,277 @@
 <template>
   <div>
-    <div class="text-center mt-4" v-if="String(serviceCode) !== '0' && !selectOption">
+    <div class="text-center mt-5" v-if="String(serviceCode) !== '0' && !selectOption">
       <v-progress-circular
         :size="100"
         :width="1"
         color="primary"
         indeterminate
       ></v-progress-circular>
-      <p class="mt-4">đang tạo hồ sơ ...</p>
+      <p class="mt-5">Đang tạo hồ sơ ...</p>
     </div>
-    <div class="row-header no__hidden_class">
-      <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-        <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+    <div v-else>
+      <div class="row-header no__hidden_class">
+        <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
+          <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
+        </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+            <v-text-field
+              v-model="serviceNameKey"
+              placeholder="Tìm kiếm theo tên thủ tục"
+              solo
+              chips
+              multiple
+              deletable-chips
+              item-value="value"
+              item-text="text"
+              @keyup.enter="filterServiceName"
+              content-class="adv__search__select"
+              return-object
+            ></v-text-field>
+          </div>
+          <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
+            <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
+              <v-icon size="16">search</v-icon>
+            </v-btn>
+          </div>
+        </div> 
       </div>
-      <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-text-field
-            v-model="serviceNameKey"
-            placeholder="Tìm kiếm theo tên thủ tục"
-            solo
-            chips
-            multiple
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @keyup.enter="filterServiceName"
-            content-class="adv__search__select"
-            return-object
-          ></v-text-field>
-        </div>
-        <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="filterServiceName">
-            <v-icon size="16">search</v-icon>
-          </v-btn>
-        </div>
-      </div> 
-    </div>
-    <v-layout wrap class="white pt-3">
-      <v-flex style="width:calc(100% - 230px)">
-        <v-layout wrap class="">
-          <v-flex xs6 class="px-2">
-            <v-autocomplete
-              class="select-border"
-              :items="govAgencyList"
-              v-model="govAgencyFilter"
-              label="Chọn cơ quan"
-              item-text="govAgencyName"
-              item-value="govAgencyCode"
-              :hide-selected="true"
-              clearable
-              @change="changeFilterAgency"
-              box
-            ></v-autocomplete>
-          </v-flex>
-          <v-flex xs6 class="px-2">
-            <v-autocomplete
-              class="select-border"
-              :items="domainList"
-              v-model="domainFilter"
-              label="Chọn lĩnh vực"
-              item-text="domainName"
-              item-value="domainCode"
-              :hide-selected="true"
-              clearable
-              @change="changeFilterDomain"
-              box
-            ></v-autocomplete>
-          </v-flex>
-        </v-layout>
-      </v-flex>
-      <v-flex style="width:230px" class="pl-2">
-        <v-chip label color="primary" class="my-0" text-color="white" style="height:48px;border-radius: 5px;">
-          <v-checkbox
-            class="mt-0"
-            v-model="serviceLastest"
-            color="white"
-            hide-details
-          >
-            <template slot="label">
-              <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
-            </template>
-          </v-checkbox>
-        </v-chip>
-      </v-flex>
-    </v-layout>
-    <v-divider class="my-0 py-0"></v-divider>
-    <v-expansion-panel v-if="!domainFilter && !activeFilterKey && !serviceLastest" class="expand__select__gov" v-model="panelAgency" expand>
-      <v-expansion-panel-content v-for='(itemGov, index) in govAgencyRender' :key='index'>
-        <div slot='header' class="ml-3 text-bold">
-          <v-icon style="
-            font-size: 14px;
-            margin-top: -4px;
-            padding-right: 5px;
-          ">account_balance</v-icon>
-          {{itemGov.govAgencyName}}
-        </div>
-        <v-card>
-          <v-card-text class='grey lighten-3 px-0 py-0'>
-            <!-- Cap 2 -->
-            <v-expansion-panel class="expand__select__domain" v-model="panelDomain[index]" expand>
-              <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
-                <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
-                   <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
-                   <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
-                </div>
-                <v-card>
-                  <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
-                    <!-- Cap 3 -->
-                    <v-layout row wrap>
-                      <v-flex xs12 sm9 class="pt-1">
-                        <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-                        <span>{{itemServiceConfig.serviceInfoName}}</span>
-                      </v-flex>
-                      <v-flex xs12 sm1 class="text-xs-center pt-1">
-                        <span>Mức {{itemServiceConfig.level}}</span>
-                      </v-flex>
-                      <v-flex xs12 sm2 class="text-xs-center">
-                        <v-menu left offset-x>
-                          <v-btn flat class="mx-0 my-0" slot="activator" small 
-                            @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)"
-                          >
-                            Chọn
-                          </v-btn>
-                          <v-list v-if="serviceOptions.length > 1">
-                            <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                              @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
-                              <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                            </v-list-tile>
-                          </v-list>
-                        </v-menu>
-                      </v-flex>
-                    </v-layout>
-                  </v-card-text>
-                </v-card>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-card-text>
-        </v-card>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-    <v-card v-if="domainFilter">
-      <v-card-text class='grey lighten-3 px-0 py-0'>
-        <v-expansion-panel class="expand__select__domain" v-model="panelDomainList" expand>
-          <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in domainListRender' :key='index2' :value="true">
-            <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
-                <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
-                <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}} <span v-if="domainListRender.length > 1"> - {{itemDomain.govAgencyName}}</span> </span>
-            </div>
-            <v-card>
-              <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
-                <!-- Cap 3 -->
-                <v-layout row wrap>
-                  <v-flex xs12 sm9 class="pt-1">
-                    <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-                    <span>{{itemServiceConfig.serviceInfoName}}</span>
-                  </v-flex>
-                  <v-flex xs12 sm1 class="text-xs-center pt-1">
-                    <span>Mức {{itemServiceConfig.level}}</span>
-                  </v-flex>
-                  <v-flex xs12 sm2 class="text-xs-center">
-                    <v-menu left offset-x>
-                      <v-btn flat class="mx-0 my-0" slot="activator" small 
-                        @click="pullServiceOptions(itemServiceConfig, itemDomain.govAgencyCode)"
-                      >
-                        Chọn
-                      </v-btn>
-                      <v-list v-if="serviceOptions.length > 1">
-                        <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                          @click="selectServiceOption(itemOption, itemDomain.govAgencyCode, itemServiceConfig)">
-                          <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                        </v-list-tile>
-                      </v-list>
-                    </v-menu>
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-card-text>
-    </v-card>
-    <v-card v-if="activeFilterKey || serviceLastest">
-      <div v-if="serviceConfigListRender.length > 0">
-        <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
-          <!-- Cap 3 -->
-          <v-layout row wrap>
-            <v-flex xs12 sm9 class="pt-1">
-              <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
-              <span>{{itemServiceConfig.serviceInfoName}}</span>&nbsp;
-              <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
+      <v-layout wrap class="white pt-3">
+        <v-flex style="width:calc(100% - 230px)">
+          <v-layout wrap class="">
+            <v-flex xs6 class="px-2">
+              <v-autocomplete
+                class="select-border"
+                :items="govAgencyList"
+                v-model="govAgencyFilter"
+                label="Chọn cơ quan"
+                item-text="govAgencyName"
+                item-value="govAgencyCode"
+                :hide-selected="true"
+                clearable
+                @change="changeFilterAgency"
+                box
+              ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm1 class="text-xs-center pt-1">
-              <span>Mức {{serviceLastest ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}</span>
-            </v-flex>
-            <v-flex xs12 sm2 class="text-xs-center">
-              <v-menu left offset-x>
-                <v-btn flat class="mx-0 my-0" slot="activator" small 
-                  @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
-                >
-                  Chọn
-                </v-btn>
-                <v-list v-if="serviceOptions.length > 1">
-                  <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
-                    @click="selectServiceOption(itemOption, itemServiceConfig.govAgencyCode, itemServiceConfig)">
-                    <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
-                  </v-list-tile>
-                </v-list>
-              </v-menu>
+            <v-flex xs6 class="px-2">
+              <v-autocomplete
+                class="select-border"
+                :items="domainList"
+                v-model="domainFilter"
+                label="Chọn lĩnh vực"
+                item-text="domainName"
+                item-value="domainCode"
+                :hide-selected="true"
+                clearable
+                @change="changeFilterDomain"
+                box
+              ></v-autocomplete>
             </v-flex>
           </v-layout>
+        </v-flex>
+        <v-flex style="width:230px" class="pl-2">
+          <v-chip label color="primary" class="my-0" text-color="white" style="height:48px;border-radius: 5px;">
+            <v-checkbox
+              class="mt-0"
+              v-model="serviceLastest"
+              color="white"
+              hide-details
+            >
+              <template slot="label">
+                <div class="white--text">THỦ TỤC NỘP GẦN ĐÂY</div>
+              </template>
+            </v-checkbox>
+          </v-chip>
+        </v-flex>
+      </v-layout>
+      <v-divider class="my-0 py-0"></v-divider>
+      <v-expansion-panel v-if="!domainFilter && !activeFilterKey && !serviceLastest" class="expand__select__gov" v-model="panelAgency" expand>
+        <v-expansion-panel-content v-for='(itemGov, index) in govAgencyRender' :key='index'>
+          <div slot='header' class="ml-3 text-bold">
+            <v-icon style="
+              font-size: 14px;
+              margin-top: -4px;
+              padding-right: 5px;
+            ">account_balance</v-icon>
+            {{itemGov.govAgencyName}}
+          </div>
+          <v-card>
+            <v-card-text class='grey lighten-3 px-0 py-0'>
+              <!-- Cap 2 -->
+              <v-expansion-panel class="expand__select__domain" v-model="panelDomain[index]" expand>
+                <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in itemGov.domains' :key='index2' v-if='itemGov.domains' :value="true">
+                  <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
+                    <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
+                    <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}}</span>
+                  </div>
+                  <v-card>
+                    <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
+                      <!-- Cap 3 -->
+                      <v-layout row wrap>
+                        <v-flex xs12 sm9 class="pt-1">
+                          <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
+                          <span>{{itemServiceConfig.serviceInfoName}}</span>
+                        </v-flex>
+                        <v-flex xs12 sm1 class="text-xs-center pt-1">
+                          <span>Mức {{itemServiceConfig.level}}</span>
+                        </v-flex>
+                        <v-flex xs12 sm2 class="text-xs-center">
+                          <v-menu left offset-x>
+                            <v-btn flat class="mx-0 my-0" slot="activator" small 
+                              @click="pullServiceOptions(itemServiceConfig, itemGov.govAgencyCode)"
+                            >
+                              Chọn
+                            </v-btn>
+                            <v-list v-if="serviceOptions.length > 1">
+                              <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                                @click="selectServiceOption(itemOption, itemGov.govAgencyCode, itemServiceConfig)">
+                                <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                              </v-list-tile>
+                            </v-list>
+                          </v-menu>
+                        </v-flex>
+                      </v-layout>
+                    </v-card-text>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-card-text>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <div class="my-2" v-if="!govAgencyFilter && !domainFilter && !activeFilterKey && !serviceLastest && govAgencyFilterList.length > numberPerPage">
+        <div class="text-xs-right layout wrap" style="position: relative;">
+          <div class="flex pagging-table px-2"> 
+            <tiny-pagination :total="govAgencyFilterList.length" :page="agencyPage" :currentLimit="10" nameRecord="đơn vị" custom-class="custom-tiny-class" 
+              @tiny:change-page="changePage" ></tiny-pagination> 
+          </div>
+        </div>
+      </div>
+      <v-card v-if="domainFilter">
+        <v-card-text class='grey lighten-3 px-0 py-0'>
+          <v-expansion-panel class="expand__select__domain" v-model="panelDomainList" expand>
+            <v-expansion-panel-content class="blue darken-3" v-for='(itemDomain, index2) in domainListRender' :key='index2' :value="true">
+              <div class="text-bold white--text" slot='header' style="margin-left: 14px;">
+                  <v-icon class="pr-2 theme--dark">navigate_next</v-icon> 
+                  <span style="position: absolute;margin-top: 1px;">{{itemDomain.domainName}} <span v-if="domainListRender.length > 1"> - {{itemDomain.govAgencyName}}</span> </span>
+              </div>
+              <v-card>
+                <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in itemDomain.serviceConfigs' v-if='itemDomain.serviceConfigs' :key='index3'>
+                  <!-- Cap 3 -->
+                  <v-layout row wrap>
+                    <v-flex xs12 sm9 class="pt-1">
+                      <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
+                      <span>{{itemServiceConfig.serviceInfoName}}</span>
+                    </v-flex>
+                    <v-flex xs12 sm1 class="text-xs-center pt-1">
+                      <span>Mức {{itemServiceConfig.level}}</span>
+                    </v-flex>
+                    <v-flex xs12 sm2 class="text-xs-center">
+                      <v-menu left offset-x>
+                        <v-btn flat class="mx-0 my-0" slot="activator" small 
+                          @click="pullServiceOptions(itemServiceConfig, itemDomain.govAgencyCode)"
+                        >
+                          Chọn
+                        </v-btn>
+                        <v-list v-if="serviceOptions.length > 1">
+                          <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                            @click="selectServiceOption(itemOption, itemDomain.govAgencyCode, itemServiceConfig)">
+                            <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                          </v-list-tile>
+                        </v-list>
+                      </v-menu>
+                    </v-flex>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-card-text>
-      </div>
-      <div v-else class="my-2">
-        <v-alert outline color="warning" icon="priority_high" :value="true">
-          Không có thủ tục nào
-        </v-alert>
-      </div>
-    </v-card>
-    <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
-      <v-card>
-        <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Xác thực người dùng</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialog_captcha = false">
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-text>
-          <v-form ref="formCaptcha" v-model="validCaptcha" lazy-validation>
-            <v-layout wrap class="py-1 align-center row-list-style">
-              <v-flex xs12>
-                <captcha ref="captcha"></captcha>
+      </v-card>
+      <v-card v-if="activeFilterKey || serviceLastest">
+        <div v-if="serviceConfigListRender.length > 0">
+          <v-card-text class="card__text__gov" v-for='(itemServiceConfig, index3) in serviceConfigListRender' :key='index3'>
+            <!-- Cap 3 -->
+            <v-layout row wrap>
+              <v-flex xs12 sm9 class="pt-1">
+                <span style="font-weight: bold">{{index3 + 1}}.</span> &nbsp;
+                <span>{{itemServiceConfig.serviceInfoName}}</span>&nbsp;
+                <span v-if="itemServiceConfig.govAgencyNameRender" class="primary--text">({{itemServiceConfig.govAgencyNameRender}})</span>
+              </v-flex>
+              <v-flex xs12 sm1 class="text-xs-center pt-1">
+                <span>Mức {{serviceLastest ? itemServiceConfig.serviceLevel : itemServiceConfig.level}}</span>
+              </v-flex>
+              <v-flex xs12 sm2 class="text-xs-center">
+                <v-menu left offset-x>
+                  <v-btn flat class="mx-0 my-0" slot="activator" small 
+                    @click="pullServiceOptions(itemServiceConfig, itemServiceConfig.govAgencyCode)"
+                  >
+                    Chọn
+                  </v-btn>
+                  <v-list v-if="serviceOptions.length > 1">
+                    <v-list-tile v-for="(itemOption, i) in serviceOptions" :key="i" 
+                      @click="selectServiceOption(itemOption, itemServiceConfig.govAgencyCode, itemServiceConfig)">
+                      <v-list-tile-title>{{ itemOption.optionName }}</v-list-tile-title>
+                    </v-list-tile>
+                  </v-list>
+                </v-menu>
               </v-flex>
             </v-layout>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="mr-3" color="primary" @click="doCreateDossier"
-          :loading="loadingAction"
-          :disabled="loadingAction">
-            <v-icon>done</v-icon> &nbsp;
-            Đồng ý
-            <span slot="loader">Loading...</span>
-          </v-btn>
-          <v-btn class="mr-3" color="primary" @click="dialog_captcha = false"
-          :loading="loadingAction"
-          :disabled="loadingAction">
-            <v-icon>clear</v-icon> &nbsp;
-            Hủy nộp hồ sơ
-            <span slot="loader">Loading...</span>
-          </v-btn>
-        </v-card-actions>
+          </v-card-text>
+        </div>
+        <div v-else class="my-3 mx-2">
+          <v-alert outline color="warning" icon="priority_high" :value="true">
+            Không có thủ tục nào
+          </v-alert>
+        </div>
       </v-card>
-    </v-dialog>
+      <v-dialog v-model="dialog_captcha" scrollable persistent max-width="700px">
+        <v-card>
+          <v-toolbar flat dark color="primary">
+            <v-toolbar-title>Xác thực người dùng</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon dark @click.native="dialog_captcha = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text>
+            <v-form ref="formCaptcha" v-model="validCaptcha" lazy-validation>
+              <v-layout wrap class="py-1 align-center row-list-style">
+                <v-flex xs12>
+                  <captcha ref="captcha"></captcha>
+                </v-flex>
+              </v-layout>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="mr-3" color="primary" @click="doCreateDossier"
+            :loading="loadingAction"
+            :disabled="loadingAction">
+              <v-icon>done</v-icon> &nbsp;
+              Đồng ý
+              <span slot="loader">Loading...</span>
+            </v-btn>
+            <v-btn class="mr-3" color="primary" @click="dialog_captcha = false"
+            :loading="loadingAction"
+            :disabled="loadingAction">
+              <v-icon>clear</v-icon> &nbsp;
+              Hủy nộp hồ sơ
+              <span slot="loader">Loading...</span>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
+    
   </div>
 </template>
 
 <script>
   import Captcha from './Captcha.vue'
   import toastr from 'toastr'
+  import TinyPagination from './pagging/hanghai_pagination.vue'
   toastr.options = {
     'closeButton': true,
     'timeOut': '3000'
@@ -267,7 +279,8 @@
   export default {
     props: ['serviceCode'],
     components: {
-      'captcha': Captcha
+      'captcha': Captcha,
+      'tiny-pagination': TinyPagination
     },
     data: () => ({
       dialog_captcha: false,
@@ -281,6 +294,7 @@
       panelAgency: [],
       panelDomain: [],
       govAgencies: [],
+      govAgencyFilterList: [],
       govAgencyRender: [],
       serviceOptions: [],
       serviceConfigSelect: '',
@@ -294,7 +308,9 @@
       activeFilterKey: false,
       loadingMutiple: true,
       dataPostDossier: '',
-      serviceLastest: false
+      serviceLastest: false,
+      numberPerPage: 10,
+      agencyPage: 1
     }),
     computed: {
       currentIndex () {
@@ -303,9 +319,12 @@
     },
     created () {
       var vm = this
+      console.log('run created 2')
+      let current = vm.$router.history.current
+      let newQuery = current.query
       vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {
         vm.govAgencies = result
-        vm.govAgencyRender = vm.govAgencies
+        vm.govAgencyFilterList = vm.govAgencies
         vm.govAgencyList = []
         vm.domainList = []
         vm.serviceConfigList = []
@@ -341,6 +360,13 @@
         vm.serviceConfigListRender = vm.serviceConfigList
         vm.domainListRender = vm.domainList
         // 
+        if (newQuery['domain']) {
+          vm.domainFilter = newQuery['domain']
+        }
+        if (newQuery['agency']) {
+          vm.govAgencyFilter = newQuery['agency']
+        }
+        
         if (String(vm.serviceCode) === '0') {
           vm.filterAndSort()
         }
@@ -403,7 +429,7 @@
       },
       filterServiceName () {
         let vm = this
-        if (vm.serviceNameKey && vm.serviceNameKey.length > 3) {
+        if (vm.serviceNameKey && vm.serviceNameKey.length > 5) {
           vm.govAgencyFilter = ''
           vm.domainFilter = ''
           vm.serviceLastest = false
@@ -418,6 +444,26 @@
           vm.filterService()
         }
       },
+      changePage (config) {
+        let vm = this
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        vm.agencyPage = config.page
+        newQuery['page'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null && newQuery[key] !== 'null') {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'page=' + vm.agencyPage
+        vm.$router.push({
+          path: current.path + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
       filterService () {
         let vm = this
         setTimeout (function () {
@@ -426,8 +472,15 @@
           let queryString = '?'
           newQuery['agency'] = vm.govAgencyFilter
           newQuery['domain'] = vm.domainFilter
-          newQuery['lastest'] = vm.serviceLastest
+          if (vm.serviceLastest) {
+            newQuery['lastest'] = vm.serviceLastest
+          } else {
+            newQuery['lastest'] = ''
+          }
           newQuery['keyword'] = String(vm.serviceNameKey).trim()
+          if (!vm.govAgencyFilter) {
+            newQuery['page'] = 1
+          }
           for (let key in newQuery) {
             if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
               queryString += key + '=' + newQuery[key] + '&'
@@ -439,14 +492,29 @@
               renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
             }
           })
-        }, 200)
+        }, 5)
       },
       filterAndSort () {
         let vm = this
+        vm.govAgencyRender = []
+        vm.govAgencyRender = []
+        vm.domainListRender = []
         let current = vm.$router.history.current
         let newQuery = current.query
-        if (!newQuery.hasOwnProperty('agency') && !newQuery.hasOwnProperty('domain') && !newQuery.hasOwnProperty('keyword')) {
-          vm.govAgencyRender = vm.govAgencies
+        if (!newQuery.hasOwnProperty('agency') && !newQuery.hasOwnProperty('domain') && !newQuery.hasOwnProperty('keyword') && !newQuery['lastest']) {
+          vm.govAgencyFilterList = vm.govAgencies
+          if (newQuery.hasOwnProperty('page') && newQuery['page']) {
+            vm.agencyPage = newQuery['page']
+            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
+            let end = vm.agencyPage * vm.numberPerPage
+            vm.govAgencyRender = vm.govAgencyFilterList.slice(start, end)
+          } else {
+            vm.agencyPage = 1
+            let start = vm.agencyPage * vm.numberPerPage - vm.numberPerPage
+            let end = vm.agencyPage * vm.numberPerPage
+            vm.govAgencyRender = vm.govAgencyFilterList.slice(start, end)
+          }
+          console.log('vm.govAgencyRender', vm.govAgencyRender)
         }
         if (newQuery.hasOwnProperty('agency') && newQuery.agency) {
           vm.govAgencyRender = vm.govAgencies.filter(function (item) {
@@ -463,7 +531,6 @@
           vm.serviceConfigListRender = vm.serviceConfigList.filter(function (item) {
             return vm.convertString(String(item['serviceInfoName'])).indexOf(keySearch) >= 0
           })
-          console.log('serviceConfigListRender 1', vm.serviceConfigListRender)
         }
         if (newQuery.hasOwnProperty('lastest') && newQuery.lastest && String(newQuery.lastest) !== 'false') {
           vm.$store.dispatch('getServiceRecently').then(function (result) {
@@ -485,7 +552,11 @@
               }
               vm.serviceConfigListRender = serviceConfigs
               console.log('serviceConfigListRender 2', vm.serviceConfigListRender)
+            } else {
+              vm.serviceConfigListRender = []
             }
+          }).catch (function () {
+            vm.serviceConfigListRender = []
           })
         }
         if (!vm.domainFilter && !vm.serviceNameKey) {

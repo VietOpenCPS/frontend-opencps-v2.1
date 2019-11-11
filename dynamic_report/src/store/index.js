@@ -312,6 +312,9 @@ export const store = new Vuex.Store({
           }
           let govAgency = filter['govAgency']
           let agencyLists = filter['agencyLists']
+          let agencyListsGet = agencyLists.filter(function (item) {
+            return String(item['value']) !== '0'
+          })
           let requestURL = ''
             // test local
             // requestURL = 'http://127.0.0.1:8081/api/statistics'
@@ -340,9 +343,9 @@ export const store = new Vuex.Store({
               })
             } else if (String(govAgency) === '0' && agencyLists.length > 0) {
               let promises = []
-              for (let key in agencyLists) {
-                if (String(agencyLists[key]['value']) !== '0') {
-                  param['headers']['groupId'] = agencyLists[key]['value']
+              for (let key in agencyListsGet) {
+                if (String(agencyListsGet[key]['value']) !== '0') {
+                  param['headers']['groupId'] = agencyListsGet[key]['value']
                   promises.push(axios.get(requestURL, param))
                 }
               }
@@ -365,6 +368,14 @@ export const store = new Vuex.Store({
                 for (let i = 0; i < args.length; i++) {
                   if (args[i]['data']['total'] > 0) {
                     myObject = myObject.concat(args[i]['data']['data'])
+                  } else {
+                    let itemNoData = [
+                      {
+                        govAgencyCode: agencyListsGet[i]['value'],
+                        govAgencyName: agencyListsGet[i]['text']
+                      }
+                    ]
+                    myObject = myObject.concat(itemNoData)
                   }
                 }
                 if (myObject.length > 0) {

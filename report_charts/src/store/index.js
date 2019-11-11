@@ -174,11 +174,11 @@ export const store = new Vuex.Store({
                 if (state.groupConfig.hasOwnProperty(groupCode)) {
                   let childs = state.groupConfig[groupCode].split(',')
                   for (let index2 in childs) {
-                    resultData[index]['processingCount'] = childsData(childs[index2])[0] ? resultData[index]['processingCount'] + childsData(childs[index2])[0]['processingCount'] : resultData[index]['processingCount']
-                    resultData[index]['waitingCount'] += childsData(childs[index2])[0] ? resultData[index]['waitingCount'] + childsData(childs[index2])[0]['waitingCount'] : resultData[index]['waitingCount']
-                    resultData[index]['releaseCount'] += childsData(childs[index2])[0] ? resultData[index]['releaseCount'] + childsData(childs[index2])[0]['releaseCount'] : resultData[index]['releaseCount']
-                    resultData[index]['onlineCount'] += childsData(childs[index2])[0] ? resultData[index]['onlineCount'] + childsData(childs[index2])[0]['onlineCount'] : resultData[index]['onlineCount']
-                    resultData[index]['onegateCount'] += childsData(childs[index2])[0] ? resultData[index]['onegateCount'] + childsData(childs[index2])[0]['onegateCount'] : resultData[index]['onegateCount']
+                    resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
+                    resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
+                    resultData[index]['releaseCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['releaseCount']) + Number(childsData(childs[index2])[0]['releaseCount']) : resultData[index]['releaseCount']
+                    resultData[index]['onlineCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onlineCount']) + Number(childsData(childs[index2])[0]['onlineCount']) : resultData[index]['onlineCount']
+                    resultData[index]['onegateCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onegateCount']) + Number(childsData(childs[index2])[0]['onegateCount']) : resultData[index]['onegateCount']
                   }
                 }
                 let removeItems = childsCode.filter(function (item) {
@@ -203,7 +203,7 @@ export const store = new Vuex.Store({
                   if (state.groupConfig.hasOwnProperty(groupCode)) {
                     let childs = state.groupConfig[groupCode].split(',')
                     for (let index2 in childs) {
-                      resultData[index]['receivedCount'] = childsData(childs[index2])[0] && childsData(childs[index2])[0]['month'] === resultData[index]['month'] ? resultData[index]['receivedCount'] + childsData(childs[index2])[0]['receivedCount'] : resultData[index]['receivedCount']
+                      resultData[index]['receivedCount'] = childsData(childs[index2])[0] && childsData(childs[index2])[0]['month'] === resultData[index]['month'] ? Number(resultData[index]['receivedCount']) + Number(childsData(childs[index2])[0]['receivedCount']) : resultData[index]['receivedCount']
                     }
                   }
                   let removeItems = childsCode.filter(function (item) {

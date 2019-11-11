@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
-import LandingReportCharts from '@/components/screens/Landing_v3.0'
+import LandingReportCharts from '@/components/screens/Landing_DVC'
 
 const routes = [
   { path: '/bao-cao/:index', component: LandingReportCharts, props: true },

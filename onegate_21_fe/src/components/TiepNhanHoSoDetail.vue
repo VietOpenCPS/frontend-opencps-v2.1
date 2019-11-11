@@ -187,6 +187,7 @@
     <!-- add new template -->
     <div v-if="formTemplate === 'version_2.0'">
       <div style="display: none">
+        <input id="validate_required" type="text" :value="true">
         <input id="serviceCode_hidden" type="text" :value="serviceCode_hidden">
         <input id="serviceName_hidden" type="text" :value="serviceName_hidden">
         <input id="govAgencyCode_hidden" type="text" :value="govAgencyCode_hidden">
@@ -867,49 +868,53 @@ export default {
       dataCreate['dossierFileArr'] = JSON.stringify(dataFilter['dossierFileArr'])
       dataCreate['dossierMarkArr'] = JSON.stringify(dataFilter['dossierMarkArr'])
       dataCreate['payment'] = JSON.stringify(dataFilter['payment'])
-
-      vm.loadingAction = true
-      vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
-        vm.loadingAction = false
-        vm.goBack()
-        // let paymentsOut = ''
-        // if (dataFormTemplate['payment']) {
-        //   try {
-        //     paymentsOut = JSON.parse(dataFormTemplate['payment'])
-        //   } catch (error) {
-        //   }
-        // }
-        // let payloadDate = ''
-        // if (dataFormTemplate['dueDate']) {
-        //   payloadDate = {
-        //     dueDate: vm.parseDateToTimestamp(dataFormTemplate['dueDate']),
-        //     receiveDate: (new Date()).getTime()
-        //   }
-        // }
-        // let dataPostAction = {
-        //   dossierId: result.dossierId,
-        //   actionCode: 1100,
-        //   actionNote: '',
-        //   actionUser: window.themeDisplay.getUserName(),
-        //   payload: payloadDate,
-        //   security: '',
-        //   assignUsers: '',
-        //   payment: paymentsOut,
-        //   createDossiers: ''
-        // }
-        // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
-        //   vm.loadingAction = false
-        //   if (!type) {
-        //     vm.goBack()
-        //   } else {
-        //   }
-        // }).catch(reject => {
-        //   vm.loadingAction = false
-        // })
-        
-      }).catch(reject => {
-        vm.loadingAction = false
-      })
+      if (String($('#validate_required').val()) === 'true' ) {
+        vm.loadingAction = true
+        vm.$store.dispatch('postDossierNewVersion', dataCreate).then(function (result) {
+          vm.loadingAction = false
+          vm.goBack()
+          // let paymentsOut = ''
+          // if (dataFormTemplate['payment']) {
+          //   try {
+          //     paymentsOut = JSON.parse(dataFormTemplate['payment'])
+          //   } catch (error) {
+          //   }
+          // }
+          // let payloadDate = ''
+          // if (dataFormTemplate['dueDate']) {
+          //   payloadDate = {
+          //     dueDate: vm.parseDateToTimestamp(dataFormTemplate['dueDate']),
+          //     receiveDate: (new Date()).getTime()
+          //   }
+          // }
+          // let dataPostAction = {
+          //   dossierId: result.dossierId,
+          //   actionCode: 1100,
+          //   actionNote: '',
+          //   actionUser: window.themeDisplay.getUserName(),
+          //   payload: payloadDate,
+          //   security: '',
+          //   assignUsers: '',
+          //   payment: paymentsOut,
+          //   createDossiers: ''
+          // }
+          // vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
+          //   vm.loadingAction = false
+          //   if (!type) {
+          //     vm.goBack()
+          //   } else {
+          //   }
+          // }).catch(reject => {
+          //   vm.loadingAction = false
+          // })
+          
+        }).catch(reject => {
+          vm.loadingAction = false
+        })
+      } else {
+        toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
+        return
+      }
     },
     // 
     parseDateToTimestamp (date) {

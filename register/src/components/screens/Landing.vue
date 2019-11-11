@@ -85,7 +85,6 @@
                 <div>Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   box
-                  type="tel"
                   placeholder="Thư điện tử"
                   v-model="contactEmail"
                   :rules="[rules.required, rules.email]"

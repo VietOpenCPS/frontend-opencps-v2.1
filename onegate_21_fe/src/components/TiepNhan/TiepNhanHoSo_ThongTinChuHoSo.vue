@@ -22,7 +22,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span style="color:red"></span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <v-text-field
@@ -54,7 +54,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span style="color:red"></span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].nguoi_nop }}<span v-if="requiredOptions['applicantName']" style="color:red"> &nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -65,13 +65,15 @@
                         v-model="thongTinChuHoSo.applicantName"
                         @input="changeApplicantInfos"
                         :disabled="loadingVerify"
+                        :rules="requiredOptions['applicantName'] ? [rules.required] : ''"
+                        :required="requiredOptions['applicantName']"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="originality === 1" style="color:red"></span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ <span v-if="requiredOptions['address']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm10>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -82,6 +84,8 @@
                       v-model="thongTinChuHoSo.address"
                       multi-line
                       rows="2"
+                      :rules="requiredOptions['address'] ? [rules.required] : ''"
+                      :required="requiredOptions['address']"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -145,7 +149,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Số điện thoại <span style="color:red"></span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['contactTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -155,6 +159,8 @@
                       v-else
                       v-model="thongTinChuHoSo.contactTelNo"
                       append-icon="phone"
+                      :rules="requiredOptions['contactTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                      :required="requiredOptions['contactTelNo']"
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2>
@@ -228,7 +234,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Họ và tên <span style="color:red"></span>: </v-subheader>
+                        <v-subheader v-else class="pl-0">Họ và tên <span v-if="requiredOptions['delegateName']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -237,13 +243,15 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateName"
+                        :rules="requiredOptions['delegateName'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateName']"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Địa chỉ: </v-subheader>
+                        <v-subheader v-else class="pl-0">Địa chỉ <span v-if="requiredOptions['delegateAddress']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm10>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -254,6 +262,8 @@
                         v-model="thongTinNguoiNopHoSo.delegateAddress"
                         multi-line
                         rows="2"
+                        :rules="requiredOptions['delegateAddress'] ? [rules.required] : ''"
+                        :required="requiredOptions['delegateAddress']"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -316,7 +326,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Số điện thoại: </v-subheader>
+                        <v-subheader v-else class="pl-0">Số điện thoại <span v-if="requiredOptions['delegateTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm2>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -325,8 +335,9 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateTelNo"
-                        :rules="[rules.telNo]"
                         append-icon="phone"
+                        :rules="requiredOptions['delegateTelNo'] ? [rules.telNo, rules.required] : [rules.telNo]"
+                        :required="requiredOptions['delegateTelNo']"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2>
@@ -430,8 +441,8 @@ export default {
       wardCode: false,
       contactTelNo: false,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
+      delegateIdNo: false,
+      delegateName: false,
       delegateAddress: false,
       delegateCityCode: false,
       delegateDistrictCode: false,

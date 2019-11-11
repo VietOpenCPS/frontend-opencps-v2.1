@@ -134,6 +134,7 @@
 
 <script>
   import { isMobile } from 'mobile-device-detect'
+  import $ from 'jquery'
   export default {
     data: () => ({
       isCallBack: true,
@@ -159,7 +160,14 @@
       }
     },
     created () {
-      var vm = this
+      let vm = this
+      if (window.location.href.includes('/m/') && vm.viewMobile) {
+        $('head meta[name=viewport]').remove()
+      } else {
+        if ($('head meta[name=viewport]').length === 0) {
+          $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        }
+      }
       vm.$nextTick(function () {
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
@@ -188,7 +196,7 @@
       })
     },
     updated () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
         if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -205,6 +213,13 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
+        if (window.location.href.includes('/m/') && vm.viewMobile) {
+          $('head meta[name=viewport]').remove()
+        } else {
+          if ($('head meta[name=viewport]').length === 0) {
+            $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+          }
+        }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
@@ -223,7 +238,7 @@
         }
       },
       activeGetCounter (val) {
-        var vm = this
+        let vm = this
         setTimeout(function () {
           vm.loadingCounter()
         }, 300)

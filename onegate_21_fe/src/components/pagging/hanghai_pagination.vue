@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span> hồ sơ. </div>
+    <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}}. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!viewMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
       <div class="pr-3 xs4 sm2 flex">
         <v-autocomplete
@@ -51,6 +51,10 @@ export default {
     total: {
       type: Number,
       required: true
+    },
+    nameRecord: {
+      type: String,
+      default: 'hồ sơ'
     },
     page: {
       type: Number,

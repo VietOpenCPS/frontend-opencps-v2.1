@@ -1226,6 +1226,7 @@ export default {
     }
   },
   created () {
+    console.log('run new_version')
     var vm = this
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
@@ -1877,17 +1878,20 @@ export default {
     },
     changeServiceConfigsGuide (item) {
       let vm = this
-      if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
-        vm.listDichVuGuide = item.options
-      } else {
-        vm.listDichVuGuide = []
-      }
-      if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
-        vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
-        vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
-      } else {
-        vm.dichVuSelectedGuide = null
-      }
+      vm.listDichVuGuide = []
+      setTimeout (function () {
+        if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
+          vm.listDichVuGuide = item.options
+        } else {
+          vm.listDichVuGuide = []
+        }
+        if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
+          vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
+          vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
+        } else {
+          vm.dichVuSelectedGuide = null
+        }
+      }, 300)
     },
     changeDomain (item) {
       // console.log('change Domain')
@@ -2042,10 +2046,26 @@ export default {
         // In văn bản mới nhất đã phê duyệt
         vm.doPrint03(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'GUIDING') {
+        vm.thuTucHanhChinhSelectedGuide = ''
+        vm.dichVuSelectedGuide = ''
+        vm.tphsGuide = []
+        if (vm.thuTucHanhChinhSelected) {
+          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+        }
         vm.dialog_printGuide = true
+        vm.$refs.formGuide.resetValidation()
       } else if (String(item.form) === 'DENIED') {
         vm.thuTucHanhChinhSelectedGuide = ''
         vm.dichVuSelectedGuide = ''
+        if (vm.thuTucHanhChinhSelected) {
+          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+        }
         vm.dialog_denied = true
         vm.$refs.formDenied.resetValidation()
       } else if (String(item.form) === 'PREVIEW') {
@@ -2819,7 +2839,11 @@ export default {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         }
       } else {
-        alert('Bạn không có quyền thao tác với hồ sơ này')
+        if (item['originality'] === 1) {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        } else {
+          alert('Bạn không có quyền thao tác với hồ sơ này')
+        }
       }
     },
     keywordEventChange (data) {

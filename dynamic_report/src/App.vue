@@ -1,6 +1,6 @@
 <template>
-  <v-app id="app_dynamic_report">
-    <v-navigation-drawer app clipped floating width="240">
+  <v-app id="app_dynamic_report" :class="hiddenAside ? 'px-3' : ''">
+    <v-navigation-drawer v-if="!hiddenAside" app clipped floating width="300">
       <div class="drawer__filter">
         <v-list dense style="padding: 0;" class="report_list">
           <v-list-tile
@@ -14,13 +14,13 @@
             </v-list-tile-action>
 
             <v-list-tile-content>
-              <v-list-tile-title :title="item.reportName">{{ item.reportName }}</v-list-tile-title>
+              <v-list-tile-title :title="item.reportName" style="font-size:13px">{{ item.reportName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
       </div>
     </v-navigation-drawer>
-    <v-content>
+    <v-content :style="hiddenAside ? 'background: #ffffff' : ''">
       <router-view></router-view>
     </v-content>
     <v-snackbar
@@ -77,6 +77,7 @@
   export default {
     props: ['index'],
     data: () => ({
+      hiddenAside: false,
       dialog: false,
       drawer: null,
       dataSocket: {},
@@ -166,6 +167,11 @@
     created () {
       var vm = this
       vm.$nextTick(function () {
+        if (vm.$route.query.hasOwnProperty('doreport')) {
+          vm.hiddenAside = true
+        } else {
+          vm.hiddenAside = false
+        }
         if (vm.$route.query.reportType !== undefined && vm.$route.query.reportType !== null) {
           vm.reportTypeFilter = vm.$route.query.reportType
         }
