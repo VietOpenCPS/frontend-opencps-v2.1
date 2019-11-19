@@ -99,8 +99,7 @@
                   v-model="contactTelNo"
                   :rules="[rules.telNo]"
                   box
-                  readonly
-                  onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');}"
+                  browser-autocomplete="off"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -328,6 +327,19 @@ export default {
   updated () {
     var vm = this
     vm.$nextTick(function () {
+    })
+  },
+  mounted () {
+    let elements = document.querySelectorAll('[autocomplete="off"]');
+    if (!elements) {
+      return
+    }
+    elements.forEach(element => {
+      element.setAttribute('readonly', 'readonly')
+      element.style.backgroundColor = 'inherit'
+      setTimeout(() => {
+        element.removeAttribute('readonly')
+      }, 500)
     })
   },
   watch: {

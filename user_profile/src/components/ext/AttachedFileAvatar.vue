@@ -9,7 +9,8 @@
               <i v-else aria-hidden="true" class="v-icon material-icons" style="font-size: 54px;opacity: .2;position: absolute;top: 0;right: 0;">insert_drive_file</i>
             </a>
           </span>
-          <ejs-uploader id='imagePreview' name="UploadFiles" :allowedExtensions= "type === 'image' ? extensions : extensionsDocument" :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+          <ejs-uploader id='imagePreview' name="UploadFiles" :allowedExtensions= "type === 'image' ? extensions : extensionsDocument" :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea"
+           :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
           </ejs-uploader>
           <svg v-if="noAvatar && type === 'image'" style="width: 100px;margin: 0 auto;margin-top: 45px;enable-background:new 0 0 563.43 563.43;"
             version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"

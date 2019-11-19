@@ -211,18 +211,12 @@
               ></v-text-field>
             </v-flex>
             <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
-              <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
-                <v-radio :value="0"></v-radio>
-                <v-radio :value="1"></v-radio>
-                <v-radio :value="2"></v-radio>
-                <v-radio :value="3"></v-radio>
-              </v-radio-group> -->
-              <v-select
+              <v-autocomplete
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
-              ></v-select>
+              ></v-autocomplete>
             </v-flex>
             <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">
               <v-select
@@ -459,22 +453,25 @@ export default {
     pdfEform: false,
     sampleCount: 0,
     serviceInfoId: 0,
-    fileMarkItems: [{
-      text: 'Không có',
-      value: 0
-    }, {
-      text: 'Bản chụp',
-      value: 1
-    }, {
-      text: 'Bản sao',
-      value: 2
-    }, {
-      text: 'Bản gốc',
-      value: 3
-    }, {
-      text: 'Bản dịch',
-      value: 4
-    }],
+    fileMarkItems: [
+      {
+        text: 'Không có',
+        value: 0
+      }, {
+        text: 'Bản chụp',
+        value: 1
+      }, {
+        text: 'Bản sao',
+        value: 2
+      }, {
+        text: 'Bản gốc',
+        value: 3
+      }, {
+        text: 'Bản dịch',
+        value: 4
+      }
+    ],
+
     fileCheckItems: [{
       text: 'Chưa kiểm tra',
       value: 0
@@ -579,6 +576,28 @@ export default {
     },
     initData (data) {
       var vm = this
+      vm.$store.dispatch('getDocumentType').then(function (result) {
+        let sortItems = function (items) {
+          function compare(a, b) {
+            if (a.itemCode < b.itemCode)
+              return -1
+            if (a.itemCode > b.itemCode)
+              return 1
+            return 0
+          }
+          return items.sort(compare)
+        }
+        if (result) {
+          let items = sortItems(result)
+          vm.fileMarkItems = []
+          for (let key in items) {
+            vm.fileMarkItems.push({
+              text: items[key]['itemName'],
+              value: items[key]['itemCode']
+            })
+          }
+        }
+      })
       vm.thongTinHoSo = data
       vm.applicantNoteDossier = data['applicantNote'] && String(data['applicantNote']).indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []

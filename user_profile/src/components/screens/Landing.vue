@@ -237,7 +237,7 @@
                 </v-flex>
               </v-layout>
               <!-- Đổi mật khẩu -->
-              <v-layout row wrap>
+              <v-layout row wrap v-if="activeChangePass">
                 <v-flex xs12 class="mx-3">
                   <v-btn block color="blue darken-3" dark v-on:click.native="showChangePass">{{stateLabel}}</v-btn>
                 </v-flex>
@@ -412,6 +412,7 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      activeChangePass: true,
       zaloOaId: '',
       zaloOaid_token_access: '',
       userAppZaloUid: '',

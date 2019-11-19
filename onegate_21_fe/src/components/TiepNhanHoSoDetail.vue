@@ -86,6 +86,7 @@
               v-else-if="originality !== 1"
               v-model="thongTinChiTietHoSo.sampleCount"
               type="number"
+              @click.stop=""
               ></v-text-field> &nbsp;
               <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
               <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>

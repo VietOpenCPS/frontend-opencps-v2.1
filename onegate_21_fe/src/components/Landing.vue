@@ -329,7 +329,7 @@
         <span slot="loader">Loading...</span>
       </v-btn>
     </div>
-    
+    <!--  -->
     <v-data-table
         :headers="headers"
         :items="hosoDatas"
@@ -1760,6 +1760,7 @@ export default {
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : ''
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1784,7 +1785,8 @@ export default {
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
-            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : ''
           }
         }
         // console.log('filter doLoadingData', filter)

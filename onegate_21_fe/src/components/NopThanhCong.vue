@@ -27,7 +27,6 @@
 
 <script>
   
-  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     props: {
       id: {

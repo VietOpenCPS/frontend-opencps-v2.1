@@ -27,6 +27,7 @@ export const store = new Vuex.Store({
     totalQuestion: 0,
     agencyFilter: '',
     lvdsFilter: '',
+    lvttFilter: '',
     keywordFilter: '',
     user: {
       'role': ''
@@ -113,6 +114,7 @@ export const store = new Vuex.Store({
                 keyword: filter.keyword ? filter.keyword : '',
                 publish: filter.publish,
                 answered: filter.answered,
+                domainCode: filter.domainCode ? filter.domainCode : '',
                 subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
               }
             }
@@ -127,6 +129,7 @@ export const store = new Vuex.Store({
                 publish: 1,
                 govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
                 keyword: filter.keyword ? filter.keyword : '',
+                domainCode: filter.domainCode ? filter.domainCode : '',
                 subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
               }
             }
@@ -457,7 +460,7 @@ export const store = new Vuex.Store({
             sort: 'sibling'
           }
         }
-        axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', paramGetGovAgency).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/SERVICE_ADMINISTRATION/dictitems', paramGetGovAgency).then(function (response) {
           resolve(response.data.data)
         }).catch(function (xhr) {
           console.log(xhr)
@@ -475,6 +478,28 @@ export const store = new Vuex.Store({
           }
         }
         axios.get('/o/rest/v2/dictcollections/QUESTION_SUBDOMAIN_CODE/dictitems', paramGetGovAgency).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getLvttList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            agency: filter['agency'] ? filter['agency'] : '',
+            sort: 'siblingSearch'
+          }
+        }
+        axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
           if (response.data.data) {
             resolve(response.data.data)
           } else {
@@ -538,6 +563,9 @@ export const store = new Vuex.Store({
     setLvdsFilter (state, payload) {
       state.lvdsFilter = payload
     },
+    setLvttFilter (state, payload) {
+      state.lvttFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -590,6 +618,9 @@ export const store = new Vuex.Store({
     },
     getLvdsFilter (state) {
       return state.lvdsFilter
+    },
+    getLvttFilter (state) {
+      return state.lvttFilter
     },
     getKeywordFilter (state) {
       return state.keywordFilter

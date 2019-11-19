@@ -69,6 +69,34 @@
         <v-icon>replay</v-icon>
       </v-btn>
     </v-snackbar>
+    <!--  -->
+    <div v-if="isChildPage" style="position:fixed;top:250px;right:0;width: 34px;background-color:#ffffff;
+      border-radius:15px;border-top-right-radius: 0;border-bottom-right-radius: 0;border: 1.5px solid #dedede;border-right: 0">
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="blue" class="mx-0 my-0" style="width: 32px; height:32px" @click="goTo('thong-ke')">
+          <v-icon size="20">pie_chart</v-icon>
+        </v-btn>
+        <span>Thống kê chung</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="green" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('bao-cao')">
+          <v-icon size="20">book</v-icon>
+        </v-btn>
+        <span>Báo cáo tình hình giải quyết</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="orange" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-thu-tuc')">
+          <v-icon size="20">assignment_turned_in</v-icon>
+        </v-btn>
+        <span>Theo dõi tình hình đánh giá thủ tục</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" flat icon color="teal" class="mx-0 my-0" style="width: 32px;height:32px" @click="goTo('thong-ke#/danh-gia-can-bo')">
+          <v-icon size="20">perm_identity</v-icon>
+        </v-btn>
+        <span>Theo dõi tình hình đánh giá cán bộ</span>
+      </v-tooltip>
+    </div>
   </v-app>
 </template>
 
@@ -161,6 +189,16 @@
         // setter
         set: function(newValue) {
           this.$store.commit('setsnackbarsocket', newValue)
+        }
+      },
+      isChildPage () {
+        try {
+          if (childPage) {
+            return true
+          }
+          return false
+        } catch (error) {
+          return false
         }
       }
     },
@@ -263,6 +301,11 @@
             break
           }
         }
+      },
+      goTo (page) {
+        let vm = this
+        let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+        window.location.href = url + '/' + page
       }
     }
   }

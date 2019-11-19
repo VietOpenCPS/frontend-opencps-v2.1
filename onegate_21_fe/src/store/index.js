@@ -305,6 +305,7 @@ export const store = new Vuex.Store({
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
             paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
+            viapostal: filter.viapostal ? filter.viapostal : ''
           }
           if (filter['follow']) {
             paramSearch.follow = filter.follow
@@ -379,7 +380,8 @@ export const store = new Vuex.Store({
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
-            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            viapostal: filter.viapostal ? filter.viapostal : ''
           }
           if (filter['originality']) {
             paramSearch['originality'] = filter.originality
@@ -933,6 +935,27 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDocumentType ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get(state.initData.regionApi + '/DOCUMENT_TYPE/dictitems', param).then(function (response) {
+          if (response.data && response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve(null)
+          }
+        }).catch(function() {
+          reject(null)
+        })
+      })
+    },
     loadDossierFiles ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let param = {
@@ -1342,48 +1365,6 @@ export const store = new Vuex.Store({
         dataPutdossier.append('dossierFileArr', data['dossierFiles'])
         dataPutdossier.append('dossierMarkArr', data['dossierMarks'])
         dataPutdossier.append('payment', data['payment'])
-        // dataPutdossier.append('dossierMarkArr', data['dossierMarkArr'])
-        // dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
-        // dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
-        // dataPutdossier.append('applicantIdType', applicantType)
-        // dataPutdossier.append('applicantIdNo', data.applicantIdNo ? data.applicantIdNo : '')
-        // dataPutdossier.append('address', data.address ? data.address : '')
-        // dataPutdossier.append('cityCode', data.cityCode ? data.cityCode : '')
-        // dataPutdossier.append('districtCode', data.districtCode ? data.districtCode : '')
-        // dataPutdossier.append('wardCode', data.wardCode ? data.wardCode : '')
-        // dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
-        // dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
-        // dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
-        // dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
-        // dataPutdossier.append('delegateTelNo', data.delegateTelNo ? data.delegateTelNo : '')
-        // dataPutdossier.append('delegateEmail', data.delegateEmail ? data.delegateEmail : '')
-        // dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress : '')
-        // dataPutdossier.append('delegateCityCode', data.delegateCityCode ? data.delegateCityCode : '')
-        // dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
-        // dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
-        // dataPutdossier.append('applicantNote', state.applicantNote)
-        // if (data.originality !== 1) {
-        //   dataPutdossier.append('dossierName', data.dossierName)
-        // }
-        // dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
-        // if (data.editable) {
-        //   dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
-        // }
-        // dataPutdossier.append('viaPostal', data.viaPostal ? data.viaPostal : 1)
-        // dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : 'VNPOST')
-        // dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
-        // dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
-        // dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-        // if (data.viaPostal) {
-        //   dataPutdossier.append('viaPostal', data.viaPostal)
-        //   dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : '')
-        //   dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
-        //   dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
-        //   dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-        //   // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
-        //   // dataPutdossier.append('postalWardCode', data.postalWardCode)
-        // }
-        // dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 1)
         axios.post(state.initData.postDossierApi + '/import/all', dataPutdossier, options).then(function (response) {
           resolve(response.data)
         }).catch(rejectXhr => {
@@ -3498,6 +3479,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getScriptViewDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2_1/menuconfigs/'+ filter.menuGroup + '/script', param).then(result => {
+            let serializable = result.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getDetailMenuConfig ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
@@ -3984,6 +3987,9 @@ export const store = new Vuex.Store({
     },
     activeAddFileGroup (state) {
       return state.activeAddFileGroup
+    },
+    getMenuConfigsTodo (state) {
+      return state.trangThaiHoSoList
     }
   }
 })

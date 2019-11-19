@@ -89,10 +89,10 @@
 
 <script>
   // 
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     components: {
-      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+      'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
     },
     data: () => ({
       minDate: null,

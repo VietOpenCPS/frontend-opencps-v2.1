@@ -28,7 +28,22 @@
                 @change="changeAdministration"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6 :class="!agencyCodeSiteExits ? 'sm6 pl-2' : 'sm12 pl-0'">
+            <v-flex xs12 sm6 class="pl-0" v-if="!agencyCodeSiteExits">
+              <v-autocomplete
+                class="select-border"
+                :items="lvttList"
+                v-model="lvttFilterSelected"
+                placeholder="Lĩnh vực thủ tục hành chính"
+                item-text="domainName"
+                item-value="domainCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeLvtt"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm12 class="pl-0">
               <v-autocomplete
                 class="select-border"
                 :items="lvdsList"
@@ -271,112 +286,6 @@
           </v-form>
         </v-card>
       </v-flex>
-      <!-- <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="700px">
-        <v-card>
-          <v-toolbar flat dark color="primary">
-            <v-toolbar-title>Thêm mới câu hỏi</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon dark @click.native="dialog_addQuestion = false">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-card-text>
-            <v-form ref="form" v-model="valid" lazy-validation>
-              <v-layout wrap class="px-2 mt-2 pb-3">
-                <v-flex xs12>
-                  <div class="mb-1">Cơ quan tiếp nhận <span style="color:red"></span></div>
-                  <v-autocomplete
-                    class="select-border"
-                    :items="agencyList"
-                    v-model="agencySelected"
-                    placeholder="Chọn cơ quan tiếp nhận câu hỏi"
-                    item-text="agencyName"
-                    item-value="agencyCode"
-                    return-object
-                    :hide-selected="true"
-                    box
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12>
-                  <div class="mb-1">Họ và tên người gửi <span style="color:red">(*)</span></div>
-                  <v-text-field
-                    box
-                    placeholder="Ghi rõ họ tên"
-                    v-model="fullName"
-                    :rules="[rules.required]"
-                    min="6"
-                    required
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <div class="mb-1">Địa chỉ</div>
-                  <v-text-field
-                    box
-                    placeholder="Ghi rõ số nhà, tên đường, quận/ huyện, tỉnh thành."
-                    v-model="address"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs6 class="pr-1">
-                  <div class="mb-1">Số điện thoại</div>
-                  <v-text-field
-                    box
-                    placeholder="Nhập số điện thoại"
-                    v-model="telNo"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs6 class="pl-1">
-                  <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
-                  <v-text-field
-                    placeholder="Nhập thư điện tử"
-                    box
-                    v-model="contactEmail"
-                    :rules="contactEmail ? [rules.email] : [rules.required]"
-                    required
-                    name="input-10-2"
-                    min="6"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <div class="mb-1">Tiêu đề</div>
-                  <v-text-field
-                    box
-                    placeholder="Nhập tiêu đề"
-                    v-model="titleQuestion"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <div class="mb-1">Nội dung câu hỏi <span style="color:red">(*)</span></div>
-                  <v-textarea
-                    box
-                    row="5"
-                    placeholder="Nhập nội dung câu hỏi"
-                    v-model="content"
-                    :rules="[rules.required]"
-                    required
-                  ></v-textarea>
-                </v-flex>
-                <v-flex xs12 style="margin:0 auto">
-                  <captcha ref="captcha"></captcha>
-                </v-flex>
-              </v-layout>
-            </v-form>
-          </v-card-text>
-          <v-card-actions class="mx-3">
-            <v-spacer></v-spacer>
-            <v-btn color="primary"
-              :loading="loading"
-              :disabled="loading"
-              @click="submitAddQuestion"
-            >
-              Gửi câu hỏi
-            </v-btn>
-            <v-btn @click="dialog_addQuestion = false" color="primary">
-              <v-icon>clear</v-icon>&nbsp;
-              Hủy
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog> -->
     </v-layout>
   </div>
 </template>
@@ -406,11 +315,13 @@ export default {
   data: () => ({
     agencyList: [],
     lvdsList: [],
+    lvttList: [],
     dialog_addQuestion: false,
     agencyCodeSiteExits: '',
     agencySelected: '',
     lvdsSelected: '',
     lvdsFilterSelected: '',
+    lvttFilterSelected: '',
     agencyFilterSelected: '',
     keyword: '',
     answerList: [],
@@ -490,6 +401,9 @@ export default {
     lvdsFilter () {
       return this.$store.getters.getLvdsFilter
     },
+    lvttFilter () {
+      return this.$store.getters.getLvttFilter
+    },
     activeCounter () {
       return this.$store.getters.getCounter
     }
@@ -498,14 +412,46 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
-      console.log('run1 run1 run1')
+      console.log('run app')
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('getGovAgency').then(function(result) {
-        vm.agencyList = result
+        // agencyConfig cấu hình trên fragment
+        try {
+          if (agencyConfig) {
+            vm.agencyList = []
+            for (let index in result) {
+              if (agencyConfig.split(',').filter(function (item) {
+                return item === result[index]['itemCode']
+              }).length > 0) {
+                vm.agencyList.push(result[index])
+              }
+            }
+          } else {
+            vm.agencyList = result
+          }
+        } catch (error) {
+          vm.agencyList = result
+        }
       })
       vm.$store.dispatch('getLvdsList').then(function(result) {
-        vm.lvdsList = result
+        let sortDomain = function (domainList) {
+          function compare(a, b) {
+            if (a.itemName < b.itemName)
+              return -1
+            if (a.itemName > b.itemName)
+              return 1
+            return 0
+          }
+          return domainList.sort(compare)
+        }
+        vm.lvdsList = sortDomain(result)
+      })
+      let filter = {
+        agency: ''
+      }
+      vm.$store.dispatch('getLvttList', filter).then(function(result) {
+        vm.lvttList = result
       })
     })
   },
@@ -532,10 +478,15 @@ export default {
     agencyFilter (val) {
       let vm = this
       vm.agencyFilterSelected = val
+      vm.getLinhVucThuTuc()
     },
     lvdsFilter (val) {
       let vm = this
       vm.lvdsFilterSelected = val
+    },
+    lvttFilter (val) {
+      let vm = this
+      vm.lvttFilterSelected = val
     },
     activeAddQuestion (val) {
       let vm = this
@@ -571,6 +522,18 @@ export default {
         item['loading'] = false
         vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
       })
+    },
+    getLinhVucThuTuc () {
+      let vm = this
+      setTimeout(function () {
+        let agencyCode = vm.agencyFilterSelected ? vm.agencyFilterSelected['itemCode'] : ''
+        let filter = {
+          agency: agencyCode
+        }
+        vm.$store.dispatch('getLvttList', filter).then(function(result) {
+          vm.lvttList = result
+        })
+      }, 200)
     },
     paggingData (config) {
       let vm = this
@@ -620,8 +583,10 @@ export default {
     },
     changeAdministration () {
       let vm = this
+      vm.lvttFilterSelected = ''
       setTimeout (function () {
         vm.$store.commit('setAgencyFilter', vm.agencyFilterSelected)
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
         vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
@@ -630,6 +595,14 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setLvdsFilter', vm.lvdsFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeLvtt () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
         vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)

@@ -33,13 +33,13 @@
             </div> 
           </div>
           <v-card-text class="pt-4 py-0 px-0">
-            <v-layout wrap>
+            <v-layout wrap class="custom-class">
               <v-flex xs12 sm6 class="px-2 pb-3">
                 <v-card color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32">timeline</v-icon>
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
@@ -54,7 +54,7 @@
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32">timeline</v-icon>
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
@@ -69,7 +69,7 @@
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32">timeline</v-icon>
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
@@ -84,7 +84,7 @@
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
                       <v-btn outline fab color="white" depressed style="pointer-events:none;height:52px">
-                        <v-icon size="32">timeline</v-icon>
+                        <v-icon size="32" color="#ffffff">timeline</v-icon>
                       </v-btn>
                     </v-flex>
                     <v-flex class="xs9 pl-4 pt-2">
@@ -1606,13 +1606,29 @@ export default {
       vm.seriesDossierTypeChart[0]['data'] = onegateCountData
       vm.seriesDossierTypeChart[1]['data'] = onlineCountData
       vm.dossierTypeChartOption.xaxis.categories = vm.chartView ? labelAgency : labelDomain
-      vm.dossierTypeChartOption.xaxis.labels = {
-        show: true,
-        rotate: 0,
-        rotateAlways: false,
-        trim: false,
-        formatter: function(val) {
-          return val
+      try {
+        if (typeDossierChartXLabel) {
+          vm.dossierTypeChartOption.xaxis.labels = typeDossierChartXLabel
+        } else {
+          vm.dossierTypeChartOption.xaxis.labels = {
+            show: true,
+            rotate: 0,
+            rotateAlways: false,
+            trim: false,
+            formatter: function(val) {
+              return val
+            }
+          }
+        }
+      } catch (error) {
+        vm.dossierTypeChartOption.xaxis.labels = {
+          show: true,
+          rotate: 0,
+          rotateAlways: false,
+          trim: false,
+          formatter: function(val) {
+            return val
+          }
         }
       }
     },

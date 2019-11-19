@@ -178,7 +178,7 @@
             if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
-               vm.$router.push({
+                vm.$router.push({
                   path: vm.pathLanding + '/0',
                   query: {
                     q: vm.trangThaiHoSoList[0]['queryParams']
@@ -188,7 +188,6 @@
                 vm.trangThaiHoSoList[currentParams.index]['active'] = true
               }
             }
-            console.log('trangThaiHoSoList', vm.trangThaiHoSoList)
             vm.loadingCounter()
             vm.loading = false
           }

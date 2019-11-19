@@ -60,8 +60,11 @@ export const store = new Vuex.Store({
             'userId': 20103
           }
         }
-        if (groupStatisticConfig) {
-          state['groupConfig'] = groupStatisticConfig
+        try {
+          if (groupStatisticConfig) {
+            state['groupConfig'] = groupStatisticConfig
+          }
+        } catch (error) {
         }
         resolve(state.initData)
         // let param = {

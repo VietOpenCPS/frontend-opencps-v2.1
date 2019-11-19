@@ -96,6 +96,9 @@
       lvdsFilterSelected () {
         return this.$store.getters.getLvdsFilter
       },
+      lvttFilterSelected () {
+        return this.$store.getters.getLvttFilter
+      },
       activeCounter () {
         return this.$store.getters.getCounter
       }
@@ -134,13 +137,17 @@
         let query = current.query
         let filter = {
           agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          domainCode: vm.lvttFilterSelected ? vm.lvttFilterSelected['domainCode'] : '',
           subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : '',
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
           answered: query.hasOwnProperty('answered') ? query['answered'] : ''
         }
-        if (agencyCodeSite) {
-          filter.agencyCode = agencyCodeSite
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
         }
         vm.$store.commit('setLoading', true)
         vm.$store.dispatch('getQuestions', filter).then(function (result) {

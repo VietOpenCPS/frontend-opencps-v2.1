@@ -10,7 +10,7 @@
             item-text="text"
             item-value="value"
             @change="changeAgency"
-            class="selectOutline"
+            class="input-outline"
             >
             </v-autocomplete>
           </v-flex>
@@ -23,7 +23,7 @@
                 :data-value="data[item.key]"
                 :data-all="data"
                 @change="reloadPickerChange(item.key)"
-                class="selectOutline"
+                class="input-outline"
               >
               </datetime-picker>
             </v-flex>
