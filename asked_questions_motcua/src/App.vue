@@ -139,8 +139,11 @@
           answered: query.hasOwnProperty('answered') ? query['answered'] : '',
           subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : ''
         }
-        if (agencyCodeSite) {
-          filter.agencyCode = agencyCodeSite
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
         }
         vm.$store.commit('setLoading', true)
         console.log('getQuestion 111', filter)
@@ -169,8 +172,11 @@
           answered: ''
         }
         // vm.$store.commit('setLoading', true)
-        if (agencyCodeSite) {
-          filter.agencyCode = agencyCodeSite
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
         }
         vm.$store.dispatch('getQuestionsCounter', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
@@ -181,8 +187,11 @@
             publish: 1,
             answered: ''
           }
-          if (agencyCodeSite) {
-            filter1.agencyCode = agencyCodeSite
+          try {
+            if (agencyCodeSite) {
+              filter1.agencyCode = agencyCodeSite
+            }
+          } catch (error) {
           }
           console.log('filterCounter 1', filter1)
           vm.$store.dispatch('getQuestionsCounter', filter1).then(function (result1) {
@@ -198,8 +207,11 @@
             publish: '',
             answered: true
           }
-          if (agencyCodeSite) {
-            filter2.agencyCode = agencyCodeSite
+          try {
+            if (agencyCodeSite) {
+              filter2.agencyCode = agencyCodeSite
+            }
+          } catch (error) {
           }
           console.log('filterCounter 2', filter2)
           vm.$store.dispatch('getQuestionsCounter', filter2).then(function (result2) {

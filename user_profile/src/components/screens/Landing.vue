@@ -412,7 +412,7 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
-      activeChangePass: true,
+      activeChangePass: false,
       zaloOaId: '',
       zaloOaid_token_access: '',
       userAppZaloUid: '',

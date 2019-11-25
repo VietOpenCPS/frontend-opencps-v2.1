@@ -194,7 +194,7 @@
             <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1 && !onlyView">
               <v-text-field
                 title="Số lượng"
-                style="width:100px;"
+                style="width:100px"
                 v-model="dossierTemplateItems[index]['recordCount']"
                 append-icon="add"
                 prepend-inner-icon="remove"

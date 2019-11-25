@@ -80,7 +80,7 @@
                     <v-flex xs12 class="mb-2">
                       <v-layout wrap>
                         <div class="d-inline-block" style="width:120px"><span class="">Rất hài lòng</span> </div>
-                        <progress-bar class="d-inline-block" style="width:300px;z-index:10000" size="16" :spacing="1" bar-transition="all 1s ease"
+                        <progress-bar class="d-inline-block" style="width:300px;z-index:5" size="16" :spacing="1" bar-transition="all 1s ease"
                         :val="item.percentVeryGood" text="" bg-color="#e0e0e0" bar-color="#2196f3"></progress-bar>
                         <div class="d-inline-block pl-3" style="width:120px; color:#034687">
                           <span class="text-bold">{{item.veryGoodCount}}</span>
@@ -92,7 +92,7 @@
                     <v-flex xs12 class="mb-2">
                       <v-layout wrap>
                         <div class="d-inline-block" style="width:120px"><span class="">Hài lòng</span> </div>
-                        <progress-bar class="d-inline-block" style="width:300px;z-index:10000" size="16" :spacing="1" bar-transition="all 1s ease"
+                        <progress-bar class="d-inline-block" style="width:300px;z-index:5" size="16" :spacing="1" bar-transition="all 1s ease"
                         :val="item.percentGood" text="" bg-color="#e0e0e0" bar-color="#2196f3"></progress-bar>
                         <div class="d-inline-block pl-3" style="width:120px;color:#034687">
                           <span class="text-bold">{{item.goodCount}}</span>
@@ -309,7 +309,7 @@ export default {
     formatData (data, groupId) {
       let vm = this
       let dataAgency = data.filter(function(item) {
-        return (String(item['groupId']) === String(groupId) && item['govAgencyCode'])
+        return (String(item['groupId']) === String(groupId) && item['govAgencyCode'] && !item['domain'] && item['votingSubject'])
       })
       let votingItems = {}
       for (let key in dataAgency) {

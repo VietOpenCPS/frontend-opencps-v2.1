@@ -143,7 +143,7 @@
       <div class="my-2" v-if="!govAgencyFilter && !domainFilter && !activeFilterKey && !serviceLastest && govAgencyFilterList.length > numberPerPage">
         <div class="text-xs-right layout wrap" style="position: relative;">
           <div class="flex pagging-table px-2"> 
-            <tiny-pagination :total="govAgencyFilterList.length" :page="agencyPage" :currentLimit="10" nameRecord="đơn vị" custom-class="custom-tiny-class" 
+            <tiny-pagination :total="govAgencyFilterList.length" :page="agencyPage" :numberPerPage="numberPerPage" nameRecord="đơn vị" custom-class="custom-tiny-class" 
               @tiny:change-page="changePage" ></tiny-pagination> 
           </div>
         </div>
@@ -319,7 +319,7 @@
     },
     created () {
       var vm = this
-      console.log('run created 2')
+      // console.log('run created 2')
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {

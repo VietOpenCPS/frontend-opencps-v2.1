@@ -48,7 +48,7 @@
             <v-list-tile-content class="pl-3">
               <v-list-tile-sub-title>
                 <span :style="item.employeeId === employeeSelected.employeeId ? 'color:#004b94' :'color:black'">
-                  {{item.jobPosTitle ? item.jobPosTitle : 'Cán bộ'}}
+                  {{item.titleJobpos ? item.titleJobpos : 'Cán bộ tiếp nhận'}}
                 </span>
               </v-list-tile-sub-title>
               <v-list-tile-title>

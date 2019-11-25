@@ -216,7 +216,8 @@ export const store = new Vuex.Store({
                   'action_active': 'play_arrow',
                   'counter': -1,
                   'menuType': parseInt(current['menuType']),
-                  'queryParams': current['queryParams']
+                  'queryParams': current['queryParams'],
+                  'hasViewText': current['hasViewText']
                 }
                 index = index + 1
                 let tableConfig = current['tableConfig']
@@ -288,8 +289,8 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let paramSearch = {
-            start: filter.page * 15 - 15,
-            end: filter.page * 15,
+            start: filter.page * filter.numberPerPage - filter.numberPerPage,
+            end: filter.page * filter.numberPerPage,
             order: filter.order ? filter.order : '',
             agency: filter.agency ? filter.agency : '',
             service: filter.service ? filter.service : '',
@@ -304,8 +305,7 @@ export const store = new Vuex.Store({
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
-            viapostal: filter.viapostal ? filter.viapostal : ''
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
           }
           if (filter['follow']) {
             paramSearch.follow = filter.follow
@@ -313,6 +313,9 @@ export const store = new Vuex.Store({
           }
           if (filter['originality']) {
             paramSearch.originality = filter.originality
+          }
+          if (filter['viapostal']) {
+            paramSearch.viapostal = filter.viapostal
           }
           let param = {
             headers: {

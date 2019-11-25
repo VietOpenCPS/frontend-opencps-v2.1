@@ -416,7 +416,7 @@ export default {
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('getGovAgency').then(function(result) {
-        // agencyConfig cấu hình trên fragment
+        // agencyConfig = "govAgencyCode_1, govAgencyCode_2, ..." cấu hình trên fragment 
         try {
           if (agencyConfig) {
             vm.agencyList = []
@@ -462,7 +462,11 @@ export default {
   },
   mounted () {
     let vm = this
-    vm.agencyCodeSiteExits = agencyCodeSite ? agencyCodeSite : ''
+    // agencyCodeSite = "govAgencyCode" cấu hình trên fragment 
+    try {
+      vm.agencyCodeSiteExits = agencyCodeSite ? agencyCodeSite : ''
+    } catch (error) {
+    }
     $('.v-expansion-panel__header').css('background', '#f1f1f1')
   },
   watch: {

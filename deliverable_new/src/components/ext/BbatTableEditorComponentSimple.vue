@@ -93,7 +93,6 @@
             :rules="processRules(item.rules)"
             :placeholder="item['placeholder']"
             box 
-            clearable
             style="pointer-events: none"
             :rows="item['rows'] ? item['rows'] : 5"
           >

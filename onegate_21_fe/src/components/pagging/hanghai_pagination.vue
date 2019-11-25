@@ -2,6 +2,16 @@
   <div>
     <div :style="!viewMobile ? 'text-align: left;position: absolute;line-height: 46px;' : ''">Tổng số <span class="text-bold primary--text">{{total}}</span> {{nameRecord}}. </div>
     <div v-if="total > 0" class="vue-tiny-pagination pagination layout" :style="!viewMobile ? 'justify-content: flex-end; -webkit-justify-content: flex-end;' : ''">
+      <div v-if="showLimit" class="pr-2 xs4 sm2 flex" style="width:120px">
+        Số hồ sơ mỗi trang:
+      </div>
+      <div v-if="showLimit" class="pr-3 xs4 sm2 flex" style="width:50px">
+        <v-autocomplete
+          v-bind:items="limits"
+          v-model="numberPerPage"
+          @input="onLimitChange"
+        ></v-autocomplete>
+      </div>
       <div class="pr-3 xs4 sm2 flex">
         <v-autocomplete
           v-bind:items="totalPagesData"
@@ -60,6 +70,10 @@ export default {
       type: Number,
       default: 1
     },
+    numberPerPage: {
+      type: Number,
+      default: 15
+    },
     lang: {
       type: String,
       default: 'en'
@@ -67,19 +81,15 @@ export default {
     customClass: {
       type: String
     },
-    currentLimit: {
-      type: Number,
-      default: 15
-    },
     limits: {
       type: Array,
       default () {
-        return [10, 15, 20, 50, 100]
+        return [15, 30, 50, 100]
       }
     },
     showLimit: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   data () {
@@ -98,6 +108,7 @@ export default {
   },
   created () {
     this.currentPage = this.page
+    // console.log('total, numberPerPage', this.total, this.numberPerPage)
   },
   watch: {
     page (val) {
@@ -111,7 +122,7 @@ export default {
         : this.translations['en']
     },
     totalPages () {
-      return Math.ceil(this.total / this.currentLimit)
+      return Math.ceil(this.total / this.numberPerPage)
     },
     totalPagesData () {
       var totalDatas = []
@@ -147,7 +158,8 @@ export default {
       if (this.currentPage !== this.totalPages) {
         this.currentPage += 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage
+          page: this.currentPage,
+          numberPerPage: this.numberPerPage
         })
       }
     },
@@ -155,29 +167,37 @@ export default {
       if (this.currentPage > 1) {
         this.currentPage -= 1
         this.$emit('tiny:change-page', {
-          page: this.currentPage
+          page: this.currentPage,
+          numberPerPage: this.numberPerPage
         })
       }
     },
     nextPageLast () {
       this.currentPage = this.totalPages
       this.$emit('tiny:change-page', {
-        page: this.totalPages
+        page: this.totalPages,
+        numberPerPage: this.numberPerPage
       })
     },
     lastPageLast () {
       this.currentPage = 1
       this.$emit('tiny:change-page', {
-        page: 1
+        page: 1,
+        numberPerPage: this.numberPerPage
       })
     },
     goToPage () {
       this.$emit('tiny:change-page', {
-        page: this.currentPage
+        page: this.currentPage,
+        numberPerPage: this.numberPerPage
       })
     },
     onLimitChange () {
       this.currentPage = 1
+      this.$emit('tiny:change-page', {
+        page: 1,
+        numberPerPage: this.numberPerPage
+      })
     }
   }
 }

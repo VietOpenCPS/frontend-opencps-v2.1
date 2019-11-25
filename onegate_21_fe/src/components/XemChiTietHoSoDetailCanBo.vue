@@ -9,6 +9,20 @@
         ></v-progress-circular>
       </div>
       <div v-else>
+        <div class="row-header">
+          <div class="background-triangle-big"> <span>CHI TIẾT HỒ SƠ</span> </div>
+          <div class="layout row wrap header_tools row-blue">
+            <div class="flex xs8 sm10 pl-3 text-ellipsis text-bold" :title="thongTinChiTietHoSo.serviceName">
+              {{thongTinChiTietHoSo.serviceCode}} - {{thongTinChiTietHoSo.serviceName}}
+            </div>
+            <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
+              <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
+                <v-icon size="18">reply</v-icon> &nbsp;
+                Quay lại
+              </v-btn>
+            </div>
+          </div> 
+        </div>
         <v-card flat color="#fff">
           <div id="formScriptTemplate" class="mb-5 pt-0"></div>
         </v-card>
@@ -888,19 +902,21 @@ export default {
     window.addEventListener('resize', this.onResize, { passive: true })
   },
   created () {
-    var vm = this
+    let vm = this
     vm.$nextTick(function () {
-      if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewScript']) {
+      console.log('meunconfig created', vm.menuConfigs, vm.index)
+      if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
         vm.viewScript = true
         vm.loadingForm = true
         let filter = {
-          menuGroup: vm.menuConfigs[vm.index]['menuGroup']
+          menuGroup: vm.menuConfigs[vm.index]['id']
         }
         vm.$store.dispatch('getScriptViewDetail', filter).then(function (data) {
           vm.loadingForm = false
           let formScript, formData
-          formScript = data
+          formScript = eval('(' + data + ')')
           vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
+            vm.thongTinChiTietHoSo = resultDossier
             formData = resultDossier
             formScript.data = formData
             window.$('#formScriptTemplate').alpaca(formScript)
@@ -944,18 +960,20 @@ export default {
     },
     menuConfigs (val) {
       let vm = this
+      console.log('menuconfig watch', vm.menuConfigs, vm.index)
       if (val) {
-        if (vm.menuConfigs && vm.menuConfigs[vm.index]['viewScript']) {
+        if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
           vm.viewScript = true
           vm.loadingForm = true
           let filter = {
-            menuGroup: vm.menuConfigs[vm.index]['menuGroup']
+            menuGroup: vm.menuConfigs[vm.index]['id']
           }
           vm.$store.dispatch('getScriptViewDetail', filter).then(function (data) {
             vm.loadingForm = false
             let formScript, formData
-            formScript = data
+            formScript = eval('(' + data + ')')
             vm.$store.dispatch('getDetailDossier', vm.id).then(resultDossier => {
+              vm.thongTinChiTietHoSo = resultDossier
               formData = resultDossier
               formScript.data = formData
               window.$('#formScriptTemplate').alpaca(formScript)
@@ -2428,30 +2446,30 @@ export default {
         console.log(reject)
       })
     },
-    loadVoting () {
-      let vm = this
-      let filter = {
-        className: 'dossier',
-        classPk: vm.id
-      }
-      vm.$store.dispatch('loadVoting', filter).then(function (result) {
-        vm.votingItems = result
-        console.log('votingItems', vm.votingItems)
-      }).catch(function (reject) {
-      })
-    },
     // loadVoting () {
     //   let vm = this
     //   let filter = {
     //     className: 'dossier',
-    //     dossierDetail: vm.thongTinChiTietHoSo
+    //     classPk: vm.id
     //   }
-    //   vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+    //   vm.$store.dispatch('loadVoting', filter).then(function (result) {
     //     vm.votingItems = result
     //     console.log('votingItems', vm.votingItems)
     //   }).catch(function (reject) {
     //   })
     // },
+    loadVoting () {
+      let vm = this
+      let filter = {
+        className: 'dossier',
+        dossierDetail: vm.thongTinChiTietHoSo
+      }
+      vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+        vm.votingItems = result
+        console.log('votingItems', vm.votingItems)
+      }).catch(function (reject) {
+      })
+    },
     getPreAction () {
       let vm = this
       let filter = {
@@ -2713,5 +2731,11 @@ export default {
       }
     }
   }
+}
+window.showSuccess = function (note) {
+  toastr.success(note)
+}
+window.showError = function (note) {
+  toastr.error(note)
 }
 </script>

@@ -941,25 +941,28 @@ export default {
           
           // TODO
           let resultData = result
+          // console.log('resultData 1', resultData)
           if (selection !== undefined && selection !== null && selection.length > 0) {
+            // console.log('selection', selection)
             resultData = result.filter(function(obj) {
               let totalCHK = 0
               for (let keySe in selection) {
                 if (selection[keySe]['compare'] === '#') {
                   if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
                     totalCHK = totalCHK + 1
-                    // return obj
+                    return obj
                   }
                 } else if (selection[keySe]['compare'] === '=') {
                   if (selection[keySe]['value'] === '') {
                     if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   } else {
+                    console.log('compare', selection[keySe], obj[selection[keySe]['key']], selection[keySe]['value'])
                     if (String(obj[selection[keySe]['key']]) === String(selection[keySe]['value'])) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   }
                 } else {
@@ -974,6 +977,7 @@ export default {
               }
             })
           }
+          // console.log('resultData 1', resultData)
           let resultDataTotal = resultData.filter(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -985,6 +989,7 @@ export default {
               }
             }
           })
+          // console.log('resultDataTotal 1', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1167,7 +1172,7 @@ export default {
               }
               break
             }
-            console.log('dataRowTotal 555', dataRowTotal)
+            // console.log('dataRowTotal 555', dataRowTotal)
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1

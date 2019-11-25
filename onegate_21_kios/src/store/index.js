@@ -525,6 +525,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
+              // jobposCode: filter['jobposCode']
             }
           }
           axios.get(state.endPoint + '/employees', param).then(result => {
