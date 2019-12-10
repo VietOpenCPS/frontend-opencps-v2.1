@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["TiepNhanHoSoDetail"],{d129:function(t,n,e){"use strict";e.r(n);var u=function(){var t=this,n=t.$createElement,e=t._self._c||n;return e("div",[t._v("\n  uuuttttttttttt 12312 3123  1231\n")])},i=[],o={props:["index"],data:function(){return{dossierCounting:[]}}},r=o,a=e("2877"),s=Object(a["a"])(r,u,i,!1,null,null,null);n["default"]=s.exports}}]);
+//# sourceMappingURL=TiepNhanHoSoDetail.js.map

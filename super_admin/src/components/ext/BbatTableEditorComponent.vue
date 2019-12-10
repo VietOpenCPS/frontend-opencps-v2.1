@@ -174,7 +174,7 @@
           border-top: 1px solid #dcdcdc;
       ">
         <v-progress-linear v-if="loading" :indeterminate="true" class="my-0" color="blue darken-3"></v-progress-linear>
-        <v-btn v-if="String(id) === '0'" color="teal darken-3" class="mr-0" dark
+        <v-btn v-if="(!tableConfig.hasOwnProperty('flagHtml') || (tableConfig.hasOwnProperty('flagHtml') && tableConfig['flagHtml']) ) && String(id) === '0'" color="teal darken-3" class="mr-0" dark
           :loading="loading"
           :disabled="loading"
           v-on:click.native="saveToData('cmd_ide')"
@@ -182,6 +182,7 @@
         <v-btn color="blue darken-3" class="mr-0" dark v-on:click.native="saveToData('cmd')"
           :loading="loading"
           :disabled="loading"
+          v-if="!tableConfig.hasOwnProperty('flagHtml') || (tableConfig.hasOwnProperty('flagHtml') && tableConfig['flagHtml']) "
         >Ghi lại</v-btn>
         <v-btn color="red darken-3" class="mr-0" dark v-on:click.native="backToList">
           <v-icon>reply</v-icon> &nbsp;

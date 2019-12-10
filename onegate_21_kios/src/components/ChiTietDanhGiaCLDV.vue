@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3 px-2 py-0 kios-item">
+  <div class="mt-3 py-0 kios-item" :class="!isMobile ? 'px-2' : ''">
     <div class="wrap-scroll px-2 py-2" :class="votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
       <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
         <div class="text-bold">
@@ -55,10 +55,10 @@
         >Gửi kết quả</v-btn>
       </div>
     </div>
-    <v-btn v-if="votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
+    <v-btn v-if="!isMobile && votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
     </v-btn>
-    <div class="virtual-keyboard" v-if="visible">
+    <div class="virtual-keyboard" v-if="visible && !isMobile">
       <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
     </div>
   </div>
@@ -91,7 +91,11 @@ export default {
       preventClickEvent: false
     }
   }),
-  computed: {},
+  computed: {
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
@@ -133,7 +137,6 @@ export default {
             dossierNo: $('#dossierIdNoKey').val()
           }
           vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
-            console.log('result', result)
             if (result.hasPermission === true || result.hasPermission === 'true') {
               vm.doResultVoting()
             } else {

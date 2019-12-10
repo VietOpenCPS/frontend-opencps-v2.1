@@ -477,11 +477,11 @@ export default {
     },
     changeAdministration () {
       var vm = this
-      console.log('vm.groupIdSelected', vm.govAgencyList, vm.govAgencySelected)
-      vm.groupIdSelected = vm.govAgencyList.filter(function (item) {
-        return item['administrationCode'] === vm.govAgencySelected
-      })[0]['groupId']
-      console.log('vm.groupIdSelected', vm.groupIdSelected)
+      // console.log('vm.groupIdSelected', vm.govAgencyList, vm.govAgencySelected)
+      // vm.groupIdSelected = vm.govAgencyList.filter(function (item) {
+      //   return item['administrationCode'] === vm.govAgencySelected
+      // })[0]['groupId']
+      // console.log('vm.groupIdSelected', vm.groupIdSelected)
       vm.showListThuTuc = false
       vm.listLinhVuc = []
       vm.linhVucSelected = ''

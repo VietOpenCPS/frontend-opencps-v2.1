@@ -26,7 +26,8 @@ export const store = new Vuex.Store({
     activeDetailService: false,
     applicantIdNoSearch: '',
     dossierNoSearch: '',
-    fullScreen: false
+    fullScreen: false,
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -638,6 +639,9 @@ export const store = new Vuex.Store({
     },
     setGroupid (state, payload) {
       state.groupIdSite = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
     }
   },
   getters: {
@@ -664,6 +668,9 @@ export const store = new Vuex.Store({
     },
     getFullScreen (state) {
       return state.fullScreen
+    },
+    getIsMobile (state) {
+      return state.isMobile
     },
     getOriginality (state) {
       return state.originality

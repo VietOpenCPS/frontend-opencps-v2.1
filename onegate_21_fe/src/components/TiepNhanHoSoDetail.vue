@@ -44,7 +44,7 @@
         </v-expansion-panel>
       </div>
       <!--  -->
-      <thong-tin-chu-ho-so ref="thongtinchuhoso" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
+      <thong-tin-chu-ho-so ref="thongtinchuhoso" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
       <!--  -->
       <div v-if="originality !== 1">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -52,7 +52,7 @@
             <div slot="header" style="display: flex; align-items: center;">
               <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
               <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
-              <span v-else>Tên hồ sơ</span>
+              <span v-else>Nội dung giải quyết</span>
               &nbsp;&nbsp;&nbsp;&nbsp;
             </div>
             <div>
@@ -62,7 +62,7 @@
                     v-model="briefNote"
                     :rows="2"
                     box
-                    :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
+                    :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
                   ></v-textarea>
                 </v-card-text>
               </v-card>
@@ -91,10 +91,39 @@
               <v-icon v-if="!stateEditSample && originality !== 1" v-on:click.stop="stateEditSample = !stateEditSample" style="cursor: pointer;" size="16" color="primary">edit</v-icon>
               <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
             </div>
-            <thanh-phan-ho-so ref="thanhphanhoso" :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+            <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
+      <!--  -->
+      <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1">
+        <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+          <v-expansion-panel-content hide-actions value="2">
+            <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
+            <div class="absolute__btn" style="width: 220px">
+              <content-placeholders class="mt-1" v-if="loading">
+                <content-placeholders-text :lines="1" />
+              </content-placeholders>
+              <!--  -->
+              <v-checkbox
+                v-model="smsNotify"
+                label="Gửi SMS"
+                color="primary"
+                hide-details
+                class="d-inline-block mr-3 mt-2"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="emailNotify"
+                label="Gửi email"
+                color="primary"
+                hide-details
+                class="d-inline-block ml-3 mt-2"
+              ></v-checkbox>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </div>
+      <!--  -->
       <!--  -->
       <div style="position: relative;" v-if="viaPortalDetail !== 0">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
@@ -329,7 +358,9 @@ export default {
     sampleCount: 0,
     isMobile: false,
     loadingAction: false,
-    loadingForm: false
+    loadingForm: false,
+    smsNotify: true,
+    emailNotify: true
   }),
   computed: {
     loading () {
@@ -371,6 +402,16 @@ export default {
       } else {
         viewport.attr('content', 'initial-scale=1.0, width=device-width')
       }
+    },
+    thongTinChuHoSo () {
+      let vm = this
+      // console.log('thongTinChuHoSo', vm.thongTinChuHoSo)
+      vm.briefNote = vm.thongTinChiTietHoSo.dossierName ? vm.thongTinChiTietHoSo.dossierName : ''
+      if (vm.thongTinChiTietHoSo.dossierName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+        vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
+      } else if (vm.thongTinChiTietHoSo.dossierName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+        vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+      }
     }
   },
   methods: {
@@ -389,7 +430,7 @@ export default {
         vm.templateName = result['templateName']
         if (result['newFormScript']) {
           vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
-          console.log('data_form_template', vm.data_form_template)
+          // console.log('data_form_template', vm.data_form_template)
           vm.formTemplate = 'version_2.0'
           vm.loadingForm = true
           let filterServiceConfig = {
@@ -423,6 +464,11 @@ export default {
           vm.$store.dispatch('getDetailDossier', data).then(result => {
             vm.dossierId = result.dossierId
             vm.briefNote = result.dossierName ? result.dossierName : ''
+            if (result.dossierName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+              vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
+            } else if (result.dossierName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+              vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+            }
             result['editable'] = false
             if (result.dossierStatus === '') {
               vm.$store.dispatch('pullNextactions', result).then(result2 => {
@@ -458,7 +504,7 @@ export default {
               })
             } else {
               if (vm.$refs.thongtinchunghoso) {
-                console.log('has thong tin chung ho so')
+                // console.log('has thong tin chung ho so')
                 vm.$refs.thongtinchunghoso.initData(result)
               }
             }
@@ -474,6 +520,8 @@ export default {
               }
               vm.$store.commit('setDichVuChuyenPhatKetQua', result)
             }
+            // lấy thông tin notify config
+            vm.getNotifyConfig(vm.dossierId)
           }).catch(reject => {
           })
         }
@@ -481,14 +529,14 @@ export default {
     },
     luuHoSo () {
       var vm = this
-      console.log('luu Ho So--------------------')
+      // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso ? this.$refs.thongtinchunghoso.getthongtinchunghoso() : {}
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso ? this.$refs.thongtinchuhoso.thongTinNguoiNopHoSo : {}
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       if (validThongtinchuhoso['validForm']) {
         let passValid = false
@@ -524,7 +572,7 @@ export default {
           tempData['dossierId'] = vm.dossierId
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
-          console.log('data put dossier -->', tempData)
+          // console.log('data put dossier -->', tempData)
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
               // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -561,13 +609,15 @@ export default {
               toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
+            // cập nhật notify config
+            vm.updateNotifyConfig()
           }, 500)
         }
       }
     },
     tiepNhanHoSo (type) {
       var vm = this
-      console.log('luu Ho So--------------------')
+      // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
@@ -575,7 +625,7 @@ export default {
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       let validThongtinchuhoso = vm.$refs.thongtinchuhoso.showValid()
       if (validThongtinchuhoso['validForm']) {
         let passValid = false
@@ -586,7 +636,7 @@ export default {
           }
         } else { passValid = true }
         if (passValid) {
-          console.log('valid confirm2', passValid)
+          // console.log('valid confirm2', passValid)
           vm.loadingAction = true
           if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
             vm.loadingAction = false
@@ -616,7 +666,7 @@ export default {
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['dossierName'] = vm.briefNote
           tempData['originality'] = vm.originality
-          console.log('data put dossier -->', tempData)
+          // console.log('data put dossier -->', tempData)
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             vm.loadingAction = false
             // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
@@ -674,7 +724,7 @@ export default {
                         queryString += key + '=' + newQuery[key] + '&'
                       }
                     }
-                    console.log('queryString=====', queryString)
+                    // console.log('queryString=====', queryString)
                     vm.$router.push({
                       path: '/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW' + queryString,
                       query: {
@@ -691,16 +741,20 @@ export default {
             }
           }).catch(rejectXhr => {
             vm.loadingAction = false
-            console.log('rejectXhr==========', rejectXhr)
+            // console.log('rejectXhr==========', rejectXhr)
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
+          // 
+          vm.updateNotifyConfig()
         }
+      } else {
+        toastr.error('Vui lòng điền đầy đủ thông tin bắt buộc')
       }
     },
     boSungHoSo () {
       var vm = this
-      console.log('luu Ho So--------------------')
+      // console.log('luu Ho So--------------------')
       vm.$store.commit('setPrintPH', false)
       let thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.thongTinChuHoSo
@@ -708,7 +762,7 @@ export default {
       let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
       let lephi = this.$refs.lephi.lePhi
       let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua
-      console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
+      // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
       if (vm.$refs.thongtinchuhoso.showValid()) {
         let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
         let dossierTemplates = thanhphanhoso
@@ -750,6 +804,8 @@ export default {
             vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
             })
           })
+          // 
+          vm.updateNotifyConfig()
         }).catch(reject => {
         })
       }
@@ -846,6 +902,8 @@ export default {
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại')
         })
+        // 
+        vm.updateNotifyConfig()
       })
     },
     // 
@@ -916,6 +974,32 @@ export default {
         toastr.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
         return
       }
+    },
+    getNotifyConfig (id) {
+      let vm = this
+      let filter1 = {
+        dossierId: id,
+        key: 'smsNotify'
+      }
+      vm.$store.dispatch('getNotifyConfig', filter1).then(result => {
+        vm.smsNotify = result
+      })
+      let filter2 = {
+        dossierId: id,
+        key: 'emailNotify'
+      }
+      vm.$store.dispatch('getNotifyConfig', filter2).then(result => {
+        vm.emailNotify = result
+      })
+    },
+    updateNotifyConfig () {
+      let vm = this
+      let filter = {
+        dossierId: vm.dossierId,
+        smsNotify: vm.smsNotify,
+        emailNotify: vm.emailNotify
+      }
+      vm.$store.dispatch('putNotifyConfig', filter).then(result => {})
     },
     // 
     parseDateToTimestamp (date) {

@@ -57,15 +57,23 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
+        <v-divider class="my-0 py-0"></v-divider>
+        <v-btn depressed small color="primary" class="white--text mx-0" @click="showReportDossier" style="width:100%">
+          Tình hình xử lý hồ sơ của cơ quan &nbsp; <v-icon>double_arrow</v-icon>
+        </v-btn>
+        <v-divider class="my-0 py-0"></v-divider>
       </v-flex>
 
       <v-flex xs12 sm9 class="pl-3">
         <div class="row-header">
-          <div class="background-triangle-big"> <span> KẾT QUẢ ĐÁNH GIÁ</span> </div>
-          <div class="layout row wrap header_tools row-blue">
+          <div class="background-triangle-big"> 
+            <span v-if="!reportDossier"> KẾT QUẢ ĐÁNH GIÁ</span>
+            <span v-else> THỐNG KÊ TÌNH HÌNH XỬ LÝ HỒ SƠ</span>
+          </div>
+          <div class="layout row wrap header_tools row-blue"> 
           </div> 
         </div>
-        <v-card flat class="py-4">
+        <v-card flat class="py-4" v-if="!reportDossier">
           <v-layout wrap class="px-3">
             <v-flex class="" style="text-align: center!important;max-height: 200px;width: 150px">
               <img v-if="employeeSelected['imgSrc']" :src="employeeSelected['imgSrc']" 
@@ -129,6 +137,74 @@
             </v-data-table>
           </div>
         </v-card>
+        <v-card v-else>
+          <v-layout wrap class="pt-3">
+            <v-flex xs6 class="text-center">
+              <span class="text-bold"> BỘ GIAO THÔNG VẬN TẢI </span><br/>
+              <span>{{govAgencyName}}</span>
+              <hr align="center" width="120px" style="margin: auto;">
+            </v-flex>
+            <v-flex xs6 class="text-center">
+              <span class="text-bold"> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM </span><br/>
+              <span>Độc lập - Tự do - Hạnh phúc </span>
+              <hr align="center" width="120px" style="margin: auto;">
+            </v-flex>
+            <v-flex xs12 class="text-center mt-5" style="font-size:14px">
+              <span class="text-bold">THỐNG KÊ TÌNH HÌNH XỬ LÝ HỒ SƠ CỦA CƠ QUAN</span> <br/>
+              <span>Từ ngày {{data['fromStatisticDate']}} đến ngày {{data['toStatisticDate']}}</span>
+            </v-flex>
+          </v-layout>
+          <div class="pb-3">
+            <v-data-table
+              :headers="headersReport"
+              :items="listDossierEmployeeFilter"
+              hide-actions
+              class="table-landing table-bordered mt-4 mx-3"
+              style="border-left: 1px solid #dedede;"
+            >
+              <template slot="items" slot-scope="props">
+                <tr>
+                  <td class="text-xs-center py-2" style="width: 65px;height: 36px">
+                    <div>
+                      <span>{{ pageNumber * 10 - 10 + props.index + 1 }}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-2" style="height: 36px">
+                    <div>
+                      <span>{{props.item.fullName}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-left py-2" style="height: 36px">
+                    <div>
+                      <span>{{props.item.jobPosName ? props.item.jobPosName : 'Cán bộ'}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center py-2" style="height: 36px">
+                    <div>
+                      <span>{{Number(props.item.overdue) + Number(props.item.undue)}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center py-2" style="height: 36px">
+                    <div>
+                      <span>{{props.item.undue}}</span>
+                    </div>
+                  </td>
+                  <td class="text-xs-center py-2" style="height: 36px">
+                    <div>
+                      <span>{{props.item.overdue}}</span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table>
+            <div class="text-xs-right layout wrap mx-2" style="position: relative;" v-if="listDossierEmployee.length > 10">
+              <div class="flex pagging-table px-2"> 
+                <tiny-pagination :total="listDossierEmployee.length" nameRecord="cán bộ" :page="pageNumber" :numberPerPage="10" :showLimit="false" custom-class="custom-tiny-class" 
+                 @tiny:change-page="paggingData" ></tiny-pagination> 
+              </div>
+            </div>
+          </div>
+        </v-card>
       </v-flex>
     </v-layout>
     
@@ -142,6 +218,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import DatetimePicker from './DatetimePicker.vue'
 import StarRating from 'vue-star-rating'
+import TinyPagination from './pagination'
 Vue.use(toastr)
 toastr.options = {
   'closeButton': true,
@@ -151,9 +228,11 @@ export default {
   props: ['index'],
   components: {
     DatetimePicker,
-    StarRating
+    StarRating,
+    'tiny-pagination': TinyPagination
   },
   data: () => ({
+    reportDossier: false,
     loading: false,
     agencyLists: [],
     filterConfig: '',
@@ -163,7 +242,7 @@ export default {
     data: {},
     showPicker: true,
     totalEmployee: 0,
-    employeeItems: '',
+    employeeItems: [],
     employeeSelected: '',
     votingList: '',
     headers: [
@@ -192,7 +271,43 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    headersReport: [
+      {
+        text: 'STT',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Cán bộ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Chức vụ',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Tổng số hồ sơ đã xử lý',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Đúng hạn',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Quá hạn',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    listDossierEmployee: [],
+    listDossierEmployeeFilter: [],
+    reportDossierTotal: 0,
+    pageNumber: 1
   }),
   computed: {
     loading () {
@@ -271,6 +386,11 @@ export default {
   watch: {
   },
   methods: {
+    showReportDossier () {
+      let vm = this
+      vm.reportDossier = true
+      vm.getReportDossierEmployee()
+    },
     reloadPickerChange (key) {
       let vm = this
       vm.showPicker = false
@@ -278,6 +398,9 @@ export default {
         vm.data[key] = new Date(vm.data[key]).toLocaleDateString('vi-VN')
         vm.showPicker = true
         vm.getVotingEmployee(vm.employeeSelected)
+        if (vm.reportDossier) {
+          vm.getReportDossierEmployee()
+        }
       }, 200)
     },
     changeAgency () {
@@ -291,10 +414,14 @@ export default {
           jobposCode: 'DANHGIA_' + agencyCode
         }
         vm.getEmployee(filter)
+        if (vm.reportDossier) {
+          vm.getReportDossierEmployee()
+        }
       }, 200)
     },
     changeEmployee (item) {
       let vm = this
+      vm.reportDossier = false
       vm.employeeSelected = item
       vm.getVotingEmployee(vm.employeeSelected)
       vm.getAvatar(vm.employeeSelected)
@@ -320,8 +447,12 @@ export default {
           vm.employeeSelected = vm.employeeItems[0]
           vm.getVotingEmployee(vm.employeeItems[0])
           vm.getAvatar(vm.employeeItems[0])
+        } else {
+          vm.employeeSelected = ''
         }
       }).catch(xhr => {
+        vm.totalEmployee = 0
+        vm.employeeItems = []
       })
     },
     getVotingEmployee (item) {
@@ -407,6 +538,24 @@ export default {
         }).catch(function () {
           vm.hasData = false
           vm.loading = false
+        })
+      }, 200)
+    },
+    getReportDossierEmployee () {
+      let vm = this
+      setTimeout (function () {
+        let filter = {
+          groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
+          from: vm.data['fromStatisticDate'],
+          to: vm.data['toStatisticDate']
+        }
+        vm.$store.dispatch('getReportDossierEmployee', filter).then(function (result) {
+          vm.listDossierEmployee = result
+          vm.pageNumber = 1
+          vm.listDossierEmployeeFilter = vm.listDossierEmployee.slice(0, 10)
+        }).catch(function () {
+          vm.listDossierEmployee = []
+          vm.listDossierEmployeeFilter = []
         })
       }, 200)
     },
@@ -523,8 +672,13 @@ export default {
         }
         vm.totalAnswer = totalAnswer
         vm.resultTotal = votingPercent
-        console.log('votingPercent', votingPercent)
+        // console.log('votingPercent', votingPercent)
       }
+    },
+    paggingData (config) {
+      let vm = this
+      vm.pageNumber = config.page
+      vm.listDossierEmployeeFilter = vm.listDossierEmployee.slice((config.page - 1)*10, config.page*10)
     }
   },
   filters: {

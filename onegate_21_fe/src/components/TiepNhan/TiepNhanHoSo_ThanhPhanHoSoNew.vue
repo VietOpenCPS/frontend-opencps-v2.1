@@ -7,6 +7,9 @@
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item) : ''" style="min-width: 20px; display: flex;">
+                  <div v-if="originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
+                    <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
+                  </div>
                   <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs" style="text-align: justify;">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
@@ -427,6 +430,10 @@ export default {
     checkInput: {
       type: Number,
       default: () => 0
+    },
+    formCodeInput: {
+      type: String,
+      default: () => ''
     }
   },
   data: () => ({
@@ -632,6 +639,9 @@ export default {
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
+        // 
+        vm.saveMark()
+        // console.log('vm.dossierTemplateItems', vm.dossierTemplateItems)
         if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0) {
           let dossierTemplateKQ = []
           vm.dossierTemplateItems.forEach(item => {
@@ -765,11 +775,19 @@ export default {
             itemTemplate['fileComment'] = fileMarkFind.fileComment
             itemTemplate['fileCheck'] = fileMarkFind.fileCheck
             itemTemplate['recordCount'] = fileMarkFind.recordCount
+            itemTemplate['fileMarkDefault'] = fileMarkFind.fileMark
+            itemTemplate['hasTemplate'] = String(fileMarkFind.fileMark) !== '0'
+            if (itemTemplate['hasTemplate'] && !itemTemplate['recordCount']) {
+              itemTemplate['recordCount'] = 1
+            } else if (!itemTemplate['hasTemplate']) {
+              itemTemplate['recordCount'] = 0
+            }
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
             itemTemplate['fileCheck'] = 0
-            itemTemplate['recordCount'] = ''
+            itemTemplate['recordCount'] = 0
+            itemTemplate['hasTemplate'] = false
           }
           return itemTemplate
         })
@@ -1277,10 +1295,11 @@ export default {
       return
     },
     saveMark () {
-      var vm = this
+      let vm = this
+      // console.log('save mark', vm.dossierTemplateItems)
       if (vm.dossierTemplateItems) {
         vm.dossierTemplateItems.forEach(function (value, index) {
-          if (value.partType === 1) {
+          if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
             value['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('postDossierMark', value)
           }
@@ -1288,7 +1307,7 @@ export default {
       }
     },
     changeFileMark (event, index) {
-      var vm = this
+      let vm = this
       if (!vm.onlyView) {
         let item = vm.dossierTemplateItems[index]
         item['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1296,7 +1315,26 @@ export default {
         item['checkInput'] = vm.checkInput
         vm.$store.dispatch('postDossierMark', item)
         vm.dossierTemplateItems[index].fileMark = event
+        vm.dossierTemplateItems[index].hasTemplate = String(vm.dossierTemplateItems[index].fileMark) !== '0'
+        if (event === 0) {
+          vm.dossierTemplateItems[index].recordCount = 0
+        }
       }
+    },
+    changeHasTemplate (index, item) {
+      let vm = this
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      setTimeout(function () {
+        console.log('item changeHasTemplate 123', item)
+        if (item['hasTemplate']) {
+          item.fileMark = item.fileMarkDefault
+          item.recordCount = 1
+        } else {
+          item.fileMark = 0
+          item.recordCount = 0
+        }
+        vm.$store.dispatch('postDossierMark', item)
+      }, 100)
     },
     changeFileCheck (event, index) {
       var vm = this

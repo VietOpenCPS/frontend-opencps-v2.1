@@ -10,7 +10,7 @@
             </a>
           </span>
           <ejs-uploader id='imagePreview' name="UploadFiles" :allowedExtensions= "type === 'image' ? extensions : extensionsDocument" :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea"
-           :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
+           :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders" :selected= "onFileSelect" :multiple="false">
           </ejs-uploader>
           <svg v-if="noAvatar && type === 'image'" style="width: 100px;margin: 0 auto;margin-top: 45px;enable-background:new 0 0 563.43 563.43;"
             version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -62,6 +62,12 @@
 
 <script>
   import Vue from 'vue'
+  import toastr from 'toastr'
+  Vue.use(toastr)
+  toastr.options = {
+    'closeButton': true,
+    'timeOut': '3000'
+  }
   import {
     UploaderPlugin
   } from '@syncfusion/ej2-vue-inputs'
@@ -125,6 +131,18 @@
         let vm = this
         args.currentRequest.setRequestHeader('Token', vm.getAuthToken())
         args.currentRequest.setRequestHeader('groupId', vm.getScopeGroupId())
+      },
+      onFileSelect: function (args) {
+        console.log('arg', args)
+        console.log('uploadObj', this.$refs.uploadObj)
+        args.cancel = true
+        let newFile = args['filesData'][0]
+        if (String(newFile.name).indexOf('<') >=0 || String(newFile.name).indexOf('>') >=0) {
+          toastr.error('Ảnh tải lên không hợp lệ. Vui lòng kiểm tra định dạng ảnh, tên ảnh.')
+          return
+        } else {
+          this.$refs.uploadObj.upload(newFile, true)
+        }
       },
       loadImageComponent() {
         let vm = this

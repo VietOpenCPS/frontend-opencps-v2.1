@@ -422,7 +422,7 @@ export const store = new Vuex.Store({
               let dataOutput = [employees.length, employees]
               resolve(dataOutput)
             } else {
-              resolve([])
+              resolve([0, []])
             }
           }).catch(xhr => {
             reject(xhr)
@@ -470,7 +470,31 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    getReportDossierEmployee ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: filter['groupId']
+            },
+            params: {
+              from: filter['from'],
+              to: filter['to']
+            }
+          }
+          axios.get('/o/rest/v2/statistics/dossiers/person', param).then(result => {
+            if (result.data) {
+              resolve(result.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

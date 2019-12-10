@@ -99,7 +99,7 @@
           </v-tab>
           <v-tab :key="5" href="#tabs-5" @click="loadDossierActions()" v-if="originality !== 1">
             <v-btn flat class="px-0 py-0 mx-0 my-0">
-              TIẾN TRÌNH THỤ LÝ
+              TIẾN TRÌNH XỬ LÝ
             </v-btn>
           </v-tab>
           <!-- <v-tab :key="7" href="#tabs-7" @click="loadMermaidgraph()" v-if="originality !== 1">

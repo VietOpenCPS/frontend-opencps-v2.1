@@ -556,6 +556,9 @@ export const store = new Vuex.Store({
             }
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
+                serializable['dossierParts'][key].hasTemplate = false
+                serializable['dossierParts'][key].fileMarkDefault = ''
+                serializable['dossierParts'][key].recordCountDefault = ''
                 let partTip = serializable['dossierParts'][key]['partTip']
                 serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
               }
@@ -3542,6 +3545,45 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getNotifyConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata/' + filter['key'], param).then(result => {
+            let serializable = result.data
+            if (serializable) {
+              resolve(serializable)
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    putNotifyConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let formData = new URLSearchParams()
+          formData.append('smsNotify', filter['smsNotify'])
+          formData.append('emailNotify', filter['emailNotify'])
+          axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
     }
     // ----End---------
   },
@@ -3612,7 +3654,7 @@ export const store = new Vuex.Store({
     },
     setThongTinChuHoSo (state, payload) {
       let userTypeCondition = true
-      if (payload.applicantIdType === 'business') {
+      if (payload.applicantIdType === 'business' || !payload.userType) {
         userTypeCondition = false
       }
       let thongTinChuHoSoPayLoad = {

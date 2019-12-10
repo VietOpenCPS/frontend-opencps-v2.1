@@ -159,6 +159,8 @@ export const store = new Vuex.Store({
               childsCode = childsCode.concat(state.groupConfig[key].split(','))
             }
           }
+          // Khởi tạo group cha với trường hợp group cha không có dữ liệu, group con có dữ liệu
+          // return code group cha
           // 
           axios.get('/o/rest/statistics', param).then(function (response) {
             let serializable = response.data
@@ -173,6 +175,7 @@ export const store = new Vuex.Store({
               let resultData = serializable['data']
               let resultOutput = []
               for (let index in resultData) {
+                // check có group cha không, không có thì khởi tạo
                 let groupCode = resultData[index]['govAgencyCode']
                 if (state.groupConfig.hasOwnProperty(groupCode)) {
                   let childs = state.groupConfig[groupCode].split(',')

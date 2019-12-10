@@ -121,7 +121,6 @@
                 renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
               }
             })
-            console.log('newQuery KIOS 2', queryString)
           }
         }
         // 

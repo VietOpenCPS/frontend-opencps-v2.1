@@ -174,7 +174,7 @@
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 350px; margin-top: 4px;">
+    <div class="absolute__btn" style="width: 345px; margin-top: 4px;">
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
