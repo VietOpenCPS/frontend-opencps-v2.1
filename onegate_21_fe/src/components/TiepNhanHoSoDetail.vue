@@ -104,7 +104,6 @@
               <content-placeholders class="mt-1" v-if="loading">
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
-              <!--  -->
               <v-checkbox
                 v-model="smsNotify"
                 label="Gửi SMS"
@@ -123,7 +122,6 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </div>
-      <!--  -->
       <!--  -->
       <div style="position: relative;" v-if="viaPortalDetail !== 0">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">

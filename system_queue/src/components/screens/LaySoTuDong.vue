@@ -196,7 +196,9 @@ export default {
             if (keySearch.length === 1) {
               let filterEform = {
                 eFormNo: vm.eformInformation,
-                endPoint: '/eforms/' + vm.eformInformation + '/barcode'
+                endPoint: '/eforms/' + vm.eformInformation + '/barcode',
+                serverNo: 'SERVER_EFORM_DVC',
+                protocol: 'API_CONNECT'
               }
               vm.$store.dispatch('getEformBarcode', filterEform).then(function (result) {
                 let bookingName = ''

@@ -95,15 +95,18 @@ export const store = new Vuex.Store({
               groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
 	            Token: window.Liferay ? window.Liferay.authToken : ''
             },
-            params: {}
+            params: {
+              eFormNo: filter['eFormNo']
+            }
           }
-          let endPoint = filter['endPoint']
-          let dataPost = new URLSearchParams()
-          let textPost = {}
-          dataPost.append('method', 'GET')
-          dataPost.append('url', endPoint)
-          dataPost.append('data', JSON.stringify(textPost))
-          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
+          // let endPoint = filter['endPoint']
+          // let dataPost = new URLSearchParams()
+          // let textPost = {}
+          // dataPost.append('method', 'GET')
+          // dataPost.append('url', endPoint)
+          // dataPost.append('data', JSON.stringify(textPost))
+          axios.get('/o/rest/v2/serverconfigs/' + filter['serverNo'] + '/protocols/' + filter['protocol'], param).then(function (response) {
+          // axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             if (response.data) {
               resolve(response.data)
             } else {

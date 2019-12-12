@@ -169,12 +169,12 @@ export const store = new Vuex.Store({
             params['domain'] = ''
           }
           // 
-          let childsCode = []
-          if (state.groupConfig) {
-            for (let key in state.groupConfig) {
-              childsCode = childsCode.concat(state.groupConfig[key].split(','))
-            }
-          }
+          // let childsCode = []
+          // if (state.groupConfig) {
+          //   for (let key in state.groupConfig) {
+          //     childsCode = childsCode.concat(state.groupConfig[key].split(','))
+          //   }
+          // }
           // 
           let dataPost = new URLSearchParams()
           let url = '/statistics'
@@ -187,6 +187,60 @@ export const store = new Vuex.Store({
           dataPost.append('serverCode', 'SERVER_DVC')
           axios.post('/o/rest/v2/proxy', dataPost, param).then(function (response) {
             let serializable = response.data
+            // 
+            let childsCode = []
+            if (state.groupConfig) {
+              for (let key in state.groupConfig) {
+                childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+                if (params['agency'] !== 'total') {
+                  if (params.hasOwnProperty('month') && param.params['month']) {
+                    let groupExits = serializable['data'].filter(function (item) {
+                      return item['govAgencyCode'] === key && Number(item['month']) === Number(params['month'])
+                    })
+                    if (groupExits.length === 0) {
+                      let group = {
+                        govAgencyCode: key,
+                        govAgencyName: state.groupConfig[key][0],
+                        domainCode: '',
+                        domainName: '',
+                        processingCount: 0,
+                        waitingCount: 0,
+                        releaseCount: 0,
+                        onlineCount: 0,
+                        onegateCount: 0,
+                        month: Number(params['month']),
+                        year: Number(params['year'])
+                      }
+                      serializable['data'] = serializable['data'].concat([group])
+                    }
+                  } else {
+                    for (let indexMonth = 1; indexMonth <= 12; indexMonth++) {
+                      let groupExits = serializable['data'].filter(function (item) {
+                        return item['govAgencyCode'] === key && Number(item['month']) === Number(indexMonth)
+                      })
+                      if (groupExits.length === 0) {
+                        let group = {
+                          govAgencyCode: key,
+                          govAgencyName: state.groupConfig[key][0],
+                          domainCode: '',
+                          domainName: '',
+                          receivedCount: 0,
+                          processingCount: 0,
+                          waitingCount: 0,
+                          releaseCount: 0,
+                          onlineCount: 0,
+                          onegateCount: 0,
+                          month: Number(indexMonth),
+                          year: Number(params['year'])
+                        }
+                        serializable['data'] = serializable['data'].concat([group])
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            // 
             if (params.hasOwnProperty('month') && String(params['month']) !== 'undefined' && params['agency'] !== 'total' 
               && params.hasOwnProperty('domain') && params['domain'] === 'total' && state.groupConfig) {
               let childsData = function (code) {
@@ -199,7 +253,7 @@ export const store = new Vuex.Store({
               for (let index in resultData) {
                 let groupCode = resultData[index]['govAgencyCode']
                 if (state.groupConfig.hasOwnProperty(groupCode)) {
-                  let childs = state.groupConfig[groupCode].split(',')
+                  let childs = state.groupConfig[groupCode][1].split(',')
                   for (let index2 in childs) {
                     resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
                     resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
@@ -228,9 +282,12 @@ export const store = new Vuex.Store({
                 for (let index in resultData) {
                   let groupCode = resultData[index]['govAgencyCode']
                   if (state.groupConfig.hasOwnProperty(groupCode)) {
-                    let childs = state.groupConfig[groupCode].split(',')
+                    let childs = state.groupConfig[groupCode][1].split(',')
                     for (let index2 in childs) {
-                      resultData[index]['receivedCount'] = childsData(childs[index2])[0] && childsData(childs[index2])[0]['month'] === resultData[index]['month'] ? Number(resultData[index]['receivedCount']) + Number(childsData(childs[index2])[0]['receivedCount']) : resultData[index]['receivedCount']
+                      let childMonth = childsData(childs[index2]).filter(function (item) {
+                        return item['month'] === resultData[index]['month']
+                      })
+                      resultData[index]['receivedCount'] = childMonth[0] ? Number(resultData[index]['receivedCount']) + Number(childMonth[0]['receivedCount']) : resultData[index]['receivedCount']
                     }
                   }
                   let removeItems = childsCode.filter(function (item) {
@@ -249,7 +306,7 @@ export const store = new Vuex.Store({
                 resolve(null)
               }
             }
-          }).catch(function () {
+          }).catch(function (error) {
             reject(error)
           })
         })

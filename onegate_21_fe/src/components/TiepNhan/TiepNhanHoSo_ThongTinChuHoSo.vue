@@ -451,7 +451,7 @@
           <v-layout wrap class="mt-3">
             <v-flex xs12 sm8 class="pr-2 input-group--text-field-box">
               <v-text-field
-                  label="Tìm kiếm theo số cmnd/ căn cước, mã số thuế doanh nghiệp, tên người dùng"
+                  label="Tìm kiếm theo tên người dùng"
                   v-model="keySearch"
                   @keyup.enter="searchKeyword"
                   append-icon="search"
@@ -486,7 +486,7 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.index + 1}}</span><br>
+                    <span>{{ applicantPage * numberPerPage - numberPerPage + props.index + 1 }}</span>
                   </div>
                 </td>
                 <td class="text-xs-left" style="height:36px">
@@ -526,7 +526,7 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <v-tooltip top v-if="!loadingTable">
-                    <v-btn color="green" slot="activator" flat icon class="mx-0 my-0">
+                    <v-btn @click="showEditApplicant(props.item)" color="green" slot="activator" flat icon class="mx-0 my-0">
                       <v-icon>edit</v-icon>
                     </v-btn>
                     <span>Sửa thông tin</span>
@@ -557,6 +557,95 @@
           <v-btn class="mr-4" color="primary" @click.native="dialog_applicantList = false">
             <v-icon>clear</v-icon> &nbsp;
             Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialog_editApplicant" scrollable persistent max-width="700px">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>{{titleEdit}}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialog_editApplicant = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-1">
+          <v-form ref="form" v-model="valid" lazy-validation class="py-3 px-0 grid-list">
+            <v-layout row wrap class="px-0 py-3">
+              <v-flex xs12 sm12>
+                <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
+                  <template slot="label"> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên tổ chức, doanh nghiệp</span>
+                    <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Họ tên</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field v-model="applicantEdit['applicantIdNo']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required style="pointer-events: none">
+                  <template slot="label"> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Mã số thuế</span>
+                    <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Số CMND/ Căn cước</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-menu
+                  ref="menuBirthDate"
+                  :close-on-content-click="false"
+                  v-model="menuBirthDate"
+                  :nudge-right="40"
+                  lazy
+                  transition="fade-transition"
+                  offset-y
+                  full-width
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    slot="activator"
+                    box append-icon="event"
+                    v-model="applicantEdit['applicantIdDate']"
+                    label="Ngày cấp"
+                    @blur="ngayCap = parseDate(applicantEdit['applicantIdDate'])"
+                  ></v-text-field>
+                  <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
+                  v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
+                </v-menu>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box readonly></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12>
+                <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete :items="cityItems" label="Tỉnh/thành phố" v-model="applicantEdit['cityCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeCityEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete :items="districtItems" label="Quận/huyện" v-model="applicantEdit['districtCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeDistrictEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-autocomplete label="Xã/phường" :items="wardItems" v-model="applicantEdit['wardCode']" item-text="itemName" item-value="itemCode" :hide-selected="true" box @change="onChangeWardEditApplicant($event)"></v-autocomplete>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="primary" @click.native="exitDialogEditApplicant">
+            <v-icon>clear</v-icon> &nbsp;
+            Thoát
+          </v-btn>
+          <v-btn class="mr-3" color="primary" @click.native="updateApplicant">
+            <v-icon>save</v-icon> &nbsp;
+            Cập nhật
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -697,6 +786,9 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
+    titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
+    applicantEdit: '',
+    dialog_editApplicant: false,
     rules: {
       required: (value) => !!value || 'Thông tin bắt buộc',
       email: (value) => {
@@ -714,6 +806,13 @@ export default {
     },
     typeSearch: '',
     keySearch: '',
+    menuBirthDate: false,
+    ngayCap: null,
+    toDateFormatted: null,
+    cityItems: [],
+    districtItems: [],
+    wardItems: [],
+    valid: false,
     loadingTable: false
   }),
   computed: {
@@ -828,7 +927,11 @@ export default {
         vm.applicantListHeader[1].text = 'Tên tổ chức, doanh nghiệp'
         vm.applicantListHeader[3].text = 'Mã số thuế doanh nghiệp'
       }
-    }
+    },
+    ngayCap(val) {
+      this.toDateFormatted = this.formatDate(val)
+      this.applicantEdit['applicantIdDate'] = this.toDateFormatted
+    },
   },
   methods: {
     initData (data) {
@@ -1268,7 +1371,7 @@ export default {
               start: vm.applicantPage * vm.numberPerPage - vm.numberPerPage,
               end: vm.applicantPage * vm.numberPerPage,
               type: vm.typeSearch,
-              keyword: vm.keySearch
+              applicantName: vm.keySearch
             }
           }
           axios.get(url, param).then(response => {
@@ -1354,6 +1457,136 @@ export default {
         vm.onSearchItemSelected1(item)
       }
       vm.dialog_applicantList = false
+    },
+    showEditApplicant (item) {
+      let vm = this
+      vm.applicantEdit = item
+      if (vm.cityItems.length === 0) {
+        let filterCity = {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 0,
+          parent: 0,
+          commit: ''
+        }
+        vm.$store.dispatch('loadDictItems', filterCity).then(function (result) {
+          vm.cityItems = result.data
+        })
+      }
+      if (vm.applicantEdit['cityCode']) {
+        vm.$store.dispatch('loadDictItems', {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 1,
+          parent: vm.applicantEdit['cityCode']
+        }).then(function (resultDistricts) {
+          vm.districtItems = resultDistricts.data
+        })
+      }
+      if (vm.applicantEdit['districtCode']) {
+        vm.$store.dispatch('loadDictItems', {
+          collectionCode: 'ADMINISTRATIVE_REGION',
+          level: 1,
+          parent: vm.applicantEdit['districtCode']
+        }).then(function (resultWards) {
+          vm.wardItems = resultWards.data
+        })
+      }
+      if (vm.applicantEdit['applicantIdType'] === 'citizen') {
+        vm.titleEdit = "Thông tin công dân"
+      } else if (vm.applicantEdit['applicantIdType'] === 'business') {
+        vm.titleEdit = "Thông tin tổ chức, doanh nghiệp"
+      }
+      vm.dialog_editApplicant = true
+    },
+    changeBirthDate () {
+      let vm = this
+      vm.menuBirthDate = false
+      vm.applicantEdit['applicantIdDate'] = vm.formatDate(vm.ngayCap)
+    },
+    formatDate(date) {
+      if (!date) return null
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    getMaxdate () {
+      let date = new Date()
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+    },
+    parseDateInput (dateInput) {
+      if (dateInput) {
+        let date = ''
+        if (isNaN(dateInput)) {
+          date = new Date(dateInput)
+        } else {
+          date = new Date(Number(dateInput))
+        }
+        let dateFormated = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+        return dateFormated
+      }
+    },
+    parseDate(date) {
+      if (!date) return null
+      const [day, month, year] = date.split('/')
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    },
+    onChangeCityEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['cityName'] = vm.cityItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.districtItems = result.data
+        vm.wardItems = []
+      })
+    },
+    onChangeDistrictEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['districtName'] = vm.districtItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+      let filter = {
+        collectionCode: 'ADMINISTRATIVE_REGION',
+        level: 1,
+        parent: data
+      }
+      vm.$store.dispatch('loadDictItems', filter).then(function (result) {
+        vm.wardItems = result.data
+      })
+    },
+    onChangeWardEditApplicant (data) {
+      let vm = this
+      vm.applicantEdit['wardName'] = vm.wardItems.filter(function (item) {
+        return item['itemCode'] === data
+      })[0]['itemName']
+    },
+    updateApplicant () {
+      let vm = this
+      if (vm.$refs.form.validate()) {
+        vm.loading = true
+        // console.log('user put data', vm.applicantEdit)
+        vm.$store.dispatch('putUser', vm.applicantEdit).then(function () {
+          toastr.clear()
+          toastr.success('Yêu cầu thực hiện thành công')
+          vm.dialog_editApplicant = false
+        }).catch(function () {
+          toastr.clear()
+          toastr.error('Yêu cầu thực hiện thất bại')
+        })
+      }
+    },
+    exitDialogEditApplicant () {
+      let vm = this
+      vm.dialog_editApplicant = false
+      vm.getApplicantList().then(function(result) {
+        vm.totalApplicantSearch = result['total']
+        vm.applicantLists = result['data']
+      }).catch(function () {
+        toastr.error('Không lấy được danh sách công dân, tổ chức, doanh nghiệp')
+      })
     },
     fullAddress (address, city, district, ward) {
       let fullAddress = ''

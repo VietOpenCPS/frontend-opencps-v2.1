@@ -254,7 +254,13 @@
               </v-alert>
               <div v-if="rollbackable || printDocument" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                 <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
-                <v-btn color="primary" v-if="printDocument" @click="printViewDocument()">In văn bản hành chính</v-btn>
+                <v-btn color="primary" v-if="printDocument" @click="printViewDocument()"
+                  :loading="dialogPDFLoading"
+                  :disabled="dialogPDFLoading"
+                >
+                  In văn bản hành chính
+                  <span slot="loader">Loading...</span>
+                </v-btn>
               </div>
               <!--  -->
             </v-tab-item>
@@ -707,7 +713,7 @@ export default {
     thongTinChiTietHoSo: {
     },
     dialogPDF: false,
-    dialogPDFLoading: true,
+    dialogPDFLoading: false,
     loadingAlpacajsForm: false,
     nextActions: [],
     createFiles: [],
@@ -1572,14 +1578,18 @@ export default {
     doPreview (dossierItem, item, index) {
       let vm = this
       vm.dialogPDFLoading = true
-      vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
         document: item.document
       }
       vm.$store.dispatch('doPrint03', filter).then(function (result) {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        if (result !== 'pending') {
+          vm.dialogPDF = true
+          document.getElementById('dialogPDFPreview').src = result
+        }
+      }).catch(function () {
+        vm.dialogPDFLoading = false
       })
     },
     doCopy (dossierItem, item, index) {
@@ -2158,14 +2168,18 @@ export default {
     doPrint03 (dossierItem, item, index, isGroup) {
       let vm = this
       vm.dialogPDFLoading = true
-      vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
         document: item.document
       }
       vm.$store.dispatch('doPrint03', filter).then(function (result) {
         vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
+        if (result !== 'pending') {
+          vm.dialogPDF = true
+          document.getElementById('dialogPDFPreview').src = result
+        }
+      }).catch(function () {
+        vm.dialogPDFLoading = false
       })
     },
     doGuiding (dossierItem, item, index, isGroup) {
@@ -2535,14 +2549,31 @@ export default {
     printViewDocument () {
       let vm = this
       vm.dialogPDFLoading = true
-      vm.dialogPDF = true
       let filter = {
         dossierId: vm.thongTinChiTietHoSo.dossierId
       }
-      vm.$store.dispatch('doPrint03', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
-      })
+      let counter = 0
+      let callServer = function() {
+        setTimeout(function () {
+          vm.$store.dispatch('doPrint03', filter).then(function (result) {
+            if (result === 'pending' && counter <= 5) {
+              counter += 1
+              callServer()
+            } else {
+              if (counter > 5) {
+                vm.dialogPDFLoading = false
+              } else {
+                vm.dialogPDFLoading = false
+                vm.dialogPDF = true
+                setTimeout(function () {
+                  document.getElementById('dialogPDFPreview').src = result
+                }, 100)
+              }
+            }
+          })
+        }, 1000)
+      }
+      callServer()
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false

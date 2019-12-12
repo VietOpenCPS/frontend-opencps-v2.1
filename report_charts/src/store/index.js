@@ -153,17 +153,68 @@ export const store = new Vuex.Store({
             param.params['domain'] = ''
           }
           // 
-          let childsCode = []
-          if (state.groupConfig) {
-            for (let key in state.groupConfig) {
-              childsCode = childsCode.concat(state.groupConfig[key].split(','))
-            }
-          }
-          // Khởi tạo group cha với trường hợp group cha không có dữ liệu, group con có dữ liệu
-          // return code group cha
+          // let childsCode = []
+          // if (state.groupConfig) {
+          //   for (let key in state.groupConfig) {
+          //     childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+          //   }
+          // }
           // 
           axios.get('/o/rest/statistics', param).then(function (response) {
             let serializable = response.data
+            // Khởi tạo group cha với fix trường hợp group cha không có dữ liệu, group con có dữ liệu
+            let childsCode = []
+            if (state.groupConfig) {
+              for (let key in state.groupConfig) {
+                childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
+                if (param.params['agency'] !== 'total') {
+                  if (param.params.hasOwnProperty('month') && param.params['month']) {
+                    let groupExits = serializable['data'].filter(function (item) {
+                      return item['govAgencyCode'] === key && Number(item['month']) === Number(param.params['month'])
+                    })
+                    if (groupExits.length === 0) {
+                      let group = {
+                        govAgencyCode: key,
+                        govAgencyName: state.groupConfig[key][0],
+                        domainCode: '',
+                        domainName: '',
+                        processingCount: 0,
+                        waitingCount: 0,
+                        releaseCount: 0,
+                        onlineCount: 0,
+                        onegateCount: 0,
+                        month: Number(param.params['month']),
+                        year: Number(param.params['year'])
+                      }
+                      serializable['data'] = serializable['data'].concat([group])
+                    }
+                  } else {
+                    for (let indexMonth = 1; indexMonth <= 12; indexMonth++) {
+                      let groupExits = serializable['data'].filter(function (item) {
+                        return item['govAgencyCode'] === key && Number(item['month']) === Number(indexMonth)
+                      })
+                      if (groupExits.length === 0) {
+                        let group = {
+                          govAgencyCode: key,
+                          govAgencyName: state.groupConfig[key][0],
+                          domainCode: '',
+                          domainName: '',
+                          processingCount: 0,
+                          receivedCount: 0,
+                          waitingCount: 0,
+                          releaseCount: 0,
+                          onlineCount: 0,
+                          onegateCount: 0,
+                          month: Number(indexMonth),
+                          year: Number(param.params['year'])
+                        }
+                        serializable['data'] = serializable['data'].concat([group])
+                      }
+                    }
+                  }
+                }
+              }
+            }
             // 
             if (param.params.hasOwnProperty('month') && String(param.params['month']) !== 'undefined' && param.params['agency'] !== 'total' 
               && param.params.hasOwnProperty('domain') && param.params['domain'] === 'total' && state.groupConfig) {
@@ -175,10 +226,9 @@ export const store = new Vuex.Store({
               let resultData = serializable['data']
               let resultOutput = []
               for (let index in resultData) {
-                // check có group cha không, không có thì khởi tạo
                 let groupCode = resultData[index]['govAgencyCode']
                 if (state.groupConfig.hasOwnProperty(groupCode)) {
-                  let childs = state.groupConfig[groupCode].split(',')
+                  let childs = state.groupConfig[groupCode][1].split(',')
                   for (let index2 in childs) {
                     resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
                     resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
@@ -207,9 +257,15 @@ export const store = new Vuex.Store({
                 for (let index in resultData) {
                   let groupCode = resultData[index]['govAgencyCode']
                   if (state.groupConfig.hasOwnProperty(groupCode)) {
-                    let childs = state.groupConfig[groupCode].split(',')
+                    let childs = state.groupConfig[groupCode][1].split(',')
                     for (let index2 in childs) {
-                      resultData[index]['receivedCount'] = childsData(childs[index2])[0] && childsData(childs[index2])[0]['month'] === resultData[index]['month'] ? Number(resultData[index]['receivedCount']) + Number(childsData(childs[index2])[0]['receivedCount']) : resultData[index]['receivedCount']
+                      if (groupCode === 'BGTVT-CDTND') {
+                        // console.log('resultOutput', resultData[index]['month'], childs[index2], childsData(childs[index2]))
+                      }
+                      let childMonth = childsData(childs[index2]).filter(function (item) {
+                        return item['month'] === resultData[index]['month']
+                      })
+                      resultData[index]['receivedCount'] = childMonth[0] ? Number(resultData[index]['receivedCount']) + Number(childMonth[0]['receivedCount']) : resultData[index]['receivedCount']
                     }
                   }
                   let removeItems = childsCode.filter(function (item) {

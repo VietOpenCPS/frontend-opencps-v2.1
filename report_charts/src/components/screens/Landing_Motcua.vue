@@ -1316,11 +1316,14 @@ export default {
       let monthData = {}
       // console.log('dataReport1', data)
       // Bind data report NĂM
+      for (let i = 1; i <= 12; i++) {
+        labelsCustomMonth['' + i] = 'T ' + i
+      }
       for (let key in data) {
         if (String(data[key].govAgencyCode) === '' && String(data[key].domainName) === '') {
         } else {
           if (data[key].month > 0) {
-            labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
+            // labelsCustomMonth['' + data[key].month] = 'T ' + data[key].month
             if (data[key].govAgencyName !== '' && String(data[key].domainName) === '') {
               let agencyName = String(data[key].govAgencyName).normalize('NFD')
               if (monthData[agencyName] !== null && monthData[agencyName] !== undefined) {
@@ -1353,7 +1356,7 @@ export default {
           }
         }
       }
-      console.log('monthData 19891', monthData)
+      // console.log('monthData 19891', monthData)
 
       for (let key in monthData) {
         let lineProcessData = {
@@ -1382,7 +1385,7 @@ export default {
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
-      console.log('vm.seriesChart', vm.seriesChart)
+      // console.log('vm.seriesChart', vm.seriesChart)
     },
     doProcessReport2 (data) {
       let vm = this

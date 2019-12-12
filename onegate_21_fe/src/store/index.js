@@ -447,7 +447,7 @@ export const store = new Vuex.Store({
           axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems', param).then(function (response) {
             let serializable = response.data
             if (data.collectionCode === 'ADMINISTRATIVE_REGION') {
-              if (data.level === 0) {
+              if (data.level === 0 && !data.hasOwnProperty('commit')) {
                 commit('setCitys', serializable.data)
               }
             }
@@ -2316,7 +2316,6 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           },
           params: {
-            // abc: dât.abc
           }
         }
         let url = state.initData.documentApi + '/' + data.dossierId + '/documents'
@@ -2653,8 +2652,12 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
-            let file = window.URL.createObjectURL(serializable)
-            resolve(file)
+            if (serializable['size']) {
+              let file = window.URL.createObjectURL(serializable)
+              resolve(file)
+            } else {
+              resolve('pending')
+            }
           }).catch(function (error) {
             console.log(error)
             toastr.clear()
@@ -3565,12 +3568,43 @@ export const store = new Vuex.Store({
         })
       })
     },
+    putUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/applicants/' + filter['applicantId']
+        dataPutUser.append('applicantName', filter['applicantName'])
+        dataPutUser.append('contactTelNo', filter['contactTelNo'])
+        dataPutUser.append('address', filter['address'])
+        dataPutUser.append('contactEmail', filter['contactEmail'])
+        dataPutUser.append('cityCode', filter['cityCode'])
+        dataPutUser.append('cityName', filter['cityName'])
+        dataPutUser.append('districtCode', filter['districtCode'])
+        dataPutUser.append('districtName', filter['districtName'])
+        dataPutUser.append('wardCode', filter['wardCode'])
+        dataPutUser.append('wardName', filter['wardName'])
+        // dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
+        dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+        axios.put(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
     putNotifyConfig ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: state.initData.groupId,
+              'Content-Type': 'multipart/form-data'
             }
           }
           let formData = new URLSearchParams()

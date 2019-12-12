@@ -1386,7 +1386,7 @@ export default {
         vm.chartOptions.colors.push(datasetsCustom[key]['borderColor'])
       }
       vm.reloadLine = false
-      console.log('vm.seriesChart', vm.seriesChart)
+      // console.log('vm.seriesChart', vm.seriesChart)
     },
     doProcessReport2 (data) {
       let vm = this
