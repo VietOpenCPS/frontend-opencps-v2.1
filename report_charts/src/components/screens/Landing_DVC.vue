@@ -840,6 +840,12 @@ export default {
               }
             )
           }
+          if (String(yearsFilter[0]) === '0') {
+            vm.years.unshift({
+              'value': '0',
+              'name': 'Tất cả các năm'
+            })
+          }
         } else {
           for (let j = 0; j<=2; j++) {
             vm.years.push(
@@ -860,10 +866,6 @@ export default {
           )
         }
       }
-      vm.years.unshift({
-        'value': '0',
-        'name': 'Tất cả các năm'
-      })
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
       if (currentParams.hasOwnProperty('index') && vm.isCallBack) {

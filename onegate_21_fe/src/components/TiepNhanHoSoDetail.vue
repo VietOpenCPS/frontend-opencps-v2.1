@@ -96,7 +96,7 @@
         </v-expansion-panel>
       </div>
       <!--  -->
-      <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1">
+      <div style="position: relative;border-top:1px solid #ddd" v-if="originality !== 1 && notifyConfig">
         <v-expansion-panel :value="[true]" expand  class="expansion-pl">
           <v-expansion-panel-content hide-actions value="2">
             <div slot="header"><div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon> </div>Hình thức gửi thông báo giải quyết hồ sơ</div>
@@ -357,6 +357,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
+    notifyConfig: true,
     smsNotify: true,
     emailNotify: true
   }),
@@ -975,12 +976,19 @@ export default {
     },
     getNotifyConfig (id) {
       let vm = this
+      if (!vm.notifyConfig || vm.originality !== 3) {
+        return
+      }
       let filter1 = {
         dossierId: id,
         key: 'smsNotify'
       }
       vm.$store.dispatch('getNotifyConfig', filter1).then(result => {
-        vm.smsNotify = result
+        if (String(result) === 'true') {
+          vm.smsNotify = true
+        } else {
+          vm.smsNotify = false
+        }
       })
       let filter2 = {
         dossierId: id,
@@ -988,10 +996,18 @@ export default {
       }
       vm.$store.dispatch('getNotifyConfig', filter2).then(result => {
         vm.emailNotify = result
+        if (String(result) === 'true') {
+          vm.emailNotify = true
+        } else {
+          vm.emailNotify = false
+        }
       })
     },
     updateNotifyConfig () {
       let vm = this
+      if (!vm.notifyConfig || vm.originality !== 3) {
+        return
+      }
       let filter = {
         dossierId: vm.dossierId,
         smsNotify: vm.smsNotify,

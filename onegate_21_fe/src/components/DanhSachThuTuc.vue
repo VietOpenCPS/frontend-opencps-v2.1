@@ -263,6 +263,17 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="dialogVerifycation" max-width="350">
+        <v-card class="px-0">
+          <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click="dialog = false">Đóng</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
     
   </div>
@@ -310,11 +321,18 @@
       dataPostDossier: '',
       serviceLastest: false,
       numberPerPage: 10,
-      agencyPage: 1
+      agencyPage: 1,
+      dialogVerifycation: false
     }),
     computed: {
       currentIndex () {
         return this.$store.getters.index
+      },
+      currentUser () {
+        return this.$store.getters.loadingInitData.user
+      },
+      userLoginInfomation () {
+        return this.$store.getters.getUserLogin
       }
     },
     created () {
@@ -589,45 +607,49 @@
       },
       pullServiceOptions (item, govAgencyCode) {
         var vm = this
-        vm.serviceConfigSelect = item
-        vm.govAgencyCodeSelect = govAgencyCode
-        vm.serviceInfoIdSelect = item.serviceInfoId
-        vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
-          vm.serviceOptions = result
-          if (result.length === 1) {
-            vm.selectOption = false
-            vm.$store.dispatch('getServiceInfo', {
-              serviceInfoId: item.serviceInfoId
-            }).then(resServiceInfo => {
-              let data = {
-                serviceCode: resServiceInfo.serviceCode,
-                govAgencyCode: govAgencyCode,
-                templateNo: result[0].templateNo,
-                originality: vm.getOriginality(),
-                j_captcha_response: ''
-              }
-              if (!vm.isOffLine) {
-                vm.$store.dispatch('postDossier', data).then(function (result) {
-                  vm.loadingAction = false
-                  vm.indexAction = -1
-                  vm.$router.push({
-                    path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                    query: vm.$router.history.current.query
+        if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+          vm.dialogVerifycation = true
+        } else {
+          vm.serviceConfigSelect = item
+          vm.govAgencyCodeSelect = govAgencyCode
+          vm.serviceInfoIdSelect = item.serviceInfoId
+          vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
+            vm.serviceOptions = result
+            if (result.length === 1) {
+              vm.selectOption = false
+              vm.$store.dispatch('getServiceInfo', {
+                serviceInfoId: item.serviceInfoId
+              }).then(resServiceInfo => {
+                let data = {
+                  serviceCode: resServiceInfo.serviceCode,
+                  govAgencyCode: govAgencyCode,
+                  templateNo: result[0].templateNo,
+                  originality: vm.getOriginality(),
+                  j_captcha_response: ''
+                }
+                if (!vm.isOffLine) {
+                  vm.$store.dispatch('postDossier', data).then(function (result) {
+                    vm.loadingAction = false
+                    vm.indexAction = -1
+                    vm.$router.push({
+                      path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                      query: vm.$router.history.current.query
+                    })
                   })
-                })
-              } else {
-                vm.dataPostDossier = data
-                vm.$refs.captcha.makeImageCap()
-                vm.dialog_captcha = true
-              }
-            })
-          } else {
-            vm.serviceOptionsProcess = result
-            vm.selectOption = true
-          }
-        }).catch(result => {
-          vm.serviceOptions = []
-        })
+                } else {
+                  vm.dataPostDossier = data
+                  vm.$refs.captcha.makeImageCap()
+                  vm.dialog_captcha = true
+                }
+              })
+            } else {
+              vm.serviceOptionsProcess = result
+              vm.selectOption = true
+            }
+          }).catch(result => {
+            vm.serviceOptions = []
+          })
+        }
       },
       selectServiceOption (item, govAgencyCode, itemServiceConfig) {
         var vm = this

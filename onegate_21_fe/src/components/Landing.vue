@@ -180,9 +180,12 @@
           </v-fade-transition>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
-            <v-icon size="16">filter_list</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <v-btn slot="activator" icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
+              <v-icon size="16">fas fa fa-filter</v-icon>
+            </v-btn>
+            <span>Tìm kiếm nâng cao</span>
+          </v-tooltip>
         </div>
       </div> 
     </div>
@@ -427,7 +430,7 @@
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
               <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
-                <v-icon>more_vert</v-icon>
+                <v-icon>filter_list</v-icon>
               </v-btn>
               <v-list>
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->

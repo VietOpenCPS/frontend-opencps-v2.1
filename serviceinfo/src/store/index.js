@@ -17,7 +17,8 @@ export const store = new Vuex.Store({
     agencyList: [],
     domainList: [],
     levelList: [],
-    isMobile: false
+    isMobile: false,
+    userLogin: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -191,6 +192,9 @@ export const store = new Vuex.Store({
     },
     setIsMobile (state, payload) {
       state.isMobile = payload
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
     }
   },
   getters: {
@@ -211,6 +215,9 @@ export const store = new Vuex.Store({
     },
     getIsMobile (state) {
       return state.isMobile
+    },
+    getUserLogin (state) {
+      return state.userLogin
     }
   }
 })

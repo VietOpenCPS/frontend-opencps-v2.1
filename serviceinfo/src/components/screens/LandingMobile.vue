@@ -158,6 +158,7 @@ export default {
     serviceNameKey: '',
     serviceDetail: '',
     dialogGuide: false,
+    dialogVerifycation: false,
     loading: true,
     headers: [
       {
@@ -199,6 +200,9 @@ export default {
     },
     viewMobile () {
       return isMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     }
   },
   created () {

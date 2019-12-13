@@ -348,6 +348,19 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="dialogVerifycation" max-width="350">
+        <v-card class="px-0">
+          <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+          <v-divider class="my-0"></v-divider>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+            Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -367,6 +380,7 @@ export default {
   },
   data: () => ({
     dialog_createDossier: false,
+    dialogVerifycation: false,
     pathRouter: '/thu-tuc-hanh-chinh/',
     serviceInfoList: [],
     totalThuTuc: 0,
@@ -424,6 +438,9 @@ export default {
     },
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     }
   },
   created () {

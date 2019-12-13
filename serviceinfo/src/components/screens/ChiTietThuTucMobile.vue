@@ -247,11 +247,15 @@ export default {
     serviceDetail: '',
     serviceConfigDetail: '',
     active: null,
-    dialogGuide: false
+    dialogGuide: false,
+    dialogVerifycation: false,
   }),
   computed: {
     viewMobile () {
       return isMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     }
   },
   created () {

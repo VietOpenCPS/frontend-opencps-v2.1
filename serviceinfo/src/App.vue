@@ -40,6 +40,7 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import GoTop from '@inotom/vue-go-top'
   export default {
     data: () => ({
@@ -153,7 +154,7 @@
           vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           vm.menuServiceInfos[0].children = result
           vm.$store.commit('setAgencyList', result)
-          console.log('run app',  current)
+          // console.log('run app',  current)
           if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
           (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
           ) {
@@ -192,6 +193,13 @@
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
         vm.getCountAll()
+        // 
+        axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+          let userData = response.data
+          vm.$store.commit('setUserLogin', userData)
+        })
+        .catch(function(error) {
+        })
       })
     },
     watch: {

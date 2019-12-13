@@ -49,7 +49,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <v-tooltip top>
+                      <v-tooltip top v-if="originality === 3 || originality === '3'">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
                         </v-btn>
@@ -240,7 +240,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <v-tooltip top>
+                        <v-tooltip top v-if="originality === 3 || originality === '3'">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
                           </v-btn>

@@ -29,6 +29,7 @@ export const store = new Vuex.Store({
     user: {
       'role': ''
     },
+    userLogin: '',
     index: 0,
     kysoSuccess: false,
     activeGetCounter: false,
@@ -3604,12 +3605,15 @@ export const store = new Vuex.Store({
           let param = {
             headers: {
               groupId: state.initData.groupId,
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'application/x-www-form-urlencoded'
             }
           }
+          let data = {
+            smsNotify: filter['smsNotify'],
+            emailNotify: filter['emailNotify']
+          }
           let formData = new URLSearchParams()
-          formData.append('smsNotify', filter['smsNotify'])
-          formData.append('emailNotify', filter['emailNotify'])
+          formData.append('data', JSON.stringify(data))
           axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -3877,6 +3881,9 @@ export const store = new Vuex.Store({
     },
     setActiveAddFileGroup (state, payload) {
       state.activeAddFileGroup = payload
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
     }
   },
   getters: {
@@ -4069,6 +4076,9 @@ export const store = new Vuex.Store({
     },
     getMenuConfigsTodo (state) {
       return state.trangThaiHoSoList
+    },
+    getUserLogin (state) {
+      return state.userLogin
     }
   }
 })

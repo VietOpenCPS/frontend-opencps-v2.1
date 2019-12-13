@@ -124,13 +124,26 @@
       <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && !isOffLine" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
+      <v-dialog v-model="dialogVerifycation" max-width="350">
+        <v-card class="px-0">
+          <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+          <v-divider class="my-0"></v-divider>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+            Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-content>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </v-app>
 </template>
 
 <script>
-  
+  import axios from 'axios'
   import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
@@ -139,7 +152,8 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0
+      detailState: 0,
+      dialogVerifycation: false
     }),
     computed: {
       currentIndex () {
@@ -156,10 +170,22 @@
       },
       pathLanding () {
         return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
+      },
+      currentUser () {
+        return this.$store.getters.loadingInitData.user
+      },
+      userLoginInfomation () {
+        return this.$store.getters.getUserLogin
       }
     },
     created () {
       let vm = this
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+      })
+      .catch(function(error) {
+      })
       if (window.location.href.includes('/m/') && vm.viewMobile) {
         $('head meta[name=viewport]').remove()
       } else {
@@ -327,7 +353,11 @@
       },
       doAddDVC () {
         let vm = this
-        vm.$router.push('/add-dvc/0')
+        if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+          vm.dialogVerifycation = true
+        } else {
+          vm.$router.push('/add-dvc/0')
+        }
       }
     }
   }

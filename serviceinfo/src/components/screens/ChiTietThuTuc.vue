@@ -475,11 +475,15 @@ export default {
     serviceDetail: '',
     serviceConfigDetail: '',
     active: null,
-    dialogGuide: false
+    dialogGuide: false,
+    dialogVerifycation: false,
   }),
   computed: {
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     }
   },
   created () {

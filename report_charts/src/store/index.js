@@ -259,9 +259,9 @@ export const store = new Vuex.Store({
                   if (state.groupConfig.hasOwnProperty(groupCode)) {
                     let childs = state.groupConfig[groupCode][1].split(',')
                     for (let index2 in childs) {
-                      if (groupCode === 'BGTVT-CDTND') {
-                        // console.log('resultOutput', resultData[index]['month'], childs[index2], childsData(childs[index2]))
-                      }
+                      // if (groupCode === 'BGTVT-CDTND') {
+                      //   console.log('resultOutput', resultData[index]['month'], childs[index2], childsData(childs[index2]))
+                      // }
                       let childMonth = childsData(childs[index2]).filter(function (item) {
                         return item['month'] === resultData[index]['month']
                       })

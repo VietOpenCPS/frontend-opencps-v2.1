@@ -349,8 +349,8 @@ export default {
               vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
             })
             .catch(function(error) {
-              vm.avatarURL = "";
-            });
+              vm.avatarURL = ""
+            })
         }, 1000);
       }
     });

@@ -839,6 +839,12 @@ export default {
               }
             )
           }
+          if (String(yearsFilter[0]) === '0') {
+            vm.years.unshift({
+              'value': '0',
+              'name': 'Tất cả các năm'
+            })
+          }
         } else {
           for (let j = 0; j<=2; j++) {
             vm.years.push(

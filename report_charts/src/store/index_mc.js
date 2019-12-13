@@ -193,7 +193,7 @@ export const store = new Vuex.Store({
               for (let key in state.groupConfig) {
                 childsCode = childsCode.concat(state.groupConfig[key][1].split(','))
                 if (params['agency'] !== 'total') {
-                  if (params.hasOwnProperty('month') && param.params['month']) {
+                  if (params.hasOwnProperty('month') && params['month']) {
                     let groupExits = serializable['data'].filter(function (item) {
                       return item['govAgencyCode'] === key && Number(item['month']) === Number(params['month'])
                     })
