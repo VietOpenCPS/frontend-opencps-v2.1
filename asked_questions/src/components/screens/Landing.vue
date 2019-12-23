@@ -43,7 +43,7 @@
                 @change="changeLvtt"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm12 class="pl-0">
+            <v-flex xs12 sm12 class="selectLvds pl-0">
               <v-autocomplete
                 class="select-border"
                 :items="lvdsList"
@@ -197,7 +197,22 @@
                   box
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12>
+              <v-flex xs12 class="selectLvtt" style="display: none">
+                <div class="mb-1">Lĩnh vực thủ tục hành chính <span style="color:red"></span></div>
+                <v-autocomplete
+                  class="select-border"
+                  :items="lvttList"
+                  v-model="lvttSelectAdd"
+                  placeholder="Chọn lĩnh vực"
+                  item-text="domainName"
+                  item-value="domainCode"
+                  return-object
+                  :hide-selected="true"
+                  box
+                  clearable
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 class="selectLvds">
                 <div class="mb-1">Lĩnh vực đời sống <span style="color:red"></span></div>
                 <v-autocomplete
                   class="select-border"
@@ -412,7 +427,6 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
-      console.log('run app')
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('getGovAgency').then(function(result) {
@@ -566,6 +580,8 @@ export default {
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
             agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
+            domainCode: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainCode'] : '',
+            domainName: vm.lvttSelectAdd ? vm.lvttSelectAdd['domainName'] : '',
             subDomainCode: vm.lvdsSelected ? vm.lvdsSelected['itemCode'] : '',
             subDomainName: vm.lvdsSelected ? vm.lvdsSelected['itemName'] : '',
             questionType: 'FAQ'

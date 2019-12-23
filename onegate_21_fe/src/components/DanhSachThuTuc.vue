@@ -406,7 +406,7 @@
             }
           }
         }
-      })
+      }).catch(function(){})
     },
     updated () {
     },

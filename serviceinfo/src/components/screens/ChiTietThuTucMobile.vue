@@ -231,6 +231,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogVerifycation" max-width="350">
+      <v-card class="px-0">
+        <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+        <v-divider class="my-0"></v-divider>
+        <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+          Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -277,13 +290,22 @@ export default {
   watch: {},
   methods: {
     createDossier (item) {
-      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-      if (isSigned) {
-        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-        window.open(url, '_self')
+      let vm = this
+      if (item.serviceUrl) {
+        window.location.href = item.serviceUrl
       } else {
-        alert('Vui lòng đăng nhập để thực hiện')
+        let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+        if (isSigned) {
+          if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+            vm.dialogVerifycation = true
+          } else {
+            let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+            window.open(url, '_self')
+          }
+        } else {
+          alert('Vui lòng đăng nhập để thực hiện')
+        }
       }
     },
     viewGuide (item) {

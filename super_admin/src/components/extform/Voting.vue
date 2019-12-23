@@ -60,9 +60,18 @@
           </v-btn>
           <div class="px-2 py-2">
             <div class="mb-2" v-if="Array.isArray(votingItems) && votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" style="position:relative">
-              <div class="text-bold">
+              <!-- <div class="text-bold" v-else>
                 {{index + 1}}.&nbsp; {{ item.subject }}
-              </div>
+              </div> -->
+              <v-layout wrap class="text-bold">
+                <div class="flex px-3 py-1" style="height:26px;max-width:80px;background-color: #034687;transform: skew(-25deg)">
+                  <span class="d-block white--text" style="transform: skew(25deg)">Câu {{index + 1}} : </span>
+                </div>
+                <!-- <div v-html="item.subject" class="flex pl-3 pr-2" style="max-width:calc(100% - 100px);color:#034687" v-if="String(item.subject).indexOf('/>') > 0 || String(item.subject).indexOf('<br') > 0">
+                </div> -->
+                <div v-html="item.subject" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                </div>
+              </v-layout>
               <div style="position:absolute;right:0px;top:-5px" :style="Array.isArray(item.choices) && item.choices.length > 1  ? 'width:50px' : 'width:85px'">
                 <v-tooltip top>
                   <v-btn slot="activator" class="mx-0 my-1" icon ripple @click="editVotings(item)">
@@ -91,7 +100,7 @@
             </div>
           </div>
         </v-card>
-        <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="700px">
+        <v-dialog v-model="dialog_addQuestion" scrollable persistent max-width="1000px">
           <v-card>
             <v-card-title class="headline pb-2">
               <span v-if="type === 'add'">Thêm câu hỏi</span>
@@ -110,26 +119,33 @@
                       :disabled="type !== 'add'"
                     ></v-text-field>
                   </v-flex>
-                  <v-flex xs12 class="">
+                  <p class="my-2">Nội dung câu hỏi:</p>
+                  <v-flex xs12 class="" style="position: relative">
+                    <v-btn @click="editorVisible = !editorVisible" flat icon color="primary" style="position: absolute; top: 0; right: 0; z-index: 5">
+                      <v-icon v-if="!editorVisible">code</v-icon>
+                      <v-icon v-else>edit</v-icon>
+                    </v-btn>
                     <v-textarea
-                      label="Nội dung câu hỏi"
+                      v-if="!editorVisible"
                       box
-                      rows="2"
+                      rows="3"
                       v-model="subject"
                       :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
                       required
                     ></v-textarea>
+                    <vue-editor v-else v-model="subject" :editorToolbar="customToolbar"></vue-editor>
                   </v-flex>
+                  <p class="my-2">Câu trả lời: </p>
                   <v-flex xs12 class="">
                     <!-- <div class="my-2 text-bold">:</div> -->
                     <v-layout wrap>
                       <v-flex xs12 sm10 class="pr-2">
                         <v-text-field
-                          label="Câu trả lời"
                           box
                           v-model="answer"
                           clearable
                           @keyup.enter="addChoices"
+                          rows="3"
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm2 class="text-xs-right">
@@ -197,9 +213,11 @@
 
 <script>
   import TinyPagination from '../ext/TinyPagination.vue'
+  import { VueEditor, Quill } from 'vue2-editor'
   export default {
     components: {
-      'tiny-pagination': TinyPagination
+      'tiny-pagination': TinyPagination,
+      VueEditor
     },
     data () {
       return {
@@ -242,11 +260,28 @@
         choicesCurrent: [],
         votingIdCurrent: '',
         type: '',
+        editorVisible: false,
         loading: false,
         dialog_addQuestion: false,
         rules: {
           required: (value) => (!!value || value === 0) || 'Trường dữ liệu bắt buộc'
-        }
+        },
+        customToolbar: [
+          [{ header: [false, 1, 2, 3, 4, 5, 6] }],
+          ["bold", "italic", "underline", "strike"], // toggled buttons
+          [
+            { align: "" },
+            { align: "center" },
+            { align: "right" },
+            { align: "justify" }
+          ],
+          ["blockquote", "code-block"],
+          [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+          [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+          [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+          // ["link", "image", "video"],
+          ["clean"] // remove formatting button
+        ]
       }
     },
     created () {

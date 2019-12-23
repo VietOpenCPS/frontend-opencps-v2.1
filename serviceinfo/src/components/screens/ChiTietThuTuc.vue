@@ -458,6 +458,31 @@
         </v-card>
       </v-dialog>
     </div>
+    <v-dialog v-model="dialogVerifycation" max-width="350">
+      <v-card class="px-0">
+        <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+        <v-divider class="my-0"></v-divider>
+        <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+          Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
+      <v-card>
+        <v-card-text class="px-0 py-0">
+          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
+            width: 100%;
+            height: 650px;
+            border: none;
+          "></iframe>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -465,6 +490,7 @@
 
 import Vue from 'vue'
 import toastr from 'toastr'
+import $ from 'jquery'
 Vue.use(toastr)
 export default {
   props: ['index'],
@@ -477,6 +503,8 @@ export default {
     active: null,
     dialogGuide: false,
     dialogVerifycation: false,
+    dialog_loginDVCQG: false,
+    tempDVCQG: ''
   }),
   computed: {
     isMobile () {
@@ -489,7 +517,12 @@ export default {
   created () {
     let vm = this
     vm.$nextTick(function () {
-      var vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      if (query.hasOwnProperty('vnconnect') && String(query['vnconnect']) === '1') {
+        window.callback_dvcqg = vm.callback_dvcqg
+        vm.checkVNConect()
+      }
       vm.loading = true
       let filter = {
         index: vm.index
@@ -502,16 +535,26 @@ export default {
       })
     })
   },
-  watch: {},
+  watch: {
+  },
   methods: {
     createDossier (item) {
-      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-      if (isSigned) {
-        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-        window.open(url, '_self')
+      let vm = this
+      if (item.serviceUrl) {
+        window.location.href = item.serviceUrl
       } else {
-        alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+        let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+        if (isSigned) {
+          if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+            vm.dialogVerifycation = true
+          } else {
+            let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+            window.open(url, '_self')
+          }
+        } else {
+          alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+        }
       }
     },
     viewGuide (item) {
@@ -546,6 +589,30 @@ export default {
         }
       }
     },
+    checkVNConect () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let filter = {
+        vnconnect: query.vnconnect ? query.vnconnect : 1,
+        currenturl: window.themeDisplay.getLayoutURL() + '#' + current.path
+      }
+      vm.$store.dispatch('getVNConect', filter).then(function (result) {
+        if (result) {
+          vm.dialog_loginDVCQG = true
+          setTimeout(function () {
+            vm.tempDVCQG = result
+          }, 200)
+        }
+      })
+    },
+    callback_dvcqg (data) {
+      let vm = this
+      let current = vm.$router.history.current
+      window.location.href = window.themeDisplay.getLayoutURL() + '#' + current.path
+      window.location.reload()
+      vm.dialog_loginDVCQG = false
+    },
     goBack () {
       window.history.back()
     },
@@ -561,13 +628,3 @@ export default {
   }
 }
 </script>
-<style>
-  .table-detail-domain table.table tbody td:first-child {
-    border-left: 0;
-    padding: 0 15px;
-  }
-  .table-detail-domain .table.table tbody td {
-    height: 36px;
-    vertical-align: middle;
-  }
-</style>

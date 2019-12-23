@@ -298,7 +298,7 @@ export default {
     isSignedIn: false,
     userNameLogin: "",
     drawerLogin: false,
-    avatarURL: "http://via.placeholder.com/350x150",
+    avatarURL: "/o/opencps-store/js/cli/login/app/image/img_login.png",
     notificationCount: 0,
     isShowUserMenu: false,
     toggle_exclusive: 0,

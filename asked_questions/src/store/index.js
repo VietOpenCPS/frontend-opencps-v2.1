@@ -238,6 +238,8 @@ export const store = new Vuex.Store({
           dataAdd.append('email', filter.email ? filter.email : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
           dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('domainCode', filter.domainCode ? filter.domainCode : '')
+          dataAdd.append('domainName', filter.domainName ? filter.domainName : '')
           dataAdd.append('subDomainCode', filter.subDomainCode ? filter.subDomainCode : '')
           dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')

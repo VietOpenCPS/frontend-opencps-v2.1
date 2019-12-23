@@ -322,7 +322,43 @@ export const store = new Vuex.Store({
           })
         })
       })
-    }
+    },
+    getServerConfigAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs'
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getUserTichHop ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let url = filter.url
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            reject([])
+          })
+        })
+      })
+    },
   },
   mutations: {
     setsnackbarerror (state, payload) {

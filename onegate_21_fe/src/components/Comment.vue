@@ -215,7 +215,7 @@ export default {
             vm.comment = result
             vm.formatComment(vm.comment)
             onSuccess(vm.comment)
-          })
+          }).catch(function(){})
         },
         putComment: function (data, onSuccess, onError) {
           data.classPK = vm.classPK
@@ -224,7 +224,7 @@ export default {
             vm.comment = result
             vm.formatComment(vm.comment)
             onSuccess(vm.comment)
-          })
+          }).catch(function(){})
         },
         deleteComment: function (data, onSuccess, onError) {
           data.classPK = vm.classPK

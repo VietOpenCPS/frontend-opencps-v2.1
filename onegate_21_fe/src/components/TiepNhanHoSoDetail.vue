@@ -357,7 +357,7 @@ export default {
     isMobile: false,
     loadingAction: false,
     loadingForm: false,
-    notifyConfig: true,
+    notifyConfig: false,
     smsNotify: true,
     emailNotify: true
   }),

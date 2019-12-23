@@ -49,7 +49,7 @@
                           </v-list-tile-content>
                         </div>
                       </suggestions>
-                      <v-tooltip top v-if="originality === 3 || originality === '3'">
+                      <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                         <v-btn @click="showDialogApplicantList('ChuHoSo')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                           <v-icon size="14">fas fa fa-address-card</v-icon>
                         </v-btn>
@@ -240,7 +240,7 @@
                             </v-list-tile-content>
                           </div>
                         </suggestions>
-                        <v-tooltip top v-if="originality === 3 || originality === '3'">
+                        <v-tooltip top v-if="(originality === 3 || originality === '3') && applicantConfig">
                           <v-btn @click="showDialogApplicantList('NguoiNop')" slot="activator" class="mx-0 my-0" flat icon color="primary" style="position: absolute;top:0;right:-5px">
                             <v-icon size="14">fas fa fa-address-card</v-icon>
                           </v-btn>
@@ -670,21 +670,21 @@ export default {
   props: ['showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     requiredOptions: {
-      applicantIdNo: true,
-      applicantName: true,
-      address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
-      contactTelNo: true,
+      applicantIdNo: false,
+      applicantName: false,
+      address: false,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
+      contactTelNo: false,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
+      delegateIdNo: false,
+      delegateName: false,
       delegateAddress: true,
       delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
-      delegateTelNo: true,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
+      delegateTelNo: false,
       delegateEmail: false
     },
     valid_thongtinchuhoso: false,
@@ -786,6 +786,7 @@ export default {
     functionTimeOut: null,
     dialog_applicantInfos: false,
     dialog_applicantList: false,
+    applicantConfig: false,
     titleEdit: 'Thông tin công dân, tổ chức, doanh nghiệp',
     applicantEdit: '',
     dialog_editApplicant: false,
@@ -981,11 +982,11 @@ export default {
         vm.$store.getters.getDictItems(filter).then(function (result) {
           vm.citys = result.data
           // set default cityCode
-          if (vm.formCode === "NEW") {
-            vm.thongTinChuHoSo['cityCode'] = 87
-            vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
-          }
-          // 
+          // if (vm.formCode === "NEW") {
+          //   vm.thongTinChuHoSo['cityCode'] = 87
+          //   vm.thongTinChuHoSo['cityName'] = 'Tỉnh Đồng Tháp'
+          // }
+          
         })
         setTimeout(function () {
           if (data.cityCode) {

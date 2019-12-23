@@ -209,7 +209,27 @@ export const store = new Vuex.Store({
                         onlineCount: 0,
                         onegateCount: 0,
                         month: Number(params['month']),
-                        year: Number(params['year'])
+                        year: Number(params['year']),
+                        betimesCount: 0,
+                        cancelledCount: 0,
+                        deniedCount: 0,
+                        doneCount: 0,
+                        insideCount: 0,
+                        interoperatingCount: 0,
+                        ontimeCount: 0,
+                        ontimePercentage: 0,
+                        outsideCount: 0,
+                        overdueCount: 0,
+                        overtimeCount: 0,
+                        overtimeInside: 0,
+                        overtimeOutside: 0,
+                        processCount: 0,
+                        receivedCount: 0,
+                        releasingCount: 0,
+                        remainingCount: 0,
+                        totalCount: 0,
+                        undueCount: 0,
+                        unresolvedCount: 0
                       }
                       serializable['data'] = serializable['data'].concat([group])
                     }
@@ -231,7 +251,27 @@ export const store = new Vuex.Store({
                           onlineCount: 0,
                           onegateCount: 0,
                           month: Number(indexMonth),
-                          year: Number(params['year'])
+                          year: Number(params['year']),
+                          betimesCount: 0,
+                          cancelledCount: 0,
+                          deniedCount: 0,
+                          doneCount: 0,
+                          insideCount: 0,
+                          interoperatingCount: 0,
+                          ontimeCount: 0,
+                          ontimePercentage: 0,
+                          outsideCount: 0,
+                          overdueCount: 0,
+                          overtimeCount: 0,
+                          overtimeInside: 0,
+                          overtimeOutside: 0,
+                          processCount: 0,
+                          receivedCount: 0,
+                          releasingCount: 0,
+                          remainingCount: 0,
+                          totalCount: 0,
+                          undueCount: 0,
+                          unresolvedCount: 0
                         }
                         serializable['data'] = serializable['data'].concat([group])
                       }
@@ -255,11 +295,16 @@ export const store = new Vuex.Store({
                 if (state.groupConfig.hasOwnProperty(groupCode)) {
                   let childs = state.groupConfig[groupCode][1].split(',')
                   for (let index2 in childs) {
-                    resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
-                    resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
-                    resultData[index]['releaseCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['releaseCount']) + Number(childsData(childs[index2])[0]['releaseCount']) : resultData[index]['releaseCount']
-                    resultData[index]['onlineCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onlineCount']) + Number(childsData(childs[index2])[0]['onlineCount']) : resultData[index]['onlineCount']
-                    resultData[index]['onegateCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onegateCount']) + Number(childsData(childs[index2])[0]['onegateCount']) : resultData[index]['onegateCount']
+                    // resultData[index]['processingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['processingCount']) + Number(childsData(childs[index2])[0]['processingCount']) : resultData[index]['processingCount']
+                    // resultData[index]['waitingCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['waitingCount']) + Number(childsData(childs[index2])[0]['waitingCount']) : resultData[index]['waitingCount']
+                    // resultData[index]['releaseCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['releaseCount']) + Number(childsData(childs[index2])[0]['releaseCount']) : resultData[index]['releaseCount']
+                    // resultData[index]['onlineCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onlineCount']) + Number(childsData(childs[index2])[0]['onlineCount']) : resultData[index]['onlineCount']
+                    // resultData[index]['onegateCount'] = childsData(childs[index2])[0] ? Number(resultData[index]['onegateCount']) + Number(childsData(childs[index2])[0]['onegateCount']) : resultData[index]['onegateCount']
+                    for (let prop in resultData[index]) {
+                      if (String(prop).indexOf('Count') > 0) {
+                        resultData[index][prop] = childsData(childs[index2])[0] ? Number(resultData[index][prop]) + Number(childsData(childs[index2])[0][prop]) : resultData[index][prop]
+                      }
+                    }
                   }
                 }
                 let removeItems = childsCode.filter(function (item) {

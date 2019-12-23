@@ -87,11 +87,31 @@
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
+            <v-btn v-if="conectDvcqg" class="ml-0 my-0 white--text" color="#913938"
+              :loading="loading"
+              :disabled="loading"
+              @click="loginDVCQG"
+            >
+              <v-icon>how_to_reg</v-icon>&nbsp;
+              Đăng nhập qua Cổng DVC Quốc gia
+            </v-btn>
           </v-flex>
         </v-form>
       </v-flex>
     </v-layout>
     <div class="footer_login"></div>
+    <!--  -->
+    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
+      <v-card>
+        <v-card-text class="px-0 py-0">
+          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
+            width: 100%;
+            height: 650px;
+            border: none;
+          "></iframe>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -111,7 +131,10 @@ export default {
     loading: false,
     valid: false,
     pinCode: '',
-    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+    conectDvcqg: false,
+    dialog_loginDVCQG: false,
+    tempDVCQG: ''
   }),
   computed: {
   },
@@ -122,6 +145,13 @@ export default {
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
+      try {
+        vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
+      } catch (error) {
+      }
+      if (vm.conectDvcqg) {
+        window.callback_dvcqg = vm.callback_dvcqg
+      }
       // vm.makeImageCap()
     })
   },
@@ -170,6 +200,39 @@ export default {
     getPassword () {
       let vm = this
       window.location.href = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/cap-lai-mat-khau' : ''
+    },
+    loginDVCQG () {
+      let vm = this
+      let urlSso = ''
+      try {
+        urlSso = ssoConfig ? ssoConfig['urlSend'] : ''
+      } catch (error) {
+      }
+      let filter = {
+        vnconnect: 1,
+        currenturl: urlSso ? urlSso : ''
+      }
+      vm.$store.dispatch('getVNConect', filter).then(function (result) {
+        if (result) {
+          vm.dialog_loginDVCQG = true
+          setTimeout(function () {
+            vm.tempDVCQG = result
+          }, 200)
+        }
+      }).catch(function() {
+        alert('Chức năng đang cập nhật')
+      })
+    },
+    callback_dvcqg (data) {
+      let vm = this
+      let urlRedirect = ''
+      try {
+        urlRedirect = ssoConfig ? ssoConfig['urlRedirect'] : window.themeDisplay.getLayoutURL() + '#' + current.path
+      } catch (error) {
+      }
+      window.location.href = urlRedirect
+      window.location.reload()
+      vm.dialog_loginDVCQG = false
     },
     goBack () {
       window.history.back()

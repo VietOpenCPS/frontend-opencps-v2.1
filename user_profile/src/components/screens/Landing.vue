@@ -87,12 +87,13 @@
               </v-flex>
             </v-layout>
             <!-- profile công dân -->
-            <v-layout v-if="state === 0 && user['className'] === 'org.opencps.usermgt.model.Applicant'" row wrap class="px-3 py-3">
+            <v-layout v-if="state === 0 && (user['className'] === 'org.opencps.usermgt.model.Applicant' || user['className'] === 'com.liferay.portal.kernel.model.User')" row wrap class="px-3 py-3">
               <v-flex xs12 :class="user['applicantType'] === 'citizen' ? 'sm4' : 'sm12'">
                 <v-text-field v-model="user['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
                   <template slot="label"> 
                     <span v-if="user['applicantType'] === 'business'">Tên tổ chức, doanh nghiệp</span>
-                    <span v-if="user['applicantType'] === 'citizen'">Họ tên</span> 
+                    <span v-else-if="user['applicantType'] === 'citizen'">Họ tên</span>
+                    <span v-else>Tên người dùng</span> 
                     <span class="red--text darken-3"> *</span>
                   </template>
                 </v-text-field>
@@ -150,7 +151,8 @@
                 <v-text-field v-model="user['applicantIdNo']" box readonly>
                   <template slot="label"> 
                     <span v-if="user['applicantType'] === 'business'">Mã số thuế</span>
-                    <span v-if="user['applicantType'] === 'citizen'">Số CMND/ Căn cước</span> 
+                    <span v-else-if="user['applicantType'] === 'citizen'">Số CMND/ Căn cước</span> 
+                    <span v-else>Số CMND/ Căn cước</span> 
                     <span class="red--text darken-3"> *</span>
                   </template>
                 </v-text-field>
@@ -206,7 +208,8 @@
                 <v-text-field v-model="user['applicantAddress']" box clearable>
                   <template slot="label"> 
                     <span v-if="user['applicantType'] === 'business'">Địa chỉ</span>
-                    <span v-if="user['applicantType'] === 'citizen'">Địa chỉ thường trú</span> 
+                    <span v-else-if="user['applicantType'] === 'citizen'">Địa chỉ thường trú</span> 
+                    <span v-else>Địa chỉ</span> 
                   </template>
                 </v-text-field>
               </v-flex>
@@ -386,7 +389,16 @@
               <v-flex xs12 sm4>
                 <v-text-field label="Chức danh ký số" v-model="user['title']" box></v-text-field>
               </v-flex>
-
+              <!--  -->
+              <v-flex xs12 class="px-0" v-if="serverProtocolFilter.length > 0">
+                <v-layout wrap>
+                  <v-flex xs12 sm4 v-for="(item, index) in serverProtocolFilter" :key="index">
+                    <v-autocomplete :label="item['serverName']" :items="item['optionsData']" v-model="item['serverNo']" item-text="TEN" item-value="MA" :hide-selected="true" box>
+                    </v-autocomplete>
+                  </v-flex>
+                </v-layout>
+              </v-flex>
+              <!--  -->
               <v-flex xs12 sm6>
                 <p class="mb-2 px-1">File ảnh ký số</p>
                 <attached-file-avatar v-if="user['classPK'] !== '' && user['classPK'] !== 'undefined'" :pk="user['classPK']" :pick-item="itemEsign" :type="'image'"></attached-file-avatar>
@@ -452,7 +464,7 @@
               </v-layout>
             </v-card-text>
             <!-- Profile Apllicant -->
-            <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant'">
+            <v-card-text class="py-3" v-else-if="user['className'] === 'org.opencps.usermgt.model.Applicant' || user['className'] === 'com.liferay.portal.kernel.model.User'">
               <div class="text-bold text-xs-center label__user_profile">{{user['applicantName']}}</div>
               <div class="text-xs-center label__user_profile pb-2">
                 <a href="javascript:;" style="
@@ -785,7 +797,8 @@
           align: 'center',
           sortable: false
         }
-      ]
+      ],
+      serverProtocolFilter: []
     }),
     watch: {
       ngayCap(val) {
@@ -837,6 +850,7 @@
           if (vm.user['className'] === 'org.opencps.usermgt.model.Employee') {
             vm.item['upload_api'] = '/o/v1/opencps/users/upload/opencps_employee/org.opencps.usermgt.model.Employee'
             vm.item['class_name'] = 'org.opencps.usermgt.model.Employee'
+            vm.getServerConfigAll()
           }
           if (vm.user['applicantCityCode'] && vm.user['applicantCityCode'].indexOf('0') !== 0) {
             vm.user['applicantCityCode'] = Number(vm.user['applicantCityCode'])
@@ -1063,6 +1077,8 @@
         } else {
           vm.state = 0
           vm.stateLabel = 'Đổi mật khẩu'
+          vm.$refs.form.reset()
+          vm.$refs.form.resetValidation()
         }
       },
       doChangePassWord () {
@@ -1076,16 +1092,33 @@
           vm.changePassWordFail = false
           vm.$store.dispatch('changePass', data).then(function (data) {
             vm.loading = false
-            if (String(data) === 'false') {
-              vm.changePassWordFail = true
-            } else {
+            // if (String(data) === 'false') {
+            //   vm.changePassWordFail = true
+            // } else {
               vm.snackbarsuccess = true
-              vm.state = 1
-            }
+              toastr.success('Đổi mật khẩu thành công')
+              vm.state = 0
+            // }
           }).catch(function () {
-            vm.loading = false
+            vm.doActionChangePass(data)
           })
         }
+      },
+      doActionChangePass (data) {
+        let vm = this
+        vm.changePassWordFail = false
+        vm.$store.dispatch('changePass', data).then(function (data) {
+          vm.loading = false
+          // if (String(data) === 'false') {
+          //   vm.changePassWordFail = true
+          // } else {
+            toastr.success('Đổi mật khẩu thành công')
+            vm.snackbarsuccess = true
+            vm.state = 0
+          // }
+        }).catch(function () {
+          vm.loading = false
+        })
       },
       parseDateInput (dateInput) {
         if (dateInput) {
@@ -1161,6 +1194,43 @@
             vm.getUserAppZaloInfo()
           } catch (error) {
           }
+        })
+      },
+      getServerConfigAll () {
+        let vm = this
+        let filter = {
+        }
+        vm.serverProtocolFilter = []
+        vm.$store.dispatch('getServerConfigAll', filter).then(function (result) {
+          let serverNoFilter = result.filter(function (item) {
+            return item.protocol === 'ACCOUNT_MAPPING'
+          })
+          for (let index in serverNoFilter) {
+            let configs =  JSON.parse(serverNoFilter[index]['configs'])
+            let serverNoData = configs['serverNoData']
+            let serverConfig = result.filter(function (item) {
+              return item.serverNo === serverNoData
+            })
+            if (serverConfig.length > 0) {
+              vm.serverProtocolFilter.push(serverConfig[0])
+            }
+          }
+          for (let index in vm.serverProtocolFilter) {
+            let configs =  JSON.parse(vm.serverProtocolFilter[index]['configs'])
+            let url = configs['url']
+            vm.getUserTichHop(url, index)
+          }
+        })
+      },
+      getUserTichHop (arg, index) {
+        let vm = this
+        let filter = {
+          url: arg
+        }
+        vm.$store.dispatch('getUserTichHop', filter).then(function (result) {
+          vm.serverProtocolFilter[index].optionsData =  result
+        }).catch (function () {
+          vm.serverProtocolFilter[index].optionsData = []
         })
       },
       getUserAppZaloInfo () {

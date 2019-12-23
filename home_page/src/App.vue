@@ -65,8 +65,9 @@
       currentIndex: 0,
       loading: true,
       items: [
-        {icon: 'how_to_reg', title: 'Đăng nhập', page: 'dangnhap'},
         {icon: 'account_balance', title: 'Trang chủ', page: 'trangchu'},
+        {icon: 'how_to_reg', title: 'Đăng nhập', page: 'dangnhap'},
+        {icon: 'edit', title: 'Đăng ký', page: 'dangky'},
         {icon: 'move_to_inbox', title: 'Hồ sơ có kết quả', page: 'ketquahoso'},
         {icon: 'find_in_page', title: 'Tra cứu hồ sơ', page: 'tracuuhoso'},
         {icon: 'pageview', title: 'Tra cứu thủ tục', page: 'tracuuthutuc'},
@@ -114,6 +115,8 @@
           queryString = '/danh-gia-cldv'
         } else if (page === 'dangnhap') {
           queryString = '/dang-nhap'
+        } else if (page === 'dangky') {
+          window.location.href = '/web/cong-dich-vu-cong/register'
         } else if (page === 'trangchu') {
           window.location.href = '/'
           return

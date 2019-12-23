@@ -11,33 +11,6 @@ const routes = [
   { path: '/m/thu-tuc-hanh-chinh', name: 'LandingMobile', component: LandingMobile, props: true },
   { path: '/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },
   { path: '/m/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTucMobile', component: ChiTietThuTucMobile, props: true },
-
-
-  // {
-  //   path: '/thu-tuc-hanh-chinh',
-  //   name: 'Landing',
-  //   component: () => import('@/components/screens/Landing.vue'),
-  //   props: true
-  // },
-  // {
-  //   path: '/m/thu-tuc-hanh-chinh',
-  //   name: 'LandingMobile',
-  //   component: () => import('@/components/screens/LandingMobile.vue'),
-  //   props: true
-  // },
-  // {
-  //   path: '/thu-tuc-hanh-chinh/:index',
-  //   name: 'ChiTietThuTuc',
-  //   component: () => import('@/components/screens/ChiTietThuTuc.vue'),
-  //   props: true
-  // },
-  // {
-  //   path: '/m/thu-tuc-hanh-chinh/:index',
-  //   name: 'ChiTietThuTucMobile',
-  //   component: () => import('@/components/screens/ChiTietThuTucMobile.vue'),
-  //   props: true
-  // },
-  ///////
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',
@@ -66,13 +39,7 @@ const routes = [
     }
   },
   { path: '/danh-sach-ho-so/:index/ho-so/:id/:formCode', name: 'DetailForward', component: DetailForward, props: true },
-  {
-    path: '*',
-    name: 'NotFound',
-    component: () => import('@/components/screens/Landing.vue'),
-    props: true
-  }
-
+  { path: '*', name: 'NotFound', component: NotFound }
 ]
 
 Vue.use(Router)

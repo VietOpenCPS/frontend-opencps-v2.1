@@ -296,7 +296,7 @@ export default {
       let filter = vm.dossierDetail
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
-      })
+      }).catch(function(){})
     },
     currency (value) {
       if (value) {
@@ -317,7 +317,7 @@ export default {
       vm.$store.dispatch('viewPaymentFile', filter).then(result => {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPreview').src = result
-      })
+      }).catch(function(){})
     },
     getEPaymentProfile (paymentProfile) {
       if (paymentProfile) {
@@ -350,7 +350,7 @@ export default {
       vm.$store.dispatch('printPay', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPreview').src = result
-      })
+      }).catch(function(){})
     },
     getEinvoiceNo (string) {
       if (string && string.indexOf('#') >= 0) {
