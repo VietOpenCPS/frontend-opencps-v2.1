@@ -405,12 +405,12 @@ export default {
     thongTinChuHoSo () {
       let vm = this
       // console.log('thongTinChuHoSo', vm.thongTinChuHoSo)
-      vm.briefNote = vm.thongTinChiTietHoSo.dossierName ? vm.thongTinChiTietHoSo.dossierName : ''
-      if (vm.thongTinChiTietHoSo.dossierName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-        vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
-      } else if (vm.thongTinChiTietHoSo.dossierName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-        vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
-      }
+      vm.briefNote = vm.thongTinChiTietHoSo.serviceName ? vm.thongTinChiTietHoSo.serviceName : ''
+      // if (vm.thongTinChiTietHoSo.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+      //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
+      // } else if (vm.thongTinChiTietHoSo.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+      //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+      // }
     }
   },
   methods: {
@@ -462,12 +462,12 @@ export default {
           vm.formTemplate = 'version_1.0'
           vm.$store.dispatch('getDetailDossier', data).then(result => {
             vm.dossierId = result.dossierId
-            vm.briefNote = result.dossierName ? result.dossierName : ''
-            if (result.dossierName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-              vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
-            } else if (result.dossierName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-              vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
-            }
+            vm.briefNote = result.serviceName ? result.serviceName : ''
+            // if (result.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+            //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
+            // } else if (result.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
+            //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
+            // }
             result['editable'] = false
             if (result.dossierStatus === '') {
               vm.$store.dispatch('pullNextactions', result).then(result2 => {
@@ -493,7 +493,7 @@ export default {
                     if (vm.$refs.thongtinchunghoso) {
                       vm.$refs.thongtinchunghoso.initData(result)
                     }
-                  })
+                  }).catch(function(){})
                 } else {
                   // call initData thong tin chung ho so
                   if (vm.$refs.thongtinchunghoso) {

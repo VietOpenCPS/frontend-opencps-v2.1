@@ -10,6 +10,9 @@
                   <div v-if="originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
                     <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
                   </div>
+                  <div v-if="originality === 3 && tempLienThong" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
+                    <v-checkbox class="my-0 py-0" v-model="item['hasTemplateLienThong']" @change="changeHasTemplateLienThong(index, item)"></v-checkbox>
+                  </div>
                   <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs" style="text-align: justify;">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
@@ -213,7 +216,7 @@
                 @input="changeRecordCount(index)"
               ></v-text-field>
             </v-flex>
-            <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
+            <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && (item.partType === 1 || item.partType === 3) && !thongTinHoSo.online && checkInput !== 1">
               <v-autocomplete
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
@@ -434,6 +437,10 @@ export default {
     formCodeInput: {
       type: String,
       default: () => ''
+    },
+    tempLienThong: {
+      type: Boolean,
+      default: () => false
     }
   },
   data: () => ({
@@ -498,7 +505,8 @@ export default {
     pstEl: 0,
     endEl: 0,
     applicantNoteDossier: '',
-    doChange: {}
+    doChange: {},
+    dossierTemplateLienThong: []
   }),
   computed: {
     loading () {
@@ -515,10 +523,17 @@ export default {
       let vm = this
       let dossierTemplate = vm.dossierTemplateItems
       if (dossierTemplate.length > 0) {
-        let filter = dossierTemplate.filter(function (item) {
+        let filter1 = dossierTemplate.filter(function (item) {
           return vm.partTypes.includes(item.partType) && vm.checkVisibleTemp(item, 0)
         })
-        return filter
+        // check
+        let filterCheckInput = filter1
+        if (String(vm.checkInput) === '1') {
+          filterCheckInput = filter1.filter(function (item) {
+            return item['fileMark'] !== 0
+          })
+        }
+        return filterCheckInput
       }
     },
     applicantBussinessExit () {
@@ -642,7 +657,7 @@ export default {
         // 
         vm.saveMark()
         // console.log('vm.dossierTemplateItems', vm.dossierTemplateItems)
-        if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0) {
+        if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0 && !vm.tempLienThong) {
           let dossierTemplateKQ = []
           vm.dossierTemplateItems.forEach(item => {
             let hasKQ = vm.dossierFilesItems.find(file => {
@@ -660,11 +675,17 @@ export default {
           vm.recountFileTemplates()
         }, 500)
         let fileTemplateNoArr = []
+        vm.dossierTemplateLienThong = []
         for (let key in vm.dossierTemplateItems) {
           if (vm.dossierTemplateItems[key]['fileTemplateNo']) {
             fileTemplateNoArr.push(vm.dossierTemplateItems[key]['fileTemplateNo'])
           }
+          // 
+          if (vm.tempLienThong && vm.dossierTemplateItems[key]['hasTemplateLienThong']) {
+            vm.dossierTemplateLienThong.push(vm.dossierTemplateItems[key]['partNo'])
+          }
         }
+        vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
           if (vm.applicantId && !vm.onlyView) {
@@ -763,6 +784,7 @@ export default {
       return dossierTemplates
     },
     mergeDossierTemplateVsDossierMark (dossierTemplates, dossierMarks) {
+      let vm = this
       if (dossierMarks.length !== 0) {
         dossierTemplates.map(itemTemplate => {
           itemTemplate['count'] = 0
@@ -782,12 +804,14 @@ export default {
             } else if (!itemTemplate['hasTemplate']) {
               itemTemplate['recordCount'] = 0
             }
+            itemTemplate['hasTemplateLienThong'] = itemTemplate['hasTemplate']
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
             itemTemplate['fileCheck'] = 0
             itemTemplate['recordCount'] = 0
             itemTemplate['hasTemplate'] = false
+            itemTemplate['hasTemplateLienThong'] = itemTemplate['hasTemplate']
           }
           return itemTemplate
         })
@@ -1325,7 +1349,6 @@ export default {
       let vm = this
       item['dossierId'] = vm.thongTinHoSo.dossierId
       setTimeout(function () {
-        console.log('item changeHasTemplate 123', item)
         if (item['hasTemplate']) {
           item.fileMark = item.fileMarkDefault
           item.recordCount = 1
@@ -1335,6 +1358,21 @@ export default {
         }
         vm.$store.dispatch('postDossierMark', item)
       }, 100)
+    },
+    changeHasTemplateLienThong (index, item) {
+      let vm = this
+      setTimeout(() => {
+        if (item['hasTemplateLienThong']) {
+          vm.dossierTemplateLienThong.push(item.partNo)
+          vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
+        } else {
+          let a = vm.dossierTemplateLienThong.filter(function(item1) {
+            return item1 !== item.partNo
+          })
+          vm.dossierTemplateLienThong = a
+          vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
+        }
+      }, 100);
     },
     changeFileCheck (event, index) {
       var vm = this

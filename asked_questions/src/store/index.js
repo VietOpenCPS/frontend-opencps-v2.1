@@ -29,6 +29,7 @@ export const store = new Vuex.Store({
     lvdsFilter: '',
     lvttFilter: '',
     keywordFilter: '',
+    typeFilter: '',
     user: {
       'role': ''
     },
@@ -115,7 +116,8 @@ export const store = new Vuex.Store({
                 publish: filter.publish,
                 answered: filter.answered,
                 domainCode: filter.domainCode ? filter.domainCode : '',
-                subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.questionType ? filter.questionType : ''
               }
             }
           } else {
@@ -130,7 +132,8 @@ export const store = new Vuex.Store({
                 govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
                 keyword: filter.keyword ? filter.keyword : '',
                 domainCode: filter.domainCode ? filter.domainCode : '',
-                subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.questionType ? filter.questionType : ''
               }
             }
           }
@@ -201,10 +204,10 @@ export const store = new Vuex.Store({
                 end: 1,
                 govAgencyCode: filter['agencyCode'] ? filter['agencyCode'] : '',
                 publish: filter['publish'] ? filter['publish'] : '',
-                answered: filter['answered'] ? filter['answered'] : ''
+                answered: filter['answered'] ? filter['answered'] : '',
+                questionType: filter['questionType'] ? filter['questionType'] : ''
               }
             }
-            console.log('param2', param)
             let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
             axios.get(url + '/faq/questions', param).then(function (response) {
               if (response.data) {
@@ -236,6 +239,8 @@ export const store = new Vuex.Store({
           dataAdd.append('content', filter.content ? filter.content : '')
           dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('email', filter.email ? filter.email : '')
+          dataAdd.append('telNo', filter.telNo ? filter.telNo : '')
+          dataAdd.append('address', filter.address ? filter.address : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
           dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
           dataAdd.append('domainCode', filter.domainCode ? filter.domainCode : '')
@@ -568,6 +573,9 @@ export const store = new Vuex.Store({
     setLvttFilter (state, payload) {
       state.lvttFilter = payload
     },
+    setTypeFilter (state, payload) {
+      state.typeFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -623,6 +631,9 @@ export const store = new Vuex.Store({
     },
     getLvttFilter (state) {
       return state.lvttFilter
+    },
+    getTypeFilter (state) {
+      return state.typeFilter
     },
     getKeywordFilter (state) {
       return state.keywordFilter

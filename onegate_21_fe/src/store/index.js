@@ -129,7 +129,8 @@ export const store = new Vuex.Store({
     forGroupDossier: false,
     dossierIntoGroup: [],
     filesAdd: [],
-    activeAddFileGroup: false
+    activeAddFileGroup: false,
+    dossierTemplateLienThong: ''
   },
   actions: {
     clearError ({commit}) {
@@ -225,9 +226,15 @@ export const store = new Vuex.Store({
                 let buttonConfig = current['buttonConfig']
                 if (tableConfig !== '' && tableConfig !== undefined && tableConfig !== 'undefined' && String(tableConfig).indexOf('{') !== -1 && String(tableConfig).indexOf('}') !== -1) {
                   menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
+                  // let funcEval = new Function('(' + tableConfig + ')')
+                  // menuDetail['tableConfig'] = funcEval()
+                  // console.log('tableConfig', menuDetail['tableConfig'])
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
                   menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
+                  // let funcEval = new Function('(' + buttonConfig + ')')
+                  // menuDetail['buttonConfig'] = funcEval()
+                  // console.log('buttonConfig', menuDetail['buttonConfig'])
                 }
                 if (current.hasOwnProperty('steps')) {
                   if (Array.isArray(current.steps) && current.steps.length > 1) {
@@ -249,7 +256,7 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       } else {
         return new Promise((resolve, reject) => {
@@ -276,7 +283,7 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       } else {
         return new Promise((resolve, reject) => {
@@ -335,7 +342,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getGroupDossier ({commit, state}, filter) {
@@ -363,7 +370,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingCounterNotStep ({commit, state}, filter) {
@@ -402,7 +409,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingCounterHoSo ({commit, state}, filter) {
@@ -425,7 +432,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadDossierSelected ({commit, state}, data) {
@@ -456,7 +463,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     resetThongTinChungHoSo ({ commit }) {
@@ -527,7 +534,7 @@ export const store = new Vuex.Store({
           } else {
             resolve([])
           }
-        }, error => {
+        }).catch(function (error){
           reject(error)
         })
       })
@@ -558,6 +565,7 @@ export const store = new Vuex.Store({
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
                 serializable['dossierParts'][key].hasTemplate = false
+                serializable['dossierParts'][key].hasTemplateLienThong = false
                 serializable['dossierParts'][key].fileMarkDefault = ''
                 serializable['dossierParts'][key].recordCountDefault = ''
                 let partTip = serializable['dossierParts'][key]['partTip']
@@ -568,7 +576,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadAllDossierTemplates ({commit, state}, data) {
@@ -604,7 +612,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     copyFile ({commit, state}, filter) {
@@ -922,7 +930,7 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             console.log(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getGovAgency ({commit, state}, data) {
@@ -1580,7 +1588,7 @@ export const store = new Vuex.Store({
             console.log(xhr)
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
@@ -2283,7 +2291,7 @@ export const store = new Vuex.Store({
               reject(error)
               commit('setUserNextAction', [])
             })
-          })
+          }).catch(function (){})
         })
       },
       pullBtnConfigStep ({commit, state}, filter) {
@@ -2424,7 +2432,7 @@ export const store = new Vuex.Store({
             }).catch(function (error) {
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       },
       getDossierUserAsign ({commit, state}, classPK) {
@@ -2468,7 +2476,7 @@ export const store = new Vuex.Store({
             }).catch(function (error) {
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       },
       loadDossierSyncs ({commit, state}, data) {
@@ -2512,7 +2520,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     deleteDossier ({commit, state}, filter) {
@@ -2535,7 +2543,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     restoreDossier ({commit, state}, filter) {
@@ -2556,7 +2564,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getListDossierFiles ({ commit, state }, data) {
@@ -2576,7 +2584,7 @@ export const store = new Vuex.Store({
           console.log(xhr)
           reject(xhr)
         })
-      })
+      }).catch(function (){})
     },
     deleteDossierPatch ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
@@ -2611,7 +2619,7 @@ export const store = new Vuex.Store({
               reject(error)
             })
           }
-        })
+        }).catch(function (){})
       })
     },
     doPrint01 ({commit, state}, filter) {
@@ -2636,7 +2644,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doPrint03 ({commit, state}, filter) {
@@ -2665,7 +2673,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doGuiding ({commit, state}, filter) {
@@ -2712,7 +2720,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doPrint02 ({commit, state}, filter) {
@@ -2761,7 +2769,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     processPullBtnDetail ({commit, state}, filter) {
@@ -2779,7 +2787,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getNextAction ({commit, state}, filter) {
@@ -2794,11 +2802,9 @@ export const store = new Vuex.Store({
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
-            console.log(error)
-            resolve([])
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadFormScript ({state, commit}, data) {
@@ -2822,7 +2828,7 @@ export const store = new Vuex.Store({
               reject(xhr)
             }
           })
-        })
+        }).catch(function (){})
       })
     },
     loadFormData ({state, commit}, data) {
@@ -2846,7 +2852,7 @@ export const store = new Vuex.Store({
               reject(xhr)
             }
           })
-        })
+        }).catch(function (){})
       })
     },
     loadDossierCounting ({state, commit}, data) {
@@ -2883,7 +2889,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     pullProcessSteps ({commit, state}, data) {
@@ -2901,7 +2907,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadServiceConfigsGov ({commit, state}, data) {
@@ -2930,7 +2936,7 @@ export const store = new Vuex.Store({
             commit('setLoadingGov', false)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     processCheckNextActions ({commit, state}, filter) {
@@ -2963,7 +2969,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceOpionByProcess ({commit, state}, data) {
@@ -2990,7 +2996,7 @@ export const store = new Vuex.Store({
             reject(error)
           })
         })
-      })
+      }).catch(function (){})
     },
     getStatusLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
@@ -3018,7 +3024,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getVNPOSTcode ({commit, state}, data) {
@@ -3043,7 +3049,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getSubstatusLists ({commit, state}, data) {
@@ -3072,7 +3078,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getAgencyLists ({commit, state}, data) {
@@ -3104,7 +3110,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceLists ({commit, state}, data) {
@@ -3133,7 +3139,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceinfoFilter ({commit, state}, data) {
@@ -3156,7 +3162,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getDomainLists ({commit, state}, data) {
@@ -3182,7 +3188,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getExtraForm ({commit, state}, filter) {
@@ -3201,10 +3207,9 @@ export const store = new Vuex.Store({
               resolve([])
             }
           }).catch(function (error) {
-            console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceInfo ({commit, state}, data) {
@@ -3222,7 +3227,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     changeDisplayNameFile ({commit, state}, data) {
@@ -3242,7 +3247,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingDossierCounting ({commit, state}, filter) {
@@ -3264,7 +3269,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadVoting ({commit, state}, data) {
@@ -3287,7 +3292,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadVotingMC ({commit, state}, data) {
@@ -3378,7 +3383,7 @@ export const store = new Vuex.Store({
             toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     validFileUpload ({commit, state}, data) {
@@ -3446,7 +3451,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     // add new template
@@ -3464,7 +3469,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceConfigDetail ({commit, state}, filter) {
@@ -3486,7 +3491,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getScriptViewDetail ({commit, state}, filter) {
@@ -3508,7 +3513,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getDetailMenuConfig ({commit, state}, filter) {
@@ -3530,7 +3535,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getPreAction ({commit, state}, data) {
@@ -3547,7 +3552,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getNotifyConfig ({commit, state}, filter) {
@@ -3566,7 +3571,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     putUser ({commit, state}, filter) {
@@ -3620,7 +3625,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     }
     // ----End---------
@@ -3884,6 +3889,9 @@ export const store = new Vuex.Store({
     },
     setUserLogin (state, payload) {
       state.userLogin = payload
+    },
+    setDossierTemplateLienThong (state, payload) {
+      state.dossierTemplateLienThong = payload
     }
   },
   getters: {
@@ -3912,7 +3920,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadMenuConfigToDo').then(function (result) {
           resolve(result)
-        })
+        }).catch(function () {})
       })
     },
     loadingInitData (state) {
@@ -4079,6 +4087,9 @@ export const store = new Vuex.Store({
     },
     getUserLogin (state) {
       return state.userLogin
+    },
+    getDossierTemplateLienThong (state) {
+      return state.dossierTemplateLienThong
     }
   }
 })

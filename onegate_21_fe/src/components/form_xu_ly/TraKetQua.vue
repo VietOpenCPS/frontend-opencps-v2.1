@@ -13,18 +13,7 @@
               <v-expansion-panel-content hide-actions :value="false">
                 <div slot="header" @click="stateView = false" style="background-color:#fff">
                   <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
-                    <!-- <div class="mr-2" @click="loadAlpcaForm(item)" style="min-width: 18px; display: flex;">
-                      <div class="header__tphs"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
-                      <div class="header__tphs">
-                        {{item.partName}} <span v-if="item.required" style="color: red"> (*)</span>
-                        &nbsp;&nbsp;
-                        <v-tooltip top v-if="item.eForm">
-                          <i slot="activator" style="color: #0d71bb; font-size: 13px;" class="fa fa-file-text-o" aria-hidden="true"></i>
-                          <span>Biểu mẫu trực tuyến</span>
-                        </v-tooltip>
-                      </div>
-                    </div> -->
-                    <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id">
+                    <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.dossierPartNo + id === itemFileView.dossierPartNo + id">
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
                         <span class="text-bold">{{index + 1}}. </span>
                         <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">

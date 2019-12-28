@@ -2,8 +2,9 @@
   <div>
     <v-layout row wrap class="mx-2 py-2" id="contentFaq">
       <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'sm7' : ''" class="pr-3">
-        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data')" class="text-bold mb-3" style="color:#034687">
-          NHỮNG CÂU HỎI THƯỜNG GẶP
+        <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data')" class="text-bold mb-2" style="color:#034687">
+          <v-btn flat class="ml-0 px-0" :color="questionType === ''? '#0167d3' : ''" @click="changeType('')">NHỮNG CÂU HỎI THƯỜNG GẶP</v-btn>
+          <v-btn flat class="ml-3" :color="questionType === 'FAQ'? '#0167d3' : ''" @click="changeType('FAQ')">TỔNG HỢP HỎI ĐÁP</v-btn>
         </h3>
         <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-bold mb-3 text-xs-center" style="color:#034687">
           DANH SÁCH CÂU HỎI
@@ -238,22 +239,6 @@
                   required
                 ></v-text-field>
               </v-flex>
-              <!-- <v-flex xs12>
-                <div class="mb-1">Địa chỉ</div>
-                <v-text-field
-                  box
-                  placeholder="Ghi rõ số nhà, tên đường, quận/ huyện, tỉnh thành."
-                  v-model="address"
-                ></v-text-field>
-              </v-flex> -->
-              <!-- <v-flex xs6 class="pr-1">
-                <div class="mb-1">Số điện thoại</div>
-                <v-text-field
-                  box
-                  placeholder="Nhập số điện thoại"
-                  v-model="telNo"
-                ></v-text-field>
-              </v-flex> -->
               <v-flex xs12 class="">
                 <div class="mb-1">Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
@@ -264,6 +249,26 @@
                   required
                   name="input-10-2"
                   min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 class="">
+                <div class="mb-1">Số điện thoại <span style="color:red">(*)</span></div>
+                <v-text-field
+                  placeholder="Nhập số điện thoại"
+                  box
+                  v-model="contactTelNo"
+                  :rules="contactTelNo ? [rules.telNo] : [rules.required]"
+                  required
+                  name="input-10-2"
+                  min="6"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mb-1">Địa chỉ</div>
+                <v-text-field
+                  box
+                  placeholder="Nhập địa chỉ"
+                  v-model="address"
                 ></v-text-field>
               </v-flex>
               <!-- <v-flex xs12>
@@ -347,9 +352,10 @@ export default {
     captchaActive: false,
     valid: false,
     validAnswer: false,
-    telNo: '',
     address: '',
     contactEmail: '',
+    contactTelNo: '',
+    questionType: '',
     fullName: '',
     titleQuestion: '',
     answers: [
@@ -362,6 +368,15 @@ export default {
       email: (value) => {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      },
+      telNo: (value) => {
+        // const pattern = /^(([0-9]{0,}))$/
+        const pattern = /^0([1-9]{1}\d{8})$/
+        if (value) {
+          return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+        } else {
+          return []
+        }
       }
     },
     customToolbar: [
@@ -577,6 +592,8 @@ export default {
             content: vm.content,
             fullname: vm.fullName,
             email: vm.contactEmail,
+            telNo: vm.contactTelNo,
+            address: vm.address,
             publish: 0,
             j_captcha_response: vm.$refs.captcha.j_captcha_response,
             agencyCode: vm.agencySelected ? vm.agencySelected['itemCode'] : '',
@@ -623,6 +640,15 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeType (val) {
+      let vm = this
+      vm.questionType = val
+      setTimeout (function () {
+        vm.$store.commit('setTypeFilter', val)
         vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)

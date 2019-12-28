@@ -75,7 +75,7 @@
             </div>
           </v-flex>
           <v-flex xs12 class="mt-3 text-xs-center">
-            <v-btn class="ml-0 my-0 white--text" color="#0b72ba"
+            <v-btn class="my-0 white--text" color="#0b72ba"
               :loading="loading"
               :disabled="loading"
               @click="submitConfirmLogin"
@@ -87,12 +87,11 @@
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
-            <v-btn v-if="conectDvcqg" class="ml-0 my-0 white--text" color="#913938"
+            <v-btn v-if="conectDvcqg" class="px-2 my-0" color="#913938"
               :loading="loading"
               :disabled="loading"
               @click="loginDVCQG"
             >
-              <v-icon>how_to_reg</v-icon>&nbsp;
               Đăng nhập qua Cổng DVC Quốc gia
             </v-btn>
           </v-flex>

@@ -224,6 +224,16 @@
               </content-placeholders>
               <!--  -->
               <v-layout wrap v-if="dialogActionProcess && !loadingAction">
+                <v-expansion-panel v-if="showThanhPhanLienThong" :value="[true]" expand class="expansion-pl ext__form">
+                  <v-expansion-panel-content :key="1">
+                    <div slot="header">
+                      <div class="background-triangle-small"> 
+                        <v-icon size="18" color="white">star_rate</v-icon> 
+                      </div> Thành phần hồ sơ gửi liên thông
+                    </div>
+                    <thanh-phan-ho-so ref="thanhphanhoso" :tempLienThong="true" :checkInput="checkInput" :onlyView="checkInput === 2 ? false : true" :id="'ci'" :partTypes="inputTypesLienThong"></thanh-phan-ho-so>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
                 <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
                 <tai-lieu-ket-qua ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
@@ -253,7 +263,7 @@
                 {{alertObj.message}}
               </v-alert>
               <div v-if="rollbackable || printDocument" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
-                <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Quay lại bước trước</v-btn>
+                <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Thu hồi hồ sơ</v-btn>
                 <v-btn color="primary" v-if="printDocument" @click="printViewDocument()"
                   :loading="dialogPDFLoading"
                   :disabled="dialogPDFLoading"
@@ -689,6 +699,7 @@ export default {
   data: () => ({
     isMobile: false,
     inputTypes: [1, 3, 6],
+    inputTypesLienThong: [1, 2, 3, 6, 7],
     outputTypes: [2, 7],
     actionIdCurrent: 0,
     validateAction: true,
@@ -742,6 +753,7 @@ export default {
     ],
     typeEsign: '',
     showTraKetQua: false,
+    showThanhPhanLienThong: false,
     showThuPhi: false,
     showPostalService: false,
     showThanhToanDienTu: false,
@@ -896,6 +908,9 @@ export default {
     },
     menuConfigs () {
       return this.$store.getters.getMenuConfigsTodo
+    },
+    dossierTemplateLienThong () {
+      return this.$store.getters.getDossierTemplateLienThong
     }
   },
   beforeDestroy () {
@@ -1328,6 +1343,7 @@ export default {
       vm.showTaoTaiLieuKetQua = false
       vm.showKyPheDuyetTaiLieu = false
       vm.showTraKetQua = false
+      vm.showThanhPhanLienThong = false
       vm.showThuPhi = false
       vm.showPostalService = false
       vm.showThanhToanDienTu = false
@@ -1394,6 +1410,18 @@ export default {
             vm.returnFiles = [result.returnFiles]
           }
           vm.showTraKetQua = true
+        }
+        if (result.hasOwnProperty('dossierParts') && result.dossierParts !== null && result.dossierParts !== undefined && result.dossierParts !== 'undefined') {
+          isPopup = true
+          if (Array.isArray(result.dossierParts)) {
+            vm.dossierParts = result.dossierParts
+          } else {
+            vm.dossierParts = [result.dossierParts]
+          }
+          vm.showThanhPhanLienThong = true
+          setTimeout(function () {
+            vm.$refs.thanhphanhoso.initData(vm.thongTinChiTietHoSo)
+          }, 200)
         }
         if (result.hasOwnProperty('preCondition') && result.preCondition !== null && result.preCondition !== undefined && result.preCondition !== 'undefined' && result.preCondition.indexOf('sendViaPostal=1') >= 0) {
           isPopup = true
@@ -1858,6 +1886,11 @@ export default {
           if (vm.dataEsign.signatureType !== 'digital') {
             alert('Yêu cầu xác thực ký duyệt')
           }
+        }
+      }
+      if (vm.showThanhPhanLienThong) {
+        filter['payload'] = {
+          'dossierParts': vm.dossierTemplateLienThong.toString()
         }
       }
       if (validPhanCong && validYKien && validTreHan && validThanhToanDienTu && validFormBoSung && validCreateFiles) {

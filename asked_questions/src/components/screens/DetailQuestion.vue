@@ -18,6 +18,12 @@
             <p>
               Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
             </p>
+            <p v-if="questionDetail.address">
+              Địa chỉ: <span class="text-bold">{{questionDetail.address}}</span>
+            </p>
+            <p v-if="questionDetail.telNo">
+              Số điện thoại: <span class="text-bold">{{questionDetail.telNo}}</span>
+            </p>
             <p>
               Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
             </p>

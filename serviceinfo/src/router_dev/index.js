@@ -7,6 +7,7 @@ import ChiTietThuTuc from '@/components/screens/ChiTietThuTuc'
 import ChiTietThuTucMobile from '@/components/screens/ChiTietThuTucMobile'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
+  { path: '/:index', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
   { path: '/thu-tuc-hanh-chinh', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
   { path: '/m/thu-tuc-hanh-chinh', name: 'LandingMobile', component: LandingMobile, props: true },
   { path: '/thu-tuc-hanh-chinh/:index', name: 'ChiTietThuTuc', component: ChiTietThuTuc, props: true },

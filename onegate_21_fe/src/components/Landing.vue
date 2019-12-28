@@ -1230,20 +1230,6 @@ export default {
     activeLoadingDataHoSo () {
       return this.$store.getters.activeLoadingDataHoSo
     },
-    // showLimit () {
-    //   let vm = this
-    //   if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') 
-    //     && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']
-    //   ) {
-    //     if (vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
-    //       return Number(item) <= 100
-    //     }).length > 0) {
-    //       return true
-    //     }
-    //     return false
-    //   }
-    //   return false
-    // }
   },
   created () {
     let vm = this
@@ -1328,7 +1314,7 @@ export default {
               }
             }
             vm.$store.commit('setLoadingDynamicBtn', false)
-          })
+          }).catch(function (){})
         }, 200)
       }
     })
@@ -1447,7 +1433,7 @@ export default {
           vm.tphsGuide = result.filter(function (item) {
             return item['partType'] === 1
           })
-        })
+        }).catch(function (){})
       }
     },
     trangThaiHoSoList (val) {
@@ -1697,7 +1683,7 @@ export default {
           vm.templateNo = ''
         }
         vm.doLoadingDataHoSo()
-      })
+      }).catch(function (){})
     },
     processListDomain (currentQuery) {
       let vm = this
@@ -1723,12 +1709,12 @@ export default {
               thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
-          })
+          }).catch(function (){})
         } else {
           vm.linhVucSelected = null
         }
         // vm.doLoadingDataHoSo()
-      })
+      }).catch(function (){})
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this
@@ -1887,7 +1873,7 @@ export default {
               vm.dossierCounting = []
             }
             vm.dossierCountingShow = true
-          })
+          }).catch(function (){})
         }, 200)
       } else {
         vm.dossierCountingShow = false
@@ -1968,7 +1954,7 @@ export default {
               thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
-          })
+          }).catch(function (){})
           // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
           //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
           // })
@@ -2214,7 +2200,7 @@ export default {
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+      }).catch(function (){})
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
@@ -2237,7 +2223,7 @@ export default {
         vm.$store.dispatch('doPrint02', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreview').src = result
-        })
+        }).catch(function (){})
       }
     },
     doPrint03 (dossierItem, item, index, isGroup) {
@@ -2349,7 +2335,7 @@ export default {
       vm.$store.dispatch('doPrint03', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+      }).catch(function (){})
     },
     doActions (dossierItem, item, index, isGroup) {
       let vm = this
@@ -2385,8 +2371,8 @@ export default {
                 path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
                 query: query
               })
-            })
-          })
+            }).catch(function (){})
+          }).catch(function (){})
         } else {
           alert('Chọn hồ sơ để thao tác')
         }
@@ -2570,7 +2556,7 @@ export default {
             }
             filter['dossierId'] = deleteIds
             vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
-            })
+            }).catch(function (){})
           } else {
             alert('Chọn hồ sơ để thực hiện')
           }
@@ -2589,7 +2575,7 @@ export default {
                 q: currentQuery['q']
               }
             })
-          })
+          }).catch(function (){})
         }
       } else {
         return false
@@ -2627,7 +2613,7 @@ export default {
             vm.loadingAction = false
           })
         }
-      })
+      }).catch(function (){})
       //
     },
     doSubmitDialogAction (item) {
@@ -2655,7 +2641,7 @@ export default {
       if (item.dossierStatus === '' || item.dossierSubStatus === '') {
         vm.$store.dispatch('pullNextactions', filter).then(result => {
           vm.btnDossierDynamics = result
-        })
+        }).catch(function (){})
       } else {
         vm.btnStepsDynamics = []
         var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
@@ -2665,7 +2651,7 @@ export default {
         }).catch(reject => {
           vm.$store.dispatch('pullNextactions', filter).then(result => {
             vm.btnDossierDynamics = result
-          })
+          }).catch(function (){})
         })
       }
       // }
@@ -2709,7 +2695,7 @@ export default {
             vm.$router.push({
               path: vm.$router.history.current.path + queryString
             })
-          })
+          }).catch(function (){})
         } else {
           return false
         }
@@ -2759,7 +2745,7 @@ export default {
                 }
               } else {}
             })
-          })
+          }).catch(function (){})
         }
       }
     },
@@ -3012,22 +2998,22 @@ export default {
         if (vm.getUser('Administrator_data')) {
           vm.itemFilterSupport.statusLists.push(statusDeleted)
         }
-      })
+      }).catch(function (){})
       let filter = {
         itemCode: ''
       }
       vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
         vm.itemFilterSupport.substatusLists = result
-      })
+      }).catch(function (){})
       vm.$store.dispatch('getAgencyLists').then(function (result) {
         vm.itemFilterSupport.agencyLists = result
-      })
+      }).catch(function (){})
       vm.$store.dispatch('getServiceLists').then(function (result) {
         vm.itemFilterSupport.serviceLists = result
-      })
+      }).catch(function (){})
       vm.$store.dispatch('getDomainLists').then(function (result) {
         vm.itemFilterSupport.domainLists = result
-      })
+      }).catch(function (){})
     },
     changeAdvFilterData (data, spec, index) {
       let vm = this
@@ -3038,7 +3024,7 @@ export default {
         }
         vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
           vm.itemFilterSupport.substatusLists = result
-        })
+        }).catch(function (){})
       }
       let valueFilter = data
       if (spec === 'year') {

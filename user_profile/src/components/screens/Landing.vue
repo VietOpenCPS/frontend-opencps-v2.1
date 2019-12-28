@@ -342,6 +342,9 @@
                 <v-btn color="blue darken-3" :loading="loading" :disabled="loading" v-on:click="submitUserProfile" class="mx-0" dark>
                   <v-icon>done</v-icon>&nbsp; Cập nhật thông tin
                 </v-btn>
+                <v-btn v-if="hasSSo" color="blue darken-3" @click="checkVNConect" class="mx-0 ml-3" dark>
+                  <v-icon>sync</v-icon>&nbsp; Đồng bộ thông tin từ Cổng DVC Quốc gia
+                </v-btn>
               </v-flex>
             </v-layout>
             <!-- profile cán bộ -->
@@ -612,6 +615,18 @@
         </iframe>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
+      <v-card>
+        <v-card-text class="px-0 py-0">
+          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
+            width: 100%;
+            height: 650px;
+            border: none;
+          "></iframe>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -632,6 +647,9 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      hasSSo: false,
+      dialog_loginDVCQG: false,
+      tempDVCQG: '',
       profileConfig: '',
       activeChangePass: true,
       zaloOaId: '',
@@ -838,6 +856,11 @@
     },
     created() {
       var vm = this
+      window.callback_dvcqg = vm.callback_dvcqg
+      try {
+        vm.hasSSo = ssoConect
+      } catch (error) {
+      }
       vm.$nextTick(function() {
         window.axios = axios
         let current = vm.$router.history.current
@@ -1260,16 +1283,6 @@
         let vm = this
         let zaloOaToken = vm.zaloOaid_token_access
         let url = 'https://cors-anywhere.herokuapp.com/https://openapi.zalo.me/v2.0/oa/getprofile?access_token=' + zaloOaToken + '&data={"user_id":"' + uid + '"}'
-        // window.axios.get(url).then(function (response) {
-        //   console.log(response.data)
-        //   if (response.data && response.data['user_id']) {
-        //     vm.isFollowZalo = true
-        //   }
-        //   // vm.zaloOaId = response.data.message !== 'Success' ? vm.MSystemConfiguration.configuration.zalo.oaid : ''
-        // }).catch(function (error) {
-        //   console.log(error)
-        // })
-        // 
         $.ajax({
           url: url,
           method: 'GET',
@@ -1294,6 +1307,34 @@
         window.axios.put(url, params, config).then(function (response) {
         }).catch(function (error) {
         })
+      },
+      checkVNConect () {
+        let vm = this
+        let current = vm.$router.history.current
+        let query = vm.$router.history.current.query
+        let filter = {
+          state: 'mapping'
+        }
+        vm.$store.dispatch('getVNConect', filter).then(function (result) {
+          if (result) {
+            vm.dialog_loginDVCQG = true
+            setTimeout(function () {
+              vm.tempDVCQG = result
+            }, 200)
+          }
+        }).catch(function () {
+        })
+      },
+      callback_dvcqg (data) {
+        let vm = this
+        let current = vm.$router.history.current
+        if (String(data['userId']) !== '0') {
+          window.location.href = window.themeDisplay.getLayoutURL() + '#' + current.path
+          window.location.reload()
+          vm.dialog_loginDVCQG = false
+        } else {
+          toastr.error('Chưa có tài khoản đăng ký tại Cổng DVC Quốc gia')
+        }
       },
       paggingData (config) {
         let vm = this

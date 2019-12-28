@@ -223,7 +223,7 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
+              {{ hosoDatasPage * limitRecord - limitRecord + props.index + 1 }}
             </span>
           </td>
           <td class="px-1 py-0">
@@ -282,8 +282,8 @@
     </v-data-table>
     <div :class="!viewMobile ? 'text-xs-right layout wrap' : ''" style="position: relative;">
       <div class="flex pagging-table px-2"> 
-        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
-          @tiny:change-page="paggingData" ></tiny-pagination> 
+        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
+          :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination> 
       </div>
     </div>
     <v-dialog v-model="dialogAction" max-width="400" transition="fade-transition" persistent>
@@ -718,7 +718,8 @@ export default {
       domainLists: [],
       domain: '',
       keyword: '',
-      register: ''
+      register: '',
+      limitRecord: 15
     },
     itemFilterKey: ['year', 'month', 'top', 'status', 'substatus', 'agency', 'service', 'domain', 'keyword', 'register'],
     menuType: 0,
@@ -816,7 +817,9 @@ export default {
     filterForm: null,
     checkSelectAll: false,
     titleLanding: '',
-    currentQueryState: ''
+    currentQueryState: '',
+    limits: [],
+    showLimit: false
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1022,6 +1025,42 @@ export default {
         // console.log('selectedDoAction', vm.selectedDoAction)
       },
       deep: true
+    },
+    trangThaiHoSoList (val) {
+      let vm = this
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
+        })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
+      }
+    },
+    index (val) {
+      let vm = this
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
+        })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
+      }
     }
   },
   methods: {
@@ -1283,6 +1322,7 @@ export default {
     },
     paggingData (config) {
       let vm = this
+      vm.limitRecord = config.numberPerPage ? config.numberPerPage : 15
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1318,6 +1358,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1340,6 +1381,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1360,7 +1402,7 @@ export default {
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
-          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / 15)
+          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.limitRecord)
           /*
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true

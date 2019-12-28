@@ -12,16 +12,16 @@
             <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
               <!-- <div class="text-bold primary--text" style="text-align: justify;">{{index + 1}}. {{ item.subject }}</div> -->
               <v-layout wrap class="text-bold">
-                <div class="flex px-3 py-1" style="height:26px;max-width:75px;background-color: #034687;transform: skew(-25deg)">
+                <div class="flex px-3 py-1" style="height:26px;max-width:75px;background-color: #0167d3;transform: skew(-25deg)">
                   <span class="d-block white--text" style="transform: skew(25deg)">Câu {{index + 1}}</span>
                 </div>
-                <div v-html="item.subject" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#034687">
+                <div v-html="item.subject" class="flex pl-3 pr-2 pt-0" style="max-width:calc(100% - 100px);color:#0167d3">
                 </div>
               </v-layout>
               <div class="ml-4">
                 <v-radio-group v-model="item.selected" row class="my-2">
                   <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
-                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
+                    <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#0167d3' : 'color:black'" slot="label">{{itemChoise}}</div>
                   </v-radio>
                 </v-radio-group>
               </div>

@@ -339,7 +339,7 @@
                 </v-btn>
               </v-flex>
               <v-flex xs6 class="pl-2">
-                <v-btn class="mr-3" color="primary" @click="doCreateDossier">
+                <v-btn class="mr-3" color="primary" >
                   <i class="fa fa-paper-plane mr-2" style="font-size: 13px;"></i>
                   NỘP HỒ SƠ KHÔNG CẦN TÀI KHOẢN
                 </v-btn>
@@ -362,6 +362,73 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogLogin" max-width="550">
+      <v-card class="px-0">
+        <v-card-text class="px-0 py-0">
+          <v-flex v-if="!isSigned" xs12>
+            <nav class="toolbar theme--dark primary py-2" data-booted="true">
+              <div class="toolbar__content"  style="justify-content: center">
+                <h3 class="white--text">ĐĂNG NHẬP</h3>
+              </div>
+            </nav>
+            <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
+              <v-form ref="form" v-model="valid" lazy-validation class="mt-3">
+                <v-flex xs12>
+                  <v-text-field
+                    box
+                    placeholder="Email đăng nhập"
+                    v-model="userName"
+                    :rules="[v => !!v || 'Email đăng nhập là bắt buộc']"
+                    required
+                    prepend-inner-icon="person_outline"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 class="">
+                  <v-text-field
+                    box
+                    placeholder="Mật khẩu"
+                    v-model="passWord"
+                    :type="'password'"
+                    :rules="[v => !!v || 'Mật khẩu là bắt buộc']"
+                    required
+                    prepend-inner-icon="vpn_key"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <v-layout wrap class="ml-2">
+                  <v-flex @click="getPassword" style="font-size: 12px;cursor: pointer;padding:7px">
+                    <div class="primary--text right" >
+                      Quên mật khẩu?
+                    </div>
+                  </v-flex>
+                </v-layout>
+                <v-flex xs12 class="text-xs-left text-xs-center">
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    @click="submitConfirmLogin"
+                  >
+                    <v-icon>how_to_reg</v-icon>&nbsp;
+                    Đăng nhập
+                  </v-btn>
+                  <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    @click="register"
+                  >
+                    <v-icon>create</v-icon>&nbsp;
+                    Đăng ký
+                  </v-btn>
+                </v-flex>
+                
+              </v-form>
+            </v-flex>
+          </v-flex>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -374,13 +441,18 @@ import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {
-  props: [],
+  props: ['index'],
   components: {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
     dialog_createDossier: false,
     dialogVerifycation: false,
+    dialogLogin: false,
+    valid: false,
+    userName: '',
+    passWord: '',
+    loadingLogin: false,
     pathRouter: '/thu-tuc-hanh-chinh/',
     serviceInfoList: [],
     totalThuTuc: 0,
@@ -424,7 +496,8 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    serviceSelected: ''
   }),
   computed: {
     govAgencyList () {
@@ -449,7 +522,7 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -482,21 +555,18 @@ export default {
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       vm.domainListCurrent = []
-      if (currentQuery.hasOwnProperty('agency')) {
+      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
         let filterDomain = {
-          agencyCode: currentQuery['agency']
+          agencyCode: currentQuery['agency'] ? currentQuery['agency'] : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
         })
-        // vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
-        //   return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
-        // })
       } else {
         vm.domainListCurrent = vm.domainList
       }
       vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -600,7 +670,7 @@ export default {
       var filter = null
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
-        administration: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+        administration: currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : ''),
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
@@ -622,6 +692,39 @@ export default {
         vm.totalThuTuc = 0
         vm.thutucPage = 1
       })
+    },
+    submitConfirmLogin () {
+      let vm = this
+      let current = vm.$router.history.current
+      let filter = {
+        npmreactlogin_login: vm.userName,
+        npmreactlogin_password: vm.passWord
+      }
+      vm.loadingLogin = true
+      if (vm.userName && vm.passWord) {
+        vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
+          vm.loadingLogin = false
+          if (result === 'success') {
+            vm.dialogLogin = false
+            let redirectURL = window.location.host + window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            let url = redirectURL + '/dich-vu-cong#/add-dvc/' + vm.serviceSelected.serviceConfigId
+            window.location.href = url
+            setTimeout(() => {
+              window.location.reload()
+            }, 100)
+          }          
+        }).catch(function(){
+          vm.loadingLogin = false
+        })
+      }
+    },
+    register () {
+      let vm = this
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+    },
+    getPassword () {
+      let vm = this
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
     },
     paggingData (config) {
       let vm = this
@@ -647,6 +750,7 @@ export default {
     },
     createDossier (item) {
       let vm = this
+      vm.serviceSelected = item
       if (item.serviceUrl) {
         window.location.href = item.serviceUrl
       } else {
@@ -660,6 +764,7 @@ export default {
             window.open(url, '_self')
           }
         } else {
+          // vm.dialogLogin = true
           alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
         }
       }
@@ -669,9 +774,6 @@ export default {
       let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
       let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url, '_self')
-    },
-    doCreateDossier () {
-      let vm = this
     },
     viewGuide (item) {
       var vm = this

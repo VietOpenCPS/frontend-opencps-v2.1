@@ -19,6 +19,15 @@
           </v-list-tile-content>
         </v-list-tile>
         <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 5 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(5, 'questionType=FAQ')">
+            <v-list-tile-title>Công dân hỏi đáp</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalFAQ}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
         <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'answered=true')">
             <v-list-tile-title>Câu hỏi đã trả lời</v-list-tile-title>
@@ -72,6 +81,7 @@
       totalNotAnswer: 0,
       totalPublished: 0,
       totalNotPublish: 0,
+      totalFAQ: 0,
       agencyList: []
     }),
     computed: {
@@ -98,6 +108,9 @@
       },
       lvttFilterSelected () {
         return this.$store.getters.getLvttFilter
+      },
+      typeFilterSelected () {
+        return this.$store.getters.getTypeFilter
       },
       activeCounter () {
         return this.$store.getters.getCounter
@@ -141,7 +154,8 @@
           subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : '',
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
-          answered: query.hasOwnProperty('answered') ? query['answered'] : ''
+          answered: query.hasOwnProperty('answered') ? query['answered'] : '',
+          questionType: vm.typeFilterSelected ? vm.typeFilterSelected : (query.hasOwnProperty('questionType') ? query['questionType'] : '')
         }
         try {
           if (agencyCodeSite) {
@@ -226,12 +240,24 @@
             vm.totalAnswered = 0
             vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
           })
+          // 
+          let filter3 = {
+            agencyCode: '',
+            publish: '',
+            questionType: 'FAQ'
+          }
+          vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
+            vm.totalFAQ = result2['total']
+          }).catch(function(reject) {
+            vm.totalFAQ = 0
+          })
         }).catch(function (reject) {
           vm.totalQuestionCounter = 0
           vm.totalPublished = 0
           vm.totalNotPublish = 0
           vm.totalAnswered = 0
           vm.totalNotAnswer = 0
+          vm.totalFAQ = 0
         })
       },
       filterQuestion (index, target) {

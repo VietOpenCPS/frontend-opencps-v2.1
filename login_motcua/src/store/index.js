@@ -347,7 +347,7 @@ export const store = new Vuex.Store({
               currenturl: filter.currenturl
             }
           }
-          axios.get(state.endPoint + '/dvcqgsso/checkauth', param).then(function (response) {
+          axios.get('/o/rest/v2/dvcqgsso/checkauth', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

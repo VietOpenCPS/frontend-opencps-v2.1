@@ -181,15 +181,65 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              vnconnect: filter.vnconnect,
-              currenturl: filter.currenturl
+              state: filter.state
             }
           }
-          axios.get(state.endPoint + '/dvcqgsso/checkauth', param).then(function (response) {
+          axios.get(state.endPoint + '/dvcqgsso/authurl', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    putVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.post(state.endPoint + '/dvcqgsso/auth', filter.userInfo, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    goToDangNhap({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+            }
+          }
+          let dataPostApplicant = new URLSearchParams()
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            if (response.data !== '' && response.data !== 'ok') {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              resolve('success')
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
+              resolve('error')
+            }
+          }).catch(function (error) {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
             reject(error)
           })
         })
