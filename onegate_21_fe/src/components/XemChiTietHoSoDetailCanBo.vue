@@ -1355,7 +1355,7 @@ export default {
       vm.resultDialogPick = result
       vm.indexDialogPick = index
       vm.userNote = 0
-      if (result.hasOwnProperty('configNote') && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
+      if (result.hasOwnProperty('configNote') && result.configNote && result.configNote !== null && result.configNote !== undefined && result.configNote !== 'undefined') {
         try {
           vm.configNote = JSON.parse(result.configNote)
           if (vm.configNote.confirm) {

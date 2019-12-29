@@ -2301,7 +2301,6 @@ export const store = new Vuex.Store({
               'groupId': state.initData.groupId
             }
           }
-          let params = new URLSearchParams()
           // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8080/api/stepconfigs/done/done_5', params, config).then(function (response) {
