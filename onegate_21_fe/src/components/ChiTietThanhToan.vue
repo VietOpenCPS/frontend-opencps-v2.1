@@ -275,14 +275,14 @@ export default {
   watch: {
     dossierDetail (val) {
       var vm = this
-      // vm.getPaymentFiles()
+      vm.getPaymentFiles()
     },
     payments (val) {
       // lấy thông tin tra cứu trên keypay
       let vm = this
-      if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
-        vm.payments.paymentMethod = 'Keypay'
-      }
+      // if (!vm.paymentFile && val['paymentMethod'] === 'Chuyển khoản') {
+      //   vm.payments.paymentMethod = 'Keypay'
+      // }
       let paymentProfile = vm.getEPaymentProfile(val.epaymentProfile)
       if (paymentProfile && paymentProfile['keypayUrl']) {
         vm.transId = paymentProfile['keypayUrl'].split('&').filter(function (item) {return item.indexOf('merchant_trans_id') >= 0})[0].split('=')[1]

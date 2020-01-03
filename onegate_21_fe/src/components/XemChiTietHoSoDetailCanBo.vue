@@ -1806,9 +1806,11 @@ export default {
             paymentAmount: paymentData.paymentAmount ? paymentData.paymentAmount : 0,
             paymentNote: paymentData.paymentNote ? paymentData.paymentNote : '',
             serviceAmount: paymentData.serviceAmount ? paymentData.serviceAmount : 0,
-            shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0
+            shipAmount: paymentData.shipAmount ? paymentData.shipAmount : 0,
+            paymentMethod: paymentData.paymentMethod ? paymentData.paymentMethod : 'Chuyển khoản',
           }
           let paymentsOut = filter['payment']
+          // console.log('payment data check', paymentsOut)
           let feeTotal = paymentsOut['feeAmount'] + paymentsOut['serviceAmount'] + paymentsOut['shipAmount'] - paymentsOut['advanceAmount']
           if (feeTotal === 0 && vm.originality === 3) {
             let x = confirm('Tổng phí còn phải nộp: 0 đồng. Bạn có muốn tiếp tục?')

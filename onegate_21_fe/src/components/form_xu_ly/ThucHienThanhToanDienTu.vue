@@ -99,7 +99,7 @@
               <!-- view file -->
               <div v-if="paymentFile">
                 <div v-on:click.stop="viewFile()" style="cursor: pointer;">
-                  <v-icon size="24" color="#004b94">insert_drive_file</v-icon>
+                  <v-icon size="18" color="#004b94">insert_drive_file</v-icon>
                   <span class="ml-2">{{paymentFileName}}</span>
                   <!-- <v-tooltip top class="ml-3">
                     <v-btn icon ripple slot="activator" v-on:click.stop="downloadPaymentFile(item)" class="mx-0 my-0">
@@ -210,7 +210,7 @@ export default {
     progressUploadPart: false,
     dialogPDF: false,
     dialogPDFLoading: true,
-    isBank: false,
+    isBank: true,
     errorNotSelect: false
   }),
   directives: {money: VMoney},
@@ -221,6 +221,7 @@ export default {
       vm.$store.dispatch('getPaymentFiles', filter).then(result => {
         vm.paymentFile = result
         vm.data_payment['paymentFile'] = vm.paymentFile
+        vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
         vm.$store.commit('setPaymentProfile', vm.data_payment)
       })
     }
@@ -255,7 +256,8 @@ export default {
           shipAmount: vm.paymentProfile.shipAmount,
           paymentAmount: vm.totalFee,
           paymentNote: vm.paymentProfile.paymentNote,
-          paymentFile: vm.paymentFile
+          paymentFile: vm.paymentFile,
+          paymentMethod: vm.isBank ? 'Chuyển khoản' : 'Keypay'
         }
         vm.$store.commit('setPaymentProfile', vm.data_payment)
         // }
@@ -268,6 +270,7 @@ export default {
         vm.$store.dispatch('getPaymentFiles', filter).then(result => {
           vm.paymentFile = result
           vm.data_payment['paymentFile'] = vm.paymentFile
+          vm.data_payment['paymentMethod'] = vm.isBank ? 'Chuyển khoản' : 'Keypay'
           vm.$store.commit('setPaymentProfile', vm.data_payment)
         })
       }
@@ -380,6 +383,8 @@ export default {
       }
     },
     toKeyPay (item) {
+      let vm = this
+      vm.isBank = false
       window.open(item, '_self')
     },
     goBack () {

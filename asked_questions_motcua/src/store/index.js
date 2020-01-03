@@ -22,6 +22,7 @@ export const store = new Vuex.Store({
     questionList: [],
     questionDetail: '',
     lvdsFilter: '',
+    lvttFilter: '',
     activeAddQuestion: false,
     activeGetQuestion: false,
     questionPage: 1,
@@ -92,6 +93,28 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getLvttList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            agency: filter['agency'] ? filter['agency'] : '',
+            sort: 'siblingSearch'
+          }
+        }
+        axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
     getQuestions ({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -116,6 +139,7 @@ export const store = new Vuex.Store({
               start: state.questionPage * 20 - 20,
               end: state.questionPage * 20,
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+              domainCode: filter.domainCode ? filter.domainCode : '',
               keyword: filter.keyword ? filter.keyword : '',
               publish: filter.publish,
               answered: filter.answered,
@@ -128,6 +152,7 @@ export const store = new Vuex.Store({
               end: state.questionPage * 20,
               publish: 1,
               govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
+              domainCode: filter.domainCode ? filter.domainCode : '',
               keyword: filter.keyword ? filter.keyword : '',
               questionType: 'FAQ',
               subDomainCode: filter.subDomainCode ? filter.subDomainCode : ''
@@ -273,7 +298,10 @@ export const store = new Vuex.Store({
             content: filter.content ? filter.content : '',
             fullname: filter.fullname ? filter.fullname : '',
             publish: filter.publish,
-            govAgencyCode: filter.govAgencyCode
+            govAgencyCode: filter.govAgencyCode ? filter.govAgencyCode : '',
+            domainCode: filter.domainCode ? filter.domainCode : '',
+            govAgencyName: filter.govAgencyName ? filter.govAgencyName : '',
+            domainName: filter.domainName ? filter.domainName : ''
           }
           dataPost.append('method', 'PUT')
           dataPost.append('url', urlPut)
@@ -465,7 +493,7 @@ export const store = new Vuex.Store({
             sort: 'sibling'
           }
         }
-        axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', paramGetGovAgency).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/SERVICE_ADMINISTRATION/dictitems', paramGetGovAgency).then(function (response) {
           resolve(response.data.data)
         }).catch(function (xhr) {
           console.log(xhr)
@@ -525,6 +553,9 @@ export const store = new Vuex.Store({
     setLvdsFilter (state, payload) {
       state.lvdsFilter = payload
     },
+    setLvttFilter (state, payload) {
+      state.lvttFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -553,6 +584,9 @@ export const store = new Vuex.Store({
     },
     getLvdsFilter (state) {
       return state.lvdsFilter
+    },
+    getLvttFilter (state) {
+      return state.lvttFilter
     },
     getQuestionDetail (state) {
       return state.questionDetail

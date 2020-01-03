@@ -600,7 +600,42 @@ export const store = new Vuex.Store({
             reject(error)
           })
       })
-    }
+    },
+    loadDataSource ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        // commit('setLoading', true)
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: state.groupId
+            },
+            params: {}
+          }
+          axios.get(filter.api, param).then(function (result) {
+            if (result.data) {
+              let dataMapping = []
+              let dataOutput = result.data.data
+              if (filter.hasOwnProperty('valueMapping') && filter.valueMapping) {
+                for (let index in dataOutput) {
+                  let x = {
+                    value: filter.hasOwnProperty('valueMappingChild') ? dataOutput[index][filter.valueMapping][filter.valueMappingChild] : dataOutput[index][filter.valueMapping],
+                    name: dataOutput[index][filter.nameMapping]
+                  }
+                  dataMapping.push(x)
+                }
+              } else {
+                dataMapping = dataOutput
+              }
+              resolve(dataMapping)
+            } else {
+              resolve([])
+            }
+          }).catch(function(xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setInitData (state, payload) {

@@ -2988,7 +2988,7 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               resolve(serializable.data)
             } else {
-              resolve({})
+              resolve('')
             }
           }).catch(function (error) {
             console.log(error)

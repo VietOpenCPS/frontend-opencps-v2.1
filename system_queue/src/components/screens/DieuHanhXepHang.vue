@@ -167,7 +167,9 @@ export default {
       let currentQuery = vm.$router.history.current.query
       let filterEform = {
         state: 2,
-        className: 'EFORM'
+        className: 'EFORM',
+        bookingFrom: vm.getCurrentDate(),
+        bookingTo: vm.getCurrentDate()
       }
       let bookingDossier = ''
       let bookingEform = ''
@@ -193,7 +195,9 @@ export default {
       })
       let filterDossier = {
         state: 2,
-        className: 'DOSSIER'
+        className: 'DOSSIER',
+        bookingFrom: vm.getCurrentDate(),
+        bookingTo: vm.getCurrentDate()
       }
       vm.$store.dispatch('getBookingDangGoi', filterDossier).then(function (result) {
         count+=1

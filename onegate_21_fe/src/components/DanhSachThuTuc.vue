@@ -607,6 +607,7 @@
       },
       pullServiceOptions (item, govAgencyCode) {
         var vm = this
+        console.log('service config', item)
         if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.dialogVerifycation = true
         } else {
@@ -614,37 +615,45 @@
           vm.govAgencyCodeSelect = govAgencyCode
           vm.serviceInfoIdSelect = item.serviceInfoId
           vm.$store.dispatch('getServiceOpionByProcess', item).then(result => {
-            vm.serviceOptions = result
-            if (result.length === 1) {
-              vm.selectOption = false
-              vm.$store.dispatch('getServiceInfo', {
-                serviceInfoId: item.serviceInfoId
-              }).then(resServiceInfo => {
-                let data = {
-                  serviceCode: resServiceInfo.serviceCode,
-                  govAgencyCode: govAgencyCode,
-                  templateNo: result[0].templateNo,
-                  originality: vm.getOriginality(),
-                  j_captcha_response: ''
-                }
-                if (!vm.isOffLine) {
-                  vm.$store.dispatch('postDossier', data).then(function (result) {
-                    vm.loadingAction = false
-                    vm.indexAction = -1
-                    vm.$router.push({
-                      path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
-                      query: vm.$router.history.current.query
+            if (result) {
+              vm.serviceOptions = result
+              if (result.length === 1) {
+                vm.selectOption = false
+                vm.$store.dispatch('getServiceInfo', {
+                  serviceInfoId: item.serviceInfoId
+                }).then(resServiceInfo => {
+                  let data = {
+                    serviceCode: resServiceInfo.serviceCode,
+                    govAgencyCode: govAgencyCode,
+                    templateNo: result[0].templateNo,
+                    originality: vm.getOriginality(),
+                    j_captcha_response: ''
+                  }
+                  if (!vm.isOffLine) {
+                    vm.$store.dispatch('postDossier', data).then(function (result) {
+                      vm.loadingAction = false
+                      vm.indexAction = -1
+                      vm.$router.push({
+                        path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.dossierId + '/NEW',
+                        query: vm.$router.history.current.query
+                      })
                     })
-                  })
-                } else {
-                  vm.dataPostDossier = data
-                  vm.$refs.captcha.makeImageCap()
-                  vm.dialog_captcha = true
-                }
-              })
+                  } else {
+                    vm.dataPostDossier = data
+                    vm.$refs.captcha.makeImageCap()
+                    vm.dialog_captcha = true
+                  }
+                })
+              } else {
+                vm.serviceOptionsProcess = result
+                vm.selectOption = true
+              }
             } else {
-              vm.serviceOptionsProcess = result
-              vm.selectOption = true
+              vm.$store.dispatch('getServiceConfigDetail', item).then(result => {
+                if (result.hasOwnProperty('serviceUrl') && result.serviceUrl) {
+                  window.location.href = result.serviceUrl
+                }
+              }).catch(function(){})
             }
           }).catch(result => {
             vm.serviceOptions = []
@@ -715,25 +724,29 @@
       },
       createDossier (data) {
         let vm = this
-        vm.$store.dispatch('postDossier', data).then(function (result) {
-          if (result['status'] !== undefined && result['status'] === 203) {
-            vm.loadingAction = false
-            toastr.clear()
-            toastr.error('Mã captcha không chính xác. Vui lòng thử lại')
+        if (vm.serviceConfigSelect.serviceUrl) {
+          window.location.href = vm.serviceConfigSelect
+        } else {
+          vm.$store.dispatch('postDossier', data).then(function (result) {
+            if (result['status'] !== undefined && result['status'] === 203) {
+              vm.loadingAction = false
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác. Vui lòng thử lại')
+              vm.$refs.captcha.makeImageCap()
+            } else {
+              vm.loadingAction = false
+              vm.dialog_captcha = false
+              vm.indexAction = -1
+              vm.$router.push({
+                path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.data.dossierId + '/NEW',
+                query: vm.$router.history.current.query
+              })
+            }
+          }).catch (function (reject) {
+            toastr.error('Nộp hồ sơ không thành công')
             vm.$refs.captcha.makeImageCap()
-          } else {
-            vm.loadingAction = false
-            vm.dialog_captcha = false
-            vm.indexAction = -1
-            vm.$router.push({
-              path: '/danh-sach-ho-so/' + 0 + '/ho-so/' + result.data.dossierId + '/NEW',
-              query: vm.$router.history.current.query
-            })
-          }
-        }).catch (function (reject) {
-          toastr.error('Nộp hồ sơ không thành công')
-          vm.$refs.captcha.makeImageCap()
-        })
+          })
+        }
       },
       getColor (level) {
         if (level === 2) {

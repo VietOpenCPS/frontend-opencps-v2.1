@@ -30,12 +30,12 @@
         </div> 
       </div>
       <v-layout wrap class="white py-2">
-        <v-flex xs4 class="px-2">
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="govAgencyList"
             v-model="govAgencySelected"
-            placeholder="Chọn cơ quan"
+            placeholder="Chọn cơ quan quản lý"
             item-text="administrationName"
             item-value="administrationCode"
             :hide-selected="true"
@@ -44,7 +44,21 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs4 class="px-2">
+        <v-flex v-if="hasCoQuanThucHien" :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="govAgencyListThucHien"
+            v-model="govAgencyThucHienSelected"
+            placeholder="Chọn cơ quan thực hiện"
+            item-text="govAgencyName"
+            item-value="govAgencyCode"
+            :hide-selected="true"
+            clearable
+            @change="changeGovAgencyThucHien"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="domainListCurrent"
@@ -58,7 +72,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs4 class="px-2">
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="levelList"
@@ -458,6 +472,7 @@ export default {
     totalThuTuc: 0,
     thutucPage: 1,
     govAgencySelected: {},
+    govAgencyThucHienSelected: {},
     domainListCurrent: [],
     domainSelected: {},
     levelSelected: {},
@@ -497,11 +512,15 @@ export default {
         sortable: false
       }
     ],
-    serviceSelected: ''
+    serviceSelected: '',
+    hasCoQuanThucHien: false
   }),
   computed: {
     govAgencyList () {
       return this.$store.getters.getAgencyList
+    },
+    govAgencyListThucHien () {
+      return this.$store.getters.getAgencyListThucHien
     },
     domainList () {
       return this.$store.getters.getDomainList
@@ -518,11 +537,17 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.hasCoQuanThucHien = hasCoQuanThucHien
+    } catch (error) {
+      vm.hasCoQuanThucHien = false
+    }
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -565,8 +590,9 @@ export default {
       } else {
         vm.domainListCurrent = vm.domainList
       }
-      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
       vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -582,6 +608,31 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['agency'] = vm.govAgencySelected
+        newQuery['agencyth'] = ''
+        newQuery['domain'] = ''
+        newQuery['keyword'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    changeGovAgencyThucHien () {
+      let vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agencyth'] = vm.govAgencyThucHienSelected
+        newQuery['agency'] = ''
         newQuery['domain'] = ''
         newQuery['keyword'] = ''
         for (let key in newQuery) {
@@ -671,6 +722,7 @@ export default {
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
         administration: currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : ''),
+        agency: currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : '',
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''

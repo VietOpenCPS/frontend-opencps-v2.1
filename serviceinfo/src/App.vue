@@ -91,30 +91,9 @@
           mappingCount: 'count',
           children: [],
           icon: 'select_all'
-        },
-        // {
-        //   id: 4,
-        //   name: 'HÌNH THỨC NỘP',
-        //   mappingName: 'methodName',
-        //   mappingCode: 'methodCode',
-        //   mappingCount: 'count',
-        //   children: [
-        //     {
-        //       methodName: 'Nộp trực tiếp',
-        //       methodCode: 'MC',
-        //       count: 0,
-        //       level: '2'
-        //     },
-        //     {
-        //       methodName: 'Nộp trực tuyến',
-        //       methodCode: 'DVC',
-        //       count: 0,
-        //       level: '3,4'
-        //     }
-        //   ],
-        //   icon: 'playlist_add'
-        // }
+        }
       ],
+      hasCoQuanThucHien: false
     }),
     components: {
       GoTop
@@ -147,7 +126,61 @@
     },
     created () {
       var vm = this
+      try {
+        vm.hasCoQuanThucHien = hasCoQuanThucHien
+      } catch (error) {
+        vm.hasCoQuanThucHien = false
+      }
       vm.$nextTick(function () {
+        if (vm.hasCoQuanThucHien) {
+          vm.menuServiceInfos = [
+            {
+              id: 1,
+              name: 'Cơ quan quản lý',
+              mappingName: 'administrationName',
+              mappingCode: 'administrationCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'account_balance'
+            },
+            {
+              id: 2,
+              name: 'Cơ quan thực hiện',
+              mappingName: 'govAgencyName',
+              mappingCode: 'govAgencyCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'fas fa fa-book'
+            },
+            {
+              id: 3,
+              name: 'Lĩnh vực',
+              mappingName: 'domainName',
+              mappingCode: 'domainCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'domain'
+            },
+            {
+              id: 4,
+              name: 'Mức độ',
+              mappingName: 'levelName',
+              mappingCode: 'level',
+              mappingCount: 'count',
+              children: [],
+              icon: 'sort'
+            },
+            {
+              id: 5,
+              name: 'Tất cả thủ tục',
+              mappingName: 'all',
+              mappingCode: 'all',
+              mappingCount: 'count',
+              children: [],
+              icon: 'select_all'
+            }
+          ]
+        }
         let current = vm.$router.history.current
         let newQuery = current.query
         vm.$store.dispatch('getGovAgency').then(function (result) {
@@ -177,16 +210,32 @@
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
+        // 
+        if (vm.hasCoQuanThucHien) {
+          vm.$store.dispatch('getGovAgencyThucHien').then(function (result) {
+            vm.menuServiceInfos[1].children = result
+            vm.$store.commit('setAgencyListThucHien', result)
+          }).catch(function(){})
+        }
+        // 
         let filterDomain = {
           agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.menuServiceInfos[1].children = result
+          if (vm.hasCoQuanThucHien) {
+            vm.menuServiceInfos[2].children = result
+          } else {
+            vm.menuServiceInfos[1].children = result
+          }
           vm.$store.commit('setDomainList', result)
           vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
         })
         vm.$store.dispatch('getLevelList').then(function (result) {
-          vm.menuServiceInfos[2].children = result
+          if (vm.hasCoQuanThucHien) {
+            vm.menuServiceInfos[3].children = result
+          } else {
+            vm.menuServiceInfos[2].children = result
+          }
           vm.$store.commit('setLevelList', result)
           vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
         })

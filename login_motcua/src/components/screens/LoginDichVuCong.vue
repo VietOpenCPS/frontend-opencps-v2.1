@@ -202,25 +202,26 @@ export default {
     },
     loginDVCQG () {
       let vm = this
-      let urlSso = ''
-      try {
-        urlSso = ssoConfig ? ssoConfig['urlSend'] : ''
-      } catch (error) {
-      }
-      let filter = {
-        vnconnect: 1,
-        currenturl: urlSso ? urlSso : ''
-      }
-      vm.$store.dispatch('getVNConect', filter).then(function (result) {
-        if (result) {
-          vm.dialog_loginDVCQG = true
-          setTimeout(function () {
-            vm.tempDVCQG = result
-          }, 200)
-        }
-      }).catch(function() {
-        alert('Chức năng đang cập nhật')
-      })
+      window.location.href = window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/dang-nhap-dvcqg'
+      // let urlSso = ''
+      // try {
+      //   urlSso = ssoConfig ? ssoConfig['urlSend'] : ''
+      // } catch (error) {
+      // }
+      // let filter = {
+      //   vnconnect: 1,
+      //   currenturl: urlSso ? urlSso : ''
+      // }
+      // vm.$store.dispatch('getVNConect', filter).then(function (result) {
+      //   if (result) {
+      //     vm.dialog_loginDVCQG = true
+      //     setTimeout(function () {
+      //       vm.tempDVCQG = result
+      //     }, 200)
+      //   }
+      // }).catch(function() {
+      //   alert('Chức năng đang cập nhật')
+      // })
     },
     callback_dvcqg (data) {
       let vm = this
@@ -229,8 +230,9 @@ export default {
         urlRedirect = ssoConfig ? ssoConfig['urlRedirect'] : window.themeDisplay.getLayoutURL() + '#' + current.path
       } catch (error) {
       }
-      window.location.href = urlRedirect
-      window.location.reload()
+      window.location.href = window.themeDisplay.getURLHome()
+      // window.location.href = urlRedirect
+      // window.location.reload()
       vm.dialog_loginDVCQG = false
     },
     goBack () {

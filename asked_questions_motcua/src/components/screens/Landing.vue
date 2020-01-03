@@ -28,7 +28,22 @@
                 @change="changeAdministration"
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm6>
+            <v-flex xs12 sm6 class="selectTthc pl-0">
+              <v-autocomplete
+                class="select-border"
+                :items="lvttList"
+                v-model="lvttFilterSelected"
+                placeholder="Lĩnh vực thủ tục hành chính"
+                item-text="domainName"
+                item-value="domainCode"
+                return-object
+                :hide-selected="true"
+                box
+                clearable
+                @change="changeLvtt"
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 sm6 class="selectLvds pl-0">
               <v-autocomplete
                 class="select-border"
                 :items="lvdsList"
@@ -74,13 +89,13 @@
                       <v-icon color="blue" size="16px">message</v-icon>&nbsp; Trả lời
                     </v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile v-if="getUser('Administrator')">
+                  <v-list-tile v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')">
                     <v-list-tile-title @click.stop="changePublic(itemQuestion, indexQuestion)">
                       <v-icon color="primary" size="16px">{{ itemQuestion.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
                       {{ itemQuestion.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                     </v-list-tile-title>
                   </v-list-tile>
-                  <v-list-tile v-if="getUser('Administrator')" @click.stop="deleteQuestion(itemQuestion)">
+                  <v-list-tile v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" @click.stop="deleteQuestion(itemQuestion)">
                     <v-list-tile-title><v-icon color="red" size="16px">delete</v-icon>&nbsp; Xóa</v-list-tile-title>
                   </v-list-tile>
                 </v-list>
@@ -116,7 +131,7 @@
                               </v-btn>
                               <v-list>
                                 <v-list-tile>
-                                  <v-list-tile-title v-if="getUser('Administrator') || getUser('Administrator_data')" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
+                                  <v-list-tile-title v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('tra_loi_hoi_dap')" @click.stop="changePublicAnswer(itemAnswer, indexAnswer)">
                                     <v-icon color="primary" size="16px">{{ itemAnswer.publish === 1 ? 'visibility_off' : 'visibility' }}</v-icon>&nbsp;
                                     {{ itemAnswer.publish === 1 ? 'Bỏ công khai' : 'Công khai' }}
                                   </v-list-tile-title>
@@ -391,11 +406,13 @@ export default {
   data: () => ({
     agencyList: [],
     lvdsList: [],
+    lvttList: [],
     dialog_addQuestion: false,
     agencyCodeSiteExits: '',
     agencySelected: '',
     agencyFilterSelected: '',
     lvdsFilterSelected: '',
+    lvttFilterSelected: '',
     keyword: '',
     answerList: [],
     content: '',
@@ -408,6 +425,7 @@ export default {
     telNo: '',
     address: '',
     contactEmail: '',
+    questionType: '',
     fullName: '',
     titleQuestion: '',
     answers: [
@@ -471,9 +489,11 @@ export default {
     agencyFilter () {
       return this.$store.getters.getAgencyFilter
     },
-    lvdsFilter (val) {
-      let vm = this
-      vm.lvdsFilterSelected = val
+    lvdsFilter () {
+      return this.$store.getters.getLvdsFilter
+    },
+    lvttFilter () {
+      return this.$store.getters.getLvttFilter
     },
     activeCounter () {
       return this.$store.getters.getCounter
@@ -491,6 +511,12 @@ export default {
       })
       vm.$store.dispatch('getLvdsList').then(function(result) {
         vm.lvdsList = result
+      })
+      let filter = {
+        agency: ''
+      }
+      vm.$store.dispatch('getLvttList', filter).then(function(result) {
+        vm.lvttList = result
       })
     })
   },
@@ -522,6 +548,15 @@ export default {
     agencyFilter (val) {
       let vm = this
       vm.agencyFilterSelected = val
+      vm.getLinhVucThuTuc()
+    },
+    lvdsFilter (val) {
+      let vm = this
+      vm.lvdsFilterSelected = val
+    },
+    lvttFilter (val) {
+      let vm = this
+      vm.lvttFilterSelected = val
     },
     activeAddQuestion (val) {
       let vm = this
@@ -557,6 +592,18 @@ export default {
         item['loading'] = false
         vm.questionList[index]['answers'] = vm.answers[index] ? vm.answers[index] : []
       })
+    },
+    getLinhVucThuTuc () {
+      let vm = this
+      setTimeout(function () {
+        let agencyCode = vm.agencyFilterSelected ? vm.agencyFilterSelected['itemCode'] : ''
+        let filter = {
+          agency: agencyCode
+        }
+        vm.$store.dispatch('getLvttList', filter).then(function(result) {
+          vm.lvttList = result
+        })
+      }, 200)
     },
     paggingData (config) {
       let vm = this
@@ -604,8 +651,10 @@ export default {
     },
     changeAdministration () {
       let vm = this
+      vm.lvttFilterSelected = ''
       setTimeout (function () {
         vm.$store.commit('setAgencyFilter', vm.agencyFilterSelected)
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
         vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
@@ -614,6 +663,23 @@ export default {
       let vm = this
       setTimeout (function () {
         vm.$store.commit('setLvdsFilter', vm.lvdsFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeLvtt () {
+      let vm = this
+      setTimeout (function () {
+        vm.$store.commit('setLvttFilter', vm.lvttFilterSelected)
+        vm.$store.commit('setQuestionPage', 1)
+        vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
+      }, 200)
+    },
+    changeType (val) {
+      let vm = this
+      vm.questionType = val
+      setTimeout (function () {
+        vm.$store.commit('setTypeFilter', val)
         vm.$store.commit('setQuestionPage', 1)
         vm.$store.commit('setActiveGetQuestion', !vm.activeGetQuestion)
       }, 200)
@@ -680,7 +746,10 @@ export default {
         content: item['content'],
         email: item['email'],
         fullname: item['fullname'],
-        govAgencyCode: item['govAgencyCode']
+        domainCode: item['domainCode'],
+        govAgencyCode: item['govAgencyCode'],
+        domainName: item['domainName'],
+        govAgencyName: item['govAgencyName']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')

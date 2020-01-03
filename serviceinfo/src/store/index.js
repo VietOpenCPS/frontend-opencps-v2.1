@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
     loading: false,
     index: 0,
     agencyList: [],
+    agencyListThucHien: [],
     domainList: [],
     levelList: [],
     isMobile: false,
@@ -57,6 +58,28 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getGovAgencyThucHien ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/onegate/serviceconfigs/govagencies', param).then(function (response) {
+            let serializable = response.data
+            if (serializable) {
+              resolve(serializable)
             } else {
               resolve([])
             }
@@ -125,7 +148,8 @@ export const store = new Vuex.Store({
             start: filter.page * 15 - 15,
             end: filter.page * 15,
             administration: filter.administration ? filter.administration : '',
-            keyword: filter.keyword ? filter.keyword : '',
+            agency: filter.agency ? filter.agency : '',
+            keyword: filter.keyword ? filter.keyword.replace(/,/g, '') : '',
             level: filter.level ? filter.level : 0,
             domain: filter.domain ? filter.domain : '',
             sort: ''
@@ -256,6 +280,9 @@ export const store = new Vuex.Store({
     setAgencyList (state, payload) {
       state.agencyList = payload
     },
+    setAgencyListThucHien (state, payload) {
+      state.agencyListThucHien = payload
+    },
     setDomainList (state, payload) {
       state.domainList = payload
     },
@@ -278,6 +305,9 @@ export const store = new Vuex.Store({
     },
     getAgencyList (state) {
       return state.agencyList
+    },
+    getAgencyListThucHien (state) {
+      return state.agencyListThucHien
     },
     getDomainList (state) {
       return state.domainList

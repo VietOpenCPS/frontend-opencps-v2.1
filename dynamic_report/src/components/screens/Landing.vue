@@ -96,14 +96,15 @@
           v-model="data[item.key]" 
           :label="item['label']">
         </v-text-field>
-        <v-select
+        <v-autocomplete
           v-if="item['type'] === 'select'"
           :items="item['source']"
           v-model="data[item.key]"
           :label="item['label']"
           item-value="value"
           item-text="name"
-        ></v-select>
+          :clearable="item['clearable']"
+        ></v-autocomplete>
       </v-flex>
       <v-flex xs12 sm6 v-if="hiddenAside">
         <div class="d-inline-block right">
@@ -338,6 +339,11 @@ export default {
                 vm.data[vm.filters[key]['key']] = query[vm.filters[key]['key']]
               }
             }
+            if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                vm.filters[key]['source'] = result
+              }).catch(function(){})
+            }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
             vm.buttons = vm.itemsReports[vm.index]['filterConfig']['buttons']
@@ -438,6 +444,11 @@ export default {
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+        }
+        if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+          vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+            vm.filters[key]['source'] = result
+          }).catch(function(){})
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {

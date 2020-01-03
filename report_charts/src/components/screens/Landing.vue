@@ -357,6 +357,10 @@ export default {
     group: '',
     years: [
       {
+        'value': '2020',
+        'name': 'Năm 2020'
+      },
+      {
         'value': '2019',
         'name': 'Năm 2019'
       },

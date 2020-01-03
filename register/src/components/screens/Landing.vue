@@ -87,17 +87,17 @@
                   box
                   placeholder="Thư điện tử"
                   v-model="contactEmail"
-                  :rules="[rules.required, rules.email]"
+                  :rules="requiredOption['contactEmail'] ? [rules.required, rules.email] : [rules.email]"
                   min="6"
                   required
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <div>Số điện thoại </div>
+                <div>Số điện thoại <span v-if="requiredOption['contactTelNo']" style="color:red">(*)</span></div>
                 <v-text-field
                   placeholder="Số điện thoại"
                   v-model="contactTelNo"
-                  :rules="[rules.telNo]"
+                  :rules="requiredOption['contactTelNo'] ? [rules.required, rules.telNo] : [rules.telNo]"
                   box
                   browser-autocomplete="off"
                 ></v-text-field>
@@ -311,6 +311,13 @@ export default {
           return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
         }
       }
+    },
+    requiredOption: {
+      applicantName: true,
+      applicantIdNo: true,
+      applicantIdDate: true,
+      contactEmail: true,
+      contactTelNo: false
     }
   }),
   computed: {
@@ -319,6 +326,12 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      try {
+        if (requiredOption) {
+          vm.requiredOption = requiredOption
+        }
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.getDieuKhoan()

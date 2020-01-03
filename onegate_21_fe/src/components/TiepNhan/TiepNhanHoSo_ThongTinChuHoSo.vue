@@ -670,7 +670,7 @@ export default {
   props: ['showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     requiredOptions: {
-      applicantIdNo: false,
+      applicantIdNo: true,
       applicantName: true,
       address: true,
       cityCode: true,
@@ -678,7 +678,7 @@ export default {
       wardCode: true,
       contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
+      delegateIdNo: true,
       delegateName: true,
       delegateAddress: true,
       delegateCityCode: true,

@@ -74,7 +74,13 @@ export const store = new Vuex.Store({
             icon: 'filter_6',
             link: '/table/opencps_voting/votings',
             code: 'votings',
-            text: 'Voting'
+            text: 'Câu hỏi đánh giá, khảo sát'
+          },
+          {
+            icon: 'filter_7',
+            link: '/table/opencps_config_report/reports',
+            code: 'reports',
+            text: 'Cấu hình dữ liệu thống kê'
           },
           {
             icon: 'import_export',

@@ -130,13 +130,23 @@
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen'">
-                <v-text-field label="Điện thoại di động" v-model="user['applicantContactTelNo']" box></v-text-field>
+                <v-text-field v-model="user['applicantContactTelNo']" box>
+                  <template slot="label"> 
+                    <span>Điện thoại di động</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'citizen' && profileConfig.indexOf('SoDienThoaiBan') >= 0">
                 <v-text-field label="Điện thoại cố định" v-model="user['applicantProfile']['SoDienThoaiBan']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 v-if="user['applicantType'] === 'citizen'">
-                <v-text-field label="Thư điện tử" v-model="user['applicantContactEmail']" box readonly></v-text-field>
+                <v-text-field v-model="user['applicantContactEmail']" box readonly>
+                  <template slot="label"> 
+                    <span>Thư điện tử</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business' && profileConfig.indexOf('Short_Name') >= 0">
                 <v-text-field label="Tên viết tắt" v-model="user['applicantProfile']['Short_Name']" box></v-text-field>
@@ -178,9 +188,13 @@
                     slot="activator"
                     box append-icon="event"
                     v-model="user['applicantIdDate']"
-                    label="Ngày cấp"
                     @blur="ngayCap = parseDate(user['applicantIdDate'])"
-                  ></v-text-field>
+                  >
+                    <template slot="label"> 
+                      <span>Ngày cấp</span> 
+                      <span class="red--text darken-3"> *</span>
+                    </template>
+                  </v-text-field>
                   <v-date-picker ref="picker" min="1950-01-01" :max="getMaxdate()" :first-day-of-week="1" locale="vi"
                   v-model="ngayCap" no-title @input="changeBirthDate"></v-date-picker>
                 </v-menu>
@@ -291,13 +305,23 @@
                 <v-text-field label="Điện thoại cố định" v-model="user['applicantProfile']['Phone']" box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-text-field label="Điện thoại di động" v-model="user['applicantContactTelNo']" box clearable></v-text-field>
+                <v-text-field v-model="user['applicantContactTelNo']" box clearable>
+                  <template slot="label"> 
+                    <span>Điện thoại di động</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'&& profileConfig.indexOf('Fax') >= 0">
                 <v-text-field label="Fax" v-model="user['applicantProfile']['Fax']" box clearable></v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business'">
-                <v-text-field label="Email" v-model="user['applicantContactEmail']" box readonly></v-text-field>
+                <v-text-field v-model="user['applicantContactEmail']" box readonly>
+                  <template slot="label"> 
+                    <span>Thư điện tử</span> 
+                    <span class="red--text darken-3"> *</span>
+                  </template>
+                </v-text-field>
               </v-flex>
               <v-flex xs12 sm4 v-if="user['applicantType'] === 'business' && profileConfig.indexOf('Website') >= 0">
                 <v-text-field label="Website" v-model="user['applicantProfile']['Website']" box clearable></v-text-field>
@@ -816,7 +840,14 @@
           sortable: false
         }
       ],
-      serverProtocolFilter: []
+      serverProtocolFilter: [],
+      requiredOption: {
+        applicantName: true,
+        applicantIdNo: true,
+        applicantIdDate: true,
+        contactEmail: true,
+        contactTelNo: false
+      }
     }),
     watch: {
       ngayCap(val) {
