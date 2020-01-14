@@ -37,9 +37,9 @@
                         </v-tooltip> -->
                       </div>
                     </div>
-                    <div v-for="(itemFileView, index) in dossierFilesItems" :key="index + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
+                    <div v-for="(itemFileView, index2) in dossierFilesItems" :key="index2 + 'cr'" v-if="item.partNo + id === itemFileView.dossierPartNo + id && !itemFileView.eForm">
                       <div style="width: calc(100% - 370px);display: flex;align-items: center;background: #fff;padding-left: 25px; font-size: 12px;">
-                        <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                        <span v-on:click.stop="viewFile2(itemFileView, index2)" class="ml-3" style="cursor: pointer;">
                           <v-icon class="mr-1" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
                             :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
                             {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
@@ -47,36 +47,50 @@
                           {{itemFileView.displayName}} - 
                           <i>{{itemFileView.modifiedDate}}</i>
                         </span>
-                        <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index)" class="mx-0 my-0">
+                        <v-btn title="Xóa" icon ripple v-on:click.stop="deleteSingleFile(itemFileView, index2)" class="mx-0 my-0">
                           <v-icon style="color: red">delete_outline</v-icon>
                         </v-btn>
                         <v-btn title="Đính kèm cho hồ sơ khác" v-if="itemFileView['dossierPartType'] === 7" icon ripple v-on:click.stop="attachOtherDossier(itemFileView)" class="mx-0 my-0">
                           <v-icon color="primary" size="13">fas fa fa-clone</v-icon>
                         </v-btn>
+                        <v-tooltip top v-if="esignType === 'plugin' && itemFileView.fileType.toLowerCase() === 'pdf'">
+                          <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(itemFileView, index2)" class="my-0">
+                            <v-icon size="18">fa fa-pencil-square-o</v-icon>
+                          </v-btn>
+                          <span>Ký duyệt</span>
+                        </v-tooltip>
                       </div>
                     </div>
                   </div>
                 </div>
                 <v-card v-if="item.eForm">
-                  <v-card-text style="background-color: rgba(244, 247, 213, 0.19);">
+                  <v-card-text style="overflow: hidden;background-color: rgba(244, 247, 213, 0.19);">
                     <v-layout wrap>
                       <v-flex xs12 class="text-xs-right">
                         <div :id="'wrapForm' + item.partNo + id" :style="(pstFixed > pstEl && pstFixed < endEl + pstEl) ? 'position:fixed;top:5px;z-index:101' : ''">
                           <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" :id="'saveBtn' + item.partNo + item.templateFileNo"
-                          v-if="item.eForm">
+                          v-if="item.eForm && item['editForm']">
                             <v-icon color="white">save</v-icon>&nbsp;
                             Lưu lại
                           </v-btn>
-                          <v-btn color="primary" @click.stop="previewFileEfom(item, index)" v-if="item.daKhai && item.eForm">
+                          <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.eForm">
                             <v-icon color="white">print</v-icon>&nbsp;
-                            In
+                            Xem
+                          </v-btn>
+                          <v-btn color="primary" @click.stop="editFormAlpaca(item, index)" v-if="!item['editForm'] && item.eForm">
+                            <v-icon color="white">edit</v-icon>&nbsp;
+                            Sửa
                           </v-btn>
                           <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.eForm">
                             <v-icon color="white">delete</v-icon>&nbsp;
                             Xóa
                           </v-btn>
                         </div>
-                        <div :id="'formAlpaca' + item.partNo + id"></div>
+                        <div v-show="item['editForm']" :id="'formAlpaca' + item.partNo + id"></div>
+                        <!--  -->
+                        <iframe v-show="!item['editForm']" :id="'displayPDF' + item.partNo + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+                        </iframe>
+                        <!--  -->
                       </v-flex>
                     </v-layout>
                   </v-card-text>
@@ -88,7 +102,7 @@
                 <content-placeholders-text :lines="1" />
               </content-placeholders>
               <v-layout row wrap v-else>
-                <v-flex style="width: 100px;">
+                <v-flex :style="esignType === 'plugin' ? 'width: 120px' : 'width: 100px'">
                   <input
                   type="file"
                   style="display: none"
@@ -102,14 +116,14 @@
                   indeterminate
                   v-if="progressUploadPart + id === item.partNo + id"
                   ></v-progress-circular>
-                  <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
+                  <!-- <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id & item.eForm">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click.stop="loadAlpcaFormClick(item)">
                       <v-badge>
                         <v-icon size="24" color="#004b94">edit</v-icon>
                       </v-badge>
                     </v-btn>
                     <span>Khai trực tuyến</span>
-                  </v-tooltip>
+                  </v-tooltip> -->
                   <v-tooltip top v-if="progressUploadPart + id !== item.partNo + id">
                     <v-btn slot="activator" icon class="mx-0 my-0" @click="pickFile(item)">
                       <v-badge>
@@ -118,6 +132,12 @@
                     </v-btn>
                     <span v-if="!item.partTip['extensions'] && !item.partTip['maxSize']">Tải giấy tờ lên</span>
                     <span v-else>Tải giấy tờ lên (Chấp nhận tải lên các định dạng: {{item.partTip['extensions']}}. Tối đa {{item.partTip['maxSize']}} MB)</span>
+                  </v-tooltip>
+                  <v-tooltip top v-if="esignType === 'plugin' && item['eForm']">
+                    <v-btn slot="activator" flat icon color="indigo" v-on:click.stop="signAction(item, index, item.partNo)" class="ml-2 my-0">
+                      <v-icon size="22">fa fa-pencil-square-o</v-icon>
+                    </v-btn>
+                    <span>Ký duyệt</span>
                   </v-tooltip>
                   <!-- <v-tooltip top>
                     <v-btn slot="activator" class="mx-0" fab dark small color="primary" @click="viewFileWithPartNo(item)" style="height:20px;width:20px">
@@ -236,6 +256,10 @@
       createFiles: {
         type: Array,
         default: () => []
+      },
+      esignType: {
+        type: String,
+        default: () => ''
       }
     },
     components: {
@@ -287,6 +311,9 @@
       },
       dossierIntoGroupSelect () {
         return this.$store.getters.getDossierIntoGroup
+      },
+      createFileSignedSync () {
+        return this.$store.getters.getCreateFileSigned
       }
     },
     created () {
@@ -299,9 +326,22 @@
           arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
           arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
           Promise.all(arrTemp).then(values => {
-            var dossierTemplates = values[1]
+            var dossierTemplates = values[1]['dossierParts']
             var dossierFiles = values[0]
             vm.dossierFilesItems = dossierFiles
+            //
+            vm.dossierFilesItems.forEach((template, index) => {
+              if (vm.detailDossier['dossierId'] === vm.createFileSignedSync['dossierId']) {
+                template['isSigned'] = vm.createFileSignedSync['createFiles'][index]['isSigned']
+                template['fileEntryId'] = vm.createFileSignedSync['createFiles'][index]['fileEntryId']
+                template['pdfSigned'] = vm.createFileSignedSync['createFiles'][index]['pdfSigned']
+              } else {
+                template['isSigned'] = false
+                template['fileEntryId'] = ''
+                template['pdfSigned'] = ''
+              }
+            })
+            // 
             vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, dossierFiles)
             if (dossierTemplates.length !== 0) {
               vm.createFiles.forEach(template => {
@@ -381,7 +421,19 @@
       mergeDossierTemplateVsDossierFiles (createFiles, dossierFiles) {
         let vm = this
         if (dossierFiles.length !== 0) {
-          createFiles.forEach(template => {
+          createFiles.forEach((template, index) => {
+            template['editForm'] = true
+            // if (vm.esignType === 'plugin') {
+            //   if (vm.detailDossier['dossierId'] === vm.createFileSignedSync['dossierId']) {
+            //     template['isSigned'] = vm.createFileSignedSync['createFiles'][index]['isSigned']
+            //     template['fileEntryId'] = vm.createFileSignedSync['createFiles'][index]['fileEntryId']
+            //     template['pdfSigned'] = vm.createFileSignedSync['createFiles'][index]['pdfSigned']
+            //   } else {
+            //     template['isSigned'] = false
+            //     template['fileEntryId'] = ''
+            //     template['pdfSigned'] = ''
+            //   }
+            // }
             let itemFind = dossierFiles.find(file => {
               return template.partNo === file.dossierPartNo && file.fileSize !== 0
               // return template.partNo === file.dossierPartNo && file.eForm
@@ -396,6 +448,10 @@
           createFiles.forEach(template => {
             if (template.eForm) {
               template['daKhai'] = false
+              template['editForm'] = true
+              // template['isSigned'] = false
+              // template['fileEntryId'] = ''
+              // template['pdfSigned'] = ''
             }
           })
         }
@@ -436,6 +492,7 @@
           fileFind['dossierId'] = vm.detailDossier.dossierId
           fileFind['id'] = vm.id
           vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+            toastr.clear()
             toastr.success('Yêu cầu của bạn thực hiện thành công')
             vm.createFiles[index].daKhai = true
             if (vm.dossierIntoGroup.length > 0) {
@@ -445,10 +502,23 @@
             }
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
+              // 
+              vm.createFileSigned('update')
+              // 
             }).catch(reject => {
             })
+            // 
+            // vm.createFiles[index]['isSigned'] = false
+            // vm.createFiles[index]['fileEntryId'] = ''
+            // vm.createFiles[index]['pdfSigned'] = ''
+            // let createFileSigned = {
+            //   dossierId: vm.detailDossier['dossierId'],
+            //   createFiles: vm.createFiles
+            // }
+            // vm.$store.commit('setCreateFileSigned', createFileSigned)
           }).catch(reject => {
             console.log('run saveForm')
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         } else {
@@ -466,27 +536,25 @@
             }, 3000)
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(resFiles => {
               vm.dossierFilesItems = resFiles
+              // 
+              vm.createFileSigned('update')
+              // 
             }).catch(reject => {
+              toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
+            // 
+            // vm.createFiles[index]['isSigned'] = false
+            // vm.createFiles[index]['fileEntryId'] = ''
+            // vm.createFiles[index]['pdfSigned'] = ''
+            // let createFileSigned = {
+            //   dossierId: vm.detailDossier['dossierId'],
+            //   createFiles: vm.createFiles
+            // }
+            // vm.$store.commit('setCreateFileSigned', createFileSigned)
           }).catch(reject => {
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-          })
-        }
-      },
-      onDeleteAttackFiles (item) {
-        var vm = this
-        console.log('delete')
-        let x = confirm('Bạn có muốn xóa toàn bộ file trong thành phần hồ sơ này?')
-        if (x) {
-          vm.dossierFilesItems.forEach(val => {
-            if (val.dossierPartNo === item.partNo) {
-              val['dossierId'] = vm.detailDossier.dossierId
-              vm.$store.dispatch('deleteAttackFiles', val).then(function (result) {
-                vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId)
-              }).catch(function (xhr) {
-              })
-            }
           })
         }
       },
@@ -508,6 +576,9 @@
             vm.dossierFilesItems = result
             vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
             console.log('createFiles', vm.createFiles)
+            // 
+            vm.createFileSigned()
+            // 
           })
           // add hồ sơ cùng nhóm
           console.log('vm.dossierIntoGroup', vm.dossierIntoGroup)
@@ -558,11 +629,32 @@
         }, 300)
         //
         var fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === data.partNo && itemFile.eForm
+          return itemFile.dossierPartNo === data.partNo && itemFile.eForm && itemFile.fileSize !== 0
         })
         if (fileFind) {
           fileFind['id'] = vm.id
           vm.$store.dispatch('loadAlpcaForm', fileFind)
+          // preview PDF
+          data['editForm'] = false
+          // 
+          let indexFile = ''
+          for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+            if (vm.dossierFilesItems[i]['dossierPartNo'] === data['partNo'] && vm.dossierFilesItems[i]['eForm']) {
+              indexFile = i
+              break
+            }
+          }
+          // 
+          console.log('capnhat eform', vm.dossierFilesItems[indexFile])
+          if (!vm.dossierFilesItems[indexFile]['isSigned']) {
+            vm.$store.dispatch('viewFile', fileFind).then(result => {
+              document.getElementById('displayPDF' + fileFind.dossierPartNo + vm.id).src = result
+            })
+          } else {
+            setTimeout(function () {
+              document.getElementById('displayPDF' + data.partNo + vm.id).src = vm.dossierFilesItems[indexFile].pdfSigned
+            }, 200)
+          }
         } else {
           vm.createFiles.forEach(val => {
             if (val.eForm && data.partNo === val.partNo) {
@@ -570,6 +662,70 @@
               vm.showAlpacaJSFORM(val)
             }
           })
+        }
+      },
+      editFormAlpaca (item, index) {
+        let vm = this
+        vm.createFiles[index]['editForm'] = true
+        window.scrollBy(0, 10)
+        console.log('createFiles', vm.createFiles)
+        setTimeout (function () {
+          let fileFind = vm.dossierFilesItems.find(itemFile => {
+            return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+          })
+          fileFind['id'] = vm.id
+          vm.$store.dispatch('loadAlpcaForm', fileFind)
+        }, 200)
+      },
+      previewFormAlpaca (item, index) {
+        let vm = this
+        vm.createFiles[index]['editForm'] = false
+        window.scrollBy(0, 10)
+        // 
+        let indexFile = ''
+        for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+          if (vm.dossierFilesItems[i]['dossierPartNo'] === item['partNo'] && vm.dossierFilesItems[i]['eForm']) {
+            indexFile = i
+            break
+          }
+        }
+        // 
+        if (!vm.dossierFilesItems[indexFile]['isSigned']) {
+          vm.dossierFilesItems.forEach(file => {
+            if (file.dossierPartNo === item.partNo && file.eForm && !file.removed) {
+              file['dossierId'] = vm.detailDossier.dossierId
+              if (!vm.onlyView) {
+                file['id'] = vm.id
+                vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+                  // item['editForm'] = false
+                  setTimeout(function () {
+                    vm.$store.dispatch('viewFile', file).then(result => {
+                      document.getElementById('displayPDF' + file.dossierPartNo + vm.id).src = result
+                    })
+                  }, 200)
+                }).catch(reject => {
+                  toastr.clear()
+                  toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+                })
+              } else {
+                // item['editForm'] = false
+                vm.$store.dispatch('viewFile', file).then(result => {
+                  if (file['eForm']) {
+                    vm.pdfEform = true
+                  } else {
+                    vm.pdfEform = false
+                  }
+                  setTimeout(function () {
+                    document.getElementById('displayPDF' + item.partNo + vm.id).src = result
+                  }, 200)
+                })
+              }
+            }
+          })
+        } else {
+          setTimeout(function () {
+            document.getElementById('displayPDF' + item.partNo + vm.id).src = vm.dossierFilesItems[indexFile].pdfSigned
+          }, 200)
         }
       },
       deleteSingleFileEform (item, index) {
@@ -580,27 +736,29 @@
             if (file.dossierPartNo === item.partNo && file.eForm) {
               file['dossierId'] = vm.detailDossier.dossierId
               vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
-                console.log('success!')
                 vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
                   vm.dossierFilesItems = result
+                  // 
+                  vm.createFileSigned('update')
+                  // 
+                  item['editForm'] = true
                   var fileViewsTemp = vm.dossierFilesItems.filter(file => {
                     return file.dossierPartNo === item.partNo && !file.eForm
                   })
                   if (fileViewsTemp) {
                     vm.fileViews = fileViewsTemp
                   }
-                  // var changeCreateFile = {
-                  //   createFiles: []
-                  // }
-                  // if (vm.dossierFilesItems && vm.dossierFilesItems.length > 0) {
-                  //   for (var i = 0; i < vm.dossierFilesItems.length; i++) {
-                  //     if (vm.dossierFilesItems[i].dossierPartType === 2 && vm.dossierFilesItems[i].eForm === true) {
-                  //       changeCreateFile.createFiles.push(vm.dossierFilesItems[i])
-                  //     }
-                  //   }
-                  // }
-                  // vm.$store.commit('setDataCreateFile', changeCreateFile)
+                  
                 })
+                // 
+                // vm.createFiles[index]['isSigned'] = false
+                // vm.createFiles[index]['fileEntryId'] = ''
+                // vm.createFiles[index]['pdfSigned'] = ''
+                // let createFileSigned = {
+                //   dossierId: vm.detailDossier['dossierId'],
+                //   createFiles: vm.createFiles
+                // }
+                // vm.$store.commit('setCreateFileSigned', createFileSigned)
               })
             }
           })
@@ -624,10 +782,85 @@
                 })
               }, 1000)
             }).catch(reject => {
+              toastr.clear()
               toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             })
           }
         })
+      },
+      showConfigSignService () {
+        vgca_show_config()
+      },
+      viewFileKySo (item, index) {},
+      signAction (item, index, partNo) {
+        let vm = this
+        console.log('file ký duyệt', item)
+        if (item['eForm'] && item['daKhai'] || !item['eForm']) {
+          let signFileCallBack = function (rv) {
+            let received_msg = JSON.parse(rv)
+            if (received_msg.Status === 0) {
+              let dataSigned
+              try {
+                dataSigned = JSON.parse(received_msg.FileServer)
+              } catch (error) {
+              }
+              toastr.clear()
+              toastr.success('Tài liệu đã được ký duyệt')
+              if (!partNo) {
+                vm.dossierFilesItems[index].isSigned = true
+                vm.dossierFilesItems[index].pdfSigned = dataSigned ? dataSigned.url : ''
+                vm.dossierFilesItems[index].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
+              } else {
+                let indexFile = ''
+                for (let i = 0; i < vm.dossierFilesItems.length; i++) {
+                  if (vm.dossierFilesItems[i]['dossierPartNo'] === partNo && vm.dossierFilesItems[i]['eForm']) {
+                    indexFile = i
+                    break
+                  }
+                }
+ 
+                vm.dossierFilesItems[indexFile].isSigned = true
+                vm.dossierFilesItems[indexFile].pdfSigned = dataSigned ? dataSigned.url : ''
+                vm.dossierFilesItems[indexFile].fileEntryId = dataSigned ? dataSigned.fileEntryId : ''
+                // 
+                if (vm.createFiles[index]['editForm']) {
+                  vm.createFiles[index]['editForm'] = false
+                  setTimeout(function () {
+                    document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
+                  }, 200)
+                } else {
+                  setTimeout(function () {
+                    document.getElementById('displayPDF' + partNo + vm.id).src = dataSigned.url
+                  }, 200)
+                }
+                // 
+              }
+              let createFileSigned = {
+                dossierId: vm.detailDossier['dossierId'],
+                createFiles: vm.dossierFilesItems
+              }
+              vm.$store.commit('setCreateFileSigned', createFileSigned)
+            } else {
+              if (received_msg.Message) {
+                toastr.clear()
+                toastr.error(received_msg.Message)
+              } else {
+                toastr.clear()
+                toastr.error('Ký duyệt không thành công')
+              }
+            }
+          }
+          let prms = {}
+          prms['FileUploadHandler'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/vgca/fileupload'
+          prms['SessionId'] = ''
+          prms['FileName'] = window.themeDisplay.getPortalURL() + '/o/rest/v2/dossiers/' + vm.detailDossier['dossierId'] + '/files/' + item['referenceUid'] + '/preview.pdf'
+
+          let json_prms = JSON.stringify(prms)
+          vgca_sign_approved(json_prms, signFileCallBack)
+        } else {
+          toastr.clear()
+          toastr.error('Chưa có tài liệu ký duyệt')
+        }
       },
       deleteSingleFile (item, index) {
         var vm = this
@@ -639,9 +872,13 @@
             vm.partView = item.dossierPartNo
             vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId).then(result => {
               vm.dossierFilesItems = result
+              // 
+              vm.createFileSigned()
+              // 
               vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, vm.dossierFilesItems)
             })
           }).catch(reject => {
+            toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }
@@ -655,7 +892,7 @@
           }
         })
       },
-      viewFile2 (data) {
+      viewFile2 (data, index) {
         var vm = this
         if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt') {
           var url = vm.initDataResource.dossierApi + '/' + vm.detailDossier.dossierId + '/files/' + data.referenceUid
@@ -665,10 +902,15 @@
           vm.documentType = 'Tài liệu đính kèm'
           vm.dialogPDF = true
           data['dossierId'] = vm.detailDossier.dossierId
-          vm.$store.dispatch('viewFile', data).then(result => {
+          if (vm.esignType === 'plugin' && vm.dossierFilesItems[index]['isSigned']) {
             vm.dialogPDFLoading = false
-            document.getElementById('dialogPDFPreview' + vm.id).src = result
-          })
+            document.getElementById('dialogPDFPreview' + vm.id).src = vm.dossierFilesItems[index]['pdfSigned']
+          } else {
+            vm.$store.dispatch('viewFile', data).then(result => {
+              vm.dialogPDFLoading = false
+              document.getElementById('dialogPDFPreview' + vm.id).src = result
+            })
+          }
         }
       },
       viewFileWithPartNo (item) {
@@ -762,6 +1004,46 @@
             )
           })
         })
+      },
+      checkIsSigned (dossierFileId) {
+        let vm = this
+        if (vm.createFileSignedSync) {
+          let file = vm.createFileSignedSync['createFiles'].filter(function(item) {
+            return item.dossierFileId === dossierFileId
+          })
+          if (file.length > 0) {
+            return file[0]
+          } else {return false}
+        } else {
+          return false
+        }
+      },
+      createFileSigned (type) {
+        let vm = this
+        vm.dossierFilesItems.forEach((template, index) => {
+          if (vm.createFileSignedSync && vm.detailDossier['dossierId'] === vm.createFileSignedSync['dossierId']) {
+            let file = vm.checkIsSigned(template['dossierFileId'])
+            if (file && type !== 'update') {
+              vm.dossierFilesItems[index]['isSigned'] = file['isSigned']
+              vm.dossierFilesItems[index]['fileEntryId'] = file['fileEntryId']
+              vm.dossierFilesItems[index]['pdfSigned'] = file['pdfSigned']
+            } else {
+              vm.dossierFilesItems[index]['isSigned'] = false
+              vm.dossierFilesItems[index]['fileEntryId'] = ''
+              vm.dossierFilesItems[index]['pdfSigned'] = ''
+            }
+          } else {
+            vm.dossierFilesItems[index]['isSigned'] = false
+            vm.dossierFilesItems[index]['fileEntryId'] = ''
+            vm.dossierFilesItems[index]['pdfSigned'] = ''
+          }
+        })
+        let createFileSigned = {
+          dossierId: vm.detailDossier['dossierId'],
+          createFiles: vm.dossierFilesItems
+        }
+        console.log('fileSignedSync', createFileSigned)
+        vm.$store.commit('setCreateFileSigned', createFileSigned)
       },
       addFileToDossier () {
         let vm = this

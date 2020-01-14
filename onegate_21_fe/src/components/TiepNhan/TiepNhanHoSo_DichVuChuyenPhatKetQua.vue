@@ -174,7 +174,7 @@
         
       </v-card-text>
     </v-card>
-    <div class="absolute__btn" style="width: 345px; margin-top: 4px;">
+    <div class="absolute__btn" style="width: 485px; margin-top: 4px;">
       <content-placeholders class="mt-1" v-if="loading">
         <content-placeholders-text :lines="1" />
       </content-placeholders>
@@ -182,6 +182,7 @@
       <v-radio-group class="mt-1" v-model="dichVuChuyenPhatKetQua.viaPostal" row @change="changeViaPostal($event)">
         <v-radio label="Nhận kết quả trực tiếp" :value="1" ></v-radio>
         <v-radio label="Nhận kết quả tại nhà" :value="2"></v-radio>
+        <v-radio label="Nhận trực tuyến" :value="9"></v-radio>
       </v-radio-group>
       <!--  -->
       <!-- <v-checkbox
@@ -367,10 +368,10 @@ export default {
     },
     changeViaPostal (event) {
       console.log('changeViaPostal', event)
-      this.$store.commit('setViaPostal', event === 2 ? 2 : 1)
+      this.$store.commit('setViaPostal', event)
       this.$emit('changeViapostal', event)
       let dataChuyenPhat = {
-        viaPostal: event === 2 ? 2 : 1,
+        viaPostal: event,
         postalServiceCode: this.dichVuChuyenPhatKetQua.postalServiceCode ? this.dichVuChuyenPhatKetQua.postalServiceCode : '',
         postalAddress: this.dichVuChuyenPhatKetQua.postalAddress ? this.dichVuChuyenPhatKetQua.postalAddress : '',
         postalCityCode: this.dichVuChuyenPhatKetQua.postalCityCode ? this.dichVuChuyenPhatKetQua.postalCityCode : '',

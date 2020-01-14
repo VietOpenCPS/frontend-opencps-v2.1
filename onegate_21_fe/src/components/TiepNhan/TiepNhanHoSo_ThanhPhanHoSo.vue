@@ -562,7 +562,7 @@ export default {
         serviceInfoId: data.serviceCode
       }))
       Promise.all(arrTemp).then(values => {
-        var dossierTemplates = values[0]
+        var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
         var dossierFiles = values[2]
         var fileTemplates = []

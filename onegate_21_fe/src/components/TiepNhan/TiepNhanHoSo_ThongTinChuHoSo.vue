@@ -7,7 +7,7 @@
             <v-expansion-panel-content>
               <div slot="header"> <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div> Thông tin chủ hồ sơ</div>
               <v-card>
-                <v-tooltip left v-if="(!thongTinChuHoSo.userType || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
+                <v-tooltip left v-if="(thongTinChuHoSo.userType === '2' || (originality === 1 && thongTinChuHoSo.applicantIdType === 'business')) && bussinessExits"
                 style="position:absolute;right:5px;z-index:101"
                 >
                   <v-btn slot="activator" class="my-0 mt-1" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:32px!important;height:32px!important"
@@ -22,7 +22,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0"> <!-- {{thongTinChuHoSo.userType}} --> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0"> {{ labelSwitch[thongTinChuHoSo.userType].cmtnd }} <span v-if="requiredOptions['applicantIdNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm2 style="position:relative">
                       <v-text-field
@@ -178,7 +178,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ E-mail <span v-if="originality === 1" style="color:red"></span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -187,6 +187,8 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
+                      :rules="thongTinChuHoSo.contactEmail ? [rules.email] : ''"
+                      :required="requiredOptions['contactEmail']"
                       ></v-text-field>
                     </v-flex>
                   </v-layout>
@@ -194,13 +196,18 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <div class="absolute__btn" style="width: 350px;" v-if="originality !== 1">
+          <div class="absolute__btn" :style="hasOrganization ? 'width: 420px;' : 'width: 350px;'" v-if="originality !== 1">
             <content-placeholders class="mt-1" v-if="loading">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-radio-group class="mt-2" v-else v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
-              <v-radio label="Công dân" :value="true"></v-radio>
-              <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+            <v-radio-group class="mt-2" v-if="!loading && !hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Tổ chức, doanh nghiệp" :value="'2'"></v-radio>
+            </v-radio-group>
+            <v-radio-group class="mt-2" v-if="!loading && hasOrganization" v-model="thongTinChuHoSo.userType" row @change="checkApplicantInfos">
+              <v-radio label="Công dân" :value="'1'"></v-radio>
+              <v-radio label="Doanh nghiệp" :value="'2'"></v-radio>
+              <v-radio label="Cơ quan, tổ chức" :value="'3'"></v-radio>
             </v-radio-group>
           </div>
           <div style="position: relative;" v-if="originality !== 1  && !showDelegate">
@@ -366,7 +373,7 @@
                         <content-placeholders class="mt-1" v-if="loading">
                           <content-placeholders-text :lines="1" />
                         </content-placeholders>
-                        <v-subheader v-else class="pl-0">Email: </v-subheader>
+                        <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['delegateEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                       </v-flex>
                       <v-flex xs12 sm6>
                         <content-placeholders class="mt-1" v-if="loading">
@@ -376,6 +383,7 @@
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
                         :rules="thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : ''"
+                        :required="requiredOptions['delegateEmail']"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -667,23 +675,23 @@ export default {
     'suggestions': Suggestions,
     'tiny-pagination': TinyPagination
   },
-  props: ['showApplicant', 'showDelegate', 'formCode'],
+  props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     requiredOptions: {
-      applicantIdNo: true,
-      applicantName: true,
-      address: true,
-      cityCode: true,
-      districtCode: true,
-      wardCode: true,
+      applicantIdNo: false,
+      applicantName: false,
+      address: false,
+      cityCode: false,
+      districtCode: false,
+      wardCode: false,
       contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: true,
-      delegateName: true,
-      delegateAddress: true,
-      delegateCityCode: true,
-      delegateDistrictCode: true,
-      delegateWardCode: true,
+      delegateIdNo: false,
+      delegateName: false,
+      delegateAddress: false,
+      delegateCityCode: false,
+      delegateDistrictCode: false,
+      delegateWardCode: false,
       delegateTelNo: true,
       delegateEmail: false
     },
@@ -715,7 +723,7 @@ export default {
         sortable: false
       },
       {
-        text: 'Số CMND/ căn cước, mã số doanh nghiệp',
+        text: 'Số CMND/ căn cước, mã tổ chức, doanh nghiệp',
         align: 'center',
         sortable: false
       },
@@ -731,17 +739,17 @@ export default {
       }
     ],
     labelSwitch: {
-      'true': {
+      '1': {
         cmtnd: 'CMND/ Hộ chiếu',
         nguoi_nop: 'Họ và tên'
       },
-      'false': {
+      '2': {
         cmtnd: 'Mã số thuế',
         nguoi_nop: 'Tên tổ chức, doanh nghiệp'
       }
     },
     thongTinChuHoSo: {
-      userType: true,
+      userType: '1',
       cityCode: '',
       districtCode: '',
       wardCode: '',
@@ -754,7 +762,7 @@ export default {
       applicantName: ''
     },
     thongTinNguoiNopHoSo: {
-      sameUser: true,
+      sameUser: false,
       delegateName: '',
       delegateCityCode: '',
       delegateAddress: '',
@@ -814,7 +822,8 @@ export default {
     districtItems: [],
     wardItems: [],
     valid: false,
-    loadingTable: false
+    loadingTable: false,
+    hasOrganization: false
   }),
   computed: {
     loading () {
@@ -846,6 +855,29 @@ export default {
     }
   },
   created () {
+    let vm = this
+    if (vm.formCode === "NEW") {
+      vm.thongTinNguoiNopHoSo.sameUser = true
+    }
+    if (vm.hasOrganization) {
+      vm.labelSwitch = {
+        '1': {
+          cmtnd: 'CMND/ Hộ chiếu',
+          nguoi_nop: 'Họ và tên'
+        },
+        '2': {
+          cmtnd: 'Mã số thuế',
+          nguoi_nop: 'Tên doanh nghiệp'
+        },
+        '3': {
+          cmtnd: 'Mã cơ quan, tổ chức',
+          nguoi_nop: 'Tên cơ quan, tổ chức'
+        }
+      }
+    }
+    if (vm.requiredConfig && vm.requiredConfig['applicant']) {
+      vm.requiredOptions = Object.assign(vm.requiredOptions, vm.requiredConfig['applicant'])
+    }
   },
   watch: {
     thongTinChuHoSo: {
@@ -950,9 +982,11 @@ export default {
       }
       let thongTinNguoiNopHoSoTemp = Object.assign(vm.thongTinNguoiNopHoSo, tempData)
       vm.thongTinNguoiNopHoSo = thongTinNguoiNopHoSoTemp
-      let userTypeCondition = true
+      let userTypeCondition = '1'
       if (data.applicantIdType === 'business') {
-        userTypeCondition = false
+        userTypeCondition = '2'
+      } else if (data.applicantIdType === 'organization') {
+        userTypeCondition = '3'
       }
       let tempDataChuHs = {
         userType: userTypeCondition,
@@ -1140,7 +1174,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
           vm.checkApplicantInfos()
         }
         vm.$store.commit('setApplicantId', query)
@@ -1206,10 +1240,12 @@ export default {
       vm.selectedSearchItem = item
       // console.log('selectedSearchItem', vm.selectedSearchItem)
       if (item['applicantIdType'] === 'business') {
-        vm.thongTinChuHoSo.userType = false
+        vm.thongTinChuHoSo.userType = '2'
         // vm.thongTinNguoiNopHoSo.sameUser = false
+      } else if (item['applicantIdType'] === 'citizen') {
+        vm.thongTinChuHoSo.userType = '1'
       } else {
-        vm.thongTinChuHoSo.userType = true
+        vm.thongTinChuHoSo.userType = '3'
       }
       vm.thongTinChuHoSo['applicantIdNo'] = item.applicantIdNo.toString()
       //
@@ -1306,7 +1342,7 @@ export default {
         clearTimeout(vm.functionTimeOut)
       }
       vm.functionTimeOut = setTimeout(function () {
-        if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+        if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2') || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
           vm.checkApplicantInfos()
         }
         vm.$store.commit('setApplicantId', vm.thongTinChuHoSo.applicantIdNo)
@@ -1314,7 +1350,7 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
-      if ((vm.originality === 3 && !vm.thongTinChuHoSo.userType && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
+      if ((vm.originality === 3 && vm.thongTinChuHoSo.userType === '2' && vm.thongTinChuHoSo.applicantIdNo) || (vm.originality === 1 && vm.thongTinChuHoSo.applicantIdType === 'business')) {
         let filter = {
           applicantIdNo: vm.thongTinChuHoSo.applicantIdNo,
           applicantName: vm.thongTinChuHoSo.applicantName

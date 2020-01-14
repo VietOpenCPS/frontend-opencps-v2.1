@@ -78,8 +78,8 @@ export const store = new Vuex.Store({
           }
           axios.get(state.endPoint + '/onegate/serviceconfigs/govagencies', param).then(function (response) {
             let serializable = response.data
-            if (serializable) {
-              resolve(serializable)
+            if (serializable.data) {
+              resolve(serializable.data)
             } else {
               resolve([])
             }

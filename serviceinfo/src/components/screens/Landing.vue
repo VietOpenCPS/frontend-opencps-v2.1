@@ -513,7 +513,8 @@ export default {
       }
     ],
     serviceSelected: '',
-    hasCoQuanThucHien: false
+    hasCoQuanThucHien: false,
+    configUrl: ''
   }),
   computed: {
     govAgencyList () {
@@ -542,6 +543,12 @@ export default {
     } catch (error) {
       vm.hasCoQuanThucHien = false
     }
+    // 
+    try {
+      vm.configUrl = configSso 
+    } catch (error) {
+    }
+    // 
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
@@ -657,6 +664,7 @@ export default {
         newQuery['page'] = 1
         newQuery['domain'] = vm.domainSelected
         newQuery['keyword'] = vm.serviceNameKey
+        newQuery['agencyth'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -752,18 +760,19 @@ export default {
         npmreactlogin_login: vm.userName,
         npmreactlogin_password: vm.passWord
       }
-      vm.loadingLogin = true
       if (vm.userName && vm.passWord) {
+        vm.loadingLogin = true
         vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
           vm.loadingLogin = false
           if (result === 'success') {
             vm.dialogLogin = false
             let redirectURL = window.location.host + window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
             let url = redirectURL + '/dich-vu-cong#/add-dvc/' + vm.serviceSelected.serviceConfigId
-            window.location.href = url
-            setTimeout(() => {
-              window.location.reload()
-            }, 100)
+            console.log('run login success 456', url)
+            // window.location.href = url
+            // setTimeout(() => {
+            //   window.location.reload()
+            // }, 100)
           }          
         }).catch(function(){
           vm.loadingLogin = false
@@ -772,11 +781,11 @@ export default {
     },
     register () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
     },
     getPassword () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
     },
     paggingData (config) {
       let vm = this
@@ -813,7 +822,7 @@ export default {
           } else {
             let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
             let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-            window.open(url, '_self')
+            window.open(url, '_self') 
           }
         } else {
           // vm.dialogLogin = true

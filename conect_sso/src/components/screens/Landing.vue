@@ -2,7 +2,12 @@
   <div>
     <v-dialog class="my-0" v-model="dialog_loginDVCQG" persistent max-width="1200px" style="width:100%;max-height: 100%;">
       <v-card>
-        <v-card-text class="px-0 py-0">
+        <v-card-text class="px-0 py-0" style="position: relative">
+          <div style="position:absolute;right:15px">
+            <v-btn style="height: 36px;width: 42px;" @click="goBack" fab color="#913938">
+              <v-icon class="white--text">fas fa fa-reply</v-icon>
+            </v-btn>
+          </div>
           <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
             width: 100%;
             height: 650px;
@@ -20,6 +25,10 @@
               <div class="toolbar__content"  style="justify-content: center">
                 <h3 class="white--text">ĐĂNG NHẬP</h3>
               </div>
+              <v-spacer></v-spacer>
+              <v-btn style="position: absolute;top: 0;right: 0;" icon dark @click.native="goBack">
+                <v-icon class="white--text">close</v-icon>
+              </v-btn>
             </nav>
             <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
               <v-form ref="form" v-model="valid" lazy-validation class="mt-3">
@@ -105,7 +114,8 @@ export default {
     userName: '',
     passWord: '',
     loadingLogin: false,
-    valid: false
+    valid: false,
+    userInfoDvcqg: ''
   }),
   computed: {
   },
@@ -171,6 +181,8 @@ export default {
       } else {
         vm.dialog_loginDVCQG = false
         vm.dialogLogin = true
+        vm.userInfoDvcqg = data
+        console.log('user dvcqg', vm.userInfoDvcqg)
       }
     },
     submitConfirmLogin () {
@@ -186,7 +198,7 @@ export default {
           vm.loadingLogin = false
           if (result === 'success') {
             vm.dialogLogin = false
-            let url = window.themeDisplay.getURLHome()
+            let url = window.themeDisplay.getURLHome() + '/profile#/?sync=true'
             setTimeout(() => {
               window.location.href = url
             }, 300)
@@ -196,13 +208,28 @@ export default {
         })
       }
     },
+    goBack () {
+      window.history.back()
+    },
     register () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      if (vm.userInfoDvcqg && String(vm.userInfoDvcqg['userId']) === '0') {
+        let name = vm.userInfoDvcqg['HoVaTen'] ? vm.userInfoDvcqg['HoVaTen'] : ''
+        let mail = vm.userInfoDvcqg['ThuDienTu'] ? vm.userInfoDvcqg['ThuDienTu'] : ''
+        let tel = vm.userInfoDvcqg['SoDienThoai'] ? vm.userInfoDvcqg['SoDienThoai'] : ''
+        let credit = vm.userInfoDvcqg['SoCMND'] ? vm.userInfoDvcqg['SoCMND'] : ''
+        let type = vm.userInfoDvcqg['LoaiTaiKhoan'] ? vm.userInfoDvcqg['LoaiTaiKhoan'] : ''
+
+        let query = '#/?name=' + name + '&mail=' + mail + '&tel=' + tel + '&credit=' + credit + '&type=' + type
+        let url = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + query : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register' + query
+        window.location.href = url
+      } else {
+        window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      }
     },
     getPassword () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
     },
   }
 }

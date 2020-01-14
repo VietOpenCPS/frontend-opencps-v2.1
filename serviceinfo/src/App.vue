@@ -18,7 +18,7 @@
           <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
             <v-list-tile-action>
               <v-icon color="#00aeef" 
-                v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
+                v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentAgencyTh) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
                 || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
               >play_arrow</v-icon>
             </v-list-tile-action>
@@ -49,6 +49,7 @@
       activeTab: 0,
       pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
+      currentAgencyTh: '',
       currentDomain: '',
       currentLevel: '',
       currentMethod: '',
@@ -213,6 +214,7 @@
         // 
         if (vm.hasCoQuanThucHien) {
           vm.$store.dispatch('getGovAgencyThucHien').then(function (result) {
+            vm.currentAgencyTh = newQuery.hasOwnProperty('agencyth') ? newQuery.agencyth : ''
             vm.menuServiceInfos[1].children = result
             vm.$store.commit('setAgencyListThucHien', result)
           }).catch(function(){})
@@ -262,6 +264,7 @@
           vm.isDetail = false
         }
         vm.currentAgency = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+        vm.currentAgencyTh = currentQuery.hasOwnProperty('agencyth') ? currentQuery.agencyth : ''
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
         vm.currentMethod = currentQuery.hasOwnProperty('level') && String(currentQuery.level) === '2' ? 'MC' : currentQuery.hasOwnProperty('level') && String(currentQuery.level === '3,4') ? 'DVC' : ''
@@ -292,16 +295,32 @@
       },
       filterAction (index, item1) {
         let vm = this
-        if (index === 0) {
-          vm.filterAgency(item1)
-        } else if (index === 1) {
-          vm.filterDomain(item1)
-        } else if (index === 2) {
-          vm.filterLevel(item1)
-        } else if (index === 3) {
-          vm.filterMethod(item1)
-        } else if (index === 5) {
-          vm.filterAll()
+        if (!vm.hasCoQuanThucHien) {
+          if (index === 0) {
+            vm.filterAgency(item1)
+          } else if (index === 1) {
+            vm.filterDomain(item1)
+          } else if (index === 2) {
+            vm.filterLevel(item1)
+          } else if (index === 3) {
+            vm.filterMethod(item1)
+          } else if (index === 5) {
+            vm.filterAll()
+          }
+        } else {
+          if (index === 0) {
+            vm.filterAgency(item1)
+          } else if (index === 1) {
+            vm.filterAgencyThucHien(item1)
+          } else if (index === 2) {
+            vm.filterDomain(item1)
+          } else if (index === 3) {
+            vm.filterLevel(item1)
+          } else if (index === 4) {
+            vm.filterMethod(item1)
+          } else if (index === 5) {
+            vm.filterAll()
+          }
         }
       },
       filterAgency (item) {
@@ -312,6 +331,31 @@
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['agency'] = item.administrationCode
+        newQuery['agencyth'] = ''
+        newQuery['domain'] = ''
+        newQuery['level'] = ''
+        newQuery['all'] = false
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      filterAgencyThucHien (item) {
+        var vm = this
+        vm.currentAgencyth = item.govAgencyCode
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agencyth'] = item.govAgencyCode
+        newQuery['agency'] = ''
         newQuery['domain'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
@@ -336,6 +380,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = item.domainCode
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
         for (let key in newQuery) {
@@ -359,6 +404,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
@@ -382,6 +428,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
@@ -406,6 +453,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = true
         for (let key in newQuery) {

@@ -949,6 +949,7 @@
 
 <script>
 // import Vue from 'vue'
+import $ from 'jquery'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
@@ -993,6 +994,10 @@ export default {
         {
           'value': '2019',
           'name': 'năm 2019'
+        },
+        {
+          'value': '2020',
+          'name': 'năm 2020'
         }
       ],
       year: '',
@@ -1230,6 +1235,9 @@ export default {
     activeLoadingDataHoSo () {
       return this.$store.getters.activeLoadingDataHoSo
     },
+    activePrintBienNhan () {
+      return this.$store.getters.getActivePrintBienNhan
+    }
   },
   created () {
     let vm = this
@@ -1252,6 +1260,20 @@ export default {
       // <--- set State advSearch
       vm.setStateAdvSearch(currentQuery)
       // ---->
+      if (vm.activePrintBienNhan) {
+        vm.itemAction = {
+          title: 'In phiếu biên nhận',
+          form: 'PRINT_03'
+        }
+        $(window).scrollTop(0)
+        setTimeout(function () {
+          let dossier = {
+            dossierId: vm.activePrintBienNhan
+          }
+          vm.doPrint03(dossier)
+          vm.$store.commit('setActivePrintBienNhan', '')
+        }, 500)
+      }
     })
   },
   updated () {
@@ -1398,6 +1420,17 @@ export default {
         vm.setStateAdvSearch(currentQuery)
         // ---->
       }
+      // 
+      // if (vm.activePrintBienNhan) {
+      //   $(window).scrollTop(0)
+      //   setTimeout(function () {
+      //     let dossier = {
+      //       dossierId: vm.activePrintBienNhan
+      //     }
+      //     vm.doPrint03(dossier)
+      //     vm.$store.commit('setActivePrintBienNhan', '')
+      //   }, 500)
+      // }
     },
     activeLoadingDataHoSo (val) {
       var vm = this
@@ -1427,10 +1460,10 @@ export default {
         val.dossierTemplateNo = val['templateNo']
         // console.log('val_dichVuSelectedGuide', val)
         vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {
-          for (let key in result) {
-            result[key].fileMark = true
+          for (let key in result['dossierParts']) {
+            result['dossierParts'][key].fileMark = true
           }
-          vm.tphsGuide = result.filter(function (item) {
+          vm.tphsGuide = result['dossierParts'].filter(function (item) {
             return item['partType'] === 1
           })
         }).catch(function (){})
@@ -2232,12 +2265,30 @@ export default {
       vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
-        document: item.document
+        document: item ? item.document : ''
       }
-      vm.$store.dispatch('doPrint03', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
-      })
+      let counter = 0
+      let callServer = function() {
+        setTimeout(function () {
+          vm.$store.dispatch('doPrint03', filter).then(function (result) {
+            if (result === 'pending' && counter <= 5) {
+              counter += 1
+              callServer()
+            } else {
+              if (counter > 5) {
+                vm.dialogPDFLoading = false
+              } else {
+                vm.dialogPDFLoading = false
+                vm.dialogPDF = true
+                setTimeout(function () {
+                  document.getElementById('dialogPDFPreview').src = result
+                }, 100)
+              }
+            }
+          })
+        }, 1000)
+      }
+      callServer()
     },
     doGuiding (type) {
       let vm = this

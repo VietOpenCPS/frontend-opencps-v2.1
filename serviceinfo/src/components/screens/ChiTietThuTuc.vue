@@ -581,7 +581,8 @@ export default {
     isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
     doCreateDossier: false,
     serviceSelected: '',
-    userInfoDvc: ''
+    userInfoDvc: '',
+    userInfoDvcqg: ''
   }),
   computed: {
     isMobile () {
@@ -657,8 +658,8 @@ export default {
         npmreactlogin_login: vm.userName,
         npmreactlogin_password: vm.passWord
       }
-      vm.loadingLogin = true
       if (vm.userName && vm.passWord) {
+        vm.loadingLogin = true
         vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
           vm.loadingLogin = false
           if (result === 'success') {
@@ -685,11 +686,23 @@ export default {
     },
     register () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      if (vm.userInfoDvcqg && String(vm.userInfoDvcqg['userId']) === '0') {
+        let name = vm.userInfoDvcqg['HoVaTen'] ? vm.userInfoDvcqg['HoVaTen'] : ''
+        let mail = vm.userInfoDvcqg['ThuDienTu'] ? vm.userInfoDvcqg['ThuDienTu'] : ''
+        let tel = vm.userInfoDvcqg['SoDienThoai'] ? vm.userInfoDvcqg['SoDienThoai'] : ''
+        let credit = vm.userInfoDvcqg['SoCMND'] ? vm.userInfoDvcqg['SoCMND'] : ''
+        let type = vm.userInfoDvcqg['LoaiTaiKhoan'] ? vm.userInfoDvcqg['LoaiTaiKhoan'] : ''
+
+        let query = '#/?name=' + name + '&mail=' + mail + '&tel=' + tel + '&credit=' + credit + '&type=' + type
+        let url = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + query : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register' + query
+        window.location.href = url
+      } else {
+        window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      }
     },
     getPassword () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl.hasOwnProperty('registerUrl') + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
     },
     viewGuide (item) {
       var vm = this
@@ -764,17 +777,20 @@ export default {
       // vm.userInfoDvc = data
       let current = vm.$router.history.current
       if (String(data['userId']) !== '0') {
-        let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
-        window.location.href = url
+        // let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
+        let url = window.themeDisplay.getLayoutURL() + '#' + current.path
+        console.log('url', url)
         vm.dialog_loginDVCQG = false
-        alert('Đăng nhập thành công')
-        setTimeout(() => {
-          window.location.reload()
-        }, 100)
+        // window.location.href = url
+        // alert('Đăng nhập thành công')
+        // setTimeout(() => {
+          window.open(url, '_self')
+        // }, 100)
       } else {
         vm.dialog_loginDVCQG = false
         vm.doCreateDossier = false
         vm.dialogLogin = true
+        vm.userInfoDvcqg = data
       }
     },
     goBack () {

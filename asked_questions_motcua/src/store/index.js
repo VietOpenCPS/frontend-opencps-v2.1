@@ -294,6 +294,7 @@ export const store = new Vuex.Store({
           let dataPost = new URLSearchParams()
           let urlPut = '/faq/questions/' + filter.questionId
           let dataAdd = {
+            questionType: filter.questionType ? filter.questionType : '',
             email: filter.email ? filter.email : '',
             content: filter.content ? filter.content : '',
             fullname: filter.fullname ? filter.fullname : '',

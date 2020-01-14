@@ -236,7 +236,7 @@
                 </v-expansion-panel>
                 <form-bo-sung-thong-tin ref="formBoSungThongTinNgan" v-if="showFormBoSungThongTinNgan" :dossier_id="Number(id)" :action_id="Number(actionIdCurrent)"></form-bo-sung-thong-tin>
                 <phan-cong ref="phancong" v-if="showPhanCongNguoiThucHien" v-model="assign_items" :detailDossier="thongTinChiTietHoSo" :data_uyquyen="reAsignUsers" :type="type_assign"></phan-cong>
-                <tai-lieu-ket-qua ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
+                <tai-lieu-ket-qua :esignType="typeEsign" ref="tailieuketqua" v-if="showTaoTaiLieuKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="createFiles"></tai-lieu-ket-qua>
                 <tra-ket-qua v-if="showTraKetQua" :detailDossier="thongTinChiTietHoSo" :createFiles="returnFiles"></tra-ket-qua>
                 <thu-phi v-if="showThuPhi" v-model="payments" :viaPortal="viaPortalDetail" :detailDossier="thongTinChiTietHoSo"></thu-phi>
                 <!-- thanh toán điện tử -->
@@ -911,6 +911,9 @@ export default {
     },
     dossierTemplateLienThong () {
       return this.$store.getters.getDossierTemplateLienThong
+    },
+    createFileSignedSync () {
+      return this.$store.getters.getCreateFileSigned
     }
   },
   beforeDestroy () {
@@ -1395,11 +1398,15 @@ export default {
             vm.createFiles = [result.createFiles]
           }
           vm.showTaoTaiLieuKetQua = true
+          if (result.hasOwnProperty('signatureType') && result.signatureType === 'plugin') {
+            vm.typeEsign = result.signatureType
+          }
         }
-        if (result.hasOwnProperty('eSignature') && result.eSignature) {
+        if (result.hasOwnProperty('eSignature') && result.eSignature && result.signatureType !== 'plugin') {
           isPopup = true
           vm.showKyPheDuyetTaiLieu = true
           vm.dataEsign = result
+          vm.typeEsign = result.signatureType
           // vm.$store.commit('setDataCreateFile', result)
         }
         if (result.hasOwnProperty('returnFiles') && result.returnFiles !== null && result.returnFiles !== undefined && result.returnFiles !== 'undefined') {
@@ -2082,7 +2089,7 @@ export default {
                 return Number(item.assigned) > 0
               }).length > 0 ) {
                 vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-                  if (vm.checkInput === 2 || vm.checkInput === '2') {
+                  if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
                     vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
                     })
                   }
@@ -2134,51 +2141,168 @@ export default {
             }).catch(function (error) {
             })
           } else {
-            vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
-              if (vm.checkInput === 2 || vm.checkInput === '2') {
-                vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
-                })
-              }
-              vm.loadingAction = false
-              vm.dialogActionProcess = false
-              vm.loadingActionProcess = false
-              vm.alertObj = {
-                icon: 'check_circle',
-                color: 'success',
-                message: 'Thực hiện thành công!'
-              }
-              vm.btnStateVisible = false
-              if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
-                vm.rollbackable = result.rollbackable
-              }
-              if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
-                vm.printDocument = true
-              }
-              if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
-                vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
-              }
-              vm.checkInput = 0
-              vm.$store.commit('setCheckInput', 0)
-              if (String(item.form) === 'ACTIONS') {
+            // ký số với plugin cài đặt
+            if (result.signatureType === 'plugin') {
+              console.log('file ký số', vm.createFileSignedSync)
+              let valid = true
+              if (!vm.createFileSignedSync) {
+                toastr.clear()
+                toastr.error('Chưa có tài liệu nào được ký duyệt')
               } else {
-                vm.$router.push({
-                  path: vm.$router.history.current.path,
-                  query: {
-                    recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
-                    q: currentQuery['q']
+                let files = vm.createFileSignedSync.createFiles
+                let fileEntries = []
+                let dossierFiles = []
+                for (let index in files) {
+                  if (!files[index]['isSigned']) {
+                    toastr.clear()
+                    toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
+                    valid = false
+                    return
+                  } else {
+                    fileEntries.push(files[index]['fileEntryId'])
+                    dossierFiles.push(files[index]['dossierFileId'])
                   }
+                }
+                console.log('fileEntries 12312', fileEntries, dossierFiles)
+                if (!valid) {
+                  return
+                }
+                let filterUpdateFile = {
+                  dossierId: vm.thongTinChiTietHoSo['dossierId'],
+                  fileEntries: fileEntries.toString(),
+                  dossierFiles: dossierFiles.toString()
+                }
+                vm.$store.dispatch('updateFileKySoPlugin', filterUpdateFile).then(function () {
+                  // 1
+                  vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                    if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                      vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                      })
+                    }
+                    vm.loadingAction = false
+                    vm.dialogActionProcess = false
+                    vm.loadingActionProcess = false
+                    vm.alertObj = {
+                      icon: 'check_circle',
+                      color: 'success',
+                      message: 'Thực hiện thành công!'
+                    }
+                    vm.btnStateVisible = false
+                    if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                      vm.rollbackable = result.rollbackable
+                    }
+                    if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                      vm.printDocument = true
+                    }
+                    if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                      vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                    }
+                    vm.checkInput = 0
+                    vm.$store.commit('setCheckInput', 0)
+                    if (String(item.form) === 'ACTIONS') {
+                    } else {
+                      vm.$router.push({
+                        path: vm.$router.history.current.path,
+                        query: {
+                          recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                          q: currentQuery['q']
+                        }
+                      })
+                    }
+                    $('html, body').animate({
+                      scrollTop: 0
+                    }, 500, 'linear')
+                  }).catch(function (reject) {
+                    vm.loadingAction = false
+                    vm.loadingActionProcess = false
+                  })
+                }).catch(function () {
+                  toastr.error('Cập nhật kết quả xử lý thất bại')
+                  vm.loadingAction = false
+                  vm.loadingActionProcess = false
                 })
               }
-              $('html, body').animate({
-                scrollTop: 0
-              }, 500, 'linear')
-            }).catch(function (reject) {
-              vm.loadingAction = false
-              vm.loadingActionProcess = false
-            })
+            } else {
+              // 1
+              vm.$store.dispatch('processDossierRouter', filter).then(function (result) {
+                if (vm.originality === 3 && (vm.checkInput === 2 || vm.checkInput === '2')) {
+                  vm.$store.dispatch('updateApplicantNote', vm.thongTinChiTietHoSo).then(function (result) {
+                  })
+                }
+                vm.loadingAction = false
+                vm.dialogActionProcess = false
+                vm.loadingActionProcess = false
+                vm.alertObj = {
+                  icon: 'check_circle',
+                  color: 'success',
+                  message: 'Thực hiện thành công!'
+                }
+                vm.btnStateVisible = false
+                if (result.hasOwnProperty('rollbackable') && result['rollbackable'] !== null && result['rollbackable'] !== undefined) {
+                  vm.rollbackable = result.rollbackable
+                }
+                if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
+                  vm.printDocument = true
+                }
+                if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
+                  vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
+                }
+                vm.checkInput = 0
+                vm.$store.commit('setCheckInput', 0)
+                if (String(item.form) === 'ACTIONS') {
+                } else {
+                  vm.$router.push({
+                    path: vm.$router.history.current.path,
+                    query: {
+                      recount: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                      renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
+                      q: currentQuery['q']
+                    }
+                  })
+                }
+                $('html, body').animate({
+                  scrollTop: 0
+                }, 500, 'linear')
+              }).catch(function (reject) {
+                vm.loadingAction = false
+                vm.loadingActionProcess = false
+              })
+              // 
+            }
+            
           }
         }
+      }
+    },
+    kyDuyetPlugin () {
+      let vm = this
+      console.log('file ký số', vm.createFileSignedSync)
+      if (!vm.createFileSignedSync) {
+        toastr.clear()
+        toastr.error('Chưa có tài liệu nào được ký duyệt')
+        return false
+      } else {
+        let files = vm.createFileSignedSync.createFiles
+        let fileEntries = []
+        let dossierFiles = []
+        for (let index in files) {
+          if (!files[index]['isSigned']) {
+            toastr.clear()
+            toastr.error(files[index]['displayName'] + ' chưa được ký duyệt')
+            return false
+          } else {
+            fileEntries.push(files[index]['fileEntryId'])
+            dossierFiles.push(files[index]['dossierFileId'])
+          }
+        }
+        console.log('fileEntries 12312', fileEntries, dossierFiles)
+        let filter = {
+          dossierId: vm.thongTinChiTietHoSo['dossierId'],
+          fileEntries: fileEntries.toString(),
+          dossierFiles: dossierFiles.toString()
+        }
+        vm.$store.dispatch('updateFileKySoPlugin', filter)
       }
     },
     doPrint02 (dossierItem, item, index, isGroup) {

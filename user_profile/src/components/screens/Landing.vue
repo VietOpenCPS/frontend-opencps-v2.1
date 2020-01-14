@@ -885,7 +885,7 @@
         }
       }
     },
-    created() {
+    created () {
       var vm = this
       window.callback_dvcqg = vm.callback_dvcqg
       try {
@@ -1002,6 +1002,10 @@
               vm.profileConfig = profileConfigBusiness ? profileConfigBusiness : ''
             }
           } catch (error) {
+          }
+          // Tự động đồng bộ thông tin Cổng DVC Quốc gia
+          if (currentQuery.hasOwnProperty('sync') && currentQuery.sync) {
+            vm.checkVNConect()
           }
         })
       })
@@ -1359,10 +1363,15 @@
       callback_dvcqg (data) {
         let vm = this
         let current = vm.$router.history.current
+        let currentQuery = current.query
         if (String(data['userId']) !== '0') {
-          window.location.href = window.themeDisplay.getLayoutURL() + '#' + current.path
-          window.location.reload()
           vm.dialog_loginDVCQG = false
+          // if (!currentQuery.hasOwnProperty('sync')) {
+            // window.location.href = window.themeDisplay.getLayoutURL() + '#' + current.path
+            // window.location.reload()
+            let url = window.themeDisplay.getLayoutURL() + '#' + current.path
+            window.open(url, '_self')
+          // }
         } else {
           toastr.error('Chưa có tài khoản đăng ký tại Cổng DVC Quốc gia')
         }

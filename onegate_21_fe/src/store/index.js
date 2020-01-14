@@ -83,7 +83,7 @@ export const store = new Vuex.Store({
     applicantBussinessExit: false,
     applicantNote: '',
     thongTinChuHoSo: {
-      userType: true,
+      userType: '1',
       cityCode: '',
       districtCode: '',
       wardCode: '',
@@ -130,7 +130,9 @@ export const store = new Vuex.Store({
     dossierIntoGroup: [],
     filesAdd: [],
     activeAddFileGroup: false,
-    dossierTemplateLienThong: ''
+    dossierTemplateLienThong: '',
+    activePrintBienNhan: '',
+    createFileSigned: ''
   },
   actions: {
     clearError ({commit}) {
@@ -487,7 +489,7 @@ export const store = new Vuex.Store({
     },
     resetThongTinChuHoSo ({ commit }) {
       let data = {
-        userType: true,
+        userType: '1',
         cityCode: 25,
         districtCode: '',
         wardCode: '',
@@ -572,7 +574,7 @@ export const store = new Vuex.Store({
                 serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
               }
             }
-            resolve(serializable.dossierParts)
+            resolve(serializable)
           }, error => {
             reject(error)
           })
@@ -1294,10 +1296,12 @@ export const store = new Vuex.Store({
           }
         }
         let applicantType = ''
-        if (!data.userType) {
+        if (data.userType === '2') {
           applicantType = 'business'
-        } else {
+        } else if (data.userType === '1') {
           applicantType = 'citizen'
+        } else {
+          applicantType = 'organization'
         }
         //
         let isSameAsApplicant = false
@@ -2660,11 +2664,15 @@ export const store = new Vuex.Store({
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
-            if (serializable['size']) {
-              let file = window.URL.createObjectURL(serializable)
-              resolve(file)
+            if (response['status'] !== undefined && response['status'] !== 200) {
+              reject('pending')
             } else {
-              resolve('pending')
+              if (serializable['size']) {
+                let file = window.URL.createObjectURL(serializable)
+                resolve(file)
+              } else {
+                resolve('pending')
+              }
             }
           }).catch(function (error) {
             console.log(error)
@@ -3626,6 +3634,25 @@ export const store = new Vuex.Store({
           })
         }).catch(function (){})
       })
+    },
+    updateFileKySoPlugin ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataUpdate = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/defaultsignature/vgca/' + filter['dossierId'] + '/dossierFiles'
+        dataUpdate.append('fileEntries', filter['fileEntries'])
+        dataUpdate.append('dossierFiles', filter['dossierFiles'])
+        axios.put(url, dataUpdate, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
     }
     // ----End---------
   },
@@ -3695,9 +3722,9 @@ export const store = new Vuex.Store({
       state.stepOverdueNextAction = payload
     },
     setThongTinChuHoSo (state, payload) {
-      let userTypeCondition = true
-      if (payload.applicantIdType === 'business' || !payload.userType) {
-        userTypeCondition = false
+      let userTypeCondition = '1'
+      if (payload.applicantIdType === 'business' || payload.userType === '2') {
+        userTypeCondition = '2'
       }
       let thongTinChuHoSoPayLoad = {
         applicantIdNo: payload.applicantIdNo,
@@ -3891,6 +3918,12 @@ export const store = new Vuex.Store({
     },
     setDossierTemplateLienThong (state, payload) {
       state.dossierTemplateLienThong = payload
+    },
+    setActivePrintBienNhan (state, payload) {
+      state.activePrintBienNhan = payload
+    },
+    setCreateFileSigned (state, payload) {
+      state.createFileSigned = payload
     }
   },
   getters: {
@@ -4089,6 +4122,12 @@ export const store = new Vuex.Store({
     },
     getDossierTemplateLienThong (state) {
       return state.dossierTemplateLienThong
+    },
+    getActivePrintBienNhan (state) {
+      return state.activePrintBienNhan
+    },
+    getCreateFileSigned (state) {
+      return state.createFileSigned
     }
   }
 })

@@ -742,6 +742,7 @@ export default {
       vm.$store.commit('setQuestionList', list)
       let filter = {
         questionId: item['questionId'],
+        questionType: item['questionType'],
         publish: vm.questionList[index]['publish'] === 1 ? 0 : 1,
         content: item['content'],
         email: item['email'],

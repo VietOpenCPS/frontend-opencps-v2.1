@@ -8,7 +8,7 @@
           </div>
           <span>Duyệt hồ sơ</span>
         </div>
-        <div slot='header' v-if="esignType === 'plugin'">
+        <!-- <div slot='header' v-if="esignType === 'plugin'">
           <div class='background-triangle-small'> 
             <v-icon size='18' color='white'>star_rate</v-icon> 
           </div>
@@ -16,27 +16,25 @@
           <v-btn class="ml-2 my-0" flat icon color="indigo" title="Cấu hình hệ thống ký số" @click.stop="showConfigSignService">
             <v-icon size="16">fa fa-cog</v-icon>
           </v-btn>
-        </div>
+        </div> -->
         <v-card >
           <v-card-text class='px-0 py-0'>
             <!--  -->
-            <v-flex xs12 sm12 v-if="esignType === 'plugin'" class="pl-5 py-2">
+            <!-- <v-flex xs12 sm12 v-if="esignType === 'plugin'" class="pl-3 py-2">
               <div v-for="(item, index) in filesPdfSignPlugin" :key="index">
                 <span @click="viewFileKySo(item, index)" class="ml-3" style="cursor: pointer;">
-                  <v-icon class="mr-1" color="red" v-if="!item.fileSigned" size="14">
-                    fa fa-file-pdf-o
-                  </v-icon>
-                  <v-icon v-else class="mr-1" color="green" size="16">
-                    fa-check-square-o
+                  <v-icon class="mr-1" :color="getDocumentTypeIcon(item.fileType)['color']"
+                    :size="getDocumentTypeIcon(item.fileType)['size']">
+                    {{getDocumentTypeIcon(item.fileType)['icon']}}
                   </v-icon>
                   {{item.fileName}} - 
                   <i>{{item.time}}</i>
                 </span>
-                <v-btn flat icon color="indigo" title="Ký duyệt, đóng dấu" v-on:click.stop="signAction(item, index)" class="ml-2 my-0">
+                <v-btn flat icon color="indigo" title="Ký duyệt" v-on:click.stop="signAction(item, index)" class="ml-2 my-0">
                   <v-icon size="18">fa fa-pencil-square-o</v-icon>
                 </v-btn>
               </div>
-            </v-flex>
+            </v-flex> -->
             <!--  -->
             <v-flex xs12 sm12 class="my-3" v-if="esignType === 'captcha'">
               <span class="ml-3" style="color:#ec0f0f">(*) Xác thực ký duyệt hồ sơ</span>
@@ -422,6 +420,47 @@
             alert('ky so false')
           }
         })
+      },
+      getDocumentTypeIcon (type) {
+        let vm = this
+        let typeDoc = 'doc,docx'
+        let typeExcel = 'xls,xlsx'
+        let typeImage = 'png,jpg,jpeg'
+        if (type) {
+          if (typeDoc.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-word-o',
+              color: 'blue',
+              size: 14
+            }
+          } else if (typeExcel.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-excel-o',
+              color: 'green',
+              size: 14
+            }
+          } else if (type.toLowerCase() === 'pdf') {
+            return {
+              icon: 'fa fa-file-pdf-o',
+              color: 'red',
+              size: 14
+            }
+          } else if (typeImage.indexOf(type.toLowerCase()) >= 0) {
+            return {
+              icon: 'fas fa fa-file-image-o',
+              color: 'primary',
+              size: 14
+            }
+          } else {
+            return {
+              icon: 'fas fa fa-paperclip',
+              color: '',
+              size: 14
+            }
+          }
+        } else {
+          return ''
+        }
       }
     }
   }

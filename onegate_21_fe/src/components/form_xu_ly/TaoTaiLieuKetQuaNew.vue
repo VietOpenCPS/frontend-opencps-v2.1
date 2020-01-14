@@ -245,7 +245,7 @@
           arrTemp.push(vm.$store.dispatch('loadDossierFiles', vm.detailDossier.dossierId))
           arrTemp.push(vm.$store.dispatch('loadDossierTemplates', vm.detailDossier))
           Promise.all(arrTemp).then(values => {
-            var dossierTemplates = values[1]
+            var dossierTemplates = values[1]['dossierParts']
             var dossierFiles = values[0]
             vm.dossierFilesItems = dossierFiles
             vm.createFiles = vm.mergeDossierTemplateVsDossierFiles(vm.createFiles, dossierFiles)
