@@ -2779,6 +2779,27 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    previewTienTrinh ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId +'/documents/preview/SEQUENCES', param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     processPullBtnDetail ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -3592,6 +3613,7 @@ export const store = new Vuex.Store({
         let url = ''
         url = '/o/rest/v2/applicants/' + filter['applicantId']
         dataPutUser.append('applicantName', filter['applicantName'])
+        dataPutUser.append('applicantIdType', filter['applicantIdType'])
         dataPutUser.append('contactTelNo', filter['contactTelNo'])
         dataPutUser.append('address', filter['address'])
         dataPutUser.append('contactEmail', filter['contactEmail'])

@@ -178,7 +178,7 @@
                       <content-placeholders class="mt-1" v-if="loading">
                         <content-placeholders-text :lines="1" />
                       </content-placeholders>
-                      <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactTelNo']" style="color:red">&nbsp;*</span>: </v-subheader>
+                      <v-subheader v-else class="pl-0">Địa chỉ email <span v-if="requiredOptions['contactEmail']" style="color:red">&nbsp;*</span>: </v-subheader>
                     </v-flex>
                     <v-flex xs12 sm6>
                       <content-placeholders class="mt-1" v-if="loading">
@@ -187,7 +187,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
-                      :rules="thongTinChuHoSo.contactEmail ? [rules.email] : ''"
+                      :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : [rules.email]"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
                     </v-flex>
@@ -382,7 +382,7 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
-                        :rules="thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : ''"
+                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : [rules.email]"
                         :required="requiredOptions['delegateEmail']"
                         ></v-text-field>
                       </v-flex>
@@ -457,7 +457,7 @@
         </v-toolbar>
         <v-card-text class="py-1">
           <v-layout wrap class="mt-3">
-            <v-flex xs12 sm8 class="pr-2 input-group--text-field-box">
+            <v-flex xs12 sm7 class="pr-2 input-group--text-field-box">
               <v-text-field
                   label="Tìm kiếm theo tên người dùng"
                   v-model="keySearch"
@@ -470,12 +470,13 @@
                   @click:append="searchKeyword"
                 ></v-text-field>
             </v-flex>
-            <v-flex xs12 sm4 class="pl-2 pr-2">
+            <v-flex xs12 sm5 class="pl-2 pr-2">
               <div style="position:relative">
                 <v-radio-group class="mt-1" v-model="typeSearch" row @change="changeTypeSearch">
                   <v-radio label="Tất cả" :value="''" ></v-radio>
                   <v-radio label="Công dân" :value="'citizen'"></v-radio>
-                  <v-radio label="Tổ chức, doanh nghiệp" :value="'business'"></v-radio>
+                  <v-radio label="Doanh nghiệp" :value="'business'"></v-radio>
+                  <v-radio label="Cơ quan, tổ chức" :value="'organization'"></v-radio>
                 </v-radio-group>
               </div>
             </v-flex>
@@ -510,7 +511,7 @@
                     <content-placeholders-text :lines="1" />
                   </content-placeholders>
                   <div v-else>
-                    <span>{{props.item.applicantIdType === 'citizen' ? 'Công dân' : 'Tổ chức, doanh nghiệp'}}</span>
+                    <span>{{props.item.applicantIdType === 'citizen' ? 'Công dân' : (props.item.applicantIdType === 'business' ? 'Doanh nghiệp' : 'Cơ quan, tổ chức')}}</span>
                   </div>
                 </td>
                 <td class="text-xs-left" style="height:36px">
@@ -585,8 +586,9 @@
               <v-flex xs12 sm12>
                 <v-text-field v-model="applicantEdit['applicantName']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required>
                   <template slot="label"> 
-                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên tổ chức, doanh nghiệp</span>
+                    <span v-if="applicantEdit['applicantIdType'] === 'business'">Tên doanh nghiệp</span>
                     <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Họ tên</span> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'organization'">Tên cơ quan, tổ chức</span> 
                     <span class="red--text darken-3"> *</span>
                   </template>
                 </v-text-field>
@@ -596,6 +598,7 @@
                   <template slot="label"> 
                     <span v-if="applicantEdit['applicantIdType'] === 'business'">Mã số thuế</span>
                     <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Số CMND/ Căn cước</span> 
+                    <span v-if="applicantEdit['applicantIdType'] === 'organization'">Mã cơ quan, tổ chức</span> 
                     <span class="red--text darken-3"> *</span>
                   </template>
                 </v-text-field>
@@ -678,20 +681,20 @@ export default {
   props: ['requiredConfig', 'showApplicant', 'showDelegate', 'formCode'],
   data: () => ({
     requiredOptions: {
-      applicantIdNo: false,
-      applicantName: false,
-      address: false,
-      cityCode: false,
-      districtCode: false,
-      wardCode: false,
+      applicantIdNo: true,
+      applicantName: true,
+      address: true,
+      cityCode: true,
+      districtCode: true,
+      wardCode: true,
       contactTelNo: true,
       contactEmail: false,
-      delegateIdNo: false,
-      delegateName: false,
-      delegateAddress: false,
-      delegateCityCode: false,
-      delegateDistrictCode: false,
-      delegateWardCode: false,
+      delegateIdNo: true,
+      delegateName: true,
+      delegateAddress: true,
+      delegateCityCode: true,
+      delegateDistrictCode: true,
+      delegateWardCode: true,
       delegateTelNo: true,
       delegateEmail: false
     },
@@ -957,8 +960,11 @@ export default {
         vm.applicantListHeader[1].text = 'Tên công dân'
         vm.applicantListHeader[3].text = 'Số CMND/ căn cước'
       } else if (val === 'business') {
-        vm.applicantListHeader[1].text = 'Tên tổ chức, doanh nghiệp'
+        vm.applicantListHeader[1].text = 'Tên doanh nghiệp'
         vm.applicantListHeader[3].text = 'Mã số thuế doanh nghiệp'
+      } else {
+        vm.applicantListHeader[1].text = 'Tên cơ quan, tổ chức'
+        vm.applicantListHeader[3].text = 'Mã cơ quan, tổ chức'
       }
     },
     ngayCap(val) {

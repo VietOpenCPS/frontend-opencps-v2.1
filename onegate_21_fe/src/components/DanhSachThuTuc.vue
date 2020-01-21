@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-center mt-5" v-if="String(serviceCode) !== '0' && !selectOption">
+    <div class="text-center mt-5" v-if="String(serviceCode) !== '0' && !selectOption && !hasVerify">
       <v-progress-circular
         :size="100"
         :width="1"
@@ -322,7 +322,9 @@
       serviceLastest: false,
       numberPerPage: 10,
       agencyPage: 1,
-      dialogVerifycation: false
+      dialogVerifycation: false,
+      verificationApplicantCreateDossier: false,
+      hasVerify: false
     }),
     computed: {
       currentIndex () {
@@ -337,7 +339,12 @@
     },
     created () {
       var vm = this
-      // console.log('run created 2')
+      //
+      try {
+        vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+      } catch (error) {
+      }
+      // 
       let current = vm.$router.history.current
       let newQuery = current.query
       vm.$store.dispatch('loadServiceConfigsGov', {}).then(result => {
@@ -608,8 +615,11 @@
       pullServiceOptions (item, govAgencyCode) {
         var vm = this
         console.log('service config', item)
-        if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
-          vm.dialogVerifycation = true
+        if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+          vm.hasVerify = true
+          setTimeout(function () {
+            vm.dialogVerifycation = true
+          }, 300)
         } else {
           vm.serviceConfigSelect = item
           vm.govAgencyCodeSelect = govAgencyCode

@@ -581,6 +581,8 @@ export default {
     isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
     doCreateDossier: false,
     serviceSelected: '',
+    isLogin: false,
+    verificationApplicantCreateDossier: false,
     userInfoDvc: '',
     userInfoDvcqg: ''
   }),
@@ -598,6 +600,12 @@ export default {
       vm.configUrl = configSso 
     } catch (error) {
     }
+    // 
+    try {
+      vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+    } catch (error) {
+    }
+    // 
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
@@ -636,8 +644,8 @@ export default {
         window.location.href = item.serviceUrl
       } else {
         let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-        if (isSigned) {
-          if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+        if (isSigned || vm.isLogin) {
+          if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
             vm.dialogVerifycation = true
           } else {
             let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
@@ -645,9 +653,9 @@ export default {
             window.open(url, '_self')
           }
         } else {
-          alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
-          // vm.doCreateDossier = true
-          // vm.dialogLogin = true
+          // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+          vm.doCreateDossier = true
+          vm.dialogLogin = true
         }
       }
     },
@@ -665,11 +673,8 @@ export default {
           if (result === 'success') {
             vm.dialogLogin = false
             if (vm.doCreateDossier) {
-              let redirectURL = window.location.host + window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-              let url = window.themeDisplay.getURLHome() + '/dich-vu-cong#/add-dvc/' + vm.serviceSelected.serviceConfigId
-              setTimeout(() => {
-                window.location.href = url
-              }, 300)
+              vm.isLogin = true
+              vm.createDossier(vm.serviceSelected)
             } else {
               // vm.doMappingDvcqg()
               let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path

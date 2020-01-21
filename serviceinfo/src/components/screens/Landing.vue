@@ -512,6 +512,8 @@ export default {
         sortable: false
       }
     ],
+    isLogin: false,
+    verificationApplicantCreateDossier: false,
     serviceSelected: '',
     hasCoQuanThucHien: false,
     configUrl: ''
@@ -546,6 +548,11 @@ export default {
     // 
     try {
       vm.configUrl = configSso 
+    } catch (error) {
+    }
+    // 
+    try {
+      vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
     } catch (error) {
     }
     // 
@@ -766,13 +773,8 @@ export default {
           vm.loadingLogin = false
           if (result === 'success') {
             vm.dialogLogin = false
-            let redirectURL = window.location.host + window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-            let url = redirectURL + '/dich-vu-cong#/add-dvc/' + vm.serviceSelected.serviceConfigId
-            console.log('run login success 456', url)
-            // window.location.href = url
-            // setTimeout(() => {
-            //   window.location.reload()
-            // }, 100)
+            vm.isLogin = true
+            vm.createDossier(vm.serviceSelected)
           }          
         }).catch(function(){
           vm.loadingLogin = false
@@ -816,8 +818,8 @@ export default {
         window.location.href = item.serviceUrl
       } else {
         let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-        if (isSigned) {
-          if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+        if (isSigned || vm.isLogin) {
+          if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
             vm.dialogVerifycation = true
           } else {
             let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
@@ -825,8 +827,8 @@ export default {
             window.open(url, '_self') 
           }
         } else {
-          // vm.dialogLogin = true
-          alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+          vm.dialogLogin = true
+          // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
         }
       }
     },

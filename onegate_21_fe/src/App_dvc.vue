@@ -153,7 +153,8 @@
       currentStep: '0',
       counterData: [],
       detailState: 0,
-      dialogVerifycation: false
+      dialogVerifycation: false,
+      verificationApplicantCreateDossier: false
     }),
     computed: {
       currentIndex () {
@@ -180,6 +181,12 @@
     },
     created () {
       let vm = this
+      //
+      try {
+        vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+      } catch (error) {
+      }
+      // 
       axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
         let userData = response.data
         vm.$store.commit('setUserLogin', userData)
@@ -353,7 +360,7 @@
       },
       doAddDVC () {
         let vm = this
-        if (vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+        if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
           vm.dialogVerifycation = true
         } else {
           vm.$router.push('/add-dvc/0')

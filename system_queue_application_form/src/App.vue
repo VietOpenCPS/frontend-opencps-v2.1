@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_application_form" style="max-width:1200px;margin:0 auto">
+  <v-app id="app_application_form" style="max-width:1300px;margin:0 auto">
     <v-content>
       <router-view></router-view>
     </v-content>

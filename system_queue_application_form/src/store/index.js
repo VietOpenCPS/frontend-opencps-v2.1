@@ -270,30 +270,128 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getEform ({commit, state}, filter) {
+    createBookingOnline ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay.getScopeGroupId()
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
             },
-            params: {}
+            params: {
+              className: filter.className,
+              classPK: filter.classPK,
+              codeNumber: filter.codeNumber,
+              serviceCode: filter.serviceCode,
+              state: filter.state,
+              bookingName: filter.bookingName,
+              serviceGroupCode: filter.serviceGroupCode,
+              gateNumber: ''
+            }
           }
-          axios.get('/o/rest/v2/eforms/' + filter.eFormId, param).then(function (response) {
-            if (response['status'] !== undefined && response['status'] === 203) {
-              toastr.clear()
-              toastr.error('Mã tờ khai không chính xác. Vui lòng kiểm tra lại.')
-              resolve('secretFail')
+          axios.get('/o/rest/v2/serverconfigs/' + filter.serverNo + '/protocols/API_CONNECT', param).then(function (response) {
+            if (response.data) {
+              resolve(response.data)
             } else {
-              let serializable = response.data
-              resolve(serializable)
+              resolve(response)
             }
           }).catch(function (xhr) {
             reject(xhr)
           })
         })
       })
-    }
+    },
+    updateBooking ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let dataUpdateBooking = new URLSearchParams()
+          dataUpdateBooking.append('speaking', filter.speaking)
+          axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    updateBookingAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let dataUpdateBooking = new URLSearchParams()
+          dataUpdateBooking.append('state', filter.state)
+          dataUpdateBooking.append('gateNumber', filter.gateNumber)
+          dataUpdateBooking.append('speaking', filter.speaking)
+          axios.put('/o/rest/v2/bookings/' + filter.bookingId, dataUpdateBooking, param).then(function (response) {
+            resolve(response)
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    getBookingDangGoi ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            params: {
+              state: filter.state ? filter.state : '',
+            }
+          }
+          if (filter['bookingFrom']) {
+            param['params'].bookingFrom = filter['bookingFrom']
+          }
+          if (filter['bookingTo']) {
+            param['params'].bookingTo = filter['bookingTo']
+          }
+          axios.get('/o/rest/v2/serverconfigs/' + filter.serverNo + '/protocols/API_CONNECT', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              let dataReturn = serializable.data
+              resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            reject([])
+          })
+        })
+      })
+    },
+    getServerConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
   },
   mutations: {
     setLoading (state, payload) {

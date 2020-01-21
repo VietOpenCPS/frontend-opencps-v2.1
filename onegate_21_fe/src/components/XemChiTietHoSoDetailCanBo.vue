@@ -345,6 +345,14 @@
                   <v-radio label="Xem dạng bảng" :value="1" ></v-radio>
                   <v-radio label="Xem dạng biểu đồ" :value="2"></v-radio>
                 </v-radio-group>
+                <v-btn small color="primary" @click.stop="previewTienTrinh" v-if="hasPreviewSync"
+                  :loading="dialogPDFLoading"
+                  :disabled="dialogPDFLoading"
+                  class="right"
+                >
+                  <v-icon color="white">print</v-icon>&nbsp;
+                  In
+                </v-btn>
               </v-flex>
               <v-data-table v-if="typeTienTrinh === 1" :headers="headers" :items="dossierActions" class="table-landing table-bordered"
               hide-actions no-data-text="Không có dữ liệu"
@@ -878,7 +886,8 @@ export default {
     loadingVoting: false,
     titleDialogPdf: 'Tài liệu đính kèm',
     viewScript: false,
-    loadingForm: false
+    loadingForm: false,
+    hasPreviewSync: false
   }),
   computed: {
     loading () {
@@ -1257,6 +1266,21 @@ export default {
           vm.loadMermaidgraph()
         }, 200)
       }
+    },
+    previewTienTrinh () {
+      let vm = this
+      let data = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId
+      }
+      vm.dialogPDFLoading = true
+      vm.$store.dispatch('previewTienTrinh', data).then(function (result) {
+        vm.dialogPDFLoading = false
+        vm.titleDialogPdf = 'Tiến trình thụ lý'
+        vm.dialogPDF = true
+        document.getElementById('dialogPDFPreview').src = result
+      }).catch(function () {
+        vm.dialogPDFLoading = false
+      })
     },
     loadDossierLogs (data) {
       var vm = this
