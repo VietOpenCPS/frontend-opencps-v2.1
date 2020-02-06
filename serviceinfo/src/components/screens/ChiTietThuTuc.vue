@@ -789,7 +789,9 @@ export default {
         // window.location.href = url
         // alert('Đăng nhập thành công')
         // setTimeout(() => {
-          window.open(url, '_self')
+          // window.open(url, '_self')
+          window.location.href = url
+          window.location.reload()
         // }, 100)
       } else {
         vm.dialog_loginDVCQG = false

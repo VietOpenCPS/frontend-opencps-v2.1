@@ -1,6 +1,18 @@
 <template>
   <div>
     <v-card flat>
+      <div class="d-inline-block" v-if="checkInput === 1" style="position: absolute;right: 10px;top: -50px">
+        <v-checkbox
+          v-model="markCheck"
+          color="indigo"
+          hide-details
+          @change="markAllDone"
+        >
+          <template slot="label">
+            <span style="color: #000000de">Xác nhận tất cả hồ sơ đạt yêu cầu</span>
+          </template>
+        </v-checkbox>
+      </div>
       <div class="form_alpaca" style="position: relative;overflow: hidden;" v-for="(item, index) in dossierTemplateItemsFilter" v-bind:key="item.partNo">
         <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
           <v-expansion-panel-content hide-actions>
@@ -19,6 +31,7 @@
                       <span slot="activator">
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
+                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
@@ -52,6 +65,8 @@
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
                   @keyup.enter="changeFileComment(item, index)"
+                  @click.stop=""
+                  class="ml-3"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
@@ -60,12 +75,12 @@
                     <span>Gửi</span>
                   </v-tooltip>
                 </div>
-                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <i class="pl-3" v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb">Lý do không đạt: {{item.fileComment}}</i>
                 <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
-                  <span>Chỉnh sửa ý kiến</span>
+                  <span>Chỉnh sửa lý do</span>
                 </v-tooltip>
-                <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
+                <div class="mt-2" v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
                   <!-- <div v-if="itemFileView.eForm && onlyView && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
@@ -74,7 +89,7 @@
                     </span>
                   </div> -->
                   <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-1" style="cursor: pointer;">
                       <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
                         :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
                         {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
@@ -224,7 +239,7 @@
                 @change="changeFileMark($event, index)"
               ></v-autocomplete>
             </v-flex>
-            <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">
+            <v-flex style="width: 130px;" class="layout wrap" v-if="checkInput === 1">
               <v-select
                 :items="fileCheckItems"
                 item-text="text"
@@ -485,7 +500,7 @@ export default {
         value: 4
       }
     ],
-
+    markCheck: false,
     fileCheckItems: [{
       text: 'Chưa kiểm tra',
       value: 0
@@ -573,6 +588,19 @@ export default {
     }
   },
   methods: {
+    markAllDone () {
+      let vm = this
+      if (vm.dossierTemplateItems && vm.markCheck) {
+        vm.dossierTemplateItems.forEach(function (value, index) {
+          if (value.partType === 1 && value.fileMark && !value.recordCountDefault && value.fileCheck !== 1) {
+            value['dossierId'] = vm.thongTinHoSo.dossierId
+            value['fileCheck'] = 1
+            value['fileComment'] = ''
+            vm.$store.dispatch('postDossierMark', value)
+          }
+        })
+      }
+    },
     resetCounterTemplate ({commit, state}, data) {
       var vm = this
       vm.dossierTemplateItems.forEach(val => {

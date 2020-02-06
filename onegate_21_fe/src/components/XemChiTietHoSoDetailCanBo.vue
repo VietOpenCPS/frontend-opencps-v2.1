@@ -146,11 +146,16 @@
                     </v-flex>
                   </v-layout>
                 </div>
-                <div class="px-2 py-2" style="border: 1px solid #4caf50" v-if="thongTinChiTietHoSo.finishDate && btnStateVisible">
-                  <p class="mb-2">
-                    Hồ sơ đã hoàn thành quá trình xử lý
-                  </p>
-                </div>
+
+                <v-alert
+                  :value="true"
+                  color="success"
+                  icon="check_circle"
+                  outline
+                  v-if="thongTinChiTietHoSo.finishDate && btnStateVisible"
+                >
+                  Hồ sơ đã hoàn thành quá trình xử lý
+                </v-alert>
               </div>
               <div style="position: relative;" v-if="checkInput !== 0 && filterNextActionEnable(btnDossierDynamics)">
                 <v-expansion-panel :value="[true]" expand  class="expansion-pl">

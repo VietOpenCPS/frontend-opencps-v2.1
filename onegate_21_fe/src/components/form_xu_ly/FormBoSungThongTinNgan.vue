@@ -37,6 +37,19 @@
                   :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                   :required="(item.required === true || item.required === 'true') ? true : false"
                 ></v-text-field>
+                <v-autocomplete v-if="item.fieldType === 'select'"
+                  class="select-border"
+                  :items="item.datasource"
+                  :value="item.value"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                  :placeholder="item.placeholder"
+                  item-text="text"
+                  item-value="value"
+                  :hide-selected="true"
+                  @change="inputChangeValue(item)"
+                  box
+                ></v-autocomplete>
                 <!-- <v-text-field v-if="item.fieldType === 'date'"
                   :id="item.fieldName"
                   :value="item.value|parseDate"
@@ -123,6 +136,21 @@
                 :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                 :required="(item.required === true || item.required === 'true') ? true : false"
               ></v-text-field>
+            </v-flex>
+            <v-flex xs12 class="px-3">
+              <v-autocomplete v-if="item.fieldType === 'select'"
+                class="select-border"
+                :items="item.datasource"
+                :value="item.value"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
+                :placeholder="item.placeholder"
+                item-text="text"
+                item-value="value"
+                :hide-selected="true"
+                @change="inputChangeValue(item)"
+                box
+              ></v-autocomplete>
             </v-flex>
             <v-flex xs12 class="px-3">
               <!-- <v-text-field v-if="item.fieldType === 'date'"

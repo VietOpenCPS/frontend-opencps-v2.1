@@ -1288,6 +1288,7 @@ export const store = new Vuex.Store({
     },
     setlistTableMenu (state, payload) {
       let listTableMenu = state.listTableMenu
+      listTableMenu[2].children = []
       for (let key in payload) {
         if (payload[key][4] && listTableMenu.length > 1) {
           listTableMenu[1].children.push({
