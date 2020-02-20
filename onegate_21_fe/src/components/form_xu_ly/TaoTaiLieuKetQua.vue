@@ -393,6 +393,7 @@
           } else {
             createFiles.forEach(val => {
               if (val.eForm) {
+                val['fileTemplateNo'] = val['templateFileNo']
                 val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
                 vm.showAlpacaJSFORM(val)
               }
@@ -404,6 +405,7 @@
                 return template.partNo === item.dossierPartNo
               })
               if (indexFromFile === -1) {
+                template['fileTemplateNo'] = template['templateFileNo']
                 template['templateFileNo'] = vm.detailDossier.dossierTemplateNo
                 vm.showAlpacaJSFORM(template)
               }
@@ -412,6 +414,7 @@
         } else {
           createFiles.forEach(val => {
             if (val.eForm) {
+              val['fileTemplateNo'] = val['templateFileNo']
               val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
               vm.showAlpacaJSFORM(val)
             }
@@ -603,6 +606,7 @@
         } else {
           vm.createFiles.forEach(val => {
             if (val.eForm && data.partNo === val.partNo) {
+              val['fileTemplateNo'] = val['templateFileNo']
               val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
               vm.showAlpacaJSFORM(val)
             }
@@ -611,6 +615,7 @@
       },
       loadAlpcaFormClick (data) {
         var vm = this
+        console.log('data alpaca1', data)
         //
         if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
           vm.currentFormView = ''
@@ -658,11 +663,32 @@
         } else {
           vm.createFiles.forEach(val => {
             if (val.eForm && data.partNo === val.partNo) {
+              val['fileTemplateNo'] = val['templateFileNo']
               val['templateFileNo'] = vm.detailDossier.dossierTemplateNo
               vm.showAlpacaJSFORM(val)
             }
           })
         }
+        // giấy phép
+        // if (window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]')) {
+          let control = window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').alpaca('get')
+          let formData = control.data
+          let formScript = ''
+          try {
+            formScript = eval('(' + data.formScript + ')')
+          } catch (error) {
+          }
+
+          formData.dossierId_hidden = vm.detailDossier.dossierId
+          formData.dossierStatus_hidden = vm.detailDossier.dossierStatus
+          formData.dossierSubStatus_hidden = vm.detailDossier.dossierSubStatus
+          formData.fileTemplateNo_hidden = data.fileTemplateNo
+          formData.deliverableType_hidden = data.deliverableType
+          formData.userEmailAddress_hidden = window.themeDisplay.getUserEmailAddress()
+
+          formScript.data = formData
+          window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').alpaca(formScript)
+        // }
       },
       editFormAlpaca (item, index) {
         let vm = this

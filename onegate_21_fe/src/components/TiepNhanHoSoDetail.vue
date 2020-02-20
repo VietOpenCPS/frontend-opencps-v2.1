@@ -47,7 +47,7 @@
         <!--  -->
         <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
         <!--  -->
-        <div v-if="originality !== 1">
+        <div>
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -65,6 +65,7 @@
                       box
                       :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
                     ></v-textarea>
+                    <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
                   </v-card-text>
                 </v-card>
               </div>
@@ -654,7 +655,8 @@ export default {
     dialogPDF: false,
     dialogPDFLoading: true,
     tiltleDialog: '',
-    requiredConfigData: false
+    requiredConfigData: false,
+    templateDescription : ''
   }),
   computed: {
     loading () {
@@ -729,6 +731,7 @@ export default {
         } catch (error) {
         }
         vm.templateName = result['templateName']
+        vm.templateDescription = result['description']
         if (result['newFormScript']) {
           vm.data_form_template = eval("( " + result['newFormScript'] + " ) ")
           // console.log('data_form_template', vm.data_form_template)

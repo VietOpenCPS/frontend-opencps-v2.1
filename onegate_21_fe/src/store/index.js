@@ -132,7 +132,9 @@ export const store = new Vuex.Store({
     activeAddFileGroup: false,
     dossierTemplateLienThong: '',
     activePrintBienNhan: '',
-    createFileSigned: ''
+    createFileSigned: '',
+    advSearchShow: false,
+    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate']
   },
   actions: {
     clearError ({commit}) {
@@ -295,6 +297,7 @@ export const store = new Vuex.Store({
       }
     },
     loadingDataHoSo ({commit, state}, filter) {
+      console.log('filter search dossier', filter)
       commit('setLoadingTable', true)
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -327,6 +330,14 @@ export const store = new Vuex.Store({
           if (filter['viapostal']) {
             paramSearch.viapostal = filter.viapostal
           }
+          // 
+          for (let index in state.filterDateFromTo) {
+            if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
+              paramSearch[state.filterDateFromTo[index]] = filter[state.filterDateFromTo[index]]
+            }
+          }
+          console.log('paramSearch', paramSearch)
+          // 
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -1328,9 +1339,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
         dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
         dataPutdossier.append('applicantNote', state.applicantNote)
-        if (data.originality !== 1) {
-          dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
-        }
+        dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
           dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
@@ -2658,9 +2667,10 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             responseType: 'blob',
-            params: {
-              payload: filter.payload
-            }
+            params: {}
+          }
+          if (filter.document) {
+            param.params.documentType =  filter.document
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
@@ -3038,12 +3048,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'itemCode': '',
-                  'itemName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3092,12 +3096,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'itemCode': '',
-                  'itemName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3124,12 +3122,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'administrationCode': '',
-                  'administrationName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3946,7 +3938,13 @@ export const store = new Vuex.Store({
     },
     setCreateFileSigned (state, payload) {
       state.createFileSigned = payload
-    }
+    },
+    setAdvSearchShow (state, payload) {
+      state.advSearchShow = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -4150,6 +4148,12 @@ export const store = new Vuex.Store({
     },
     getCreateFileSigned (state) {
       return state.createFileSigned
-    }
+    },
+    advSearchShow (state) {
+      return state.advSearchShow
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

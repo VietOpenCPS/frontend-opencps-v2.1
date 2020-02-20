@@ -132,7 +132,8 @@ export default {
                 className: 'EFORM',
                 service: vm.columnList[index]['config'],
                 bookingFrom: vm.getCurrentDate(),
-                bookingTo: vm.getCurrentDate()
+                bookingTo: vm.getCurrentDate(),
+                online: false
               }
               // console.log('filterEform', filterEform)
               let bookingDossier = []
@@ -163,7 +164,8 @@ export default {
                 className: 'DOSSIER',
                 service: vm.columnList[index]['config'],
                 bookingFrom: vm.getCurrentDate(),
-                bookingTo: vm.getCurrentDate()
+                bookingTo: vm.getCurrentDate(),
+                online: false
               }
               let bookingDossier = []
               let bookingEform = []
@@ -201,7 +203,8 @@ export default {
                   className: 'DOSSIER',
                   service: vm.columnList[index]['config'],
                   bookingFrom: vm.getCurrentDate(),
-                  bookingTo: vm.getCurrentDate()
+                  bookingTo: vm.getCurrentDate(),
+                  online: false
                 }
                 vm.$store.dispatch('getBookingDangGoi', filter).then(function (resultBooking) {
                   if (resultBooking) {

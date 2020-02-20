@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import NotFound from '@/components/NotFound'
-import LandingServiceInfo from '@/components/screens/Landing'
+import LandingDvc from '@/components/screens/Landing'
 import DetailForward from '@/components/blacklist/DetailForward'
 const routes = [
-  { path: '/', name: 'LandingServiceInfo', component: LandingServiceInfo, props: true },
+  { path: '/', name: 'LandingDvc', component: LandingDvc, props: true },
   {
     path: '/danh-sach-ho-so/:index',
     name: 'Landing',

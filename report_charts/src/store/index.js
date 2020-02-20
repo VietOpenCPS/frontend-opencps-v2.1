@@ -40,7 +40,8 @@ export const store = new Vuex.Store({
     reportType: 'REPORT_01',
     groupType: 'domain',
     siteName: '',
-    itemsReports: support['trangThaiHoSoList']
+    itemsReports: support['trangThaiHoSoList'],
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -393,7 +394,10 @@ export const store = new Vuex.Store({
     },
     setitemsReports (state, payload) {
       state.itemsReports = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     getsnackbarerror (state) {
@@ -431,6 +435,9 @@ export const store = new Vuex.Store({
     },
     itemsReports (state) {
       return state.itemsReports
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

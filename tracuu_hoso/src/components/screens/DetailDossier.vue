@@ -5,8 +5,9 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="pb-2">
-          <h3 style="color:#0167d3"><span class="text-bold">Tên thủ tục: </span>{{dossierDetail.serviceName}}</h3>
+        <v-flex :class="isMobile ? 'pb-2 pl-2' : 'pb-2'">
+          <h3 style="color:#0167d3" v-if="!isMobile"><span class="text-bold">Tên hồ sơ: </span>{{dossierDetail.dossierName ? dossierDetail.dossierName : dossierDetail.serviceName}}</h3>
+          <h3 style="color:#0167d3" v-else><span class="text-bold">Thủ tục hành chính: </span>{{dossierDetail.serviceName}}</h3>
         </v-flex>
       </v-layout>
       <div class="pt-1">
@@ -24,9 +25,17 @@
               <v-card-text class="px-0 py-0">
                 <v-layout wrap class="px-2 py-2">
                   <v-flex xs12 sm4 class="pr-3">
+                    <div class="xs12 sm12 pb-1" v-if="isMobile">
+                      <span class="pr-2">Tên hồ sơ: </span>
+                      <span class="pl-0 text-bold ">  {{dossierDetail.dossierName ? dossierDetail.dossierName  : dossierDetail.serviceName}} </span>
+                    </div>
                     <div class="xs12 sm12 pb-1">
                       <span class="pr-2">Mã hồ sơ: </span>
                       <span class="pl-0 text-bold ">  {{dossierDetail.dossierNo}} </span>
+                    </div>
+                    <div class="xs12 sm12 pb-1">
+                      <span class="pr-2">Hình thức nộp: </span>
+                      <span class="pl-0 text-bold ">  {{dossierDetail.online ? 'Nộp trực tuyến' : 'Nộp trực tiếp'}} </span>
                     </div>
                     <!--  -->
                     <div class="xs12 sm12 pb-1">
@@ -44,6 +53,10 @@
                     <div class="xs12 sm12 pb-1">
                       <span class="pr-2">Chủ hồ sơ: </span>
                       <span class="pl-0 text-bold"> {{dossierDetail.applicantName}} </span>
+                    </div>
+                    <div class="xs12 sm12 pb-1" v-if="isMobile">
+                      <span class="pr-2">{{dossierDetail.applicantIdType === 'citizen' ? 'Số CMND/ căn cước' : 'Mã số thuế'}} : </span>
+                      <span class="pl-0 text-bold ">  {{dossierDetail.applicantIdNo}} </span>
                     </div>
                     <!--  -->
                     <div class="xs12 sm12 pb-1">
@@ -70,7 +83,7 @@
                     <!--  -->
                     <div class="xs12 sm12 pb-1">
                       <span class="pr-2">Ngày hẹn trả: </span>
-                      <span class="pl-0 text-bold "> {{dossierDetail.dueDate}}</span>
+                      <span class="pl-0 text-bold "> {{dossierDetail.dueDate ? dossierDetail.dueDate : 'Chưa có ngày hẹn trả'}}</span>
                     </div>
                   </v-flex>
                   <!--  -->
@@ -95,7 +108,7 @@
             <v-card style="border: 1px solid #dedede;border-top: none;">
               <v-card-text class="px-0 py-0">
                 <div>
-                  <v-data-table :headers="headers" :items="dossierActions" class="table-landing table-bordered"
+                  <v-data-table v-if="!isMobile" :headers="headers" :items="dossierActions" class="table-landing table-bordered"
                   hide-actions no-data-text="Không có dữ liệu"
                   >
                     <template slot="headerCell" slot-scope="props">
@@ -119,6 +132,36 @@
                           {{itemUser.userName}} <br>
                         </div>
                       </td>
+                      <td class="text-xs-left">
+                        <div v-for="(itemAction, index) in props.item.actions" :key="index">
+                          {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
+                        </div>
+                        <div v-if="props.item.statusText">
+                          <span style="color: green">{{props.item.statusText}}</span>
+                        </div>
+                      </td>
+                    </template>
+                  </v-data-table>
+                  <!--  -->
+                  <v-data-table v-else :headers="headersMobile" :items="dossierActions" class="table-landing table-bordered"
+                  hide-actions no-data-text="Không có dữ liệu"
+                  >
+                    <template slot="headerCell" slot-scope="props">
+                      <v-tooltip bottom>
+                        <span slot="activator">
+                          {{ props.header.text }}
+                        </span>
+                        <span>
+                          {{ props.header.text }}
+                        </span>
+                      </v-tooltip>
+                    </template>
+                    <!--  -->
+                    <template slot="items" slot-scope="props">
+                      <td class="text-xs-center">{{props.index + 1}}</td>
+                      <td class="text-xs-left">{{props.item.sequenceName}}</td>
+                      <td class="text-xs-left">{{props.item.sequenceRole}}</td>
+                      <td class="text-xs-left">{{props.item.startDate|dateTimeView}}</td>
                       <td class="text-xs-left">
                         <div v-for="(itemAction, index) in props.item.actions" :key="index">
                           {{itemAction.createDate | dateTimeView}} : <span style="color: #0b72ba">{{itemAction.actionName}}</span>
@@ -189,48 +232,99 @@
       tailieuKeyQua: [],
       votingItems: [],
       loadingVoting: false,
-      headers: [{
-        text: '#',
-        align: 'center',
-        sortable: false
-      },
-      {
-        text: 'Vai trò',
-        align: 'center',
-        sortable: false,
-        class: 'vaitro_column'
-      }, {
-        text: 'Công việc',
-        align: 'center',
-        sortable: false,
-        class: 'congviec_column'
-      }, {
-        text: 'Thời hạn quy định',
-        align: 'center',
-        sortable: false,
-        class: 'thoihanquydinh_column'
-      }, {
-        text: 'Ngày bắt đầu',
-        align: 'center',
-        sortable: false,
-        class: 'ngaybatdau_column'
-      }, {
-        text: 'Người thực hiện',
-        align: 'center',
-        sortable: false,
-        class: 'nguoithuchien_column'
-      }, {
-        text: 'Kết quả',
-        align: 'center',
-        sortable: false,
-        class: 'ketqua_column'
-      }]
+      headers: [
+        {
+          text: '#',
+          align: 'center',
+          sortable: false
+        },
+        {
+          text: 'Vai trò',
+          align: 'center',
+          sortable: false,
+          class: 'vaitro_column'
+        }, {
+          text: 'Công việc',
+          align: 'center',
+          sortable: false,
+          class: 'congviec_column'
+        }, {
+          text: 'Thời hạn quy định',
+          align: 'center',
+          sortable: false,
+          class: 'thoihanquydinh_column'
+        }, {
+          text: 'Ngày bắt đầu',
+          align: 'center',
+          sortable: false,
+          class: 'ngaybatdau_column'
+        }, {
+          text: 'Người thực hiện',
+          align: 'center',
+          sortable: false,
+          class: 'nguoithuchien_column'
+        }, {
+          text: 'Kết quả',
+          align: 'center',
+          sortable: false,
+          class: 'ketqua_column'
+        }
+      ],
+      headersMobile: [
+        {
+          text: 'TT',
+          align: 'center',
+          sortable: false
+        }, {
+          text: 'Công việc',
+          align: 'center',
+          sortable: false,
+          class: 'congviec_column'
+        }, {
+          text: 'Bộ phận xử lý',
+          align: 'center',
+          sortable: false,
+          class: 'vaitro_column'
+        }, {
+          text: 'Ngày bắt đầu',
+          align: 'center',
+          sortable: false,
+          class: 'ngaybatdau_column'
+        }, {
+          text: 'Kết quả',
+          align: 'center',
+          sortable: false,
+          class: 'ketqua_column'
+        }
+      ],
+      isMobile: false,
+      two_system: false
     }),
-    computed: {},
+    computed: {
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      let vm = this
+      vm.onResize()
+      window.addEventListener('resize', vm.onResize, { passive: true })
+      if (vm.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
     created () {
       let vm = this
       vm.$nextTick(function () {
-        var vm = this
+        vm.onResize()
+        window.addEventListener('resize', vm.onResize, { passive: true })
+        try {
+          // server dvc và motcua độc lập
+          vm.two_system = two_system_config 
+        } catch (error) {
+        }
         vm.dossierDetail = vm.detail
         if (vm.dossierDetail.submissionNote) {
           let submissionNote = vm.dossierDetail.submissionNote ? JSON.parse(vm.dossierDetail.submissionNote) : ''
@@ -292,11 +386,19 @@
           className: 'dossier',
           classPK: vm.dossierDetail.dossierId
         }
-        vm.$store.dispatch('loadVoting', filter).then(function (result) {
-          vm.votingItems = result
-          console.log('votingItems', vm.votingItems)
-        }).catch(function (reject) {
-        })
+        if (!vm.two_system) {
+          vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
+            vm.votingItems = result
+            console.log('votingItems', vm.votingItems)
+          }).catch(function (reject) {
+          })
+        } else {
+          vm.$store.dispatch('loadVoting', filter).then(function (result) {
+            vm.votingItems = result
+            console.log('votingItems', vm.votingItems)
+          }).catch(function (reject) {
+          })
+        }
       },
       submitVoting () {
         let vm = this
@@ -306,7 +408,12 @@
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
             vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
-            arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+            vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
+            if (!vm.two_system) {
+              arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
+            } else {
+              arrAction.push(vm.$store.dispatch('submitVotingMC', vm.votingItems[index]))
+            }
           }
           Promise.all(arrAction).then(results => {
             vm.loadingVoting = false
@@ -318,7 +425,11 @@
       },
       goBack () {
         window.history.back()
-      }
+      },
+      onResize () {
+        let vm = this
+        vm.isMobile = window.innerWidth < 1024
+      },
     },
     filters: {
       dateTimeView (arg) {

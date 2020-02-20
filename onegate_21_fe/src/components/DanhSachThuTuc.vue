@@ -14,7 +14,7 @@
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
           <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span>
         </div>
-        <div class="layout row wrap header_tools row-blue">
+        <div class="layout row wrap header_tools row-blue" v-if="!isMobile">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
             <v-text-field
               v-model="serviceNameKey"
@@ -38,9 +38,9 @@
         </div> 
       </div>
       <v-layout wrap class="white pt-3">
-        <v-flex style="width:calc(100% - 230px)">
+        <v-flex :style="!isMobile ? 'width:calc(100% - 230px)' : ''">
           <v-layout wrap class="">
-            <v-flex xs6 class="px-2">
+            <v-flex xs12 sm6 class="px-2">
               <v-autocomplete
                 class="select-border"
                 :items="govAgencyList"
@@ -54,7 +54,7 @@
                 box
               ></v-autocomplete>
             </v-flex>
-            <v-flex xs6 class="px-2">
+            <v-flex xs12 sm6 class="px-2">
               <v-autocomplete
                 class="select-border"
                 :items="domainList"
@@ -70,7 +70,7 @@
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex style="width:230px" class="pl-2">
+        <v-flex style="width:230px" class="pl-2" v-if="!isMobile">
           <v-chip label color="primary" class="my-0" text-color="white" style="height:48px;border-radius: 5px;">
             <v-checkbox
               class="mt-0"
@@ -335,6 +335,9 @@
       },
       userLoginInfomation () {
         return this.$store.getters.getUserLogin
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {

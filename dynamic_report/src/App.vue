@@ -192,6 +192,7 @@
         }
       },
       isChildPage () {
+        // giám sát
         try {
           if (childPage) {
             return true

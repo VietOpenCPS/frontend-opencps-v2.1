@@ -125,6 +125,7 @@
                     box
                     :rules="[v => !!v || 'Nơi nộp hồ sơ là bắt buộc']" required
                     @change="changeAgencyBooking"
+                    return-object
                   >
                     <template slot="label"> 
                       <span>Nơi nộp hồ sơ</span> 
@@ -133,65 +134,48 @@
                   </v-autocomplete>
                 </v-flex>
                 <v-flex xs12>
-                  <v-layout wrap>
-                    <v-flex style="width: calc(100% - 120px)">
-                      <v-menu
-                        ref="menuApplicantIdDate"
-                        :close-on-content-click="false"
-                        v-model="menuApplicantIdDate"
-                        :nudge-right="40"
-                        lazy
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                        max-width="290px"
-                        min-width="290px"
-                      >
-                        <v-text-field
-                          :rules="[v => !!v || 'Ngày đăng ký là bắt buộc']"
-                          required
-                          box
-                          slot="activator"
-                          v-model="applicantIdDateFormatted"
-                          append-icon="event"
-                          @blur="dateBooking = parseDate(applicantIdDateFormatted)"
-                        >
-                          <template slot="label"> 
-                            <span>Ngày đăng ký nộp hồ sơ</span> 
-                            <span class="red--text darken-3"> *</span>
-                          </template>
-                        </v-text-field>
-                        <v-date-picker :min="getMindate()" ref="picker"
-                        :first-day-of-week="1" v-model="dateBooking" no-title @input="changeDateBooking"></v-date-picker>
-                      </v-menu>
-                    </v-flex>
-                    <v-flex class="pl-3 pt-3" style="width: 120px">
-                      <div>
-                        Còn trống:<span class="text-bold" style="font-size: 16px"> {{countEmpty}}</span>
-                      </div>
-                    </v-flex>
-                  </v-layout>
+                  <v-menu
+                    ref="menuApplicantIdDate"
+                    :close-on-content-click="false"
+                    v-model="menuApplicantIdDate"
+                    :nudge-right="40"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      :rules="[v => !!v || 'Ngày đăng ký là bắt buộc']"
+                      required
+                      box
+                      slot="activator"
+                      v-model="applicantIdDateFormatted"
+                      append-icon="event"
+                      @blur="dateBooking = parseDate(applicantIdDateFormatted)"
+                    >
+                      <template slot="label"> 
+                        <span>Ngày đăng ký nộp hồ sơ</span> 
+                        <span class="red--text darken-3"> *</span>
+                      </template>
+                    </v-text-field>
+                    <v-date-picker :min="getMindate()" ref="picker"
+                    :first-day-of-week="1" v-model="dateBooking" no-title @input="changeDateBooking"></v-date-picker>
+                  </v-menu>
                 </v-flex>
                 <!--  -->
-                <!-- <v-flex xs12>
-                  <v-layout wrap>
-                    <v-flex style="width: calc(100% - 150px)">
-                      <v-text-field v-model="captcha" box clearable
-                        :rules="[v => !!v || 'Mã xác thực là bắt buộc']" required
-                      >
-                        <template slot="label"> 
-                          <span>Mã xác thực</span> 
-                          <span class="red--text darken-3"> *</span>
-                        </template>
-                      </v-text-field>
-                    </v-flex>
-                    <v-flex class="pl-3 pt-3" style="width: 150px">
-                      <div>
-                        Còn trống:<span class="text-bold" style="font-size: 16px"> {{countEmpty}}</span>
-                      </div>
-                    </v-flex>
-                  </v-layout>
-                </v-flex> -->
+                <v-flex xs12 v-if="!isSlot">
+                  <v-alert
+                    class="py-2"
+                    :value="true"
+                    color="error"
+                    icon="warning"
+                    outline
+                  >
+                    Ngày {{applicantIdDateFormatted}} đã hết lượt xếp hàng
+                  </v-alert>
+                </v-flex>
                 <!--  -->
                 <v-flex sm12>
                   <div><span class="red--text">Chú ý:</span></div>
@@ -202,7 +186,7 @@
                   </div>
                 </v-flex>
                 <v-flex sm12 class="text-xs-right">
-                  <v-btn color="blue darken-3" :loading="loading" :disabled="loading" @click.native="submitQueue" class="mx-0" dark>
+                  <v-btn color="blue darken-3" :loading="loading" :disabled="loading || !isSlot" @click.native="submitQueue" class="mx-0" dark>
                     <v-icon>create</v-icon>&nbsp; Đăng ký
                   </v-btn>
                 </v-flex>
@@ -312,6 +296,7 @@ export default {
   components: {
   },
   data: () => ({
+    isSlot: true,
     groupDvc: '',
     bookingGroups: '',
     currentGroup: '',
@@ -326,8 +311,8 @@ export default {
     serviceInfoListRender: [],
     formTemplateList: [],
     agencyItems: [
-      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: 'CLS'},
-      {name: 'Sở ngoại vụ TP.Hồ Chí Minh - 6 Alexandre De Rhodes, Quận 1, TP.HCM', value: 'SNVHCM'}
+      {name: 'Cục lãnh sự - 40 Trần Phú, Ba Đình, Hà Nội', value: '124302', code: 'CLS'},
+      {name: 'Sở ngoại vụ TP.Hồ Chí Minh - 6 Alexandre De Rhodes, Quận 1, TP.HCM', value: '124301', code: 'SNV'}
     ],
     dialogSecret: false,
     loading: false,
@@ -339,6 +324,7 @@ export default {
     secretBooking: '',
     countEmpty: 0,
     captcha: '',
+    detailEform: '',
     rules: {
       required: (value) => !!value || 'Trường dữ liệu bắt buộc',
       email: (value) => {
@@ -497,7 +483,10 @@ export default {
         bookingName: '',
         serviceGroupCode: '',
         serverNo: '',
-        dossierRelease: false
+        dossierRelease: false,
+        telNo: vm.applicantTelNo,
+        groupId: vm.agencyTiepNhan.value,
+        bookingDate: vm.applicantIdDateFormatted
       }
       if (keySearch.length === 1) {
         filterBooking['codeNumber'] = vm.eformNoBooking
@@ -512,6 +501,8 @@ export default {
         vm.$store.dispatch('getEformSecret', filter).then(function(result) {
           let bookingName = ''
           if (result && result.hasOwnProperty('eFormId')) {
+            vm.detailEform = result
+            vm.$store.commit('setEformDetail', result)
             // 
             vm.currentGroup = vm.bookingGroups.filter(function (item) {
               return (item['config'] && item['config'].split(',').indexOf(result['serviceCode']) >= 0)
@@ -533,14 +524,29 @@ export default {
               filterBooking.serviceCode = result.serviceCode
               filterBooking.bookingName = bookingName
               filterBooking.serviceGroupCode = vm.currentGroup['groupCode']
-              filterBooking.serverNo = 'CREATE_BOOKING_' + vm.agencyTiepNhan
-              vm.createBookingOnline(filterBooking)
+              // 
+              let filter = {
+                groupIdBooking: vm.agencyTiepNhan.value,
+                bookingDate: vm.applicantIdDateFormatted
+              }
+              vm.$store.dispatch('getCounterBooking', filter).then(function (result) {
+                console.log('checkCounter', result)
+                if (result) {
+                  vm.isSlot = true
+                  vm.createBookingOnline(filterBooking)
+                } else {
+                  vm.isSlot = false
+                }
+              }).catch(reject => {
+                vm.isSlot = false
+              })
             }
           } else {
             toastr.clear()
             toastr.error('Mã tờ khai hoặc mã bí mật không chính xác. Vui lòng kiểm tra lại')
           }
         }).catch(function () {
+          console.log('reject')
         })
       } else {
         toastr.clear()
@@ -549,8 +555,22 @@ export default {
     },
     createBookingOnline (filter) {
       let vm = this
-      console.log('filter create booking', filter)
       vm.$store.dispatch('createBookingOnline', filter).then(function (result) {
+        toastr.success('Đăng ký xếp hàng thành công')
+        vm.applicantName = ''
+        vm.eformNoBooking = ''
+        vm.secretBooking = ''
+        vm.applicantTelNo = ''
+        vm.agencyTiepNhan = ''
+        vm.$refs.formBooking.resetValidation()
+        setTimeout(function () {
+          vm.$router.push({
+            path: '/tao-to-khai-thanh-cong/1',
+            query: {
+              renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            }
+          })
+        }, 300)
       }).catch (function (reject) {
         toastr.error('Đăng ký xếp hàng thất bại. Vui lòng thử lại.')
       })
@@ -559,14 +579,14 @@ export default {
       let vm = this
       vm.getBookingConfigs()
       if (vm.applicantIdDateFormatted) {
-        vm.getBooking()
+        vm.getCounterBooking()
       }
     },
     changeDateBooking () {
       let vm = this
       vm.menuApplicantIdDate = false
       if (vm.agencyTiepNhan) {
-        vm.getBooking()
+        vm.getCounterBooking()
       }
     },
     getBooking () {
@@ -596,7 +616,7 @@ export default {
       let vm = this
       setTimeout(function () {
         let filter = {
-          serverNo: 'BOOKING_CONFIG_' + vm.agencyTiepNhan
+          serverNo: 'BOOKING_CONFIG_' + vm.agencyTiepNhan.code
         }
         vm.$store.dispatch('getServerConfig', filter).then(function (result) {
           // nhóm thủ tục, step dossier
@@ -610,6 +630,24 @@ export default {
         }).catch(function (reject) {
         })
       }, 300)  
+    },
+    getCounterBooking () {
+      let vm = this
+      setTimeout(function () {
+        let filterEform = {
+          groupIdBooking: vm.agencyTiepNhan.value,
+          bookingDate: vm.applicantIdDateFormatted
+        }
+        vm.$store.dispatch('getCounterBooking', filterEform).then(function (result) {
+          if (result) {
+            vm.isSlot = true
+          } else {
+            vm.isSlot = false
+          }
+        }).catch(reject => {
+          vm.isSlot = false
+        })
+      }, 300)
     },
     maBienNhan (str) {
       let index = 0

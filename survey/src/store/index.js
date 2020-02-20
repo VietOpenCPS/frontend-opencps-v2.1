@@ -12,8 +12,8 @@ export const store = new Vuex.Store({
     initData: {},
     loading: false,
     index: 0,
-    endPointApi: '/o/rest/v2'
-    // endPointApi: 'http://127.0.0.1:8081/api'
+    endPointApi: '/o/rest/v2',
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -187,7 +187,10 @@ export const store = new Vuex.Store({
     },
     setLoading (state, payload) {
       state.loading = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -195,6 +198,9 @@ export const store = new Vuex.Store({
     },
     index (state) {
       return state.index
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

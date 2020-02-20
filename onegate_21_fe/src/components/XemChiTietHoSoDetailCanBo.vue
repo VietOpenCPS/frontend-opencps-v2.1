@@ -589,6 +589,12 @@
     <!-- plugin ký số -->
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
     <!--  -->
+    <div style="display: none">
+      <input id="dossierId_hidden" type="text" :value="thongTinChiTietHoSo.dossierId">
+      <input id="dossierStatus_hidden" type="text" :value="thongTinChiTietHoSo.dossierStatus">
+      <input id="dossierSubStatus_hidden" type="text" :value="thongTinChiTietHoSo.dossierSubStatus">
+    </div>
+    <!--  -->
     <v-dialog v-model="dialog_reAsign" scrollable persistent max-width="700px">
       <v-card>
         <v-toolbar dark color="primary">
@@ -938,11 +944,13 @@ export default {
   mounted () {
     this.onResize()
     window.addEventListener('resize', this.onResize, { passive: true })
+    $('#m-navigation').css('display', 'none')
   },
   created () {
     let vm = this
     vm.$nextTick(function () {
-      console.log('meunconfig created', vm.menuConfigs, vm.index)
+      $('#m-navigation').css('display', 'none')
+      // console.log('meunconfig created', vm.menuConfigs, vm.index)
       if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
         vm.viewScript = true
         vm.loadingForm = true
@@ -1064,7 +1072,7 @@ export default {
   methods: {
     onResize () {
       let vm = this
-      let isMobile = window.innerWidth < 1024
+      let isMobile = window.innerWidth < 1264
       vm.isMobile = isMobile
     },
     initData (data) {

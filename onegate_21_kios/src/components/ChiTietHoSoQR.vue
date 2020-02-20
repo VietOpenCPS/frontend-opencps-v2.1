@@ -24,7 +24,6 @@
           >
             <v-tab key="1" ripple class="mx-2"> Thông tin chung </v-tab>
             <v-tab key="2" ripple class="mx-2"> Tiến trình thụ lý </v-tab>
-            <!-- <v-tab key="3" ripple class="mx-2" @click="loadLogs"> Nhật ký sửa đổi</v-tab> -->
             <v-tab-item key="1" class="wrap-scroll wrap-scroll-dossier">
               <v-card flat>
                 <v-card-text class="px-0 py-0">

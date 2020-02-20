@@ -1,9 +1,11 @@
 <template>
   <div>
-    <v-layout row wrap class="pt-3">
-      <v-flex xs12 sm3>
-        <div style="font-size: 20px;font-weight: 500;color:#0167d3" class="px-2">TRA CỨU HỒ SƠ</div>
-        <v-card flat color="#ffffff" class="px-2 py-2">
+    <v-layout row wrap :class="isMobile ? 'pt-3' : 'pt-2'">
+      <v-flex xs12 md3>
+        <div style="font-size: 20px;font-weight: 500;color:#0167d3" :class="isMobile ? 'px-2 text-xs-center' : 'px-2'">
+          {{!qrscan ? 'TRA CỨU HỒ SƠ' : 'THÔNG TIN HỒ SƠ'}}
+        </div>
+        <v-card v-if="!qrscan" flat color="#ffffff" class="px-2 py-2">
           <v-flex xs12 class="mb-2">
             <v-text-field
               label="Mã số hồ sơ"
@@ -20,7 +22,7 @@
               @keyup.enter="changeDataSearch"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 class="mb-2">
+          <v-flex xs12 :class="isMobile ? 'mb-2 right' : 'mb-2'">
             <v-btn class="mr-2 ml-0" color="primary" @click="changeDataSearch"
             :loading="loading"
             :disabled="loading">
@@ -34,10 +36,9 @@
             </v-btn>
           </v-flex>
         </v-card>
-        
       </v-flex>
 
-      <v-flex xs12 sm9 class="pl-3 pt-1">
+      <v-flex xs12 md9 :class="isMobile ? 'pt-1 mb-2' : 'pl-3 pt-1 mb-2'">
         <v-card flat class="" v-if="!detail">
           <div class="" v-if="totalDossier > 0">
             <div class="mx-2">Có <span class="text-bold" style="color:#0167d3">{{totalDossier}}</span> hồ sơ được tìm thấy</div>
@@ -58,7 +59,7 @@
                       <span>{{dossierPage * 10 - 10 + props.index + 1}}</span><br>
                     </div>
                   </td>
-                  <td class="text-xs-left py-2" style="min-width: 135px;">
+                  <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 110px' : 'min-width: 135px'">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -66,7 +67,7 @@
                       <span>{{props.item.dossierNo}}</span>
                     </div>
                   </td>
-                  <td class="text-xs-left py-2" @click="viewDetail(props.item)">
+                  <td class="text-xs-left py-2" @click="viewDetail(props.item)" style="min-width: 150px;">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -84,7 +85,7 @@
                       </span>
                     </div>
                   </td>
-                  <td class="text-xs-left py-2" style="min-width: 135px">
+                  <td class="text-xs-left py-2" :style="isMobile ? 'min-width: 100px' : 'min-width: 135px'">
                     <content-placeholders v-if="loading">
                       <content-placeholders-text :lines="1" />
                     </content-placeholders>
@@ -139,6 +140,7 @@
                 height="42"
                 :rules="[v => !!v || 'Mã tra cứu là bắt buộc']"
                 required
+                @keyup.enter.native="submitPass"
               ></v-text-field>
             </v-flex>
             <div class="flex primary--text mb-3">Mã tra cứu là dãy số gồm 4 ký tự được in trên giấy tiếp nhận hồ sơ và hẹn trả kết quả, mail thông báo tiếp nhận hồ sơ.</div>
@@ -230,12 +232,27 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    isMobile: false,
+    qrscan: false
   }),
   computed: {
     originality () {
       var vm = this
       return vm.getOriginality()
+    }
+  },
+  beforeDestroy () {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onResize, { passive: true })
+    }
+  },
+  mounted () {
+    let vm = this
+    vm.onResize()
+    window.addEventListener('resize', vm.onResize, { passive: true })
+    if (vm.isMobile) {
+      $('section#content').css('padding-left', '0px')
     }
   },
   created () {
@@ -244,7 +261,11 @@ export default {
       var vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
-      if (newQuery.dossierNo || newQuery.applicantIdNo) {
+      if (newQuery.hasOwnProperty('id') && newQuery.id && newQuery.hasOwnProperty('secretKey') && newQuery.secretKey) {
+        vm.qrscan = true
+        vm.submitPassQrscan(newQuery.id, newQuery.secretKey)
+      } else {
+        vm.qrscan = false
         vm.doSearchDossier()
       }
     })
@@ -254,15 +275,18 @@ export default {
     vm.$nextTick(function () {
     })
   },
-  mounted () {
-    let vm = this
-  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
-      vm.doSearchDossier()
+      if (currentQuery.hasOwnProperty('id') && currentQuery.id && currentQuery.hasOwnProperty('secretKey') && currentQuery.secretKey) {
+        vm.qrscan = true
+        vm.submitPassQrscan(currentQuery.id, currentQuery.secretKey)
+      } else {
+        vm.qrscan = false
+        vm.doSearchDossier()
+      }
     }
   },
   methods: {
@@ -281,13 +305,17 @@ export default {
         dossierNo: vm.dossierNoKey,
         applicantIdNo: vm.applicantIdNo
       }
-      vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+      if (vm.dossierNoKey || vm.applicantIdNo) {
+        vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
+          vm.loading = false
+          vm.totalDossier = result.total
+          vm.dossierList = result.data ? result.data : []
+        }).catch(function (reject) {
+          vm.loading = false
+        })
+      } else {
         vm.loading = false
-        vm.totalDossier = result.total
-        vm.dossierList = result.data ? result.data : []
-      }).catch(function (reject) {
-        vm.loading = false
-      })
+      }
     },
     changeDataSearch () {
       let vm = this
@@ -335,19 +363,36 @@ export default {
             vm.dialogCheckPass = false
             vm.dossierDetail = result.data
             vm.detail = true
-            // vm.$store.commit('setDossierDetail', vm.dossierDetail)
-            // vm.$router.push({
-            //   path: current.path + '/' + vm.dossierSelected.dossierId,
-            //   query: {
-            //     renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            //   }
-            // })
           }
         }).catch(function (reject) {
           vm.loading = false
           toastr.error('Lỗi hệ thống')
         })
       }
+    },
+    submitPassQrscan (id, secretKey) {
+      let vm = this
+      let current = vm.$router.history.current
+      let filter = {
+        password: secretKey,
+        dossierId: id
+      }
+      vm.$store.dispatch('getDossierDetailPass', filter).then(function (result) {
+        vm.loading = false
+        if (result.status && result.status.toString() === '203') {
+          toastr.error('Mã tra cứu không chính xác. Vui lòng thử lại.')
+        } else if (result.status && result.status.toString() === '200') {
+          vm.dossierDetail = result.data
+          vm.detail = true
+        }
+      }).catch(function (reject) {
+        vm.loading = false
+        toastr.error('Lỗi hệ thống')
+      })
+    },
+    onResize () {
+      let vm = this
+      vm.isMobile = window.innerWidth < 1024
     },
     paggingData (config) {
       let vm = this

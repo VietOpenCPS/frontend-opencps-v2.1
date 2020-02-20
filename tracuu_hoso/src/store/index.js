@@ -166,6 +166,25 @@ export const store = new Vuex.Store({
       })
     },
     // voting
+    loadDetailDossierMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers/' + data['referenceUid'])
+        dataPost.append('data', '')
+        dataPost.append('serverCode', 'SERVER_' + data['govAgencyCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     loadVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
@@ -185,6 +204,32 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
+        })
+      })
+    },
+    loadVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
+          dataPost.append('data', '')
+          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
+            if (result1.data) {
+              resolve(result1.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(xhr => {
         })
       })
     },
@@ -212,6 +257,38 @@ export const store = new Vuex.Store({
         })
       })
     },
+    submitVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          // api đồng bộ sang một cửa
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected
+          }
+          if (data.className === 'dossier') {
+            textPost['votingCode'] = data.votingCode ? data.votingCode : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+            resolve(result.data)
+          }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Gửi đánh giá thất bại')
+            reject(xhr)
+          })
+        })
+      })
+    }
   },
   mutations: {
     setLoading (state, payload) {
@@ -230,6 +307,6 @@ export const store = new Vuex.Store({
     },
     getDetailDossier (state) {
       return state.dossierDetail
-    },
+    }
   }
 })

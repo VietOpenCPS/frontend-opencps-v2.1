@@ -597,12 +597,12 @@ export default {
                   "/register#/xac-thuc-tai-khoan?active_user_id=" +
                   window.themeDisplay.getUserId() +
                   "&redirectURL=" +
-                  window.themeDisplay.getURLHome();
+                  window.themeDisplay.getURLHome()
               } else {
-                window.location.href = response.data;
+                window.location.href = response.data
               }
             } else if (response.data === "ok") {
-              window.location.href = window.themeDisplay.getURLHome();
+              window.location.href = window.themeDisplay.getURLHome()
             } else if (response.data === "captcha") {
               let redirectURL = window.themeDisplay
                 .getLayoutRelativeURL()
@@ -616,12 +616,14 @@ export default {
                 window.location.href =
                   window.themeDisplay.getURLHome() + "/register#/login";
               }
+            } else if (response.data === "lockout") {
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị khóa tạm khóa trong 10 phút.")
             } else {
-              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
             }
           })
           .catch(function(error) {
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
           });
       }
     },

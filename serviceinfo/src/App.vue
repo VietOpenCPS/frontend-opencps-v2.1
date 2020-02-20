@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;max-width:1300px;margin:0 auto">
+  <v-app id="app_serviceinfo" :style="!isMobile ? 'border: 1px solid #dedede;max-width:1300px;margin:0 auto' : 'max-width:1300px;margin:0 auto'">
     <v-navigation-drawer app clipped floating width="265" v-if="!isMobile">
       <v-list class="py-0">
         <v-list-group
@@ -124,6 +124,15 @@
     mounted () {
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+        $('.input-search input').css('margin-top', '5px')
+        $('.input-search .v-input__slot').css('min-height', '36px')
+        $('.input-search .v-input__append-inner').css('margin-top', '10px')
+      }
+    },
+    beforeCreate() {
+      console.log(this.message)
     },
     created () {
       var vm = this
@@ -133,6 +142,8 @@
         vm.hasCoQuanThucHien = false
       }
       vm.$nextTick(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
         if (vm.hasCoQuanThucHien) {
           vm.menuServiceInfos = [
             {
@@ -182,8 +193,7 @@
             }
           ]
         }
-        let current = vm.$router.history.current
-        let newQuery = current.query
+        
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           vm.menuServiceInfos[0].children = result
@@ -252,6 +262,8 @@
         .catch(function(error) {
         })
       })
+      // 
+      
     },
     watch: {
       '$route': function (newRoute, oldRoute) {

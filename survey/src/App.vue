@@ -11,6 +11,30 @@
 <script>
   export default {
     data: () => ({
-    })
+    }),
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
+    computed: {
+      isMobile () {
+        return this.$store.getters.getIsMobile
+      }
+    },
+    methods: {
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1024
+        vm.$store.commit('setIsMobile', isMobile)
+      },
+    }
   }
 </script>

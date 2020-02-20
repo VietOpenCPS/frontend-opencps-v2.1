@@ -99,7 +99,7 @@ export const store = new Vuex.Store({
           let paramGet = {
             start: filter.page * 15 - 15,
             end: filter.page * 15,
-            keyword: filter.keyword,
+            keyword: filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, ''),
             domain: filter.domain,
             administration: filter.agency
           }
@@ -110,6 +110,31 @@ export const store = new Vuex.Store({
             params: paramGet
           }
           axios.get(state.endPoint + '/serviceinfos/mappingsuggest', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServiceMcLists ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let paramGet = {
+            start: filter.page * 15 - 15,
+            end: filter.page * 15,
+            keyword: filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, ''),
+            domain: filter.domain
+          }
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: paramGet
+          }
+          axios.get(state.endPoint + '/serviceinfos', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

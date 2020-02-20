@@ -1,15 +1,27 @@
 <template>
-  <div style="max-width:1300px;height: 100%; background-color: #ffff; padding-top: 20px;">
+  <div :class="!isMobile ? 'pt-3' : 'pt-0'" style="max-width:1300px;height: 100%; background-color: #ffff;" >
     <v-layout row wrap>
-      <v-flex xs12 sm9 v-if="votingItems.length > 0">
+      <v-flex xs12 md9 v-if="votingItems.length > 0">
         <v-layout row wrap>
-          <v-flex xs12 sm12 class="mb-4 px-2">
+          <v-flex xs12 sm12 class="mb-4 px-2" v-if="!isMobile">
             <div id="title" class="text-bold" style="color:#034687">
+            </div>
+          </v-flex>
+          <v-flex xs12 sm12 class="mb-2" v-else>
+            <div class="row-header" style="background-color: #0054a6">
+              <div class="ml-2 py-2 text-bold white--text"> <span>KHẢO SÁT MỨC ĐỘ HÀI LÒNG</span> </div>
+              <div class="layout row wrap header_tools row-blue">
+                <div class="flex text-right" style="margin-left: auto;">
+                  <v-btn icon class="my-0 white--text" @click="dialogMobile = true">
+                    <v-icon size="18">star</v-icon>
+                  </v-btn>
+                </div>
+              </div> 
             </div>
           </v-flex>
           <v-flex xs12 sm12>
             <div v-for="(item, index) in votingItems" style="margin-bottom: 5px;" :key="index">
-              <v-layout wrap class="text-bold">
+              <v-layout wrap class="text-bold" v-if="!isMobile">
                 <div class="flex px-3 py-1" style="height:26px;max-width:87px;background-color: #034687;transform: skew(-25deg)">
                   <span class="d-block white--text" style="transform: skew(25deg)">Chỉ số {{index + 1}} : </span>
                 </div>
@@ -17,7 +29,12 @@
                   {{ item.subject }}
                 </div>
               </v-layout>
-              <div class="ml-4">
+              <div class="text-bold px-2" v-if="isMobile">
+                <div class="" style="text-align: justify;color:#034687">
+                  Chỉ số {{index + 1}}: {{ item.subject }}
+                </div>
+              </div>
+              <div :class="!isMobile ? 'ml-4' : 'ml-2'">
                 <v-radio-group v-model="item.selected" column class="mt-1">
                   <v-radio :value="indexChoise + 1" v-for="(itemChoise, indexChoise) in item['choices']" :key="'rd' + indexChoise">
                     <div style="text-align: justify;" :style="item.selected === indexChoise + 1 ? 'color:#034687' : 'color:black'" slot="label">{{itemChoise}}</div>
@@ -28,7 +45,7 @@
             <v-flex xs12 sm12 class="mb-3 mt-3" v-if="showCaptcha">
               <captcha ref="captcha"></captcha>
             </v-flex>
-            <v-flex xs12 sm12 class="text-xs-left mt-2">
+            <v-flex xs12 sm12 :class="!isMobile ? 'text-xs-left mt-2' : 'text-xs-left mt-2 px-2'">
               <v-btn class="white--text" @click="doVottingResultSubmit" color="#004C98" :loading="btnLoading" :disabled="btnLoading">
                 <v-icon>save</v-icon>&nbsp;
                 Gửi đánh giá
@@ -37,14 +54,14 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex xs12 sm9 v-else>
+      <v-flex xs12 md9 v-else>
         <div class="px-3">
           <v-alert outline color="warning" icon="priority_high" :value="true">
             Chưa có câu hỏi khảo sát
           </v-alert>
         </div>
       </v-flex>
-      <v-flex xs12 sm3>
+      <v-flex xs12 md3 v-if="!isMobile">
         <div >
           <v-card color="#034687" flat class="white--text px-2 py-2" style="border-radius: 7px;">
             <v-card-text class="px-2 py-1 pr-0 ">
@@ -54,7 +71,7 @@
               <div class="text-xs-center">lượt đánh giá</div>
             </v-card-text>
           </v-card>
-          <v-card color="#0072bc" flat class="px-2 py-2 mt-4" style="border-radius: 7px;">
+          <v-card color="#0072bc" flat :class="isMobile ? 'px-2 py-2 mt-4' : 'px-2 py-2 mt-2'" style="border-radius: 7px;">
             <v-card-text class="px-2 py-1 pr-0">
               <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
               <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
@@ -143,6 +160,48 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogMobile" width="320">
+      <v-card>
+        <v-card-text class="px-1 py-1">
+          <div>
+            <v-card color="#034687" flat class="white--text px-2 py-2" style="border-radius: 7px;">
+              <v-card-text class="px-2 py-1 pr-0 ">
+                <div class="text-xs-center text-bold">Tổng số lượt đánh giá</div>
+                <div class="text-xs-center"> trong năm {{(new Date()).getFullYear()}}</div>
+                <div class="text-xs-center text-bold" style="font-size:24px">{{totalAnswer}}</div>
+                <div class="text-xs-center">lượt đánh giá</div>
+              </v-card-text>
+            </v-card>
+            <v-card color="#0072bc" flat :class="isMobile ? 'px-2 py-2 mt-4' : 'px-2 py-2 mt-2'" style="border-radius: 7px;">
+              <v-card-text class="px-2 py-1 pr-0">
+                <div class="text-xs-center white--text text-bold">Kết quả đánh giá các chỉ số</div>
+                <div class="text-xs-center white--text" >Năm {{(new Date()).getFullYear()}}</div>
+                <v-flex xs12 v-for="(item, index) in votingItems" :key="index" class="white--text mt-2">
+                  <v-layout row justify-center>
+                    <v-flex xs7 class="text-xs-center">
+                      <span>Chỉ số {{index + 1}}: </span>
+                      <span style="color:#6dcff6">{{item.answersCount ? item.averageScore + ' / 2 điểm' : 'Chưa có đánh giá'}}</span>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-card-text>
+            </v-card>
+          </div>
+        </v-card-text>
+        <v-divider class="my-0"></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            small
+            color="primary"
+            @click="dialogMobile = false"
+          >
+            Thoát
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -170,11 +229,15 @@ export default {
     barColor: ['#5cb85c', '#f0ad4e', '#d9534f', '#2e4fc8', '#2ec8bad9', '#142f14'],
     dialog_voting_result: false,
     resultTotal: [],
-    totalAnswer: 0
+    totalAnswer: 0,
+    dialogMobile: false
   }),
   computed: {
     loading () {
       return this.$store.getters.loading
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {

@@ -161,6 +161,9 @@ export const store = new Vuex.Store({
           if (filter['bookingTo']) {
             paramGet.bookingTo = filter['bookingTo']
           }
+          if (filter.hasOwnProperty('online')) {
+            paramGet.online = String(filter['online']) === 'true' ? true : false
+          }
           let param = {
             headers: {
               groupId: window.themeDisplay.getScopeGroupId()

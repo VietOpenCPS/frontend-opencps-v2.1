@@ -7,7 +7,7 @@
         </h2>
         <v-layout wrap class="mx-2 mt-2 px-0 py-0">
           <v-flex xs12 >
-            <v-card class="px-3 py-3" color="#002c46b3" flat style="max-width:700px;margin: 0 auto;border: 1px solid #dddddd">
+            <v-card :class="isMobile ? 'px-2 py-3' : 'px-3 py-3'" color="#002c46b3" flat style="max-width:700px;margin: 0 auto;border: 1px solid #dddddd">
               <v-form ref="form" v-model="valid" lazy-validation class="mt-2">
                 <v-flex xs12 class="mt-3">
                   <v-text-field
@@ -52,13 +52,13 @@
           </v-flex>
         </v-layout>
         <div style="max-width:1300px;margin:0 auto">
-          <v-flex class="mt-3 mx-3">
+          <v-flex :class="isMobile ? 'mt-3 mx-2' : 'mt-3 mx-3'">
             <v-toolbar height="42" color="#0b72ba" dark flat>
               <v-toolbar-title v-if="!activeDetailDossier" style="font-size: 16px !important;">Kết quả tìm kiếm <span>: {{dossierList.length}} hồ sơ</span></v-toolbar-title>
               <v-toolbar-title v-else style="font-size: 16px !important;">Thông tin chi tiết hồ sơ</v-toolbar-title>
             </v-toolbar>
           </v-flex>
-          <div class="mx-3 mt-4" v-if="validateTracuu === true && !activeDetailDossier" style="position:relative">
+          <div :class="isMobile ? 'mt-4 mx-2' : 'mt-4 mx-3'" v-if="validateTracuu === true && !activeDetailDossier" style="position:relative">
             <v-data-table
             :headers="headersTable"
             :items="dossierList"
@@ -125,7 +125,7 @@
               </div>
             </div>
           </div>
-          <div class="mx-3 mt-0" v-if="validateTracuu === true && activeDetailDossier" style="border: 1px solid #0b72ba;">
+          <div :class="isMobile ? 'mx-2 mt-0' : 'mx-3 mt-0'" v-if="validateTracuu === true && activeDetailDossier" style="border: 1px solid #0b72ba;">
             <chi-tiet-ho-so :index="dossierDetail.dossierId"></chi-tiet-ho-so>
           </div>
         </div>
@@ -215,6 +215,9 @@ export default {
   computed: {
     filterDossierKey () {
       return this.$store.getters.getFilterDossierKey
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
@@ -244,6 +247,12 @@ export default {
         vm.activeDetailDossier = false
       }
     })
+  },
+  mounted () {
+    let vm = this
+    if (vm.isMobile) {
+      $('section#content').css('padding-left', '0px')
+    }
   },
   watch: {
     '$route': function (newRoute, oldRoute) {

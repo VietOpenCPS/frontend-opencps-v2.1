@@ -243,6 +243,29 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getDetailBooking ({state, commit}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay.getScopeGroupId()
+            },
+            params: {
+              codeNumber: filter.codeNumber
+            }
+          }
+          axios.get('/o/rest/v2/bookings/eformDetail', param).then(function (response) {
+            if (response.data) {
+              resolve(response.data)
+            } else {
+              resolve(response)
+            }
+          }).catch(function (xhr) {
+            reject(xhr)
+          })
+        })
+      })
+    },
     getEformData ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -275,21 +298,26 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              groupId: filter.groupId ? filter.groupId : '',
               Token: window.Liferay ? window.Liferay.authToken : ''
-            },
-            params: {
-              className: filter.className,
-              classPK: filter.classPK,
-              codeNumber: filter.codeNumber,
-              serviceCode: filter.serviceCode,
-              state: filter.state,
-              bookingName: filter.bookingName,
-              serviceGroupCode: filter.serviceGroupCode,
-              gateNumber: ''
             }
           }
-          axios.get('/o/rest/v2/serverconfigs/' + filter.serverNo + '/protocols/API_CONNECT', param).then(function (response) {
+          
+          let dataCreateBooking = new URLSearchParams()
+          dataCreateBooking.append('className', filter.className)
+          dataCreateBooking.append('classPK', filter.classPK)
+          dataCreateBooking.append('codeNumber', filter.codeNumber)
+          dataCreateBooking.append('serviceCode', filter.serviceCode)
+          dataCreateBooking.append('state', filter.state)
+          dataCreateBooking.append('gateNumber', '')
+          dataCreateBooking.append('bookingName', filter.bookingName)
+          dataCreateBooking.append('serviceGroupCode', filter.serviceGroupCode)
+          dataCreateBooking.append('online', true),
+          dataCreateBooking.append('bookingDate', filter.bookingDate)
+
+          console.log('params_create', dataCreateBooking)
+
+          axios.post('/o/rest/v2/bookings', dataCreateBooking, param).then(function (response) {
             if (response.data) {
               resolve(response.data)
             } else {
@@ -368,6 +396,32 @@ export const store = new Vuex.Store({
             }
           }).catch(function (xhr) {
             reject([])
+          })
+        })
+      })
+    },
+    getCounterBooking ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            params: {
+              groupIdBooking: filter.groupIdBooking ? filter.groupIdBooking : '',
+              bookingDate: filter.bookingDate ? filter.bookingDate : ''
+            }
+          }
+          axios.get('/o/rest/v2/bookings/counter', param).then(function (response) {
+            let serializable = response.data
+            if (serializable && serializable.booking) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          }).catch(function (xhr) {
+            reject(false)
           })
         })
       })

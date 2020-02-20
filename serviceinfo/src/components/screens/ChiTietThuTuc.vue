@@ -3,7 +3,7 @@
     <div v-if="!isMobile">
       <v-card>
         <div class="row-header">
-          <div class="background-triangle-big"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
+          <div class="background-triangle-big"> <span>THÔNG TIN THỦ TỤC HÀNH CHÍNH</span> </div>
           <div class="layout row wrap header_tools row-blue">
             <div class="flex xs4 sm2 text-right" style="margin-left: auto;">
               <v-btn flat class="my-0 mx-0 btn-border-left" @click="goBack" active-class="temp_active">
@@ -46,7 +46,7 @@
                           <tbody>
                             <tr>
                               <td width="200"><span class="text-bold">Mã thủ tục</span></td>
-                              <td><span>{{serviceDetail.serviceCode}}</span></td>
+                              <td><span>{{serviceDetail.serviceCodeDVCQG ? serviceDetail.serviceCodeDVCQG : serviceDetail.serviceCode}}</span></td>
                             </tr>
                             <tr>
                               <td width="200"><span class="text-bold">Cơ quan quản lý</span></td>
@@ -91,8 +91,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -122,8 +122,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -163,8 +163,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -194,8 +194,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -233,8 +233,8 @@
     </div>
     <div v-else>
       <v-card>
-        <div class="row-header" style="background-color: #070f52">
-          <div class="ml-2 py-2 text-bold white--text"> <span>CHI TIẾT THỦ TỤC HÀNH CHÍNH</span> </div>
+        <div class="row-header" style="background-color: #0054a6">
+          <div class="ml-2 py-2 text-bold white--text"> <span>THÔNG TIN THỦ TỤC HÀNH CHÍNH</span> </div>
           <div class="layout row wrap header_tools row-blue">
             <div class="flex text-right" style="margin-left: auto;">
               <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
@@ -247,17 +247,17 @@
           <content-placeholders-text :lines="10" />
         </content-placeholders>
         <div v-else>
-          <v-layout class="wrap mt-3 ml-2">
-            <div class="pb-2" style="width: 100px">
-              <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white" style="height:px">
+          <div class="mt-2 mx-1">
+            <div style="text-align: justify;">
+              <span class="text-bold">{{serviceDetail.serviceName}}</span>
+            </div>
+            <div>
+              <v-chip class="mx-0 my-0" small disabled label :color="getColor(serviceDetail.maxLevel)" text-color="white">
                 Mức độ {{serviceDetail.maxLevel}}
               </v-chip>
             </div>
-            <div style="width:calc(100% - 100px)">
-              <span class="text-bold">{{serviceDetail.serviceName}}</span>
-            </div>    
-          </v-layout>
-          <div class="mt-3">
+          </div>
+          <div :class="!isMobile ? 'mt-3' : 'mt-2'">
             <v-tabs
               icons-and-text
               v-model="active"
@@ -276,36 +276,40 @@
                         <table class="datatable table">
                           <tbody>
                             <tr>
-                              <td width="150"><span class="text-bold">Cơ quan quản lý</span></td>
-                              <td><span>{{serviceDetail.administrationName}}</span></td>
+                              <td width="130" class="px-1"><span class="text-bold">Mã thủ tục</span></td>
+                              <td class="px-1"><span>{{serviceDetail.serviceCodeDVCQG ? serviceDetail.serviceCodeDVCQG : serviceDetail.serviceCode}}</span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Lĩnh vực</span></td>
-                              <td><span>{{serviceDetail.domainName}}</span></td>
+                              <td class="px-1"><span class="text-bold">Cơ quan quản lý</span></td>
+                              <td class="px-1"><span>{{serviceDetail.administrationName}}</span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Cách thực hiện</span></td>
-                              <td><span v-html="serviceDetail.methodText"></span></td>
+                              <td class="px-1"><span class="text-bold">Lĩnh vực</span></td>
+                              <td class="px-1"><span>{{serviceDetail.domainName}}</span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Thời gian giải quyết</span></td>
-                              <td><span v-html="serviceDetail.durationText"></span></td>
+                              <td class="px-1"><span class="text-bold">Cách thực hiện</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.methodText"></span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Đối tượng</span></td>
-                              <td><span v-html="serviceDetail.applicantText"></span></td>
+                              <td class="px-1"><span class="text-bold">Thời gian giải quyết</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.durationText"></span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Kết quả giải quyết</span></td>
-                              <td><span v-html="serviceDetail.resultText"></span></td>
+                              <td class="px-1"><span class="text-bold">Đối tượng</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.applicantText"></span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Lệ phí</span></td>
-                              <td><span v-html="serviceDetail.feeText"></span></td>
+                              <td class="px-1"><span class="text-bold">Kết quả giải quyết</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.resultText"></span></td>
                             </tr>
                             <tr>
-                              <td><span class="text-bold">Căn cứ pháp lý</span></td>
-                              <td><span v-html="serviceDetail.regularText"></span></td>
+                              <td class="px-1"><span class="text-bold">Lệ phí</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.feeText"></span></td>
+                            </tr>
+                            <tr>
+                              <td class="px-1"><span class="text-bold">Căn cứ pháp lý</span></td>
+                              <td class="px-1"><span v-html="serviceDetail.regularText"></span></td>
                             </tr>
                           </tbody>
                         </table>
@@ -318,8 +322,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -349,8 +353,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -390,8 +394,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -421,8 +425,8 @@
                     <v-btn small slot="activator" color="primary" v-if="serviceDetail.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-btn small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                     <v-list v-if="serviceDetail.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(serviceDetail.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -613,12 +617,25 @@ export default {
         window.callback_dvcqg = vm.callback_dvcqg
         vm.checkVNConect()
       }
+      // Auto mapping
+      let sync = false
+      if ( typeof(Storage) !== 'undefined') {
+        sync = sessionStorage.getItem('sync')
+      }
+      if (window.themeDisplay.isSignedIn() && sync) {
+        window.callback_dvcqg = vm.callback_dvcqg
+        vm.checkVNConectAutoMapping()  
+      }
+      // 
       vm.loading = true
       let filter = {
         index: vm.index
       }
       vm.$store.dispatch('getServiceDetail', filter).then(function (result) {
         vm.serviceDetail = result
+        if (query.hasOwnProperty('code') && query.code) {
+          vm.serviceDetail.serviceCodeDVCQG = query.code
+        }
         vm.loading = false
       }).catch(function (reject) {
         vm.loading = false
@@ -626,13 +643,6 @@ export default {
     })
   },
   mounted () {
-    // let vm = this
-    // let current = vm.$router.history.current
-    // let query = vm.$router.history.current.query
-    // if (query.hasOwnProperty('vnconnect') && String(query['vnconnect']) === '1' && String(window.themeDisplay.isSignedIn()) === 'false') {
-    //   window.callback_dvcqg = vm.callback_dvcqg
-    //   vm.checkVNConect()
-    // }
   },
   watch: {
   },
@@ -676,14 +686,16 @@ export default {
               vm.isLogin = true
               vm.createDossier(vm.serviceSelected)
             } else {
-              // vm.doMappingDvcqg()
+              if ( typeof(Storage) !== 'undefined') {
+                sessionStorage.setItem('sync','true')
+              }
               let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
               window.location.href = url
               setTimeout(() => {
                 window.location.reload()
               }, 100)
             }
-          }          
+          } 
         }).catch(function(){
           vm.loadingLogin = false
         })
@@ -716,7 +728,7 @@ export default {
     },
     downloadFileTemplate (item) {
       var vm = this
-      let url = '/o/rest/v2/serviceinfos/' + vm.index + '/filetemplates/' + item.fileTemplateNo
+      let url = '/o/rest/v2/serviceinfos/' + vm.serviceDetail.serviceInfoId + '/filetemplates/' + item.fileTemplateNo
       window.open(url)
     },
     fileTemplate (fileData) {
@@ -766,6 +778,25 @@ export default {
         }
       }, 300)
     },
+    checkVNConectAutoMapping () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let filter = {
+        state: 'mapping'
+      }
+      setTimeout (function () {
+        vm.$store.dispatch('getVNConect', filter).then(function (result) {
+          if (result) {
+            vm.dialog_loginDVCQG = true
+            setTimeout(function () {
+              vm.tempDVCQG = result
+            }, 200)
+          }
+        }).catch(function () {
+        })
+      }, 300)
+    },
     doMappingDvcqg () {
       let vm = this
       let current = vm.$router.history.current
@@ -781,23 +812,28 @@ export default {
       let vm = this
       // vm.userInfoDvc = data
       let current = vm.$router.history.current
-      if (String(data['userId']) !== '0') {
-        // let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
-        let url = window.themeDisplay.getLayoutURL() + '#' + current.path
-        console.log('url', url)
+      let currentQuery = current.query
+      // remove auto mapping
+      let sync = false
+      if ( typeof(Storage) !== 'undefined') {
+        sync = sessionStorage.getItem('sync')
+      }
+      if (vm.isSigned && sync) {
         vm.dialog_loginDVCQG = false
-        // window.location.href = url
-        // alert('Đăng nhập thành công')
-        // setTimeout(() => {
-          // window.open(url, '_self')
+        sessionStorage.removeItem('sync')
+      } else {
+        if (String(data['userId']) !== '0') {
+          let url = window.themeDisplay.getLayoutURL() + '#' + current.path
+          console.log('url', url)
+          vm.dialog_loginDVCQG = false
           window.location.href = url
           window.location.reload()
-        // }, 100)
-      } else {
-        vm.dialog_loginDVCQG = false
-        vm.doCreateDossier = false
-        vm.dialogLogin = true
-        vm.userInfoDvcqg = data
+        } else {
+          vm.dialog_loginDVCQG = false
+          vm.doCreateDossier = false
+          vm.dialogLogin = true
+          vm.userInfoDvcqg = data
+        }
       }
     },
     goBack () {

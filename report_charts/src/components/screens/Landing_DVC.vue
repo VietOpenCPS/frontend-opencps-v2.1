@@ -1,6 +1,6 @@
 <template>
   <div class="form-chitiet">
-    <div class="run-down mt-3" v-if="String(index) === '0'">
+    <div class="run-down mt-3" v-if="String(index) === '0' && !isMobile">
       <div class="box-title">Tình hình xử lý các năm</div>
       <div class="in-time">
         <span>{{itemTotalAllYear['ontimePercentage'] ? Math.round(itemTotalAllYear['ontimePercentage']) : 0}} %</span>
@@ -24,17 +24,55 @@
         Rút hồ sơ
       </div>
     </div>
+    <div class="group-mobile pb-2" v-if="String(index) === '0' && isMobile">
+      <div class="run-down-mobile mt-0">
+        <div class="box-title">Tình hình xử lý các năm</div>
+        <div class="in-time flex text-xs-center">
+          <span>{{itemTotalAllYear['ontimePercentage'] ? Math.round(itemTotalAllYear['ontimePercentage']) : 0}} %</span>
+          Sớm và đúng hạn
+        </div>
+      </div>
+      <!--  -->
+      <v-layout wrap class="run-down-mobile">
+        <v-flex xs6>
+          <div class="total-solved text-xs-center">
+            <span>{{itemTotalAllYear['processCount']}}</span>
+            Tổng giải quyết
+          </div>
+        </v-flex>
+        <v-flex xs6>
+          <div class="finished text-xs-center">
+            <span>{{itemTotalAllYear['releaseCount']}}</span>
+            Hoàn thành
+          </div>
+        </v-flex>
+        <v-flex xs6>
+          <div class="processing text-xs-center">
+            <span>{{itemTotalAllYear['processingCount']}}</span>
+            Đang xử lý
+          </div>
+        </v-flex>
+        <v-flex xs6>
+          <div class="take-back text-xs-center">
+            <span>{{itemTotalAllYear['cancelledCount']}}</span>
+            Rút hồ sơ
+          </div>
+        </v-flex>
+      </v-layout>
+    </div>
+    
+    <!--  -->
     <v-layout row wrap style="margin: 0;">
-      <v-flex xs12 lg6 class="mt-3 pr-2" v-if="String(index) === '0'">
+      <v-flex xs12 lg6 class="mt-3" :class="!isMobile ? 'pr-2' : 'pr-0'" v-if="String(index) === '0'">
         <v-card class="wrap_report" style="border-radius: 0;height: 100%">
           <div class="row-header">
             <div class="background-triangle-big"> <span>THỐNG KÊ THỦ TỤC HÀNH CHÍNH</span> </div>
             <div class="layout row wrap header_tools row-blue">
             </div> 
           </div>
-          <v-card-text class="pt-4 py-0 px-0">
+          <v-card-text class="py-0 px-0" :class="!isMobile ? 'pt-4' : 'pt-2'">
             <v-layout wrap class="custom-class">
-              <v-flex xs12 sm6 class="px-2 pb-3">
+              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pb-3' : 'pb-2'">
                 <v-card color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -49,7 +87,7 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pb-3">
+              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pb-3' : 'pb-2'">
                 <v-card color="orange lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -64,7 +102,7 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
+              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pt-2 pb-3' : 'pt-0 pb-2'">
                 <v-card color="red lighten-1" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -79,7 +117,7 @@
                   </v-layout>
                 </v-card>
               </v-flex>
-              <v-flex xs12 sm6 class="px-2 pt-2 pb-3">
+              <v-flex xs12 sm6 class="px-2" :class="!isMobile ? 'pt-2 pb-3' : 'pt-0 pb-2'">
                 <v-card color="#00bcd5" class="white--text" height="70px">
                   <v-layout class="px-2" style="height:70px">
                     <v-flex class="xs3 pt-1">
@@ -98,7 +136,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-flex xs12 lg6 class="mt-3 pl-2" v-if="String(index) === '0'">
+      <v-flex xs12 lg6 class="mt-3" :class="!isMobile ? 'pl-2' : 'pl-0'" v-if="String(index) === '0'">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header">
             <div class="background-triangle-big two-line"> 
@@ -110,7 +148,6 @@
             </div> 
           </div>
           <v-card-text class="pt-2 pb-0 px-0 pie-chart" v-if="showTableTotal">
-            <!-- <pie-chart-report-public :item="itemTotal" :year="year" :month="month" :chart_view="chartView"></pie-chart-report-public> -->
             <!-- report_1 -->
             <apexchart type=donut width=380 height=270 :options="chartDonutOptions" :series="seriesDonut" />
             <span class="d-inline-block total-pie-text">
@@ -124,35 +161,32 @@
         </v-card>
       </v-flex>
 
-      <v-card v-if="showDetailReport" class="wrap_report xs12 flex" style="border-radius: 0;">
-        <v-card-text class="py-2 px-1 layout row wrap" style="
-            background: #fafafa;
-            margin: 0;
-        ">
-          <v-flex xs12 sm4 class="px-2" v-for="(item, index) in agencyLists" v-bind:key="index" v-if="((govAgencyCode === '' && item.govAgencyName !== '') || (govAgencyCode !== '' && item.domainName !== '') || (!chartView && item.domainName !== '')) && reloadPie">
-            <pie-chart-report :item="item" :year="year" :month="month" :chart_view="chartView"></pie-chart-report>
-          </v-flex>
-        </v-card-text>
-      </v-card>
       <!-- filter navigation -->
       <v-layout wrap class="mt-4 ml-0" :class="String(index) !== '0' ? 'mb-4' : ''">
         <v-flex xs12 >
-          <div class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile" class="d-inline-block px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
              class="mr-2" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
             <v-btn @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
             :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
           </div>
 
-          <div class="d-inline-block ml-3 px-2" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+          <div v-if="!isMobile" class="ml-3 d-inline-block" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
             <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mr-2" style="height: 24px;">Tất cả các hệ thống</v-btn>
             <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
             <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mr-2" style="height: 24px;">NSW</v-btn>
             <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
           </div>
 
-          <v-layout wrap class="right date-filter">
-            <v-flex class="mr-2" :style="String(year) !== '0' ? 'width:125px' : 'width:155px'">
+          <div class="d-inline-block" v-if="isMobile" class="ml-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+            <v-btn @click="changeSystem('total')" :flat="systemReport !== 'total' ? true : false" :class="systemReport === 'total' ? 'white--text' : ''" small color="#0054a6" depressed class="mx-1 px-1" style="height: 24px;">Tất cả các hệ thống</v-btn>
+            <v-btn @click="changeSystem('0')" :flat="systemReport !== '0' ? true : false" :class="systemReport === '0' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" title="Dịch vụ công và một cửa điện tử" style="height: 24px;">DVC-MCĐT</v-btn>
+            <v-btn @click="changeSystem('1')" :flat="systemReport !== '1' ? true : false" :class="systemReport === '1' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">NSW</v-btn>
+            <v-btn @click="changeSystem('2')" :flat="systemReport !== '2' ? true : false" :class="systemReport === '2' ? 'white--text' : ''" small depressed color="#0054a6" class="mx-0 px-1" style="height: 24px;">Phần mềm nghiệp vụ</v-btn>
+          </div>
+
+          <v-layout v-if="!isMobile" wrap :class="!isMobile ? 'right date-filter' : ' left date-filter mt-2'">
+            <v-flex class="mr-2" :style="String(year) !== '0' ? 'max-width:125px' : 'max-width:155px'">
               <v-select
                 :items="years"
                 v-model="year"
@@ -207,10 +241,80 @@
               </v-tooltip>
             </v-flex>
           </v-layout>
+          <!-- mobile -->
+          <v-layout wrap class="mt-2" v-if="isMobile">
+            <v-flex style="max-width:140px">
+              <div class="d-inline-block px-0" style="border: 1px solid #0054a6;border-radius: 4px;background: #fff;">
+                <v-btn @click="toNativeViewType(true)" :flat="chartView ? false : true" depressed small color="#0054a6"
+                class="mr-1" :class="chartView ? 'white--text' : ''" style="height: 24px;">Đơn vị</v-btn>
+                <v-btn class="mx-0" @click="toNativeViewType(false)" :flat="chartView ? true : false" depressed small color="#0054a6" 
+                :class="chartView ? '' : 'white--text'" style="height: 24px;">Lĩnh vực</v-btn>
+              </div>
+            </v-flex>
+            <v-flex style="width: calc(100% - 140px);">
+              <v-layout wrap class="date-filter">
+                <v-flex class="mr-0" :style="String(year) !== '0' ? 'max-width:122px' : 'max-width:155px'">
+                  <v-select
+                    :items="years"
+                    v-model="year"
+                    item-text="name"
+                    item-value="value"
+                    @change="changeYear"
+                    class="d-inline-block text-bold"
+                    solo
+                    flat
+                    background-color="#fff"
+                    style="border: 1px solid #0054a6; border-radius: 3px;height:36px"
+                    hide-details
+                    >
+                    <template v-slot:selection="{ item, index }">
+                      <span style="color: #0054a6 !important">{{item ? item['name'] : ''}}</span>
+                    </template>
+                  </v-select>
+                </v-flex>
+                <v-flex class="mr-0 pl-1" style="max-width:115px">
+                  <v-select
+                    :items="months"
+                    v-model="month"
+                    item-text="name"
+                    item-value="value"
+                    :hide-selected="true"
+                    @change="changeMonth"
+                    class="d-inline-block text-bold"
+                    solo
+                    flat
+                    background-color="#fff"
+                    style="border: 1px solid #0054a6; border-radius: 3px; height:36px"
+                    hide-details
+                    :disabled="String(year) === '0'"
+                    >
+                    <template v-slot:selection="{ item, index }">
+                      <span style="color: #0054a6 !important">{{item ? item['name'] : ''}}</span>
+                    </template>
+                  </v-select>
+                </v-flex>
+                <v-flex class="" style="width:80px;border: 1px solid #0054a6; border-radius: 3px; height:36px;background: #fff">
+                  <v-tooltip bottom class="ml-1">
+                    <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
+                      <v-icon size="16" :color="String(index) === '0' ? 'blue' : 'grey'">pie_chart</v-icon>
+                    </v-btn>
+                    <span>Xem dạng biểu đồ</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(1)">
+                      <v-icon size="16" :color="String(index) !== '0' ? 'blue' : 'grey'">grid_on</v-icon>
+                    </v-btn>
+                    <span>Xem dạng bảng biểu</span>
+                  </v-tooltip>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-layout>
+          <!--  -->
         </v-flex>
       </v-layout>
       <!-- Thống kê theo đơn vị, lĩnh vực -->
-      <v-flex xs12 class="mt-4 ml-0" v-if="!reloadBar && String(index) === '0'">
+      <v-flex xs12 class="ml-0" :class="isMobile ? 'mt-2' : 'mt-4'" v-if="!reloadBar && String(index) === '0'">
         <v-card class="wrap_report" style="border-radius: 0;">
           <div class="row-header" v-if="String(month) !== '0'">
             <div class="background-triangle-big"> <span>TÌNH HÌNH GIẢI QUYẾT HỒ SƠ THÁNG {{month}} NĂM {{year}}</span> </div>
@@ -237,7 +341,7 @@
               </v-alert>
             </div>
             <!-- report_2 -->
-            <apexchart v-else type="bar" height="350" 
+            <apexchart v-else type="bar" :height="isMobile ? 500 : 350" 
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
@@ -264,7 +368,7 @@
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
             <!-- report_3 -->
-            <apexchart type="bar" height="500"
+            <apexchart type="bar" :height="isMobile ? 500 : 500"
               :options="dossierTypeChartOption" 
               :series="seriesDossierTypeChart" 
               style="margin-top: -30px"
@@ -473,7 +577,6 @@ export default {
   },
   data: () => ({
     systemReport: '',
-    showDetailReport: false,
     itemTotalAllYear: {},
     itemTotal: {},
     levelList: [
@@ -615,6 +718,11 @@ export default {
             }
           }
         }
+      },
+      legend: {
+        formatter: function(seriesName, opts) {
+          return window.innerWidth < 600 ? String(seriesName).normalize().replace('Việt Nam', '') : seriesName
+        }
       }
     },
     chartDonutOptions: {
@@ -680,17 +788,17 @@ export default {
           }
         },
       },
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 220
-          },
-          legend: {
-            show: false
-          }
-        }
-      }],
+      // responsive: [{
+      //   breakpoint: 480,
+      //   options: {
+      //     chart: {
+      //       width: 220
+      //     },
+      //     legend: {
+      //       show: true
+      //     }
+      //   }
+      // }],
       legend: {
         position: 'left',
         offsetY: 0,
@@ -769,7 +877,7 @@ export default {
         categories: [],
         labels: {
           show: true,
-          rotate: 0,
+          rotate: window.innerWidth < 600 ? -45 : 0,
           rotateAlways: false,
           trim: false,
           formatter: function(val) {
@@ -797,7 +905,17 @@ export default {
             return val
           }
         }
-      }
+      },
+      responsive: [
+        {
+          breakpoint: 1000,
+          options: {
+            legend: {
+              position: "bottom"
+            }
+          }
+        }
+      ]
     },
     seriesDossierTypeChart: [
       {
@@ -821,6 +939,9 @@ export default {
         offset: 0,
         easing: 'easeInOutCubic'
       }
+    },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
@@ -1376,6 +1497,7 @@ export default {
         }
         datasetsCustom.push(lineProcessData)
       }
+
       vm.chartOptions.xaxis.categories = Object.values(labelsCustomMonth)
       vm.chartOptions.colors = []
       vm.seriesChart = []
@@ -1528,7 +1650,7 @@ export default {
         plotOptions: {
           bar: {
             barHeight: '100%',
-            horizontal: true,
+            horizontal: window.innerWidth < 600 ? false : true,
             dataLabels: {
               hideOverflowingLabels: true
             }
@@ -1556,13 +1678,22 @@ export default {
           labels: {
             formatter: function(val) {
               return val
-            }
+            },
+            rotate: vm.isMobile ? -45 : 0,
+            trim: false,
+            formatter: (val) => { return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val },
           }
         },
         yaxis: {
           title: {
             text: undefined
-          }
+          },
+          labels: {
+            offsetX: 0,
+            offsetY: 0,
+            rotate: vm.isMobile ? -45 : 0,
+            formatter: (val) => { return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val },
+          },
         },
         dataLabels: {
           enabled: true,
@@ -1617,22 +1748,22 @@ export default {
         } else {
           vm.dossierTypeChartOption.xaxis.labels = {
             show: true,
-            rotate: 0,
+            rotate: vm.isMobile ? -60 : 0,
             rotateAlways: false,
             trim: false,
             formatter: function(val) {
-              return val
+              return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val
             }
           }
         }
       } catch (error) {
         vm.dossierTypeChartOption.xaxis.labels = {
           show: true,
-          rotate: 0,
+          rotate: vm.isMobile ? -60 : 0,
           rotateAlways: false,
           trim: false,
           formatter: function(val) {
-            return val
+            return vm.isMobile ? String(val).normalize().replace('Việt Nam', '') : val
           }
         }
       }

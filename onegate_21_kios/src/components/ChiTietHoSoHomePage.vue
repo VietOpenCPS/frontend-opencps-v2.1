@@ -5,7 +5,7 @@
     </content-placeholders>
     <div v-else>
       <v-layout class="wrap">
-        <v-flex class="px-2 py-3">
+        <v-flex class="px-2 py-2">
           <span class="text-bold">Tên thủ tục: {{dossierDetail.serviceName}}</span>
         </v-flex>
       </v-layout>

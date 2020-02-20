@@ -4,7 +4,7 @@
     <div class="list-thu-tuc" v-if="!isMobile">
       <div class="row-header no__hidden_class">
         <div v-if="trangThaiHoSoList !== null" class="background-triangle-big">
-          <span>ĐỒNG BỘ THỦ TỤC HÀNH CHÍNH DỊCH VỤ CÔNG QUỐC GIA</span>
+          <span>ĐỒNG BỘ THỦ TỤC HÀNH CHÍNH TỪ CỔNG DỊCH VỤ CÔNG QUỐC GIA</span>
         </div>
         <div class="layout row wrap header_tools row-blue">
           <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
@@ -38,6 +38,7 @@
             @change="changeAdministration"
             box
             :readonly="loading"
+            clearable
           ></v-autocomplete>
         </v-flex>
         <v-flex class="xs12 sm6 px-2">
@@ -52,6 +53,7 @@
             @change="changeDomain"
             box
             :readonly="loading"
+            clearable
           ></v-autocomplete>
         </v-flex>
         
@@ -60,7 +62,7 @@
         <content-placeholders-text :lines="10" />
       </content-placeholders>
       <div v-else class="service__info__table">
-        <v-flex class="xs12 mb-2 right">
+        <!-- <v-flex class="xs12 mb-2 right">
           <v-btn color="primary" dark
             v-on:click.native="syncAll"
             :loading="loading"
@@ -68,7 +70,7 @@
           >
           <v-icon size="18">sync</v-icon> &nbsp; Đồng bộ tất cả thủ tục đã mapping
           </v-btn>
-        </v-flex>
+        </v-flex> -->
         <v-data-table
           :headers="headers"
           :items="serviceInfoList"
@@ -167,7 +169,7 @@ export default {
     totalThuTuc: 0,
     thutucPage: 1,
     govAgencyList: [],
-    govAgencySelected: {},
+    govAgencySelected: '',
     govAgencyThucHienSelected: {},
     domainList: [],
     domainListCurrent: [],
@@ -215,9 +217,9 @@ export default {
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.$store.dispatch('getGovAgency').then(function (result) {
         vm.govAgencyList = result
-        vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyList[0]['administrationCode']
+        // vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyList[0]['administrationCode']
         let filterDomain = {
-          agencyCode: vm.govAgencySelected
+          agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
@@ -225,9 +227,9 @@ export default {
             vm.domainList = result
           }
         })
-        vm.doLoadingThuTuc()
       }).catch(function(){
       })
+      vm.doLoadingThuTuc()
     })
   },
   updated () {
@@ -276,6 +278,8 @@ export default {
         let newQuery = current.query
         let queryString = '?'
         newQuery['page'] = 1
+        newQuery['agency'] = ''
+        newQuery['domain'] = ''
         newQuery['keyword'] = vm.serviceNameKey
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {

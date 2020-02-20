@@ -10,7 +10,7 @@
     <v-card flat color="#ffffff" class="pt-2 pb-4">
       <v-flex xs12 class="text-xs-center pt-2" id="nav-calling">
         <v-layout wrap class="white py-0">
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="serviceGroupList"
@@ -25,7 +25,22 @@
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
+            <v-autocomplete
+              class="select-border"
+              :items="bookingMethods"
+              v-model="bookingMethodSelected"
+              label="Chọn loại đăng ký xếp hàng"
+              item-text="text"
+              item-value="value"
+              :hide-selected="true"
+              @change="changeMethod"
+              box
+              :disabled="isCalling"
+              :readonly="serviceGroupSelected['className'] === 'DOSSIER' || serviceGroupSelected['key'] === 'API'"
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="serviceInfoList"
@@ -40,7 +55,7 @@
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="stateList"
@@ -353,7 +368,12 @@ export default {
     currentBooking : '',
     isCalling: false,
     serviceGroupList: [],
-    serviceGroupSelected: ''
+    serviceGroupSelected: '',
+    bookingMethods: [
+      {text: 'Trực tiếp', value: false},
+      {text: 'Trực tuyến', value: true}
+    ],
+    bookingMethodSelected: false
   }),
   computed: {
   },
@@ -435,6 +455,10 @@ export default {
       vm.serviceInfoSelected = ''
       vm.filterBooking()
     },
+    changeMethod () {
+      let vm = this
+      vm.filterBooking()
+    },
     getGateLists () {
       let vm = this
       vm.$store.dispatch('getGateLists').then(function (result) {
@@ -458,6 +482,7 @@ export default {
           newQuery['service'] = ''
           newQuery['keyBooking'] = ''
           newQuery['className'] = vm.serviceGroupSelected['className']
+          vm.bookingMethodSelected = false
         } else {
           newQuery['className'] = ''
         }
@@ -467,6 +492,11 @@ export default {
           newQuery['keyBooking'] = vm.serviceGroupSelected['key']
         } else {
           newQuery['keyBooking'] = ''
+        }
+        if (vm.serviceGroupSelected['key'] === 'API') {
+          newQuery['online'] = ''
+        } else {
+          newQuery['online'] = vm.bookingMethodSelected
         }
         newQuery['state'] = vm.stateSelected
         for (let key in newQuery) {
@@ -483,15 +513,15 @@ export default {
       }, 200)
     },
     changeService () {
-      var vm = this
+      let vm = this
       vm.filterBooking()
     },
     changeState () {
-      var vm = this
+      let vm = this
       vm.filterBooking()
     },
     loadBooking () {
-      var vm = this
+      let vm = this
       let count = 0
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
@@ -503,7 +533,8 @@ export default {
           state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
           className: 'EFORM',
           bookingFrom: vm.getCurrentDate(),
-          bookingTo: vm.getCurrentDate()
+          bookingTo: vm.getCurrentDate(),
+          online: vm.bookingMethodSelected
         }
         vm.$store.dispatch('getBooking', filterEform).then(function (result) {
           count+=1
@@ -527,7 +558,8 @@ export default {
           state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
           className: 'DOSSIER',
           bookingFrom: vm.getCurrentDate(),
-          bookingTo: vm.getCurrentDate()
+          bookingTo: vm.getCurrentDate(),
+          online: vm.bookingMethodSelected
         }
         vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
           count+=1

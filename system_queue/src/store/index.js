@@ -160,6 +160,9 @@ export const store = new Vuex.Store({
           if (filter['bookingTo']) {
             param['params'].bookingTo = filter['bookingTo']
           }
+          if (filter.hasOwnProperty('online')) {
+            param['params'].online = String(filter['online']) === 'true' ? true : false
+          }
           axios.get(state.endPoint + '/bookings/' + filter.className, param).then(function (response) {
             let serializable = response.data
             if (serializable.data) {

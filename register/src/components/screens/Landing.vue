@@ -3,17 +3,17 @@
     <v-layout wrap class="py-2" style="
       max-width: 1300px;
     ">
-      <v-flex xs12 sm8 class="px-3">
+      <v-flex xs12 md8 :class="!isMobile ? 'px-3' : 'px-2'">
         <div class="bg-gif-register" style="background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;padding-top: 77.961783%;background-size: contain;"></div>
       </v-flex>
-      <v-flex xs12 sm4 class="px-3">
+      <v-flex xs12 md4 :class="!isMobile ? 'px-3' : 'px-2'">
         <v-card>
           <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
             <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
               <span class="text-bold white--text">ĐĂNG KÝ TÀI KHOẢN</span>
             </div>
           </nav>
-          <v-form ref="form" v-model="valid" lazy-validation class="px-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
+          <v-form ref="form" v-model="valid" lazy-validation :class="!isMobile ? 'px-3' : 'px-2'" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
             <v-layout wrap>
               <v-radio-group v-if="hasOrganization" class="mt-2 radio_register_type" v-model="applicantType" row @change="changeApplicantType">
                 <v-radio label="Công dân" :value="'1'" class="mr-2"></v-radio>
@@ -327,6 +327,9 @@ export default {
     }
   }),
   computed: {
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    }
   },
   created () {
     var vm = this

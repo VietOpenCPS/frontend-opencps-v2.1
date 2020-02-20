@@ -114,6 +114,9 @@
       },
       activeCounter () {
         return this.$store.getters.getCounter
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
@@ -124,6 +127,18 @@
         vm.getQuestionList()
         vm.getCounter()
       })
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -299,6 +314,11 @@
         vm.$router.push({
           path: '/'
         })
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1024
+        vm.$store.commit('setIsMobile', isMobile)
       },
       convertString(str) {
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')

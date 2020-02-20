@@ -1,7 +1,7 @@
 <template>
   <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile && !isOffLine"
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !isMobile && !isOffLine"
     >
       <div class="">
         <v-btn class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="doAddDVC()"
@@ -59,9 +59,9 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile && !isOffLine">
-      <div class="row-header mb-2 py-2" style="background-color: #070f52">
-        <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
+    <div v-if="trangThaiHoSoList.length !== 0 && isMobile && !isOffLine" id="m-navigation">
+      <div class="row-header mb-0 py-2" style="background-color: #070f52">
+        <div class="ml-2 white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
       <div class="mx-2">
         <v-btn block color="primary" v-on:click.native="doAddDVC()"
@@ -144,7 +144,7 @@
 
 <script>
   import axios from 'axios'
-  import { isMobile } from 'mobile-device-detect'
+  // import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
       isCallBack: true,
@@ -156,6 +156,18 @@
       dialogVerifycation: false,
       verificationApplicantCreateDossier: false
     }),
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
@@ -166,21 +178,26 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      viewMobile () {
-        return isMobile
-      },
+      // viewMobile () {
+      //   return isMobile
+      // },
       pathLanding () {
-        return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
+        return '/danh-sach-ho-so'
       },
       currentUser () {
         return this.$store.getters.loadingInitData.user
       },
       userLoginInfomation () {
         return this.$store.getters.getUserLogin
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
       let vm = this
+      let isMobile = window.innerWidth < 1264
+      vm.$store.commit('setIsMobile', isMobile)
       //
       try {
         vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
@@ -242,13 +259,15 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
-        if (window.location.href.includes('/m/') && vm.viewMobile) {
-          $('head meta[name=viewport]').remove()
-        } else {
-          if ($('head meta[name=viewport]').length === 0) {
-            $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
-          }
-        }
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+        // if (window.location.href.includes('/m/') && vm.viewMobile) {
+        //   $('head meta[name=viewport]').remove()
+        // } else {
+        //   if ($('head meta[name=viewport]').length === 0) {
+        //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        //   }
+        // }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
@@ -275,6 +294,17 @@
     methods: {
       toTableIndexing (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
+        
         this.$store.commit('setIndex', index)
         vm.$router.push({
           path: vm.pathLanding + '/' + index,
@@ -286,6 +316,17 @@
       },
       filterSteps (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+            {
+              scrollTop: $('#table-dossier').offset().top,
+            }, 200,'linear'
+          )
+          }
+        } catch (error) {   
+        }
+
         let currentQuery = this.$router.history.current.query
         let currentParams = this.$router.history.current.params
         console.log('currentParams', currentParams)
@@ -365,7 +406,12 @@
         } else {
           vm.$router.push('/add-dvc/0')
         }
-      }
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+      },
     }
   }
 </script>

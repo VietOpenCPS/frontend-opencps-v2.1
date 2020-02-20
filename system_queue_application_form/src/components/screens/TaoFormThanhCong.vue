@@ -1,5 +1,18 @@
 <template>
-  <v-card flat color="#ffffff" class="py-4" style="height:100vh;">
+  <v-card flat color="#ffffff" class="my-4" style="height:100vh;">
+    <div v-if="timeBooking" style="position: absolute;top: 0; right: 0; max-width: 500px">
+      <v-alert
+        :value="true"
+        color="info"
+        icon="info"
+        outline
+        class="my-0"
+      >
+        Tờ khai đã đăng ký xếp hàng.<br>
+        Thời gian xếp hàng: {{timeBooking}} {{parseDate(eformDetail.bookingDate)}}.<br>
+        Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
+      </v-alert>
+    </div>
     <!-- <div class="row-header no__hidden_class">
       <div class="background-triangle-big">
         <span v-if="String(index) !== '0'">THÔNG TIN TỜ KHAI</span>
@@ -128,7 +141,8 @@ export default {
     eformNoSearch: '',
     formScriptEform: '',
     dialogPDF: false,
-    dialogPDFLoading: false
+    dialogPDFLoading: false,
+    timeBooking: ''
   }),
   computed: {
     serviceinfoSelected () {
@@ -148,6 +162,9 @@ export default {
       let currentQuery = current.query
       if (!vm.eformDetail.secret && !vm.eformDetail.eFormNo) {
         vm.goBack()
+      }
+      if (String(vm.index) === '1') {
+        vm.getDetailBooking()
       }
     })
   },
@@ -188,6 +205,30 @@ export default {
       try {
         document.getElementById("dialogPDFPreview").contentWindow.print()
       } catch (error) {
+      }
+    },
+    getDetailBooking () {
+      let vm = this
+      let filter = {
+        codeNumber: vm.eformDetail.eFormNo ? vm.eformDetail.eFormNo : ''
+      }
+      vm.$store.dispatch('getDetailBooking', filter).then(function (result) {
+        vm.timeBooking = result.bookingInTime ? result.bookingInTime : ''
+      }).catch(function (reject) {
+      })
+    },
+    parseDate (value) {
+      if (!value) return ''
+      let date = ''
+      if (!isNaN(Number(value))) {
+        date = new Date(Number(value))
+      } else {
+        date = new Date(value)
+      }
+      if (date) {
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      } else {
+        return ''
       }
     },
     goBack () {

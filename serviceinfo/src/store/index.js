@@ -149,7 +149,7 @@ export const store = new Vuex.Store({
             end: filter.page * 15,
             administration: filter.administration ? filter.administration : '',
             agency: filter.agency ? filter.agency : '',
-            keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),.?":{}|<>]/g, '') : '',
+            keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
             domain: filter.domain ? filter.domain : '',
             sort: ''
