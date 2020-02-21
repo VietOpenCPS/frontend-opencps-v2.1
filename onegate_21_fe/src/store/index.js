@@ -29,6 +29,7 @@ export const store = new Vuex.Store({
     user: {
       'role': ''
     },
+    userLogin: '',
     index: 0,
     kysoSuccess: false,
     activeGetCounter: false,
@@ -82,7 +83,7 @@ export const store = new Vuex.Store({
     applicantBussinessExit: false,
     applicantNote: '',
     thongTinChuHoSo: {
-      userType: true,
+      userType: '1',
       cityCode: '',
       districtCode: '',
       wardCode: '',
@@ -128,7 +129,12 @@ export const store = new Vuex.Store({
     forGroupDossier: false,
     dossierIntoGroup: [],
     filesAdd: [],
-    activeAddFileGroup: false
+    activeAddFileGroup: false,
+    dossierTemplateLienThong: '',
+    activePrintBienNhan: '',
+    createFileSigned: '',
+    advSearchShow: false,
+    filterDateFromTo: ['fromReceiveDate','toReceiveDate','fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate']
   },
   actions: {
     clearError ({commit}) {
@@ -179,7 +185,7 @@ export const store = new Vuex.Store({
                 roles.push(serializable[key]['role'])
               }
             }
-            console.log('roles', roles)
+            // console.log('roles', roles)
             resolve(roles)
           } else {
             resolve(['default'])
@@ -216,16 +222,23 @@ export const store = new Vuex.Store({
                   'action_active': 'play_arrow',
                   'counter': -1,
                   'menuType': parseInt(current['menuType']),
-                  'queryParams': current['queryParams']
+                  'queryParams': current['queryParams'],
+                  'hasViewText': current['hasViewText']
                 }
                 index = index + 1
                 let tableConfig = current['tableConfig']
                 let buttonConfig = current['buttonConfig']
                 if (tableConfig !== '' && tableConfig !== undefined && tableConfig !== 'undefined' && String(tableConfig).indexOf('{') !== -1 && String(tableConfig).indexOf('}') !== -1) {
                   menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
+                  // let funcEval = new Function('(' + tableConfig + ')')
+                  // menuDetail['tableConfig'] = funcEval()
+                  // console.log('tableConfig', menuDetail['tableConfig'])
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
                   menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
+                  // let funcEval = new Function('(' + buttonConfig + ')')
+                  // menuDetail['buttonConfig'] = funcEval()
+                  // console.log('buttonConfig', menuDetail['buttonConfig'])
                 }
                 if (current.hasOwnProperty('steps')) {
                   if (Array.isArray(current.steps) && current.steps.length > 1) {
@@ -247,7 +260,7 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       } else {
         return new Promise((resolve, reject) => {
@@ -274,7 +287,7 @@ export const store = new Vuex.Store({
               console.log(error)
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       } else {
         return new Promise((resolve, reject) => {
@@ -284,12 +297,13 @@ export const store = new Vuex.Store({
       }
     },
     loadingDataHoSo ({commit, state}, filter) {
+      console.log('filter search dossier', filter)
       commit('setLoadingTable', true)
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
           let paramSearch = {
-            start: filter.page * 15 - 15,
-            end: filter.page * 15,
+            start: filter.page * filter.numberPerPage - filter.numberPerPage,
+            end: filter.page * filter.numberPerPage,
             order: filter.order ? filter.order : '',
             agency: filter.agency ? filter.agency : '',
             service: filter.service ? filter.service : '',
@@ -304,7 +318,7 @@ export const store = new Vuex.Store({
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
             dossierNo: filter.dossierNo ? filter.dossierNo : '',
-            paymentStatus: filter.paymentStatus ? filter.paymentStatus : '',
+            paymentStatus: filter.paymentStatus ? filter.paymentStatus : ''
           }
           if (filter['follow']) {
             paramSearch.follow = filter.follow
@@ -313,6 +327,17 @@ export const store = new Vuex.Store({
           if (filter['originality']) {
             paramSearch.originality = filter.originality
           }
+          if (filter['viapostal']) {
+            paramSearch.viapostal = filter.viapostal
+          }
+          // 
+          for (let index in state.filterDateFromTo) {
+            if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
+              paramSearch[state.filterDateFromTo[index]] = filter[state.filterDateFromTo[index]]
+            }
+          }
+          console.log('paramSearch', paramSearch)
+          // 
           let param = {
             headers: {
               groupId: state.initData.groupId
@@ -330,7 +355,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getGroupDossier ({commit, state}, filter) {
@@ -358,7 +383,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingCounterNotStep ({commit, state}, filter) {
@@ -379,7 +404,8 @@ export const store = new Vuex.Store({
             month: filter.month ? filter.month : 0,
             day: filter.day ? filter.day : 0,
             top: filter.top ? filter.top : '',
-            dossierNo: filter.dossierNo ? filter.dossierNo : ''
+            dossierNo: filter.dossierNo ? filter.dossierNo : '',
+            viapostal: filter.viapostal ? filter.viapostal : ''
           }
           if (filter['originality']) {
             paramSearch['originality'] = filter.originality
@@ -396,7 +422,7 @@ export const store = new Vuex.Store({
           }).catch(function (error) {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingCounterHoSo ({commit, state}, filter) {
@@ -419,7 +445,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadDossierSelected ({commit, state}, data) {
@@ -442,7 +468,7 @@ export const store = new Vuex.Store({
           axios.get(state.initData.regionApi + '/' + data.collectionCode + '/dictitems', param).then(function (response) {
             let serializable = response.data
             if (data.collectionCode === 'ADMINISTRATIVE_REGION') {
-              if (data.level === 0) {
+              if (data.level === 0 && !data.hasOwnProperty('commit')) {
                 commit('setCitys', serializable.data)
               }
             }
@@ -450,7 +476,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     resetThongTinChungHoSo ({ commit }) {
@@ -474,7 +500,7 @@ export const store = new Vuex.Store({
     },
     resetThongTinChuHoSo ({ commit }) {
       let data = {
-        userType: true,
+        userType: '1',
         cityCode: 25,
         districtCode: '',
         wardCode: '',
@@ -521,7 +547,7 @@ export const store = new Vuex.Store({
           } else {
             resolve([])
           }
-        }, error => {
+        }).catch(function (error){
           reject(error)
         })
       })
@@ -551,15 +577,19 @@ export const store = new Vuex.Store({
             }
             if (serializable && serializable['dossierParts']) {
               for (let key in serializable['dossierParts']) {
+                serializable['dossierParts'][key].hasTemplate = false
+                serializable['dossierParts'][key].hasTemplateLienThong = false
+                serializable['dossierParts'][key].fileMarkDefault = ''
+                serializable['dossierParts'][key].recordCountDefault = ''
                 let partTip = serializable['dossierParts'][key]['partTip']
                 serializable['dossierParts'][key]['partTip'] = jsonParse(partTip)
               }
             }
-            resolve(serializable.dossierParts)
+            resolve(serializable)
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadAllDossierTemplates ({commit, state}, data) {
@@ -595,7 +625,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     copyFile ({commit, state}, filter) {
@@ -624,8 +654,8 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           }
         }
-        console.log('data -delete-----', data)
-        console.log('data-- dossier file-------', state.dossierFiles)
+        // console.log('data -delete-----', data)
+        // console.log('data-- dossier file-------', state.dossierFiles)
         let dataPut = new URLSearchParams()
         if (data.hasForm || data.eform) {
           axios.put(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/resetformdata', dataPut, param).then(function (response) {
@@ -688,7 +718,7 @@ export const store = new Vuex.Store({
     uploadSingleFile ({ commit, state }, data) {
       return new Promise((resolve, reject) => {
         let dataOutPut = []
-        let files = $('#file' + data.partNo)[0].files
+        let files = $('input[id="file' + data.partNo + '"]')[0].files
         let countFiles = files.length
         let count = 0
         if (files) {
@@ -835,7 +865,7 @@ export const store = new Vuex.Store({
             }
           }).then(function (response) {
             resolve(response.data)
-            console.log('Tải file lên thành công')
+            // console.log('Tải file lên thành công')
           }).catch(function (xhr) {
             console.log(xhr)
             toastr.clear()
@@ -913,7 +943,7 @@ export const store = new Vuex.Store({
           }).catch(function (xhr) {
             console.log(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getGovAgency ({commit, state}, data) {
@@ -930,6 +960,27 @@ export const store = new Vuex.Store({
           resolve(response.data.data)
         }).catch(function (xhr) {
           console.log(xhr)
+        })
+      })
+    },
+    getDocumentType ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get(state.initData.regionApi + '/DOCUMENT_TYPE/dictitems', param).then(function (response) {
+          if (response.data && response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve(null)
+          }
+        }).catch(function() {
+          reject(null)
         })
       })
     },
@@ -1071,7 +1122,7 @@ export const store = new Vuex.Store({
       })
     },
     postDossier ({ commit, state }, data) {
-      console.log('data-------------', data)
+      // console.log('data-------------', data)
       return new Promise((resolve, reject) => {
         commit('setLoading', true)
         let options = {
@@ -1090,7 +1141,7 @@ export const store = new Vuex.Store({
         if (data.j_captcha_response) {
           dataPostdossier.append('j_captcha_response', data.j_captcha_response)
         }
-        console.log('dataPostdossier-------------', dataPostdossier)
+        // console.log('dataPostdossier-------------', dataPostdossier)
         axios.post(state.initData.postDossierApi, dataPostdossier, options).then(function (response) {
           response.data.serviceConfig = state.serviceConfigObj
           commit('setLoading', false)
@@ -1256,10 +1307,12 @@ export const store = new Vuex.Store({
           }
         }
         let applicantType = ''
-        if (!data.userType) {
+        if (data.userType === '2') {
           applicantType = 'business'
-        } else {
+        } else if (data.userType === '1') {
           applicantType = 'citizen'
+        } else {
+          applicantType = 'organization'
         }
         //
         let isSameAsApplicant = false
@@ -1286,9 +1339,7 @@ export const store = new Vuex.Store({
         dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
         dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
         dataPutdossier.append('applicantNote', state.applicantNote)
-        if (data.originality !== 1) {
-          dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
-        }
+        dataPutdossier.append('dossierName', data.dossierName ? data.dossierName : '')
         dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
         if (data.editable) {
           dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
@@ -1342,48 +1393,6 @@ export const store = new Vuex.Store({
         dataPutdossier.append('dossierFileArr', data['dossierFiles'])
         dataPutdossier.append('dossierMarkArr', data['dossierMarks'])
         dataPutdossier.append('payment', data['payment'])
-        // dataPutdossier.append('dossierMarkArr', data['dossierMarkArr'])
-        // dataPutdossier.append('applicantName', data.applicantName ? data.applicantName : '')
-        // dataPutdossier.append('dossierNo', data.dossierNo ? data.dossierNo : '')
-        // dataPutdossier.append('applicantIdType', applicantType)
-        // dataPutdossier.append('applicantIdNo', data.applicantIdNo ? data.applicantIdNo : '')
-        // dataPutdossier.append('address', data.address ? data.address : '')
-        // dataPutdossier.append('cityCode', data.cityCode ? data.cityCode : '')
-        // dataPutdossier.append('districtCode', data.districtCode ? data.districtCode : '')
-        // dataPutdossier.append('wardCode', data.wardCode ? data.wardCode : '')
-        // dataPutdossier.append('contactTelNo', data.contactTelNo ? data.contactTelNo : '')
-        // dataPutdossier.append('contactEmail', data.contactEmail ? data.contactEmail : '')
-        // dataPutdossier.append('delegateName', data.delegateName ? data.delegateName : '')
-        // dataPutdossier.append('delegateIdNo', data.delegateIdNo ? data.delegateIdNo : '')
-        // dataPutdossier.append('delegateTelNo', data.delegateTelNo ? data.delegateTelNo : '')
-        // dataPutdossier.append('delegateEmail', data.delegateEmail ? data.delegateEmail : '')
-        // dataPutdossier.append('delegateAddress', data.delegateAddress ? data.delegateAddress : '')
-        // dataPutdossier.append('delegateCityCode', data.delegateCityCode ? data.delegateCityCode : '')
-        // dataPutdossier.append('delegateDistrictCode', data.delegateDistrictCode ? data.delegateDistrictCode : '')
-        // dataPutdossier.append('delegateWardCode', data.delegateWardCode ? data.delegateWardCode : '')
-        // dataPutdossier.append('applicantNote', state.applicantNote)
-        // if (data.originality !== 1) {
-        //   dataPutdossier.append('dossierName', data.dossierName)
-        // }
-        // dataPutdossier.append('isSameAsApplicant', isSameAsApplicant)
-        // if (data.editable) {
-        //   dataPutdossier.append('dueDate', data.dueDate ? data.dueDate : '')
-        // }
-        // dataPutdossier.append('viaPostal', data.viaPostal ? data.viaPostal : 1)
-        // dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : 'VNPOST')
-        // dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
-        // dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
-        // dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-        // if (data.viaPostal) {
-        //   dataPutdossier.append('viaPostal', data.viaPostal)
-        //   dataPutdossier.append('postalServiceCode', data.postalServiceCode ? data.postalServiceCode : '')
-        //   dataPutdossier.append('postalAddress', data.postalAddress ? data.postalAddress : '')
-        //   dataPutdossier.append('postalCityCode', data.postalCityCode ? data.postalCityCode : '')
-        //   dataPutdossier.append('postalTelNo', data.postalTelNo ? data.postalTelNo : '')
-        //   // dataPutdossier.append('postalDistrictCode', data.postalDistrictCode)
-        //   // dataPutdossier.append('postalWardCode', data.postalWardCode)
-        // }
-        // dataPutdossier.append('sampleCount', data.sampleCount ? data.sampleCount : 1)
         axios.post(state.initData.postDossierApi + '/import/all', dataPutdossier, options).then(function (response) {
           resolve(response.data)
         }).catch(rejectXhr => {
@@ -1532,7 +1541,7 @@ export const store = new Vuex.Store({
         if (!isNaN(data.recordCount) && data.recordCount !== undefined && data.recordCount !== 'undefined' && data.recordCount !== null) {
           dataPostdossierMark.append('recordCount', data.recordCount)
         }
-        console.log('dataChangeRecord', data.dossierId)
+        // console.log('dataChangeRecord', data.dossierId)
         let url = state.initData.dossierApi + '/' + data.dossierId + '/marks/' + data.partNo
         axios.post(url, dataPostdossierMark, options).then(function (response) {
           resolve(response.data)
@@ -1592,14 +1601,12 @@ export const store = new Vuex.Store({
             console.log(xhr)
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       let id = data['id'] ? data['id'] : 'nm'
-      console.log('dataaaaa 2222', data)
-      window.$('#formAlpaca' + data.dossierPartNo + id).empty()
-      console.log('dataaaaa', data)
+      window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').empty()
       /* eslint-disable */
       let formScript, formData
       if (data.formScript) {
@@ -1614,7 +1621,7 @@ export const store = new Vuex.Store({
       }
       /* eslint-disable */
       formScript.data = formData
-      window.$('#formAlpaca' + data.dossierPartNo + id).alpaca(formScript)
+      window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca(formScript)
     },
     putAlpacaForm ({ commit, state, dispatch }, data) {
       return new Promise((resolve, reject) => {
@@ -1626,9 +1633,9 @@ export const store = new Vuex.Store({
         }
         let id = data['id'] ? data['id'] : 'nm'
         try {
-          let control = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get')
+          let control = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get')
           let formData = control.getValue()
-          let field = window.$('#formAlpaca' + data.dossierPartNo + id).alpaca('get').childrenByPropertyId
+          let field = window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
@@ -1707,11 +1714,11 @@ export const store = new Vuex.Store({
         try {
           let id = data['id'] ? data['id'] : 'nm'
           let dataPostEform = new FormData()
-          let control = window.$('#formAlpaca' + data.partNo + id).alpaca('get')
+          let control = window.$('div[id="formAlpaca' + data.partNo + id + '"]').alpaca('get')
           let formData = control.getValue()
           dataPostEform.append('formData', JSON.stringify(formData))
           dataPostEform.append('file', '')
-          let field = window.$('#formAlpaca' + data.partNo + id).alpaca('get').childrenByPropertyId
+          let field = window.$('div[id="formAlpaca' + data.partNo + id + '"]').alpaca('get').childrenByPropertyId
           if (field) {
             for (let prop in field) {
               if (field[prop].isRequired() && field[prop].getValue() === '') {
@@ -1863,10 +1870,10 @@ export const store = new Vuex.Store({
           ]).then( axios.spread(function (urlResponesFormScript, urlResponesFormData) {
             let responseScript = urlResponesFormScript.data
             let responseData = urlResponesFormData.data
-            console.log('responseScript==============', responseScript)
+            // console.log('responseScript==============', responseScript)
             item.plugin = true
             if(responseScript.indexOf('#preview@pdf') !== -1){
-              console.log('view pdf')
+              // console.log('view pdf')
               let url = state.initData.dossierApi + '/' + item.dossierId + '/plugins/' + item.processPluginId + '/preview' 
               let config_blob =  {
                 headers: {
@@ -1907,10 +1914,10 @@ export const store = new Vuex.Store({
                 let dossierFileId = serializable.dossierFileId
                 let formReport = eval('(' + serializable.formReport + ')')
                 let formData = eval('(' + serializable.formData + ')')
-                console.log('formReport======', formReport)
-                console.log('formData======', formData)
+                // console.log('formReport======', formReport)
+                // console.log('formData======', formData)
                 formReport.data = formData
-                console.log('formReport_____FINAL=======', formReport)
+                // console.log('formReport_____FINAL=======', formReport)
                 window.$('#alpacajs_form_plugin').alpaca(formReport)
                 window.$('.dossierFilePartNo').val('')
                 window.$('.dossierFilePartNo').attr('id', 'dossierFileId' + partNo)
@@ -2140,7 +2147,7 @@ export const store = new Vuex.Store({
         params.append('pings', strPings)
         params.append('content', data.content)
         // params.append('upvoteCount', data.upvoteCount != null ? data.upvoteCount : 0)
-        console.log('dataPut', data)
+        // console.log('dataPut', data)
         axios.put(state.initData.commentApi + '/' + data.commentId, params, config)
         .then(function (response) {
           let resPutCmt = {}
@@ -2258,10 +2265,10 @@ export const store = new Vuex.Store({
               }
               let nextactions = serializableNextActionConvert
               let plugins = serializablePluginsConvert
-              console.log('nextactions++++++++++++', nextactions)
-              console.log('plugins++++++++++++', plugins)
+              // console.log('nextactions++++++++++++', nextactions)
+              // console.log('plugins++++++++++++', plugins)
               nextactions.push(...plugins);
-              console.log('nextactions2++++++++++++', nextactions)
+              // console.log('nextactions2++++++++++++', nextactions)
               resolve(nextactions)
             }))
             .catch(function (xhr) {
@@ -2297,7 +2304,7 @@ export const store = new Vuex.Store({
               reject(error)
               commit('setUserNextAction', [])
             })
-          })
+          }).catch(function (){})
         })
       },
       pullBtnConfigStep ({commit, state}, filter) {
@@ -2307,7 +2314,6 @@ export const store = new Vuex.Store({
               'groupId': state.initData.groupId
             }
           }
-          let params = new URLSearchParams()
           // test local
           axios.get(state.initData.stepConfigApi + '/status/' + filter.dossierStatus + '/' + filter.dossierSubStatus, config).then(function (response) {
           // axios.get('http://congtrinh0209:8080/api/stepconfigs/done/done_5', params, config).then(function (response) {
@@ -2331,7 +2337,6 @@ export const store = new Vuex.Store({
             groupId: state.initData.groupId
           },
           params: {
-            // abc: dât.abc
           }
         }
         let url = state.initData.documentApi + '/' + data.dossierId + '/documents'
@@ -2439,7 +2444,7 @@ export const store = new Vuex.Store({
             }).catch(function (error) {
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       },
       getDossierUserAsign ({commit, state}, classPK) {
@@ -2483,7 +2488,7 @@ export const store = new Vuex.Store({
             }).catch(function (error) {
               reject(error)
             })
-          })
+          }).catch(function (){})
         })
       },
       loadDossierSyncs ({commit, state}, data) {
@@ -2527,7 +2532,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     deleteDossier ({commit, state}, filter) {
@@ -2550,7 +2555,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     restoreDossier ({commit, state}, filter) {
@@ -2571,7 +2576,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getListDossierFiles ({ commit, state }, data) {
@@ -2591,7 +2596,7 @@ export const store = new Vuex.Store({
           console.log(xhr)
           reject(xhr)
         })
-      })
+      }).catch(function (){})
     },
     deleteDossierPatch ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
@@ -2626,7 +2631,7 @@ export const store = new Vuex.Store({
               reject(error)
             })
           }
-        })
+        }).catch(function (){})
       })
     },
     doPrint01 ({commit, state}, filter) {
@@ -2651,7 +2656,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doPrint03 ({commit, state}, filter) {
@@ -2662,21 +2667,30 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             responseType: 'blob',
-            params: {
-              payload: filter.payload
-            }
+            params: {}
+          }
+          if (filter.document) {
+            param.params.documentType =  filter.document
           }
           axios.get(state.initData.getNextAction + '/' + filter.dossierId + '/documents/print', param).then(function (response) {
             let serializable = response.data
-            let file = window.URL.createObjectURL(serializable)
-            resolve(file)
+            if (response['status'] !== undefined && response['status'] !== 200) {
+              reject('pending')
+            } else {
+              if (serializable['size']) {
+                let file = window.URL.createObjectURL(serializable)
+                resolve(file)
+              } else {
+                resolve('pending')
+              }
+            }
           }).catch(function (error) {
             console.log(error)
             toastr.clear()
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doGuiding ({commit, state}, filter) {
@@ -2723,7 +2737,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     doPrint02 ({commit, state}, filter) {
@@ -2772,7 +2786,28 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
+      })
+    },
+    previewTienTrinh ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            responseType: 'blob'
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter.dossierId +'/documents/preview/SEQUENCES', param).then(function (response) {
+            let serializable = response.data
+            let file = window.URL.createObjectURL(serializable)
+            resolve(file)
+          }).catch(function (error) {
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            reject(error)
+          })
+        }).catch(function (){})
       })
     },
     processPullBtnDetail ({commit, state}, filter) {
@@ -2790,7 +2825,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getNextAction ({commit, state}, filter) {
@@ -2805,11 +2840,9 @@ export const store = new Vuex.Store({
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {
-            console.log(error)
-            resolve([])
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadFormScript ({state, commit}, data) {
@@ -2833,7 +2866,7 @@ export const store = new Vuex.Store({
               reject(xhr)
             }
           })
-        })
+        }).catch(function (){})
       })
     },
     loadFormData ({state, commit}, data) {
@@ -2857,7 +2890,7 @@ export const store = new Vuex.Store({
               reject(xhr)
             }
           })
-        })
+        }).catch(function (){})
       })
     },
     loadDossierCounting ({state, commit}, data) {
@@ -2894,7 +2927,7 @@ export const store = new Vuex.Store({
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     pullProcessSteps ({commit, state}, data) {
@@ -2912,7 +2945,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadServiceConfigsGov ({commit, state}, data) {
@@ -2941,7 +2974,7 @@ export const store = new Vuex.Store({
             commit('setLoadingGov', false)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     processCheckNextActions ({commit, state}, filter) {
@@ -2974,7 +3007,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceOpionByProcess ({commit, state}, data) {
@@ -2994,14 +3027,14 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               resolve(serializable.data)
             } else {
-              resolve({})
+              resolve('')
             }
           }).catch(function (error) {
             console.log(error)
             reject(error)
           })
         })
-      })
+      }).catch(function (){})
     },
     getStatusLists ({commit, state}, data) {
       return new Promise((resolve, reject) => {
@@ -3015,12 +3048,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'itemCode': '',
-                  'itemName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3029,7 +3056,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getVNPOSTcode ({commit, state}, data) {
@@ -3054,7 +3081,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getSubstatusLists ({commit, state}, data) {
@@ -3069,12 +3096,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'itemCode': '',
-                  'itemName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3083,7 +3104,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getAgencyLists ({commit, state}, data) {
@@ -3101,12 +3122,6 @@ export const store = new Vuex.Store({
             let serializable = response.data
             if (serializable.data) {
               let dataReturn = serializable.data
-              if (dataReturn !== null && dataReturn !== undefined && dataReturn !== 'undefined') {
-                dataReturn.unshift({
-                  'administrationCode': '',
-                  'administrationName': 'toàn bộ'
-                })
-              }
               resolve(dataReturn)
             } else {
               resolve([])
@@ -3115,7 +3130,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceLists ({commit, state}, data) {
@@ -3144,7 +3159,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceinfoFilter ({commit, state}, data) {
@@ -3167,7 +3182,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getDomainLists ({commit, state}, data) {
@@ -3193,7 +3208,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getExtraForm ({commit, state}, filter) {
@@ -3212,10 +3227,9 @@ export const store = new Vuex.Store({
               resolve([])
             }
           }).catch(function (error) {
-            console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceInfo ({commit, state}, data) {
@@ -3233,7 +3247,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     changeDisplayNameFile ({commit, state}, data) {
@@ -3253,7 +3267,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadingDossierCounting ({commit, state}, filter) {
@@ -3275,7 +3289,7 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     loadVoting ({commit, state}, data) {
@@ -3287,7 +3301,7 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          axios.get('/o/rest/v2/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
           // axios.get('http://127.0.0.1:8080/api/votings/12/' + data.classPK, param).then(result => {
             let serializable = result.data
             if (serializable && serializable.data) {
@@ -3298,30 +3312,98 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
+        }).catch(function (){})
+      })
+    },
+    loadVotingMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadDetailDossierMC', data['dossierDetail']).then(result => {
+          let config = {
+            headers: {
+              'groupId': state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/postal/votings/' + data.className + '/' + result['dossierId'])
+          dataPost.append('data', '')
+          dataPost.append('serverCode', 'SERVER_' + result['govAgencyCode'])
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result1) {
+            if (result1.data) {
+              resolve(result1.data.data)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(xhr => {
+        })
+      })
+    },
+    loadDetailDossierMC ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            'groupId': state.initData.groupId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('method', 'GET')
+        dataPost.append('url', '/dossiers/' + data['referenceUid'])
+        dataPost.append('data', '')
+        dataPost.append('serverCode', 'SERVER_' + data['govAgencyCode'])
+        axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
+          resolve(result.data)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     },
     submitVoting ({commit, state}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result1) {
-          let params = new URLSearchParams()
-          const config = {
+          // let params = new URLSearchParams()
+          // const config = {
+          //   headers: {
+          //     'groupId': state.initData.groupId
+          //   }
+          // }
+          // params.append('className', data.className)
+          // params.append('classPk', data.classPk)
+          // params.append('votingCode', data.votingCode ? data.votingCode : '')
+          // params.append('selected', data.selected)
+          // axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          //   resolve(result.data)
+          // }).catch(xhr => {
+          //   reject(xhr)
+          // })
+
+          // api đồng bộ sang một cửa
+          let config = {
             headers: {
               'groupId': state.initData.groupId
             }
           }
-          params.append('className', data.className)
-          params.append('classPk', data.classPk)
-          params.append('votingCode', data.votingCode ? data.votingCode : '')
-          params.append('selected', data.selected)
-          // test local
-          // axios.post('http://127.0.0.1:8080/api/votings/' + data.votingId, params, config).then(result => {
-          axios.post('/o/rest/v2/postal/votings/' + data.votingId + '/results', params, config).then(result => {
+          let textPost = {
+            className: data.className,
+            classPk: data.classPk,
+            selected: data.selected,
+            votingCode: data.votingCode ? data.votingCode : ''
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'POST')
+          dataPost.append('url', '/postal/votings/' + data.votingId + '/results')
+          dataPost.append('data', JSON.stringify(textPost))
+          dataPost.append('serverCode', data.serverCode)
+          axios.post('/o/rest/v2/proxy', dataPost, config).then(function (result) {
             resolve(result.data)
           }).catch(xhr => {
+            toastr.clear()
+            toastr.error('Gửi đánh giá thất bại')
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     validFileUpload ({commit, state}, data) {
@@ -3389,7 +3471,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     // add new template
@@ -3407,7 +3489,7 @@ export const store = new Vuex.Store({
           }, error => {
             reject(error)
           })
-        })
+        }).catch(function (){})
       })
     },
     getServiceConfigDetail ({commit, state}, filter) {
@@ -3429,7 +3511,29 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
+      })
+    },
+    getScriptViewDetail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          // test local
+          axios.get('/o/rest/v2_1/menuconfigs/'+ filter.menuGroup + '/script', param).then(result => {
+            let serializable = result.data
+            if (serializable) {
+              resolve(serializable)
+            } else {
+              resolve('')
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(function (){})
       })
     },
     getDetailMenuConfig ({commit, state}, filter) {
@@ -3451,7 +3555,7 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
-        })
+        }).catch(function (){})
       })
     },
     getPreAction ({commit, state}, data) {
@@ -3468,6 +3572,99 @@ export const store = new Vuex.Store({
           }).catch(xhr => {
             reject(xhr)
           })
+        }).catch(function (){})
+      })
+    },
+    getNotifyConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.get('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata/' + filter['key'], param).then(result => {
+            let serializable = result.data
+            if (serializable) {
+              resolve(serializable)
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        }).catch(function (){})
+      })
+    },
+    putUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataPutUser = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/applicants/' + filter['applicantId']
+        dataPutUser.append('applicantName', filter['applicantName'])
+        dataPutUser.append('applicantIdType', filter['applicantIdType'])
+        dataPutUser.append('contactTelNo', filter['contactTelNo'])
+        dataPutUser.append('address', filter['address'])
+        dataPutUser.append('contactEmail', filter['contactEmail'])
+        dataPutUser.append('cityCode', filter['cityCode'])
+        dataPutUser.append('cityName', filter['cityName'])
+        dataPutUser.append('districtCode', filter['districtCode'])
+        dataPutUser.append('districtName', filter['districtName'])
+        dataPutUser.append('wardCode', filter['wardCode'])
+        dataPutUser.append('wardName', filter['wardName'])
+        // dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
+        dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+        axios.put(url, dataPutUser, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
+          commit('setsnackbarerror', true)
+        })
+      })
+    },
+    putNotifyConfig ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+          let data = {
+            smsNotify: filter['smsNotify'],
+            emailNotify: filter['emailNotify']
+          }
+          let formData = new URLSearchParams()
+          formData.append('data', JSON.stringify(data))
+          axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    updateFileKySoPlugin ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId
+          }
+        }
+        let dataUpdate = new URLSearchParams()
+        let url = ''
+        url = '/o/rest/v2/defaultsignature/vgca/' + filter['dossierId'] + '/dossierFiles'
+        dataUpdate.append('fileEntries', filter['fileEntries'])
+        dataUpdate.append('dossierFiles', filter['dossierFiles'])
+        axios.put(url, dataUpdate, param).then(result1 => {
+          resolve(result1)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     }
@@ -3539,9 +3736,9 @@ export const store = new Vuex.Store({
       state.stepOverdueNextAction = payload
     },
     setThongTinChuHoSo (state, payload) {
-      let userTypeCondition = true
-      if (payload.applicantIdType === 'business') {
-        userTypeCondition = false
+      let userTypeCondition = '1'
+      if (payload.applicantIdType === 'business' || payload.userType === '2') {
+        userTypeCondition = '2'
       }
       let thongTinChuHoSoPayLoad = {
         applicantIdNo: payload.applicantIdNo,
@@ -3729,7 +3926,25 @@ export const store = new Vuex.Store({
     },
     setActiveAddFileGroup (state, payload) {
       state.activeAddFileGroup = payload
-    }
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
+    },
+    setDossierTemplateLienThong (state, payload) {
+      state.dossierTemplateLienThong = payload
+    },
+    setActivePrintBienNhan (state, payload) {
+      state.activePrintBienNhan = payload
+    },
+    setCreateFileSigned (state, payload) {
+      state.createFileSigned = payload
+    },
+    setAdvSearchShow (state, payload) {
+      state.advSearchShow = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -3757,11 +3972,10 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         store.dispatch('loadMenuConfigToDo').then(function (result) {
           resolve(result)
-        })
+        }).catch(function () {})
       })
     },
     loadingInitData (state) {
-      console.log('loadingInitDataloadingInitDataloadingInitDataloadingInitData: ', state.initData)
       return state.initData
     },
     loadingDynamicBtn (state) {
@@ -3919,6 +4133,27 @@ export const store = new Vuex.Store({
     },
     activeAddFileGroup (state) {
       return state.activeAddFileGroup
-    }
+    },
+    getMenuConfigsTodo (state) {
+      return state.trangThaiHoSoList
+    },
+    getUserLogin (state) {
+      return state.userLogin
+    },
+    getDossierTemplateLienThong (state) {
+      return state.dossierTemplateLienThong
+    },
+    getActivePrintBienNhan (state) {
+      return state.activePrintBienNhan
+    },
+    getCreateFileSigned (state) {
+      return state.createFileSigned
+    },
+    advSearchShow (state) {
+      return state.advSearchShow
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

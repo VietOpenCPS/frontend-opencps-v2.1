@@ -6,9 +6,14 @@
           <v-layout wrap class="text-xs-center">
             <v-flex xs12 class="pr-2">
               <div class="input-border input-group input-group--placeholder input-group--text-field primary--text">
-                <div class="input-group__input">
+                <!-- <div class="input-group__input">
                   <input id="passCheck" class="kios-input" data-layout="normal" @keyup.enter="submitPass" @focus="show" aria-label="Số hồ sơ" placeholder="Nhập mã tra cứu" type="text">
                   <i v-if="visible" @click="clear('passCheck')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
+                </div> -->
+                <div class="input-custom" style="width:100%">
+                  <input id="passCheck" type="text" @keyup.enter="submitPass" @focus="show" required="required" />
+                  <span class="bar"></span>
+                  <label for="passCheck">Mã tra cứu</label>
                 </div>
                 <div class="mt-2" v-if="!validPass">
                   <div class="input-group__messages" style="color:red">* Mã tra cứu là bắt buộc</div>
@@ -17,7 +22,7 @@
             </v-flex>
           </v-layout>
         </div>
-        <div class="text-center" style="width: 150px;margin-top:12px">
+        <div class="text-center" style="width: 150px">
           <v-btn color="primary"
             :loading="loadingTable"
             :disabled="loadingTable"

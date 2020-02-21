@@ -103,7 +103,7 @@ export default {
     lengthPage: 0,
     totalEmployee: 0,
     employeePage: 1,
-    numberPerPage: 10
+    numberPerPage: 12
   }),
   computed: {
     loading () {
@@ -140,10 +140,12 @@ export default {
         end: vm.employeePage * vm.numberPerPage,
         itemCode: vm.itemCode
       }
-      vm.$store.dispatch('loadEmployees', filter).then(result => {
+      vm.$store.dispatch('loadEmployeesProxy', filter).then(result => {
         vm.totalEmployee = result[0]
-        vm.employeeItems = sortEmployee(result[1])     
+        vm.employeeItems = sortEmployee(result[1])
         vm.lengthPage = Math.ceil(result[0] / vm.numberPerPage)
+
+        vm.employeeItems = vm.employeeItems.slice(filter.start, filter.end)
         if (vm.employeeItems && vm.employeeItems.length > 0) {
           for (let key in vm.employeeItems) {
             vm.getAvatar(vm.employeeItems[key], key)

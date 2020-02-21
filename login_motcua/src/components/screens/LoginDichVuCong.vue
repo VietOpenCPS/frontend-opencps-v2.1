@@ -1,5 +1,14 @@
 <template>
   <div id="login_container">
+    <div class="header_login">
+      <div class="logo"> 
+        <a href=""> 
+          <img src=""> 
+          <div class="text-logo">
+          </div> 
+        </a> 
+      </div>
+    </div>
     <v-layout class="mt-4" wrap style="max-width:500px;margin: 0 auto">
       <v-flex xs12 v-if="isSigned" class="container-login">
         <v-card flat class="px-2 py-3" style="border: 1px solid #dddddd;">
@@ -66,7 +75,7 @@
             </div>
           </v-flex>
           <v-flex xs12 class="mt-3 text-xs-center">
-            <v-btn class="ml-0 my-0 white--text" color="#0b72ba"
+            <v-btn class="my-0 white--text" color="#0b72ba"
               :loading="loading"
               :disabled="loading"
               @click="submitConfirmLogin"
@@ -78,10 +87,30 @@
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
+            <v-btn v-if="conectDvcqg" class="px-2 my-0" color="#913938"
+              :loading="loading"
+              :disabled="loading"
+              @click="loginDVCQG"
+            >
+              Đăng nhập qua Cổng DVC Quốc gia
+            </v-btn>
           </v-flex>
         </v-form>
       </v-flex>
     </v-layout>
+    <div class="footer_login"></div>
+    <!--  -->
+    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
+      <v-card>
+        <v-card-text class="px-0 py-0">
+          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
+            width: 100%;
+            height: 650px;
+            border: none;
+          "></iframe>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -101,7 +130,10 @@ export default {
     loading: false,
     valid: false,
     pinCode: '',
-    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+    conectDvcqg: false,
+    dialog_loginDVCQG: false,
+    tempDVCQG: ''
   }),
   computed: {
   },
@@ -112,7 +144,14 @@ export default {
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.makeImageCap()
+      try {
+        vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
+      } catch (error) {
+      }
+      if (vm.conectDvcqg) {
+        window.callback_dvcqg = vm.callback_dvcqg
+      }
+      // vm.makeImageCap()
     })
   },
   updated () {
@@ -146,11 +185,55 @@ export default {
       }
     },
     doLogOut () {
+      let vm = this
+      // if (typeof(Storage) !== 'undefined') {
+      //   sessionStorage.removeItem('userLogout')
+      //   if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+      //     sessionStorage.setItem('userLogout', 'employee')
+      //   } else {
+      //     sessionStorage.setItem('userLogout', 'applicant')
+      //   }
+      // }
       window.location.href = "/c/portal/logout";
     },
     getPassword () {
       let vm = this
       window.location.href = window.themeDisplay ? window.themeDisplay.getLayoutURL() + '/#/cap-lai-mat-khau' : ''
+    },
+    loginDVCQG () {
+      let vm = this
+      window.location.href = window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/dang-nhap-dvcqg'
+      // let urlSso = ''
+      // try {
+      //   urlSso = ssoConfig ? ssoConfig['urlSend'] : ''
+      // } catch (error) {
+      // }
+      // let filter = {
+      //   vnconnect: 1,
+      //   currenturl: urlSso ? urlSso : ''
+      // }
+      // vm.$store.dispatch('getVNConect', filter).then(function (result) {
+      //   if (result) {
+      //     vm.dialog_loginDVCQG = true
+      //     setTimeout(function () {
+      //       vm.tempDVCQG = result
+      //     }, 200)
+      //   }
+      // }).catch(function() {
+      //   alert('Chức năng đang cập nhật')
+      // })
+    },
+    callback_dvcqg (data) {
+      let vm = this
+      let urlRedirect = ''
+      try {
+        urlRedirect = ssoConfig ? ssoConfig['urlRedirect'] : window.themeDisplay.getLayoutURL() + '#' + current.path
+      } catch (error) {
+      }
+      window.location.href = window.themeDisplay.getURLHome()
+      // window.location.href = urlRedirect
+      // window.location.reload()
+      vm.dialog_loginDVCQG = false
     },
     goBack () {
       window.history.back()

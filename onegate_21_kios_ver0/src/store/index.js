@@ -26,7 +26,8 @@ export const store = new Vuex.Store({
     activeDetailService: false,
     applicantIdNoSearch: '',
     dossierNoSearch: '',
-    fullScreen: false
+    fullScreen: false,
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -462,7 +463,7 @@ export const store = new Vuex.Store({
             }
           }
           // test local
-          axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPK, param).then(result => {
+          axios.get(state.endPoint + '/postal/votings/' + data.className + '/' + data.classPk, param).then(result => {
           // axios.get('http://127.0.0.1:8081/api/votings/12/' + data.classPK, param).then(result => {
             if (result.data) {
               resolve(result.data.data)
@@ -638,6 +639,9 @@ export const store = new Vuex.Store({
     },
     setGroupid (state, payload) {
       state.groupIdSite = payload
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
     }
   },
   getters: {
@@ -664,6 +668,9 @@ export const store = new Vuex.Store({
     },
     getFullScreen (state) {
       return state.fullScreen
+    },
+    getIsMobile (state) {
+      return state.isMobile
     },
     getOriginality (state) {
       return state.originality

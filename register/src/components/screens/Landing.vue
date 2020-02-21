@@ -3,26 +3,31 @@
     <v-layout wrap class="py-2" style="
       max-width: 1300px;
     ">
-      <v-flex xs12 sm8 class="px-3">
+      <v-flex xs12 md8 :class="!isMobile ? 'px-3' : 'px-2'">
         <div class="bg-gif-register" style="background: url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend-cli/register/app/img/bg-gif-register.gif') no-repeat center center;padding-top: 77.961783%;background-size: contain;"></div>
       </v-flex>
-      <v-flex xs12 sm4 class="px-3">
+      <v-flex xs12 md4 :class="!isMobile ? 'px-3' : 'px-2'">
         <v-card>
           <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
             <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
               <span class="text-bold white--text">ĐĂNG KÝ TÀI KHOẢN</span>
             </div>
           </nav>
-          <v-form ref="form" v-model="valid" lazy-validation class="px-3" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
+          <v-form ref="form" v-model="valid" lazy-validation :class="!isMobile ? 'px-3' : 'px-2'" style="border: 1px solid #ddd;border-top:0px;background-color: white;border-radius:2px">
             <v-layout wrap>
-              <v-radio-group class="mt-2 radio_register_type" v-model="applicantType" row @change="changeApplicantType">
-                <v-radio label="Công dân" :value="true" class="ml-4"></v-radio>
-                <v-radio label="Tổ chức, doanh nghiệp" :value="false"></v-radio>
+              <v-radio-group v-if="hasOrganization" class="mt-2 radio_register_type" v-model="applicantType" row @change="changeApplicantType">
+                <v-radio label="Công dân" :value="'1'" class="mr-2"></v-radio>
+                <v-radio label="Doanh nghiệp" :value="'2'" class="mr-2"></v-radio>
+                <v-radio label="Cơ quan, tổ chức" :value="'3'" class="mr-2"></v-radio>
+              </v-radio-group>
+              <v-radio-group v-else class="mt-2 radio_register_type" v-model="applicantType" row @change="changeApplicantType">
+                <v-radio label="Công dân" :value="'1'" class="mr-2"></v-radio>
+                <v-radio label="Tổ chức, doanh nghiệp" :value="'2'" class="mr-2"></v-radio>
               </v-radio-group>
               <v-flex xs12>
                 <div style="position:relative">
-                  <span>{{applicantType ? 'Họ và tên ' : 'Tên tổ chức, doanh nghiệp '}}</span> <span style="color:red">(*)</span>
-                  <v-tooltip left v-if="!applicantType && bussinessExits" style="position:absolute;top:-5px;right:-3px">
+                  <span>{{applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span>
+                  <v-tooltip left v-if="applicantType === '2' && bussinessExits" style="position:absolute;top:-5px;right:-3px">
                     <v-btn slot="activator" class="my-0" fab icon small dark color="primary" @click.native="getApplicantInfos()" style="width:26px!important;height:26px!important"
                     >
                       <v-icon dark>account_balance</v-icon>
@@ -31,7 +36,7 @@
                   </v-tooltip>
                 </div>
                 <v-text-field
-                  :placeholder="applicantType ? 'Họ và tên ' : 'Tên tổ chức, doanh nghiệp '"
+                  :placeholder="applicantType === '1' ? 'Họ và tên ' : (applicantType === '2' ? 'Tên tổ chức, doanh nghiệp ' : 'Tên cơ quan, tổ chức ')"
                   v-model="applicantName"
                   box
                   :rules="[v => !!v || 'Trường dữ liệu bắt buộc']"
@@ -41,12 +46,12 @@
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <div><span>{{applicantType ? 'Số CMND/ Hộ chiếu ' : 'Mã số thuế '}}</span> <span style="color:red">(*)</span></div>
+                <div><span>{{applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số thuế ' : 'Mã cơ quan, tổ chức ')}}</span> <span style="color:red">(*)</span></div>
                 <v-text-field
-                  :placeholder="applicantType ? 'Số CMND/ Hộ chiếu ' : 'Mã số thuế '"
+                  :placeholder="applicantType === '1' ? 'Số CMND/ Hộ chiếu ' : (applicantType === '2' ? 'Mã số thuế ' : 'Mã cơ quan, tổ chức ')"
                   v-model="applicantIdNo"
                   box
-                  :rules="applicantType ? [rules.required, rules.credit] : [rules.required, rules.taxCode]"
+                  :rules="applicantType === '1' ? [rules.required, rules.credit] : (applicantType === '2' ? [rules.required, rules.taxCode] : [rules.required])"
                   required
                   @input="changeApplicantInfos"
                   :disabled="loadingVerify"
@@ -85,23 +90,21 @@
                 <div>Thư điện tử <span style="color:red">(*)</span></div>
                 <v-text-field
                   box
-                  type="tel"
                   placeholder="Thư điện tử"
                   v-model="contactEmail"
-                  :rules="[rules.required, rules.email]"
+                  :rules="requiredOption['contactEmail'] ? [rules.required, rules.email] : [rules.email]"
                   min="6"
                   required
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <div>Số điện thoại </div>
+                <div>Số điện thoại <span v-if="requiredOption['contactTelNo']" style="color:red">(*)</span></div>
                 <v-text-field
                   placeholder="Số điện thoại"
                   v-model="contactTelNo"
-                  :rules="[rules.telNo]"
+                  :rules="requiredOption['contactTelNo'] ? [rules.required, rules.telNo] : [rules.telNo]"
                   box
-                  readonly
-                  onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');}"
+                  browser-autocomplete="off"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -258,7 +261,8 @@ export default {
     loading: false,
     loadingVerify: false,
     valid: false,
-    applicantType: true,
+    hasOrganization: false,
+    applicantType: '1',
     applicantName: '',
     applicantIdNo: '',
     menuApplicantIdDate: false,
@@ -313,22 +317,71 @@ export default {
           return pattern.test(value) || 'Số CMND gồm 9 hoặc 12 ký tự 0-9'
         }
       }
+    },
+    requiredOption: {
+      applicantName: true,
+      applicantIdNo: true,
+      applicantIdDate: true,
+      contactEmail: true,
+      contactTelNo: false
     }
   }),
   computed: {
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    }
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      try {
+        if (requiredOption) {
+          vm.requiredOption = requiredOption
+        }
+        if (hasOrganizationConfig === true) {
+          vm.hasOrganization = true
+        }
+      } catch (error) {
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.getDieuKhoan()
+      // mappping user dvcqg
+      console.log('currentQuery', currentQuery)
+      if (currentQuery.hasOwnProperty('name') && currentQuery['name']) {
+        console.log('currentQuery 2', currentQuery['type'], currentQuery['name'], currentQuery['tel'])
+        vm.applicantType = currentQuery.hasOwnProperty('type') ? (String(currentQuery['type']) === '1' ? '1' : '2') : '1'
+        vm.applicantName = currentQuery.hasOwnProperty('name') ? currentQuery['name'] : ''
+        vm.applicantIdNo = currentQuery.hasOwnProperty('credit') ? currentQuery['credit'] : ''
+        vm.contactTelNo = currentQuery.hasOwnProperty('tel') ? currentQuery['tel'] : ''
+        vm.contactEmail = currentQuery.hasOwnProperty('mail') ? currentQuery['mail'] : ''
+      }
     })
   },
   updated () {
     var vm = this
     vm.$nextTick(function () {
+    })
+  },
+  mounted () {
+    let vm = this
+    try {
+      if (hasOrganizationConfig === true) {
+        vm.hasOrganization = true
+      }
+    } catch (error) {
+    }
+    let elements = document.querySelectorAll('[autocomplete="off"]');
+    if (!elements) {
+      return
+    }
+    elements.forEach(element => {
+      element.setAttribute('readonly', 'readonly')
+      element.style.backgroundColor = 'inherit'
+      setTimeout(() => {
+        element.removeAttribute('readonly')
+      }, 500)
     })
   },
   watch: {
@@ -349,10 +402,10 @@ export default {
       let vm = this
       let currentQuery = vm.$router.history.current.query
       let currentParams = vm.$router.history.current.params
-      console.log(this.$refs.form.validate(), vm.agreeRules)
+      // console.log(this.$refs.form.validate(), vm.agreeRules)
       let dataForm = {
         applicantName: vm.applicantName,
-        applicantType: vm.applicantType ? 'citizen' : 'business',
+        applicantType: vm.applicantType === '1' ? 'citizen' : (vm.applicantType === '2' ? 'business' : 'organization'),
         applicantIdNo: vm.applicantIdNo,
         applicantIdNoDate: vm.applicantIdDateFormatted,
         contactTelNo: vm.contactTelNo,
@@ -387,15 +440,15 @@ export default {
     },
     changeApplicantType () {
       var vm = this
-      console.log(vm.applicantType)
-      if (!vm.applicantType) {
+      // console.log(vm.applicantType)
+      if (vm.applicantType === '2') {
         vm.validBussinessInfos = true
       }
       vm.changeApplicantInfos()
     },
     changeApplicantInfos () {
       let vm = this
-      if (!vm.applicantType) {
+      if (vm.applicantType === '2') {
         if (vm.functionTimeOut) {
           clearTimeout(vm.functionTimeOut)
         }
@@ -408,7 +461,7 @@ export default {
     },
     checkApplicantInfos () {
       let vm = this
-      if (!vm.applicantType) {
+      if (vm.applicantType === '2') {
         let filter = {
           applicantIdNo: vm.applicantIdNo,
           applicantName: vm.applicantName
@@ -447,7 +500,7 @@ export default {
         vm.applicantInfos['applicantName'] = result['MainInformation']['NAME']
         vm.applicantInfos['applicantIdNo'] = result['MainInformation']['ENTERPRISE_GDT_CODE']
         vm.applicantInfos['address'] = result['HOAdress']['AddressFullText']
-        vm.applicantInfos['representatives'] = result['Representatives']['FULL_NAME']
+        vm.applicantInfos['representatives'] = result['Representatives']['FULL_NAME'] ? result['Representatives']['FULL_NAME'] : result['Representatives'][0]['FULL_NAME']
         vm.applicantInfos['companyType'] = result['MainInformation']['ENTERPRISE_TYPE_NAME']
         vm.applicantInfos['companyStatus'] = result['MainInformation']['ENTERPRISE_STATUS_NAME']
         vm.dialog_applicantInfos = true

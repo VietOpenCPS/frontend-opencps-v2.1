@@ -12,7 +12,58 @@ export const store = new Vuex.Store({
   state: {
     initData: {},
     snackbarerror: false,
-    snackbarsocket: false
+    snackbarsocket: false,
+    profileCitizenDefault: {
+      SoDienThoaiBan: '',
+      LoaiThe: '',
+      GioiTinh: '',
+      DanToc: '',
+      TonGiao: '',
+      DanToc: '',
+      TinhTrangHonNhan: '',
+      NhomMau: '',
+      NgayThangNamSinh: '',
+      NoiDangKyKhaiSinhAddress: '',
+      NoiDangKyKhaiSinhCityCode: '',
+      NoiDangKyKhaiSinhCityName: '',
+      NoiDangKyKhaiSinhDistrictCode: '',
+      NoiDangKyKhaiSinhDistrictName: '',
+      NoiDangKyKhaiSinhWardCode: '',
+      NoiDangKyKhaiSinhWardName: '',
+      QueQuan: '',
+      ThuongTru: '',
+      NoiOHienTaiAddress: '',
+      NoiOHienTaiCityCode: '',
+      NoiOHienTaiCityName: '',
+      NoiOHienTaiDistrictCode: '',
+      NoiOHienTaiDistrictName: '',
+      NoiOHienTaiWardCode: '',
+      NoiOHienTaiWardName: '',
+      QuocTich: '',
+      Cha: '',
+      Me: '',
+      VoChong: '',
+      NguoiDaiDien: '',
+      ChuHo: '',
+      TrangThai: ''
+    },
+    profileBussinessDefault : {
+      Short_Name: '',
+      Name_F: '',
+      HOAddress: '',
+      Phone: '',
+      Fax: '',
+      Website: '',
+      Founding_Date: '',
+      Legal_Name: '',
+      Enterprise_type_id: '',
+      Enterprise_Status: '',
+      Enterprise_Id: '',
+      Enterprise_Code: '',
+      Enterprise_Gdt_Code: '',
+      Site_Id: '',
+      Subunit_Paren_Ent_Id: ''
+    }
   },
   actions: {
     loadInitResource ({state}) {
@@ -47,10 +98,23 @@ export const store = new Vuex.Store({
           if (window.themeDisplay !== undefined && window.themeDisplay !== null) {
             userId = window.themeDisplay.getUserId()
           }
-          // test local
-          // axios.get('http://127.0.0.1:8081/api/users/113', param).then(function (response) {
           axios.get('/o/v1/opencps/users/' + userId, param).then(function (response) {
             let seriable = response.data
+            if (seriable['applicantProfile']) {
+              try {
+                let x = JSON.parse(seriable.applicantProfile)
+                if (seriable['applicantType'] === 'citizen') {
+                  seriable.applicantProfile = Object.assign({}, state.profileCitizenDefault, x)
+                } else {
+                  seriable.applicantProfile = Object.assign({}, state.profileBussinessDefault, x)
+                }
+              } catch (error) {
+                seriable['applicantProfile'] = seriable['applicantType'] === 'citizen' ? state.profileCitizenDefault : state.profileBussinessDefault
+              }
+              
+            } else {
+              seriable['applicantProfile'] = seriable['applicantType'] === 'citizen' ? state.profileCitizenDefault : state.profileBussinessDefault
+            }
             resolve(seriable)
           }).catch(function (xhr) {
             reject(xhr)
@@ -139,6 +203,10 @@ export const store = new Vuex.Store({
           dataPutUser.append('districtCode', filter['applicantDistrictCode'])
           dataPutUser.append('wardCode', filter['applicantWardCode'])
           dataPutUser.append('applicantIdNo', filter['applicantIdNo'])
+          dataPutUser.append('applicantIdDate', filter['applicantIdDate'])
+          if (filter['applicantProfile']) {
+            dataPutUser.append('profile', JSON.stringify(filter['applicantProfile']))
+          }
         }
         axios.put(url, dataPutUser, param).then(result1 => {
           resolve(result1)
@@ -246,6 +314,63 @@ export const store = new Vuex.Store({
           }
           let url = '/o/rest/v2/serverconfigs/' + filter.serverNo
           axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    getServerConfigAll ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let url = '/o/rest/v2/serverconfigs'
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    getUserTichHop ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            }
+          }
+          let url = filter.url
+          axios.get(url, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            reject([])
+          })
+        })
+      })
+    },
+    getVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              state: filter.state
+            }
+          }
+          axios.get('/o/rest/v2/dvcqgsso/authurl', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

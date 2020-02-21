@@ -3,191 +3,37 @@
     <div class="row-header no__hidden_class">
       <div v-if="trangThaiHoSoList !== null" class="background-triangle-big"> <span>{{trangThaiHoSoList[index]['title']}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
-        <div class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
-          <v-combobox
-            v-model="advSearchItems"
-            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục ..."
+        <div v-if="!isMobile" class="flex pl-3 text-ellipsis text-bold" style="position: relative;">
+          <v-text-field
+            v-model="keyword"
+            placeholder="Tìm kiếm theo tên hồ sơ, tên thủ tục, chủ hồ sơ ..."
             solo
-            chips
-            multiple
-            deletable-chips
-            item-value="value"
-            item-text="text"
-            @input="keywordEventChange"
-            content-class="adv__search__select"
-            return-object
-          ></v-combobox>
-          <v-fade-transition>
-            <div v-if="menusss"
-            class="adv__search_container"
-            >
-              <v-layout wrap v-for="(item, indexTool) in advSearchTools" v-bind:key="indexTool" v-if="item.display">
-                <v-flex xs12 sm5>
-                  <v-select
-                    :items="advSearchTools"
-                    v-model="item.value"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="value"
-                    item-text="text"
-                    disabled
-                  ></v-select>
-                </v-flex>
-                <v-flex xs12 sm1 class="text-center">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">drag_handle</v-icon>
-                  </v-btn>
-                </v-flex>
-                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.years"
-                    v-model="itemFilterSupport.year"
-                    label="Chọn năm"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    hide-selected
-                    @change="changeAdvFilterData($event, 'year', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">remove</v-icon>
-                  </v-btn>
-                </v-flex> -->
-                <v-flex xs2 sm2 class="pr-2" v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.months"
-                    v-model="itemFilterSupport.month"
-                    label="Chọn tháng"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, 'month', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <!-- <v-flex xs1 sm1 class="text-center" v-if="item.spec === 'year_month_day'">
-                  <v-btn icon class="my-0 mx-0">
-                    <v-icon size="16">remove</v-icon>
-                  </v-btn>
-                </v-flex> -->
-                <v-flex xs2 sm2 v-if="item.spec === 'year_month_day'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.days"
-                    v-model="itemFilterSupport.day"
-                    label="Chọn ngày"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, 'day', item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'top'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.tops"
-                    v-model="itemFilterSupport.top"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="value"
-                    item-text="name"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'status'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.statusLists"
-                    v-model="itemFilterSupport.status"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'substatus'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.substatusLists"
-                    v-model="itemFilterSupport.substatus"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="itemCode"
-                    item-text="itemName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'agency'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.agencyLists"
-                    v-model="itemFilterSupport.agency"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="administrationCode"
-                    item-text="administrationName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'service'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.serviceLists"
-                    v-model="itemFilterSupport.service"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="serviceCode"
-                    item-text="serviceName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'domain'">
-                  <v-autocomplete
-                    :items="itemFilterSupport.domainLists"
-                    v-model="itemFilterSupport.domain"
-                    :label="item.text + ':'"
-                    single-line
-                    item-value="domainCode"
-                    item-text="domainName"
-                    @change="changeAdvFilterData($event, item.spec, item.index)"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs 12 sm6 v-if="item.spec === 'register'">
-                  <v-text-field 
-                    v-model="itemFilterSupport.register" 
-                    :placeholder="item.text">
-                  </v-text-field>
-                </v-flex>
-              </v-layout>
-              <v-layout wrap>
-                <v-flex xs12 sm10 class="no__selected__items">
-                  <v-autocomplete
-                    :items="advSearchTools"
-                    v-model="advSearchToolsSelected"
-                    label="Chọn điều kiện lọc"
-                    single-line
-                    item-value="text"
-                    item-text="text"
-                    return-object
-                    @change="selectedAdvFilter"
-                    hide-selected
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12 sm2 class="text-right">
-                  <v-btn color="primary" class="mx-0 my-0 mt-1" v-on:click.native="menusss = false">
-                    <v-icon class="mr-2">clear</v-icon>
-                    Quay lại
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </div>
-          </v-fade-transition>
+            @keyup.enter="keywordEventChange"
+          ></v-text-field>
         </div>
         <div class="flex text-right" style="margin-left: auto;max-width: 50px;">
-          <v-btn icon class="my-0 mx-2" v-on:click.native="showAdvFilter">
-            <v-icon size="16">filter_list</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <v-btn v-if="advSearchShow || getCountAdvSearch() === 0" slot="activator" icon class="my-0 mx-0 mr-2 px-0" v-on:click.native="showAdvFilter">
+              <v-icon size="20">fas fa fa-filter</v-icon>
+            </v-btn>
+
+            <v-badge color="primary" v-if="!advSearchShow && getCountAdvSearch() >= 1" left slot="activator">
+              <template slot='badge'>
+                <span style="font-size: 12px;">{{getCountAdvSearch()}}</span>
+              </template>
+              <v-btn icon class="my-0 mr-2 px-0" v-on:click.native="showAdvFilter" style="margin-left: -7px">
+                <v-icon size="20">fas fa fa-filter</v-icon>
+              </v-btn>
+            </v-badge>
+            <span>Tìm kiếm nâng cao</span>
+          </v-tooltip>
         </div>
       </div> 
     </div>
-    <v-layout wrap class="menu_header_list pt-3 pb-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
-      <!-- <template-rendering v-if="menuType === 3" :item="itemFilterSupport" :layout_view="filterForm"></template-rendering> -->
+    <!-- Tìm kiếm nâng cao -->
+    <tim-kiem-nang-cao ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
+    <!--  -->
+    <v-layout wrap class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
@@ -245,11 +91,14 @@
         </v-flex>
       </v-layout>
       <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
-        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow">
-        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index" @click="changeAdvFilterDataChips(item)">
+        v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow"
+      >
+        <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index"
+         @click="changeAdvFilterDataChips(item)" :color="item.key === status || item.key === top ? 'orange' : ''"
+        >
           <v-avatar v-if="item.key === 'deleted'" style="background-color: #da0e0e;border-color: #da0e0e;color: #fff;"><v-icon size="16">delete</v-icon></v-avatar>
           <v-avatar v-else style="background-color: #0b72ba;border-color: #0b72ba;color: #fff;">{{item.count}}</v-avatar>
-          {{item.title}}
+          <span :style="item.key === status || item.key === top ? 'color: #fff' : ''">{{item.title}}</span>
         </v-chip>
       </div>
     </v-layout>
@@ -329,8 +178,9 @@
         <span slot="loader">Loading...</span>
       </v-btn>
     </div>
-    
+    <!--  -->
     <v-data-table
+        id="table-dossier"
         :headers="headers"
         :items="hosoDatas"
         :total-items="hosoDatasTotal"
@@ -362,7 +212,7 @@
               @click.native="toggleAll"
             ></v-checkbox>
           </th>
-          <th
+          <th v-if="!isMobile"
             v-for="header in props.headers"
             :key="header.text"
             :class="header['class'] ? header['class'] : ''"
@@ -373,6 +223,16 @@
               <span>{{ header.text }}</span>
             </v-tooltip>
           </th>
+          <!--  -->
+          <th width="30px" v-if="isMobile">
+            <span>STT</span>
+          </th>
+          <th v-if="isMobile">
+            <span>Tên thủ tục</span>
+          </th>
+          <!--  -->
+          <th width="30px" v-if="isMobile"></th>
+          <!--  -->
         </tr>
       </template>
       <!--  -->
@@ -401,13 +261,13 @@
               <content-placeholders-text :lines="1" />
             </content-placeholders>
             <span v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
-              {{ hosoDatasPage * 15 - 15 + props.index + 1 }}
+              {{ hosoDatasPage * limitRecord - limitRecord + props.index + 1 }}
             </span>
           </td>
-
+          <!-- desktop -->
           <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item.dossierId"
             :class="itemHeader['class_column']"
-            v-if="itemHeader.hasOwnProperty('value')"
+            v-if="!isMobile && itemHeader.hasOwnProperty('value')"
           >
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
@@ -419,6 +279,21 @@
               </span>
             </div>
           </td>
+          <!-- mobile -->
+          <td class="px-1 py-0" v-if="isMobile">
+            <content-placeholders v-if="loadingTable">
+              <content-placeholders-text :lines="1" />
+            </content-placeholders>
+            <div v-else @click="viewDetail(props.item, props.index)" style="cursor: pointer;" :class="{'no_acction__event': !props.item['permission']}">
+              <span class="primary--text" v-if="props.item.dossierNo"> {{ props.item.dossierNo }} - </span><span class="primary--text"> {{ props.item.online ? 'Hồ sơ trực tuyến' : 'Hồ sơ một cửa' }}</span><br>
+              <span class="primary--text text-bold"> {{ props.item.serviceName }} </span><br>
+              <span class="text-bold">Chủ hồ sơ: </span> <span>{{ props.item.applicantName }}</span><br>
+              <span class="text-bold">Tiếp nhận: </span> <span>{{ props.item.receiveDate }}</span><br>
+              <span class="text-bold">Hẹn trả: </span> <span>{{ props.item.dueDate }}</span><br>
+              <span v-if="props.item.dossierOverdue" :class="props.item.dossierOverdue.indexOf('Quá hạn') >= 0 ? 'red--text' : 'green--text'">{{ props.item.dossierOverdue }}</span>
+            </div>
+          </td>
+          <!--  -->
           <td class="text-xs-center px-0 py-0" v-if="!hideAction">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
@@ -427,7 +302,7 @@
               v-if="!loadingTable && ((btnDynamics !== null || btnDynamics !== undefined || btnDynamics !== 'undefined') || 
                 (btnDossierDynamics !== null || btnDossierDynamics !== undefined || btnDossierDynamics !== 'undefined'))">
               <v-btn class="mx-0 my-0" slot="activator" icon @click="processPullBtnDynamics(props.item)">
-                <v-icon>more_vert</v-icon>
+                <v-icon>filter_list</v-icon>
               </v-btn>
               <v-list>
                 <!-- :class="{'no_acction__event': (item['enable'] === 2 || props.item['assigned'] === 0)}" -->
@@ -461,9 +336,9 @@
       </template>
     </v-data-table>
     <div class="text-xs-right layout wrap" style="position: relative;">
-      <div class="flex pagging-table px-2"> 
-        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" custom-class="custom-tiny-class" 
-          @tiny:change-page="paggingData" ></tiny-pagination> 
+      <div class="flex pagging-table px-2" :class="isMobile ? 'mt-2' : ''"> 
+        <tiny-pagination :total="hosoDatasTotal" :page="hosoDatasPage" :numberPerPage="limitRecord" :showLimit="showLimit ? showLimit : false" custom-class="custom-tiny-class" 
+          :limits="limits" @tiny:change-page="paggingData" ></tiny-pagination> 
       </div>
     </div>
     <v-dialog v-model="dialogAction" max-width="700" transition="fade-transition" persistent>
@@ -545,14 +420,7 @@
           </v-toolbar>
           <v-card-text class="py-0 px-0">
             <v-layout wrap>
-              <thong-tin-co-ban-ho-so v-if="dialogActionProcess" :detailDossier="thongtinhoso"></thong-tin-co-ban-ho-so>
-              <!-- showFormBoSungThongTinNgan: {{showFormBoSungThongTinNgan}} <br/> -->
               <phan-cong v-if="dialogActionProcess && showPhanCongNguoiThucHien" v-model="assign_items" :type="type_assign" ></phan-cong>
-              <!-- showTaoTaiLieuKetQua: {{showTaoTaiLieuKetQua}} <br/> -->
-              <!-- showKyPheDuyetTaiLieu: {{showKyPheDuyetTaiLieu}} <br/> -->
-              <tra-ket-qua v-if="dialogActionProcess && showTraKetQua" :resultFiles="returnFiles"></tra-ket-qua>
-              <thu-phi v-if="dialogActionProcess && showThuPhi" v-model="payments" :viaPortal="viaPortalDetail"></thu-phi>
-              <!-- showThucHienThanhToanDienTu: {{showThucHienThanhToanDienTu}} <br/> -->
               <y-kien-can-bo ref="ykiencanbo" v-if="dialogActionProcess && showYkienCanBoThucHien" :user_note="userNote"></y-kien-can-bo>
             </v-layout>
           </v-card-text>
@@ -679,7 +547,7 @@
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
@@ -828,7 +696,7 @@
                   :items="listThuTucHanhChinh"
                   v-model="thuTucHanhChinhSelectedGuide"
                   placeholder="Chọn thủ tục hành chính"
-                  item-text="serviceName"
+                  item-text="displayName"
                   item-value="serviceConfigId"
                   return-object
                   :hide-selected="true"
@@ -952,30 +820,25 @@
 </template>
 
 <script>
-import Vue from 'vue'
+// import Vue from 'vue'
+import $ from 'jquery'
 import TemplateRendering from './pagging/template_rendering.vue'
 import TinyPagination from './pagging/hanghai_pagination.vue'
-import ThongTinCoBanHoSo from './form_xu_ly/ThongTinCoBanHoSo.vue'
 import PhanCong from './form_xu_ly/PhanCongNguoiThucHien.vue'
-import TraKetQua from './form_xu_ly/TraKetQua.vue'
-import XacNhanThuPhi from './form_xu_ly/XacNhanThuPhi.vue'
-import ThuPhi from './form_xu_ly/FeeDetail.vue'
 import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import support from '../store/support.json'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
+import AdvSearch from './TimKiemNangCao'
 
 export default {
   props: ['index'],
   components: {
     'tiny-pagination': TinyPagination,
-    'thong-tin-co-ban-ho-so': ThongTinCoBanHoSo,
     'phan-cong': PhanCong,
-    'tra-ket-qua': TraKetQua,
-    'xac-nhan-thu-phi': XacNhanThuPhi,
-    'thu-phi': ThuPhi,
     'y-kien-can-bo': YkienCanBoThucHien,
     'template-rendering': TemplateRendering,
-    'form-bo-sung-thong-tin': FormBoSungThongTinNgan
+    'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
+    'tim-kiem-nang-cao': AdvSearch
   },
   data: () => ({
     isAdminSuper: false,
@@ -988,121 +851,6 @@ export default {
     advSearchItems: [],
     advObjectSearch: {},
     menusss: false,
-    itemFilterSupport: {
-      years: [
-        {
-          'value': '',
-          'name': 'Lọc theo năm'
-        },
-        {
-          'value': '2017',
-          'name': 'năm 2017'
-        },
-        {
-          'value': '2018',
-          'name': 'năm 2018'
-        },
-        {
-          'value': '2019',
-          'name': 'năm 2019'
-        }
-      ],
-      year: '',
-      months: [
-        {
-          'value': '',
-          'name': 'Lọc theo tháng'
-        },
-        {
-          'value': '1',
-          'name': 'tháng 1'
-        },
-        {
-          'value': '2',
-          'name': 'tháng 2'
-        },
-        {
-          'value': '3',
-          'name': 'tháng 3'
-        },
-        {
-          'value': '4',
-          'name': 'tháng 4'
-        },
-        {
-          'value': '5',
-          'name': 'tháng 5'
-        },
-        {
-          'value': '6',
-          'name': 'tháng 6'
-        },
-        {
-          'value': '7',
-          'name': 'tháng 7'
-        },
-        {
-          'value': '8',
-          'name': 'tháng 8'
-        },
-        {
-          'value': '9',
-          'name': 'tháng 9'
-        },
-        {
-          'value': '10',
-          'name': 'tháng 10'
-        },
-        {
-          'value': '11',
-          'name': 'tháng 11'
-        },
-        {
-          'value': '12',
-          'name': 'tháng 12'
-        }
-      ],
-      month: '',
-      days: [],
-      day: '',
-      tops: [
-        {
-          'value': '',
-          'name': 'toàn bộ'
-        },
-        {
-          'value': 'overdue',
-          'name': 'hồ sơ đang quá hạn cần giải quyết'
-        },
-        {
-          'value': 'delay',
-          'name': 'chậm hạn trả'
-        },
-        {
-          'value': 'coming',
-          'name': 'sắp đến hạn'
-        }
-      ],
-      top: '',
-      statusLists: [],
-      status: '',
-      substatusLists: [
-        {
-          'itemCode': '',
-          'itemName': 'toàn bộ'
-        }
-      ],
-      substatus: '',
-      agencyLists: [],
-      agency: '',
-      serviceLists: [],
-      service: '',
-      domainLists: [],
-      domain: '',
-      keyword: '',
-      register: ''
-    },
-    itemFilterKey: ['year', 'month', 'day', 'top', 'status', 'substatus', 'agency', 'service', 'domain', 'keyword', 'register'],
     menuType: 0,
     type_assign: '',
     assign_items: [],
@@ -1154,6 +902,7 @@ export default {
     hosoDatas: [],
     hosoDatasTotal: 0,
     hosoDatasPage: 1,
+    limitRecord: 15,
     hosoTotalPage: 0,
     selectedDoAction: [],
     selectMultiplePage: [],
@@ -1220,7 +969,15 @@ export default {
         sortable: false
       }
     ],
-    applicantTypeGuide: true
+    applicantTypeGuide: true,
+    limits: [],
+    showLimit: false,
+    advSearchShow: false,
+    filterKeyAdvSearch: ['status','substatus','top','agency','domain','register','fromReceiveDate','toReceiveDate',
+      'fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'
+    ],
+    status: '',
+    top: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1238,29 +995,54 @@ export default {
     },
     activeLoadingDataHoSo () {
       return this.$store.getters.activeLoadingDataHoSo
+    },
+    activePrintBienNhan () {
+      return this.$store.getters.getActivePrintBienNhan
+    },
+    itemsFilterAdv () {
+      return this.$store.getters.getItemsFilterAdv
+    },
+    // advSearchShow () {
+    //   return this.$store.getters.advSearchShow
+    // },
+    isMobile () {
+      return this.$store.getters.getIsMobile
     }
   },
   created () {
-    var vm = this
+    let vm = this
     vm.selectMultiplePage = []
     vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
-    vm.itemFilterSupport['days'] = [{'value': '', 'name': 'Lọc theo ngày'}]
-    for (let i = 1; i <= 31; i++) {
-      let item = {'value': i, 'name': 'Ngày ' + i}
-      vm.itemFilterSupport.days.push(item)
-    }
     vm.$nextTick(function () {
       let query = vm.$router.history.current.query
       let currentQuery = vm.$router.history.current.query
+      if (vm.isMobile) {
+        $('#m-navigation').css('display', 'block')
+      }
       vm.currentQueryState = query
+      vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
+      vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
       if (query.hasOwnProperty('page') && query['page'] !== '1') {
         vm.hosoDatasPage = parseInt(query['page'])
       } else {
         vm.hosoDatasPage = 1
       }
-      // <--- set State advSearch
-      vm.setStateAdvSearch(currentQuery)
-      // ---->
+
+      if (vm.activePrintBienNhan) {
+        vm.itemAction = {
+          title: 'In phiếu biên nhận',
+          form: 'PRINT_03'
+        }
+        $(window).scrollTop(0)
+        setTimeout(function () {
+          let dossier = {
+            dossierId: vm.activePrintBienNhan
+          }
+          vm.doPrint03(dossier)
+          vm.$store.commit('setActivePrintBienNhan', '')
+        }, 500)
+      }
     })
   },
   updated () {
@@ -1323,7 +1105,7 @@ export default {
               }
             }
             vm.$store.commit('setLoadingDynamicBtn', false)
-          })
+          }).catch(function (){})
         }, 200)
       }
     })
@@ -1334,6 +1116,9 @@ export default {
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
+      vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
+      vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1403,9 +1188,6 @@ export default {
         } else {
           vm.doLoadingDataHoSo()
         }
-        // <--- set State advSearch
-        vm.setStateAdvSearch(currentQuery)
-        // ---->
       }
     },
     activeLoadingDataHoSo (val) {
@@ -1432,16 +1214,53 @@ export default {
     dichVuSelectedGuide (val) {
       let vm = this
       if (val) {
+        vm.templateNoGuide = val['templateNo']
         val.dossierTemplateNo = val['templateNo']
-        console.log('val_dichVuSelectedGuide', val)
+        // console.log('val_dichVuSelectedGuide', val)
         vm.$store.dispatch('loadDossierTemplates', val).then(function (result) {
-          for (let key in result) {
-            result[key].fileMark = true
+          for (let key in result['dossierParts']) {
+            result['dossierParts'][key].fileMark = true
           }
-          vm.tphsGuide = result.filter(function (item) {
+          vm.tphsGuide = result['dossierParts'].filter(function (item) {
             return item['partType'] === 1
           })
+        }).catch(function (){})
+      }
+    },
+    trangThaiHoSoList (val) {
+      let vm = this
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
         })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
+      }
+    },
+    index (val) {
+      let vm = this
+      if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('pagination') && vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination']) {
+        vm.limits = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'].filter(function (item) {
+          return Number(item) <= 100
+        })
+        if (vm.limits.length > 0) {
+          vm.limitRecord = vm.trangThaiHoSoList[vm.index]['tableConfig']['pagination'][0]
+          vm.showLimit = true
+        } else {
+          vm.showLimit = false
+          vm.limitRecord = 15
+        }
+      } else {
+        vm.showLimit = false
+        vm.limitRecord = 15
       }
     }
   },
@@ -1489,102 +1308,6 @@ export default {
       vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected'] = vm.selected
       // console.log('selected item', vm.selectMultiplePage)
     },
-    setStateAdvSearch (currentQuery) {
-      // <--------- set State advSearch
-      let vm = this
-      if (currentQuery.hasOwnProperty('adv_renew')) {
-        vm.advSearchItems = []
-        for (let key1 in vm.itemFilterKey) {
-          for (let key in currentQuery) {
-            if (vm.itemFilterKey[key1] === key && currentQuery[key]) {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = currentQuery[key]
-              break
-            } else {
-              vm.itemFilterSupport[vm.itemFilterKey[key1]] = ''
-            }
-          }
-        }
-        for (let key in vm.itemFilterKey) {
-          let spec = vm.itemFilterKey[key]
-          let current = vm.advSearchTools.find(function (item) {
-            return item.spec === spec
-          })
-          if (vm.itemFilterSupport[spec]) {
-            if (spec === 'keyword') {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: -1
-              })
-            } else if (spec === 'year') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day']
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport['day'],
-                  index: 0
-                })
-              }
-            } else if (spec === 'month') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day']
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport[spec] + '_' + vm.itemFilterSupport['day'],
-                  index: 0
-                })
-              }
-            } else if (spec === 'day') {
-              let searchDate = vm.advSearchItems.find(function (item) { return item.spec === 'year_month_day' })
-              if (searchDate) {
-                searchDate['value'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['text'] = 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec]
-                searchDate['index'] = 0
-              } else {
-                vm.advSearchItems.push({
-                  spec: 'year_month_day',
-                  value: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
-                  text: 'year_month_day' + ':' + vm.itemFilterSupport['year'] + '_' + vm.itemFilterSupport['month'] + '_' + vm.itemFilterSupport[spec],
-                  index: 0
-                })
-              }
-            } else {
-              vm.advSearchItems.push({
-                spec: spec,
-                value: spec + ':' + vm.itemFilterSupport[spec],
-                text: spec + ':' + vm.itemFilterSupport[spec],
-                index: current['index']
-              })
-            }
-          }
-        }
-      } else {
-        vm.advSearchItems = []
-      }
-      for (let keyTool in vm.advSearchTools) {
-        vm.advSearchTools[keyTool].display = false
-        vm.advSearchTools[keyTool].disabled = false
-        let current = vm.advSearchItems.find(function (item) {
-          return item.spec === vm.advSearchTools[keyTool].spec
-        })
-        if (current) {
-          vm.advSearchTools[keyTool].display = true
-          vm.advSearchTools[keyTool].disabled = true
-        }
-      }
-      // ------->
-    },
     resend () {
       var vm = this
       vm.doActions(null, vm.buttonConfigItem, null, true)
@@ -1613,12 +1336,12 @@ export default {
       vm.$store.dispatch('loadListThuTucHanhChinh').then(function (result) {
         if (!currentQuery.hasOwnProperty('domain') || (currentQuery.hasOwnProperty('domain') && String(currentQuery.domain) === '')) {
           vm.listThuTucHanhChinh = result.map(thuTuc => {
-            thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+            thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
             return thuTuc
           })
         }
         vm.listThuTuc = result.map(thuTuc => {
-          thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+          thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
           return thuTuc
         })
         if (currentQuery.hasOwnProperty('service_config') && String(currentQuery.service_config) !== '0') {
@@ -1655,7 +1378,7 @@ export default {
           vm.templateNo = ''
         }
         vm.doLoadingDataHoSo()
-      })
+      }).catch(function (){})
     },
     processListDomain (currentQuery) {
       let vm = this
@@ -1678,15 +1401,15 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
-          })
+          }).catch(function (){})
         } else {
           vm.linhVucSelected = null
         }
         // vm.doLoadingDataHoSo()
-      })
+      }).catch(function (){})
     },
     checkPemissionSpecialAction (form, currentUser, thongtinchitiet) {
       var vm = this
@@ -1721,6 +1444,7 @@ export default {
     },
     paggingData (config) {
       let vm = this
+      vm.limitRecord = config.numberPerPage ? config.numberPerPage : 15
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
@@ -1740,12 +1464,11 @@ export default {
       let vm = this
       vm.selected = []
       let currentQuery =vm.$router.history.current.query
-      console.log('currentQuery======', currentQuery)
+
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0 || currentQuery.q.indexOf('originality') > 0) {
           querySet = currentQuery.q
-          // console.log('querySet------', querySet)
         } else {
           querySet = currentQuery['step'] ? currentQuery.q + '&step=' + currentQuery['step'] : currentQuery.q
         }
@@ -1756,6 +1479,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1773,6 +1497,16 @@ export default {
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
             follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
+
+            fromReceiveDate: currentQuery.hasOwnProperty('fromReceiveDate') ? currentQuery.fromReceiveDate : '',
+            toReceiveDate: currentQuery.hasOwnProperty('toReceiveDate') ? currentQuery.toReceiveDate : '',
+            fromDueDate: currentQuery.hasOwnProperty('fromDueDate') ? currentQuery.fromDueDate : '',
+            toDueDate: currentQuery.hasOwnProperty('toDueDate') ? currentQuery.toDueDate : '',
+            fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
+            toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
+            fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : ''
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1781,6 +1515,7 @@ export default {
             /*  test local */
             // queryParams: 'http://127.0.0.1:8081' + querySet,
             page: vm.hosoDatasPage,
+            numberPerPage: vm.limitRecord,
             order: currentQuery.hasOwnProperty('order') ? currentQuery.order : '',
             agency: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : vm.govAgencyCode,
             service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceCode,
@@ -1797,14 +1532,24 @@ export default {
             originality: currentQuery.hasOwnProperty('originality') && currentQuery['originality'] ? currentQuery.originality : originalityDossierDeleted,
             paymentStatus: currentQuery.hasOwnProperty('paymentStatus') ? currentQuery.paymentStatus : '',
             dossierNo: vm.dossierNoKey ? vm.dossierNoKey : '',
-            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : ''
+            follow: currentQuery.hasOwnProperty('follow') ? currentQuery.follow : '',
+            viapostal: currentQuery.hasOwnProperty('viapostal') ? currentQuery.viapostal : '',
+
+            fromReceiveDate: currentQuery.hasOwnProperty('fromReceiveDate') ? currentQuery.fromReceiveDate : '',
+            toReceiveDate: currentQuery.hasOwnProperty('toReceiveDate') ? currentQuery.toReceiveDate : '',
+            fromDueDate: currentQuery.hasOwnProperty('fromDueDate') ? currentQuery.fromDueDate : '',
+            toDueDate: currentQuery.hasOwnProperty('toDueDate') ? currentQuery.toDueDate : '',
+            fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
+            toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
+            fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : ''
           }
         }
-        console.log('filter doLoadingData', filter)
+        // console.log('filter doLoadingData', filter)
         vm.$store.dispatch('loadingDataHoSo', filter).then(function (result) {
           vm.hosoDatas = result.data
           vm.hosoDatasTotal = result.total
-          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / 15)
+          vm.hosoTotalPage = Math.ceil(vm.hosoDatasTotal / vm.limitRecord)
           /*
           if (window.themeDisplay !== null && window.themeDisplay !== undefined && String(window.themeDisplay.getUserId()) === '20139') {
             vm.isAdminSuper = true
@@ -1818,7 +1563,7 @@ export default {
               }
               vm.selectMultiplePage.push(item)
             }
-            console.log('selectMultiplePage', vm.selectMultiplePage)
+            // console.log('selectMultiplePage', vm.selectMultiplePage)
           }
           vm.selected = vm.selectMultiplePage[vm.hosoDatasPage - 1]['selected']
         }).catch(reject => {
@@ -1840,7 +1585,7 @@ export default {
               vm.dossierCounting = []
             }
             vm.dossierCountingShow = true
-          })
+          }).catch(function (){})
         }, 200)
       } else {
         vm.dossierCountingShow = false
@@ -1891,17 +1636,20 @@ export default {
     },
     changeServiceConfigsGuide (item) {
       let vm = this
-      if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
-        vm.listDichVuGuide = item.options
-      } else {
-        vm.listDichVuGuide = []
-      }
-      if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
-        vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
-        vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
-      } else {
-        vm.dichVuSelectedGuide = null
-      }
+      vm.listDichVuGuide = []
+      setTimeout (function () {
+        if (item !== null && item !== 'null' && item !== undefined && item.hasOwnProperty('options')) {
+          vm.listDichVuGuide = item.options
+        } else {
+          vm.listDichVuGuide = []
+        }
+        if (vm.listDichVuGuide !== null && vm.listDichVuGuide !== undefined && vm.listDichVuGuide !== 'undefined' && vm.listDichVuGuide.length > 0) {
+          vm.dichVuSelectedGuide = vm.listDichVuGuide[0]
+          vm.templateNoGuide = vm.dichVuSelectedGuide.templateNo
+        } else {
+          vm.dichVuSelectedGuide = null
+        }
+      }, 300)
     },
     changeDomain (item) {
       // console.log('change Domain')
@@ -1915,10 +1663,10 @@ export default {
           }
           vm.$store.dispatch('getServiceinfoFilter', domain).then(result => {
             vm.listThuTucHanhChinh = result.map(thuTuc => {
-              thuTuc['displayName'] = thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
+              thuTuc['displayName'] = thuTuc['serviceCodeDVCQG'] ? thuTuc['serviceCodeDVCQG'] + ' - ' + thuTuc['serviceName'] : thuTuc['serviceCode'] + ' - ' + thuTuc['serviceName']
               return thuTuc
             })
-          })
+          }).catch(function (){})
           // vm.listThuTucHanhChinh = vm.listThuTuc.filter(function (itemThuTuc) {
           //   return (itemThuTuc.serviceCode.split(itemThuTuc.serviceCode.match(/\d+/g)[0])[0] === item.domainCode)
           // })
@@ -2001,7 +1749,6 @@ export default {
       vm.buttonConfigItem = item
       //
       vm.itemAction = item
-      // console.log('itemAction++++++++++++', item)
       vm.indexAction = index
       if (String(item.form) === 'NEW' || String(item.form) === 'NEW_GROUP') {
         let isOpenDialog = true
@@ -2009,23 +1756,10 @@ export default {
           isOpenDialog = false
         }
         if (isOpenDialog) {
-          // vm.thuTucHanhChinhSelected = null
           vm.dialogAction = true
         } else {
-          // if (String(item.form) === 'NEW') {
-            vm.doCreateDossier()
-          // } else {
-          //   let queryString = ''
-          //   let processOptionId = vm.dichVuSelected ? vm.dichVuSelected.processOptionId : ''
-          //   queryString = '?service_config=' + newQuery.service_config + '&serviceCode=' + vm.serviceCode + '&template_no=' + newQuery.template_no +
-          //   '&processOptionId=' + processOptionId + '&govAgencyCode=' + vm.govAgencyCode + '&groupDossierId='
-          //   console.log('queryString', queryString)
-          //   vm.$router.push({
-          //     path: '/danh-sach-ho-so/' + vm.index + '/tiep-nhan-nhom-ho-so' + queryString,
-          //   })
-          // }
+          vm.doCreateDossier()
         }
-        // console.log('isOpenDialog++++++++', isOpenDialog)
       } else if (String(item.form) === 'UPDATE') {
        vm.$router.push({
           path: '/danh-sach-ho-so/' + vm.index + '/ho-so/' + dossierItem.dossierId + '/' + vm.itemAction.form,
@@ -2056,10 +1790,26 @@ export default {
         // In văn bản mới nhất đã phê duyệt
         vm.doPrint03(dossierItem, item, index, isGroup)
       } else if (String(item.form) === 'GUIDING') {
+        vm.thuTucHanhChinhSelectedGuide = ''
+        vm.dichVuSelectedGuide = ''
+        vm.tphsGuide = []
+        if (vm.thuTucHanhChinhSelected) {
+          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+        }
         vm.dialog_printGuide = true
+        vm.$refs.formGuide.resetValidation()
       } else if (String(item.form) === 'DENIED') {
         vm.thuTucHanhChinhSelectedGuide = ''
         vm.dichVuSelectedGuide = ''
+        if (vm.thuTucHanhChinhSelected) {
+          vm.thuTucHanhChinhSelectedGuide = vm.thuTucHanhChinhSelected
+          vm.listDichVuGuide = vm.thuTucHanhChinhSelectedGuide.hasOwnProperty('options') ? vm.thuTucHanhChinhSelectedGuide['options'] : ''
+          vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
+          vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
+        }
         vm.dialog_denied = true
         vm.$refs.formDenied.resetValidation()
       } else if (String(item.form) === 'PREVIEW') {
@@ -2148,11 +1898,11 @@ export default {
       vm.$store.dispatch('doPrint01', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+      }).catch(function (){})
     },
     doPrint02 (dossierItem, item, index, isGroup) {
       let vm = this
-      console.log('vm.selectedDoAction', vm.selectedDoAction)
+      // console.log('vm.selectedDoAction', vm.selectedDoAction)
       if (vm.thuTucHanhChinhSelected === null || vm.thuTucHanhChinhSelected === undefined || vm.thuTucHanhChinhSelected === 'undefined') {
         alert('Loại thủ tục bắt buộc phải chọn')
       } else {
@@ -2171,7 +1921,7 @@ export default {
         vm.$store.dispatch('doPrint02', filter).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('dialogPDFPreview').src = result
-        })
+        }).catch(function (){})
       }
     },
     doPrint03 (dossierItem, item, index, isGroup) {
@@ -2180,12 +1930,30 @@ export default {
       vm.dialogPDF = true
       let filter = {
         dossierId: dossierItem.dossierId,
-        document: item.document
+        document: item ? item.document : ''
       }
-      vm.$store.dispatch('doPrint03', filter).then(function (result) {
-        vm.dialogPDFLoading = false
-        document.getElementById('dialogPDFPreview').src = result
-      })
+      let counter = 0
+      let callServer = function() {
+        setTimeout(function () {
+          vm.$store.dispatch('doPrint03', filter).then(function (result) {
+            if (result === 'pending' && counter <= 10) {
+              counter += 1
+              callServer()
+            } else {
+              if (counter > 10) {
+                vm.dialogPDFLoading = false
+              } else {
+                vm.dialogPDFLoading = false
+                vm.dialogPDF = true
+                setTimeout(function () {
+                  document.getElementById('dialogPDFPreview').src = result
+                }, 100)
+              }
+            }
+          })
+        }, 1000)
+      }
+      callServer()
     },
     doGuiding (type) {
       let vm = this
@@ -2283,7 +2051,7 @@ export default {
       vm.$store.dispatch('doPrint03', filter).then(function (result) {
         vm.dialogPDFLoading = false
         document.getElementById('dialogPDFPreview').src = result
-      })
+      }).catch(function (){})
     },
     doActions (dossierItem, item, index, isGroup) {
       let vm = this
@@ -2319,8 +2087,8 @@ export default {
                 path: '/danh-sach-ho-so/' + vm.index + '/xu-ly-ho-so',
                 query: query
               })
-            })
-          })
+            }).catch(function (){})
+          }).catch(function (){})
         } else {
           alert('Chọn hồ sơ để thao tác')
         }
@@ -2466,7 +2234,7 @@ export default {
             let filter = {
               dossierId: vm.selectedDoAction[key]['dossierId']
             }
-            console.log('filter Restore', filter)
+            // console.log('filter Restore', filter)
             if (vm.selectedDoAction[key]['originality']) {
               vm.$store.dispatch('restoreDossier', filter).then(function (result) {
                 restoreCounter += 1
@@ -2504,7 +2272,7 @@ export default {
             }
             filter['dossierId'] = deleteIds
             vm.$store.dispatch('deleteDossierPatch', filter).then(function (result) {
-            })
+            }).catch(function (){})
           } else {
             alert('Chọn hồ sơ để thực hiện')
           }
@@ -2523,7 +2291,7 @@ export default {
                 q: currentQuery['q']
               }
             })
-          })
+          }).catch(function (){})
         }
       } else {
         return false
@@ -2561,7 +2329,7 @@ export default {
             vm.loadingAction = false
           })
         }
-      })
+      }).catch(function (){})
       //
     },
     doSubmitDialogAction (item) {
@@ -2589,7 +2357,7 @@ export default {
       if (item.dossierStatus === '' || item.dossierSubStatus === '') {
         vm.$store.dispatch('pullNextactions', filter).then(result => {
           vm.btnDossierDynamics = result
-        })
+        }).catch(function (){})
       } else {
         vm.btnStepsDynamics = []
         var getbuttonAction = [vm.$store.dispatch('pullNextactions', filter), vm.$store.dispatch('pullBtnConfigStep', filter)]
@@ -2599,7 +2367,7 @@ export default {
         }).catch(reject => {
           vm.$store.dispatch('pullNextactions', filter).then(result => {
             vm.btnDossierDynamics = result
-          })
+          }).catch(function (){})
         })
       }
       // }
@@ -2643,7 +2411,7 @@ export default {
             vm.$router.push({
               path: vm.$router.history.current.path + queryString
             })
-          })
+          }).catch(function (){})
         } else {
           return false
         }
@@ -2693,7 +2461,7 @@ export default {
                 }
               } else {}
             })
-          })
+          }).catch(function (){})
         }
       }
     },
@@ -2833,193 +2601,41 @@ export default {
           vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
         }
       } else {
-        alert('Bạn không có quyền thao tác với hồ sơ này')
+        if (item['originality'] === 1) {
+          vm.$router.push('/danh-sach-ho-so/' + this.index + '/chi-tiet-ho-so/' + item['dossierId'])
+        } else {
+          alert('Bạn không có quyền thao tác với hồ sơ này')
+        }
       }
     },
     keywordEventChange (data) {
       let vm = this
-      vm.selectMultiplePage = []
-      console.log('keywordEventChange', data)
-      vm.advObjectSearch = {}
-      for (let key in data) {
-        if (typeof data[key] === 'string' && data[key] !== null && data[key] !== undefined && data[key] !== 'undefined') {
-          if (!data[key].startsWith('keyword:') && !data[key].startsWith('year_month_day:') && !data[key].startsWith('top:') &&
-            !data[key].startsWith('status:') && !data[key].startsWith('substatus:') && !data[key].startsWith('agency:') &&
-            !data[key].startsWith('service:') && !data[key].startsWith('domain:') && !data[key].startsWith('register:')) {
-            vm.advObjectSearch['keyword'] = data[key]
-          }
-          if (data[key].startsWith('keyword:')) {
-            vm.advObjectSearch['keyword'] = data[key].replace('keyword:', '')
-          } else {
-            for (let keyTool in vm.advSearchItems) {
-              if (data[key].startsWith(vm.advSearchItems[keyTool].spec + ':')) {
-                vm.advObjectSearch[vm.advSearchItems[keyTool].spec] = data[key].replace(vm.advSearchItems[keyTool].spec + ':', '')
-              }
-            }
-          }
-        } else {
-          let newText = data[key].value
-          vm.advObjectSearch[data[key].spec] = newText.replace(data[key].spec + ':', '')
-        }
-      }
-      vm.advSearchItems = []
-      for (let key in vm.advObjectSearch) {
-        if (!vm.advObjectSearch.hasOwnProperty(key)) continue
-        let value = vm.advObjectSearch[key]
-        if (typeof value === 'string' && value !== null && value !== undefined && value !== '') {
-          if (key === 'keyword') {
-            vm.advSearchItems.push({
-              spec: key,
-              value: key + ':' + value,
-              text: key + ':' + value,
-              index: -1
-            })
-          } else {
-            let toolIndex = -2
-            for (let keyTool in vm.advSearchTools) {
-              if (vm.advSearchTools[keyTool].spec === key) {
-                toolIndex = vm.advSearchTools[keyTool].index
-                break
-              }
-            }
-            vm.advSearchItems.push({
-              spec: key,
-              value: key + ':' + value,
-              text: key + ':' + value,
-              index: toolIndex
-            })
-          }
-        } else if (typeof value !== 'string' && value !== null && value !== undefined && value !== '') {
-          vm.advSearchItems.push({
-            spec: key,
-            value: key + ':' + value.value,
-            text: key + ':' + value.value,
-            index: key + ':' + value.index
-          })
-        }
-      }
-      for (let keyTool in vm.advSearchTools) {
-        vm.advSearchTools[keyTool].display = false
-        vm.advSearchTools[keyTool].disabled = false
-        if (vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== null && vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== undefined &&
-          vm.advObjectSearch[vm.advSearchTools[keyTool].spec] !== '') {
-          vm.advSearchTools[keyTool].display = true
-          vm.advSearchTools[keyTool].disabled = true
-        }
-      }
-      console.log('vm.advSearchItems', vm.advSearchItems)
       vm.doRedirectFilter()
-    },
-    selectedAdvFilter (item) {
-      let vm = this
-      vm.advSearchTools[item.index].display = true
-      vm.advSearchTools[item.index].disabled = true
-      let hasKey = false
-      for (let key in vm.advSearchItems) {
-        if (vm.advSearchItems[key].index === item.index) {
-          hasKey = true
-          break
-        }
-      }
-      if (!hasKey) {
-        vm.advSearchItems.push({
-          spec: vm.advSearchTools[item.index].spec,
-          value: vm.advSearchTools[item.index].spec + ':' + '__',
-          text: vm.advSearchTools[item.index].spec + ':' + '__',
-          index: item.index
-        })
-      }
     },
     showAdvFilter () {
       let vm = this
-      vm.menusss = !vm.menusss
-      vm.$store.dispatch('getStatusLists').then(function (result) {
-        vm.itemFilterSupport.statusLists = result
-        let statusDeleted = {
-          itemCode: 'deleted',
-          itemName: 'Đã xóa'
+      vm.advSearchShow = !vm.advSearchShow
+      setTimeout(function () {
+        if (vm.$refs.advSearch) {
+          vm.$refs.advSearch.setShow(vm.advSearchShow)
         }
-        if (vm.getUser('Administrator_data')) {
-          vm.itemFilterSupport.statusLists.push(statusDeleted)
-        }
-      })
-      let filter = {
-        itemCode: ''
-      }
-      vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
-        vm.itemFilterSupport.substatusLists = result
-      })
-      vm.$store.dispatch('getAgencyLists').then(function (result) {
-        vm.itemFilterSupport.agencyLists = result
-      })
-      vm.$store.dispatch('getServiceLists').then(function (result) {
-        vm.itemFilterSupport.serviceLists = result
-      })
-      vm.$store.dispatch('getDomainLists').then(function (result) {
-        vm.itemFilterSupport.domainLists = result
-      })
+      }, 200)
     },
-    changeAdvFilterData (data, spec, index) {
-      let vm = this
-      console.log('data change advSearch', data, spec, index)
-      if (spec === 'status') {
-        let filter = {
-          itemCode: data
-        }
-        vm.$store.dispatch('getSubstatusLists', filter).then(function (result) {
-          vm.itemFilterSupport.substatusLists = result
-        })
-      }
-      let valueFilter = data
-      if (spec === 'year') {
-        vm.itemFilterSupport.year = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else if (spec === 'month') {
-        vm.itemFilterSupport.month = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else if (spec === 'day') {
-        vm.itemFilterSupport.day = data
-        valueFilter = vm.itemFilterSupport.year + '_' + vm.itemFilterSupport.month + '_' + vm.itemFilterSupport.day
-        spec = 'year_month_day'
-      } else {
-        /* set State advSearch */
-        vm.itemFilterSupport[spec] = data
-      }
-      for (let key in vm.advSearchItems) {
-        console.log('adv Search index', vm.advSearchItems[key].index)
-        if (vm.advSearchItems[key].index === index) {
-          console.log('vm.itemFilterSupport2', vm.itemFilterSupport)
-          vm.advSearchItems[key].value = spec + ':' + valueFilter
-          vm.advSearchItems[key].text = spec + ':' + valueFilter
-          break
-        }
-      }
-      vm.doRedirectFilter()
-    },
+
     doRedirectFilter () {
       let vm = this
       vm.selectMultiplePage = []
       let current = vm.$router.history.current
       let newQuery = current.query
       let queryString = '?'
+      newQuery['keyword'] = vm.keyword
+      newQuery['status'] = vm.status
+      newQuery['top'] = vm.top
       for (let key in newQuery) {
-        if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined &&
-          key !== 'top' && key !== 'status' && key !== 'substatus' && key !== 'agency' && key !== 'service' && key !== 'domain' &&
-          key !== 'register' && key !== 'year' && key !== 'month' && key !== 'day' && key !== 'adv_renew' && key !== 'keyword') {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== 'adv_renew') {
           queryString += key + '=' + newQuery[key] + '&'
-        }
-      }
-      for (let key in vm.advSearchItems) {
-        let currentItemFilter = vm.advSearchItems[key]
-        if (currentItemFilter.spec === 'year_month_day') {
-          let currentYearMonth = currentItemFilter.text.replace(currentItemFilter.spec + ':', '')
-          const [year, month, day] = currentYearMonth.split('_')
-          queryString += 'year' + '=' + year + '&' + 'month' + '=' + month + '&' + 'day' + '=' + day + '&'
-        } else {
-          console.log('currentItemFilter.spec', currentItemFilter.text.replace(currentItemFilter.spec + ':', ''))
-          queryString += currentItemFilter.spec + '=' + currentItemFilter.text.replace(currentItemFilter.spec + ':', '') + '&'
         }
       }
       queryString += 'adv_renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
@@ -3030,54 +2646,18 @@ export default {
     },
     changeAdvFilterDataChips (item) {
       let vm = this
-      // console.log('changeAdvFilterDataChips', vm.advSearchItems)
-      let indexPush = -2
-      for (let key in vm.advSearchTools) {
-        if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-          if (vm.advSearchTools[key]['spec'] === 'top') {
-            indexPush = vm.advSearchTools[key]['index']
-            vm.advSearchTools[key].display = true
-            vm.advSearchTools[key].disabled = true
-          }
-        } else {
-          if (vm.advSearchTools[key]['spec'] === 'status') {
-            indexPush = vm.advSearchTools[key]['index']
-            vm.advSearchTools[key].display = true
-            vm.advSearchTools[key].disabled = true
-          }
-        }
-      }
-      let typeSearch = ''
       if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-        typeSearch = 'top'
-      } else {
-        typeSearch = 'status'
-      }
-      let noFilterData = true
-      for (let key in vm.advSearchItems) {
-        if (vm.advSearchItems[key]['spec'] === 'status') {
-          if (item.key !== 'delay' && item.key !== 'overdue' && item.key !== 'coming') {
-            vm.advSearchItems[key].value = 'status' + ':' + item.key
-            vm.advSearchItems[key].text = 'status' + ':' + item.key
-            noFilterData = false
-            break
-          }
-        } else if (vm.advSearchItems[key]['spec'] === 'top') {
-          if (item.key === 'delay' || item.key === 'overdue' || item.key === 'coming') {
-            vm.advSearchItems[key].value = 'top' + ':' + item.key
-            vm.advSearchItems[key].text = 'top' + ':' + item.key
-            noFilterData = false
-            break
-          }
+        if (vm.top === item.key) {
+          vm.top = ''
+        } else {
+          vm.top = item.key
         }
-      }
-      if (noFilterData) {
-        vm.advSearchItems.push({
-          spec: typeSearch,
-          value: typeSearch + ':' + item.key,
-          text: typeSearch + ':' + item.key,
-          index: indexPush
-        })
+      } else {
+        if (vm.status === item.key) {
+          vm.status = ''
+        } else {
+          vm.status = item.key
+        }
       }
       vm.doRedirectFilter()
     },
@@ -3101,6 +2681,18 @@ export default {
       }).catch(reject => {
         vm.loadingAction = false
       })
+    },
+    getCountAdvSearch() {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let count = 0
+      for (let index in vm.filterKeyAdvSearch) {
+        if (newQuery.hasOwnProperty(vm.filterKeyAdvSearch[index]) && newQuery[vm.filterKeyAdvSearch[index]]) {
+          count+=1
+        }
+      }
+      return count
     },
     validate () {
       // validate your form , if you don't have validate prop , default validate pass .

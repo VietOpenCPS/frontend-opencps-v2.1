@@ -92,7 +92,7 @@
           }
           vm.loadingCounter()
           vm.loading = false
-        })
+        }).catch(function(){})
       })
     },
     updated () {
@@ -191,7 +191,7 @@
             }
           }
           vm.loading = false
-        })
+        }).catch(function(){})
       }
     }
   }

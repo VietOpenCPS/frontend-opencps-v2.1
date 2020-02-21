@@ -70,7 +70,8 @@
       interVal: '',
       loading: true,
       isKios: true,
-      wrapStyle: true
+      wrapStyle: true,
+      isMobile: false
     }),
     created () {
       var vm = this
@@ -112,6 +113,13 @@
         $('.mWrapper > nav').css('display', 'none')
         $('.mWrapper > footer').css('display', 'none')
       })
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -133,6 +141,14 @@
           vm.wrapStyle = false
         } else {
           vm.wrapStyle = true
+        }
+      },
+      isMobile (val) {
+        let vm = this
+        if (val) {
+          vm.fullScreen = true
+        } else {
+          vm.fullScreen = false
         }
       }
     },
@@ -177,6 +193,11 @@
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
           }
         })
+      },
+      onResize () {
+        let vm = this
+        vm.isMobile = window.innerWidth < 1024
+        vm.$store.commit('setIsMobile', vm.isMobile)
       }
     }
   }

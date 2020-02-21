@@ -10,7 +10,7 @@
     <v-card flat color="#ffffff" class="pt-2 pb-4">
       <v-flex xs12 class="text-xs-center pt-2" id="nav-calling">
         <v-layout wrap class="white py-0">
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="serviceGroupList"
@@ -19,14 +19,28 @@
               item-text="title"
               item-value="sibling"
               :hide-selected="true"
-              clearable
               @change="changeGroup"
               box
               return-object
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
+            <v-autocomplete
+              class="select-border"
+              :items="bookingMethods"
+              v-model="bookingMethodSelected"
+              label="Chọn loại đăng ký xếp hàng"
+              item-text="text"
+              item-value="value"
+              :hide-selected="true"
+              @change="changeMethod"
+              box
+              :disabled="isCalling"
+              :readonly="serviceGroupSelected['className'] === 'DOSSIER' || serviceGroupSelected['key'] === 'API'"
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="serviceInfoList"
@@ -41,7 +55,7 @@
               :disabled="isCalling"
             ></v-autocomplete>
           </v-flex>
-          <v-flex xs4 class="px-2">
+          <v-flex xs3 class="px-2">
             <v-autocomplete
               class="select-border"
               :items="stateList"
@@ -69,17 +83,17 @@
             <div class="d-inline-block">
               <h1 class="my-2" style="color: green">SỐ ĐANG GỌI</h1>
               <v-chip class="d-inline-block text-xs-center pt-4" label color="#3fa8f1" text-color="white" style="width:250px;height:100px;font-size:32px;color:#ffffff">
-                <span v-if="currentBooking">{{currentBooking.codeNumber}}</span>
+                <span v-if="bookingCalling">{{bookingCalling.codeNumber}}</span>
                 <span v-else>-- -- --</span>
               </v-chip>
             </div>
-            <div v-if="currentBooking" class="d-inline-block ml-3 pt-1" style="position: absolute;top:50px">
+            <div v-if="bookingCalling" class="d-inline-block ml-3 pt-1" style="position: absolute;top:50px">
               <v-btn
                 :loading="loadingCalling"
                 :disabled="loadingCalling"
                 color="red"
                 class="white--text mb-1"
-                @click="ignoreBooking(currentBooking)"
+                @click="ignoreBooking(bookingCalling, true)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>clear</v-icon> &nbsp;
@@ -91,7 +105,7 @@
                 :disabled="loadingCalling"
                 color="#3fa8f1"
                 class="white--text my-0"
-                @click="receiveBooking(currentBooking)"
+                @click="receiveBooking(bookingCalling, true)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>save</v-icon> &nbsp;
@@ -100,10 +114,10 @@
               <br>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || !currentBooking['speaking']"
+                :disabled="loadingCalling || !bookingCalling['speaking']"
                 color="primary"
                 class="white--text mt-1"
-                @click="callBack(currentBooking)"
+                @click="callBack(bookingCalling)"
                 style="width: 120px;"
               >
                 <v-icon class="ml-0" right dark>cached</v-icon> &nbsp;
@@ -165,22 +179,22 @@
             <td class="text-xs-center text-bold py-1" width="350px">
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1 || isCalling"
-                :color="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1  ? 'grey' : 'primary'"
+                :disabled="loadingCalling || bookingCalling['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1 || isCalling"
+                :color="bookingCalling['codeNumber'] === props.item['codeNumber'] || props.item['state'] != 1  ? 'grey' : 'primary'"
                 class="white--text"
                 @click="callingBooking(props.item)"
                 style="width: 100px;"
               >
-                <span v-if="currentBooking['codeNumber'] === props.item['codeNumber'] || props.item['state'] == 2">Đang gọi...</span>
+                <span v-if="bookingCalling['codeNumber'] === props.item['codeNumber'] || props.item['state'] == 2">Đang gọi...</span>
                 <span v-else>Gọi số</span>
               </v-btn>
               <v-btn
                 :loading="loadingCalling"
-                :disabled="loadingCalling || currentBooking['codeNumber'] === props.item['codeNumber'] || 
+                :disabled="loadingCalling || bookingCalling['codeNumber'] === props.item['codeNumber'] || 
                 props.item['state'] === 4 || props.item['state'] === 3 || isCalling"
-                :color="currentBooking['codeNumber'] === props.item['codeNumber'] ? 'grey' : 'red'"
+                :color="bookingCalling['codeNumber'] === props.item['codeNumber'] ? 'grey' : 'red'"
                 class="white--text ml-2"
-                @click="ignoreBooking(props.item)"
+                @click="ignoreBooking(props.item, false)"
                 style="width: 100px;"
               >
                 Bỏ qua
@@ -190,7 +204,7 @@
                 :disabled="loadingCalling || props.item['state'] === 4"
                 color="#3fa8f1"
                 class="white--text ml-2"
-                @click="receiveBooking(props.item)"
+                @click="receiveBooking(props.item, false)"
                 style="width: 100px;"
               >
                 Tiếp nhận
@@ -350,10 +364,16 @@ export default {
         sortable: false
       }
     ],
+    bookingCalling: '',
     currentBooking : '',
     isCalling: false,
     serviceGroupList: [],
-    serviceGroupSelected: ''
+    serviceGroupSelected: '',
+    bookingMethods: [
+      {text: 'Trực tiếp', value: false},
+      {text: 'Trực tuyến', value: true}
+    ],
+    bookingMethodSelected: false
   }),
   computed: {
   },
@@ -424,8 +444,8 @@ export default {
       }
       vm.$store.dispatch('getServerConfig', filter).then(function (result) {
         let configs = JSON.parse(result.configs)
-        vm.serviceGroupList = configs
-        vm.apiRelease = configs.filter(function (item) {
+        vm.serviceGroupList = configs['bookings']
+        vm.apiRelease = configs['bookings'].filter(function (item) {
           return item.key === 'API'
         })[0]['url']
       })
@@ -433,6 +453,10 @@ export default {
     changeGroup () {
       let vm = this
       vm.serviceInfoSelected = ''
+      vm.filterBooking()
+    },
+    changeMethod () {
+      let vm = this
       vm.filterBooking()
     },
     getGateLists () {
@@ -449,18 +473,30 @@ export default {
         let newQuery = current.query
         let queryString = '?'
         newQuery['service'] = vm.serviceInfoSelected ? vm.serviceInfoSelected : ''
-        if (vm.serviceGroupSelected['config'] && vm.serviceGroupSelected['key'] === 'booking') {
+        if (vm.serviceGroupSelected && vm.serviceGroupSelected['config'] && vm.serviceGroupSelected['key'] === 'booking') {
           newQuery['service'] = vm.serviceGroupSelected['config']
+        } else {
+          newQuery['service'] = ''
         }
-        if (vm.serviceGroupSelected['key'] === 'booking' && vm.serviceGroupSelected['className'] === 'DOSSIER') {
+        if (vm.serviceGroupSelected && vm.serviceGroupSelected['key'] === 'booking' && vm.serviceGroupSelected['className'] === 'DOSSIER') {
           newQuery['service'] = ''
           newQuery['keyBooking'] = ''
           newQuery['className'] = vm.serviceGroupSelected['className']
+          vm.bookingMethodSelected = false
+        } else {
+          newQuery['className'] = ''
         }
-        if (vm.serviceGroupSelected['key'] === 'API') {
+        if (vm.serviceGroupSelected && vm.serviceGroupSelected['key'] === 'API') {
           newQuery['service'] = ''
           newQuery['className'] = ''
           newQuery['keyBooking'] = vm.serviceGroupSelected['key']
+        } else {
+          newQuery['keyBooking'] = ''
+        }
+        if (vm.serviceGroupSelected['key'] === 'API') {
+          newQuery['online'] = ''
+        } else {
+          newQuery['online'] = vm.bookingMethodSelected
         }
         newQuery['state'] = vm.stateSelected
         for (let key in newQuery) {
@@ -477,65 +513,75 @@ export default {
       }, 200)
     },
     changeService () {
-      var vm = this
+      let vm = this
       vm.filterBooking()
     },
     changeState () {
-      var vm = this
+      let vm = this
       vm.filterBooking()
     },
     loadBooking () {
-      var vm = this
+      let vm = this
       let count = 0
       vm.loading = true
       let currentQuery = vm.$router.history.current.query
       let bookingDossier = []
       let bookingEform = []
-      let filterEform = {
-        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
-        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
-        className: 'EFORM'
+      if (vm.serviceGroupSelected) {
+        let filterEform = {
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+          state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+          className: 'EFORM',
+          bookingFrom: vm.getCurrentDate(),
+          bookingTo: vm.getCurrentDate(),
+          online: vm.bookingMethodSelected
+        }
+        vm.$store.dispatch('getBooking', filterEform).then(function (result) {
+          count+=1
+          vm.loading = false
+          if (result.data) {
+            bookingEform = result.data
+          }
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        }).catch(reject => {
+          count+=1
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+          vm.loading = false
+        })
+        // 
+        let filterDossier = {
+          service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
+          state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
+          className: 'DOSSIER',
+          bookingFrom: vm.getCurrentDate(),
+          bookingTo: vm.getCurrentDate(),
+          online: vm.bookingMethodSelected
+        }
+        vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
+          count+=1
+          vm.loading = false
+          if (result.data) {
+            bookingDossier = result.data
+          }
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        }).catch(reject => {
+          count+=1
+          vm.loading = false
+          if (count === 2) {
+            vm.mergeBooking(bookingDossier, bookingEform)
+          }
+        })
+      } else {
+        vm.bookingList = []
       }
-      vm.$store.dispatch('getBooking', filterEform).then(function (result) {
-        count+=1
-        vm.loading = false
-        if (result.data) {
-          bookingEform = result.data
-        }
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      }).catch(reject => {
-        count+=1
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-        vm.loading = false
-      })
-      // 
-      let filterDossier = {
-        service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
-        state: currentQuery.hasOwnProperty('state') ? currentQuery.state : vm.stateSelected,
-        className: 'DOSSIER'
-      }
-      vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
-        count+=1
-        vm.loading = false
-        if (result.data) {
-          bookingDossier = result.data
-        }
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      }).catch(reject => {
-        count+=1
-        vm.loading = false
-        if (count === 2) {
-          vm.mergeBooking(bookingDossier, bookingEform)
-        }
-      })
     },
-    mergeBooking (bookingEform, bookingDossier) {
+    mergeBooking (bookingDossier, bookingEform) {
       let vm = this
       let current = vm.$router.history.current
       let newQuery = current.query
@@ -551,7 +597,9 @@ export default {
         let bookingDossierArray = []
         let filter = {
           state: 4,
-          className: 'DOSSIER'
+          className: 'DOSSIER',
+          bookingFrom: vm.getCurrentDate(),
+          bookingTo: vm.getCurrentDate()
         }
         vm.$store.dispatch('getBooking', filter).then(function (resultBooking) {
           if (resultBooking.data) {
@@ -562,7 +610,7 @@ export default {
           if (bookingDossierRealease.length > 0) {
             let lengthBooking = bookingDossierRealease.length
             for (let i = 0; i < lengthBooking; i++) {
-              let dossierId = bookingDossierRealease[i]['codeNumber'].split('-')[2]
+              let dossierId = bookingDossierRealease[i]['classPK']
               let lengthDossier = result.length
               for (let j = 0; j < lengthDossier; j++) {
                 if (String(dossierId) === String(result[j]['dossierId'])) {
@@ -581,7 +629,7 @@ export default {
             } else if (newQuery.hasOwnProperty('keyBooking') && newQuery.keyBooking === 'API') {
               vm.bookingList = [].concat(bookingRelease)
             } else {
-              vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
+              vm.bookingList = [].concat(bookingEform)
             }
             // vm.bookingList = [].concat(bookingEform, bookingDossier, bookingRelease)
             let sortBooking = function (bookingList) {
@@ -645,7 +693,9 @@ export default {
         service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
         state: 2,
         className: 'EFORM',
-        gateNumber: vm.currentGate
+        gateNumber: vm.currentGate,
+        bookingFrom: vm.getCurrentDate(),
+        bookingTo: vm.getCurrentDate()
       }
       // console.log('vm.currentGate', vm.currentGate, filterEform)
       vm.$store.dispatch('getBooking', filterEform).then(function (result) {
@@ -669,7 +719,9 @@ export default {
         service: currentQuery.hasOwnProperty('service') ? currentQuery.service : vm.serviceInfoSelected,
         state: 2,
         className: 'DOSSIER',
-        gateNumber: vm.currentGate
+        gateNumber: vm.currentGate,
+        bookingFrom: vm.getCurrentDate(),
+        bookingTo: vm.getCurrentDate()
       }
       vm.$store.dispatch('getBooking', filterDossier).then(function (result) {
         count+=1
@@ -705,16 +757,18 @@ export default {
           return bookingList.sort(compare)
         }
         booking = sortBooking(booking)
-        vm.currentBooking = booking[0]
+        vm.bookingCalling = booking[0]
         // console.log('currentBooking', vm.currentBooking)
       } else {
-        vm.currentBooking = ''
+        vm.bookingCalling = ''
       }
     },
     callingBooking (item) {
       let vm = this
-      vm.currentBooking = item
-      item.speaking = false
+      vm.bookingCalling = item
+      setTimeout(function () {
+        item.speaking = false
+      }, 10000)
       item.state = 2
       item.gateNumber = vm.currentGate
       if (vm.currentGate) {
@@ -725,7 +779,7 @@ export default {
     },
     callBack (item) {
       let vm = this
-      vm.currentBooking = item
+      vm.bookingCalling = item
       item.state = 2
       item.speaking = false
       vm.updateStateBooking(item)
@@ -793,9 +847,11 @@ export default {
         alert('Chọn bàn tiếp nhận')
       }
     },
-    ignoreBooking (item) {
+    ignoreBooking (item, calling) {
       let vm = this
-      vm.currentBooking = ''
+      if (calling) {
+        vm.bookingCalling = ''
+      }
       item.state = 3
       vm.updateStateBooking(item)
     },
@@ -816,7 +872,7 @@ export default {
       let vm = this
       vm.currentBooking = item
       vm.filterCreateDossier = ''
-      if (item.codeNumber.indexOf('E-') >= 0) {
+      if (item['className'] === 'EFORM') {
         vm.$store.dispatch('getProcessDetail').then(function (result) {
           let processDetail = result.filter(function (item2) {
             return item2.serviceCode === item.serviceCode
@@ -829,6 +885,7 @@ export default {
           }
           if (processDetail['options'].length === 1) {
             vm.filterCreateDossier.dossierTemplateNo = processDetail['options'][0]['templateNo']
+            console.log('vm.currentBooking', item, vm.currentBooking)
             vm.postDossier()
           } else {
             vm.listDichVu = processDetail['options']
@@ -837,12 +894,12 @@ export default {
           }
         }).catch (function (reject) {
         })
-      } else if (item.codeNumber.indexOf('D-' >=0)) {
+      } else if (item['className'] === 'DOSSIER') {
         vm.currentBooking.state = 4
         vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
         }).catch (function (reject1) {
         })
-        let dossierId = item.codeNumber.split('-')[2]
+        let dossierId = item['classPK']
         let urlRedirect = '/web/cuc-lanh-su#/danh-sach-ho-so/9/chi-tiet-ho-so/' + dossierId
         window.open(urlRedirect, '_blank')
       }
@@ -860,13 +917,15 @@ export default {
       }
       vm.$store.dispatch('loadDossierFormTemplates', filter).then(function (result) {
         if (result['newFormScript']) {
+          console.log('vm.currentBooking 2', vm.currentBooking)
           vm.currentBooking.state = 4
           vm.$store.dispatch('updateBooking', vm.currentBooking).then(function (result1) {
           }).catch (function (reject1) {
           })
           let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/0/NEW'
           let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true&eformCode=' + vm.currentBooking['codeNumber']
-          window.location.href = urlRedirect + query
+          // window.location.href = urlRedirect + query
+          window.open(urlRedirect + query, '_blank')
         } else {
           vm.$store.dispatch('postDossier', vm.filterCreateDossier).then(function (result) {
             vm.currentBooking.state = 4
@@ -875,7 +934,8 @@ export default {
             })
             let urlRedirect = '/web/cuc-lanh-su/mot-cua-dien-tu#/danh-sach-ho-so/0/ho-so/' + result.dossierId + '/NEW'
             let query = '?q=/o/rest/v2/dossiers/todo?order=true&step=110,500&service_config=' + vm.filterCreateDossier['serviceConfigId'] + '&template_no=' + vm.filterCreateDossier['dossierTemplateNo'] + '&eform=true'
-            window.location.href = urlRedirect + query
+            // window.location.href = urlRedirect + query
+            window.open(urlRedirect + query, '_blank')
           }).catch (function (reject) {
           })
         }
@@ -897,6 +957,10 @@ export default {
       vm.$store.dispatch('updateGateNumber', filter).then(function (result) {
         vm.getBookingCalling()
       })
+    },
+    getCurrentDate: function () {
+      let date = new Date()
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     },
     getStateName () {
       let vm = this

@@ -37,6 +37,19 @@
                   :rules="(item.required === true || item.required === 'true') ? [rules.required] : [rules.number]"
                   :required="(item.required === true || item.required === 'true') ? true : false"
                 ></v-text-field>
+                <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                  class="select-border"
+                  :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
+                  :value="item.value"
+                  :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                  :required="(item.required === true || item.required === 'true') ? true : false"
+                  :placeholder="item.placeholder"
+                  item-text="text"
+                  item-value="value"
+                  :hide-selected="true"
+                  @change="inputChangeValue($event, index)"
+                  box
+                ></v-autocomplete>
                 <!-- <v-text-field v-if="item.fieldType === 'date'"
                   :id="item.fieldName"
                   :value="item.value|parseDate"
@@ -125,6 +138,21 @@
               ></v-text-field>
             </v-flex>
             <v-flex xs12 class="px-3">
+              <v-autocomplete v-if="item.fieldType.indexOf('select') >= 0"
+                class="select-border"
+                :items="validDatasourceSelect(item.fieldType) ? JSON.parse(item.fieldType)['select'] : []"
+                :value="item.value"
+                :rules="(item.required === true || item.required === 'true') ? [rules.required] : []"
+                :required="(item.required === true || item.required === 'true') ? true : false"
+                :placeholder="item.placeholder"
+                item-text="text"
+                item-value="value"
+                :hide-selected="true"
+                @change="inputChangeValue($event, index)"
+                box
+              ></v-autocomplete>
+            </v-flex>
+            <v-flex xs12 class="px-3">
               <!-- <v-text-field v-if="item.fieldType === 'date'"
                 box
                 :id="item.fieldName"
@@ -195,10 +223,10 @@
   </div>
 </template>
 <script>
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     components: {
-      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+      'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
     },
     props: {
       dossier_id: {
@@ -305,9 +333,14 @@
         }
         vm.dialog = false
       },
-      inputChangeValue (item) {
+      inputChangeValue (item, index) {
         let vm = this
-        item.value = document.getElementById(item.fieldName).value
+        if (index !== undefined && index !== null && index !== 'undefined' && index !== 'null') {
+          vm.formBuilder[index]['value'] = item
+        } else {
+          item.value = document.getElementById(item.fieldName).value
+        }
+        console.log('formBuilder', vm.formBuilder)
       },
       showDatePicker () {
         this.$refs.datepicker.showDatePicker()
@@ -328,6 +361,21 @@
         let [day2, month, year] = date.split('/')
         // let [hh, mm, ss] = `${time}`.split(':')
         return `${year}-${month.padStart(2, '0')}-${day2.padStart(2, '0')}`
+      },
+      validDatasourceSelect (fieldType) {
+        if (fieldType) {
+          try {
+            let x = JSON.parse(fieldType)
+            if (x) {
+              return true
+            }
+            return false
+          } catch (error) {
+            return false
+          }
+        } else {
+          return false
+        }
       },
       checkValid () {
         let vm = this
@@ -357,6 +405,7 @@
         } else {
           objectReturn = ''
         }
+        console.log('form-thong-tin', objectReturn)
         return objectReturn
       },
       getCurentDateTime () {

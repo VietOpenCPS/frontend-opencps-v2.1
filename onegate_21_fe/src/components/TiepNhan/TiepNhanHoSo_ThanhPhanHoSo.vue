@@ -54,7 +54,9 @@
                     <span>Gửi</span>
                   </v-tooltip>
                 </div>
-                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <span class="ml-2">
+                  <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                </span>
                 <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
                   <span>Chỉnh sửa ý kiến</span>
@@ -78,7 +80,7 @@
                     </v-btn>
                   </div>
                 </div>
-                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow-y:scroll;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
+                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
@@ -560,7 +562,7 @@ export default {
         serviceInfoId: data.serviceCode
       }))
       Promise.all(arrTemp).then(values => {
-        var dossierTemplates = values[0]
+        var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
         var dossierFiles = values[2]
         var fileTemplates = []

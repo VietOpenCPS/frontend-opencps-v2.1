@@ -7,6 +7,7 @@ const getDeliverableTypes = `
             formReportFileId
             dataConfig
             tableConfig
+            moderator
         }
     }
 `

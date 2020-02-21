@@ -19,6 +19,15 @@
           </v-list-tile-content>
         </v-list-tile>
         <v-divider class="my-0"></v-divider>
+        <v-list-tile :style="activeTab === 5 ? 'border-left: 7px solid #00aeef' : ''">
+          <v-list-tile-content class="pl-2" @click="filterQuestion(5, 'questionType=FAQ')">
+            <v-list-tile-title>Công dân hỏi đáp</v-list-tile-title>
+            <span class="status__counter" style="color:#0b72ba!important">
+              {{totalFAQ}}
+            </span>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider class="my-0"></v-divider>
         <v-list-tile :style="activeTab === 1 ? 'border-left: 7px solid #00aeef' : ''">
           <v-list-tile-content class="pl-2" @click="filterQuestion(1, 'answered=true')">
             <v-list-tile-title>Câu hỏi đã trả lời</v-list-tile-title>
@@ -72,6 +81,7 @@
       totalNotAnswer: 0,
       totalPublished: 0,
       totalNotPublish: 0,
+      totalFAQ: 0,
       agencyList: []
     }),
     computed: {
@@ -93,8 +103,20 @@
       agencyFilterSelected () {
         return this.$store.getters.getAgencyFilter
       },
+      lvdsFilterSelected () {
+        return this.$store.getters.getLvdsFilter
+      },
+      lvttFilterSelected () {
+        return this.$store.getters.getLvttFilter
+      },
+      typeFilterSelected () {
+        return this.$store.getters.getTypeFilter
+      },
       activeCounter () {
         return this.$store.getters.getCounter
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
@@ -105,6 +127,18 @@
         vm.getQuestionList()
         vm.getCounter()
       })
+    },
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -130,13 +164,19 @@
         let current = vm.$router.history.current
         let query = current.query
         let filter = {
-          agencyCode: vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          agencyCode: vm.agencyFilterSelected && vm.agencyFilterSelected['itemCode'] ? vm.agencyFilterSelected['itemCode'] : '',
+          domainCode: vm.lvttFilterSelected ? vm.lvttFilterSelected['domainCode'] : '',
+          subDomainCode: vm.lvdsFilterSelected ? vm.lvdsFilterSelected['itemCode'] : '',
           keyword: vm.keyword ? vm.keyword : '',
           publish: query.hasOwnProperty('publish') ? query['publish'] : '',
-          answered: query.hasOwnProperty('answered') ? query['answered'] : ''
+          answered: query.hasOwnProperty('answered') ? query['answered'] : '',
+          questionType: vm.typeFilterSelected ? vm.typeFilterSelected : (query.hasOwnProperty('questionType') ? query['questionType'] : '')
         }
-        if (agencyCodeSite) {
-          filter.agencyCode = agencyCodeSite
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
         }
         vm.$store.commit('setLoading', true)
         vm.$store.dispatch('getQuestions', filter).then(function (result) {
@@ -164,9 +204,13 @@
           answered: ''
         }
         // vm.$store.commit('setLoading', true)
-        if (agencyCodeSite) {
-          filter.agencyCode = agencyCodeSite
+        try {
+          if (agencyCodeSite) {
+            filter.agencyCode = agencyCodeSite
+          }
+        } catch (error) {
         }
+        
         vm.$store.dispatch('getQuestionsCounter', filter).then(function (result) {
           vm.$store.commit('setLoading', false)
           vm.totalQuestionCounter = result['total']
@@ -176,10 +220,14 @@
             publish: 1,
             answered: ''
           }
-          if (agencyCodeSite) {
-            filter1.agencyCode = agencyCodeSite
+          try {
+            if (agencyCodeSite) {
+              filter1.agencyCode = agencyCodeSite
+            }
+          } catch (error) {
           }
-          console.log('filterCounter 1', filter1)
+          
+          // console.log('filterCounter 1', filter1)
           vm.$store.dispatch('getQuestionsCounter', filter1).then(function (result1) {
             vm.totalPublished = result1['total']
             vm.totalNotPublish = Number(vm.totalQuestionCounter) - Number(vm.totalPublished)
@@ -193,10 +241,13 @@
             publish: '',
             answered: true
           }
-          if (agencyCodeSite) {
-            filter2.agencyCode = agencyCodeSite
+          try {
+            if (agencyCodeSite) {
+              filter2.agencyCode = agencyCodeSite
+            }
+          } catch (error) { 
           }
-          console.log('filterCounter 2', filter2)
+          // console.log('filterCounter 2', filter2)
           vm.$store.dispatch('getQuestionsCounter', filter2).then(function (result2) {
             vm.totalAnswered = result2['total']
             vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
@@ -204,12 +255,24 @@
             vm.totalAnswered = 0
             vm.totalNotAnswer = Number(vm.totalQuestionCounter) - Number(vm.totalAnswered)
           })
+          // 
+          let filter3 = {
+            agencyCode: '',
+            publish: '',
+            questionType: 'FAQ'
+          }
+          vm.$store.dispatch('getQuestionsCounter', filter3).then(function (result2) {
+            vm.totalFAQ = result2['total']
+          }).catch(function(reject) {
+            vm.totalFAQ = 0
+          })
         }).catch(function (reject) {
           vm.totalQuestionCounter = 0
           vm.totalPublished = 0
           vm.totalNotPublish = 0
           vm.totalAnswered = 0
           vm.totalNotAnswer = 0
+          vm.totalFAQ = 0
         })
       },
       filterQuestion (index, target) {
@@ -251,6 +314,11 @@
         vm.$router.push({
           path: '/'
         })
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1024
+        vm.$store.commit('setIsMobile', isMobile)
       },
       convertString(str) {
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')

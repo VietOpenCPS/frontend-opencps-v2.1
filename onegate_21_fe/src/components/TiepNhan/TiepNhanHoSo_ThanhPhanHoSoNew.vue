@@ -1,18 +1,37 @@
 <template>
   <div>
     <v-card flat>
+      <div class="d-inline-block" v-if="checkInput === 1" style="position: absolute;right: 10px;top: -50px">
+        <v-checkbox
+          v-model="markCheck"
+          color="indigo"
+          hide-details
+          @change="markAllDone"
+        >
+          <template slot="label">
+            <span style="color: #000000de">Xác nhận tất cả hồ sơ đạt yêu cầu</span>
+          </template>
+        </v-checkbox>
+      </div>
       <div class="form_alpaca" style="position: relative;overflow: hidden;" v-for="(item, index) in dossierTemplateItemsFilter" v-bind:key="item.partNo">
         <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
           <v-expansion-panel-content hide-actions>
             <div slot="header" @click="stateView = false" style="background-color:#fff">
               <div style="align-items: center;background: #fff; padding-left: 25px;" :style="{width: checkStyle(item)}">
                 <div class="mr-2" @click="item.hasForm ? loadAlpcaFormClick(item) : ''" style="min-width: 20px; display: flex;">
+                  <div v-if="originality === 3 && (formCodeInput === 'NEW' || formCodeInput === 'NEW_GROUP')" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
+                    <v-checkbox class="my-0 py-0" v-model="item['hasTemplate']" @change="changeHasTemplate(index, item)"></v-checkbox>
+                  </div>
+                  <div v-if="originality === 3 && tempLienThong" @click='$event.stopPropagation()' class="header__tphs check-template mr-2" style="width: 20px;margin-left: -15px;">
+                    <v-checkbox class="my-0 py-0" v-model="item['hasTemplateLienThong']" @change="changeHasTemplateLienThong(index, item)"></v-checkbox>
+                  </div>
                   <div class="header__tphs" style="min-width:20px"><span class="text-bold">{{index + 1}}.</span> &nbsp;</div>
                   <div class="header__tphs" style="text-align: justify;">
                     <v-tooltip top style="max-width: 100% !important;" v-if="item.partTip && item.partTip['tip']">
                       <span slot="activator">
                         {{item.partName}}
                         <span v-if="item.required" style="color: red">&nbsp;  (*) </span>
+                        <span v-if="item.hasForm" style="color:#004b94">(Bản khai trực tuyến)</span>
                       </span>
                       <span v-if="item.partTip['tip']">{{item.partTip['tip']}}</span>
                     </v-tooltip>
@@ -46,6 +65,8 @@
                   :rules="[v => !!v || 'Bạn phải nhập lý do trước khi gửi']"
                   required
                   @keyup.enter="changeFileComment(item, index)"
+                  @click.stop=""
+                  class="ml-3"
                   ></v-text-field>
                   <v-tooltip top v-if="checkInput === 1 && item.fileCheck === 2 && item.stateEditFileCheck">
                     <v-btn slot="activator" v-on:click.stop="changeFileComment(item, index)" icon class="mx-0 my-0">
@@ -54,12 +75,12 @@
                     <span>Gửi</span>
                   </v-tooltip>
                 </div>
-                <i v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb; margin-left: 10px;">{{item.fileComment}}</i>
+                <i class="pl-3" v-if="item.fileComment && !item.stateEditFileCheck" style="font-size: 12px; color: #0d71bb">Lý do không đạt: {{item.fileComment}}</i>
                 <v-tooltip top v-if="item.fileComment && !item.stateEditFileCheck && checkInput === 1">
                   <v-icon slot="activator" v-on:click.stop="item.stateEditFileCheck = !item.stateEditFileCheck" style="font-size: 13px; color: #0d71bb; margin-left: 10px; cursor: pointer;">edit</v-icon>
-                  <span>Chỉnh sửa ý kiến</span>
+                  <span>Chỉnh sửa lý do</span>
                 </v-tooltip>
-                <div v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
+                <div class="mt-2" v-for="(itemFileView, index) in dossierFilesItems" :key="index" v-if="item.partNo === itemFileView.dossierPartNo">
                   <!-- <div v-if="itemFileView.eForm && onlyView && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 370px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
                     <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
                       <i style="font-size: 13px;" class="ml-1 fa fa-file-o"></i> &nbsp;
@@ -68,7 +89,7 @@
                     </span>
                   </div> -->
                   <div v-if="!itemFileView.eForm" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'background': '#fff', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '0px'}">
-                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-3" style="cursor: pointer;">
+                    <span v-on:click.stop="viewFile2(itemFileView)" class="ml-1" style="cursor: pointer;">
                       <v-icon class="mr-1" v-if="itemFileView.fileSize !== 0" :color="getDocumentTypeIcon(itemFileView.fileType)['color']"
                         :size="getDocumentTypeIcon(itemFileView.fileType)['size']">
                         {{getDocumentTypeIcon(itemFileView.fileType)['icon']}}
@@ -81,7 +102,7 @@
                     </v-btn>
                   </div>
                 </div>
-                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow-y:scroll;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
+                <div class="mr-3 my-2 py-2" :id="'fileApplicant-'+item.partNo" style="display:none;max-height: 250px;overflow:auto;border:1px dashed #f3ae75;border-radius: 5px;position:relative">
                   <div v-for="(itemFileView, indexFile) in dossierFilesApplicant" :key="indexFile" v-if="itemFileView.dossierTemplateNo === thongTinHoSo['dossierTemplateNo'] && item.partNo === itemFileView.dossierPartNo" >
                     <div v-if="itemFileView.eForm && itemFileView.fileSize !== 0" :style="{width: 'calc(100% - 0px)', 'display': 'flex', 'align-items': 'center', 'padding-left': '15px', 'font-size': '12px', 'margin-bottom': onlyView ? '5px' : '3px'}">
                       <v-tooltip top style="max-width:100%">
@@ -148,20 +169,29 @@
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
                       <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" 
-                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1">
-                        <v-icon color="white">save</v-icon>&nbsp;
+                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>save</v-icon>&nbsp;
                         Lưu lại
                       </v-btn>
-                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm">
-                        <v-icon color="white">print</v-icon>&nbsp;
+                      <v-btn color="primary" @click.stop="previewFormAlpaca(item, index)" v-if="item['editForm'] && item.daKhai && item.hasForm"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>print</v-icon>&nbsp;
                         Xem
                       </v-btn>
                       <v-btn color="primary" @click.stop="editFormAlpaca(item)" v-if="!item['editForm'] && item.hasForm && !onlyView">
                         <v-icon color="white">edit</v-icon>&nbsp;
                         Sửa
                       </v-btn>
-                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1">
-                        <v-icon color="white">delete</v-icon>&nbsp;
+                      <v-btn color="primary" @click.stop="deleteSingleFileEform(item, index)" v-if="item.daKhai && item.hasForm && !onlyView && checkInput !== 1"
+                        :disabled="loadingApacal"
+                      >
+                        <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
+                        <v-icon color="white" v-else>delete</v-icon>&nbsp;
                         Xóa
                       </v-btn>
                     </div>
@@ -185,7 +215,7 @@
             <v-flex style="width: 100px;" class="layout wrap mr-2" v-if="originality !== 1 && !onlyView">
               <v-text-field
                 title="Số lượng"
-                style="width:100px;"
+                style="width:100px"
                 v-model="dossierTemplateItems[index]['recordCount']"
                 append-icon="add"
                 prepend-inner-icon="remove"
@@ -201,21 +231,15 @@
                 @input="changeRecordCount(index)"
               ></v-text-field>
             </v-flex>
-            <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && item.partType === 1 && !thongTinHoSo.online && checkInput !== 1">
-              <!-- <v-radio-group v-model="dossierTemplateItems[index].fileMark" row>
-                <v-radio :value="0"></v-radio>
-                <v-radio :value="1"></v-radio>
-                <v-radio :value="2"></v-radio>
-                <v-radio :value="3"></v-radio>
-              </v-radio-group> -->
-              <v-select
+            <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && (item.partType === 1 || item.partType === 3) && !thongTinHoSo.online && checkInput !== 1">
+              <v-autocomplete
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
-              ></v-select>
+              ></v-autocomplete>
             </v-flex>
-            <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">
+            <v-flex style="width: 130px;" class="layout wrap" v-if="checkInput === 1">
               <v-select
                 :items="fileCheckItems"
                 item-text="text"
@@ -303,7 +327,7 @@
           </v-layout>
         </div>
       </div>
-      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(6) && !partTypes.includes(7)">
+      <div v-if="!partTypes.includes(2) && originality === 3 && !partTypes.includes(7)">
         <v-card flat>
           <v-card-text flat class="py-0 px-3 pl-4">
             <div v-if="!onlyView" class="my-2">
@@ -405,7 +429,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 toastr.options = {
   'closeButton': true,
-  'timeOut': '20000'
+  'timeOut': '5000'
 }
 export default {
   props: {
@@ -424,6 +448,14 @@ export default {
     checkInput: {
       type: Number,
       default: () => 0
+    },
+    formCodeInput: {
+      type: String,
+      default: () => ''
+    },
+    tempLienThong: {
+      type: Boolean,
+      default: () => false
     }
   },
   data: () => ({
@@ -435,6 +467,7 @@ export default {
     stateView: false,
     dialogAddOtherTemp: false,
     loadingAddOther: false,
+    loadingApacal: false,
     otherDossierTemplate: '',
     sheet: false,
     partView: '',
@@ -449,22 +482,25 @@ export default {
     pdfEform: false,
     sampleCount: 0,
     serviceInfoId: 0,
-    fileMarkItems: [{
-      text: 'Không có',
-      value: 0
-    }, {
-      text: 'Bản chụp',
-      value: 1
-    }, {
-      text: 'Bản sao',
-      value: 2
-    }, {
-      text: 'Bản gốc',
-      value: 3
-    }, {
-      text: 'Bản dịch',
-      value: 4
-    }],
+    fileMarkItems: [
+      {
+        text: 'Không có',
+        value: 0
+      }, {
+        text: 'Bản chụp',
+        value: 1
+      }, {
+        text: 'Bản sao',
+        value: 2
+      }, {
+        text: 'Bản gốc',
+        value: 3
+      }, {
+        text: 'Bản dịch',
+        value: 4
+      }
+    ],
+    markCheck: false,
     fileCheckItems: [{
       text: 'Chưa kiểm tra',
       value: 0
@@ -484,7 +520,8 @@ export default {
     pstEl: 0,
     endEl: 0,
     applicantNoteDossier: '',
-    doChange: ''
+    doChange: {},
+    dossierTemplateLienThong: []
   }),
   computed: {
     loading () {
@@ -501,10 +538,17 @@ export default {
       let vm = this
       let dossierTemplate = vm.dossierTemplateItems
       if (dossierTemplate.length > 0) {
-        let filter = dossierTemplate.filter(function (item) {
+        let filter1 = dossierTemplate.filter(function (item) {
           return vm.partTypes.includes(item.partType) && vm.checkVisibleTemp(item, 0)
         })
-        return filter
+        // check
+        let filterCheckInput = filter1
+        if (String(vm.checkInput) === '1') {
+          filterCheckInput = filter1.filter(function (item) {
+            return item['fileMark'] !== 0
+          })
+        }
+        return filterCheckInput
       }
     },
     applicantBussinessExit () {
@@ -535,9 +579,28 @@ export default {
       if (val && vm.fileTemplateNoString) {
         vm.getDossierFileApplicants(val, vm.fileTemplateNoString)
       }
+    },
+    dossierTemplateItemsFilter () {
+      let vm = this
+      for (let key in vm.dossierTemplateItemsFilter) {
+        vm.doChange[key] = ''
+      }
     }
   },
   methods: {
+    markAllDone () {
+      let vm = this
+      if (vm.dossierTemplateItems && vm.markCheck) {
+        vm.dossierTemplateItems.forEach(function (value, index) {
+          if (value.partType === 1 && value.fileMark && !value.recordCountDefault && value.fileCheck !== 1) {
+            value['dossierId'] = vm.thongTinHoSo.dossierId
+            value['fileCheck'] = 1
+            value['fileComment'] = ''
+            vm.$store.dispatch('postDossierMark', value)
+          }
+        })
+      }
+    },
     resetCounterTemplate ({commit, state}, data) {
       var vm = this
       vm.dossierTemplateItems.forEach(val => {
@@ -563,6 +626,28 @@ export default {
     },
     initData (data) {
       var vm = this
+      vm.$store.dispatch('getDocumentType').then(function (result) {
+        let sortItems = function (items) {
+          function compare(a, b) {
+            if (a.itemCode < b.itemCode)
+              return -1
+            if (a.itemCode > b.itemCode)
+              return 1
+            return 0
+          }
+          return items.sort(compare)
+        }
+        if (result) {
+          let items = sortItems(result)
+          vm.fileMarkItems = []
+          for (let key in items) {
+            vm.fileMarkItems.push({
+              text: items[key]['itemName'],
+              value: items[key]['itemCode']
+            })
+          }
+        }
+      })
       vm.thongTinHoSo = data
       vm.applicantNoteDossier = data['applicantNote'] && String(data['applicantNote']).indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
@@ -576,7 +661,7 @@ export default {
         serviceInfoId: data.serviceCode
       }))
       Promise.all(arrTemp).then(values => {
-        var dossierTemplates = values[0]
+        var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
         var dossierFiles = values[2]
         var fileTemplates = []
@@ -597,7 +682,10 @@ export default {
         vm.dossierMarksItems = dossierMarks
         vm.fileTemplateItems = fileTemplates
         vm.dossierTemplateItems = dossierTemplateItems
-        if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0) {
+        // 
+        vm.saveMark()
+        // console.log('vm.dossierTemplateItems', vm.dossierTemplateItems)
+        if ((vm.partTypes.includes(2) || vm.partTypes.includes(7)) && vm.dossierTemplateItems.length > 0 && !vm.tempLienThong) {
           let dossierTemplateKQ = []
           vm.dossierTemplateItems.forEach(item => {
             let hasKQ = vm.dossierFilesItems.find(file => {
@@ -615,11 +703,17 @@ export default {
           vm.recountFileTemplates()
         }, 500)
         let fileTemplateNoArr = []
+        vm.dossierTemplateLienThong = []
         for (let key in vm.dossierTemplateItems) {
           if (vm.dossierTemplateItems[key]['fileTemplateNo']) {
             fileTemplateNoArr.push(vm.dossierTemplateItems[key]['fileTemplateNo'])
           }
+          // 
+          if (vm.tempLienThong && vm.dossierTemplateItems[key]['hasTemplateLienThong']) {
+            vm.dossierTemplateLienThong.push(vm.dossierTemplateItems[key]['partNo'])
+          }
         }
+        vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
         if (fileTemplateNoArr.length > 0) {
           vm.fileTemplateNoString = fileTemplateNoArr.toString()
           if (vm.applicantId && !vm.onlyView) {
@@ -718,6 +812,7 @@ export default {
       return dossierTemplates
     },
     mergeDossierTemplateVsDossierMark (dossierTemplates, dossierMarks) {
+      let vm = this
       if (dossierMarks.length !== 0) {
         dossierTemplates.map(itemTemplate => {
           itemTemplate['count'] = 0
@@ -730,11 +825,21 @@ export default {
             itemTemplate['fileComment'] = fileMarkFind.fileComment
             itemTemplate['fileCheck'] = fileMarkFind.fileCheck
             itemTemplate['recordCount'] = fileMarkFind.recordCount
+            itemTemplate['fileMarkDefault'] = fileMarkFind.fileMark
+            itemTemplate['hasTemplate'] = String(fileMarkFind.fileMark) !== '0'
+            if (itemTemplate['hasTemplate'] && !itemTemplate['recordCount']) {
+              itemTemplate['recordCount'] = 1
+            } else if (!itemTemplate['hasTemplate']) {
+              itemTemplate['recordCount'] = 0
+            }
+            itemTemplate['hasTemplateLienThong'] = itemTemplate['hasTemplate']
           } else {
             itemTemplate['fileMark'] = 0
             itemTemplate['fileComment'] = ''
             itemTemplate['fileCheck'] = 0
-            itemTemplate['recordCount'] = ''
+            itemTemplate['recordCount'] = 0
+            itemTemplate['hasTemplate'] = false
+            itemTemplate['hasTemplateLienThong'] = itemTemplate['hasTemplate']
           }
           return itemTemplate
         })
@@ -779,7 +884,7 @@ export default {
       item['dossierId'] = vm.thongTinHoSo.dossierId
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
         vm.$store.dispatch('loadFormData', item).then(resData => {
-          window.$('#formAlpaca' + item.partNo + vm.id).empty()
+          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').empty()
           var formScript, formData
           /* eslint-disable */
           if (resScript) {
@@ -795,7 +900,7 @@ export default {
           }
           /* eslint-disable */
           formScript.data = formData
-          window.$('#formAlpaca' + item.partNo + vm.id).alpaca(formScript)
+          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').alpaca(formScript)
         })
       })
     },
@@ -807,23 +912,34 @@ export default {
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
+        vm.loadingApacal = true
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          setTimeout(function () {
+            vm.loadingApacal = false
+            toastr.clear()
+            toastr.success('Thực hiện thành công')
+          }, 3000)
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
           })
           vm.dossierTemplateItems[index]['passRequired'] = true
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
         }).catch(reject => {
+          vm.loadingApacal = false
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
+        vm.loadingApacal = true
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-          vm.dossierTemplateItems[index].daKhai = true
+          setTimeout(function () {
+            vm.loadingApacal = false
+            toastr.clear()
+            toastr.success('Thực hiện thành công')
+            vm.dossierTemplateItems[index].daKhai = true
+          }, 3000)
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
@@ -832,6 +948,7 @@ export default {
             toastr.error('Yêu cầu của bạn thực hiện thất bại.')
           })
         }).catch(reject => {
+          vm.loadingApacal = false
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
@@ -890,7 +1007,7 @@ export default {
           })
         })
       } else {
-        if (window.$('#file' + data.partNo)[0].files.length === 0) {
+        if (window.$('input[id="file' + data.partNo + '"]')[0].files.length === 0) {
           vm.progressUploadPart = ''
           return
         }
@@ -927,9 +1044,9 @@ export default {
       }
       vm.pstEl = vm.endEl = 0
       setTimeout(function () {
-        if ($('#formAlpaca' + data.partNo + vm.id).height() > 200) {
-          vm.pstEl = $('#wrapForm' + data.partNo + vm.id).offset().top
-          vm.endEl = $('#formAlpaca' + data.partNo + vm.id).height()
+        if (window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height() > 200) {
+          vm.pstEl = window.$('div[id="wrapForm' + data.partNo + vm.id + '"]').offset().top
+          vm.endEl = window.$('div[id="formAlpaca' + data.partNo + vm.id + '"]').height()
           $(window).scroll(function () {
             vm.pstFixed = $(window).scrollTop()
           })
@@ -977,7 +1094,6 @@ export default {
           if (file.dossierPartNo === item.partNo && file.eForm) {
             file['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('deleteDossierFile', file).then(resFile => {
-              console.log('success!')
               vm.dossierTemplateItems[index].daKhai = false
               vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
                 vm.dossierFilesItems = result
@@ -985,7 +1101,6 @@ export default {
                 // 
                 item['editForm'] = true
                 setTimeout(function () {
-                  console.log('item --1--', item)
                   vm.loadAlpcaForm(item)
                 }, 200)
                 // 
@@ -1081,7 +1196,7 @@ export default {
         vm.$store.dispatch('deleteDossierFile', item).then(resFile => {
           // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
           vm.fileViews.splice(index, 1)
-          vm.stateView = true
+          // vm.stateView = true
           vm.partView = item.dossierPartNo
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(result => {
             vm.dossierFilesItems = result
@@ -1147,7 +1262,7 @@ export default {
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
         var url = vm.initDataResource.dossierApi + '/' + vm.thongTinHoSo.dossierId + '/files/' + data.referenceUid
-        window.open(url)
+        window.location.assign(url)
       } else {
         data['dossierId'] = vm.thongTinHoSo.dossierId
         if (data.referenceUid) {
@@ -1194,7 +1309,7 @@ export default {
       }
       if (data.fileType === 'doc' || data.fileType === 'docx' || data.fileType === 'xlsx' || data.fileType === 'xls' || data.fileType === 'zip' || data.fileType === 'rar' || data.fileType === 'txt' || data.fileType === 'mp3' || data.fileType === 'mp4') {
         var url = vm.initDataResource.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid
-        window.open(url)
+        window.location.assign(url)
       } else {
         if (data.referenceUid) {
           vm.dialogPDFLoading = true
@@ -1232,10 +1347,11 @@ export default {
       return
     },
     saveMark () {
-      var vm = this
+      let vm = this
+      // console.log('save mark', vm.dossierTemplateItems)
       if (vm.dossierTemplateItems) {
         vm.dossierTemplateItems.forEach(function (value, index) {
-          if (value.partType === 1) {
+          if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
             value['dossierId'] = vm.thongTinHoSo.dossierId
             vm.$store.dispatch('postDossierMark', value)
           }
@@ -1243,7 +1359,7 @@ export default {
       }
     },
     changeFileMark (event, index) {
-      var vm = this
+      let vm = this
       if (!vm.onlyView) {
         let item = vm.dossierTemplateItems[index]
         item['dossierId'] = vm.thongTinHoSo.dossierId
@@ -1251,7 +1367,40 @@ export default {
         item['checkInput'] = vm.checkInput
         vm.$store.dispatch('postDossierMark', item)
         vm.dossierTemplateItems[index].fileMark = event
+        vm.dossierTemplateItems[index].hasTemplate = String(vm.dossierTemplateItems[index].fileMark) !== '0'
+        if (event === 0) {
+          vm.dossierTemplateItems[index].recordCount = 0
+        }
       }
+    },
+    changeHasTemplate (index, item) {
+      let vm = this
+      item['dossierId'] = vm.thongTinHoSo.dossierId
+      setTimeout(function () {
+        if (item['hasTemplate']) {
+          item.fileMark = item.fileMarkDefault
+          item.recordCount = 1
+        } else {
+          item.fileMark = 0
+          item.recordCount = 0
+        }
+        vm.$store.dispatch('postDossierMark', item)
+      }, 100)
+    },
+    changeHasTemplateLienThong (index, item) {
+      let vm = this
+      setTimeout(() => {
+        if (item['hasTemplateLienThong']) {
+          vm.dossierTemplateLienThong.push(item.partNo)
+          vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
+        } else {
+          let a = vm.dossierTemplateLienThong.filter(function(item1) {
+            return item1 !== item.partNo
+          })
+          vm.dossierTemplateLienThong = a
+          vm.$store.commit('setDossierTemplateLienThong', vm.dossierTemplateLienThong)
+        }
+      }, 100);
     },
     changeFileCheck (event, index) {
       var vm = this
@@ -1400,7 +1549,7 @@ export default {
         })
         if (fileFind) {
           let url = vm.initDataResource.serviceInfoApi + '/' + vm.serviceInfoId + '/filetemplates/' + fileFind.fileTemplateNo
-          window.open(url)
+          window.location.assign(url)
         } else {
           console.log('ko thay file')
         }
@@ -1515,14 +1664,14 @@ export default {
       if (!vm.onlyView) {
         vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
         function changeRecord () {
-          vm.doChange = setTimeout(function () {
+          vm.doChange[index] = setTimeout(function () {
             if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
               let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
               vm.$store.dispatch('postDossierMark', item)
             }
-          }, 3000)
+          }, 1000)
         }
-        clearTimeout(vm.doChange)
+        clearTimeout(vm.doChange[index])
         changeRecord()
       }
     },
@@ -1531,29 +1680,29 @@ export default {
       vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
       vm.dossierTemplateItems[index]['recordCount'] = Number(vm.dossierTemplateItems[index]['recordCount']) + 1
       function changeRecord () {
-        vm.doChange = setTimeout(function () {
+        vm.doChange[index] = setTimeout(function () {
           if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
             let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
             vm.$store.dispatch('postDossierMark', item)
           }
-        }, 3000)
+        }, 1000)
       }
-      clearTimeout(vm.doChange)
+      clearTimeout(vm.doChange[index])
       changeRecord()
     },
     decreaseCounter (index) {
       let vm = this
       vm.dossierTemplateItems[index].recordCount = vm.dossierTemplateItems[index]['recordCount'] ? vm.dossierTemplateItems[index]['recordCount'] : ''
-      vm.dossierTemplateItems[index]['recordCount'] = Number(vm.dossierTemplateItems[index]['recordCount']) - 1
+      vm.dossierTemplateItems[index]['recordCount'] = vm.dossierTemplateItems[index]['recordCount'] ? Number(vm.dossierTemplateItems[index]['recordCount']) - 1 : vm.dossierTemplateItems[index]['recordCount']
       function changeRecord () {
-        vm.doChange = setTimeout(function () {
+        vm.doChange[index] = setTimeout(function () {
           if (!vm.onlyView && Number(vm.dossierTemplateItems[index]['recordCount']) >= 0) {
             let item = Object.assign({}, vm.dossierTemplateItems[index], {dossierId: vm.thongTinHoSo.dossierId})  
             vm.$store.dispatch('postDossierMark', item)
           }
-        }, 3000)
+        }, 1000)
       }
-      clearTimeout(vm.doChange)
+      clearTimeout(vm.doChange[index])
       changeRecord()
     },
     getDocumentTypeIcon (type) {

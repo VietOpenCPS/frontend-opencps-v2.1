@@ -135,9 +135,10 @@ export const store = new Vuex.Store({
             resolve(response)
             if (response.data !== '' && response.data !== 'ok') {
               if (response.data === 'pending') {
-                window.location.href = window.themeDisplay.getURLHome() +
+                let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+                window.location.href = url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                  "&redirectURL=" + window.themeDisplay.getURLHome()
+                  "&redirectURL=" + url
               } else {
                 window.location.href = response.data
               }
@@ -330,6 +331,28 @@ export const store = new Vuex.Store({
             }
             reject(errorRes)
             // toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
+          })
+        })
+      })
+    },
+    getVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              vnconnect: filter.vnconnect,
+              currenturl: filter.currenturl
+            }
+          }
+          axios.get('/o/rest/v2/dvcqgsso/checkauth', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
           })
         })
       })

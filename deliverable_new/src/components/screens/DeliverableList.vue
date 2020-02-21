@@ -99,11 +99,19 @@
         </div>
       </v-fade-transition> -->
     </div>
-    <div style="text-align: right;">
+    <div style="text-align: right;" v-if="getUser('QUAN_LY_GIAY_PHEP') || userPermission">
       <v-btn color="blue darken-3" dark
         :to="'/danh-sach-giay-to/' + index + '/editor/0'"
       >
         Thêm giấy phép
+      </v-btn>
+      <!-- import -->
+      <v-btn color="primary" class="white--text"
+        :loading="loadingImport"
+        :disabled="loadingImport"
+        @click="doImportData">
+        <v-icon>exit_to_app</v-icon> &nbsp;
+        Import giấy phép
       </v-btn>
     </div>
     <v-data-table
@@ -117,7 +125,7 @@
       >
       <template slot="items" slot-scope="props">
         <tr>
-          <td class="text-xs-center px-0 py-0">
+          <td class="text-xs-center px-0 py-0 pt-1">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
@@ -126,13 +134,31 @@
             </span>
           </td>
 
-          <td v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
+          <td class="pt-1" v-for="(itemHeader, indexHeader) in headers" v-bind:key="indexHeader + '_' + props.item['_id']"
             :class="itemHeader['class_column']"
             v-if="itemHeader.hasOwnProperty('value')"
           >
-            <content-placeholders v-if="loadingTable">
-              <content-placeholders-text :lines="1" />
-            </content-placeholders>
+            <div v-if="itemHeader.value === 'deliverableState'" @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
+              <span>
+                {{getState(props.item['_source'])}}
+              </span>
+            </div>
+            <div class="text-xs-center" v-else-if="itemHeader.value === 'mortgageable'" style="cursor: pointer;">
+              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && props.item['_source']['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+                  <v-icon class="green--text" size="24px">check_circle</v-icon>
+                </v-btn>
+                <span>{{props.item['_source']['mortgageInfo_data']}}</span>
+              </v-tooltip>
+              
+              <v-tooltip top v-if="String(props.item['_source']['mortgageable_data']).toLowerCase() === 'true' && !props.item['_source']['mortgageInfo_data']">
+                <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.stop="showMortgage(props.item['_source'], props.index)">
+                  <v-icon style="color:#D32F2F" size="24px">remove_circle</v-icon>
+                </v-btn>
+                <span>Không có thông tin thế chấp</span>
+              </v-tooltip>
+              
+            </div>
             <div v-else @click="viewDetail(props.item['_source'], props.index)" style="cursor: pointer;">
               <template-rendering v-if="itemHeader.hasOwnProperty('layout_view')" :item="props.item['_source']" :layout_view="itemHeader.layout_view"></template-rendering>
               <span v-else>
@@ -140,13 +166,24 @@
               </span>
             </div>
           </td>
-          <td class="text-xs-center px-0 py-0" v-if="!hideAction">
+          <td class="text-xs-center px-0 py-0 pt-1" v-if="!hideAction" style="width:80px">
             <content-placeholders v-if="loadingTable">
               <content-placeholders-text :lines="1" />
             </content-placeholders>
-            <v-btn flat icon class="mx-0 my-0" v-else v-on:click.native="showPDFG(props.item['_source'])">
-              <v-icon>picture_as_pdf</v-icon>
-            </v-btn>
+
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-on:click.native="showPDFG(props.item['_source'])">
+                <v-icon>picture_as_pdf</v-icon>
+              </v-btn>
+              <span>Xem giấy phép</span>
+            </v-tooltip>
+            
+            <v-tooltip top v-if="!loadingTable">
+              <v-btn slot="activator" flat icon class="mx-0 my-0" v-if="props.item['_source']['fileAttachs'] && !loadingTable" v-on:click.native="viewFileAttach(props.item['_source'])">
+                <v-icon>attach_file</v-icon>
+              </v-btn>
+              <span>Xem tài liệu đính kèm</span>
+            </v-tooltip>
           </td>
         </tr>
       </template>
@@ -157,17 +194,20 @@
           @tiny:change-page="paggingData" ></tiny-pagination>
       </div>
     </div>
-    <v-dialog v-model="dialogPDF" max-width="900" transition="fade-transition">
+    <v-dialog v-model="dialogPDFList" max-width="1200" transition="fade-transition" fullscreen>
       <v-card>
         <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Giấy phép</v-toolbar-title>
+          <v-toolbar-title>
+           <span v-if="!viewAttach">Giấy phép</span>
+           <span v-else>Tài liệu đính kèm</span>
+          </v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="dialogPDF = false">
+          <v-btn icon dark @click.native="dialogPDFList = false">
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <div v-if="dialogPDFLoading" style="
-            min-height: 600px;
+            min-height: 650px;
             text-align: center;
             margin: auto;
             padding: 25%;
@@ -179,16 +219,77 @@
             indeterminate
           ></v-progress-circular>
         </div>
-        <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
+        <iframe v-show="!dialogPDFLoading" id="pdfViewerListComponent" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 650px;" frameborder="0">
         </iframe>
+        <v-card-actions v-if="viewAttach && fileEntryIdAttachs.length > 1" class="py-0">
+          <span class="left primary--text text-bold" style="font-size: 1.25em">Tổng số: <span class="red--text">{{fileEntryIdAttachs.length}}</span> tài liệu</span>
+          <div class="text-xs-center" style="width: calc(100% - 150px);">
+            <v-pagination
+              v-model="pageAttachs"
+              :length="fileEntryIdAttachs.length"
+              circle
+              @input="changePage(pageAttachs)"
+              :total-visible="5"
+            ></v-pagination>
+          </div>
+        </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogMortgage" max-width="700" persistent transition="fade-transition">
+      <v-card>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>
+           Thông tin thế chấp
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogMortgage = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-textarea
+            v-model="mortGageInput"
+            placeholder="Nhập thông tin thế chấp"
+            class=""
+            box
+            rows="7"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-2" color="red" @click="dialogMortgage = false"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon class="white--text">clear</v-icon> &nbsp;
+            <span class="white--text">Thoát</span>
+          </v-btn>
+          <v-btn class="mr-2" color="primary" @click="changeMortgageInfo()"
+            :loading="loading"
+            :disabled="loading"
+          >
+            <v-icon>save</v-icon> &nbsp;
+            Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <input
+      type="file"
+      ref="importData"
+      name="importData"
+      accept=""
+      @change="onFilePicked"
+      v-show="false"
+    >
   </div>
 </template>
 
 <script>
   import { TinyPagination } from '@/components'
   import TemplateRendering from './template_rendering.vue'
+  import axios from 'axios'
+  import toastr from 'toastr'
 
   export default {
     props: ['index'],
@@ -202,7 +303,10 @@
         menusss: false,
         loadingTable: false,
         dialogPDFLoading: false,
-        dialogPDF: false,
+        loadingImport: false,
+        dialogPDFList: false,
+        dialogMortgage: false,
+        mortGageInput: '',
         headers: [],
         hideAction: false,
         hosoDatas: [],
@@ -211,7 +315,12 @@
         dataSocket: {},
         filters: [],
         advSearchItems: [],
-        deliverableKey: ''
+        deliverableKey: '',
+        pageAttachs: 1,
+        viewAttach: false,
+        fileEntryIdAttachs: [],
+        deliverableSelected: '',
+        indexDeliverableSelected: ''
       }
     },
     created () {
@@ -235,6 +344,11 @@
               }, 100)
             }
             vm.pullData(vm.items[vm.index]['typeCode'])
+            // set permissionUser
+            if (vm.items.length > 0) {
+              vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+            }
+            // 
           }, 100)
         })
       })
@@ -256,6 +370,11 @@
       },
       index (val) {
         var vm = this
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[val]['moderator'])
+        }
+        // 
         if (vm.items[val]['dataConfig'] !== '') {
           vm.filters = eval('( ' + vm.items[val]['dataConfig'] + ' )')
         } else {
@@ -274,6 +393,14 @@
             vm.loadingTable = false
           }, 100)
         }
+      },
+      items () {
+        var vm = this
+        // set permissionUser
+        if (vm.items.length > 0) {
+          vm.$store.commit('setUserPermission', vm.items[vm.index]['moderator'])
+        }
+        // 
       },
       advSearchItems: {
         handler: function (val, oldVal) {
@@ -307,6 +434,9 @@
     computed: {
       items () {
         return this.$store.getters.getDeliverableTypes
+      },
+      userPermission () {
+        return this.$store.getters.getUserPermission
       }
     },
     methods: {
@@ -367,11 +497,72 @@
       },
       showPDFG (item) {
         let vm = this
-        vm.dialogPDF = true
+        vm.viewAttach = false
+        vm.dialogPDFList = true
         vm.dialogPDFLoading = true
         vm.$store.dispatch('viewPDF', item['fileEntryId']).then(function (result) {
           vm.dialogPDFLoading = false
           document.getElementById('pdfViewerListComponent').src = result
+        })
+      },
+      viewFileAttach (detail) {
+        let vm = this
+        vm.viewAttach = true
+        vm.fileEntryIdAttachs = String(detail['fileAttachs']).split(',')
+        vm.loading = true
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[0]).then(function (result) {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+          vm.dialogPDFList = true
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.loading = false
+          vm.dialogPDFLoading = false
+        })
+      },
+      showMortgage (detail, index) {
+        let vm = this
+        vm.deliverableSelected = detail
+        vm.indexDeliverableSelected = index
+        vm.mortGageInput = detail['mortgageInfo_data'] ? detail['mortgageInfo_data'] : ''
+        vm.dialogMortgage = true
+      },
+      changeMortgageInfo () {
+        let vm = this
+        var formDataObj
+        try {
+          formDataObj = JSON.parse(vm.deliverableSelected['formData'])
+          formDataObj.mortgageInfo = vm.mortGageInput
+        } catch (error) {
+          formDataObj = {
+            mortgageInfo: vm.mortGageInput
+          }
+        }
+        let filter = {
+          deliverableId: vm.deliverableSelected['deliverableId'],
+          formData: formDataObj
+        }
+        vm.loading = true
+        vm.$store.dispatch('putFormData', filter).then(function (data) {
+          toastr.success('Cập nhật thành công')
+          vm.hosoDatas[vm.indexDeliverableSelected]['_source']['mortgageInfo_data'] = vm.mortGageInput
+          vm.loading = false
+          vm.dialogMortgage = false
+        }).catch(function() {
+          vm.loading = false
+          toastr.error('Cập nhật thất bại')
+        })
+      },
+      changePage(page) {
+        let vm = this
+        let index = Number(page) - 1
+        vm.dialogPDFLoading = true
+        vm.$store.dispatch('viewPDF', vm.fileEntryIdAttachs[index]).then(function (result) {
+          vm.dialogPDFLoading = false
+          document.getElementById('pdfViewerListComponent').src = result
+        }).catch(function () {
+          vm.dialogPDFLoading = false
         })
       },
       paggingData (config) {
@@ -411,7 +602,7 @@
             index: item.index
           })
         }
-        console.log('vm.advSearchItems', vm.advSearchItems)
+        // console.log('vm.advSearchItems', vm.advSearchItems)
       },
       keywordEventChange (data) {
         let vm = this
@@ -478,6 +669,67 @@
           vm.loadingTable = false
           console.log(reject)
         })
+      },
+      doImportData () {
+        let vm = this
+        vm.$refs.importData.click()
+      },
+      onFilePicked(event) {
+        let vm = this
+        let files = event.target.files || event.dataTransfer.files
+        if (files && files[0]) {
+          vm.loadingImport = true
+          let bodyFormData = new FormData()
+          bodyFormData.append('file', files[0])
+          bodyFormData.append('deliverableType', vm.items[vm.index]['typeCode'])
+          axios({
+            method: 'post',
+            url: '/o/rest/v2/deliverables/import/files',
+            data: bodyFormData,
+            config: { headers: {
+                'groupId': window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          })
+          .then(function (response) {
+            setTimeout(function () {
+              vm.loadingImport = false
+              toastr.success('Import giấy phép thành công')
+              vm.pullData(vm.items[vm.index]['typeCode'])
+            }, 1000)
+          })
+          .catch(function (response) {
+            vm.loadingImport = false
+          })
+        }
+      },
+      getState (item) {
+        let currentDate = (new Date()).getTime()
+        let expireDate = Number(item['expireDate'])
+        if (expireDate < currentDate) {
+          return 'Hết hiệu lực'
+        } else {
+          let state = String(item['deliverableState'])
+          if (state === '0') {
+            return 'Không xác định'
+          } else if (state === '1') {
+            return 'Đang hiệu lực'
+          } else if (state === '2') {
+            return 'Gia hạn'
+          } else if (state === '4') {
+            return 'Xóa - Thu hồi'
+          }
+        }
+      },
+      getUser (roleItem) {
+        let vm = this
+        let roles = vm.$store.getters.getUser.role
+        if (!roles) {
+          return false
+        }
+        let roleExits = roles.findIndex(item => String(item).indexOf(roleItem) >= 0)
+        return (roleExits >= 0)
       }
     }
   }

@@ -74,7 +74,13 @@ export const store = new Vuex.Store({
             icon: 'filter_6',
             link: '/table/opencps_voting/votings',
             code: 'votings',
-            text: 'Voting'
+            text: 'Câu hỏi đánh giá, khảo sát'
+          },
+          {
+            icon: 'filter_7',
+            link: '/table/opencps_config_report/reports',
+            code: 'reports',
+            text: 'Cấu hình dữ liệu thống kê'
           },
           {
             icon: 'import_export',
@@ -753,6 +759,7 @@ export const store = new Vuex.Store({
           dataPostProcess.append('durationUnit', data.durationUnit)
           dataPostProcess.append('generateDossierNo', data.generateDossierNo)
           dataPostProcess.append('dossierNoPattern', data.dossierNoPattern)
+          dataPostProcess.append('dossierGroupPattern', data.dossierGroupPattern ? data.dossierGroupPattern : '')
           dataPostProcess.append('generateDueDate', data.generateDueDate)
           dataPostProcess.append('dueDatePattern', data.dueDatePattern)
           dataPostProcess.append('generatePassword', data.generatePassword)
@@ -1281,6 +1288,7 @@ export const store = new Vuex.Store({
     },
     setlistTableMenu (state, payload) {
       let listTableMenu = state.listTableMenu
+      listTableMenu[2].children = []
       for (let key in payload) {
         if (payload[key][4] && listTableMenu.length > 1) {
           listTableMenu[1].children.push({
@@ -1334,7 +1342,7 @@ export const store = new Vuex.Store({
       state.snackbarsocket = payload
     },
     setloginUser (state, payload) {
-      if (payload !== null && payload !== undefined) {
+      if (payload) {
         let currentLogin = payload[0]
         if (currentLogin['role'] === 'Administrator') {
           console.log('admin login')

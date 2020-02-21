@@ -1,11 +1,17 @@
 <template>
-  <div class="mt-3 px-2 py-0 kios-item">
-    <div class="wrap-scroll px-2 py-2" :class="votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
+  <div class="py-0 kios-item" :class="!isMobile ? 'px-2 mt-3' : ''">
+    <div v-if="!isMobile" class="d-inline-block" style="position:absolute;top:0;right:50px">
+      <qrcode :value="urlQR" :options="{ width: 150 }"></qrcode><br>
+      <v-chip class="my-0 ml-2" color="primary" text-color="white" style="width:135px;margin-top:-25px !important">
+        <v-icon left class="mr-1 pl-1">center_focus_strong</v-icon> <span style="font-size:13px !important">Quét để đánh giá</span>
+      </v-chip>
+    </div>
+    <div class="wrap-scroll py-2" :class="!isMobile && votingItems.length > 2 ? 'wrap-scroll-votting' : ''">
       <div v-if="votingItems.length > 0" v-for="(item, index) in votingItems" :key="index" :class="visible ? 'overlayActive': ''">
         <div class="text-bold">
           {{index + 1}}.&nbsp; {{ item.subject }}
         </div>
-        <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+        <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
           <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
         </v-radio-group>
         <!-- <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -16,41 +22,31 @@
       </div>
     </div>
     <div :class="visible ? 'validDanhGiaCLDV': ''">
-      <v-layout wrap class="mt-4" v-if="!isSigned && votingItems.length > 0">
-        <v-flex xs12 sm6 class="pr-3">
+      <v-layout wrap :class="!isMobile ? 'mt-4' : 'mt-0'" v-if="!isSigned && votingItems.length > 0">
+        <v-flex xs12 sm6 :class="!isMobile ? 'pr-3' : 'pr-0'">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Mã hồ sơ <span style="color:red">*</span></div>
             <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-              <!-- <div class="input-group__input">
+              <div class="input-group__input">
                 <input id="dossierIdNoKey" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập mã hồ sơ" type="text">
                 <i v-if="visible" @click="clear('dossierIdNoKey')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
               </div>
-              <div class="mt-2" v-if="!validPass1">
-                <div class="input-group__messages" style="color:red">Mã hồ sơ là bắt buộc</div>
-              </div> -->
-              <div class="input-custom">
-                <input id="dossierIdNoKey" type="text" @focus="show" required="required" />
-                <span class="bar"></span>
-                <label for="dossierIdNoKey">Mã hồ sơ</label>
+              <div class="mt-1" v-if="!validPass1">
+                <div class="input-group__messages" style="color:red">Mã hồ sơ là bắt buộc!</div>
               </div>
             </div>
           </v-layout>
         </v-flex>
-        <v-flex xs12 sm6 class="pl-3">
+        <v-flex xs12 sm6 :class="!isMobile ? 'pl-3' : 'pl-0 mt-2'">
           <v-layout wrap>
             <div style="width:110px" class="text-bold">Số CMND <span style="color:red">*</span></div>
-            <div style="width:calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
-              <!-- <div class="input-group__input">
+            <div style="width: calc(100% - 110px)" class="pt-0 input-border input-group input-group--placeholder input-group--text-field primary--text">
+              <div class="input-group__input">
                 <input id="applicantIdNo" class="kios-input" data-layout="normal" @focus="show" aria-label="Số CMND" placeholder="Nhấn để nhập số CMND" type="text">
                 <i v-if="visible" @click="clear('applicantIdNo')" aria-hidden="true" class="icon material-icons input-group__append-icon input-group__icon-cb input-group__icon-clearable">clear</i>
               </div>
-              <div class="mt-2" v-if="!validPass2">
-                <div class="input-group__messages" style="color:red">Số CMND là bắt buộc</div>
-              </div> -->
-              <div class="input-custom">
-                <input id="applicantIdNo" type="text" @focus="show" required="required" />
-                <span class="bar"></span>
-                <label for="applicantIdNo">Số CMND</label>
+              <div class="mt-1" v-if="!validPass2">
+                <div class="input-group__messages" style="color:red">Số CMND là bắt buộc!</div>
               </div>
             </div>
           </v-layout>
@@ -65,10 +61,10 @@
         >Gửi kết quả</v-btn>
       </div>
     </div>
-    <v-btn v-if="votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
+    <v-btn v-if="!isMobile && votingItems.length > 0" class="back-btn" @click="goBack" fab color="primary">
       <v-icon dark>arrow_back</v-icon>
     </v-btn>
-    <div class="virtual-keyboard" v-if="visible">
+    <div class="virtual-keyboard" v-if="visible && !isMobile">
       <vue-touch-keyboard v-if="visible" :layout="layout" :cancel="hide" :accept="accept" :input="input" :next="next" />
     </div>
   </div>
@@ -80,6 +76,8 @@ import Vue from 'vue/dist/vue.min.js'
 import $ from 'jquery'
 import toastr from 'toastr'
 import VueTouchKeyBoard from './keyboard.vue'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
+Vue.component(VueQrcode.name, VueQrcode)
 export default {
   props: ['administration'],
   components: {
@@ -101,7 +99,11 @@ export default {
       preventClickEvent: false
     }
   }),
-  computed: {},
+  computed: {
+    isMobile () {
+      return this.$store.getters.getIsMobile
+    }
+  },
   created () {
     let vm = this
     vm.$nextTick(function () {
@@ -111,7 +113,7 @@ export default {
       vm.validPass2 = true
       let filter = {
         className: 'govagency',
-        classPK: vm.administration
+        classPk: vm.administration
       }
       vm.$store.dispatch('loadVoting', filter).then(function (result) {
         vm.votingItems = result
@@ -121,6 +123,10 @@ export default {
         vm.loading = false
       })
     })
+  },
+  mounted () {
+    let vm = this
+    vm.urlQR = window.location.href
   },
   watch: {},
   methods: {
@@ -143,7 +149,6 @@ export default {
             dossierNo: $('#dossierIdNoKey').val()
           }
           vm.$store.dispatch('checkPermisionVoting', filter).then(result => {
-            console.log('result', result)
             if (result.hasPermission === true || result.hasPermission === 'true') {
               vm.doResultVoting()
             } else {
@@ -188,10 +193,12 @@ export default {
       this.hide()
     },
     show (e) {
-      this.validPass = true
-      this.input = e.target
-      if (!this.visible) {
-        this.visible = true
+      if (!this.isMobile) {
+        this.validPass = true
+        this.input = e.target
+        if (!this.visible) {
+          this.visible = true
+        }
       }
     },
     showKeyboard (e) {

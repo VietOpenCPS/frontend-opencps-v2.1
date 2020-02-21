@@ -1,5 +1,5 @@
 <template>
-  <v-app :data-app="false" id="app_login">
+  <div id="app_login">
     <div
       @click="drawerLogin = false"
       v-if="drawerLogin"
@@ -151,18 +151,18 @@
       </div>
 
       <v-navigation-drawer
-        class="login_drawer"
-        v-model="drawerLogin"
-        fixed
-        right
-        hide-overlay
-        temporary
-        style="
-              -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-              box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
-              z-index: 9999;
-            "
-      >
+          class="login_drawer"
+          v-model="drawerLogin"
+          fixed
+          right
+          hide-overlay
+          temporary
+          style="
+                -webkit-box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+                box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 5px 28px 2px rgba(0,0,0,.14), 0 -5px 28px 1px rgba(0,0,0,0);
+                z-index: 9999;
+              "
+        >
         <article class="glass down">
           <v-layout
             class="px-3"
@@ -175,11 +175,11 @@
                 block
                 small
                 style="
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-    "
+                  border-top-right-radius: 0;
+                  border-bottom-right-radius: 0;
+                  border-top-left-radius: 8px;
+                  border-bottom-left-radius: 8px;
+                "
               >Thông báo</v-btn>
             </v-flex>
             <v-flex xs6 class="text-center">
@@ -188,12 +188,12 @@
                 block
                 small
                 style="
-        background: #d0d0d0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-    "
+                    background: #d0d0d0;
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    border-top-right-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                "
               >Đánh dấu đã đọc</v-btn>
             </v-flex>
           </v-layout>
@@ -278,7 +278,7 @@
         </article>
       </v-navigation-drawer>
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -298,7 +298,7 @@ export default {
     isSignedIn: false,
     userNameLogin: "",
     drawerLogin: false,
-    avatarURL: "http://via.placeholder.com/350x150",
+    avatarURL: "/o/opencps-store/js/cli/login/app/image/img_login.png",
     notificationCount: 0,
     isShowUserMenu: false,
     toggle_exclusive: 0,
@@ -328,6 +328,7 @@ export default {
       }
       if (vm.isSignedIn) {
         vm.userData = {};
+        // kt
         vm.pullNotificationCount();
         setTimeout(() => {
           axios
@@ -342,13 +343,14 @@ export default {
                 className: vm.userData['className'] === 'org.opencps.usermgt.model.Applicant' ? 'org.opencps.usermgt.model.ApplicantAvatar' : vm.userData['className'],
                 classPK: vm.userData['classPK']
               }
+              // kt
               vm.getImageAvatar(filter)
               vm.userNameLogin = vm.userData["userName"];
               vm.colorBG = vm.intToRGB(vm.hashCode(vm.userNameLogin));
             })
             .catch(function(error) {
-              vm.avatarURL = "";
-            });
+              vm.avatarURL = ""
+            })
         }, 1000);
       }
     });
@@ -357,6 +359,7 @@ export default {
     $route: function(newRoute, oldRoute) {
       let vm = this;
       if (vm.notificationCount < 5) {
+        // kt
         vm.pullNotificationCount();
       }
     }
@@ -392,33 +395,40 @@ export default {
     },
     markReadEventId (configOBJ) {
       let vm = this
+      let userType = ''
+      if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+        userType = 'employee'
+      } else {
+        userType = 'applicant'
+      }
+      let urlCurrent = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
       axios
       .post("/o/rest/v2/notifications/" + configOBJ['eventId'] + "/mark")
       .then(function(response) {
         //send redirect
-        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        let urlRedirect =  urlCurrent + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (userType === 'employee') {
+          urlRedirect = urlCurrent + '#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+        // if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
           window.location.href = urlRedirect
-        } else {
-          window.location.href = urlRedirect
-          window.location.reload()
-        }
+        // } else {
+        //   window.location.href = urlRedirect
+        //   window.location.reload()
+        // }
       })
       .catch(function(error) {
         //send redirect
-        let urlRedirect =  configOBJ['viewRootURI'] + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
-        if (configOBJ['originality'] !== 1 || configOBJ['originality'] !== '1') {
-          urlRedirect = configOBJ['viewRootURI'] + '/mot-cua-dien-tu#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        let urlRedirect =  urlCurrent + '/dich-vu-cong#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
+        if (userType === 'employee') {
+          urlRedirect = urlCurrent + '#/danh-sach-ho-so/0/chi-tiet-ho-so/' + configOBJ['dossierId']+ '?t=' + new Date().getTime()
         }
-        if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
+        // if (window.document.getElementById('app') === null || window.document.getElementById('app') === undefined) {
             window.location.href = urlRedirect
-          } else {
-            window.location.href = urlRedirect
-            window.location.reload()
-          }
+          // } else {
+          //   window.location.href = urlRedirect
+          //   window.location.reload()
+          // }
       })
     },
     pullNotificationCount() {
@@ -481,6 +491,15 @@ export default {
       }
     },
     doExitApp() {
+      let vm = this
+      if (typeof(Storage) !== 'undefined') {
+        sessionStorage.removeItem('userLogout')
+        if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+          sessionStorage.setItem('userLogout', 'employee')
+        } else {
+          sessionStorage.setItem('userLogout', 'applicant')
+        }
+      }
       window.location.href = "/c/portal/logout";
     },
     goToDangKyPage() {
@@ -518,12 +537,13 @@ export default {
             response.data !== "captcha"
           ) {
             if (response.data === "pending") {
+              let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
               window.location.href =
-                window.themeDisplay.getURLHome() +
+                url +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" +
                 window.themeDisplay.getUserId() +
                 "&redirectURL=" +
-                window.themeDisplay.getURLHome();
+                url;
             } else {
               window.location.href = response.data;
             }
@@ -577,12 +597,12 @@ export default {
                   "/register#/xac-thuc-tai-khoan?active_user_id=" +
                   window.themeDisplay.getUserId() +
                   "&redirectURL=" +
-                  window.themeDisplay.getURLHome();
+                  window.themeDisplay.getURLHome()
               } else {
-                window.location.href = response.data;
+                window.location.href = response.data
               }
             } else if (response.data === "ok") {
-              window.location.href = window.themeDisplay.getURLHome();
+              window.location.href = window.themeDisplay.getURLHome()
             } else if (response.data === "captcha") {
               let redirectURL = window.themeDisplay
                 .getLayoutRelativeURL()
@@ -596,12 +616,14 @@ export default {
                 window.location.href =
                   window.themeDisplay.getURLHome() + "/register#/login";
               }
+            } else if (response.data === "lockout") {
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị khóa tạm khóa trong 10 phút.")
             } else {
-              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
             }
           })
           .catch(function(error) {
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
           });
       }
     },

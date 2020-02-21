@@ -4,7 +4,7 @@
       <div class="control_wrapper">
         <div class="sample_wrapper">
             <div id="dropArea">
-                <span id="drop" class="droparea" style="display: none;" > Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
+                <span id="drop" class="droparea" style="" > Kéo thả tệp tin hoặc <a href="javascript:;" id="browse">Chọn từ máy tính &nbsp; 📤</a></span>
                 <ejs-uploader id='templateupload' name="UploadFiles" :allowedExtensions= 'extensions' :asyncSettings= "path" ref="uploadObj" :dropArea= "dropArea" :success= "onSuccess" :removing= "onFileRemove" :uploading= "addHeaders">
                 </ejs-uploader>
                 <div class="e-upload-done-list" v-if="fileTemplateTotal > 0 && code === 'opencps_serviceinfo'">

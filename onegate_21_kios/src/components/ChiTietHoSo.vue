@@ -44,7 +44,7 @@
                   </v-flex>
                   <!--  -->
                   <v-flex xs12 sm4>
-                    <div class="xs12 sm12 pb-1">
+                    <div class="xs12 sm12 pb-1" v-if="dossierDetail.online">
                       <span class="pr-2">Ngày gửi: </span>
                       <span class="pl-0 text-bold" v-if="dossierDetail.online"> {{dossierDetail.submitDate}} </span>
                       <span class="pl-0 text-bold" v-else> Một cửa </span>
@@ -128,7 +128,7 @@
                     <div class="text-bold">
                       {{index + 1}}.&nbsp; {{ item.subject }}
                     </div>
-                    <v-radio-group class="ml-3 pt-2" v-model="item.selected" row>
+                    <v-radio-group class="ml-3 pt-2 mt-0" v-model="item.selected" row>
                       <v-radio v-for="(item1, index1) in item.choices" v-bind:key="index1" :label="item1" :value="index1 + 1"></v-radio>
                     </v-radio-group>
                     <v-layout wrap class="ml-3" style="margin-top:-10px">
@@ -323,9 +323,9 @@
         let vm = this
         let filter = {
           className: 'dossier',
-          classPK: vm.dossierDetail.dossierId
+          dossierDetail: vm.dossierDetail
         }
-        vm.$store.dispatch('loadVoting', filter).then(function (result) {
+        vm.$store.dispatch('loadVotingMC', filter).then(function (result) {
           vm.votingItems = result
           console.log('votingItems', vm.votingItems)
         }).catch(function (reject) {
@@ -339,6 +339,7 @@
           for (var index in vm.votingItems) {
             vm.votingItems[index]['className'] = 'dossier'
             vm.votingItems[index]['classPk'] = vm.dossierDetail.dossierId
+            vm.votingItems[index]['serverCode'] = 'SERVER_' + vm.dossierDetail['govAgencyCode']
             arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[index]))
           }
           Promise.all(arrAction).then(results => {

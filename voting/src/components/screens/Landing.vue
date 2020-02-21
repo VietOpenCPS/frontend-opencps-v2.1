@@ -64,7 +64,8 @@ export default {
               },
               params: {
                 start: 0,
-                end: 1
+                end: 1,
+                jobposCode: 'DANHGIA_' + agencyList[i].itemCode
               }
             }
             axios.get('/o/rest/v2/employees/publish/' + agencyList[i].itemCode, param).then(result => {

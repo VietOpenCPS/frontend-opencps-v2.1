@@ -1,7 +1,7 @@
 <template>
   <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile"
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !isMobile"
     >
       <content-placeholders class="mt-3" v-if="loading">
         <content-placeholders-text :lines="7" />
@@ -48,9 +48,9 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile">
-      <div class="row-header mb-2 py-2" style="background-color: #070f52">
-        <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
+    <div v-if="trangThaiHoSoList.length !== 0 && isMobile" id="m-navigation">
+      <div class="row-header mb-0 py-2" style="background-color: #070f52">
+        <div class="ml-2 white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
       <div style="max-height:200px;overflow:hidden;overflow-y:scroll">
         <content-placeholders class="mt-3" v-if="loading">
@@ -133,7 +133,8 @@
 </template>
 
 <script>
-  import { isMobile } from 'mobile-device-detect'
+  // import { isMobile } from 'mobile-device-detect'
+  import $ from 'jquery'
   export default {
     data: () => ({
       isCallBack: true,
@@ -144,6 +145,18 @@
       detailState: 0,
       isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
     }),
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
@@ -151,16 +164,31 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      viewMobile () {
-        return isMobile
-      },
+      // viewMobile () {
+      //   return isMobile
+      // },
       pathLanding () {
-        return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
+        return '/danh-sach-ho-so'
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
-      var vm = this
+      let vm = this
+      let isMobile = window.innerWidth < 1264
+      vm.$store.commit('setIsMobile', isMobile)
+      // if (window.location.href.includes('/m/') && vm.isMobile) {
+      //   $('head meta[name=viewport]').remove()
+      // } else {
+      //   if ($('head meta[name=viewport]').length === 0) {
+      //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+      //   }
+      // }
       vm.$nextTick(function () {
+        // 
+        window.message = vm.callback_alpacal
+        // 
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
           vm.loading = false
@@ -170,7 +198,7 @@
             if (Array.isArray(vm.trangThaiHoSoList) && vm.trangThaiHoSoList.length > 0) {
               if (!currentParams.hasOwnProperty('index') && !currentParams.hasOwnProperty('serviceCode')) {
                 vm.trangThaiHoSoList[0]['active'] = true
-               vm.$router.push({
+                vm.$router.push({
                   path: vm.pathLanding + '/0',
                   query: {
                     q: vm.trangThaiHoSoList[0]['queryParams']
@@ -180,7 +208,6 @@
                 vm.trangThaiHoSoList[currentParams.index]['active'] = true
               }
             }
-            console.log('trangThaiHoSoList', vm.trangThaiHoSoList)
             vm.loadingCounter()
             vm.loading = false
           }
@@ -188,7 +215,7 @@
       })
     },
     updated () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
         if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -205,6 +232,15 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+        // if (window.location.href.includes('/m/') && vm.isMobile) {
+        //   $('head meta[name=viewport]').remove()
+        // } else {
+        //   if ($('head meta[name=viewport]').length === 0) {
+        //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        //   }
+        // }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
@@ -223,7 +259,7 @@
         }
       },
       activeGetCounter (val) {
-        var vm = this
+        let vm = this
         setTimeout(function () {
           vm.loadingCounter()
         }, 300)
@@ -232,8 +268,18 @@
     methods: {
       toTableIndexing (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
         this.$store.commit('setIndex', index)
-       vm.$router.push({
+        vm.$router.push({
           path: vm.pathLanding + '/' + index,
           query: {
             renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1,
@@ -243,10 +289,21 @@
       },
       filterSteps (item) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
+        
         let currentQuery = vm.$router.history.current.query
         let currentParams = vm.$router.history.current.params
-        console.log('currentParams', currentParams)
-        console.log('currentQuery', currentQuery)
+        // console.log('currentParams', currentParams)
+        // console.log('currentQuery', currentQuery)
         let queryString = vm.trangThaiHoSoList[currentParams.index].queryParams
         console.log('queryString++++++1111111+++++', queryString)
         /* test Local */
@@ -258,17 +315,7 @@
           }
         }
         vm.currentStep = String(item.stepCode)
-        // if (vm.currentStep) {
-        //   let urls = queryString.split("?")
-        //   if (urls !== null && urls.length !== 0) {
-        //     for (var i = 0; i < urls.length; i++) {
-        //       if (urls[i].indexOf('step') > 0) {
-        //         urls.splice(i, 1)
-        //       }
-        //     }
-        //   }
-        // }
-        console.log('queryString++++++++22222222+++', queryString)
+        // console.log('queryString++++++++22222222+++', queryString)
         vm.$router.push({
           path: vm.pathLanding + '/' + currentParams.index,
           query: {
@@ -344,7 +391,15 @@
       },
       goBack () {
         window.history.back()
-      }
+      },
+      callback_alpacal (data) {
+        console.log('data_export_eform', data)
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+      },
     }
   }
 </script>

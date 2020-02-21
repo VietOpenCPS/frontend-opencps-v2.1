@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app_serviceinfo" style="border: 1px solid #dedede;max-width:1300px;margin:0 auto">
+  <v-app id="app_serviceinfo" :style="!isMobile ? 'border: 1px solid #dedede;max-width:1300px;margin:0 auto' : 'max-width:1300px;margin:0 auto'">
     <v-navigation-drawer app clipped floating width="265" v-if="!isMobile">
       <v-list class="py-0">
         <v-list-group
@@ -11,14 +11,14 @@
         >
           <v-list-tile slot="activator" @click="item.mappingCode === 'all' ? filterAll() : activeAll = false ">
             <v-list-tile-title>{{item.name}}</v-list-tile-title>
-            <span v-if="item.mappingCode === 'all'" class="status__counter" style="color:#0b72ba!important">
+            <span v-if="item.mappingCode === 'all'" class="status__counter" style="color:#0b72ba">
               {{countAllService}}
             </span>
           </v-list-tile>
           <v-list-tile v-for="(item1, index1) in item['children']" :key="index1">
             <v-list-tile-action>
               <v-icon color="#00aeef" 
-                v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
+                v-if="String(currentAgency) === String(item1[item.mappingCode]) || String(currentAgencyTh) === String(item1[item.mappingCode]) || String(currentDomain) === String(item1[item.mappingCode])
                 || String(currentLevel) === String(item1[item.mappingCode]) || String(currentMethod) === String(item1[item.mappingCode])"
               >play_arrow</v-icon>
             </v-list-tile-action>
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+  import axios from 'axios'
   import GoTop from '@inotom/vue-go-top'
   export default {
     data: () => ({
@@ -48,6 +49,7 @@
       activeTab: 0,
       pathRouter: '/thu-tuc-hanh-chinh',
       currentAgency: '',
+      currentAgencyTh: '',
       currentDomain: '',
       currentLevel: '',
       currentMethod: '',
@@ -90,30 +92,9 @@
           mappingCount: 'count',
           children: [],
           icon: 'select_all'
-        },
-        // {
-        //   id: 4,
-        //   name: 'HÌNH THỨC NỘP',
-        //   mappingName: 'methodName',
-        //   mappingCode: 'methodCode',
-        //   mappingCount: 'count',
-        //   children: [
-        //     {
-        //       methodName: 'Nộp trực tiếp',
-        //       methodCode: 'MC',
-        //       count: 0,
-        //       level: '2'
-        //     },
-        //     {
-        //       methodName: 'Nộp trực tuyến',
-        //       methodCode: 'DVC',
-        //       count: 0,
-        //       level: '3,4'
-        //     }
-        //   ],
-        //   icon: 'playlist_add'
-        // }
+        }
       ],
+      hasCoQuanThucHien: false
     }),
     components: {
       GoTop
@@ -143,16 +124,81 @@
     mounted () {
       this.onResize()
       window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+        $('.input-search input').css('margin-top', '5px')
+        $('.input-search .v-input__slot').css('min-height', '36px')
+        $('.input-search .v-input__append-inner').css('margin-top', '10px')
+      }
+    },
+    beforeCreate() {
+      console.log(this.message)
     },
     created () {
       var vm = this
+      try {
+        vm.hasCoQuanThucHien = hasCoQuanThucHien
+      } catch (error) {
+        vm.hasCoQuanThucHien = false
+      }
       vm.$nextTick(function () {
         let current = vm.$router.history.current
         let newQuery = current.query
+        if (vm.hasCoQuanThucHien) {
+          vm.menuServiceInfos = [
+            {
+              id: 1,
+              name: 'Cơ quan quản lý',
+              mappingName: 'administrationName',
+              mappingCode: 'administrationCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'account_balance'
+            },
+            {
+              id: 2,
+              name: 'Cơ quan thực hiện',
+              mappingName: 'govAgencyName',
+              mappingCode: 'govAgencyCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'fas fa fa-book'
+            },
+            {
+              id: 3,
+              name: 'Lĩnh vực',
+              mappingName: 'domainName',
+              mappingCode: 'domainCode',
+              mappingCount: 'count',
+              children: [],
+              icon: 'domain'
+            },
+            {
+              id: 4,
+              name: 'Mức độ',
+              mappingName: 'levelName',
+              mappingCode: 'level',
+              mappingCount: 'count',
+              children: [],
+              icon: 'sort'
+            },
+            {
+              id: 5,
+              name: 'Tất cả thủ tục',
+              mappingName: 'all',
+              mappingCode: 'all',
+              mappingCount: 'count',
+              children: [],
+              icon: 'select_all'
+            }
+          ]
+        }
+        
         vm.$store.dispatch('getGovAgency').then(function (result) {
           vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           vm.menuServiceInfos[0].children = result
           vm.$store.commit('setAgencyList', result)
+          // console.log('run app',  current)
           if ((vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'Landing') && !newQuery.hasOwnProperty('agency')) ||
           (vm.govAgencyList.length > 0 && current.hasOwnProperty('name') && (current.name === 'NotFound') && !newQuery.hasOwnProperty('agency'))
           ) {
@@ -175,23 +221,49 @@
             vm.currentAgency = newQuery.hasOwnProperty('agency') ? newQuery.agency : ''
           }
         })
+        // 
+        if (vm.hasCoQuanThucHien) {
+          vm.$store.dispatch('getGovAgencyThucHien').then(function (result) {
+            vm.currentAgencyTh = newQuery.hasOwnProperty('agencyth') ? newQuery.agencyth : ''
+            vm.menuServiceInfos[1].children = result
+            vm.$store.commit('setAgencyListThucHien', result)
+          }).catch(function(){})
+        }
+        // 
         let filterDomain = {
           agencyCode: ''
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.menuServiceInfos[1].children = result
+          if (vm.hasCoQuanThucHien) {
+            vm.menuServiceInfos[2].children = result
+          } else {
+            vm.menuServiceInfos[1].children = result
+          }
           vm.$store.commit('setDomainList', result)
           vm.currentDomain = newQuery.hasOwnProperty('domain') ? newQuery.domain : ''
         })
         vm.$store.dispatch('getLevelList').then(function (result) {
-          vm.menuServiceInfos[2].children = result
+          if (vm.hasCoQuanThucHien) {
+            vm.menuServiceInfos[3].children = result
+          } else {
+            vm.menuServiceInfos[2].children = result
+          }
           vm.$store.commit('setLevelList', result)
           vm.currentLevel = newQuery.hasOwnProperty('level') ? newQuery.level : ''
         })
         vm.currentMethod = newQuery.hasOwnProperty('level') && String(newQuery.level) === '2' ? 'MC' : newQuery.hasOwnProperty('level') && String(newQuery.level === '3,4') ? 'DVC' : ''
         vm.activeAll = newQuery.hasOwnProperty('all') && newQuery['all']
         vm.getCountAll()
+        // 
+        axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+          let userData = response.data
+          vm.$store.commit('setUserLogin', userData)
+        })
+        .catch(function(error) {
+        })
       })
+      // 
+      
     },
     watch: {
       '$route': function (newRoute, oldRoute) {
@@ -204,6 +276,7 @@
           vm.isDetail = false
         }
         vm.currentAgency = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+        vm.currentAgencyTh = currentQuery.hasOwnProperty('agencyth') ? currentQuery.agencyth : ''
         vm.currentDomain = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
         vm.currentLevel = currentQuery.hasOwnProperty('level') ? currentQuery.level : ''
         vm.currentMethod = currentQuery.hasOwnProperty('level') && String(currentQuery.level) === '2' ? 'MC' : currentQuery.hasOwnProperty('level') && String(currentQuery.level === '3,4') ? 'DVC' : ''
@@ -221,8 +294,8 @@
               dossierMc += Number(list[index]['count'])
             }
           }
-          vm.menuServiceInfos[3]['children'][0]['count'] = dossierMc
-          vm.menuServiceInfos[3]['children'][1]['count'] = dossierDvc
+          // vm.menuServiceInfos[3]['children'][0]['count'] = dossierMc
+          // vm.menuServiceInfos[3]['children'][1]['count'] = dossierDvc
         }
       }
     },
@@ -234,16 +307,32 @@
       },
       filterAction (index, item1) {
         let vm = this
-        if (index === 0) {
-          vm.filterAgency(item1)
-        } else if (index === 1) {
-          vm.filterDomain(item1)
-        } else if (index === 2) {
-          vm.filterLevel(item1)
-        } else if (index === 3) {
-          vm.filterMethod(item1)
-        } else if (index === 5) {
-          vm.filterAll()
+        if (!vm.hasCoQuanThucHien) {
+          if (index === 0) {
+            vm.filterAgency(item1)
+          } else if (index === 1) {
+            vm.filterDomain(item1)
+          } else if (index === 2) {
+            vm.filterLevel(item1)
+          } else if (index === 3) {
+            vm.filterMethod(item1)
+          } else if (index === 5) {
+            vm.filterAll()
+          }
+        } else {
+          if (index === 0) {
+            vm.filterAgency(item1)
+          } else if (index === 1) {
+            vm.filterAgencyThucHien(item1)
+          } else if (index === 2) {
+            vm.filterDomain(item1)
+          } else if (index === 3) {
+            vm.filterLevel(item1)
+          } else if (index === 4) {
+            vm.filterMethod(item1)
+          } else if (index === 5) {
+            vm.filterAll()
+          }
         }
       },
       filterAgency (item) {
@@ -254,6 +343,31 @@
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['agency'] = item.administrationCode
+        newQuery['agencyth'] = ''
+        newQuery['domain'] = ''
+        newQuery['level'] = ''
+        newQuery['all'] = false
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      },
+      filterAgencyThucHien (item) {
+        var vm = this
+        vm.currentAgencyth = item.govAgencyCode
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agencyth'] = item.govAgencyCode
+        newQuery['agency'] = ''
         newQuery['domain'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
@@ -278,6 +392,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = item.domainCode
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = false
         for (let key in newQuery) {
@@ -301,6 +416,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
@@ -324,6 +440,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['all'] = false
         newQuery['level'] = item.level
         for (let key in newQuery) {
@@ -348,6 +465,7 @@
         newQuery['page'] = 1
         newQuery['domain'] = ''
         newQuery['agency'] = ''
+        newQuery['agencyth'] = ''
         newQuery['level'] = ''
         newQuery['all'] = true
         for (let key in newQuery) {

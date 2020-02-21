@@ -104,11 +104,52 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
+              jobposCode: 'DANHGIA_' + data.itemCode,
               start: data.start,
               end: data.end
             }
           }
           axios.get(state.endPointApi + '/employees/publish/' + data.itemCode, param).then(result => {
+            if (result.data) {
+              let employees = result.data.data
+              if (employees && employees.length > 0) {
+                for (let key in employees) {
+                  employees[key].imgSrc = ''
+                  employees[key].score = 0
+                  employees[key].totalVoting = 0
+                }
+              }
+              let dataOutput = [result.data.total, employees]
+              resolve(dataOutput)
+            } else {
+              resolve([])
+            }
+          }).catch(xhr => {
+            reject(xhr)
+          })
+        })
+      })
+    },
+    loadEmployeesProxy ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result1) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            }
+          }
+          let params = {
+            jobposCode: 'DANHGIA_' + data.itemCode,
+            start: data.start,
+            end: data.end
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('method', 'GET')
+          dataPost.append('url', '/employees/publish/' + data.itemCode)
+          dataPost.append('data', JSON.stringify(params))
+          dataPost.append('serverCode', 'SERVER_' + data.itemCode)
+          axios.post('/o/rest/v2/proxy', dataPost, param).then(function (result) {
             if (result.data) {
               let employees = result.data.data
               if (employees && employees.length > 0) {

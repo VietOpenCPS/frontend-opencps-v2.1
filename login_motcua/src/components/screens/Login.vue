@@ -1,5 +1,14 @@
 <template>
   <div id="login_container">
+    <div class="header_login">
+      <div class="logo"> 
+        <a href=""> 
+          <img src=""> 
+          <div class="text-logo">
+          </div> 
+        </a> 
+      </div>
+    </div>
     <v-layout class="mt-4" wrap style="max-width:550px;margin: 0 auto">
       <v-flex xs12 v-if="isSigned">
         <v-card flat class="px-2 py-3" style="border: 1px solid #dddddd;">
@@ -112,6 +121,7 @@
         </v-flex>
       </v-flex>
     </v-layout>
+    <div class="footer_login"></div>
   </div>
 </template>
 
@@ -142,7 +152,7 @@ export default {
       $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.makeImageCap()
+      // vm.makeImageCap()
     })
   },
   updated () {
@@ -176,6 +186,15 @@ export default {
       }
     },
     doLogOut () {
+      let vm = this
+      // if (typeof(Storage) !== 'undefined') {
+      //   sessionStorage.removeItem('userLogout')
+      //   if (String(vm.userData['className']).indexOf('Employee') >= 0) {
+      //     sessionStorage.setItem('userLogout', 'employee')
+      //   } else {
+      //     sessionStorage.setItem('userLogout', 'applicant')
+      //   }
+      // }
       window.location.href = "/c/portal/logout";
     },
     getPassword () {

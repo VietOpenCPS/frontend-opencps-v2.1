@@ -18,7 +18,8 @@ export const store = new Vuex.Store({
     index: 0,
     agencyList: [],
     domainList: [],
-    levelList: []
+    levelList: [],
+    isMobile: false,
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -315,7 +316,7 @@ export const store = new Vuex.Store({
             } else {
               resolve(response.data)
               toastr.clear()
-              toastr.success('Xác thực thành công. Bạn vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
+              toastr.success('Xác thực thành công. Vui lòng kiểm tra email hoặc số điện thoại để có mật khẩu mới')
               setTimeout(function () {
                 let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
                 window.open(redirectURL, '_self')
@@ -349,7 +350,10 @@ export const store = new Vuex.Store({
     },
     setLevelList (state, payload) {
       state.levelList = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -366,6 +370,9 @@ export const store = new Vuex.Store({
     },
     getLevelList (state) {
       return state.levelList
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

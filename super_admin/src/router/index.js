@@ -7,6 +7,7 @@ import TableEditorForm from '@/components/screens/TableEditorForm.vue'
 import QuyTrinhThuTuc from '@/components/extform/QuyTrinhThuTuc.vue'
 import ThamSoHeThong from '@/components/extform/ThamSoHeThong.vue'
 import Voting from '@/components/extform/Voting.vue'
+import Report from '@/components/extform/Report.vue'
 import Import from '@/components/screens/import.vue'
 import Export from '@/components/screens/export.vue'
 import FlowChartView from '@/components/screens/FlowChartView.vue'
@@ -60,6 +61,15 @@ const routes = [
         path: '/table/opencps_voting/votings',
         name: 'Voting',
         component: Voting,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/table/opencps_config_report/reports',
+        name: 'Report',
+        component: Report,
         props: true,
         meta: {
           requiresAuth: true

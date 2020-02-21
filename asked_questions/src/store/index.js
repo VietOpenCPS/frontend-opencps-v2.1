@@ -26,14 +26,18 @@ export const store = new Vuex.Store({
     questionPage: 1,
     totalQuestion: 0,
     agencyFilter: '',
+    lvdsFilter: '',
+    lvttFilter: '',
     keywordFilter: '',
+    typeFilter: '',
     user: {
       'role': ''
     },
     serverConfig: '',
     endPointApi: '/o/rest/v2',
     // endPointApi: 'http://127.0.0.1:8081/api',
-    counter: true
+    counter: true,
+    isMobile: false
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -112,6 +116,9 @@ export const store = new Vuex.Store({
                 keyword: filter.keyword ? filter.keyword : '',
                 publish: filter.publish,
                 answered: filter.answered,
+                domainCode: filter.domainCode ? filter.domainCode : '',
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.questionType ? filter.questionType : ''
               }
             }
           } else {
@@ -124,7 +131,10 @@ export const store = new Vuex.Store({
                 end: state.questionPage * 20,
                 publish: 1,
                 govAgencyCode: filter.agencyCode ? filter.agencyCode : '',
-                keyword: filter.keyword ? filter.keyword : ''
+                keyword: filter.keyword ? filter.keyword : '',
+                domainCode: filter.domainCode ? filter.domainCode : '',
+                subDomainCode: filter.subDomainCode ? filter.subDomainCode : '',
+                questionType: filter.questionType ? filter.questionType : ''
               }
             }
           }
@@ -195,10 +205,10 @@ export const store = new Vuex.Store({
                 end: 1,
                 govAgencyCode: filter['agencyCode'] ? filter['agencyCode'] : '',
                 publish: filter['publish'] ? filter['publish'] : '',
-                answered: filter['answered'] ? filter['answered'] : ''
+                answered: filter['answered'] ? filter['answered'] : '',
+                questionType: filter['questionType'] ? filter['questionType'] : ''
               }
             }
-            console.log('param2', param)
             let url = state.serverConfig ? state.serverConfig['url'] : state.endPointApi
             axios.get(url + '/faq/questions', param).then(function (response) {
               if (response.data) {
@@ -230,8 +240,14 @@ export const store = new Vuex.Store({
           dataAdd.append('content', filter.content ? filter.content : '')
           dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('email', filter.email ? filter.email : '')
+          dataAdd.append('telNo', filter.telNo ? filter.telNo : '')
+          dataAdd.append('address', filter.address ? filter.address : '')
           dataAdd.append('publish', filter.publish ? filter.publish : '')
           dataAdd.append('govAgencyCode', filter.agencyCode ? filter.agencyCode : '')
+          dataAdd.append('domainCode', filter.domainCode ? filter.domainCode : '')
+          dataAdd.append('domainName', filter.domainName ? filter.domainName : '')
+          dataAdd.append('subDomainCode', filter.subDomainCode ? filter.subDomainCode : '')
+          dataAdd.append('subDomainName', filter.subDomainName ? filter.subDomainName : '')
           dataAdd.append('j_captcha_response', filter.j_captcha_response ? filter.j_captcha_response : '')
           dataAdd.append('questionType', filter.questionType ? filter.questionType : '')
           axios.post(url, dataAdd, param).then(response => {
@@ -452,8 +468,51 @@ export const store = new Vuex.Store({
             sort: 'sibling'
           }
         }
-        axios.get('/o/rest/v2/dictcollections/GOVERNMENT_AGENCY/dictitems', paramGetGovAgency).then(function (response) {
+        axios.get('/o/rest/v2/dictcollections/SERVICE_ADMINISTRATION/dictitems', paramGetGovAgency).then(function (response) {
           resolve(response.data.data)
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getLvdsList ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let paramGetGovAgency = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            sort: 'sibling'
+          }
+        }
+        axios.get('/o/rest/v2/dictcollections/QUESTION_SUBDOMAIN_CODE/dictitems', paramGetGovAgency).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          console.log(xhr)
+        })
+      })
+    },
+    getLvttList ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          },
+          params: {
+            agency: filter['agency'] ? filter['agency'] : '',
+            sort: 'siblingSearch'
+          }
+        }
+        axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+          if (response.data.data) {
+            resolve(response.data.data)
+          } else {
+            resolve([])
+          }
         }).catch(function (xhr) {
           console.log(xhr)
         })
@@ -509,6 +568,15 @@ export const store = new Vuex.Store({
     setAgencyFilter (state, payload) {
       state.agencyFilter = payload
     },
+    setLvdsFilter (state, payload) {
+      state.lvdsFilter = payload
+    },
+    setLvttFilter (state, payload) {
+      state.lvttFilter = payload
+    },
+    setTypeFilter (state, payload) {
+      state.typeFilter = payload
+    },
     setKeywordFilter (state, payload) {
       state.keywordFilter = payload
     },
@@ -523,7 +591,10 @@ export const store = new Vuex.Store({
     },
     setCounter (state, payload) {
       state.counter = payload
-    }
+    },
+    setIsMobile (state, payload) {
+      state.isMobile = payload
+    },
   },
   getters: {
     loading (state) {
@@ -556,14 +627,26 @@ export const store = new Vuex.Store({
     getUser (state) {
       return state.user
     },
-    getAgencyFilter (state, payload) {
+    getAgencyFilter (state) {
       return state.agencyFilter
     },
-    getKeywordFilter (state, payload) {
+    getLvdsFilter (state) {
+      return state.lvdsFilter
+    },
+    getLvttFilter (state) {
+      return state.lvttFilter
+    },
+    getTypeFilter (state) {
+      return state.typeFilter
+    },
+    getKeywordFilter (state) {
       return state.keywordFilter
     },
-    getCounter (state, payload) {
+    getCounter (state) {
       return state.counter
-    }
+    },
+    getIsMobile (state) {
+      return state.isMobile
+    },
   }
 })

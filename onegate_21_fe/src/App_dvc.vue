@@ -1,7 +1,7 @@
 <template>
   <v-app class="onegate__fe" style="border: 1px solid #dedede;">
     <v-navigation-drawer app clipped floating width="240"
-      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !viewMobile && !isOffLine"
+      :class='{"detail_state": detailState !== 0}' v-if="trangThaiHoSoList.length !== 0 && !isMobile && !isOffLine"
     >
       <div class="">
         <v-btn class="px-0 mt-0 ml-0" block color="primary" v-on:click.native="doAddDVC()"
@@ -59,9 +59,9 @@
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <div v-if="trangThaiHoSoList.length !== 0 && viewMobile && !isOffLine">
-      <div class="row-header mb-2 py-2" style="background-color: #070f52">
-        <div class="ml-2 text-bold white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
+    <div v-if="trangThaiHoSoList.length !== 0 && isMobile && !isOffLine" id="m-navigation">
+      <div class="row-header mb-0 py-2" style="background-color: #070f52">
+        <div class="ml-2 white--text"> <span>QUẢN LÝ HỒ SƠ</span> </div>
       </div>
       <div class="mx-2">
         <v-btn block color="primary" v-on:click.native="doAddDVC()"
@@ -124,14 +124,27 @@
       <v-alert class="mx-3" v-if="!loading && trangThaiHoSoList.length === 0 && !isOffLine" outline color="warning" icon="priority_high" :value="true">
         Bạn không có quyền thao tác!
       </v-alert>
+      <v-dialog v-model="dialogVerifycation" max-width="350">
+        <v-card class="px-0">
+          <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+          <v-divider class="my-0"></v-divider>
+          <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+            Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-content>
     <object id="plugin0" type="application/x-cryptolib05plugin" width="0" height="0"></object>
   </v-app>
 </template>
 
 <script>
-  
-  import { isMobile } from 'mobile-device-detect'
+  import axios from 'axios'
+  // import { isMobile } from 'mobile-device-detect'
   export default {
     data: () => ({
       isCallBack: true,
@@ -139,8 +152,22 @@
       loading: true,
       currentStep: '0',
       counterData: [],
-      detailState: 0
+      detailState: 0,
+      dialogVerifycation: false,
+      verificationApplicantCreateDossier: false
     }),
+    beforeDestroy () {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', this.onResize, { passive: true })
+      }
+    },
+    mounted () {
+      this.onResize()
+      window.addEventListener('resize', this.onResize, { passive: true })
+      if (this.isMobile) {
+        $('section#content').css('padding-left', '0px')
+      }
+    },
     computed: {
       currentIndex () {
         return this.$store.getters.index
@@ -151,15 +178,45 @@
       activeGetCounter () {
         return this.$store.getters.activeGetCounter
       },
-      viewMobile () {
-        return isMobile
-      },
+      // viewMobile () {
+      //   return isMobile
+      // },
       pathLanding () {
-        return isMobile ? '/m/danh-sach-ho-so' : '/danh-sach-ho-so'
+        return '/danh-sach-ho-so'
+      },
+      currentUser () {
+        return this.$store.getters.loadingInitData.user
+      },
+      userLoginInfomation () {
+        return this.$store.getters.getUserLogin
+      },
+      isMobile () {
+        return this.$store.getters.getIsMobile
       }
     },
     created () {
-      var vm = this
+      let vm = this
+      let isMobile = window.innerWidth < 1264
+      vm.$store.commit('setIsMobile', isMobile)
+      //
+      try {
+        vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+      } catch (error) {
+      }
+      // 
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+      })
+      .catch(function(error) {
+      })
+      if (window.location.href.includes('/m/') && vm.viewMobile) {
+        $('head meta[name=viewport]').remove()
+      } else {
+        if ($('head meta[name=viewport]').length === 0) {
+          $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        }
+      }
       vm.$nextTick(function () {
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {
@@ -185,7 +242,7 @@
       })
     },
     updated () {
-      var vm = this
+      let vm = this
       vm.$nextTick(function () {
         let currentParams = vm.$router.history.current.params
         if (currentParams.hasOwnProperty('index') && vm.isCallBack) {
@@ -202,6 +259,15 @@
     watch: {
       '$route': function (newRoute, oldRoute) {
         let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+        // if (window.location.href.includes('/m/') && vm.viewMobile) {
+        //   $('head meta[name=viewport]').remove()
+        // } else {
+        //   if ($('head meta[name=viewport]').length === 0) {
+        //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+        //   }
+        // }
         let currentParams = newRoute.params
         let currentQuery = newRoute.query
         if (currentQuery.hasOwnProperty('step')) {
@@ -219,7 +285,7 @@
         }
       },
       activeGetCounter (val) {
-        var vm = this
+        let vm = this
         setTimeout(function () {
           vm.loadingCounter()
         }, 300)
@@ -228,6 +294,17 @@
     methods: {
       toTableIndexing (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+              {
+                scrollTop: $('#table-dossier').offset().top,
+              }, 200,'linear'
+            )
+          }
+        } catch (error) {
+        }
+        
         this.$store.commit('setIndex', index)
         vm.$router.push({
           path: vm.pathLanding + '/' + index,
@@ -239,6 +316,17 @@
       },
       filterSteps (item, index) {
         let vm = this
+        try {
+          if (vm.isMobile && $('#table-dossier')) {
+            $('html, body').animate(
+            {
+              scrollTop: $('#table-dossier').offset().top,
+            }, 200,'linear'
+          )
+          }
+        } catch (error) {   
+        }
+
         let currentQuery = this.$router.history.current.query
         let currentParams = this.$router.history.current.params
         console.log('currentParams', currentParams)
@@ -313,8 +401,17 @@
       },
       doAddDVC () {
         let vm = this
-        vm.$router.push('/add-dvc/0')
-      }
+        if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+          vm.dialogVerifycation = true
+        } else {
+          vm.$router.push('/add-dvc/0')
+        }
+      },
+      onResize () {
+        let vm = this
+        let isMobile = window.innerWidth < 1264
+        vm.$store.commit('setIsMobile', isMobile)
+      },
     }
   }
 </script>

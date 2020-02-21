@@ -30,12 +30,12 @@
         </div> 
       </div>
       <v-layout wrap class="white py-2">
-        <v-flex xs4 class="px-2">
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="govAgencyList"
             v-model="govAgencySelected"
-            placeholder="Chọn cơ quan"
+            placeholder="Chọn cơ quan quản lý"
             item-text="administrationName"
             item-value="administrationCode"
             :hide-selected="true"
@@ -44,7 +44,21 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs4 class="px-2">
+        <v-flex v-if="hasCoQuanThucHien" :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
+          <v-autocomplete
+            class="select-border"
+            :items="govAgencyListThucHien"
+            v-model="govAgencyThucHienSelected"
+            placeholder="Chọn cơ quan thực hiện"
+            item-text="govAgencyName"
+            item-value="govAgencyCode"
+            :hide-selected="true"
+            clearable
+            @change="changeGovAgencyThucHien"
+            box
+          ></v-autocomplete>
+        </v-flex>
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="domainListCurrent"
@@ -58,7 +72,7 @@
             box
           ></v-autocomplete>
         </v-flex>
-        <v-flex xs4 class="px-2">
+        <v-flex :class="hasCoQuanThucHien ? 'xs12 sm3' : 'xs12 sm4'" class="px-2">
           <v-autocomplete
             class="select-border"
             :items="levelList"
@@ -99,7 +113,7 @@
                   <content-placeholders-text :lines="1" />
                 </content-placeholders>
                 <div v-else>
-                  <span>{{props.item.serviceCode}}</span>
+                  <span>{{props.item.serviceCodeDVCQG ? props.item.serviceCodeDVCQG : props.item.serviceCode}}</span>
                 </div>
               </td>
               <td class="text-xs-left" @click="viewDetail(props.item)">
@@ -138,8 +152,8 @@
                     <v-btn small slot="activator" color="primary" v-if="props.item.maxLevel >= 3" style="min-width: 110px;">Nộp hồ sơ</v-btn>
                     <v-btn small slot="activator" color="primary" v-else style="min-width: 110px;">Hướng dẫn</v-btn>
                     <v-list v-if="props.item.serviceConfigs">
-                      <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index">
-                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                      <v-list-tile v-for="(item2, index) in serviceConfigs(props.item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                        <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                         <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                       </v-list-tile>
                     </v-list>
@@ -188,6 +202,16 @@
     </div>
     <!-- layout for mobile -->
     <div class="list-thu-tuc" v-else>
+      <div class="row-header" style="background-color: #0054a6">
+        <div class="ml-2 py-2 text-bold white--text"> <span>DANH SÁCH THỦ TỤC HÀNH CHÍNH</span> </div>
+        <div class="layout row wrap header_tools row-blue">
+          <div class="flex text-right" style="margin-left: auto;">
+            <v-btn flat class="my-0 mx-0 btn-border-left white--text" @click="goBack" active-class="temp_active">
+              <v-icon size="18">reply</v-icon> &nbsp; Quay lại
+            </v-btn>
+          </div>
+        </div> 
+      </div>
       <v-layout wrap class="white py-2">
         <v-flex xs12 sm6 md3 class="px-2 input-group--text-field-box">
           <v-select
@@ -236,12 +260,13 @@
         <v-flex xs12 sm6 md3 class="pl-2 pr-2">
           <div style="position:relative">
             <v-text-field class="input-border input-search"
-              placeholder="Nhập tên thủ tục hành chính"
+              placeholder="Tên thủ tục, mã thủ tục..."
               v-model="serviceNameKey"
               @keyup.enter="filterServiceName()"
               box
               append-icon="search"
               :append-icon-cb="filterServiceName"
+              hide-details
             ></v-text-field>
           </div>
         </v-flex>
@@ -251,8 +276,8 @@
       </content-placeholders>
       <div v-else class="service__info__table mt-2">
         <v-card class="mx-2">
-          <div class="px-2 py-2 blue text-bold white--text">
-            STT | Tên thủ tục
+          <div class="px-2 py-2 text-bold white--text" style="background: #0054a6;">
+            STT | Thủ tục hành chính
           </div>
           <v-list class="py-0">
             <template v-for="(item, index) in serviceInfoList" >
@@ -261,7 +286,7 @@
                   <span>{{index + 1}}</span>
                 </v-flex>
                 <v-flex xs10 @click="viewDetail(item)">
-                  <div style="color:#1e5018">{{item.serviceName}}</div>
+                  <div style="color:#0054a6; text-align:justify;">{{item.serviceName}}</div>
                   <div> <span class="text-bold">Lĩnh vực: </span> <span>{{item.domainName}}</span> </div>
                   <div> <span class="text-bold">Mức độ: </span> <span>{{item.maxLevel}}</span> </div>
                 </v-flex>
@@ -275,8 +300,8 @@
                         <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-if="item.maxLevel >= 3">Nộp hồ sơ &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                         <v-btn class="mx-0 my-0" small slot="activator" color="primary" v-else>Xem hướng dẫn &nbsp; <v-icon size="18">arrow_drop_down</v-icon></v-btn>
                         <v-list v-if="item.serviceConfigs">
-                          <v-list-tile v-for="(item2, index) in serviceConfigs(item.serviceConfigs)" :key="index">
-                            <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)">{{item2.govAgencyName}}</v-list-tile-title>
+                          <v-list-tile v-for="(item2, index) in serviceConfigs(item.serviceConfigs)" :key="index" :class="item2.govAgencyCode+'-'+item2.serviceConfigId">
+                            <v-list-tile-title v-if="item2.serviceLevel >= 3" @click="createDossier(item2)" >{{item2.govAgencyName}}</v-list-tile-title>
                             <v-list-tile-title v-else @click="viewGuide(item2)">{{item2.govAgencyName}}</v-list-tile-title>
                           </v-list-tile>
                         </v-list>
@@ -339,7 +364,7 @@
                 </v-btn>
               </v-flex>
               <v-flex xs6 class="pl-2">
-                <v-btn class="mr-3" color="primary" @click="doCreateDossier">
+                <v-btn class="mr-3" color="primary" >
                   <i class="fa fa-paper-plane mr-2" style="font-size: 13px;"></i>
                   NỘP HỒ SƠ KHÔNG CẦN TÀI KHOẢN
                 </v-btn>
@@ -349,6 +374,86 @@
         </v-card>
       </v-dialog>
     </div>
+    <v-dialog v-model="dialogVerifycation" max-width="350">
+      <v-card class="px-0">
+        <v-card-title color="primary" class="headline">Yêu cầu xác minh tài khoản</v-card-title>
+        <v-divider class="my-0"></v-divider>
+        <v-card-text>Tài khoản chỉ được phép nộp tối đa 3 hồ sơ trực tuyến khi chưa được xác minh. <br>
+          Để tiếp tục nộp hồ sơ trực tuyến vui lòng mang chứng minh thư nhân dân/ thẻ căn cước đến Bộ phận tiếp nhận và trả kết quả để được xác minh.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="dialogVerifycation = false">Đóng</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogLogin" max-width="550">
+      <v-card class="px-0">
+        <v-card-text class="px-0 py-0">
+          <v-flex v-if="!isSigned" xs12>
+            <nav class="toolbar theme--dark primary py-2" data-booted="true">
+              <div class="toolbar__content"  style="justify-content: center">
+                <h3 class="white--text">ĐĂNG NHẬP</h3>
+              </div>
+            </nav>
+            <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
+              <v-form ref="form" v-model="valid" lazy-validation class="mt-3">
+                <v-flex xs12>
+                  <v-text-field
+                    box
+                    placeholder="Email đăng nhập"
+                    v-model="userName"
+                    :rules="[v => !!v || 'Email đăng nhập là bắt buộc']"
+                    required
+                    prepend-inner-icon="person_outline"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 class="">
+                  <v-text-field
+                    box
+                    placeholder="Mật khẩu"
+                    v-model="passWord"
+                    :type="'password'"
+                    :rules="[v => !!v || 'Mật khẩu là bắt buộc']"
+                    required
+                    prepend-inner-icon="vpn_key"
+                    @keyup.enter="submitConfirmLogin"
+                  ></v-text-field>
+                </v-flex>
+                <v-layout wrap class="ml-2">
+                  <v-flex @click="getPassword" style="font-size: 12px;cursor: pointer;padding:7px">
+                    <div class="primary--text right" >
+                      Quên mật khẩu?
+                    </div>
+                  </v-flex>
+                </v-layout>
+                <v-flex xs12 class="text-xs-left text-xs-center">
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    @click="submitConfirmLogin"
+                  >
+                    <v-icon>how_to_reg</v-icon>&nbsp;
+                    Đăng nhập
+                  </v-btn>
+                  <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    @click="register"
+                  >
+                    <v-icon>create</v-icon>&nbsp;
+                    Đăng ký
+                  </v-btn>
+                </v-flex>
+                
+              </v-form>
+            </v-flex>
+          </v-flex>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -361,17 +466,24 @@ import support from '../../store/support.json'
 import TinyPagination from './Pagination.vue'
 Vue.use(toastr)
 export default {
-  props: [],
+  props: ['index'],
   components: {
     'tiny-pagination': TinyPagination
   },
   data: () => ({
     dialog_createDossier: false,
+    dialogVerifycation: false,
+    dialogLogin: false,
+    valid: false,
+    userName: '',
+    passWord: '',
+    loadingLogin: false,
     pathRouter: '/thu-tuc-hanh-chinh/',
     serviceInfoList: [],
     totalThuTuc: 0,
     thutucPage: 1,
     govAgencySelected: {},
+    govAgencyThucHienSelected: {},
     domainListCurrent: [],
     domainSelected: {},
     levelSelected: {},
@@ -410,11 +522,20 @@ export default {
         align: 'center',
         sortable: false
       }
-    ]
+    ],
+    isLogin: false,
+    verificationApplicantCreateDossier: false,
+    serviceSelected: '',
+    hasCoQuanThucHien: false,
+    configUrl: '',
+    keyCodeDvcqg: ''
   }),
   computed: {
     govAgencyList () {
       return this.$store.getters.getAgencyList
+    },
+    govAgencyListThucHien () {
+      return this.$store.getters.getAgencyListThucHien
     },
     domainList () {
       return this.$store.getters.getDomainList
@@ -424,15 +545,52 @@ export default {
     },
     isMobile () {
       return this.$store.getters.getIsMobile
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
     }
   },
   created () {
     var vm = this
+    try {
+      vm.hasCoQuanThucHien = hasCoQuanThucHien
+    } catch (error) {
+      vm.hasCoQuanThucHien = false
+    }
+    // 
+    try {
+      vm.configUrl = configSso 
+    } catch (error) {
+    }
+    // 
+    try {
+      vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
+    } catch (error) {
+    }
+    // 
+    try {
+      vm.keyCodeDvcqg = keyCodeDvcqg
+    } catch (error) {
+    }
+    // 
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
-      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      if (vm.keyCodeDvcqg) {
+        if (currentQuery.hasOwnProperty(vm.keyCodeDvcqg) && currentQuery[vm.keyCodeDvcqg]) {
+          let url = window.location.href.split('?')[0] + '/' + currentQuery[vm.keyCodeDvcqg] + '?' + window.location.href.split('?')[1]
+          window.location.href = url
+        }
+      } else {
+        if (currentQuery.hasOwnProperty('MaTTHCDP') && currentQuery['MaTTHCDP']) {
+          let url = window.location.href.split('?')[0] + '/' + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1]
+          window.location.href = url
+        }
+      }
+      // 
+      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -459,27 +617,32 @@ export default {
     vm.$nextTick(function () {
     })
   },
+  mounted () {
+    if (this.isMobile) {
+      $('.input-search input').css('margin-top', '5px')
+      $('.input-search .v-input__slot').css('min-height', '36px')
+      $('.input-search .v-input__append-inner').css('margin-top', '10px')
+    }
+  },
   watch: {
     '$route': function (newRoute, oldRoute) {
       let vm = this
       let currentParams = newRoute.params
       let currentQuery = newRoute.query
       vm.domainListCurrent = []
-      if (currentQuery.hasOwnProperty('agency')) {
+      if ((currentQuery.hasOwnProperty('agency') && currentQuery['agency']) || vm.index) {
         let filterDomain = {
-          agencyCode: currentQuery['agency']
+          agencyCode: currentQuery['agency'] ? currentQuery['agency'] : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
         }
         vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
           vm.domainListCurrent = result
         })
-        // vm.domainListCurrent = vm.domainList.filter(function (itemLinhVuc) {
-        //   return (itemLinhVuc.domainCode.indexOf(currentQuery.agency) === 0)
-        // })
       } else {
         vm.domainListCurrent = vm.domainList
       }
-      vm.govAgencySelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') ? currentQuery.agency : ''
+      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
       vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
       vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
       vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
@@ -495,6 +658,31 @@ export default {
         let queryString = '?'
         newQuery['page'] = 1
         newQuery['agency'] = vm.govAgencySelected
+        newQuery['agencyth'] = ''
+        newQuery['domain'] = ''
+        newQuery['keyword'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        vm.$router.push({
+          path: vm.pathRouter + queryString,
+          query: {
+            renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+          }
+        })
+      }, 100)
+    },
+    changeGovAgencyThucHien () {
+      let vm = this
+      setTimeout(function () {
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['agencyth'] = vm.govAgencyThucHienSelected
+        newQuery['agency'] = ''
         newQuery['domain'] = ''
         newQuery['keyword'] = ''
         for (let key in newQuery) {
@@ -519,6 +707,7 @@ export default {
         newQuery['page'] = 1
         newQuery['domain'] = vm.domainSelected
         newQuery['keyword'] = vm.serviceNameKey
+        newQuery['agencyth'] = ''
         for (let key in newQuery) {
           if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== null) {
             queryString += key + '=' + newQuery[key] + '&'
@@ -583,7 +772,8 @@ export default {
       var filter = null
       filter = {
         page: currentQuery.page ? currentQuery.page : 1,
-        administration: currentQuery.hasOwnProperty('agency') ? currentQuery.agency : '',
+        administration: currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : ''),
+        agency: currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : '',
         keyword: currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : '',
         level: currentQuery.hasOwnProperty('level') ? currentQuery.level : '',
         domain: currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
@@ -606,6 +796,35 @@ export default {
         vm.thutucPage = 1
       })
     },
+    submitConfirmLogin () {
+      let vm = this
+      let current = vm.$router.history.current
+      let filter = {
+        npmreactlogin_login: vm.userName,
+        npmreactlogin_password: vm.passWord
+      }
+      if (vm.userName && vm.passWord) {
+        vm.loadingLogin = true
+        vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
+          vm.loadingLogin = false
+          if (result === 'success') {
+            vm.dialogLogin = false
+            vm.isLogin = true
+            vm.createDossier(vm.serviceSelected)
+          }          
+        }).catch(function(){
+          vm.loadingLogin = false
+        })
+      }
+    },
+    register () {
+      let vm = this
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+    },
+    getPassword () {
+      let vm = this
+      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + '/#/cap-lai-mat-khau' : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register/#/cap-lai-mat-khau'
+    },
     paggingData (config) {
       let vm = this
       let current = vm.$router.history.current
@@ -623,20 +842,36 @@ export default {
       })
     },
     viewDetail (item) {
-      var vm = this
-      vm.$router.push({
-        path: vm.pathRouter + item.serviceInfoId
-      })
+      let vm = this
+      if (item.serviceCodeDVCQG) {
+        vm.$router.push({
+          path: vm.pathRouter + item.serviceInfoId + '?code=' + item.serviceCodeDVCQG
+        })
+      } else {
+        vm.$router.push({
+          path: vm.pathRouter + item.serviceInfoId
+        })
+      }
     },
     createDossier (item) {
-      let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
-      if (isSigned) {
-        let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
-        let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
-        window.open(url, '_self')
+      let vm = this
+      vm.serviceSelected = item
+      if (item.serviceUrl) {
+        window.location.href = item.serviceUrl
       } else {
-        alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
-        // vm.dialog_createDossier = true
+        let isSigned = window.themeDisplay ? window.themeDisplay.isSignedIn() : ''
+        if (isSigned || vm.isLogin) {
+          if (vm.verificationApplicantCreateDossier && vm.userLoginInfomation && vm.userLoginInfomation['verification'] && String(vm.userLoginInfomation['verification']) === '2') {
+            vm.dialogVerifycation = true
+          } else {
+            let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
+            let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
+            window.open(url, '_self') 
+          }
+        } else {
+          vm.dialogLogin = true
+          // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
+        }
       }
     },
     doLogin () {
@@ -644,9 +879,6 @@ export default {
       let redirectURL = window.themeDisplay.getLayoutRelativeURL().substring(0, window.themeDisplay.getLayoutRelativeURL().lastIndexOf('\/'))
       let url = redirectURL + '/dich-vu-cong#/add-dvc/' + item.serviceConfigId
       window.open(url, '_self')
-    },
-    doCreateDossier () {
-      let vm = this
     },
     viewGuide (item) {
       var vm = this
@@ -663,6 +895,9 @@ export default {
           return []
         }
       }
+    },
+    goBack () {
+      window.history.back()
     },
     getColor (level) {
       if (level === 2) {

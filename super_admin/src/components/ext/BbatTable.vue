@@ -84,6 +84,12 @@
           </v-list-tile-action>
           <v-list-tile-title>Biểu đồ quy trình</v-list-tile-title>
         </v-list-tile>
+        <v-list-tile v-if="tableName === 'opencps_serviceprocess'" v-on:click.native="cloneServiceProcess">
+          <v-list-tile-action>
+            <v-icon>copyright</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Sao chép quy trình</v-list-tile-title>
+        </v-list-tile>
         <v-list-tile v-on:click.native="deleteRecord()">
           <v-list-tile-action>
             <v-icon color="red darken-3">clear</v-icon>
@@ -671,6 +677,10 @@
           path: '/table/' + vm.tableName + '/flowchart/' + idEditor,
           query: newQuery
         })
+      },
+      cloneServiceProcess () {
+        let currentProcess = this.dataSocket['tableData'][this.currentIndex]
+        this.$emit('cloneProcess', currentProcess[0], currentProcess[1], currentProcess[2])
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout class="mt-4" wrap style="max-width:550px;margin: 0 auto">
+    <v-layout :style="dialogVerify ? 'visibility: hidden;' : ''" class="mt-4" wrap style="max-width:550px;margin: 0 auto">
       <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
         <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
           <span class="text-bold">XÁC THỰC TÀI KHOẢN</span>
@@ -33,6 +33,25 @@
         </v-form>
       </v-flex>
     </v-layout>
+    <v-dialog
+      v-model="dialogVerify"
+      persistent
+      width="300"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          Xác thực tài khoản
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -50,16 +69,24 @@ export default {
     valid: false,
     pinCode: '',
     userName: '',
-    passWord: ''
+    passWord: '',
+    dialogVerify: false
   }),
   computed: {
   },
   created () {
     var vm = this
     vm.$nextTick(function () {
-      var vm = this
-      let current = vm.$router.history.current
-      let currentQuery = current.query
+      let vm = this
+      let currentQuery = vm.$router.history.current.query
+      let currentParams = vm.$router.history.current.params
+      if (currentQuery.hasOwnProperty('active_code') && currentQuery.active_code) {
+        vm.dialogVerify = true
+        vm.pinCode = currentQuery.active_code
+        setTimeout(function() {
+          vm.submitConfirmPIN()
+        }, 300)
+      }
     })
   },
   updated () {
@@ -78,7 +105,7 @@ export default {
         userId: currentQuery.hasOwnProperty('active_user_id') ? currentQuery.active_user_id : '',
         pinCode: vm.pinCode
       }
-      console.log('dataForm', dataForm)
+      // console.log('dataForm', dataForm)
       if (vm.$refs.form.validate() && dataForm.userId) {
         vm.loading = true
         let filter = dataForm

@@ -27,7 +27,6 @@
 
 <script>
   
-  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     props: {
       id: {
@@ -55,7 +54,7 @@
           arrTemp.push(vm.$store.dispatch('loadDossierTemplates', resultDossier))
           arrTemp.push(vm.$store.dispatch('loadDossierFiles', resultDossier.dossierId))
           Promise.all(arrTemp).then(results => {
-            vm.dossierTemplateItems = results[0]
+            vm.dossierTemplateItems = results[0]['dossierParts']
             vm.dossierFilesItems = results[1]
             vm.dossierTemplateSendItems = vm.filterDossierTemplateSend()
           }).catch(xhr => {

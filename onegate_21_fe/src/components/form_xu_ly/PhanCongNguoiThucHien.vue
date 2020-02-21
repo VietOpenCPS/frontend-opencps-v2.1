@@ -36,7 +36,7 @@
         <div slot="header">
           <div class="background-triangle-small"> 
             <v-icon size="18" color="white">star_rate</v-icon> 
-          </div>Phân công người thực hiện
+          </div>Chọn người thực hiện
         </div>
         <v-card >
           <div v-if="type === 1 || type === 3" class="px-4 py-1">

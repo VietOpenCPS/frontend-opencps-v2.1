@@ -620,7 +620,7 @@ input::-webkit-input-placeholder, input::placeholder{
 body .theme--light .list .list__tile--highlighted {
     background: none;
 }
-body .card__title.headline {
+body .v-card__title.headline {
     padding: 5px 16px;
     font-size: 16px !important;
     font-weight: bold;
@@ -1360,13 +1360,14 @@ table > thead > tr > th.column {
 /* style vitual keyboard */
 .virtual-keyboard {
     z-index: 10000;
-    background-color: #1b4771;
+    background-color: #000000;
     width: calc(100% - 350px);
     position: fixed;
     bottom: 0px;
 }
 .virtual-keyboard .vue-touch-keyboard {
     width: 85% !important;
+    max-width: 1000px;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -1382,7 +1383,17 @@ table > thead > tr > th.column {
     bottom: 272px;
 }
 .vue-touch-keyboard .keyboard .key {
-    font-size: 25px !important
+    font-size: 25px !important;
+    background-color: #383533;
+    cursor: pointer;
+    padding-top: 15px;
+    overflow: hidden;
+    vertical-align: middle;
+    border: 1px solid #383533;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
 }
 .vue-touch-keyboard .keyboard .key.backspace {
     background-size: 18px;
@@ -1407,14 +1418,12 @@ table > thead > tr > th.column {
 .vue-touch-keyboard .keyboard .key {
     width: 60px;
     height: 60px; 
-    background-color: #fff;
+    background-color: #383533;
     cursor: pointer;
-    border-radius: 5px;
     padding-top: 15px;
     overflow: hidden;
     vertical-align: middle;
-    border: 1px solid #ccc;
-    color: #000;
+    color: #fff;
     text-align: center;
     white-space: nowrap;
     user-select: none;
@@ -1430,21 +1439,24 @@ table > thead > tr > th.column {
     flex: 20;
 }
 .vue-touch-keyboard .keyboard .key.control {
-    color: #000;
-    background-color: #fff;
+    color: #ccc;
+    background-color: #1e1b18;
     width: 100px;
+    border: 1px solid #383533;
 }
 .vue-touch-keyboard .keyboard .key.featured {
-    color: #000;
+    color: #ccc;
+    background-color: #1e1b18;
     width: 100px;
+    border: 1px solid #383533;
 }
 .vue-touch-keyboard .keyboard .key:hover {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }
 .vue-touch-keyboard .keyboard .key:active {
     transform: scale(0.98);
-    color: #000;
-    background-color: #fff;
+    color: #ccc;
+    background-color: #1e1b18;
 }
 .vue-touch-keyboard .keyboard .key.activated {
     color: #000;
@@ -1533,12 +1545,12 @@ table > thead > tr > th.column {
 /* style kios home */
 * {margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 a, a:hover, a:focus {text-decoration: none}
-header {
+/* header {
     background: white url('https://vietopencps.github.io/frontend-opencps-v2.1/o/opencps-frontend/kios/img/bg-banner.jpg') center center no-repeat;
     background-size: auto 100%;
 	padding: 10px 15px;
 	border-bottom: 1px solid #ddd;
-}
+} */
 header a {
 	display: -webkit-box;
 	display: flex;
@@ -1669,7 +1681,7 @@ header span {
 .tab-item .left a:nth-child(5):hover {
 	background-color: #e4d538;
 }
-.mWrapper > header {
+/* .mWrapper > header {
     display: none !important;
 }
 .mWrapper > nav {
@@ -1677,7 +1689,7 @@ header span {
 }
 .mWrapper > footer {
     display: none !important;
-}
+} */
 .mWrapper > section {
     padding: 0 !important
 }
@@ -1784,4 +1796,17 @@ body .v-table__overflow .v-table > thead > tr > th {
     color: #0b72ba;
     padding-left: 15px;
     border-bottom: 1px solid #d3d3d3
+}
+.back-btn {
+    position: absolute !important;
+  }
+  .table-detail-domain table.table tbody tr td:first-child {
+    min-width: 150px!important;
+    max-width: 200px;
+}
+.table-bordered tbody tr td:not(:last-child) {
+    border-right: 1px solid #d3d3d3;
+}
+.table-bordered tbody tr:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,.12);
 }

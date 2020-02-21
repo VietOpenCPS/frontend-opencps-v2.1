@@ -1,7 +1,7 @@
 <template>
 <v-form ref="form" v-model="valid" lazy-validation>
   <div class="form-chitiet">
-    <div class="row-header">
+    <div class="row-header" v-if="!hiddenAside">
       <div class="background-triangle-big"> <span>{{nameReport}}</span> </div>
       <div class="layout row wrap header_tools row-blue">
         <div class="flex xs12 pl-3 text-ellipsis text-bold">
@@ -45,8 +45,24 @@
         </div>
       </div>
     </div>
+    <v-flex v-if="hiddenAside" class="xs12" style="
+      background-color: #004b94 !important;
+      height: 36px;
+      padding: 9px 15px;
+      font-weight: 600;
+      color: white;">
+      <span>Đánh giá hài lòng của người sử dụng đối với dịch vụ công trực tuyến mức độ 3 và 4</span>
+      <div class="d-inline-block right" style="margin-top: -5px;">
+        <v-tooltip top>
+          <v-btn icon class="mx-0 my-0" slot="activator" @click="goToThongKe">
+            <v-icon size="20" color="white">assignment</v-icon>
+          </v-btn>
+          <span>Báo cáo tổng hợp</span>
+        </v-tooltip>
+      </div>
+    </v-flex>
     <v-layout row wrap class="filter_menu mt-4">
-      <v-flex xs6 sm2 class="mx-3" v-if="agencyLists.length > 1">
+      <v-flex xs6 sm2 class="px-3" v-if="agencyLists.length > 1">
         <v-autocomplete
           :items="agencyLists"
           v-model="govAgency"
@@ -56,7 +72,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs6 sm2 class="mx-3" v-if="groupBy.length > 1">
+      <v-flex xs6 sm2 class="px-3" v-if="groupBy.length > 1">
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
@@ -66,7 +82,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs12 sm2 class="mx-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
+      <v-flex xs12 sm2 class="px-3" v-for="(item, indexTool) in filters" v-bind:key="indexTool">
         <datetime-picker
           v-if="item['type'] === 'date' && showPicker"
           v-model="data[item.key]" 
@@ -80,14 +96,24 @@
           v-model="data[item.key]" 
           :label="item['label']">
         </v-text-field>
-        <v-select
+        <v-autocomplete
           v-if="item['type'] === 'select'"
           :items="item['source']"
           v-model="data[item.key]"
           :label="item['label']"
           item-value="value"
           item-text="name"
-        ></v-select>
+          :clearable="item['clearable']"
+        ></v-autocomplete>
+      </v-flex>
+      <v-flex xs12 sm6 v-if="hiddenAside">
+        <div class="d-inline-block right">
+          <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
+          <v-btn dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
+            <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
+          </v-btn>
+          <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
+        </div>
       </v-flex>
     </v-layout>
     <v-layout align-start justify-start row wrap class="filter_menu my-3 px-4" v-if="showConfig">
@@ -95,7 +121,7 @@
         <v-checkbox v-if="!reportType.startsWith('STATISTIC')" @change="changeConfig(index)" :label="item.text" v-model="item.selected"></v-checkbox>
       </v-flex>
     </v-layout>
-    <v-layout row wrap class="mx-2 my-2">
+    <v-layout row wrap class="mx-2 my-2" v-if="!hiddenAside">
       <v-flex xs12>
         <v-btn dark color="blue darken-3" v-on:click.native="doCreateReport(false)"> <v-icon>library_books</v-icon> &nbsp; Tạo báo cáo</v-btn>
         <v-btn dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="doCreateReport(true)">
@@ -107,7 +133,7 @@
     <div>
       <vue-friendly-iframe v-if="showGuilds" :src="'/documents/' + groupId + '/0/hdsd.pdf'"></vue-friendly-iframe>
       <vue-friendly-iframe v-if="pdfBlob !== null && pdfBlob !== undefined && pdfBlob !== '' && !showGuilds" :src="pdfBlob"></vue-friendly-iframe>
-      <div class="mx-2" v-if="showErrorData">
+      <div class="mx-3 my-4" v-if="showErrorData">
         <v-alert :value="true" outline color="info" icon="info">
           Không có dữ liệu báo cáo.
         </v-alert>
@@ -146,6 +172,7 @@ export default {
     'vue-csv-downloader': CsvDownload
   },
   data: () => ({
+    hiddenAside: false,
     groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
     doExportExcel: false,
     showGuilds: false,
@@ -239,6 +266,12 @@ export default {
   created () {
     var vm = this
     vm.$nextTick(function () {
+      let query = vm.$router.history.current.query
+      if (query.hasOwnProperty('doreport')) {
+        vm.hiddenAside = true
+      } else {
+        vm.hiddenAside = false
+      }
       setTimeout(() => {
         vm.showErrorData = false
         vm.showCSVDownload = false
@@ -286,7 +319,11 @@ export default {
                   break
                 }
               }
-              vm.govAgency = defaultVal
+              if (query.hasOwnProperty('groupId') && query['groupId']) {
+              vm.govAgency = Number(query['groupId'])
+              } else {
+                vm.govAgency = defaultVal
+              }
             }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('api')) {
@@ -298,6 +335,14 @@ export default {
           for (let key in vm.filters) {
             if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
               vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+              if (vm.filters[key]['type'] === 'date' && query.hasOwnProperty(vm.filters[key]['key']) && query[vm.filters[key]['key']]) {
+                vm.data[vm.filters[key]['key']] = query[vm.filters[key]['key']]
+              }
+            }
+            if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+              vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+                vm.filters[key]['source'] = result
+              }).catch(function(){})
             }
           }
           if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -323,6 +368,9 @@ export default {
             }, 200)
           }
           vm.pdfBlob = ''
+        }
+        if (query.hasOwnProperty('doreport')) {
+          vm.doCreateReport(false)
         }
       }, 1000)
     })
@@ -396,6 +444,11 @@ export default {
       for (let key in vm.filters) {
         if (vm.filters[key]['type'] === 'select' || vm.filters[key]['type'] === 'date') {
           vm.data[vm.filters[key]['key']] = vm.filters[key]['value']
+        }
+        if (vm.filters[key]['type'] === 'select' && vm.filters[key].hasOwnProperty('api') && vm.filters[key]['api']) {
+          vm.$store.dispatch('loadDataSource', vm.filters[key]).then(function(result) {
+            vm.filters[key]['source'] = result
+          }).catch(function(){})
         }
       }
       if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('buttons')) {
@@ -602,7 +655,7 @@ export default {
         vm.dataReportXX += header2TableReport.substring(0, header2TableReport.length - 1) + '],'
       }
       
-      // bild data
+      // build data
       let filter = {
         document: vm.reportType,
         data: vm.data,
@@ -635,20 +688,36 @@ export default {
               }
             } else {
               let dossierRawItem = {}
-              dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
-              dossierRawItem[textGroup] = dataReportCurrent[textGroup]
-              dossierRawItem['totalChild'] = 1
-              dossierRawItem['dossiers'] = []
-              dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
-              dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
-              dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+              if (!dataReportCurrent.hasOwnProperty('dossierId')) {
+                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                dossierRawItem['totalChild'] = 0
+                dossierRawItem['dossiers'] = []
+                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'] = []
+              } else {
+                dossierRawItem[vm.groupByVal] = dataReportCurrent[vm.groupByVal]
+                dossierRawItem[textGroup] = dataReportCurrent[textGroup]
+                dossierRawItem['totalChild'] = 1
+                dossierRawItem['dossiers'] = []
+                dossierRaw[dataReportCurrent[vm.groupByVal]] = dossierRawItem
+                dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] = dataReportCurrent[textGroup]
+                dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
+              }
             }
           }
           let dataToExportCSV = []
+          let dataRaw = []
           for (let key in dossierRaw) {
-            if (dossierRaw[key][vm.groupByVal] !== undefined && dossierRaw[key][vm.groupByVal] !== null && dossierRaw[key][vm.groupByVal] !== '') {
+            dataRaw.push(dossierRaw[key])
+          }
+          dataRaw.reverse()
+          // console.log('dossierRaw 46', dataRaw)
+          for (let key in dataRaw) {
+            if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []
-              csvGroup.push(dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ')
+              csvGroup.push( dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ')
               for (let colLengIndex in colLeng) {
                 csvGroup.push('')
               }
@@ -656,7 +725,7 @@ export default {
               if (vm.doExportExcel) {
                 dataReportTotal += '[ '
                 dataReportTotal += JSON.stringify({
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
                   bold: true,
                   style: 'tdStyle'
                 }) + ','
@@ -676,7 +745,7 @@ export default {
               } else {
                 dataReportTotal += JSON.stringify([{
                   colSpan: colLeng + 1,
-                  text: dossierRaw[key][vm.groupByVal] + ' - ' + dossierRaw[key][textGroup] + ' ( ' + dossierRaw[key]['totalChild'] + ' ) ',
+                  text: dataRaw[key][textGroup] + ' ( ' + dataRaw[key]['totalChild'] + ' ) ',
                   bold: true,
                   style: 'tdStyle'
                 }]) + ','
@@ -690,7 +759,7 @@ export default {
               style: 'tdStyle'
             }])
             */
-            let dossiersArray = dossierRaw[key]['dossiers']
+            let dossiersArray = dataRaw[key]['dossiers']
             let indexStt = 1
             let dataRow = []
             for (let keyDossier in dossiersArray) {
@@ -883,25 +952,28 @@ export default {
           
           // TODO
           let resultData = result
+          // console.log('resultData 1', resultData)
           if (selection !== undefined && selection !== null && selection.length > 0) {
+            // console.log('selection', selection)
             resultData = result.filter(function(obj) {
               let totalCHK = 0
               for (let keySe in selection) {
                 if (selection[keySe]['compare'] === '#') {
                   if (String(obj[selection[keySe]['key']]) !== String(selection[keySe]['value'])) {
                     totalCHK = totalCHK + 1
-                    // return obj
+                    return obj
                   }
                 } else if (selection[keySe]['compare'] === '=') {
                   if (selection[keySe]['value'] === '') {
                     if (String(obj[selection[keySe]['key']]) === '' || obj[selection[keySe]['key']] === undefined || obj[selection[keySe]['key']] === null) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   } else {
+                    console.log('compare', selection[keySe], obj[selection[keySe]['key']], selection[keySe]['value'])
                     if (String(obj[selection[keySe]['key']]) === String(selection[keySe]['value'])) {
                       totalCHK = totalCHK + 1
-                      // return obj
+                      return obj
                     }
                   }
                 } else {
@@ -916,6 +988,7 @@ export default {
               }
             })
           }
+          // console.log('resultData 1', resultData)
           let resultDataTotal = resultData.filter(function(obj) {
             if (subKey !== null && subKey !== undefined && subKey !== '') {
               if ((obj[sumKey] === '' || String(obj[sumKey]) === '0' || obj[sumKey] === undefined || obj[sumKey] === null) && obj[subKey] === '') {
@@ -927,6 +1000,7 @@ export default {
               }
             }
           })
+          // console.log('resultDataTotal 1', resultDataTotal)
           let resultDataVari = {}
           for (let key in resultData) {
             let keyVari = ''
@@ -1029,7 +1103,7 @@ export default {
                 }
                 dataToExportCSVItem.push(dataText)
                 dataRow.push({
-                  text: dataText, 
+                  text: dataText === ' ' ? 0 : dataText, 
                   alignment: alignmentConfig,
                   style: 'tdStyle'
                 })
@@ -1038,7 +1112,8 @@ export default {
                     if (currentConfig['value'] === 'ontimePercentage') {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataText)
                     } else if (isNaN(dataText)) {
-                      dataRowTotal[indexTotal]['text'] = ' '
+                      // dataRowTotal[indexTotal]['text'] = ' '
+                      dataRowTotal[indexTotal]['text'] = 0
                     } else {
                       dataRowTotal[indexTotal]['text'] = parseInt(dataRowTotal[indexTotal]['text']) + parseInt(dataText)
                     }
@@ -1103,11 +1178,12 @@ export default {
                 } else if (resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== undefined && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== null && resultDataTotal[keyXXTT][currentConfigXXTT['value']] !== '') {
                   dataTextXXTT = resultDataTotal[keyXXTT][currentConfigXXTT['value']] + ' '
                 }
-                dataRowTotal[indexTotalXXTT]['text'] = parseInt(dataTextXXTT) + ' '
+                dataRowTotal[indexTotalXXTT]['text'] = isNaN(parseInt(dataTextXXTT)) ? '0 '  : parseInt(dataTextXXTT) + ' '
                 indexTotalXXTT = indexTotalXXTT + 1
               }
               break
             }
+            // console.log('dataRowTotal 555', dataRowTotal)
           } else {
             for (let keyXXTT in resultDataTotal) {
               let indexTotalXXTT = 1
@@ -1131,7 +1207,7 @@ export default {
             }
           }
           vm.dataReportXX += JSON.stringify(dataRowTotal)
-          dataToExportCSV
+          // console.log('vm.dataReportXX 123', vm.dataReportXX)
           let itemTotal = []
           for (let keyTotalCSV in dataRowTotal) {
             itemTotal.push(dataRowTotal[keyTotalCSV]['text'])
@@ -1153,8 +1229,10 @@ export default {
           }
           vm.showCSVDownload = true
           docDString = docDString.replace(/"\[\$report\$\]"/g, vm.dataReportXX)
+          // console.log('docDString', docDString)
           // vm.docDefinition['content'][2]['table']['body'].push(dataRowTotal)
           vm.docDefinition = JSON.parse(docDString)
+          // console.log('docDefinition', vm.docDefinition)
           let pdfDocGenerator = pdfMake.createPdf(vm.docDefinition)
           pdfDocGenerator.getBlob((blob) => {
             vm.pdfBlob = window.URL.createObjectURL(blob)
@@ -1212,8 +1290,8 @@ export default {
       // } else {
       //   vm.itemsReportsConfig[index]['selected'] = true
       // }
-      console.log('itemsReportsConfig index', vm.itemsReportsConfig[index])
-      console.log('itemsReportsConfig', vm.itemsReportsConfig)
+      // console.log('itemsReportsConfig index', vm.itemsReportsConfig[index])
+      // console.log('itemsReportsConfig', vm.itemsReportsConfig)
     },
     doChotSoLieu (dataSelect, button) {
       let vm = this
@@ -1328,6 +1406,15 @@ export default {
         // window.location.href = "data:application/vnd.ms-excel;charset=UTF-8,%EF%BB%BF" + encodeURIComponent(tab_text)
         FileSaver.saveAs(blob, new Date().getTime() + ".xls");
       })
+    },
+    goToThongKe () {
+      let vm = this
+      let fromStatisticDate = vm.data['fromStatisticDate']
+      let toStatisticDate = vm.data['toStatisticDate']
+      let site = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
+      let urlReport = site + '/thong-ke#/danh-gia-thu-tuc?groupId=' + vm.govAgency + '&fromStatisticDate=' +
+      fromStatisticDate + '&toStatisticDate=' + toStatisticDate
+      window.location.href = urlReport
     },
     s2ab (s) {
       var buf = new ArrayBuffer(s.length);

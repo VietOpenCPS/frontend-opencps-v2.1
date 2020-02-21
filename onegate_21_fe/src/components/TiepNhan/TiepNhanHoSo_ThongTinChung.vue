@@ -77,6 +77,7 @@
                 :without-header="true"
                 :label="dueDateInput ? '' : 'Chọn ngày'"
                 :min-date="minDate"
+                :max-date="maxDate"
               ></vue-ctk-date-time-picker>
               <v-icon class="hover-pointer" @click="showDatePicker">event</v-icon>
             </v-subheader>
@@ -89,13 +90,14 @@
 
 <script>
   // 
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+  // import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
   export default {
     components: {
-      'vue-ctk-date-time-picker': VueCtkDateTimePicker
+      'vue-ctk-date-time-picker': window['vue-ctk-date-time-picker']
     },
     data: () => ({
       minDate: null,
+      maxDate: null,
       editable: false,
       dueDateInput: null,
       dataPostDossier: {
@@ -168,6 +170,7 @@
         vm.thongTinChungHoSo['editable'] = vm.editable
         if (vm.editable) {
           vm.dueDateInput = vm.thongTinChungHoSo.dueDate ? vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate))) : null
+          vm.maxDate = vm.formatDateInput(new Date(Number(vm.thongTinChungHoSo.dueDate)))
         }
         vm.minDate = vm.getCurentDateTime('date')
       },

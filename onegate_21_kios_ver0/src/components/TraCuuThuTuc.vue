@@ -1,36 +1,38 @@
 <template>
   <div class="px-2 py-0 kios-item">
-    <h4 class="pt-2 ml-2">
-      <span style="color:#065694">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
+    <h4 class="pt-2 pb-3 ml-2 text-xs-center">
+      <span style="color:#065694;font-size: 1.2em !important;">TRA CỨU THỦ TỤC HÀNH CHÍNH </span>
     </h4>
     <v-layout wrap class="mt-2">
       <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
+        <v-autocomplete
           :items="govAgencyList"
           v-model="govAgencySelected"
-          placeholder="Chọn cơ quan"
+          label="Cơ quan"
           item-text="administrationName"
           item-value="administrationCode"
           :hide-selected="true"
           @change="changeAdministration"
           box
           height="48"
-        ></v-select>
+          color="primary"
+          clearable
+        ></v-autocomplete>
       </v-flex>
       <v-flex xs4 class="pl-2 pr-2">
-        <v-select
-          class="select-border"
+        <v-autocomplete
           :items="listLinhVuc"
           v-model="linhVucSelected"
-          placeholder="Chọn lĩnh vực"
+          label="Lĩnh vực"
           item-text="domainName"
           item-value="domainCode"
           :hide-selected="true"
           @change="changeDomain"
           box
           height="48"
-        ></v-select>
+          color="primary"
+          clearable
+        ></v-autocomplete>
       </v-flex>
       <!-- <v-flex xs3 class="pl-2 pr-2">
         <v-select
@@ -475,11 +477,11 @@ export default {
     },
     changeAdministration () {
       var vm = this
-      console.log('vm.groupIdSelected', vm.govAgencyList, vm.govAgencySelected)
-      vm.groupIdSelected = vm.govAgencyList.filter(function (item) {
-        return item['administrationCode'] === vm.govAgencySelected
-      })[0]['groupId']
-      console.log('vm.groupIdSelected', vm.groupIdSelected)
+      // console.log('vm.groupIdSelected', vm.govAgencyList, vm.govAgencySelected)
+      // vm.groupIdSelected = vm.govAgencyList.filter(function (item) {
+      //   return item['administrationCode'] === vm.govAgencySelected
+      // })[0]['groupId']
+      // console.log('vm.groupIdSelected', vm.groupIdSelected)
       vm.showListThuTuc = false
       vm.listLinhVuc = []
       vm.linhVucSelected = ''

@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
-import support from './support.json'
 // 
 
 Vue.use(toastr)
@@ -16,9 +15,11 @@ export const store = new Vuex.Store({
     loading: false,
     index: 0,
     agencyList: [],
+    agencyListThucHien: [],
     domainList: [],
     levelList: [],
-    isMobile: false
+    isMobile: false,
+    userLogin: ''
   },
   actions: {
     loadInitResource ({commit, state}) {
@@ -57,6 +58,28 @@ export const store = new Vuex.Store({
             if (serializable.data) {
               let dataReturn = serializable.data
               resolve(dataReturn)
+            } else {
+              resolve([])
+            }
+          }).catch(function (xhr) {
+            console.log(xhr)
+          })
+        })
+      })
+    },
+    getGovAgencyThucHien ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {}
+          }
+          axios.get(state.endPoint + '/onegate/serviceconfigs/govagencies', param).then(function (response) {
+            let serializable = response.data
+            if (serializable.data) {
+              resolve(serializable.data)
             } else {
               resolve([])
             }
@@ -125,15 +148,20 @@ export const store = new Vuex.Store({
             start: filter.page * 15 - 15,
             end: filter.page * 15,
             administration: filter.administration ? filter.administration : '',
-            keyword: filter.keyword ? filter.keyword : '',
+            agency: filter.agency ? filter.agency : '',
+            keyword: filter.keyword ? filter.keyword.replace(/[!@#$%^&*(),?":{}|<>]/g, '') : '',
             level: filter.level ? filter.level : 0,
             domain: filter.domain ? filter.domain : '',
             sort: ''
           }
+          // if (filter.domain) {
+          //   paramGet.sort = "siblingSearch"
+          // } else {
+          //   paramGet.sort = "siblingDomain"
+          // }
+
           if (filter.domain) {
             paramGet.sort = "siblingSearch"
-          } else {
-            paramGet.sort = "siblingDomain"
           }
           let param = {
             headers: {
@@ -168,6 +196,78 @@ export const store = new Vuex.Store({
           })
         })
       })
+    },
+    getVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              state: filter.state
+            }
+          }
+          axios.get(state.endPoint + '/dvcqgsso/authurl', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    putVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.post(state.endPoint + '/dvcqgsso/auth', filter.userInfo, param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    goToDangNhap({ commit, state }, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
+            }
+          }
+          let dataPostApplicant = new URLSearchParams()
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            if (response.data !== '' && response.data !== 'ok') {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              resolve('success')
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
+              resolve('error')
+            }
+          }).catch(function (error) {
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
+            reject(error)
+          })
+        })
+      })
     }
   },
   mutations: {
@@ -180,6 +280,9 @@ export const store = new Vuex.Store({
     setAgencyList (state, payload) {
       state.agencyList = payload
     },
+    setAgencyListThucHien (state, payload) {
+      state.agencyListThucHien = payload
+    },
     setDomainList (state, payload) {
       state.domainList = payload
     },
@@ -188,6 +291,9 @@ export const store = new Vuex.Store({
     },
     setIsMobile (state, payload) {
       state.isMobile = payload
+    },
+    setUserLogin (state, payload) {
+      state.userLogin = payload
     }
   },
   getters: {
@@ -200,6 +306,9 @@ export const store = new Vuex.Store({
     getAgencyList (state) {
       return state.agencyList
     },
+    getAgencyListThucHien (state) {
+      return state.agencyListThucHien
+    },
     getDomainList (state) {
       return state.domainList
     },
@@ -208,6 +317,9 @@ export const store = new Vuex.Store({
     },
     getIsMobile (state) {
       return state.isMobile
+    },
+    getUserLogin (state) {
+      return state.userLogin
     }
   }
 })

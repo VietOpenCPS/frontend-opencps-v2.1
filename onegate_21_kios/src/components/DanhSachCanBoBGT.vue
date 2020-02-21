@@ -176,12 +176,12 @@ export default {
       let filter = {
         start: vm.employeePage * vm.numberPerPage - vm.numberPerPage,
         end: vm.employeePage * vm.numberPerPage,
-        agencyCode: ''
+        jobposCode: ''
       }
       let current = vm.$router.history.current
       let newQuery = current.query
       if (newQuery.hasOwnProperty('agencyCode')) {
-        filter.agencyCode = newQuery.agencyCode
+        // filter.jobposCode = 'DANHGIA_' + newQuery.agencyCode
         vm.$store.dispatch('loadEmployeesBGT', filter).then(result => {
           vm.loadingEmployee = false
           vm.totalEmployee = result[0]

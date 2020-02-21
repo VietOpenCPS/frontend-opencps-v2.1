@@ -18,6 +18,12 @@
             <p>
               Người hỏi: <span class="text-bold">{{questionDetail.fullname}}</span><i> ({{questionDetail.email}})</i>
             </p>
+            <p v-if="questionDetail.address">
+              Địa chỉ: <span class="text-bold">{{questionDetail.address}}</span>
+            </p>
+            <p v-if="questionDetail.telNo">
+              Số điện thoại: <span class="text-bold">{{questionDetail.telNo}}</span>
+            </p>
             <p>
               Ngày gửi: <span class="text-bold">{{questionDetail.createDate}}</span>
             </p>
@@ -167,7 +173,6 @@
 </template>
 
 <script>
-
 import Vue from 'vue'
 import $ from 'jquery'
 import support from '../../store/support.json'
@@ -175,7 +180,6 @@ import toastr from 'toastr'
 import Captcha from './Captcha.vue'
 import { VueEditor, Quill } from 'vue2-editor'
 Vue.use(toastr)
-
 toastr.options = {
   'closeButton': true,
   'timeOut': '5000'
@@ -188,36 +192,7 @@ export default {
   },
   data: () => ({
     answerList: [],
-    answersDefault: [
-      {
-        createDate: "30/01/2019 17:27:20",
-        modifiedDate: "30/01/2019 17:27:20",
-        publish: 1,
-        questionId: 101,
-        userName: "",
-        answerId: 101,
-        content: `<p>Nộp hồ sơ của công dân có 2 hình thức:</p>
-          <ol>
-          <li>Nộp hồ sơ trực tiếp tại Trung tâm Hành Chính Công của Bộ GTVT</li>
-          <li>Đăng ký tài khoản và nộp hồ sơ trên trang web</li>
-        </ol>`
-      },
-      {
-        createDate: "30/01/2019 17:27:20",
-        modifiedDate: "30/01/2019 17:27:20",
-        publish: 1,
-        questionId: 102,
-        userName: "",
-        answerId: 102,
-        content: `<p>Có 4 hình thức tra cứu hồ sơ cụ thể như sau:</p>
-          <ol>
-          <li>Trên trang web nhập mã hồ sơ</li>
-          <li>Đối với hồ sơ dịch vụ công trực tuyến tra cứu bằng cách đăng nhập tài khoản của cá nhân/ đơn vị đã nộp hồ sơ để tra cứu</li>
-          <li>Gọi tới số điện thoại 1900 0318</li>
-          <li>ABC &lt;khoảng cách&gt; &lt;Mã số hồ sơ&gt; gửi về tổng đài 9001</li>
-        </ol>`
-      }
-    ],
+    answersDefault: [],
     answerSelected: '',
     activeEdit: false,
     content: '',
@@ -456,7 +431,6 @@ export default {
       } else {
         vm.answerList[index]['publish'] = 1
       }
-
       let filter = {
         questionId: item['questionId'],
         answerId: item['answerId'],

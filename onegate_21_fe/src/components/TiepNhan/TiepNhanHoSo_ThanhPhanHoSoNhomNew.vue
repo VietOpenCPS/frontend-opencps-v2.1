@@ -208,12 +208,12 @@
                 <v-radio :value="2"></v-radio>
                 <v-radio :value="3"></v-radio>
               </v-radio-group> -->
-              <v-select
+              <v-autocomplete
                 :items="fileMarkItems"
                 v-model="dossierTemplateItems[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
-              ></v-select>
+              ></v-autocomplete>
             </v-flex>
             <v-flex style="width: 120px;" class="layout wrap" v-if="checkInput === 1">
               <v-select
@@ -566,6 +566,28 @@ export default {
     },
     initData (data) {
       var vm = this
+      vm.$store.dispatch('getDocumentType').then(function (result) {
+        let sortItems = function (items) {
+          function compare(a, b) {
+            if (a.itemCode < b.itemCode)
+              return -1
+            if (a.itemCode > b.itemCode)
+              return 1
+            return 0
+          }
+          return items.sort(compare)
+        }
+        if (result) {
+          let items = sortItems(result)
+          vm.fileMarkItems = []
+          for (let key in items) {
+            vm.fileMarkItems.push({
+              text: items[key]['itemName'],
+              value: items[key]['itemCode']
+            })
+          }
+        }
+      })
       vm.thongTinHoSo = data
       vm.applicantNoteDossier = data['applicantNote'] && String(data['applicantNote']).indexOf('<br>[') < 0 ? data['applicantNote'] : ''
       var arrTemp = []
@@ -579,7 +601,7 @@ export default {
         serviceInfoId: data.serviceCode
       }))
       Promise.all(arrTemp).then(values => {
-        var dossierTemplates = values[0]
+        var dossierTemplates = values[0]['dossierParts']
         var dossierMarks = values[1]
         var dossierFiles = values[2]
         var fileTemplates = []
@@ -803,14 +825,18 @@ export default {
       })
     },
     saveAlpacaForm (item, index) {
-      var vm = this
-      var fileFind = vm.dossierFilesItems.find(itemFile => {
+      let vm = this
+      let fileFind = vm.dossierFilesItems.find(itemFile => {
         return itemFile.dossierPartNo === item.partNo && itemFile.eForm && itemFile.fileSize!==0
       })
       if (fileFind) {
         fileFind['dossierId'] = vm.thongTinHoSo.dossierId
         fileFind['id'] = vm.id
         vm.$store.dispatch('putAlpacaForm', fileFind).then(resData => {
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
             vm.dossierFilesItems = resFiles
           }).catch(reject => {
@@ -825,7 +851,10 @@ export default {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
         vm.$store.dispatch('postEform', item).then(resPostEform => {
-          // toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          if (vm.dossierIntoGroup.length > 0) {
+            vm.$store.commit('setFilesAdd', [resPostEform])
+            vm.$store.commit('setActiveAddFileGroup', true)
+          }
           vm.dossierTemplateItems[index].daKhai = true
           vm.dossierTemplateItems[index]['passRequired'] = true
           vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {

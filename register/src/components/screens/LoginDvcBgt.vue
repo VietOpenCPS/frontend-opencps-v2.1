@@ -77,10 +77,11 @@
               </v-flex>
             </v-layout>
             <v-flex xs12 class="text-xs-left text-xs-center">
-              <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+              <v-btn class="ml-1 mr-1 my-0 white--text" color="#0b72ba"
                 :loading="loadingLogin"
                 :disabled="loadingLogin"
                 @click="submitConfirmLogin"
+                style="width:115px"
               >
                 <v-icon>how_to_reg</v-icon>&nbsp;
                 Đăng nhập
@@ -88,9 +89,17 @@
               <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
                 :disabled="loadingLogin"
                 @click="goBack"
+                style="width:115px"
               >
                 <v-icon>reply</v-icon>&nbsp;
                 Quay lại
+              </v-btn>
+              <v-btn v-if="conectDvcqg" class="mt-2 mx-0 px-2 my-0" color="#0b72ba"
+                :loading="loading"
+                :disabled="loading"
+                @click="loginDVCQG"
+              >
+                Đăng nhập qua Cổng DVC Quốc gia
               </v-btn>
             </v-flex>
             <v-flex class="py-2" xs12 style="
@@ -134,7 +143,8 @@ export default {
     loading: false,
     valid: false,
     pinCode: '',
-    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false
+    isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
+    conectDvcqg: false,
   }),
   computed: {
     loadingLogin () {
@@ -150,6 +160,10 @@ export default {
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.makeImageCap()
+      try {
+        vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
+      } catch (error) {
+      }
     })
   },
   updated () {
@@ -160,6 +174,10 @@ export default {
   watch: {
   },
   methods: {
+    loginDVCQG () {
+      let vm = this
+      window.location.href = window.themeDisplay.getURLHome() + '/dang-nhap-dvcqg'
+    },
     makeImageCap () {
       var vm = this
       vm.chapchablob = ''

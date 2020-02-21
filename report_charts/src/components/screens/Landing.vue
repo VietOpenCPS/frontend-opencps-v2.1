@@ -133,10 +133,13 @@
           </v-flex>
         </v-card-text>
       </v-card>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar && String(month) !== '0'">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
-          <v-card-title class="headline">
+          <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
+          </v-card-title>
+          <v-card-title class="headline" v-else>
+            Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="bar" height="350"
@@ -151,10 +154,13 @@
         <content-placeholders-heading />
         <content-placeholders-img />
       </content-placeholders> -->
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar && String(month) !== '0'">
+      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
-          <v-card-title class="headline">
+          <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
+          </v-card-title>
+          <v-card-title class="headline" v-else>
+            Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
             <apexchart type="bar" height="350"
@@ -350,6 +356,10 @@ export default {
     agencyListsMonth: [],
     group: '',
     years: [
+      {
+        'value': '2020',
+        'name': 'Năm 2020'
+      },
       {
         'value': '2019',
         'name': 'Năm 2019'
@@ -903,7 +913,7 @@ export default {
       for (let key in data) {
         if (String(data[key].govAgencyName) === '' && String(data[key].domainName) === '') {
         } else {
-          if (data[key].month > 0) {
+          // if (data[key].month > 0) {
             // if (currentQuerys.hasOwnProperty('govAgencyCode') && currentQuerys['govAgencyCode'] !== undefined && currentQuerys['govAgencyCode'] !== '' && String(data[key].domainName) !== '') {
             if (String(data[key].govAgencyName) === '' && String(data[key].domainName) !== '') {
               labelsCustomMonth[data[key].domainName] = data[key].undueCount + data[key].overdueCount + data[key].waitingCount + data[key].betimesCount + data[key].ontimeCount + data[key].overtimeCount
@@ -916,7 +926,7 @@ export default {
             betimesCountData.push(data[key].betimesCount)
             ontimeCountData.push(data[key].ontimeCount)
             overtimeCountData.push(data[key].overtimeCount)
-          }
+          // }
         }
       }
       vm.labelOfLine = []

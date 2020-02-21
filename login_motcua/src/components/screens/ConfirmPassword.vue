@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout wrap class="mt-4" style="max-width:550px;margin: 0 auto">
+    <v-layout wrap class="confirm-pass  mt-4" style="max-width:550px;margin: 0 auto">
       <nav class="v-toolbar elevation-0 theme--dark primary" data-booted="true" style="justify-content: center">
         <div class="v-toolbar__content" style="height: 40px;justify-content: center;">
           <span class="text-bold">NHẬP MÃ BẢO MẬT</span>
@@ -61,6 +61,7 @@ export default {
     var vm = this
     vm.$nextTick(function () {
       var vm = this
+      $('body').addClass('body_login')
       let current = vm.$router.history.current
       let currentQuery = current.query
     })

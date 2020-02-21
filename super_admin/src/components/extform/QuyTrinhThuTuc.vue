@@ -283,16 +283,26 @@
                     </v-layout>
                   </v-flex>
                   <!--  -->
-                  <v-flex xs12 sm12>
-                    <v-text-field
-                      v-model="currentProcess.serverNo"
-                      box
-                      :rules="[rules.required]"
-                      required
-                    >
-                      <template slot="label">Server đồng bộ  <span class="red--text darken-3">*</span></template>
-                    </v-text-field>
-                  </v-flex>
+                  <v-layout wrap>
+                    <v-flex xs12 sm6 class="pr-2">
+                      <v-text-field
+                        v-model="currentProcess.dossierGroupPattern"
+                        box
+                      >
+                        <template slot="label">Cấu hình sinh mã nhóm hồ sơ</template>
+                      </v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6>
+                      <v-text-field
+                        v-model="currentProcess.serverNo"
+                        box
+                        :rules="[rules.required]"
+                        required
+                      >
+                        <template slot="label">Server đồng bộ  <span class="red--text darken-3">*</span></template>
+                      </v-text-field>
+                    </v-flex>
+                  </v-layout>
                 </v-layout>
                 <v-flex xs12 class="text-right pr-3" style="
                   position: fixed;
@@ -1079,6 +1089,7 @@
           serverNo: '',
           generateDossierNo: '',
           dossierNoPattern: '',
+          dossierGroupPattern: '',
           generateDueDate: '',
           dueDatePattern: '',
           generatePassword: false,
@@ -1223,7 +1234,8 @@
           signatureType: 'digital'
         },
         esignatureTypeList: [
-          { text: 'Sử dụng chữ kí số', value: 'digital' },
+          { text: 'Sử dụng chữ ký số', value: 'digital' },
+          { text: 'Sử dụng plugin ký số', value: 'plugin' },
           { text: 'Sử dụng captcha', value: 'captcha' },
           { text: 'Nhập mật khẩu người dùng', value: 'password' },
           { text: 'Nhập mã pin', value: 'pin' }          
