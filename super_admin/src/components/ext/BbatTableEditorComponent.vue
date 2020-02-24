@@ -390,7 +390,7 @@
             <v-container>
               <v-row>
                 <v-col cols="12">
-                  <v-text-field v-model="data.email" label="Email hiện tại" disabled></v-text-field>
+                  <v-text-field v-model="oldEmail" label="Email hiện tại" disabled></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field v-model="newEmail" label="Email mới*" 
@@ -490,6 +490,9 @@
         set: function(newValue) {
           this.$store.commit('setisConnected', newValue)
         }
+      },
+      oldEmail () {
+        return this.data.email ? this.data.email : this.data.contactEmail
       }
     },
     created() {
