@@ -496,7 +496,7 @@
       }
     },
     created() {
-      console.log('aaaaa')
+      console.log('created')
       var vm = this
       vm.$nextTick(function() {
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
