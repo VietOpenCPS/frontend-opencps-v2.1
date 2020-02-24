@@ -1,4 +1,5 @@
 <template>
+<div>
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-layout v-if="detailForm !== null && detailForm.length > 0" row wrap style="
       margin-bottom: 100px;
@@ -26,6 +27,14 @@
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['fileform'] && ((item.dependency && String(id) !== '0') || !item.dependency)" v-on:click.native="showAttached(item)">
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'link'">how_to_vote</v-icon>
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'popup'">flip_to_back</v-icon>
+          {{item.label}}
+        </v-btn>
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['unlock']" v-on:click.native="unlock()">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'unlock'">lock_open</v-icon>
+          {{item.label}}
+        </v-btn>
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['changeEmail']" v-on:click.native="dialogChangeMail=true">
+          
           {{item.label}}
         </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
@@ -103,6 +112,10 @@
           <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['attached'] && ((itemChild.dependency && String(id) !== '0') || !itemChild.dependency)" v-on:click.native="showAttached(itemChild)">
             <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'link'">how_to_vote</v-icon>
             <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'popup'">flip_to_back</v-icon>
+            {{itemChild.label}}
+          </v-btn>
+          <v-btn :class="itemChild['class_component']" color="blue darken-3" dark v-if="itemChild.type === 'button' && itemChild['unlock']" v-on:click.native="unlock()">
+            <v-icon class="mr-1" size="14" v-if="itemChild['btn_type'] === 'unlock'">lock_open</v-icon>
             {{itemChild.label}}
           </v-btn>
           <content-placeholders v-if="itemChild.type === 'selects' && !pullOk && itemChild.hasOwnProperty('datasource_key')">
@@ -239,14 +252,7 @@
         </v-card-title>
       </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer
-      v-model="rightAccount"
-      right
-      app
-      fixed
-      temporary
-      style="background: #fff;"
-    >
+    <v-navigation-drawer v-model="rightAccount" right app fixed temporary style="background: #fff;">
       <v-card>
         <v-card-title primary-title class="pb-0">
           <v-layout row wrap>
@@ -254,10 +260,7 @@
               {{layoutNameDynamic}}
             </v-flex>
           </v-layout>
-          <v-btn class="my-0" flat icon color="primary" v-on:click.native="rightAccount = false" style="
-    position: absolute;
-    right: 25px;
-">
+          <v-btn class="my-0" flat icon color="primary" v-on:click.native="rightAccount = false" style="position: absolute;right: 25px;">
             <v-icon size="18">clear</v-icon>
           </v-btn>
         </v-card-title>
@@ -353,6 +356,59 @@
       </v-btn>
     </v-snackbar>
   </v-form>
+    <v-alert
+      style="position: fixed!important;right: 0!important;top:46px;z-index:9999999999;"
+      v-model="alertSuccess"
+      max-width="300"
+      color="cyan"
+      border="left"
+      elevation="2"
+      colored-border
+      icon="mdi-lock-open-variant"
+    >
+      Thao tác thành công.
+    </v-alert>
+    <v-alert
+      max-width="300"
+      style="position: fixed!important;right: 0!important;top:46px;z-index:9999999999;"
+      v-model="alertFail"
+      color="#D32F2F"
+      border="left"
+      elevation="2"
+      colored-border
+      icon="mdi-lock-outline"
+    >
+      Thao tác thất bại.
+    </v-alert>
+    <v-dialog v-model="dialogChangeMail" persistent max-width="400">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Cập nhập thông tin đăng nhập</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="formChangeMail" lazy-validation>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field v-model="data.email" label="Email hiện tại" disabled></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field v-model="newEmail" label="Email mới*" 
+                    :rules="[rules.required, rules.email]"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+          <v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="dialogChangeMail = false">Đóng</v-btn>
+          <v-btn color="blue darken-1" text @click="changeEmail()">Cập nhập</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+</div>
 </template>
 
 <script>
@@ -375,7 +431,11 @@
     },
     data() {
       return {
+        alertFail: false,
+        alertSuccess: false,
+        dialogChangeMail: false,
         config: {},
+        newEmail: '',
         deactiveAccountFlag: 0,
         deactiveAccountFlagBoolean: false,
         snackbarsuccess: false,
@@ -433,6 +493,7 @@
       }
     },
     created() {
+      console.log('aaaaa')
       var vm = this
       vm.$nextTick(function() {
         if (vm.tableConfig !== null && vm.tableConfig !== undefined) {
@@ -1046,6 +1107,75 @@
         vm.layoutNameDynamic = item['label']
         vm.pickItem = item
         vm.rightAttached = !vm.rightAttached
+      },
+      unlock () {
+        let vm = this
+        let params = {}
+        console.log(vm.data)
+        if(vm.data.modelClassName === 'org.opencps.usermgt.model.Employee'){
+          params = {
+            email: vm.data.email,
+            mappingUserId: vm.data.mappingUserId
+          }
+        }
+        if(vm.data.modelClassName === 'org.opencps.usermgt.model.Applicant'){
+          params = {
+            email: vm.data.contactEmail,
+            mappingUserId: vm.data.mappingUserId
+          }
+        }
+        let dataPost = new URLSearchParams()
+        dataPost.append('email', JSON.stringify(params.email))
+        dataPost.append('mappingUserId', JSON.stringify(params.mappingUserId))
+        axios.post('/o/rest/v2/users/lockin', dataPost).then((res)=>{
+          console.log(res)
+          vm.alertSuccess = true
+          setTimeout(function(){ 
+            vm.alertSuccess = false 
+            }, 3000);
+        }).catch( ()=>{
+          vm.alertFail = true
+          setTimeout(function(){ 
+            vm.alertFail = false 
+            }, 3000)
+        })
+      },
+      changeEmail(){
+        let vm = this
+        if(vm.$refs.formChangeMail.validate()){
+          let params = {}
+          console.log(vm.data)
+          if(vm.data.modelClassName === 'org.opencps.usermgt.model.Employee'){
+            params = {
+              oldEmail: vm.data.email,
+              newEmail: vm.newEmail
+            }
+          }
+          if(vm.data.modelClassName === 'org.opencps.usermgt.model.Applicant'){
+            params = {
+              oldEmail: vm.data.contactEmail,
+              newEmail: vm.newEmail
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('oldEmail', JSON.stringify(params.oldEmail))
+          dataPost.append('newEmail', JSON.stringify(params.newEmail))
+          axios.post('/o/rest/v2/applicants/updatemail', dataPost).then((res)=>{
+            vm.dialogChangeMail= false
+            if(res.data.user && res.data.user.hasOwnProperty('emailAddess') && res.data.user.emailAddess){
+              vm.alertSuccess = true
+              setTimeout(function(){ vm.alertSuccess = false }, 3000);
+            }
+            else{
+              vm.alertFail = true
+              setTimeout(function(){ vm.alertFail = false }, 3000)
+            }
+          }).catch( ()=>{
+            vm.dialogChangeMail= false
+            vm.alertFail = true
+            setTimeout(function(){ vm.alertFail = false }, 3000)
+          })
+        }
       }
     }
   }
