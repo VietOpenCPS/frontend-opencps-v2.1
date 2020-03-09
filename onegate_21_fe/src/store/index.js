@@ -11,7 +11,7 @@ Vue.use(toastr)
 Vue.use(Vuex)
 toastr.options = {
   'closeButton': true,
-  'timeOut': '15000'
+  'timeOut': '10000'
 }
 export const store = new Vuex.Store({
   state: {
@@ -229,16 +229,18 @@ export const store = new Vuex.Store({
                 let tableConfig = current['tableConfig']
                 let buttonConfig = current['buttonConfig']
                 if (tableConfig !== '' && tableConfig !== undefined && tableConfig !== 'undefined' && String(tableConfig).indexOf('{') !== -1 && String(tableConfig).indexOf('}') !== -1) {
-                  menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
-                  // let funcEval = new Function('(' + tableConfig + ')')
-                  // menuDetail['tableConfig'] = funcEval()
-                  // console.log('tableConfig', menuDetail['tableConfig'])
+                  try {
+                    menuDetail['tableConfig'] = eval('(' + tableConfig + ')')
+                  } catch (error) {
+                    alert('Lỗi cấu hình TableConfig menu ' + current['menuName'])
+                  }
                 }
                 if (buttonConfig !== '' && buttonConfig !== undefined && buttonConfig !== 'undefined' && String(buttonConfig).indexOf('{') !== -1 && String(buttonConfig).indexOf('}') !== -1) {
-                  menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
-                  // let funcEval = new Function('(' + buttonConfig + ')')
-                  // menuDetail['buttonConfig'] = funcEval()
-                  // console.log('buttonConfig', menuDetail['buttonConfig'])
+                  try {
+                    menuDetail['buttonConfig'] = eval('(' + buttonConfig + ')')
+                  } catch (error) {
+                    alert('Lỗi cấu hình ButtonConfig menu ' + current['menuName'])
+                  }
                 }
                 if (current.hasOwnProperty('steps')) {
                   if (Array.isArray(current.steps) && current.steps.length > 1) {
@@ -304,7 +306,6 @@ export const store = new Vuex.Store({
           let paramSearch = {
             start: filter.page * filter.numberPerPage - filter.numberPerPage,
             end: filter.page * filter.numberPerPage,
-            order: filter.order ? filter.order : '',
             agency: filter.agency ? filter.agency : '',
             service: filter.service ? filter.service : '',
             template: filter.template ? filter.template : '',
@@ -330,13 +331,29 @@ export const store = new Vuex.Store({
           if (filter['viapostal']) {
             paramSearch.viapostal = filter.viapostal
           }
+          if (filter['sort']) {
+            paramSearch.sort = filter.sort
+          }
+          if (filter.order !== '') {
+            paramSearch.order = String(filter.order) === 'true' ? true : false
+          }
           // 
           for (let index in state.filterDateFromTo) {
             if (filter.hasOwnProperty(state.filterDateFromTo[index]) && filter[state.filterDateFromTo[index]]) {
               paramSearch[state.filterDateFromTo[index]] = filter[state.filterDateFromTo[index]]
             }
           }
-          console.log('paramSearch', paramSearch)
+          if (paramSearch.hasOwnProperty('order') && (paramSearch.order === true || paramSearch.order === false)) {
+            filter.queryParams = filter.queryParams.replace('order=false', '')
+            filter.queryParams = filter.queryParams.replace('order=true', '')
+            filter.queryParams = filter.queryParams.replace('&order=false', '')
+            filter.queryParams = filter.queryParams.replace('&order=true', '')
+          }
+          let splitUrl = filter.queryParams.split('?')
+          if (splitUrl[1].charAt(0) === '&') {
+            filter.queryParams = splitUrl[0] + '?' + splitUrl[1].slice(1)
+          }
+          console.log('paramSearch dossier 000', filter.queryParams, paramSearch)
           // 
           let param = {
             headers: {
@@ -1058,8 +1075,12 @@ export const store = new Vuex.Store({
           responseType: 'blob'
         }
         axios.get(state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid, param).then(function (response) {
-          let url = window.URL.createObjectURL(response.data)
-          resolve(url)
+          if (response.data) {
+            let url = window.URL.createObjectURL(response.data)
+            resolve(url)
+          } else {
+            resolve('pending')
+          }
         }).catch(function (xhr) {
           console.log(xhr)
         })
@@ -1607,6 +1628,7 @@ export const store = new Vuex.Store({
     loadAlpcaForm ({ commit, state, dispatch }, data) {
       let id = data['id'] ? data['id'] : 'nm'
       window.$('div[id="formAlpaca' + data.dossierPartNo + id + '"]').empty()
+      console.log('data_loadAlpcaForm', data, eval('(' + data.formScript + ')'))
       /* eslint-disable */
       let formScript, formData
       if (data.formScript) {
@@ -1647,6 +1669,29 @@ export const store = new Vuex.Store({
           }
           let dataPutAlpacaForm = new URLSearchParams()
           dataPutAlpacaForm.append('formdata', JSON.stringify(formData))
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
+          axios.put(url, dataPutAlpacaForm, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    putAlpacaFormCallBack ({ commit, state, dispatch }, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            groupId: state.initData.groupId,
+            cps_auth: ''
+          }
+        }
+        try {
+          let dataPutAlpacaForm = new URLSearchParams()
+          dataPutAlpacaForm.append('formdata', JSON.stringify(data))
           let url = state.initData.dossierApi + '/' + data.dossierId + '/files/' + data.referenceUid + '/formdata'
           axios.put(url, dataPutAlpacaForm, options).then(function (response) {
             resolve(response.data)
@@ -1729,6 +1774,31 @@ export const store = new Vuex.Store({
             }
           }
           let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.partNo
+          axios.post(url, dataPostEform, options).then(function (response) {
+            resolve(response.data)
+          }).catch(function (xhr) {
+            reject(data)
+          })
+        } catch (e) {
+          console.log(e)
+          reject(data)
+        }
+      })
+    },
+    postEformCallBack ({commit, state}, data) {
+      return new Promise((resolve, reject) => {
+        let options = {
+          headers: {
+            'groupId': state.initData.groupId,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        try {
+          let dataPostEform = new FormData()
+          console.log('data put1',data)
+          dataPostEform.append('formData', JSON.stringify(data))
+          dataPostEform.append('file', '')
+          let url = state.initData.dossierApi + '/' + data.dossierId + '/eforms/' + data.tp
           axios.post(url, dataPostEform, options).then(function (response) {
             resolve(response.data)
           }).catch(function (xhr) {
@@ -2869,6 +2939,30 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    loadFormScriptKQ ({state, commit}, data) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          $.ajax({
+            url: state.initData.dossierTemplatesApi + '/' + data.templateNo + '/parts/' + data.partNo + '/formscript',
+            type: 'GET',
+            headers: {
+              groupId: state.initData.groupId,
+              Token: window.Liferay ? window.Liferay.authToken : ''
+            },
+            dataType: 'text',
+            success: function (result) {
+              let serializable = result
+              resolve(serializable)
+            },
+            error: function (xhr) {
+              console.log(xhr)
+              resolve(xhr)
+              reject(xhr)
+            }
+          })
+        }).catch(function (){})
+      })
+    },
     loadFormData ({state, commit}, data) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -3667,7 +3761,98 @@ export const store = new Vuex.Store({
           reject(xhr)
         })
       })
-    }
+    },
+    getNotarization ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let config = {
+          headers: {
+            groupId: state.initData.groupId
+          },
+          params: {
+            dossierId: filter.dossierId
+          }
+        }
+        axios.get('/o/rest/v2/notarizations', config).then(function (response) {
+          let serializable = response.data
+          if (serializable.data) {
+            resolve(serializable.data)
+          } else {
+            resolve([])
+          }
+        }).catch(function (xhr) {
+          reject([])
+        })
+      })
+    },
+    createNotarization ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPost = new URLSearchParams()
+          dataPost.append('dossierId', filter.dossierId)
+          dataPost.append('fileName', filter.fileName)
+          dataPost.append('totalRecord', Number(filter.totalRecord))
+          dataPost.append('totalPage', Number(filter.totalPage))
+          dataPost.append('totalFee', filter.totalFee.toString().replace(/\./g, ''))
+          dataPost.append('totalCopy', 0),
+          dataPost.append('notarizationNo', (new Date()).getTime()),
+          dataPost.append('notarizationYear', (new Date()).getFullYear()),
+          dataPost.append('totalCopy', 0),
+          dataPost.append('notarizationDate', (new Date()).getTime()),
+          dataPost.append('signerName', ''),
+          dataPost.append('signerPosition', ''),
+          dataPost.append('statusCode', ''),
+
+          axios.post('/o/rest/v2/notarizations', dataPost, param).then(function (response) {
+            resolve(response.data)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    updateNotarization ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          let dataPut = new URLSearchParams()
+          dataPut.append('fileName', filter.fileName)
+          dataPut.append('totalRecord', Number(filter.totalRecord))
+          dataPut.append('totalPage', Number(filter.totalPage))
+          dataPut.append('totalFee', filter.totalFee.toString().replace(/\./g, ''))
+          dataPut.append('totalCopy', 0)
+          axios.put('/o/rest/v2/notarizations/' + filter.notarizationNo, dataPut, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
+    deleteNotarization ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            }
+          }
+          axios.delete('/o/rest/v2/notarizations/' + filter.notarizationNo, dataPut, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        }).catch(function (){})
+      })
+    },
     // ----End---------
   },
   mutations: {

@@ -673,16 +673,18 @@ export default {
           let dataReportCurrent = {}
           let dataReportTotal = ''
           let textGroup = ''
+          let codeGroup = ''
           for (let keyGroup in vm.groupBy) {
             if (String(vm.groupBy[keyGroup]['key']) === String(vm.groupByVal)) {
               textGroup = vm.groupBy[keyGroup]['display']
+              codeGroup = vm.groupBy[keyGroup]['key']
               break
             }
           }
           for (let key in dataReport) {
             dataReportCurrent = dataReport[key]
             if (dossierRaw[dataReportCurrent[vm.groupByVal]] !== '' && dossierRaw[dataReportCurrent[vm.groupByVal]] !== undefined) {
-              if (dossierRaw[dataReportCurrent[vm.groupByVal]][textGroup] === dataReportCurrent[textGroup]) {
+              if (dossierRaw[dataReportCurrent[vm.groupByVal]][codeGroup] === dataReportCurrent[codeGroup]) {
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['dossiers'].push(dataReportCurrent)
                 dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] = dossierRaw[dataReportCurrent[vm.groupByVal]]['totalChild'] + 1
               }
@@ -707,13 +709,14 @@ export default {
               }
             }
           }
+          console.log('dossierRaw', dossierRaw)
           let dataToExportCSV = []
           let dataRaw = []
           for (let key in dossierRaw) {
             dataRaw.push(dossierRaw[key])
           }
           dataRaw.reverse()
-          // console.log('dossierRaw 46', dataRaw)
+          console.log('dossierRaw 46', dataRaw)
           for (let key in dataRaw) {
             if (dataRaw[key][vm.groupByVal] !== undefined && dataRaw[key][vm.groupByVal] !== null && dataRaw[key][vm.groupByVal] !== '') {
               let csvGroup = []

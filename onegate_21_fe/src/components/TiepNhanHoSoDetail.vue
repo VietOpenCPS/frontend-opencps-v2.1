@@ -22,7 +22,7 @@
             </div>
           </div> 
         </div>
-        <div style="position: relative;" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
+        <div :style="!isNotarization ? 'position: relative' : 'display: none'" v-if="originality !== 1 && formCode !== 'NEW_GROUP'">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content>
               <thong-tin-chung ref="thongtinchunghoso"></thong-tin-chung>
@@ -45,15 +45,16 @@
           </v-expansion-panel>
         </div>
         <!--  -->
-        <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="false"></thong-tin-chu-ho-so>
+        <thong-tin-chu-ho-so ref="thongtinchuhoso" :requiredConfig="requiredConfigData" :formCode="formCode" :showApplicant="formCode === 'NEW_GROUP' ? true : false" :showDelegate="isNotarization ? true : false"></thong-tin-chu-ho-so>
         <!--  -->
-        <div>
+        <div v-if="!isNotarization">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
                 <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
                 <span v-if="formCode === 'NEW_GROUP'">Tên nhóm hồ sơ</span>
-                <span v-else>Nội dung giải quyết</span>
+                <span v-else>Tên hồ sơ</span>
+                <!-- <span v-else>Nội dung giải quyết</span> -->
                 &nbsp;&nbsp;&nbsp;&nbsp;
               </div>
               <div>
@@ -63,8 +64,14 @@
                       v-model="briefNote"
                       :rows="2"
                       box
-                      :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
+                      :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập tên hồ sơ'"
                     ></v-textarea>
+                    <!-- <v-textarea
+                      v-model="briefNote"
+                      :rows="2"
+                      box
+                      :label="formCode === 'NEW_GROUP' ? 'Nhập tên nhóm hồ sơ' : 'Nhập nội dung giải quyết'"
+                    ></v-textarea> -->
                     <div v-if="templateDescription">(*) &nbsp; {{templateDescription}}</div>
                   </v-card-text>
                 </v-card>
@@ -73,7 +80,7 @@
           </v-expansion-panel>
         </div>
         <!--  -->
-        <div style="position: relative;">
+        <div style="position: relative;" v-if="!isNotarization">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content>
               <div slot="header" style="display: flex; align-items: center;">
@@ -94,6 +101,18 @@
                 <v-icon v-else-if="originality !== 1" style="cursor: pointer;" v-on:click.stop="stateEditSample = !stateEditSample" size="16" color="primary">done</v-icon>
               </div>
               <thanh-phan-ho-so ref="thanhphanhoso" :formCodeInput="formCode"  :onlyView="formCode === 'NEW_GROUP' ? true : false" :id="'nm'" :partTypes="formCode === 'NEW_GROUP' ? inputTypesGroup : inputTypes"></thanh-phan-ho-so>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </div>
+        <!-- thu-tuc-chung-thuc -->
+        <div style="position: relative;" v-if="isNotarization">
+          <v-expansion-panel :value="[true]" expand  class="expansion-pl">
+            <v-expansion-panel-content>
+              <div slot="header" style="display: flex; align-items: center;">
+                <div class="background-triangle-small"> <v-icon size="18" color="white">star_rate</v-icon></div>
+                <span>Tài liệu chứng thực</span>
+              </div>
+              <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :formCodeInput="formCode" :onlyView="false"></tai-lieu-chung-thuc>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </div>
@@ -570,6 +589,7 @@ import toastr from 'toastr'
 import $ from 'jquery'
 import ThongTinChuHoSo from './TiepNhan/TiepNhanHoSo_ThongTinChuHoSo.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
+import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import ThongTinChung from './TiepNhan/TiepNhanHoSo_ThongTinChung.vue'
 import LePhi from './form_xu_ly/FeeDetail.vue'
 import DichVuChuyenPhatKetQua from './TiepNhan/TiepNhanHoSo_DichVuChuyenPhatKetQua.vue'
@@ -582,12 +602,14 @@ export default {
   components: {
     'thong-tin-chu-ho-so': ThongTinChuHoSo,
     'thanh-phan-ho-so': ThanhPhanHoSo,
+    'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'thong-tin-chung': ThongTinChung,
     'thu-phi': LePhi,
     'dich-vu-chuyen-phat-ket-qua': DichVuChuyenPhatKetQua
   },
   data: () => ({
     // add new template
+    isNotarization: false,
     templateName: '',
     formTemplate: '',
     data_form_template: '',
@@ -656,7 +678,8 @@ export default {
     dialogPDFLoading: true,
     tiltleDialog: '',
     requiredConfigData: false,
-    templateDescription : ''
+    templateDescription : '',
+    actionDetail: ''
   }),
   computed: {
     loading () {
@@ -781,11 +804,6 @@ export default {
           vm.$store.dispatch('getDetailDossier', data).then(result => {
             vm.dossierId = result.dossierId
             vm.briefNote = result.serviceName ? result.serviceName : ''
-            // if (result.serviceName && !vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-            //   vm.briefNote = vm.briefNote + ' cho ' + vm.thongTinChuHoSo['applicantName']
-            // } else if (result.serviceName && vm.thongTinChuHoSo['userType'] && vm.thongTinChuHoSo['applicantName']) {
-            //   vm.briefNote = vm.briefNote + ' cho ông/bà ' + vm.thongTinChuHoSo['applicantName']
-            // }
             if (vm.formCode === 'UPDATE') {
               vm.briefNote = result.dossierName ? result.dossierName : result.serviceName
             }
@@ -793,16 +811,24 @@ export default {
             if (result.dossierStatus === '') {
               vm.$store.dispatch('pullNextactions', result).then(result2 => {
                 if (result2) {
-                  var actionDetail = result2.filter(function (item) {
-                    return (item.actionCode === 1100 || item.actionCode === '1100')
+                  let actionList = result2.filter(function (item) {
+                    return String(item.enable) === '1' && item.autoEvent !== 'listener'
                   })
+                  if (actionList.length > 1) {
+                    vm.actionDetail = actionList.filter(function (item) {
+                      return item.actionCode === 1100 || item.actionCode === '1100'
+                    })[0]
+                  } else {
+                    vm.actionDetail = actionList[0]
+                  }
                   vm.$store.dispatch('processPullBtnDetail', {
                     dossierId: result.dossierId,
-                    actionId: actionDetail[0] ? actionDetail[0].processActionId : ''
+                    actionId: vm.actionDetail[0] ? vm.actionDetail[0].processActionId : ''
                   }).then(resAction => {
                     result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
                     result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
                     result['receivingDate'] = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
+                    result['allowAssignUser'] = String(resAction['allowAssignUser'])
                     vm.editableDate = resAction && resAction.receiving ? resAction.receiving.editable : false
                     vm.dueDateEdit = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : ''
                     vm.receiveDateEdit = resAction && resAction.receiving ? resAction.receiving.receiveDate : ''
@@ -830,7 +856,6 @@ export default {
             }
             vm.thongTinChiTietHoSo = result
             vm.$refs.thongtinchuhoso.initData(result)
-            vm.$refs.thanhphanhoso.initData(result)
             vm.viaPortalDetail = result.viaPostal
             if (result.viaPostal > 0) {
               let postalAddress = result.address ? (result.address + ', ' + result.wardName + ' - ' + result.districtName + ' - ' + result.cityName) : ''
@@ -842,6 +867,17 @@ export default {
             }
             // lấy thông tin notify config
             vm.getNotifyConfig(vm.dossierId)
+            vm.$store.dispatch('getServiceInfo', {
+              serviceInfoId: result.serviceCode
+            }).then(function (res) {
+              if (res.serviceCode === 'TEST-CHUNG-THUC') {
+                vm.isNotarization = true
+
+              } else {
+                vm.isNotarization = false
+                vm.$refs.thanhphanhoso.initData(result)
+              }
+            })
           }).catch(reject => {
           })
         }
@@ -892,6 +928,7 @@ export default {
           tempData['dossierId'] = vm.dossierId
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
           tempData['originality'] = vm.originality
+          tempData['dossierName'] = vm.briefNote
           // console.log('data put dossier -->', tempData)
           setTimeout(function () {
             vm.$store.dispatch('putDossier', tempData).then(function (result) {
@@ -903,7 +940,7 @@ export default {
                 let actionUser = initData.user.userName ? initData.user.userName : ''
                 let dataPostAction = {
                   dossierId: vm.dossierId,
-                  actionCode: 1100,
+                  actionCode: vm.actionDetail.actionCode,
                   actionNote: '',
                   actionUser: actionUser,
                   payload: '',
@@ -942,7 +979,7 @@ export default {
       var thongtinchunghoso = this.$refs.thongtinchunghoso.getthongtinchunghoso()
       let thongtinchuhoso = this.$refs.thongtinchuhoso.getThongTinChuHoSo()
       let thongtinnguoinophoso = this.$refs.thongtinchuhoso.getThongTinNguoiNopHoSo()
-      let thanhphanhoso = this.$refs.thanhphanhoso.dossierTemplateItems
+      let thanhphanhoso = this.$refs.thanhphanhoso ? this.$refs.thanhphanhoso.dossierTemplateItems : ''
       // let dichvuchuyenphatketqua = this.$refs.dichvuchuyenphatketqua ? this.$refs.dichvuchuyenphatketqua.dichVuChuyenPhatKetQua : {}
       let dichvuchuyenphatketqua = vm.dichVuChuyenPhatKetQua
       // console.log('validate TNHS formThongtinchuhoso.validate()', vm.$refs.thongtinchuhoso.showValid())
@@ -958,7 +995,7 @@ export default {
         if (passValid) {
           // console.log('valid confirm2', passValid)
           vm.loadingAction = true
-          if (!vm.$refs.thanhphanhoso.validDossierTemplate()) {
+          if (vm.$refs.thanhphanhoso && !vm.$refs.thanhphanhoso.validDossierTemplate()) {
             vm.loadingAction = false
             return
           }
@@ -966,7 +1003,7 @@ export default {
             vm.loadingAction = false
             return
           }
-          let dossierFiles = vm.$refs.thanhphanhoso.dossierFilesItems
+          let dossierFiles = vm.$refs.thanhphanhoso ? vm.$refs.thanhphanhoso.dossierFilesItems : ''
           let dossierTemplates = thanhphanhoso
           let listAction = []
           let listDossierMark = []
@@ -978,9 +1015,6 @@ export default {
               }
             })
           }
-          // if (vm.$refs.thanhphanhoso) {
-          //   vm.$refs.thanhphanhoso.saveMark()
-          // }
           var tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, dichvuchuyenphatketqua, thongtinchunghoso)
           tempData['dossierId'] = vm.dossierId
           tempData['sampleCount'] = vm.thongTinChiTietHoSo.sampleCount
@@ -1013,7 +1047,7 @@ export default {
               }
               let dataPostAction = {
                 dossierId: vm.dossierId,
-                actionCode: 1100,
+                actionCode: vm.actionDetail.actionCode,
                 actionNote: '',
                 actionUser: actionUser,
                 payload: payloadDate,
@@ -1021,6 +1055,9 @@ export default {
                 assignUsers: '',
                 payment: paymentsOut,
                 createDossiers: ''
+              }
+              if (vm.thongTinChiTietHoSo.hasOwnProperty('allowAssignUser') && vm.thongTinChiTietHoSo.allowAssignUser === '1') {
+                dataPostAction.assignUsers = [{userId: initData.user.userId, userName: actionUser, assigned: 1}]
               }
               vm.loadingAction = true
               vm.$store.dispatch('postAction', dataPostAction).then(function (result) {
@@ -1106,9 +1143,9 @@ export default {
         }).catch(function (xhr) {
         })
         Promise.all(listAction).then(values => {
-          console.log(values)
+          // console.log(values)
           let tempData = Object.assign(thongtinchuhoso, thongtinnguoinophoso, thanhphanhoso, lephi, dichvuchuyenphatketqua, thongtinchunghoso)
-          console.log('data put dossier -->', tempData)
+          // console.log('data put dossier -->', tempData)
           tempData['dossierId'] = vm.dossierId
           vm.$store.dispatch('putDossier', tempData).then(function (result) {
             let dataPostAction = {

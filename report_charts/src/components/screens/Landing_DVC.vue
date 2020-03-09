@@ -341,12 +341,14 @@
               </v-alert>
             </div>
             <!-- report_2 -->
-            <apexchart v-else type="bar" :height="isMobile ? 500 : 350" 
-              :options="chartOptionsBarTotal" 
-              :series="seriesChartBarTotal" 
-              :stacked="true"
-              style="margin-top: -30px"
-            ></apexchart>
+            <div v-else style="max-width: 100%;">
+              <apexchart type="bar" :height="isMobile ? 500 : 350" width='100%'
+                :options="chartOptionsBarTotal" 
+                :series="seriesChartBarTotal" 
+                :stacked="true"
+                style="margin-top: -30px"
+              ></apexchart>
+            </div>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -368,11 +370,14 @@
           </div>
           <v-card-text class="pt-2 pb-0 px-0">
             <!-- report_3 -->
-            <apexchart type="bar" :height="isMobile ? 500 : 500"
-              :options="dossierTypeChartOption" 
-              :series="seriesDossierTypeChart" 
-              style="margin-top: -30px"
-            ></apexchart>
+            <div style="max-width: 100%;">
+              <apexchart type="bar" :height="isMobile ? 500 : 500" width='100%'
+                :options="dossierTypeChartOption" 
+                :series="seriesDossierTypeChart" 
+                style="margin-top: -30px"
+              ></apexchart>
+            </div>
+            
           </v-card-text>
         </v-card>
       </v-flex>
@@ -420,11 +425,14 @@
               </v-alert>
             </div>
             <!-- report_4 -->
-            <apexchart v-else type="line" height="500"
-              :options="chartOptions" 
-              :series="seriesChart"
-              style="margin-top: -30px;"
-            ></apexchart>
+            <div v-else style="max-width: 100%">
+              <apexchart type="line" height="500" width='100%'
+                :options="chartOptions" 
+                :series="seriesChart"
+                style="margin-top: -30px;"
+              ></apexchart>
+            </div>
+            
           </v-card-text>
         </v-card>
       </v-flex>
@@ -788,17 +796,6 @@ export default {
           }
         },
       },
-      // responsive: [{
-      //   breakpoint: 480,
-      //   options: {
-      //     chart: {
-      //       width: 220
-      //     },
-      //     legend: {
-      //       show: true
-      //     }
-      //   }
-      // }],
       legend: {
         position: 'left',
         offsetY: 0,

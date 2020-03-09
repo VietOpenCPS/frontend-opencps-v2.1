@@ -245,6 +245,8 @@ export default {
           vm.gateNumberList[index].bookings = currentGate && currentGate.hasOwnProperty('gateNumber') ? currentGate : bookingEmty
         }
         vm.loadData = !vm.loadData
+      } else {
+        vm.loadData = !vm.loadData
       }
     }
   }

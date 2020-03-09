@@ -82,9 +82,12 @@
               <span v-if="originality === 3">XỬ LÝ HỒ SƠ</span> <span v-else>CHUẨN BỊ HỒ SƠ</span>
             </v-btn>
           </v-tab>
-          <v-tab :key="2" href="#tabs-2" @click="loadTPHS()">
-            <v-btn flat class="px-0 py-0 mx-0 my-0">
+          <v-tab :key="2" href="#tabs-2" @click="!isNotarization ? loadTPHS() : ''">
+            <v-btn flat class="px-0 py-0 mx-0 my-0" v-if="!isNotarization">
               <span v-if="thongTinChiTietHoSo.finishDate">THÀNH PHẦN HỒ SƠ VÀ KẾT QUẢ</span> <span v-else>THÀNH PHẦN HỒ SƠ</span>
+            </v-btn>
+            <v-btn flat class="px-0 py-0 mx-0 my-0" v-else>
+              <span> TÀI LIỆU CHỨNG THỰC</span>
             </v-btn>
           </v-tab>
           <v-tab v-if="paymentDetail" :key="3" href="#tabs-3" @click="loadPaymentFile()">
@@ -267,67 +270,81 @@
               <v-alert class="mx-3" v-if="!btnStateVisible" outline :color="alertObj.color" :icon="alertObj.icon" :value="true">
                 {{alertObj.message}}
               </v-alert>
-              <div v-if="rollbackable || printDocument" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
+              <div v-if="!btnStateVisible && (rollbackable || printDocument || printInvoicefilePayment)" class="ml-2 py-2" style="width: 100%;border-bottom: 1px solid #dddddd">
                 <v-btn color="primary" v-if="rollbackable" @click="rollBack()">Thu hồi hồ sơ</v-btn>
                 <v-btn color="primary" v-if="printDocument" @click="printViewDocument()"
                   :loading="dialogPDFLoading"
                   :disabled="dialogPDFLoading"
                 >
+                  <v-icon>print</v-icon> &nbsp;
                   In văn bản hành chính
+                  <span slot="loader">Loading...</span>
+                </v-btn>
+                <v-btn color="primary" v-if="printInvoicefilePayment" @click="printPay()"
+                  :loading="dialogPDFLoading"
+                  :disabled="dialogPDFLoading"
+                >
+                  <v-icon>print</v-icon> &nbsp;
+                  In biên lai
                   <span slot="loader">Loading...</span>
                 </v-btn>
               </div>
               <!--  -->
             </v-tab-item>
             <v-tab-item value="tabs-2" :key="2" reverse-transition="fade-transition" transition="fade-transition">
-              <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form">
-                <v-expansion-panel-content :key="1">
-                  <div slot="header" class="text-bold">
-                    <div class="background-triangle-small"> I.</div>
-                    Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
-                    <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form" v-if="stateViewResult">
-                <v-expansion-panel-content :key="1">
-                  <div slot="header" class="text-bold">
-                    <div class="background-triangle-small"> II.</div>
-                    Kết quả xử lý
-                  </div>
-                  <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
-                <v-expansion-panel-content :key="1">
-                  <div slot="header" class="text-bold">
-                    <div class="background-triangle-small"> 
-                      <span v-if="stateViewResult">III.</span>
-                      <span v-else>II.</span>
+              <div v-if="!isNotarization">
+                <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form">
+                  <v-expansion-panel-content :key="1">
+                    <div slot="header" class="text-bold">
+                      <div class="background-triangle-small"> I.</div>
+                      Tài liệu nộp &nbsp;&nbsp;&nbsp;&nbsp;
+                      <span v-if="thongTinChiTietHoSo.sampleCount !== 0 && !thongTinChiTietHoSo.online">({{thongTinChiTietHoSo.sampleCount === 0 ? '?' : thongTinChiTietHoSo.sampleCount}}&nbsp;bộ hồ sơ)</span>
                     </div>
-                    Văn bản hành chính
-                  </div>
-                  <div v-for="(item, index) in documents" v-bind:key="index" style="border-bottom: 1px solid #dedede;">
-                    <v-card>
-                      <v-layout wrap class="pl-4 pr-2 py-1 align-center row-list-style"> 
-                        <v-flex xs11>
-                          <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
-                          <div style="margin-left: 20px;">{{item.documentName}}</div>
-                        </v-flex>
-                        <v-flex xs1 class="text-right">
-                          <v-tooltip top>
-                            <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
-                              <v-icon style="font-size: 14px;">visibility</v-icon>
-                            </v-btn>
-                            <span>Xem</span>
-                          </v-tooltip>
-                        </v-flex>
-                      </v-layout>
-                    </v-card>
-                  </div>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
+                    <thanh-phan-ho-so ref="thanhphanhoso1" :onlyView="true" :id="'nm'" :partTypes="inputTypes"></thanh-phan-ho-so>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel :value="[true]" expand class="expansion-pl ext__form" v-if="stateViewResult">
+                  <v-expansion-panel-content :key="1">
+                    <div slot="header" class="text-bold">
+                      <div class="background-triangle-small"> II.</div>
+                      Kết quả xử lý
+                    </div>
+                    <thanh-phan-ho-so ref="thanhphanhoso2" @tp:change-state-view-result="changeStateViewResult" :onlyView="true" :id="'kq'" :partTypes="outputTypes"></thanh-phan-ho-so>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel :value="[true]" expand  class="expansion-pl ext__form" v-if="documents && documents.length > 0">
+                  <v-expansion-panel-content :key="1">
+                    <div slot="header" class="text-bold">
+                      <div class="background-triangle-small"> 
+                        <span v-if="stateViewResult">III.</span>
+                        <span v-else>II.</span>
+                      </div>
+                      Văn bản hành chính
+                    </div>
+                    <div v-for="(item, index) in documents" v-bind:key="index" style="border-bottom: 1px solid #dedede;">
+                      <v-card>
+                        <v-layout wrap class="pl-4 pr-2 py-1 align-center row-list-style"> 
+                          <v-flex xs11>
+                            <span class="text-bold" style="position: absolute;">{{index + 1}}.</span> 
+                            <div style="margin-left: 20px;">{{item.documentName}}</div>
+                          </v-flex>
+                          <v-flex xs1 class="text-right">
+                            <v-tooltip top>
+                              <v-btn slot="activator" class="mx-0 my-0" fab dark small color="primary" @click="viewFileDocument(item)" style="height:25px;width:25px">
+                                <v-icon style="font-size: 14px;">visibility</v-icon>
+                              </v-btn>
+                              <span>Xem</span>
+                            </v-tooltip>
+                          </v-flex>
+                        </v-layout>
+                      </v-card>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </div>
+              <div v-else>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :onlyView="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? false : true"></tai-lieu-chung-thuc>
+              </div>
             </v-tab-item>
             <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">
               <v-card>
@@ -684,6 +701,7 @@ import YkienCanBoThucHien from './form_xu_ly/YkienCanBoThucHien.vue'
 import TaoTaiLieuKetQua from './form_xu_ly/TaoTaiLieuKetQua.vue'
 import FormBoSungThongTinNgan from './form_xu_ly/FormBoSungThongTinNgan.vue'
 import ThanhPhanHoSo from './TiepNhan/TiepNhanHoSo_ThanhPhanHoSoNew.vue'
+import TaiLieuChungThuc from './TiepNhan/TaiLieuChungThuc.vue'
 import EditDate from './form_xu_ly/EditDate.vue'
 import ExtendDateEdit from './form_xu_ly/ExtendDateEdit.vue'
 import HoSoLienThong from './HoSoLienThong.vue'
@@ -708,6 +726,7 @@ export default {
     'tai-lieu-ket-qua': TaoTaiLieuKetQua,
     'form-bo-sung-thong-tin': FormBoSungThongTinNgan,
     'thanh-phan-ho-so': ThanhPhanHoSo,
+    'tai-lieu-chung-thuc': TaiLieuChungThuc,
     'ngay-hen-tra': EditDate,
     'thong-tin-buu-chinh': ThongTinBuuChinh,
     'ngay-gia-han': ExtendDateEdit,
@@ -880,6 +899,7 @@ export default {
     messageChat: '',
     isCallBack: true,
     printDocument: false,
+    printInvoicefilePayment: false,
     alertObj: {
       icon: 'check_circle',
       color: 'success',
@@ -898,7 +918,8 @@ export default {
     titleDialogPdf: 'Tài liệu đính kèm',
     viewScript: false,
     loadingForm: false,
-    hasPreviewSync: false
+    hasPreviewSync: false,
+    isNotarization: false
   }),
   computed: {
     loading () {
@@ -948,6 +969,7 @@ export default {
   },
   created () {
     let vm = this
+    window.top.toastr = toastr
     vm.$nextTick(function () {
       $('#m-navigation').css('display', 'none')
       // console.log('meunconfig created', vm.menuConfigs, vm.index)
@@ -1006,7 +1028,7 @@ export default {
     },
     menuConfigs (val) {
       let vm = this
-      console.log('menuconfig watch', vm.menuConfigs, vm.index)
+      console.log('menuconfig watch 123', vm.menuConfigs, vm.index)
       if (val) {
         if (vm.menuConfigs && vm.menuConfigs[vm.index]['hasViewText']) {
           vm.viewScript = true
@@ -1110,11 +1132,21 @@ export default {
         // })
         vm.$store.dispatch('getListDossierFiles', data).then(result => {
           vm.listDossierFiles = result
-          // console.log('listDossierFiles', vm.listDossierFiles)
         })
-        if (vm.$refs.thanhphanhoso) {
-          vm.$refs.thanhphanhoso.initData(resultDossier)
-        }
+        vm.$store.dispatch('getServiceInfo', {
+          serviceInfoId: resultDossier.serviceCode
+        }).then(function (res) {
+          if (resultDossier.serviceCode === 'TEST-CHUNG-THUC') {
+            vm.isNotarization = true
+
+          } else {
+            vm.isNotarization = false
+            if (vm.$refs.thanhphanhoso) {
+              vm.$refs.thanhphanhoso.initData(resultDossier)
+            }
+          }
+        })
+        
       })
     },
     recountFileTemplates () {
@@ -2145,6 +2177,10 @@ export default {
                   if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                     vm.printDocument = true
                   }
+                  if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                    vm.printInvoicefilePayment = true
+                    vm.printPay()
+                  }
                   if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
                     vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
                   }
@@ -2185,6 +2221,8 @@ export default {
               if (!vm.createFileSignedSync) {
                 toastr.clear()
                 toastr.error('Chưa có tài liệu nào được ký duyệt')
+                vm.loadingAction = false
+                vm.loadingActionProcess = false
               } else {
                 let files = vm.createFileSignedSync.createFiles
                 let fileEntries = []
@@ -2230,6 +2268,10 @@ export default {
                     }
                     if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                       vm.printDocument = true
+                    }
+                    if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                      vm.printInvoicefilePayment = true
+                      vm.printPay()
                     }
                     if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
                       vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
@@ -2281,6 +2323,10 @@ export default {
                 }
                 if (result.hasOwnProperty('dossierDocumentId') && result['dossierDocumentId'] !== null && result['dossierDocumentId'] !== undefined && result['dossierDocumentId'] !== 0 && result['dossierDocumentId'] !== '0') {
                   vm.printDocument = true
+                }
+                if (vm.showThuPhi && String(filter['payment']['requestPayment']) === '5') {
+                  vm.printInvoicefilePayment = true
+                  vm.printPay()
                 }
                 if (vm.thongTinChiTietHoSo.dossierStatus === 'new' && vm.originality === 1) {
                   vm.$router.push('/danh-sach-ho-so/' + vm.index + '/nop-thanh-cong/' + vm.thongTinChiTietHoSo.dossierId)
@@ -2643,6 +2689,7 @@ export default {
     },
     loadPaymentFile () {
       let vm = this
+      vm.loadThanhToan()
       if (vm.$refs.thongtinthanhtoan) {
         vm.$refs.thongtinthanhtoan.getPaymentFiles()
       }
@@ -2770,6 +2817,24 @@ export default {
         }, 1000)
       }
       callServer()
+    },
+    printPay () {
+      let vm = this
+      let filter = {
+        dossierId: vm.thongTinChiTietHoSo.dossierId,
+        referenceUid: vm.thongTinChiTietHoSo.referenceUid
+      }
+      vm.dialogPDFLoading = true
+      vm.$store.dispatch('printPay', filter).then(function (result) {
+        vm.dialogPDFLoading = false
+        vm.titleDialogPdf = 'Biên lai thanh toán'
+        vm.dialogPDF = true
+        setTimeout(function () {
+          document.getElementById('dialogPDFPreview').src = result
+        }, 200)
+      }).catch(function(){
+        vm.dialogPDFLoading = false
+      })
     },
     filterNextActionEnable (nextaction) {
       var isEnabale = false

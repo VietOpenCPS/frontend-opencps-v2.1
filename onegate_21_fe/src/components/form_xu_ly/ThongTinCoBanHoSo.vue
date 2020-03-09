@@ -10,6 +10,10 @@
                 <span class="pr-2">Chủ hồ sơ: </span>
                 <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantName}}</span>
               </div>
+              <div class="xs12 sm12 pb-1">
+                <span class="pr-2">Số CMND/ căn cước: </span>
+                <span class="pl-0 text-bold"> {{thongTinChiTietHoSo.applicantIdNo}}</span>
+              </div>
               <!--  -->
               <div class="xs12 sm12 pb-1 overHidden">
                 <span class="pr-2">Địa chỉ: </span>
@@ -41,6 +45,13 @@
                         {{thongTinChiTietHoSo.applicantName}}
                       </span>
                       <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateName}} </span>
+                    </div>
+                    <div class="xs12 sm12 py-1">
+                      <span class="pr-2">Số CMND/ căn cước: </span>
+                      <span class="pl-0 text-bold" v-if="thongTinChiTietHoSo.online"> 
+                        {{thongTinChiTietHoSo.applicantIdNo}}
+                      </span>
+                      <span v-else class="pl-0 text-bold "> {{thongTinChiTietHoSo.delegateIdNo}} </span>
                     </div>
                     <div class="xs12 sm12 py-1">
                       <span class="pr-2">Địa chỉ:</span>

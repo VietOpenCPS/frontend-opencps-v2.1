@@ -33,8 +33,8 @@
           <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'unlock'">lock_open</v-icon>
           {{item.label}}
         </v-btn>
-        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['changeEmail']" v-on:click.native="dialogChangeMail=true">
-          
+        <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['changeEmail']" v-on:click.native="showChangeEmail">
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'unlock'">swap_horiz</v-icon>
           {{item.label}}
         </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
@@ -52,6 +52,7 @@
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
+          :disabled="item['disabled']"
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-autocomplete>
@@ -67,6 +68,7 @@
           :chips="item['chips']"
           :multiple="item['multiple']"
           clearable
+          :disabled="item['disabled']"
         >
           <template slot="label">{{item['label']}} <span v-if="item.required" class="red--text darken-3">*</span></template>
         </v-autocomplete>
@@ -74,6 +76,7 @@
           v-model="data[item.model]"
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
+          :disabled="item['disabled']"
           box 
           clearable
         >
@@ -83,6 +86,7 @@
           v-model="data[item.model]"
           :rules="processRules(item.rules)"
           :placeholder="item['placeholder']"
+          :disabled="item['disabled']"
           box 
           clearable
         >
@@ -133,6 +137,7 @@
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
+            :disabled="item['disabled']"
           >
             <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
@@ -148,6 +153,7 @@
             :chips="item['chips']"
             :multiple="item['multiple']"
             clearable
+            :disabled="item['disabled']"
           >
             <template slot="label">{{itemChild['label']}} <span v-if="itemChild.required" class="red--text darken-3">*</span></template>
           </v-autocomplete>
@@ -382,18 +388,22 @@
     </v-alert>
     <v-dialog v-model="dialogChangeMail" persistent max-width="400">
       <v-card>
-        <v-card-title>
-          <span class="headline">Cập nhập thông tin đăng nhập</span>
-        </v-card-title>
-        <v-card-text>
+        <v-toolbar flat dark color="blue">
+          <v-toolbar-title class="px-3">Cập nhật email tài khoản</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="dialogChangeMail = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="px-2">
           <v-form ref="formChangeMail" lazy-validation>
             <v-container>
               <v-row>
                 <v-col cols="12">
-                  <v-text-field v-model="data.email" label="Email hiện tại" disabled></v-text-field>
+                  <v-text-field v-model="oldEmail" label="Email hiện tại" disabled></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-text-field v-model="newEmail" label="Email mới*" 
+                  <v-text-field v-model="newEmail" label="Email mới" 
                     :rules="[rules.required, rules.email]"
                   ></v-text-field>
                 </v-col>
@@ -401,10 +411,16 @@
             </v-container>
           <v-form>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="px-3">
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialogChangeMail = false">Đóng</v-btn>
-          <v-btn color="blue darken-1" text @click="changeEmail()">Cập nhập</v-btn>
+          <v-btn color="red darken-3" dark @click="dialogChangeMail = false">
+            <v-icon>clear</v-icon>&nbsp;
+            Thoát
+          </v-btn>
+          <v-btn color="blue darken-3" dark @click="changeEmail()">
+            <v-icon>save</v-icon>&nbsp;
+            Cập nhập
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -412,13 +428,16 @@
 </template>
 
 <script>
+  import Vue from 'vue'
   import DatetimePicker from './DatetimePicker.vue'
   import AttachedFileTemplate from './AttachedFileTemplate.vue'
   import AttachedFileAvatar from './AttachedFileAvatar.vue'
   import AttachedFileForm from './AttachedFileForm.vue'
   import AttachedFileJasper from './AttachedFileJasper.vue'
   import axios from 'axios'
+  import toastr from 'toastr'
 
+  Vue.use(toastr)
   export default {
     props: ['tableConfig', 'detailData', 'id', 'tableName'],
     components: {
@@ -435,6 +454,7 @@
         alertSuccess: false,
         dialogChangeMail: false,
         config: {},
+        oldEmail: '',
         newEmail: '',
         deactiveAccountFlag: 0,
         deactiveAccountFlagBoolean: false,
@@ -569,87 +589,6 @@
           }).catch(function (error) {
           })
         }
-          /*
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd: 'get',
-              config: true,
-              code: vm.$router.history.current.params.tableName,
-              respone: 'tableConfig'
-            }
-          )
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd: 'get',
-              code: vm.$router.history.current.params.tableName,
-              respone: 'detail',
-              responeType: 'detail',
-              filter: [
-                {
-                  'key': 'id',
-                  'value_filter': vm.id,
-                  'compare': '=',
-                  'type': 'number'
-                }
-              ]
-            }
-          )
-          */
-
-        /*
-        vm.$socket.onmessage = function (data) {
-          let dataObj = eval('( ' + data.data + ' )')
-          vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-          if (dataObj.respone === 'detail') {
-            if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
-              if (vm.dataSocket['detail'].length === 0) {
-                vm.data = {}
-              } else {
-                vm.data = vm.dataSocket[dataObj.respone][0]
-              }
-              vm.processDataSourceVerify()
-            } else {
-              vm.data = {}
-            }
-          } else if (dataObj.respone === 'loginUser') {
-            vm.$store.commit('setloginUser', dataObj['loginUser'])
-          } 
-          if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
-            vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
-            console.log('load tableConfig')
-            vm.processDataSource()
-          }
-          vm.loading = false
-          if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
-            let current = vm.$router.history.current
-            let newQuery = current.query
-            let currentPath = current.path
-            let queryString = '?'
-            newQuery['state_change'] = '0'
-            newQuery['renew'] = ''
-            for (let key in newQuery) {
-              if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-                queryString += key + '=' + newQuery[key] + '&'
-              }
-            }
-            queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
-            vm.$router.push({
-              path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
-            })
-          } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
-            vm.snackbarsuccess = true
-            vm.data = {}
-          }
-          if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-            vm.pullCounter = vm.pullCounter - 1
-            if (vm.pullCounter === 0) {
-              vm.pullOk = true
-            }
-          }
-        }
-        */
       })
     },
     methods: {
@@ -678,58 +617,6 @@
         let vm = this
         if (vm.isConnected) {
           vm.isConnected = false
-          /*
-          vm.$socket.onmessage = function (data) {
-            let dataObj = eval('( ' + data.data + ' )')
-            vm.dataSocket[dataObj.respone] = dataObj[dataObj.respone]
-            if (dataObj.respone === 'detail') {
-              if (vm.dataSocket['detail'] !== null && vm.dataSocket['detail'] !== undefined) {
-                if (vm.dataSocket['detail'].length === 0) {
-                  vm.data = {}
-                } else {
-                  vm.data = vm.dataSocket[dataObj.respone][0]
-                }
-                vm.processDataSourceVerify()
-              } else {
-                vm.data = {}
-              }
-            } else if (dataObj.respone === 'loginUser') {
-              vm.$store.commit('setloginUser', dataObj['loginUser'])
-            } 
-            if (dataObj.respone === 'tableConfig' && vm.dataSocket['tableConfig'] !== null && vm.dataSocket['tableConfig'] !== undefined) {
-              vm.detailForm = eval('( ' + vm.dataSocket['tableConfig']['detailColumns'] + ' )')
-              console.log('load tableConfig')
-              vm.processDataSource()
-            }
-            vm.loading = false
-            if (dataObj['status'] === '200' && dataObj['cmd'] !== 'get' && dataObj['cmd'] !== 'cmd_ide') {
-              let current = vm.$router.history.current
-              let newQuery = current.query
-              let currentPath = current.path
-              let queryString = '?'
-              newQuery['state_change'] = '0'
-              newQuery['renew'] = ''
-              for (let key in newQuery) {
-                if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
-                  queryString += key + '=' + newQuery[key] + '&'
-                }
-              }
-              queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
-              vm.$router.push({
-                path: currentPath.substring(0, currentPath.indexOf('/editor/')) + queryString
-              })
-            } else if (dataObj['status'] === '200' && dataObj['cmd'] === 'cmd_ide') {
-              vm.snackbarsuccess = true
-              vm.data = {}
-            }
-            if (dataObj['type'] === 'api' && dataObj['status'] === '200') {
-              vm.pullCounter = vm.pullCounter - 1
-              if (vm.pullCounter === 0) {
-                vm.pullOk = true
-              }
-            }
-          }
-          */
         }
         if (vm.$refs.form.validate()) {
           vm.loading = true
@@ -804,18 +691,6 @@
             }
           }).catch(function (error) {
           })
-          /*
-          vm.$socket.sendObj(
-            {
-              type: 'admin',
-              cmd: cmdText,
-              respone: 'detail',
-              id: vm.id,
-              code: vm.$router.history.current.params.tableName,
-              data: dataPOST
-            }
-          )
-          */
         }
       },
       processRules (rulesStr) {
@@ -872,21 +747,7 @@
               }
             }).catch(function (error) {
             })
-            /*
-            vm.$socket.sendObj(
-              {
-                type: 'api',
-                cmd: 'get',
-                respone: item.concatina['datasource_key'],
-                api: item.concatina['datasource_api'] + '?' + item.concatina['query'] + '=' + data,
-                headers: {
-                  'Token': vm.getAuthToken(),
-                  'groupId': vm.getScopeGroupId(),
-                  'USER_ID': vm.getUserId()
-                }
-              }
-            )
-            */
+            
           }
         }
       },
@@ -957,21 +818,7 @@
                 }
               }).catch(function (error) {
               })
-              /*
-              vm.$socket.sendObj(
-                {
-                  type: 'api',
-                  cmd: 'get',
-                  respone: vm.detailForm[key]['datasource_key'],
-                  api: apiURL,
-                  headers: {
-                    'Token': vm.getAuthToken(),
-                    'groupId': vm.getScopeGroupId(),
-                    'USER_ID': vm.getUserId()
-                  }
-                }
-              )
-              */
+              
             }
           }
         }
@@ -1111,7 +958,6 @@
       unlock () {
         let vm = this
         let params = {}
-        console.log(vm.data)
         if(vm.data.modelClassName === 'org.opencps.usermgt.model.Employee'){
           params = {
             email: vm.data.email,
@@ -1128,17 +974,22 @@
         dataPost.append('email', JSON.stringify(params.email))
         dataPost.append('mappingUserId', JSON.stringify(params.mappingUserId))
         axios.post('/o/rest/v2/users/lockin', dataPost).then((res)=>{
-          console.log(res)
-          vm.alertSuccess = true
-          setTimeout(function(){ 
-            vm.alertSuccess = false 
-            }, 3000);
+          console.log('lockin', res)
+          toastr.success('Mở khóa tài khoản thành công.')
         }).catch( ()=>{
-          vm.alertFail = true
-          setTimeout(function(){ 
-            vm.alertFail = false 
-            }, 3000)
         })
+      },
+      showChangeEmail () {
+        let vm = this
+        vm.dialogChangeMail = true
+        if(vm.data.modelClassName === 'org.opencps.usermgt.model.Employee'){
+          vm.oldEmail = vm.data.email
+        }
+        if(vm.data.modelClassName === 'org.opencps.usermgt.model.Applicant'){
+          vm.oldEmail = vm.data.contactEmail
+        }
+        vm.newEmail = ''
+        vm.$refs.formChangeMail.resetValidation()
       },
       changeEmail(){
         let vm = this
@@ -1162,18 +1013,14 @@
           dataPost.append('newEmail', JSON.stringify(params.newEmail))
           axios.post('/o/rest/v2/applicants/updatemail', dataPost).then((res)=>{
             vm.dialogChangeMail= false
-            if(res.data.user && res.data.user.hasOwnProperty('emailAddess') && res.data.user.emailAddess){
-              vm.alertSuccess = true
-              setTimeout(function(){ vm.alertSuccess = false }, 3000);
-            }
-            else{
-              vm.alertFail = true
-              setTimeout(function(){ vm.alertFail = false }, 3000)
+            console.log('changeMail', res)
+            if (res.data.user && res.data.user.hasOwnProperty('emailAddress') && res.data.user.emailAddress){
+              toastr.success('Cập nhật thành công.')
+            } else {
+              toastr.error('Cập nhật thất bại')
             }
           }).catch( ()=>{
-            vm.dialogChangeMail= false
-            vm.alertFail = true
-            setTimeout(function(){ vm.alertFail = false }, 3000)
+            toastr.error('Cập nhật thất bại.')
           })
         }
       }

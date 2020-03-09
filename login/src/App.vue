@@ -534,7 +534,8 @@ export default {
           if (
             response.data !== "" &&
             response.data !== "ok" &&
-            response.data !== "captcha"
+            response.data !== "captcha" &&
+            response.data !== "lockout"
           ) {
             if (response.data === "pending") {
               let url = window.themeDisplay.getSiteAdminURL().split('/~')[0].replace('group','web')
@@ -545,23 +546,14 @@ export default {
                 "&redirectURL=" +
                 url;
             } else {
-              window.location.href = response.data;
+              window.location.href = response.data
             }
           } else if (response.data === "ok") {
             window.location.href = window.themeDisplay.getURLHome();
           } else if (response.data === "captcha") {
-            let redirectURL = window.themeDisplay
-              .getLayoutRelativeURL()
-              .substring(
-                0,
-                window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
-              );
-            if (redirectURL !== "") {
-              window.location.href = redirectURL + "/register#/login";
-            } else {
-              window.location.href =
-                window.themeDisplay.getURLHome() + "/register#/login";
-            }
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
+          } else if (response.data === "lockout") {
+            toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
           } else {
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
           }
@@ -589,7 +581,8 @@ export default {
             if (
               response.data !== "" &&
               response.data !== "ok" &&
-              response.data !== "captcha"
+              response.data !== "captcha" && 
+              response.data !== "lockout"
             ) {
               if (response.data === "pending") {
                 window.location.href =
@@ -604,20 +597,9 @@ export default {
             } else if (response.data === "ok") {
               window.location.href = window.themeDisplay.getURLHome()
             } else if (response.data === "captcha") {
-              let redirectURL = window.themeDisplay
-                .getLayoutRelativeURL()
-                .substring(
-                  0,
-                  window.themeDisplay.getLayoutRelativeURL().lastIndexOf("/")
-                );
-              if (redirectURL !== "") {
-                window.location.href = redirectURL + "/register#/login";
-              } else {
-                window.location.href =
-                  window.themeDisplay.getURLHome() + "/register#/login";
-              }
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
             } else if (response.data === "lockout") {
-              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị khóa tạm khóa trong 10 phút.")
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
             } else {
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.")
             }
