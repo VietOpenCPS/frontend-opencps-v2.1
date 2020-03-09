@@ -134,6 +134,7 @@
 
 <script>
   // import { isMobile } from 'mobile-device-detect'
+  import axios from 'axios'
   import $ from 'jquery'
   export default {
     data: () => ({
@@ -185,6 +186,12 @@
       //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
       //   }
       // }
+      axios.get('/o/v1/opencps/users/' + window.themeDisplay.getUserId()).then(function(response) {
+        let userData = response.data
+        vm.$store.commit('setUserLogin', userData)
+      })
+      .catch(function(error) {
+      })
       vm.$nextTick(function () {
         // 
         window.message = vm.callback_alpacal

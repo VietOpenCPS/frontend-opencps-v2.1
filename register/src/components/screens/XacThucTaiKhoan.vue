@@ -61,6 +61,9 @@ import Vue from 'vue'
 import $ from 'jquery'
 import axios from 'axios'
 import support from '../../store/support.json'
+import toastr from 'toastr'
+
+Vue.use(toastr)
 export default {
   props: [],
   components: {},
@@ -133,7 +136,8 @@ export default {
         if (
           response.data !== '' &&
           response.data !== 'ok' &&
-          response.data !== 'captcha'
+          response.data !== 'captcha' &&
+          response.data !== "lockout"
         ) {
           if (response.data === 'pending') {
             window.location.href =
@@ -159,6 +163,8 @@ export default {
           } else {
             window.location.href = themeDisplay.getURLHome() + '/register#/login'
           }
+        } else if (response.data === "lockout") {
+          toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
         } else {
         }
       })

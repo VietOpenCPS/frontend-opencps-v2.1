@@ -42,7 +42,7 @@
         </v-flex>
         <v-flex xs12 sm6 md4 class="mb-2 px-2">
           <div>
-            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Theo top:</div>
+            <div class="d-inline-block text-bold" style="font-weight:450;width: 130px;">Theo tình trạng:</div>
             <v-autocomplete
               class="select-search d-inline-block"
               style="width: calc(100% - 130px);"

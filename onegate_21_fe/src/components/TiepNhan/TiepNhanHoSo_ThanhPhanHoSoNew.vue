@@ -2,16 +2,33 @@
   <div>
     <v-card flat>
       <div class="d-inline-block" v-if="checkInput === 1" style="position: absolute;right: 10px;top: -50px">
-        <v-checkbox
+        <!-- <v-checkbox
           v-model="markCheck"
           color="indigo"
           hide-details
-          @change="markAllDone"
+          @change="markAll"
         >
           <template slot="label">
             <span style="color: #000000de">Xác nhận tất cả hồ sơ đạt yêu cầu</span>
           </template>
-        </v-checkbox>
+        </v-checkbox> -->
+        <v-radio-group v-model="markCheck" row @change="markAll">
+          <v-radio
+            label="Tất cả đạt"
+            color="success"
+            :value="1"
+          ></v-radio>
+          <v-radio
+            label="Tất cả không đạt"
+            color="error"
+            :value="2"
+          ></v-radio>
+          <v-radio
+            label="Tất cả chưa kiểm tra"
+            color="warning"
+            :value="0"
+          ></v-radio>
+        </v-radio-group>
       </div>
       <div class="form_alpaca" style="position: relative;overflow: hidden;" v-for="(item, index) in dossierTemplateItemsFilter" v-bind:key="item.partNo">
         <v-expansion-panel expand :value="currentFormView === ('formAlpaca' + item.partNo + id) ? [true] : [false]" class="expaned__list__data">
@@ -169,7 +186,7 @@
                   <v-flex xs12 class="text-xs-right" v-if="!stateView">
                     <div :id="'wrapForm' + item.partNo + id" :style="pstFixed > pstEl && pstFixed < endEl + pstEl ? 'position:fixed;top:5px;z-index:101' : ''">
                       <v-btn color="primary" @click.stop="saveAlpacaForm(item, index)" 
-                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1"
+                        v-if="item['editForm'] && item.hasForm && !onlyView && checkInput !== 1 && !item.embed"
                         :disabled="loadingApacal"
                       >
                         <i class="fa fa-spinner" aria-hidden="true" v-if="loadingApacal"></i>
@@ -195,7 +212,10 @@
                         Xóa
                       </v-btn>
                     </div>
-                    <div :id="'formAlpaca' + item.partNo + id" :style='{"pointer-events: none": onlyView}' v-if="item['editForm']">
+                    <div :id="'formAlpaca' + item.partNo + id" :style='{"pointer-events: none": onlyView}' v-if="item['editForm'] && !item.embed"></div>
+
+                    <div :style='{"pointer-events: none": onlyView}' v-if="item['editForm'] && item.embed">
+                      <iframe :id="'formAlpaca' + item.partNo + id" width="100%" height="500px" frameborder="0" src=""></iframe>
                     </div>
                     <!--  -->
                     <iframe v-if="!item['editForm']" :id="'displayPDF' + item.partNo + id" src="" type="application/pdf" width="100%" height="100%" style="overflow: auto;min-height: 600px;" frameborder="0">
@@ -216,7 +236,7 @@
               <v-text-field
                 title="Số lượng"
                 style="width:100px"
-                v-model="dossierTemplateItems[index]['recordCount']"
+                v-model="dossierTemplateItemsFilter[index]['recordCount']"
                 append-icon="add"
                 prepend-inner-icon="remove"
                 @click:append="increaseCounter(index)"
@@ -234,7 +254,7 @@
             <v-flex style="width: 100px;" class="layout wrap" v-if="originality !== 1 && (item.partType === 1 || item.partType === 3) && !thongTinHoSo.online && checkInput !== 1">
               <v-autocomplete
                 :items="fileMarkItems"
-                v-model="dossierTemplateItems[index].fileMark"
+                v-model="dossierTemplateItemsFilter[index].fileMark"
                 :style="onlyView ? 'pointer-events: none' : ''"
                 @change="changeFileMark($event, index)"
               ></v-autocomplete>
@@ -244,7 +264,7 @@
                 :items="fileCheckItems"
                 item-text="text"
                 item-value="value"
-                v-model="dossierTemplateItems[index].fileCheck"
+                v-model="dossierTemplateItemsFilter[index].fileCheck"
                 @change="changeFileCheck($event, index)"
               ></v-select>
             </v-flex>
@@ -500,7 +520,7 @@ export default {
         value: 4
       }
     ],
-    markCheck: false,
+    markCheck: '',
     fileCheckItems: [{
       text: 'Chưa kiểm tra',
       value: 0
@@ -521,8 +541,15 @@ export default {
     endEl: 0,
     applicantNoteDossier: '',
     doChange: {},
-    dossierTemplateLienThong: []
+    dossierTemplateLienThong: [],
+    receiveMessage: ''
   }),
+  created () {
+    let vm = this
+    vm.receiveMessage = function (event) {
+      vm.saveAlpacaFormCallBack(event)
+    }
+  },
   computed: {
     loading () {
       return this.$store.getters.loading
@@ -559,7 +586,10 @@ export default {
     },
     applicantNote () {
       return this.$store.getters.getApplicantNote
-    }
+    },
+    userLoginInfomation () {
+      return this.$store.getters.getUserLogin
+    },
   },
   mounted () {
     var vm = this
@@ -588,14 +618,15 @@ export default {
     }
   },
   methods: {
-    markAllDone () {
+    markAll () {
       let vm = this
-      if (vm.dossierTemplateItems && vm.markCheck) {
-        vm.dossierTemplateItems.forEach(function (value, index) {
-          if (value.partType === 1 && value.fileMark && !value.recordCountDefault && value.fileCheck !== 1) {
+      if (vm.dossierTemplateItemsFilter && vm.markCheck !== '') {
+        vm.dossierTemplateItemsFilter.forEach(function (value, index) {
+          if (value.partType === 1 && value.fileMark && !value.recordCountDefault) {
             value['dossierId'] = vm.thongTinHoSo.dossierId
-            value['fileCheck'] = 1
+            value['fileCheck'] = vm.markCheck
             value['fileComment'] = ''
+            value['checkInput'] = vm.checkInput
             vm.$store.dispatch('postDossierMark', value)
           }
         })
@@ -733,11 +764,11 @@ export default {
           return template.hasForm && vm.partTypes.includes(template.partType)
         })
         if (dossierFilesEform.length > 0) {
-          dossierFilesEform.forEach(itemFiles => {
-            if (itemFiles.eForm) {
-              vm.$store.dispatch('loadAlpcaForm', itemFiles)
-            }
-          })
+          // dossierFilesEform.forEach(itemFiles => {
+          //   if (itemFiles.eForm) {
+          //     vm.$store.dispatch('loadAlpcaForm', itemFiles)
+          //   }
+          // })
         } else {
           dossierTemplateItems.forEach(val => {
             if (val.hasForm && vm.partTypes.includes(val.partType)) {
@@ -880,28 +911,67 @@ export default {
       return dossierTemplates
     },
     showAlpacaJSFORM (item) {
-      var vm = this
+      let vm = this
       item['dossierId'] = vm.thongTinHoSo.dossierId
+      item['editForm'] = true
       vm.$store.dispatch('loadFormScript', item).then(resScript => {
-        vm.$store.dispatch('loadFormData', item).then(resData => {
-          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').empty()
-          var formScript, formData
-          /* eslint-disable */
-          if (resScript) {
-            formScript = eval('(' + resScript + ')')
-          } else {
-            formScript = {}
-          }
-          if (resData) {
-            formData = eval('(' + resData + ')')
-            item['loaded'] = true
-          } else {
-            formData = {}
-          }
-          /* eslint-disable */
-          formScript.data = formData
-          window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').alpaca(formScript)
-        })
+        /* eslint-disable */
+        let eformScript = ''
+        try {
+          eformScript = eval('(' + resScript + ')')
+        } catch (error) {
+        }
+        /* eslint-disable */
+        if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
+          console.log('eformEmbed', eformScript)
+          item.embed = true
+          let userId = window.themeDisplay.getUserId()
+          let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
+          let referenceUid = vm.thongTinHoSo.referenceUid
+          let dossierStatus = vm.thongTinHoSo.dossierStatus
+          let dossierSubStatus = vm.thongTinHoSo.dossierSubStatus
+          let templateNo = item.partNo
+          let deliverableType = item.deliverableType ? item.deliverableType : ''
+
+          let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+          console.log('urlEmbed', urlEmbed)
+          setTimeout(function () {
+            document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
+          }, 300)
+        } else {
+          item.embed = false
+          vm.$store.dispatch('loadFormData', item).then(resData => {
+            window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').empty()
+            let formScript, formData
+            /* eslint-disable */
+            if (resScript) {
+              formScript = eval('(' + resScript + ')')
+            } else {
+              formScript = {}
+            }
+            if (resData) {
+              formData = eval('(' + resData + ')')
+              item['loaded'] = true
+            } else {
+              formData = {}
+            }
+            // option 
+            formData.templateNo_hidden = item.partNo
+            formData.dossierId_hidden = vm.thongTinHoSo.dossierId
+            formData.dossierStatus_hidden = vm.thongTinHoSo.dossierStatus
+            formData.dossierSubStatus_hidden = vm.thongTinHoSo.dossierSubStatus
+            formData.fileTemplateNo_hidden = item.fileTemplateNo
+            formData.deliverableType_hidden = item.deliverableType ? item.deliverableType : ''
+            formData.userEmailAddress_hidden = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
+            formData.referenceUid = vm.thongTinHoSo.referenceUid
+            // 
+            console.log('data_input postMessage', formScript)
+            /* eslint-disable */
+            formScript.data = formData
+            window.$('div[id="formAlpaca' + item.partNo + vm.id + '"]').alpaca(formScript)
+          })
+        }
+        
       })
     },
     saveAlpacaForm (item, index) {
@@ -952,6 +1022,64 @@ export default {
           toastr.clear()
           toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
+      }
+    },
+    saveAlpacaFormCallBack (data) {
+      let vm = this
+      let dataOutPut = data.data ? data.data : ''
+      console.log('data_output new_eform_2', dataOutPut)
+      if (dataOutPut.hasOwnProperty('tp') && dataOutPut.tp) {
+        let fileFind = vm.dossierFilesItems.find(itemFile => {
+          return itemFile.dossierPartNo === dataOutPut.tp && itemFile.eForm && itemFile.fileSize!==0
+        })
+        if (fileFind) {
+          fileFind['dossierId'] = vm.thongTinHoSo.dossierId
+          fileFind['id'] = vm.id
+          vm.loadingApacal = true
+          console.log('item put', fileFind)
+          vm.$store.dispatch('putAlpacaFormCallBack', fileFind).then(resData => {
+            setTimeout(function () {
+              vm.loadingApacal = false
+              toastr.clear()
+              toastr.success('Thực hiện thành công')
+            }, 3000)
+            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+            })
+            let index = vm.dossierTemplateItems.findIndex(item => item.partNo === dataOutPut.tp);
+            vm.dossierTemplateItems[index]['passRequired'] = true
+          }).catch(reject => {
+            vm.loadingApacal = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          })
+        } else {
+          dataOutPut['dossierId'] = vm.thongTinHoSo.dossierId
+          dataOutPut['id'] = vm.id
+          vm.loadingApacal = true
+          console.log('item post', dataOutPut)
+          vm.$store.dispatch('postEformCallBack', dataOutPut).then(resPostEform => {
+            let index = vm.dossierTemplateItems.findIndex(item => item.partNo === dataOutPut.tp)
+            setTimeout(function () {
+              vm.loadingApacal = false
+              toastr.clear()
+              toastr.success('Thực hiện thành công')
+              vm.dossierTemplateItems[index].daKhai = true
+            }, 3000)
+            vm.dossierTemplateItems[index]['passRequired'] = true
+            vm.$store.dispatch('loadDossierFiles', vm.thongTinHoSo.dossierId).then(resFiles => {
+              vm.dossierFilesItems = resFiles
+            }).catch(reject => {
+              toastr.clear()
+              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+            })
+          }).catch(reject => {
+            vm.loadingApacal = false
+            toastr.clear()
+            toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          })
+        }
       }
     },
     onDeleteAttackFiles (item) {
@@ -1036,6 +1164,8 @@ export default {
     },
     loadAlpcaFormClick (data) {
       let vm = this
+      window.removeEventListener('message', vm.receiveMessage)
+      window.addEventListener('message', vm.receiveMessage)
       //
       if (vm.currentFormView === 'formAlpaca' + data.partNo + vm.id) {
         vm.currentFormView = ''
@@ -1058,7 +1188,7 @@ export default {
       })
       if (fileFind) {
         fileFind['id'] = vm.id
-        vm.$store.dispatch('loadAlpcaForm', fileFind)
+        // vm.$store.dispatch('loadAlpcaForm', fileFind)
         // preview PDF
         data['editForm'] = false
         vm.$store.dispatch('viewFile', fileFind).then(result => {
@@ -1068,9 +1198,9 @@ export default {
         vm.dossierTemplateItems.forEach(val => {
           if (val.hasForm && data.partNo === val.partNo) {
             val['templateFileNo'] = vm.thongTinHoSo.dossierTemplateNo
-            if (!val['loaded']) {
+            // if (!val['loaded']) {
               vm.showAlpacaJSFORM(val)
-            }
+            // }
           }
         })
       }
@@ -1078,13 +1208,40 @@ export default {
     editFormAlpaca (item) {
       let vm = this
       item['editForm'] = true
-      setTimeout (function () {
-        let fileFind = vm.dossierFilesItems.find(itemFile => {
-          return itemFile.dossierPartNo === item.partNo && itemFile.eForm
-        })
-        fileFind['id'] = vm.id
-        vm.$store.dispatch('loadAlpcaForm', fileFind)
-      }, 200)
+      /* eslint-disable */
+      let fileFind = vm.dossierFilesItems.find(itemFile => {
+        return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+      })
+      let eformScript = eval('(' + fileFind.formScript + ')')
+      console.log('eformScript', eformScript)
+      /* eslint-disable */
+      if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
+        console.log('eformEmbed', eformScript)
+        item.embed = true
+        let userId = window.themeDisplay.getUserId()
+        let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
+        let referenceUid = vm.thongTinHoSo.referenceUid
+        let dossierStatus = vm.thongTinHoSo.dossierStatus
+        let dossierSubStatus = vm.thongTinHoSo.dossierSubStatus
+        let templateNo = item.partNo
+        let deliverableType = item.deliverableType ? item.deliverableType : ''
+
+        let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
+        console.log('urlEmbed', urlEmbed)
+        setTimeout(function () {
+          document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
+        }, 300)
+      } else {
+        item.embed = false
+        setTimeout (function () {
+          let fileFind = vm.dossierFilesItems.find(itemFile => {
+            return itemFile.dossierPartNo === item.partNo && itemFile.eForm
+          })
+          fileFind['id'] = vm.id
+          vm.$store.dispatch('loadAlpcaForm', fileFind)
+        }, 200)
+      }
+      
     },
     deleteSingleFileEform (item, index) {
       var vm = this
@@ -1162,18 +1319,32 @@ export default {
         if (file.dossierPartNo === item.partNo && file.eForm && !file.removed) {
           file['dossierId'] = vm.thongTinHoSo.dossierId
           if (!vm.onlyView) {
-            file['id'] = vm.id
-            vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+            //
+            let eformScript = eval('(' + file.formScript + ')')
+            console.log('eformScript preview', eformScript)
+            if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
               item['editForm'] = false
               setTimeout(function () {
                 vm.$store.dispatch('viewFile', file).then(result => {
                   document.getElementById('displayPDF' + file.dossierPartNo + vm.id).src = result
                 })
               }, 500)
-            }).catch(reject => {
-              toastr.clear()
-              toastr.error('Yêu cầu của bạn thực hiện thất bại.')
-            })
+            } else {
+              //
+              file['id'] = vm.id
+              vm.$store.dispatch('putAlpacaForm', file).then(resData => {
+                item['editForm'] = false
+                setTimeout(function () {
+                  vm.$store.dispatch('viewFile', file).then(result => {
+                    document.getElementById('displayPDF' + file.dossierPartNo + vm.id).src = result
+                  })
+                }, 500)          
+              }).catch(reject => {
+                toastr.clear()
+                toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+              })
+            }
+            
           } else {
             item['editForm'] = false
             vm.$store.dispatch('viewFile', file).then(result => {
@@ -1217,6 +1388,33 @@ export default {
           this.$store.dispatch('viewFile', val)
         }
       })
+    },
+    viewFileAlpaca (file) {
+      let vm = this
+      let counter = 0
+      vm.loadingApacal = true
+      let callServer = function() {
+        setTimeout(function () {
+          vm.$store.dispatch('viewFile', file).then(result => {
+            if (result === 'pending' && counter <= 10) {
+              counter += 1
+              callServer()
+            } else {
+              if (counter > 10) {
+                vm.loadingApacal = false
+              } else {
+                vm.loadingApacal = false
+                setTimeout(function () {
+                  document.getElementById('displayPDF' + file.dossierPartNo + vm.id).src = result
+                }, 100)
+              }
+            }
+          }).catch (function () {
+            vm.loadingApacal = false
+          })
+        }, 1000)
+      }
+      callServer()
     },
     setDaKhai (itemFile) {
       var vm = this

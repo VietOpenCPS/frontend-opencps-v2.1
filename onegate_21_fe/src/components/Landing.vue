@@ -33,7 +33,7 @@
     <!-- Tìm kiếm nâng cao -->
     <tim-kiem-nang-cao ref="advSearch" v-if="advSearchShow"></tim-kiem-nang-cao>
     <!--  -->
-    <v-layout wrap class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
+    <div class="menu_header_list py-2" :class='{"no__border__bottom": btnDynamics === null || btnDynamics === undefined || btnDynamics === "undefined" || (btnDynamics !== null && btnDynamics !== undefined && btnDynamics !== "undefined" && btnDynamics.length === 0)}'>
       <v-layout wrap v-if="originality !== 1">
         <v-flex xs12 sm3 class="pl-2 pr-2 input-group--text-field-box">
           <v-autocomplete
@@ -90,7 +90,7 @@
           </div>
         </v-flex>
       </v-layout>
-      <div class="py-1 px-1" style="background: #f6f6f6;border-top: 1px solid lightgrey;"
+      <div class="py-1 px-1" style="background: #ffffff;border-top: 1px solid lightgrey;"
         v-if="dossierCounting !== null && dossierCounting !== undefined && dossierCounting.length > 0 && dossierCountingShow"
       >
         <v-chip v-for="(item, index) in dossierCounting" v-bind:key="index"
@@ -101,7 +101,7 @@
           <span :style="item.key === status || item.key === top ? 'color: #fff' : ''">{{item.title}}</span>
         </v-chip>
       </div>
-    </v-layout>
+    </div>
     <v-layout wrap v-if="loadingDynamicBtn">
       <v-flex xs12 sm6>
       </v-flex>
@@ -217,11 +217,15 @@
             :key="header.text"
             :class="header['class'] ? header['class'] : ''"
             :width="header['width'] ? header['width'] + 'px' : ''"
+            @click="String(header['sortable']) === 'true' ? sortAction(header['value']) : ''"
+            :style="header['sortable'] ? 'cursor: pointer' : ''"
           >
             <v-tooltip bottom>
               <span slot="activator">{{ header.text }}</span>
               <span>{{ header.text }}</span>
-            </v-tooltip>
+            </v-tooltip> 
+            <v-icon v-if="header['sortable'] && header['value'] === sortValue" size="16" class="ml-2" :style="header['sortable'] && orderSort==='false' ? 'transform: rotate(180deg)' : ''">arrow_downward</v-icon>
+            <v-icon v-if="header['sortable'] && header['value'] !== sortValue" size="16" class="ml-2" style="opacity: 0.5">arrow_downward</v-icon>
           </th>
           <!--  -->
           <th width="30px" v-if="isMobile">
@@ -248,7 +252,7 @@
               v-if="getUser('Administrator') || getUser('Administrator_data')"
             ></v-checkbox>
             <v-checkbox v-else
-              :disabled="props.item['assigned'] === 0 || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
+              :disabled="props.item['assigned'] === 0 && !doActionGroup || !thuTucHanhChinhSelected || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '0') || (thuTucHanhChinhSelected && thuTucHanhChinhSelected.serviceConfigId === '')"
               v-model="props.selected"
               @change="changeSelected"
               primary
@@ -841,6 +845,7 @@ export default {
     'tim-kiem-nang-cao': AdvSearch
   },
   data: () => ({
+    doActionGroup: false,
     isAdminSuper: false,
     actionId: '',
     dossierIdSelected: '',
@@ -977,7 +982,9 @@ export default {
       'fromDueDate','toDueDate','fromReleaseDate','toReleaseDate','fromFinishDate','toFinishDate'
     ],
     status: '',
-    top: ''
+    top: '',
+    orderSort: '',
+    sortValue: ''
   }),
   computed: {
     loadingDynamicBtn () {
@@ -1019,6 +1026,7 @@ export default {
       if (vm.isMobile) {
         $('#m-navigation').css('display', 'block')
       }
+      
       vm.currentQueryState = query
       vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
@@ -1060,6 +1068,7 @@ export default {
             vm.trangThaiHoSoList = result
             vm.menuType = parseInt(vm.trangThaiHoSoList[vm.index]['menuType'])
             vm.checkSelectAll = (vm.menuType !== 3 && vm.originality !== 1)
+            vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
             vm.processListTTHC(currentQuery)
             vm.processListDomain(currentQuery)
             // console.log('vm.trangThaiHoSoList[vm.index]', vm.trangThaiHoSoList[vm.index])
@@ -1116,9 +1125,12 @@ export default {
       let currentQuery = newRoute.query
       let currentQueryOld = oldRoute.query
       vm.currentQueryState = currentQuery
+      vm.doActionGroup = vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('activeGroupAction') && vm.trangThaiHoSoList[vm.index]['tableConfig'].activeGroupAction
       vm.keyword = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
       vm.status = currentQuery.hasOwnProperty('status') ? currentQuery.status : ''
       vm.top = currentQuery.hasOwnProperty('top') ? currentQuery.top : ''
+      vm.orderSort = currentQuery.hasOwnProperty('order') ? currentQuery.order : ''
+      vm.sortValue = currentQuery.hasOwnProperty('sort') ? currentQuery.sort : ''
       if (currentQuery.hasOwnProperty('q')) {
         vm.btnDynamics = []
         vm.$store.commit('setLoadingDynamicBtn', true)
@@ -1272,7 +1284,7 @@ export default {
         vm.isAdminSuper = true
       }
       */
-      if (vm.getUser('Administrator')) {
+      if (vm.getUser('Administrator') || vm.doActionGroup) {
         if (vm.selected.length) {
           vm.selected = []
         } else {
@@ -1460,6 +1472,30 @@ export default {
         path: current.path + queryString
       })
     },
+    sortAction (val) {
+      let vm = this
+      let current = vm.$router.history.current
+      let newQuery = current.query
+      let queryString = '?'
+      newQuery['sort'] = val
+      newQuery['order'] = newQuery.hasOwnProperty('order') && newQuery['order'] === 'true' ? 'false' : 'true'
+      for (let key in newQuery) {
+        if (key === 'page') {
+          queryString += key + '=1&'
+        } else if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined && newQuery[key] !== 'null' && newQuery[key] !== null && key !== 'step') {
+          queryString += key + '=' + newQuery[key] + '&'
+        }
+      }
+      if (String(newQuery['q']).indexOf('&step') === -1 && vm.menuType !== 3) {
+        queryString += 'step=' + newQuery['step'] + '&'
+      }
+      vm.$router.push({
+        path: current.path + queryString,
+        query: {
+          renew: Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        }
+      })
+    },
     doLoadingDataHoSo () {
       let vm = this
       vm.selected = []
@@ -1506,7 +1542,8 @@ export default {
             fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
             toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
             fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
-            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : ''
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            sort: vm.sortValue
           }
         } else {
           let originalityDossierDeleted = currentQuery.hasOwnProperty('status') && currentQuery['status'] === 'deleted' ? -1 : ''
@@ -1542,7 +1579,8 @@ export default {
             fromReleaseDate: currentQuery.hasOwnProperty('fromReleaseDate') ? currentQuery.fromReleaseDate : '',
             toReleaseDate: currentQuery.hasOwnProperty('toReleaseDate') ? currentQuery.toReleaseDate : '',
             fromFinishDate: currentQuery.hasOwnProperty('fromFinishDate') ? currentQuery.fromFinishDate : '',
-            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : ''
+            toFinishDate: currentQuery.hasOwnProperty('toFinishDate') ? currentQuery.toFinishDate : '',
+            sort: vm.sortValue
           }
         }
         // console.log('filter doLoadingData', filter)
@@ -1573,9 +1611,23 @@ export default {
       }
       if (vm.menuType === 3 || String(vm.menuType) === '3') {
         setTimeout(() => {
+          vm.dossierCounting = []
           vm.$store.dispatch('loadingDossierCounting').then(function (result) {
             if (result !== null && result !== undefined) {
-              vm.dossierCounting = result
+              
+              if (vm.trangThaiHoSoList[vm.index]['tableConfig'].hasOwnProperty('advanceSearchCounting')) {
+                let status = vm.trangThaiHoSoList[vm.index]['tableConfig']['advanceSearchCounting'].split(',')
+                result.forEach(element => {
+                  if (status.filter(function(item) {
+                    return item === element['key']
+                  }).length > 0) {
+                    vm.dossierCounting.push(element)
+                  }
+                })
+              } else {
+                vm.dossierCounting = result
+              }
+              
               // add search dossierDeleted
               if (vm.getUser('Administrator_data')) {
                 let dossierDelete = {key: 'deleted', title: 'Hồ sơ đã xóa', count: 0}

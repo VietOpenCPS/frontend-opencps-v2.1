@@ -210,13 +210,13 @@
       })
       .catch(function(error) {
       })
-      if (window.location.href.includes('/m/') && vm.viewMobile) {
-        $('head meta[name=viewport]').remove()
-      } else {
-        if ($('head meta[name=viewport]').length === 0) {
-          $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
-        }
-      }
+      // if (window.location.href.includes('/m/') && isMobile) {
+      //   $('head meta[name=viewport]').remove()
+      // } else {
+      //   if ($('head meta[name=viewport]').length === 0) {
+      //     $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>')
+      //   }
+      // }
       vm.$nextTick(function () {
         vm.loading = true
         vm.$store.dispatch('loadMenuConfigToDo').then(function (result) {

@@ -153,7 +153,7 @@
       </v-flex>
       <v-data-table
         id="table-danhsachchoMC"
-        :headers="headers"
+        :headers="bookingMethodSelected ? headersOnline : headers"
         :items="bookingList"
         hide-actions
         class="mt-2"
@@ -169,6 +169,11 @@
             <td class="text-xs-center text-bold py-2" width="150px">
               <div>
                 <span>{{props.item.codeNumber}}</span>
+              </div>
+            </td>
+            <td v-if="bookingMethodSelected" class="text-xs-center text-bold py-2" width="150px">
+              <div>
+                <span>{{props.item.bookingInTime}}</span>
               </div>
             </td>
             <td class="text-xs-left text-bold py-2 px-5">
@@ -350,6 +355,33 @@ export default {
       },
       {
         text: 'Mã TK/BN',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Họ tên',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thao tác',
+        align: 'center',
+        sortable: false
+      }
+    ],
+    headersOnline: [
+      {
+        text: 'Thứ tự',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Mã TK/BN',
+        align: 'center',
+        sortable: false
+      },
+      {
+        text: 'Thời gian chờ',
         align: 'center',
         sortable: false
       },
