@@ -6,11 +6,11 @@
         color="info"
         icon="info"
         outline
-        class="my-0"
+        class="my-0 px-2 py-2"
       >
-        Tờ khai đã đăng ký xếp hàng.<br>
-        Thời gian xếp hàng: {{timeBooking}} {{parseDate(eformDetail.bookingDate)}}.<br>
-        Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
+        - Tờ khai đã đăng ký xếp hàng.<br>
+        - Thời gian xếp hàng: {{timeBooking}} {{checkinDate}}.<br>
+        - Qua thời gian xếp hàng trên nếu chưa đến làm thủ tục đề nghị đăng ký xếp hàng lại.
       </v-alert>
     </div>
     <!-- <div class="row-header no__hidden_class">
@@ -142,7 +142,8 @@ export default {
     formScriptEform: '',
     dialogPDF: false,
     dialogPDFLoading: false,
-    timeBooking: ''
+    timeBooking: '',
+    checkinDate: ''
   }),
   computed: {
     serviceinfoSelected () {
@@ -214,6 +215,7 @@ export default {
       }
       vm.$store.dispatch('getDetailBooking', filter).then(function (result) {
         vm.timeBooking = result.bookingInTime ? result.bookingInTime : ''
+        vm.checkinDate = vm.parseDate(result.checkinDate)
       }).catch(function (reject) {
       })
     },

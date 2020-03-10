@@ -3,10 +3,10 @@ import Vuex from 'vuex'
 import toastr from 'toastr'
 import axios from 'axios'
 import saveAs from 'file-saver'
-import support from './support.json'
 // 
 toastr.options = {
-  "positionClass": "toast-top-center"
+  "positionClass": "toast-top-center",
+  'timeOut': '5000'
 }
 Vue.use(toastr)
 Vue.use(Vuex)
@@ -314,16 +314,21 @@ export const store = new Vuex.Store({
           dataCreateBooking.append('serviceGroupCode', filter.serviceGroupCode)
           dataCreateBooking.append('online', true),
           dataCreateBooking.append('bookingDate', filter.bookingDate)
-
+          dataCreateBooking.append('telNo', filter.telNo)
+          dataCreateBooking.append('j_captcha_response', filter.j_captcha_response)
           console.log('params_create', dataCreateBooking)
 
           axios.post('/o/rest/v2/bookings', dataCreateBooking, param).then(function (response) {
-            if (response.data) {
-              resolve(response.data)
+            if (response['status'] !== undefined && response['status'] === 203) {
+              toastr.clear()
+              toastr.error('Mã captcha không chính xác')
+              reject(response)
             } else {
-              resolve(response)
+              resolve(response.data)
             }
           }).catch(function (xhr) {
+            toastr.clear()
+            toastr.error('Đăng ký xếp hàng thất bại. Vui lòng thử lại.')
             reject(xhr)
           })
         })
@@ -410,7 +415,8 @@ export const store = new Vuex.Store({
             },
             params: {
               groupIdBooking: filter.groupIdBooking ? filter.groupIdBooking : '',
-              bookingDate: filter.bookingDate ? filter.bookingDate : ''
+              bookingDate: filter.bookingDate ? filter.bookingDate : '',
+              online: true
             }
           }
           axios.get('/o/rest/v2/bookings/counter', param).then(function (response) {
@@ -443,6 +449,25 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
+        })
+      })
+    },
+    makeImageCap ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/rest/v2/applicants/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     },

@@ -454,6 +454,18 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
+      <v-card>
+        <v-card-text class="px-0 py-0">
+          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
+            width: 100%;
+            height: 650px;
+            border: none;
+          "></iframe>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -474,6 +486,8 @@ export default {
     dialog_createDossier: false,
     dialogVerifycation: false,
     dialogLogin: false,
+    dialog_loginDVCQG: false,
+    tempDVCQG: '',
     valid: false,
     userName: '',
     passWord: '',
@@ -528,7 +542,8 @@ export default {
     serviceSelected: '',
     hasCoQuanThucHien: false,
     configUrl: '',
-    keyCodeDvcqg: ''
+    keyCodeDvcqg: '',
+    userInfoDvcqg: ''
   }),
   computed: {
     govAgencyList () {
@@ -551,7 +566,7 @@ export default {
     }
   },
   created () {
-    var vm = this
+    let vm = this
     try {
       vm.hasCoQuanThucHien = hasCoQuanThucHien
     } catch (error) {
@@ -580,40 +595,50 @@ export default {
         if (currentQuery.hasOwnProperty(vm.keyCodeDvcqg) && currentQuery[vm.keyCodeDvcqg]) {
           let url = window.location.href.split('?')[0] + '/' + currentQuery[vm.keyCodeDvcqg] + '?' + window.location.href.split('?')[1]
           window.location.href = url
+        } else {
+          vm.initData()
         }
       } else {
         if (currentQuery.hasOwnProperty('MaTTHCDP') && currentQuery['MaTTHCDP']) {
-          let url = window.location.href.split('?')[0] + '/' + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1]
-          window.location.href = url
+          let serviceCode_dvcqg = currentQuery['MaTTHCDP']
+          let filter = {
+            keyword: serviceCode_dvcqg
+          }
+          vm.$store.dispatch('checkServiceExits', filter).then(function (result) {
+            if (result) {
+              // case trùng serviceCode
+              let path = vm.confirmEnding(window.location.href.split('?')[0], '/')
+              let url = path ? window.location.href.split('?')[0] + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1] : window.location.href.split('?')[0] + '/' + currentQuery['MaTTHCDP'] + '?' + window.location.href.split('?')[1]
+              window.location.href = url
+            } else {
+              // case khác serviceCode
+              if (currentQuery.hasOwnProperty('vnconnect') && String(currentQuery['vnconnect']) === '1' && !window.themeDisplay.isSignedIn()) {
+                window.callback_dvcqg = vm.callback_dvcqg
+                vm.checkVNConect()
+                vm.initData()
+              }
+            }
+          }).catch(function () {
+            vm.initData()
+          })
+        } else {
+          vm.initData()
         }
+      }
+      // Auto mapping
+      let sync = false
+      if ( typeof(Storage) !== 'undefined') {
+        sync = sessionStorage.getItem('sync')
+      }
+      if (window.themeDisplay.isSignedIn() && sync) {
+        window.callback_dvcqg = vm.callback_dvcqg
+        vm.checkVNConectAutoMapping()  
       }
       // 
-      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
-      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
-      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
-      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
-      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
-      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
-      if (currentQuery.hasOwnProperty('agency')) {
-        let filterDomain = {
-          agencyCode: currentQuery['agency']
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-      } else {
-        let filterDomain = {
-          agencyCode: ''
-        }
-        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
-          vm.domainListCurrent = result
-        })
-      }
-      vm.doLoadingThuTuc()
     })
   },
   updated () {
-    var vm = this
+    let vm = this
     vm.$nextTick(function () {
     })
   },
@@ -650,6 +675,34 @@ export default {
     }
   },
   methods: {
+    initData () {
+      let vm = this
+      // 
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      vm.govAgencySelected = vm.govAgencyThucHienSelected = vm.domainSelected = vm.levelSelected = vm.serviceNameKey = ''
+      vm.govAgencySelected = currentQuery.hasOwnProperty('agency') && currentQuery.agency ? currentQuery.agency : (vm.index !== 'thu-tuc-hanh-chinh' ? vm.index : '')
+      vm.govAgencyThucHienSelected = currentQuery.hasOwnProperty('agencyth') && currentQuery.agencyth ? currentQuery.agencyth : ''
+      vm.domainSelected = currentQuery.hasOwnProperty('domain') ? currentQuery.domain : ''
+      vm.levelSelected = currentQuery.hasOwnProperty('level') && !isNaN(currentQuery.hasOwnProperty('level')) ? Number(currentQuery.level) : ''
+      vm.serviceNameKey = currentQuery.hasOwnProperty('keyword') ? currentQuery.keyword : ''
+      if (currentQuery.hasOwnProperty('agency')) {
+        let filterDomain = {
+          agencyCode: currentQuery['agency']
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
+      } else {
+        let filterDomain = {
+          agencyCode: ''
+        }
+        vm.$store.dispatch('getDomain', filterDomain).then(function (result) {
+          vm.domainListCurrent = result
+        })
+      }
+      vm.doLoadingThuTuc()
+    },
     changeAdministration () {
       var vm = this
       setTimeout(function () {
@@ -809,17 +862,130 @@ export default {
           vm.loadingLogin = false
           if (result === 'success') {
             vm.dialogLogin = false
-            vm.isLogin = true
-            vm.createDossier(vm.serviceSelected)
-          }          
+            if (vm.doCreateDossier) {
+              vm.isLogin = true
+              vm.createDossier(vm.serviceSelected)
+            } else {
+              if ( typeof(Storage) !== 'undefined') {
+                sessionStorage.setItem('sync','true')
+              }
+              let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
+              window.location.href = url
+              setTimeout(() => {
+                window.location.reload()
+              }, 100)
+            }
+          } 
         }).catch(function(){
           vm.loadingLogin = false
         })
       }
     },
+    checkServiceExits (key) {
+      let vm = this
+      let filter = {
+        keyword: key
+      }
+      vm.$store.dispatch('checkServiceExits', filter).then(function(result) {
+        vm.loadingLogin = false
+        if (result === 'success') {
+          vm.dialogLogin = false
+          vm.isLogin = true
+          vm.createDossier(vm.serviceSelected)
+        }          
+      }).catch(function(){
+        vm.loadingLogin = false
+      })
+
+    },
+    checkVNConect () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let filter = {
+        state: 'auth'
+      }
+      setTimeout (function () {
+        if (!vm.isSigned) {
+          vm.$store.dispatch('getVNConect', filter).then(function (result) {
+            if (result) {
+              vm.dialog_loginDVCQG = true
+              setTimeout(function () {
+                vm.tempDVCQG = result
+              }, 200)
+            }
+          }).catch(function () {
+            // if (!vm.isSigned) {
+            //   vm.doCreateDossier = false
+            //   vm.dialogLogin = true
+            // }
+          })
+        }
+      }, 300)
+    },
+    checkVNConectAutoMapping () {
+      let vm = this
+      let current = vm.$router.history.current
+      let query = vm.$router.history.current.query
+      let filter = {
+        state: 'mapping'
+      }
+      setTimeout (function () {
+        vm.$store.dispatch('getVNConect', filter).then(function (result) {
+          if (result) {
+            vm.dialog_loginDVCQG = true
+            setTimeout(function () {
+              vm.tempDVCQG = result
+            }, 200)
+          }
+        }).catch(function () {
+        })
+      }, 300)
+    },
+    callback_dvcqg (data) {
+      let vm = this
+      // vm.userInfoDvc = data
+      let current = vm.$router.history.current
+      let currentQuery = current.query
+      // remove auto mapping
+      let sync = false
+      if ( typeof(Storage) !== 'undefined') {
+        sync = sessionStorage.getItem('sync')
+      }
+      if (vm.isSigned && sync) {
+        vm.dialog_loginDVCQG = false
+        sessionStorage.removeItem('sync')
+      } else {
+        if (String(data['userId']) !== '0') {
+          let url = window.themeDisplay.getLayoutURL() + '#' + current.path
+          vm.dialog_loginDVCQG = false
+          window.location.reload()
+        } else {
+          vm.dialog_loginDVCQG = false
+          // vm.doCreateDossier = false
+          vm.dialogLogin = true
+          vm.userInfoDvcqg = data
+        }
+      }
+    },
+    confirmEnding (string, target) {
+      return string.substr(-target.length) === target
+    },
     register () {
       let vm = this
-      window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      if (vm.userInfoDvcqg && String(vm.userInfoDvcqg['userId']) === '0') {
+        let name = vm.userInfoDvcqg['HoVaTen'] ? vm.userInfoDvcqg['HoVaTen'] : ''
+        let mail = vm.userInfoDvcqg['ThuDienTu'] ? vm.userInfoDvcqg['ThuDienTu'] : ''
+        let tel = vm.userInfoDvcqg['SoDienThoai'] ? vm.userInfoDvcqg['SoDienThoai'] : ''
+        let credit = vm.userInfoDvcqg['SoCMND'] ? vm.userInfoDvcqg['SoCMND'] : ''
+        let type = vm.userInfoDvcqg['LoaiTaiKhoan'] ? vm.userInfoDvcqg['LoaiTaiKhoan'] : ''
+
+        let query = '#/?name=' + name + '&mail=' + mail + '&tel=' + tel + '&credit=' + credit + '&type=' + type
+        let url = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] + query : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register' + query
+        window.location.href = url
+      } else {
+        window.location.href = vm.configUrl.hasOwnProperty('registerUrl') ? vm.configUrl['registerUrl'] : window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/register'
+      }
     },
     getPassword () {
       let vm = this

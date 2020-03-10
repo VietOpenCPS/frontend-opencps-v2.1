@@ -160,7 +160,7 @@
                         <span class="red--text darken-3"> *</span>
                       </template>
                     </v-text-field>
-                    <v-date-picker :min="getMindate()" ref="picker"
+                    <v-date-picker :min="getMindate()" :allowed-dates="allowedDates" ref="picker" locale="vi"
                     :first-day-of-week="1" v-model="dateBooking" no-title @input="changeDateBooking"></v-date-picker>
                   </v-menu>
                 </v-flex>
@@ -175,6 +175,9 @@
                   >
                     Ngày {{applicantIdDateFormatted}} đã hết lượt xếp hàng
                   </v-alert>
+                </v-flex>
+                <v-flex xs12>
+                  <captcha ref="captcha"></captcha>
                 </v-flex>
                 <!--  -->
                 <v-flex sm12>
@@ -285,6 +288,7 @@ import Vue from 'vue'
 import $ from 'jquery'
 import toastr from 'toastr'
 import axios from 'axios'
+import Captcha from './Captcha.vue'
 import support from '../../store/support.json'
 toastr.options = {
   "positionClass": "toast-top-center"
@@ -294,6 +298,7 @@ Vue.use(toastr)
 export default {
   props: [],
   components: {
+    'captcha': Captcha
   },
   data: () => ({
     isSlot: true,
@@ -361,6 +366,10 @@ export default {
     vm.$nextTick(function () {
       let current = vm.$router.history.current
       let currentQuery = current.query
+      try {
+        vm.agencyItems = agencyItems /**config fragment*/
+      } catch (error) {
+      }
       vm.doLoadingThuTuc()
     })
   },
@@ -486,7 +495,8 @@ export default {
         dossierRelease: false,
         telNo: vm.applicantTelNo,
         groupId: vm.agencyTiepNhan.value,
-        bookingDate: vm.applicantIdDateFormatted
+        bookingDate: vm.applicantIdDateFormatted,
+        j_captcha_response: vm.$refs.captcha.j_captcha_response
       }
       if (keySearch.length === 1) {
         filterBooking['codeNumber'] = vm.eformNoBooking
@@ -502,6 +512,12 @@ export default {
           let bookingName = ''
           if (result && result.hasOwnProperty('eFormId')) {
             vm.detailEform = result
+            let templateFile = vm.formTemplateList.filter(function (item) {
+              return item.fileTemplateNo === result.fileTemplateNo
+            })
+            if (templateFile.length > 0) {
+              vm.$store.commit('setFileTemplateSelected', templateFile[0])
+            }
             vm.$store.commit('setEformDetail', result)
             // 
             vm.currentGroup = vm.bookingGroups.filter(function (item) {
@@ -556,6 +572,7 @@ export default {
     createBookingOnline (filter) {
       let vm = this
       vm.$store.dispatch('createBookingOnline', filter).then(function (result) {
+        vm.$refs.captcha.makeImageCap()
         toastr.success('Đăng ký xếp hàng thành công')
         vm.applicantName = ''
         vm.eformNoBooking = ''
@@ -572,7 +589,7 @@ export default {
           })
         }, 300)
       }).catch (function (reject) {
-        toastr.error('Đăng ký xếp hàng thất bại. Vui lòng thử lại.')
+        vm.$refs.captcha.makeImageCap()
       })
     },
     changeAgencyBooking () {
@@ -649,6 +666,7 @@ export default {
         })
       }, 300)
     },
+    allowedDates: val => (new Date(val)).getDay() !== 0 && (new Date(val)).getDay() !== 6,
     maBienNhan (str) {
       let index = 0
       let pstBN = 0

@@ -133,7 +133,7 @@ export const store = new Vuex.Store({
         // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
         axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
           commit('setLoading', false)
-          if (response.data !== '' && response.data !== 'ok') {
+          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
             if (response.data === 'pending') {
               window.location.href = window.themeDisplay.getURLHome() +
               "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
@@ -146,6 +146,8 @@ export const store = new Vuex.Store({
             window.location.href = urlDvc + '/dich-vu-cong'
           } else if (response.data === 'captcha') {
             toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
+          } else if (response.data === "lockout") {
+            toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
           } else {
             toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
           }

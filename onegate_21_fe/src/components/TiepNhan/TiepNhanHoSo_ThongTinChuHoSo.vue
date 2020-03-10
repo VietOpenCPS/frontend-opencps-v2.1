@@ -187,7 +187,7 @@
                       <v-text-field
                       v-else
                       v-model="thongTinChuHoSo.contactEmail"
-                      :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : [rules.email]"
+                      :rules="requiredOptions['contactEmail'] ? [rules.email, rules.required] : (thongTinChuHoSo.contactEmail ? [rules.email] : '')"
                       :required="requiredOptions['contactEmail']"
                       ></v-text-field>
                     </v-flex>
@@ -594,7 +594,10 @@
                 </v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field v-model="applicantEdit['applicantIdNo']" box :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required style="pointer-events: none">
+                <v-text-field v-model="applicantEdit['applicantIdNo']" box 
+                  :rules="[v => !!v || 'Trường dữ liệu bắt buộc']" required 
+                  disabled style="pointer-events: none"
+                >
                   <template slot="label"> 
                     <span v-if="applicantEdit['applicantIdType'] === 'business'">Mã số thuế</span>
                     <span v-if="applicantEdit['applicantIdType'] === 'citizen'">Số CMND/ Căn cước</span> 
@@ -631,7 +634,7 @@
                 <v-text-field label="Số điện thoại" v-model="applicantEdit['contactTelNo']" box></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box readonly></v-text-field>
+                <v-text-field label="Thư điện tử" v-model="applicantEdit['contactEmail']" box disabled></v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
                 <v-text-field label="Địa chỉ" v-model="applicantEdit['address']" box clearable></v-text-field>
@@ -683,7 +686,7 @@ export default {
     requiredOptions: {
       applicantIdNo: true,
       applicantName: true,
-      address: true,
+      address: false,
       cityCode: true,
       districtCode: true,
       wardCode: true,
@@ -691,7 +694,7 @@ export default {
       contactEmail: false,
       delegateIdNo: true,
       delegateName: true,
-      delegateAddress: true,
+      delegateAddress: false,
       delegateCityCode: true,
       delegateDistrictCode: true,
       delegateWardCode: true,
@@ -1539,6 +1542,7 @@ export default {
         vm.titleEdit = "Thông tin tổ chức, doanh nghiệp"
       }
       vm.dialog_editApplicant = true
+      vm.$refs.form.resetValidation()
     },
     changeBirthDate () {
       let vm = this

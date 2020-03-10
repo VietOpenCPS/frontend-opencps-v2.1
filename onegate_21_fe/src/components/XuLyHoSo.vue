@@ -126,12 +126,13 @@
     </div>
     <v-dialog v-model="dialog_statusAction" scrollable persistent max-width="700px">
       <v-card>
-        <v-card-title class="headline">
-          Trạng thái xử lý
-        </v-card-title>
-        <v-btn icon dark class="mx-0 my-0 absolute__btn_panel mr-2" @click.native="closeDialogStatusAction">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-toolbar flat dark color="primary">
+          <v-toolbar-title>Trạng thái xử lý</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon dark @click.native="closeDialogStatusAction">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
         <v-card-text style="max-height: 350px">
           <div v-for="(item, index) in dossierSelected" v-bind:key="item.dossierId">
             <v-layout wrap class="py-1 align-center row-list-style" style="border-bottom: 1px solid #ddd;position:relative"> 

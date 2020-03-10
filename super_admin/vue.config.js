@@ -54,18 +54,14 @@ module.exports = {
     },
     css: {
       extract: {
-        filename: './[name].css',
-        chunkFilename: './[name].css'
-        // filename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css',
-        // chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css'
+        filename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css',
+        chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/css/[name].css'
       }
     },
     configureWebpack: {
       output: {
-        filename: './[name].js',
-        chunkFilename: './[name].js'
-        // filename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js',
-        // chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js'
+        filename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js',
+        chunkFilename: '../../docs/o/opencps-frontend/super_admin_bbat/js/[name].js'
       }
     }
   }
