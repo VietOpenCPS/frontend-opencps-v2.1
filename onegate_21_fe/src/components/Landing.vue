@@ -1500,7 +1500,8 @@ export default {
       let vm = this
       vm.selected = []
       let currentQuery =vm.$router.history.current.query
-
+      vm.orderSort = currentQuery.hasOwnProperty('order') ? currentQuery.order : ''
+      vm.sortValue = currentQuery.hasOwnProperty('sort') ? currentQuery.sort : ''
       if (currentQuery.hasOwnProperty('q')) {
         let querySet
         if (currentQuery.q.indexOf('step') > 0 || currentQuery.q.indexOf('originality') > 0) {

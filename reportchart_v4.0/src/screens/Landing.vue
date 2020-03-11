@@ -19,7 +19,7 @@
             <v-flex md6 xs12>
               <apexchart
                 type="pie"
-                width=350 height=250
+                width=400 height=220
                 :options="chartOptionsYear"
                 :series="statisticalYear"
                 class="pieChartTotal"
@@ -53,7 +53,7 @@
           <div class="row-header mb-1" style="height: 38px; overflow: hidden;background: #fff">
             <div class="background-triangle-big1">THỐNG KÊ THỦ TỤC HÀNH CHÍNH</div>
           </div>
-          <v-card-text class="px-0 py-4 pt-5">
+          <v-card-text class="px-0 py-3 pt-4">
             <v-layout wrap class="custom-class">
               <v-flex xs12 sm6 class="px-2 pb-3">
                 <v-card color="green lighten-1" class="white--text" height="70px" style="border-radius: 4px;">
@@ -186,12 +186,16 @@
                     :class="{'groupcode-active':  String(groupCode) === 'QUAN_HUYEN'}"
                     @click="groupCode='QUAN_HUYEN'"
                   >QUẬN/ HUYỆN/ THỊ XÃ</span>
-                  <span
-                    class="mx-3"
-                    style="cursor: pointer;"
-                    :class="{'groupcode-active':  String(groupCode) === 'XA_PHUONG'}"
-                    @click="groupCode='XA_PHUONG'"
-                  >XÃ/ PHƯỜNG/ THỊ TRẤN</span>
+                  <v-menu right offset-x class="d-inline-block">
+                    <span small slot="activator" color="primary" class="mx-3" :class="{'groupcode-active':  String(groupCode) === 'XA_PHUONG'}">
+                      XÃ/ PHƯỜNG/ THỊ TRẤN &nbsp; <v-icon size="18" class="text-bold">arrow_drop_down</v-icon>
+                    </span>
+                    <v-list>
+                      <v-list-tile v-for="(item, index) in listDoiTuong" :key="index" @click="getStatisticsMonth('XA_PHUONG', item)">
+                        <v-list-tile-title><v-icon size="18" class="blue--text" v-if="quanhuyenSelected.itemCode === item.itemCode">check</v-icon>&nbsp; {{item.itemName}}</v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
                 </div>
               </v-flex>
               <v-flex md5 class="text-right">
@@ -243,161 +247,172 @@
             </v-layout>
           </div>
           <v-layout wrap>
-            <v-flex md3>
-              <v-select
-                v-model="distGroupSelected"
-                v-if="groupCode==='XA_PHUONG'"
-                :items="listDoiTuong"
-                class="my-2"
-                item-text="itemName"
-                item-value="itemCode"
-              ></v-select>
-            </v-flex>
-            <v-flex xs12>
-              <apexchart
-                :height="heightChart"
-                v-if="!isTable && !isLoading"
-                :options="chartOptionsMonth"
-                :series="statisticalMonth"
+            <v-flex xs12 class="my-3 report__table" style="overflow: hidden;">
+              <apexchart v-if="!isTable && !isLoading" type="bar" :height="heightChart" width='100%'
+                :options="chartOptionsMonth" 
+                :series="statisticalMonth" 
+                :stacked="true"
               ></apexchart>
-              <v-data-table class="my-2" v-if="isTable" hide-default-footer>
-                <template v-slot:header="{ props: { } }">
-                  <thead>
-                    <tr>
-                      <th rowspan="3" class="text-center">
-                        <span>STT</span>
-                      </th>
-                      <th rowspan="3" class="text-center">
-                        <span>Đơn vị</span>
-                      </th>
-                      <th colspan="5" class="text-center">
-                        <span>Nhận giải quyết</span>
-                      </th>
-                      <th colspan="7" class="text-center">
-                        <span>Kết quả nhận giải quyết</span>
-                      </th>
-                      <th colspan="3" class="text-center">
-                        <span>Đang giải quyết</span>
-                      </th>
-                      <th rowspan="3" style="text-align: center;" width="60">
-                        <span>Tạm dừng bổ sung điều kiện</span>
-                      </th>
-                      <th rowspan="3" style="text-align: center;" width="60">
-                        <span>Rút không giải quyết</span>
-                      </th>
-                      <th rowspan="3" style="text-align: center;" width="60">
-                        <span>Tỉ lệ sớm và đúng hạn</span>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th rowspan="2" class="text-center">
-                        <span>Tổng số</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Tồn trước</span>
-                      </th>
-                      <th colspan="3" class="text-center">
-                        <span>Nhận trong kì</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Tổng số</span>
-                      </th>
-                      <th colspan="3" class="text-center">
-                        <span>Tình hình thực hiện</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Từ chối giải quyết</span>
-                      </th>
-                      <th colspan="2" class="text-center">
-                        <span>Trả kết quả</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Tổng số</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Còn hạn</span>
-                      </th>
-                      <th rowspan="2" class="text-center">
-                        <span>Quá hạn</span>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="text-center">
-                        <span>Tổng số</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Một cửa</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Trực tuyến</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Trước hạn</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Đúng hạn</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Quá hạn</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Đã trả</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Chưa trả</span>
-                      </th>
-                    </tr>
-                  </thead>
-                </template>
-                <template v-slot:body="{ }">
-                  <tbody>
-                    <tr class="note__column">
-                      <td align="center">(1)</td>
-                      <td align="center">(2)</td>
-                      <td align="center">(3)</td>
-                      <td align="center">(4)</td>
-                      <td align="center">(5)</td>
-                      <td align="center">(6)</td>
-                      <td align="center">(7)</td>
-                      <td align="center">(8)</td>
-                      <td align="center">(9)</td>
-                      <td align="center">(10)</td>
-                      <td align="center">(11)</td>
-                      <td align="center">(12)</td>
-                      <td align="center">(13)</td>
-                      <td align="center">(14)</td>
-                      <td align="center">(15)</td>
-                      <td align="center">(16)</td>
-                      <td align="center">(17)</td>
-                      <td align="center">(18)</td>
-                      <td align="center">(19)</td>
-                      <td align="center">(20)</td>
-                    </tr>
-                    <tr v-for="(item,index) in danhSachThongKeThang" :key="index">
-                      <td align="center">{{index}}</td>
-                      <td align="left" style="padding: 8px 10px;">{{item.govAgencyName}}</td>
-                      <td align="center">{{item.processCount}}</td>
-                      <td align="center">{{item.remainingCount}}</td>
-                      <td align="center">{{item.receivedCount}}</td>
-                      <td align="center">{{item.onegateCount}}</td>
-                      <td align="center">{{item.onlineCount}}</td>
-                      <td align="center">{{item.releaseCount}}</td>
-                      <td align="center">{{item.betimesCount}}</td>
-                      <td align="center">{{item.ontimeCount}}</td>
-                      <td align="center">{{item.overtimeCount}}</td>
-                      <td align="center">{{item.unresolvedCount}}</td>
-                      <td align="center">{{item.doneCount}}</td>
-                      <td align="center">{{item.releasingCount}}</td>
-                      <td align="center">{{item.processingCount}}</td>
-                      <td align="center">{{item.undueCount}}</td>
-                      <td align="center">{{item.overdueCount}}</td>
-                      <td align="center">{{item.waitingCount}}</td>
-                      <td align="center">{{item.cancelledCount}}</td>
-                      <td align="center">{{item.ontimePercentage}}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-data-table>
+              <v-flex xs12 class="text-center text-bold my-3" v-if="isTable">
+                BÁO CÁO TỔNG HỢP TÌNH HÌNH GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH <br/>
+                <span v-if="String(month) !== '0'">Tháng {{monthSelected}}</span> Năm {{yearSelected2}}
+              </v-flex>
+              <table class="my-2" v-if="isTable" hide-default-footer>
+                <thead>
+                  <tr>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>STT</span>
+                    </th>
+                    <th rowspan="3" class="text-center px-2">
+                      <span>Đơn vị</span>
+                    </th>
+                    <th colspan="5" class="text-center px-2 py-1">
+                      <span>Nhận giải quyết</span>
+                    </th>
+                    <th colspan="7" class="text-center px-2">
+                      <span>Kết quả nhận giải quyết</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Đang giải quyết</span>
+                    </th>
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tạm dừng bổ sung điều kiện</span>
+                    </th>
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Rút không giải quyết</span>
+                    </th>
+                    <th rowspan="3" style="text-align: center;" width="60" class="px-2">
+                      <span>Tỉ lệ sớm và đúng hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th rowspan="2" class="text-center px-2 py-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tồn trước</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2 py-1">
+                      <span>Nhận trong kì</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2 py-1">
+                      <span>Tổng số</span>
+                    </th>
+                    <th colspan="3" class="text-center px-2">
+                      <span>Tình hình thực hiện</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Từ chối giải quyết</span>
+                    </th>
+                    <th colspan="2" class="text-center px-2">
+                      <span>Trả kết quả</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Còn hạn</span>
+                    </th>
+                    <th rowspan="2" class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="text-center px-2">
+                      <span>Tổng số</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Một cửa</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trực tuyến</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Trước hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đúng hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Quá hạn</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Đã trả</span>
+                    </th>
+                    <th class="text-center px-2">
+                      <span>Chưa trả</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr class="note__column">
+                    <td align="center" class="px-2">(1)</td>
+                    <td align="center" class="px-2">(2)</td>
+                    <td align="center" class="px-2">(3)</td>
+                    <td align="center" class="px-2">(4)</td>
+                    <td align="center" class="px-2">(5)</td>
+                    <td align="center" class="px-2">(6)</td>
+                    <td align="center" class="px-2">(7)</td>
+                    <td align="center" class="px-2">(8)</td>
+                    <td align="center" class="px-2">(9)</td>
+                    <td align="center" class="px-2">(10)</td>
+                    <td align="center" class="px-2">(11)</td>
+                    <td align="center" class="px-2">(12)</td>
+                    <td align="center" class="px-2">(13)</td>
+                    <td align="center" class="px-2">(14)</td>
+                    <td align="center" class="px-2">(15)</td>
+                    <td align="center" class="px-2">(16)</td>
+                    <td align="center" class="px-2">(17)</td>
+                    <td align="center" class="px-2">(18)</td>
+                    <td align="center" class="px-2">(19)</td>
+                    <td align="center" class="px-2">(20)</td>
+                  </tr>
+                  <tr v-for="(item,index) in danhSachThongKeThang" :key="index">
+                    <td align="center"  class="px-2">{{index + 1}}</td>
+                    <td align="left"  class="px-2" style="padding: 8px 10px;">{{item.govAgencyName}}</td>
+                    <td align="center"  class="px-2">{{item.processCount}}</td>
+                    <td align="center"  class="px-2">{{item.remainingCount}}</td>
+                    <td align="center" class="px-2">{{item.receivedCount}}</td>
+                    <td align="center" class="px-2">{{item.onegateCount}}</td>
+                    <td align="center" class="px-2">{{item.onlineCount}}</td>
+                    <td align="center" class="px-2">{{item.releaseCount}}</td>
+                    <td align="center" class="px-2">{{item.betimesCount}}</td>
+                    <td align="center" class="px-2">{{item.ontimeCount}}</td>
+                    <td align="center" class="px-2">{{item.overtimeCount}}</td>
+                    <td align="center" class="px-2">{{item.unresolvedCount}}</td>
+                    <td align="center" class="px-2">{{item.doneCount}}</td>
+                    <td align="center" class="px-2">{{item.releasingCount}}</td>
+                    <td align="center" class="px-2">{{item.processingCount}}</td>
+                    <td align="center" class="px-2">{{item.undueCount}}</td>
+                    <td align="center" class="px-2">{{item.overdueCount}}</td>
+                    <td align="center" class="px-2">{{item.waitingCount}}</td>
+                    <td align="center" class="px-2">{{item.cancelledCount}}</td>
+                    <td align="center" class="px-2">{{item.ontimePercentage}}</td>
+                  </tr>
+                  <tr class="sum__column" style="font-weight: bold;">
+                    <td align="center" colspan="2">Tổng số</td>
+                    <td align="center" class="px-2">{{totalCounter['total_3']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_4']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_5']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_6']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_7']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_8']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_9']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_10']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_11']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_12']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_13']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_14']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_15']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_16']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_17']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_18']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_19']}}</td>
+                    <td align="center" class="px-2">{{totalCounter['total_20']}}</td>
+                  </tr>
+                </tbody>
+              </table>
             </v-flex>
           </v-layout>
         </div>
@@ -467,50 +482,71 @@ export default {
       colors: ['#00E396','#FF4560']
     },
     chartOptionsMonth: {
-      grid: {
-        padding: {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0
-        }
-      },
-      chart: {
-        type: "bar",
-
-        locales: [
-          {
-            name: "en",
-            options: {
-              toolbar: {
-                exportToSVG: "Tải xuống SVG",
-                exportToPNG: "Tải xuống PNG"
-              }
-            }
-          }
-        ]
-      },
       plotOptions: {
         bar: {
-          horizontal: true
-        }
+          barHeight: '100%',
+          horizontal: window.innerWidth < 600 ? false : true,
+          dataLabels: {
+            hideOverflowingLabels: true
+          }
+        },
       },
-      dataLabels: {
-        enabled: false,
-        offsetX: -12,
-
-        style: {
-          fontSize: "12px",
-          colors: ["#fff"]
-        }
+      chart: {
+        stacked: true,
+        locales: [{
+          "name": "en",
+          "options": {
+            "toolbar": {
+              "exportToSVG": "Tải xuống SVG",
+              "exportToPNG": "Tải xuống PNG"
+            }
+          }
+        }]
       },
+      colors: ['#8BC34A', '#2196F3'],
       stroke: {
-        show: true,
         width: 1,
-        colors: ["#fff"]
+        colors: ['#fff']
       },
       xaxis: {
-        categories: []
+        labels: {
+          formatter: function(val) {
+            return val
+          },
+          trim: false
+        },
+        min: 1
+      },
+      yaxis: {
+        title: {
+          text: undefined
+        },
+        labels: {
+          offsetX: 0,
+          offsetY: 0
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function(val) {
+          if (Number(val) > 2) {return val}
+          return ''
+        },
+        style: {
+          fontSize: '11px',
+          fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+          colors: ['white']
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val
+          }
+        }
       }
     },
     chartOptionsSoQuanXa: {
@@ -603,7 +639,9 @@ export default {
       waitingCount: 0,
       year: 2020
     },
-    danhSachThongKeThang: []
+    danhSachThongKeThang: [],
+    quanhuyenSelected: '',
+    totalCounter: {}
   }),
   computed: {
     yearList() {
@@ -620,8 +658,9 @@ export default {
   },
   created() {
     let vm = this;
+    vm.groupCode = 'SBN'
     this.$nextTick(() => {
-      vm.getDictgroups("QUAN_HUYEN");
+      vm.getDictgroups('QUAN_HUYEN');
       vm.getStatisticsYear();
       vm.getStatisticsYearSBN();
       vm.getStatisticsYearQUAN_HUYEN();
@@ -638,16 +677,31 @@ export default {
       this.getStatisticsYearXA_PHUONG();
     },
     yearSelected2() {
-      this.getStatisticsMonth(this.groupCode);
+      let vm = this
+      if (vm.groupCode === 'XA_PHUONG') {
+        vm.getStatisticsMonth('XA_PHUONG', vm.quanhuyenSelected)
+      } else {
+        vm.getStatisticsMonth(this.groupCode)
+      }
     },
     monthSelected() {
-      this.getStatisticsMonth(this.groupCode);
+      let vm = this
+      if (vm.groupCode === 'XA_PHUONG') {
+        vm.getStatisticsMonth('XA_PHUONG', vm.quanhuyenSelected)
+      } else {
+        vm.getStatisticsMonth(this.groupCode)
+      }
     },
-    distGroupSelected() {
-      this.getStatisticsMonth(this.groupCode);
-    },
+    // distGroupSelected(val) {
+    //   let vm = this
+    //   vm.getStatisticsMonth(this.groupCode);
+    // },
     groupCode(val) {
-      this.getStatisticsMonth(val);
+      let vm = this
+      if (val !== 'XA_PHUONG') {
+        vm.quanhuyenSelected = ''
+        vm.getStatisticsMonth(val)
+      }
     }
   },
   methods: {
@@ -693,16 +747,17 @@ export default {
           groupId: window.themeDisplay.getScopeGroupId(),
           Accept: "application/json"
         }
-      };
+      }
       axios
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.listDoiTuong = response.data.data;
-            vm.distGroupSelected = response.data.data[0].itemCode;
+            vm.listDoiTuong = response.data.data
+          } else {
+            vm.listDoiTuong = []
           }
         })
-        .catch();
+        .catch()
     },
     getStatisticsYear() {
       let vm = this;
@@ -722,9 +777,9 @@ export default {
         .request(config)
         .then(function(response) {
           if (response.data.data) {
-            vm.statistics = response.data.data[0];
+            vm.statistics = response.data.data[0]
             vm.statisticalYear = [
-              response.data.data[0].ontimeCount,
+              response.data.data[0].ontimeCount + response.data.data[0].betimesCount,
               response.data.data[0].overtimeCount
             ];
           } else {
@@ -745,6 +800,8 @@ export default {
         params: {
           year: vm.yearSelected,
           month: 0,
+          domain: "total",
+          agency: "total",
           groupCode: "SBN"
         }
       };
@@ -778,6 +835,8 @@ export default {
         params: {
           year: vm.yearSelected,
           month: 0,
+          domain: "total",
+          agency: "total",
           groupCode: "QUAN_HUYEN"
         }
       };
@@ -810,6 +869,7 @@ export default {
         },
         params: {
           domain: "total",
+          agency: "total",
           year: vm.yearSelected,
           month: 0,
           groupCode: "XA_PHUONG"
@@ -833,12 +893,14 @@ export default {
         })
         .catch();
     },
-    getStatisticsMonth(groupCode) {
+    getStatisticsMonth(groupCode, itemQH) {
       let vm = this;
       vm.isLoading = true;
       let originUrl = window.location.origin;
       let config = {};
       if (groupCode === "XA_PHUONG") {
+        vm.groupCode = "XA_PHUONG"
+        vm.quanhuyenSelected = itemQH
         config = {
           url: originUrl + "/o/rest/statistics",
           headers: {
@@ -850,7 +912,7 @@ export default {
             year: vm.yearSelected2,
             month: vm.monthSelected,
             groupCode: groupCode,
-            parentAgency: vm.distGroupSelected
+            parentAgency: itemQH.itemCode
           }
         };
       } else {
@@ -877,21 +939,66 @@ export default {
           vm.chartOptionsMonth.xaxis.categories = [];
           if (response.data.data) {
             vm.danhSachThongKeThang = response.data.data;
-            for (let i = 0; i < response.data.data.length; i++) {
+            let currentData = response.data.data[0]
+            vm.danhSachThongKeThang.shift()
+            for (let i = 0; i < vm.danhSachThongKeThang.length; i++) {
               vm.statisticalMonth[0].data.push(
-                response.data.data[i + 1].onegateCount
+                response.data.data[i].onegateCount
               );
               vm.statisticalMonth[1].data.push(
-                response.data.data[i + 1].onlineCount
+                response.data.data[i].onlineCount
               );
               vm.chartOptionsMonth.xaxis.categories.push(
-                response.data.data[i + 1].govAgencyName
+                response.data.data[i].govAgencyName
               );
               vm.isLoading = false;
             }
+            vm.totalCounter['total_3'] = currentData.processCount
+            vm.totalCounter['total_4'] = currentData.remainingCount
+            vm.totalCounter['total_5'] = currentData.receivedCount
+            vm.totalCounter['total_6'] = currentData.onegateCount
+            vm.totalCounter['total_7'] = currentData.onlineCount
+            vm.totalCounter['total_8'] = currentData.releaseCount
+            vm.totalCounter['total_9'] = currentData.betimesCount
+            vm.totalCounter['total_10'] = currentData.ontimeCount
+            vm.totalCounter['total_11'] = currentData.overtimeCount
+            vm.totalCounter['total_12'] = currentData.unresolvedCount
+            vm.totalCounter['total_13'] = currentData.doneCount
+            vm.totalCounter['total_14'] = currentData.releasingCount
+            vm.totalCounter['total_15'] = currentData.processingCount
+            vm.totalCounter['total_16'] = currentData.undueCount
+            vm.totalCounter['total_17'] = currentData.overdueCount
+            vm.totalCounter['total_18'] = currentData.waitingCount
+            vm.totalCounter['total_19'] = currentData.cancelledCount
+            vm.totalCounter['total_20'] = currentData.ontimePercentage
+          } else {
+            vm.setTotalCounter()
           }
         })
         .catch();
+    },
+    setTotalCounter () {
+      let vm = this
+      vm.statisticalMonth[0].data = []
+      vm.statisticalMonth[1].data = []
+      vm.totalCounter['total_3'] = 0
+      vm.totalCounter['total_4'] = 0
+      vm.totalCounter['total_5'] = 0
+      vm.totalCounter['total_6'] = 0
+      vm.totalCounter['total_7'] = 0
+      vm.totalCounter['total_8'] = 0
+      vm.totalCounter['total_9'] = 0
+      vm.totalCounter['total_10'] = 0
+      vm.totalCounter['total_11'] = 0
+      vm.totalCounter['total_12'] = 0
+      vm.totalCounter['total_13'] = 0
+      vm.totalCounter['total_14'] = 0
+      vm.totalCounter['total_15'] = 0
+      vm.totalCounter['total_16'] = 0
+      vm.totalCounter['total_17'] = 0
+      vm.totalCounter['total_18'] = 0
+      vm.totalCounter['total_19'] = 0
+      vm.totalCounter['total_20'] = 0
     }
   }
 };
