@@ -34,7 +34,7 @@
           {{item.label}}
         </v-btn>
         <v-btn :class="item['class_component']" color="blue darken-3" dark v-if="item.type === 'button' && item['changeEmail']" v-on:click.native="showChangeEmail">
-          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'unlock'">swap_horiz</v-icon>
+          <v-icon class="mr-1" size="14" v-if="item['btn_type'] === 'changeEmail'">swap_horiz</v-icon>
           {{item.label}}
         </v-btn>
         <content-placeholders v-if="item.type === 'selects' && !pullOk && item.hasOwnProperty('datasource_key')">
