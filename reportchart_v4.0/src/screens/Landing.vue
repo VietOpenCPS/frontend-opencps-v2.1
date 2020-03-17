@@ -28,8 +28,8 @@
             <v-flex md6 xs12>
               <v-layout wrap class="run-down">
                 <v-flex md6 xs12 text-center>
-                  <span style="color:#1976d2;">{{statistics.processCount}}</span>
-                  <p>Tổng số đã giải quyết</p>
+                  <span style="color:#1976d2;">{{statistics.receivedCount}}</span>
+                  <p>Tổng số đã tiếp nhận</p>
                 </v-flex>
                 <v-flex md6 xs12 text-center>
                   <span style="color:#1976d2;">{{statistics.releaseCount}}</span>

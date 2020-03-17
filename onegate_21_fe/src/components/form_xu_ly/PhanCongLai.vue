@@ -2,7 +2,7 @@
   <div class="phancong" style="background-color: white;width:100%">
     <div v-if="type > 0">
       <v-layout wrap>
-        <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
+        <!-- <v-checkbox v-for="(item, index) in data_phancong" v-bind:key="item.userId"
         slot="activator"
         v-model="item.assigned"
         :label="item.userName ? item.userName : item['fullName']"
@@ -11,7 +11,25 @@
         :title="item.userName ? item.userName : item['fullName']"
         >
           <template slot="label"><span class="black--text">{{item.userName ? item.userName : item['fullName']}}</span></template>
-        </v-checkbox>
+        </v-checkbox> -->
+
+        <v-flex style="max-width:190px" v-for="(item, index) in data_phancong" v-bind:key="index">
+          <v-list-tile>
+            <v-list-tile-action style="min-width:30px" :class="item.jobPosTitle ? 'pt-2' : ''">
+              <v-checkbox v-model="item.assigned" @change = 'changeAssigned($event, index)'></v-checkbox>
+            </v-list-tile-action>
+
+            <v-list-tile-content>
+              <v-list-tile-title>
+                <span style="font-size: 13px" class="black--text">{{item.userName}}</span>
+              </v-list-tile-title>
+              <v-list-tile-sub-title v-if="item.jobPosTitle">
+                <span style="font-size: 13px;color: #0000008a">{{item.jobPosTitle}}</span>
+              </v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-flex>
+
       </v-layout>
       <span class="ml-3" v-if="!assignValidate" style="color:#f44336">* Yêu cầu chọn người để thực hiện</span>
     </div>

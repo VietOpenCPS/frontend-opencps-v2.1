@@ -870,7 +870,7 @@ export default {
             vm.$store.dispatch('getServiceInfo', {
               serviceInfoId: result.serviceCode
             }).then(function (res) {
-              if (res.serviceCode === 'TEST-CHUNG-THUC') { /* res.hasOwnProperty('isNotarization') && res.isNotarization*/ 
+              if (res.hasOwnProperty('isNotarization') && String(res.isNotarization) === 'true') { 
                 vm.isNotarization = true
 
               } else {

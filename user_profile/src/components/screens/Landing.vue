@@ -890,6 +890,9 @@
       window.callback_dvcqg = vm.callback_dvcqg
       try {
         vm.hasSSo = ssoConect
+        if (rulesConfig) {
+          vm.rules = Object.assign({}, vm.rules, rulesConfig)
+        }
       } catch (error) {
       }
       vm.$nextTick(function() {

@@ -1241,19 +1241,6 @@ export default {
             vm.pdfBlob = window.URL.createObjectURL(blob)
             vm.isShowLoading = false
             if (vm.doExportExcel) {
-              /** TODO: Call API
-              let currentTimestemp = new Date().getTime()
-              let fileToExcel = new File([blob], currentTimestemp + '.pdf')
-              {
-                var reader = new FileReader()
-                reader.onload = function(e) {
-                    var data = e.target.result
-                    console.log('data', data)
-                    vm.convertPDFToHTML(data)
-                };
-                reader.readAsArrayBuffer(fileToExcel)
-              }
-              */
               vm.$store.dispatch('getExcelReportFromServer', {
                 data: docDString,
                 fileName: new Date().getTime() + '.xls'

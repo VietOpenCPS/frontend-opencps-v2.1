@@ -129,7 +129,6 @@
                   :rules="[rules.required, v => v===passWord || 'Mật khẩu nhập lại không chính xác']"
                   :type="e2 ? 'password' : 'text'"
                   name="input-10-2"
-                  min="8"
                   v-model="rePassWord"
                   required
                 ></v-text-field>
@@ -287,7 +286,6 @@ export default {
         return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
       },
       telNo: (value) => {
-        // const pattern = /^(([0-9]{0,}))$/
         const pattern = /^0([1-9]{1}\d{8})$/
         if (value) {
           return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
@@ -336,6 +334,9 @@ export default {
     vm.$nextTick(function () {
       var vm = this
       try {
+        if (rulesConfig) {
+          vm.rules = Object.assign({}, vm.rules, rulesConfig)
+        }
         if (requiredOption) {
           vm.requiredOption = requiredOption
         }
