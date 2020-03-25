@@ -57,7 +57,7 @@
           >
         </v-autocomplete>
       </v-flex>
-      <v-flex xs6 sm2 class="px-3" v-if="groupBy.length > 1">
+      <v-flex xs6 sm2 class="px-3 d-none" v-if="groupBy.length > 1">
         <v-autocomplete
           :items="groupBy"
           v-model="groupByVal"
@@ -119,7 +119,7 @@
         <v-btn v-if="isRender" dark color="blue darken-3" class="mx-3 my-0" v-on:click.native="printReport()">
           <v-icon>print</v-icon> &nbsp; In báo cáo
         </v-btn>
-        <v-btn v-if="isRender" dark color="blue darken-3" class="my-0" v-on:click.native="doCreateReport(true)">
+        <v-btn v-if="isRender" dark color="blue darken-3" class="my-0" v-on:click.native="exportExcel()">
           <v-icon>save_alt</v-icon> &nbsp; Tải xuống Excel
         </v-btn>
         <v-btn v-if="exportXML" dark v-on:click.native="doDynamicReportXML" color="blue darken-3">exportXML</v-btn>
@@ -485,8 +485,8 @@ export default {
             }
             vm.groupByVal = defaultValGroup
           }
-          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdsAdmin')) {
+            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
             if (vm.agencyLists.length > 0) {
               let defaultVal = vm.agencyLists[0]['value']
               for (let key in vm.agencyLists) {
@@ -593,8 +593,8 @@ export default {
         }
         vm.groupByVal = defaultValGroup
       }
-      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdsAdmin')) {
+        vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
         if (vm.agencyLists.length > 0) {
           let defaultVal = vm.agencyLists[0]['value']
           for (let key in vm.agencyLists) {
@@ -684,8 +684,8 @@ export default {
             }
             vm.groupByVal = defaultValGroup
           }
-          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIds')) {
-            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+          if (vm.itemsReports[vm.index]['filterConfig'].hasOwnProperty('groupIdsAdmin')) {
+            vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
             if (vm.agencyLists.length > 0) {
               let defaultVal = vm.agencyLists[0]['value']
               for (let key in vm.agencyLists) {
@@ -733,6 +733,10 @@ export default {
           vm.pdfBlob = ''
         }
       }, 200)
+    },
+    govAgency (val) {
+      let vm = this
+      vm.$store.commit('setGroupIdFilter', val)
     }
   },
   methods: {
@@ -757,6 +761,7 @@ export default {
     exportExcel () {
       let vm = this
       vm.$store.dispatch('getExcelReportFromServer', {
+        groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
         data: vm.dataExportExcel,
         fileName: 'baocaothongke' + '.xls'
       })
@@ -797,10 +802,10 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
-          docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          docDString = docDString.replace(/\[\$groupIdsAdmin\$\]/g, vm.agencyLists[key]['text'])
           break
         }
       }
@@ -1082,10 +1087,10 @@ export default {
           docDString = docDString.replace(eval('/\\[\\$' + find + '\\$\\]/g'), currentVal)
         }
       }
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
       for (let key in vm.agencyLists) {
         if (String(vm.agencyLists[key]['value']) === String(vm.govAgency)) {
-          docDString = docDString.replace(/\[\$groupIds\$\]/g, vm.agencyLists[key]['text'])
+          docDString = docDString.replace(/\[\$groupIdsAdmin\$\]/g, vm.agencyLists[key]['text'])
           break
         }
       }
@@ -1503,7 +1508,7 @@ export default {
     },
     doDynamicReportXML () {
       let vm = this
-      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIds']
+      vm.agencyLists = vm.itemsReports[vm.index]['filterConfig']['groupIdsAdmin']
       vm.jsonMapperJson = {}
       vm.jsonMapperJson = vm.itemsReports[vm.index]['userConfig']
       vm.api = vm.itemsReports[vm.index]['filterConfig']['api']

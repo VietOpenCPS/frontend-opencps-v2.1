@@ -158,6 +158,33 @@ export const store = new Vuex.Store({
         resolve(state.initData)
       })
     },
+    getRoleUser ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+          }
+        }
+        axios.get(state.endPointApi + '/users/login', param).then(function (response) {
+          let serializable = response.data
+          if (serializable && serializable.length > 0) {
+            let roles = []
+            for (let key in serializable) {
+              if (serializable[key]['role']) {
+                roles.push(serializable[key]['role'])
+              }
+            }
+            console.log('roles', roles)
+            resolve(roles)
+          } else {
+            resolve(['default'])
+          }
+        }).catch(function (error) {
+          console.log(error)
+          reject('default')
+        })
+      })
+    },
     loadMermaidgraph ({state}, id) {
       let config = {
         headers: {
@@ -1401,6 +1428,9 @@ export const store = new Vuex.Store({
     },
     getloginUser (state) {
       return state.loginUser[0]
+    },
+    getUserRoles (state) {
+      return state.loginUser
     },
     getisConnected (state) {
       return state.isConnected

@@ -581,6 +581,12 @@
           onsort: function (e) {
             window.$('#table_database_' + vm.tableName).jexcel('orderBy', window.$(e).next().val())
           },
+          closeEditor : function(cell, save) {
+            let value = cell.children[0].value
+            cell.innerHTML = value
+            console.log('value cell', value)
+            return value
+          },
           columns: columns
         })
         vm.problem = false

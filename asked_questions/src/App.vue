@@ -1,6 +1,6 @@
 <template>
   <v-app id="app_asked_questions" style="background: #fff !important">
-    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data')">
+    <v-navigation-drawer app clipped floating width="255" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
       <!-- <div class="">
         <v-btn class="px-0 my-0 ml-0" block color="primary" v-on:click.native="addQuestion"
           style="height:36px"
@@ -66,7 +66,7 @@
         <v-divider class="my-0"></v-divider>
       </v-list>
     </v-navigation-drawer>
-    <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
+    <v-content :style="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'width: 100%;max-width: 1300px;margin: 0 auto' : ''">
       <router-view></router-view>
     </v-content>
   </v-app>

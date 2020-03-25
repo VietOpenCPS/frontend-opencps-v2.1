@@ -686,7 +686,7 @@ export default {
     requiredOptions: {
       applicantIdNo: true,
       applicantName: true,
-      address: true,
+      address: false,
       cityCode: true,
       districtCode: true,
       wardCode: true,
@@ -694,7 +694,7 @@ export default {
       contactEmail: false,
       delegateIdNo: true,
       delegateName: true,
-      delegateAddress: true,
+      delegateAddress: false,
       delegateCityCode: true,
       delegateDistrictCode: true,
       delegateWardCode: true,

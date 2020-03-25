@@ -202,26 +202,21 @@ export default {
     },
     loginDVCQG () {
       let vm = this
-      window.location.href = window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/dang-nhap-dvcqg'
-      // let urlSso = ''
-      // try {
-      //   urlSso = ssoConfig ? ssoConfig['urlSend'] : ''
-      // } catch (error) {
-      // }
-      // let filter = {
-      //   vnconnect: 1,
-      //   currenturl: urlSso ? urlSso : ''
-      // }
-      // vm.$store.dispatch('getVNConect', filter).then(function (result) {
-      //   if (result) {
-      //     vm.dialog_loginDVCQG = true
-      //     setTimeout(function () {
-      //       vm.tempDVCQG = result
-      //     }, 200)
-      //   }
-      // }).catch(function() {
-      //   alert('Chức năng đang cập nhật')
-      // })
+      // window.location.href = window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/dang-nhap-dvcqg'
+      // new version
+      let filter = {
+        state: 'auth',
+        redirectURL: window.location.origin
+      }
+      vm.$store.dispatch('getVNConect', filter).then(function (result) {
+        if (result) {
+          window.location.href = result
+        } else {
+          alert('Chức năng đang cập nhật')
+        }
+      }).catch(function () {
+        alert('Chức năng đang cập nhật')
+      })
     },
     callback_dvcqg (data) {
       let vm = this

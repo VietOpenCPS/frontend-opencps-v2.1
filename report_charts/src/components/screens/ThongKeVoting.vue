@@ -337,8 +337,8 @@ export default {
       }
       vm.$store.dispatch('getDynamicReports', filter).then(function (result) {
         vm.filterConfig = eval('( ' + result['filterConfig'] + ' )')
-        if (vm.filterConfig.hasOwnProperty('groupIds')) {
-          vm.agencyLists = vm.filterConfig['groupIds']
+        if (vm.filterConfig.hasOwnProperty('groupIdsAdmin')) {
+          vm.agencyLists = vm.filterConfig['groupIdsAdmin']
           if (vm.agencyLists.length > 0) {
             let defaultVal = vm.agencyLists[0]['value']
             for (let key in vm.agencyLists) {

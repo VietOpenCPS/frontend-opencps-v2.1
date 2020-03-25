@@ -13,6 +13,7 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     groupId: window.themeDisplay !== undefined ? window.themeDisplay.getScopeGroupId() : 0,
+    groupIdFilter: 0,
     snackbarerror: false,
     snackbarsocket: false,
     refreshSocket: 0,
@@ -178,8 +179,8 @@ export const store = new Vuex.Store({
                 if (typeCurrent === 'dossier') {
                   // push default current siteName
                   let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-                  if (filterconfigObject.hasOwnProperty('groupIds') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
-                    let govCodes = filterconfigObject['groupIds']
+                  if (filterconfigObject.hasOwnProperty('groupIdsAdmin') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
+                    let govCodes = filterconfigObject['groupIdsAdmin']
                     let exit = false
                     for (let key in govCodes) {
                       if (String(state.groupId) === govCodes[key]['value']) {
@@ -193,7 +194,7 @@ export const store = new Vuex.Store({
                         "text": state.siteName
                       })
                     }
-                    filterconfigObject['groupIds'] = govCodes
+                    filterconfigObject['groupIdsAdmin'] = govCodes
                   }
                   state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
                   itemsReportsData.push({
@@ -245,8 +246,8 @@ export const store = new Vuex.Store({
               if (typeCurrent === 'dossier') {
                 // push default current siteName
                 let filterconfigObject = eval('( ' + current['filterConfig'] + ' )')
-                if (filterconfigObject.hasOwnProperty('groupIds') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
-                  let govCodes = filterconfigObject['groupIds']
+                if (filterconfigObject.hasOwnProperty('groupIdsAdmin') && filterconfigObject.hasOwnProperty('exclusive') && filterconfigObject['exclusive']) {
+                  let govCodes = filterconfigObject['groupIdsAdmin']
                   let exit = false
                   for (let key in govCodes) {
                     if (String(state.groupId) === govCodes[key]['value']) {
@@ -260,7 +261,7 @@ export const store = new Vuex.Store({
                       "text": state.siteName
                     })
                   }
-                  filterconfigObject['groupIds'] = govCodes
+                  filterconfigObject['groupIdsAdmin'] = govCodes
                 }
                 state.reportConfigStatic[indexKey] = eval('( ' + current['tableConfig'] + ' )')
                 itemsReportsData.push({
@@ -576,7 +577,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let options = {
           headers: {
-            'groupId': state.groupId,
+            'groupId': dataReq.groupId ? dataReq.groupId : state.groupId,
             'Content-Type': 'x-www-form-urlencoded',
             'Accept': 'application/json'
           },
@@ -644,7 +645,7 @@ export const store = new Vuex.Store({
     loadDossierActions ({commit, state}, data) {
       let config = {
         headers: {
-          groupId: state.groupId
+          'groupId': data.groupId ? data.groupId : state.groupId,
         },
         params: {
           stepType: data.stepType
@@ -714,6 +715,9 @@ export const store = new Vuex.Store({
     },
     setreportConfigStatic (state, payload) {
       state.reportConfigStatic = payload
+    },
+    setGroupIdFilter (state, payload) {
+      state.groupIdFilter = payload
     }
   },
   getters: {
@@ -758,6 +762,9 @@ export const store = new Vuex.Store({
     },
     reportConfigStatic (state) {
       return state.reportConfigStatic
+    },
+    getGroupIdFilter (state) {
+      return state.groupIdFilter
     }
   }
 })

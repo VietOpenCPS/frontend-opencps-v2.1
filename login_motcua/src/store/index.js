@@ -345,11 +345,11 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             },
             params: {
-              vnconnect: filter.vnconnect,
-              currenturl: filter.currenturl
+              state: filter.state,
+              redirectURL: filter.redirectURL
             }
           }
-          axios.get('/o/rest/v2/dvcqgsso/checkauth', param).then(function (response) {
+          axios.get('/o/rest/v2/dvcqgsso/authurl', param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
           }).catch(function (error) {

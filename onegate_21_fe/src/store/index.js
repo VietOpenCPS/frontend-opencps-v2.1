@@ -1669,6 +1669,7 @@ export const store = new Vuex.Store({
               if (field[prop].isRequired() && field[prop].getValue() === '') {
                 toastr.clear()
                 toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                reject('valid')
                 return
               }
             }

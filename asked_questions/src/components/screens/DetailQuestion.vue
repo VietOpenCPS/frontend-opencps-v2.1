@@ -7,7 +7,7 @@
           Thêm câu trả lời
         </v-btn> -->
         <v-flex xs12 sm12 class="text-xs-center" style="margin-bottom: 20px;">
-          <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-xs-center mt-2" style="color:#065694">QUẢN LÝ CÂU HỎI</h3>
           <h3 v-else class="text-xs-center mt-2" style="color:#065694">HỎI ĐÁP THÔNG TIN</h3>
         </v-flex>
         <v-flex xs12 sm12>
@@ -58,7 +58,7 @@
                   <div style="position:relative">
                     <i class="text-bold">Ngày {{answerList[0].createDate}}</i>
                     <div class="ml-2 mt-2" v-html="answerList[0].content"></div>
-                    <div v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:10px;top:0">
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top>
                         <v-btn slot="activator" icon ripple @click="editAnswer(answerList[0])" style="margin-top:-3px!important">
                           <v-icon color="primary">edit</v-icon>
@@ -91,7 +91,7 @@
                   <div style="position:relative">
                     <span class="text-bold">Câu trả lời {{ indexAnswer + 1}} </span> <i>(Ngày {{itemAnswer.createDate}})</i>
                     <div class="ml-2 mt-2" v-html="itemAnswer.content"></div>
-                    <div v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:10px;top:0">
+                    <div v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:10px;top:0">
                       <v-tooltip top >
                         <v-btn slot="activator" icon ripple @click="editAnswer(itemAnswer)" style="margin-top:-3px!important">
                           <v-icon color="primary">edit</v-icon>
@@ -120,7 +120,7 @@
             </div>
           </div>
           
-          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator') || getUser('Administrator_data')">
+          <div class="mx-2 my-3" id="contentAnswer" v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')">
             <div class="mx-3">
               <span class="mr-2"><v-icon class="blue--text">announcement</v-icon> </span>
               <span class="text-bold primary--text">NỘI DUNG TRẢ LỜI:</span>
@@ -410,7 +410,14 @@ export default {
       let filter = {
         questionId: item['questionId'],
         publish: vm.questionList[index]['publish'],
-        content: vm.questionList[index]['content']
+        content: vm.questionList[index]['content'],
+        email: vm.questionList[index]['email'],
+        fullname: vm.questionList[index]['fullname'],
+        govAgencyCode: vm.questionList[index]['govAgencyCode'],
+        govAgencyName: vm.questionList[index]['govAgencyName'],
+        domainCode: vm.questionList[index]['domainCode'],
+        domainName: vm.questionList[index]['domainName'],
+        questionType: vm.questionList[index]['questionType']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')

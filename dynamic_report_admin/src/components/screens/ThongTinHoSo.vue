@@ -365,6 +365,9 @@
       ],
     }),
     computed: {
+      groupIdFilter () {
+        return this.$store.getters.getGroupIdFilter
+      }
     },
     created() {
       let vm = this
@@ -408,7 +411,8 @@
         var vm = this
         if (vm.thongTinChiTietHoSo.dossierId) {
           let dataParams = {
-            dossierId: vm.thongTinChiTietHoSo.dossierId
+            dossierId: vm.thongTinChiTietHoSo.dossierId,
+            groupId: vm.groupIdFilter ? vm.groupIdFilter : window.themeDisplay.getScopeGroupId()
           }
           vm.$store.dispatch('loadDossierActions', dataParams).then(resultActions => {
             if (resultActions.data && resultActions.data.length !== 0) {

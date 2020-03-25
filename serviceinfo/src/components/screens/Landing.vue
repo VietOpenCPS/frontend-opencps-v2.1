@@ -394,7 +394,7 @@
           <v-flex v-if="!isSigned" xs12>
             <nav class="toolbar theme--dark primary py-2" data-booted="true">
               <div class="toolbar__content"  style="justify-content: center">
-                <h3 class="white--text">ĐĂNG NHẬP</h3>
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP</div>
               </div>
             </nav>
             <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
@@ -430,7 +430,7 @@
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-left text-xs-center">
-                  <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
                     :loading="loadingLogin"
                     :disabled="loadingLogin"
                     @click="submitConfirmLogin"
@@ -438,13 +438,17 @@
                     <v-icon>how_to_reg</v-icon>&nbsp;
                     Đăng nhập
                   </v-btn>
-                  <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                  <!-- <v-btn class="ml-1 my-0 white--text" color="primary"
                     :loading="loadingLogin"
                     :disabled="loadingLogin"
                     @click="register"
                   >
                     <v-icon>create</v-icon>&nbsp;
                     Đăng ký
+                  </v-btn> -->
+                  <v-btn @click="dialogLogin = false" color="primary">
+                    <v-icon>reply</v-icon>&nbsp;
+                    Thoát
                   </v-btn>
                 </v-flex>
                 
@@ -543,7 +547,9 @@ export default {
     hasCoQuanThucHien: false,
     configUrl: '',
     keyCodeDvcqg: '',
-    userInfoDvcqg: ''
+    userInfoDvcqg: '',
+    mapping: false,
+    dataMapping: ''
   }),
   computed: {
     govAgencyList () {
@@ -613,8 +619,21 @@ export default {
             } else {
               // case khác serviceCode
               if (currentQuery.hasOwnProperty('vnconnect') && String(currentQuery['vnconnect']) === '1' && !window.themeDisplay.isSignedIn()) {
-                window.callback_dvcqg = vm.callback_dvcqg
-                vm.checkVNConect()
+                let searchParams = window.location.href.split("?")
+                if (searchParams[1]) {
+                  let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
+                  // console.log('dataDVCQG', dataDVCQG)
+                  if (dataDVCQG) {
+                    let dataObj = JSON.parse(atob(dataDVCQG))
+                    console.log('dataObj', dataObj)
+                    if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+                      vm.mapping = true
+                      vm.dataMapping = dataObj
+                      vm.dialogLogin = true
+                      console.log('mapping', vm.mapping)
+                    }
+                  }
+                }
                 vm.initData()
               }
             }
@@ -860,6 +879,9 @@ export default {
         vm.loadingLogin = true
         vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
           vm.loadingLogin = false
+          if (vm.mapping && result === 'success') {
+            vm.doMappingDvcqg()
+          }
           if (result === 'success') {
             vm.dialogLogin = false
             if (vm.doCreateDossier) {
@@ -903,25 +925,46 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let filter = {
-        state: 'auth'
+        state: '',
+        redirectURL: window.location.href.split("?")[0]
       }
       setTimeout (function () {
         if (!vm.isSigned) {
           vm.$store.dispatch('getVNConect', filter).then(function (result) {
             if (result) {
-              vm.dialog_loginDVCQG = true
-              setTimeout(function () {
-                vm.tempDVCQG = result
-              }, 200)
+              window.location.href = result
+            } else {
+              alert('Chức năng đang cập nhật')
             }
           }).catch(function () {
-            // if (!vm.isSigned) {
-            //   vm.doCreateDossier = false
-            //   vm.dialogLogin = true
-            // }
+            if (!vm.isSigned) {
+              vm.doCreateDossier = false
+              vm.dialogLogin = true
+            }
           })
         }
       }, 300)
+    },
+    doMappingDvcqg () {
+      let vm = this
+      let filter = {
+        dataMapping: vm.dataMapping
+      }
+      vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
+      }).catch(function () {
+      })
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
     },
     checkVNConectAutoMapping () {
       let vm = this

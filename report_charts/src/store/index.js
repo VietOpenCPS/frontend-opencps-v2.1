@@ -758,7 +758,8 @@ export const store = new Vuex.Store({
               groupId: filter['groupId']
             },
             params: {
-              jobposCode: filter['jobposCode']
+              jobposCode: filter['jobposCode'],
+              employeeName: filter['employeeName']
             }
           }
           axios.get('/o/rest/v2/employees', param).then(result => {
@@ -839,7 +840,8 @@ export const store = new Vuex.Store({
             },
             params: {
               from: filter['from'],
-              to: filter['to']
+              to: filter['to'],
+              employeeName: filter['employeeName']
             }
           }
           axios.get('/o/rest/v2/statistics/dossiers/person', param).then(result => {
@@ -854,6 +856,29 @@ export const store = new Vuex.Store({
         })
       })
     },
+    getThuTucHanhChinh ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function () {
+          let param = {
+            headers: {
+              groupId: filter.groupId,
+              Accept: 'application/json'
+            },
+            params: {}
+          }
+          axios.get(filter.api, param).then(function (response) {
+            let serializable = response.data
+              if (Array.isArray(serializable.data)) {
+                resolve(serializable.data)
+              } else {
+                resolve([serializable.data])
+              }
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    }
   },
   mutations: {
     setInitData (state, payload) {

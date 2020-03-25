@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-layout row wrap class="mx-2 py-2" id="contentFaq">
-      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data')) ? 'md7' : ''" :style="!isMobile ? 'padding-right: 16px' : 'padding-right: 6px'">
+      <v-flex xs12 :class="(!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')) ? 'md7' : ''" :style="!isMobile ? 'padding-right: 16px' : 'padding-right: 6px'">
         <div>
-          <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data')" class="text-bold mb-2" style="color:#034687">
+          <h3 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee')" class="text-bold mb-2" style="color:#034687">
             <v-btn flat class="ml-0 px-0" :color="questionType === ''? '#0167d3' : ''" @click="changeType('')">CÂU HỎI THƯỜNG GẶP</v-btn>
             <v-btn flat class="ml-3" :color="questionType === 'FAQ'? '#0167d3' : ''" @click="changeType('FAQ')">TỔNG HỢP HỎI ĐÁP</v-btn>
           </h3>
-          <h3 v-if="getUser('Administrator') || getUser('Administrator_data')" class="text-bold mb-3 text-xs-center" style="color:#034687">
+          <h3 v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" class="text-bold mb-3 text-xs-center" style="color:#034687">
             DANH SÁCH CÂU HỎI
           </h3>
           <v-btn v-if="isMobile" @click="drawerMobile = true" small fab dark color="primary" style="position: absolute;right: 0;top: 0;">
@@ -83,7 +83,7 @@
             <!-- <v-expansion-panel v-for="(itemQuestion, indexQuestion) in questionList" :value="[false]" expand class="expansion-pl mb-2"
               :key="indexQuestion" style="border: 1px solid #ddd;border-radius:5px;position:relative;"
             > -->
-              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
+              <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:25px;top:5px;z-index:1">
                 <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                   <v-icon>settings</v-icon>
                 </v-btn>
@@ -132,7 +132,7 @@
                         <div>
                           <div style="position:relative">
                             <div class="" v-html="itemAnswer.content"></div>
-                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data')" style="display:inline-block;position:absolute;right:18px;top:-15px">
+                            <v-menu offset-y v-if="getUser('Administrator') || getUser('Administrator_data') || getUser('Administrator_Employee')" style="display:inline-block;position:absolute;right:18px;top:-15px">
                               <v-btn class="mx-0 my-0" slot="activator" flat icon color="primary">
                                 <v-icon>settings</v-icon>
                               </v-btn>
@@ -181,7 +181,7 @@
           </div>
         </div>
       </v-flex>
-      <v-flex xs12 md5 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !isMobile">
+      <v-flex xs12 md5 v-if="!getUser('Administrator') && !getUser('Administrator_data') && !getUser('Administrator_Employee') && !isMobile">
         <v-card flat style="border: 1px solid #ddd;border-top: 0">
           <v-flex xs12 style="border-top: 1.5px solid #0053a4;">
             <div class="head-title">
@@ -878,7 +878,11 @@ export default {
         content: item['content'],
         email: item['email'],
         fullname: item['fullname'],
-        govAgencyCode: item['govAgencyCode']
+        govAgencyCode: item['govAgencyCode'],
+        govAgencyName: item['govAgencyName'],
+        domainCode: item['domainCode'],
+        domainName: item['domainName'],
+        questionType: item['questionType']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')

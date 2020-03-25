@@ -95,7 +95,7 @@ export const store = new Vuex.Store({
           if (!roles) {
             admin = false
           } else {
-            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data'))
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'Administrator_Employee'))
             if (roleExits >= 0) {
               admin = true
             }
@@ -186,7 +186,7 @@ export const store = new Vuex.Store({
           if (!roles) {
             admin = false
           } else {
-            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data'))
+            let roleExits = roles.findIndex(item => (item === 'Administrator' || item === 'Administrator_data' || item === 'Administrator_Employee'))
             if (roleExits >= 0) {
               admin = true
             }
@@ -284,6 +284,11 @@ export const store = new Vuex.Store({
           dataAdd.append('fullname', filter.fullname ? filter.fullname : '')
           dataAdd.append('publish', filter.publish)
           dataAdd.append('govAgencyCode', filter.govAgencyCode)
+          dataAdd.append('govAgencyName', filter.govAgencyName)
+          dataAdd.append('domainCode', filter.domainCode)
+          dataAdd.append('domainName', filter.domainName)
+          dataAdd.append('questionType', filter.questionType)
+          
           axios.put(urlPut, dataAdd, param).then(response => {
             resolve(response)
           }).catch(xhr => {

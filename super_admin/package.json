@@ -22,7 +22,8 @@
     "vue-router": "^3.0.1",
     "vue2-editor": "^2.6.6",
     "vuetify": "1.3.5",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "babel-plugin-transform-remove-console": "^6.9.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.1",
