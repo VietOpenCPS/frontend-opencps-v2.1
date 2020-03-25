@@ -19,6 +19,9 @@ axios.defaults.headers.common['groupId'] = groupId
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+    isOnegate: false
+  }),
   methods: {
     getScopeGroupId: function () {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

@@ -343,7 +343,7 @@
                 </v-expansion-panel>
               </div>
               <div v-else>
-                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :onlyView="thongTinChiTietHoSo['permission'].indexOf('write') >= 0 ? false : true"></tai-lieu-chung-thuc>
+                <tai-lieu-chung-thuc ref="tailieuchungthuc" :dossierId="thongTinChiTietHoSo.dossierId" :onlyView="true"></tai-lieu-chung-thuc>
               </div>
             </v-tab-item>
             <v-tab-item value="tabs-3" :key="3" reverse-transition="fade-transition" transition="fade-transition">

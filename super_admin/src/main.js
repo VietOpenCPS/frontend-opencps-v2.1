@@ -137,7 +137,7 @@ new Vue({
          if (dataObj.respone === 'loginUser') {
           let dataSet
           try {
-            dataSet = JSON(dataObj['loginUser'])
+            dataSet = dataObj['loginUser']
           } catch (error) {
             dataSet = ''
           }

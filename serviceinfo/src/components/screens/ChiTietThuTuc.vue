@@ -482,7 +482,7 @@
           <v-flex v-if="!isSigned" xs12>
             <nav class="toolbar theme--dark primary py-2" data-booted="true">
               <div class="toolbar__content"  style="justify-content: center">
-                <h3 class="white--text">ĐĂNG NHẬP</h3>
+                <div class="white--text text-bold" style="font-size: 1.25em;">ĐĂNG NHẬP</div>
               </div>
             </nav>
             <v-flex xs12 class="px-2 pb-2" style="border: 1px solid #dddddd;">
@@ -518,7 +518,7 @@
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-left text-xs-center">
-                  <v-btn class="ml-0 mr-1 my-0 white--text" color="#0b72ba"
+                  <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
                     :loading="loadingLogin"
                     :disabled="loadingLogin"
                     @click="submitConfirmLogin"
@@ -526,13 +526,17 @@
                     <v-icon>how_to_reg</v-icon>&nbsp;
                     Đăng nhập
                   </v-btn>
-                  <v-btn class="ml-1 my-0 white--text" color="#0b72ba"
+                  <!-- <v-btn class="ml-1 my-0 white--text" color="primary"
                     :loading="loadingLogin"
                     :disabled="loadingLogin"
                     @click="register"
                   >
                     <v-icon>create</v-icon>&nbsp;
                     Đăng ký
+                  </v-btn> -->
+                  <v-btn @click="dialogLogin = false" color="primary">
+                    <v-icon>reply</v-icon>&nbsp;
+                    Thoát
                   </v-btn>
                 </v-flex>
                 
@@ -546,11 +550,7 @@
     <v-dialog class="my-0" v-model="dialog_loginDVCQG" max-width="1200px" style="width:100%;max-height: 100%;">
       <v-card>
         <v-card-text class="px-0 py-0">
-          <iframe id="iframeLoginDVCQG" :src="tempDVCQG" style="
-            width: 100%;
-            height: 650px;
-            border: none;
-          "></iframe>
+
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -588,7 +588,9 @@ export default {
     isLogin: false,
     verificationApplicantCreateDossier: false,
     userInfoDvc: '',
-    userInfoDvcqg: ''
+    userInfoDvcqg: '',
+    mapping: false,
+    dataMapping: ''
   }),
   computed: {
     isMobile () {
@@ -614,19 +616,34 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       if (query.hasOwnProperty('vnconnect') && String(query['vnconnect']) === '1' && !window.themeDisplay.isSignedIn()) {
-        window.callback_dvcqg = vm.callback_dvcqg
+        // window.callback_dvcqg = vm.callback_dvcqg
         vm.checkVNConect()
       }
       // Auto mapping
-      let sync = false
-      if ( typeof(Storage) !== 'undefined') {
-        sync = sessionStorage.getItem('sync')
-      }
-      if (window.themeDisplay.isSignedIn() && sync) {
-        window.callback_dvcqg = vm.callback_dvcqg
-        vm.checkVNConectAutoMapping()  
-      }
+      // let sync = false
+      // if ( typeof(Storage) !== 'undefined') {
+      //   sync = sessionStorage.getItem('sync')
+      // }
+      // if (window.themeDisplay.isSignedIn() && sync) {
+      //   window.callback_dvcqg = vm.callback_dvcqg
+      //   vm.checkVNConectAutoMapping()  
+      // }
       // 
+      let searchParams = window.location.href.split("?")
+      if (searchParams[1]) {
+        let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
+        // console.log('dataDVCQG', dataDVCQG)
+        if (dataDVCQG) {
+          let dataObj = JSON.parse(atob(dataDVCQG))
+          console.log('dataObj', dataObj)
+          if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+            vm.mapping = true
+            vm.dataMapping = dataObj
+            vm.dialogLogin = true
+            console.log('mapping', vm.mapping)
+          }
+        }
+      }
       vm.loading = true
       let filter = {
         index: vm.index
@@ -680,20 +697,23 @@ export default {
         vm.loadingLogin = true
         vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
           vm.loadingLogin = false
+          if (vm.mapping && result === 'success') {
+            vm.doMappingDvcqg()
+          }
           if (result === 'success') {
             vm.dialogLogin = false
             if (vm.doCreateDossier) {
               vm.isLogin = true
               vm.createDossier(vm.serviceSelected)
             } else {
-              if ( typeof(Storage) !== 'undefined') {
-                sessionStorage.setItem('sync','true')
-              }
-              let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
-              window.location.href = url
-              setTimeout(() => {
-                window.location.reload()
-              }, 100)
+              // if ( typeof(Storage) !== 'undefined') {
+              //   sessionStorage.setItem('sync','true')
+              // }
+              // let url = window.themeDisplay.getLayoutURL() + '/thu-tuc-hanh-chinh#' + current.path
+              // window.location.href = url
+              // setTimeout(() => {
+              //   window.location.reload()
+              // }, 100)
             }
           } 
         }).catch(function(){
@@ -758,16 +778,16 @@ export default {
       let current = vm.$router.history.current
       let query = vm.$router.history.current.query
       let filter = {
-        state: 'auth'
+        state: '',
+        redirectURL: window.location.href.split("?")[0]
       }
       setTimeout (function () {
         if (!vm.isSigned) {
           vm.$store.dispatch('getVNConect', filter).then(function (result) {
             if (result) {
-              vm.dialog_loginDVCQG = true
-              setTimeout(function () {
-                vm.tempDVCQG = result
-              }, 200)
+              window.location.href = result
+            } else {
+              alert('Chức năng đang cập nhật')
             }
           }).catch(function () {
             if (!vm.isSigned) {
@@ -777,6 +797,18 @@ export default {
           })
         }
       }, 300)
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
     },
     checkVNConectAutoMapping () {
       let vm = this
@@ -799,12 +831,10 @@ export default {
     },
     doMappingDvcqg () {
       let vm = this
-      let current = vm.$router.history.current
-      let query = vm.$router.history.current.query
       let filter = {
-        userInfo: vm.userInfoDvc
+        dataMapping: vm.dataMapping
       }
-      vm.$store.dispatch('putVNConect', filter).then(function (result) {
+      vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
       }).catch(function () {
       })
     },

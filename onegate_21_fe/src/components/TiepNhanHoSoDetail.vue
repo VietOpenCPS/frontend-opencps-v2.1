@@ -153,7 +153,7 @@
           </v-expansion-panel>
         </div>
         <!--  -->
-        <div style="position: relative;">
+        <div :style="isNotarization ? 'display: none' : 'position: relative;'">
           <v-expansion-panel :value="[true]" expand  class="expansion-pl">
             <v-expansion-panel-content hide-actions value="2">
               <thu-phi v-if="showThuPhi" v-model="payments" :detailDossier="thongTinChiTietHoSo" :viaPortal="viaPortalDetail"></thu-phi>
@@ -823,7 +823,7 @@ export default {
                   }
                   vm.$store.dispatch('processPullBtnDetail', {
                     dossierId: result.dossierId,
-                    actionId: vm.actionDetail[0] ? vm.actionDetail[0].processActionId : ''
+                    actionId: vm.actionDetail ? vm.actionDetail.processActionId : ''
                   }).then(resAction => {
                     result['editable'] = resAction && resAction.receiving ? resAction.receiving.editable : false
                     result['receivingDuedate'] = resAction && resAction.receiving && resAction.receiving.dueDate ? resAction.receiving.dueDate : null
@@ -870,7 +870,7 @@ export default {
             vm.$store.dispatch('getServiceInfo', {
               serviceInfoId: result.serviceCode
             }).then(function (res) {
-              if (res.serviceCode === 'TEST-CHUNG-THUC') {
+              if (res.hasOwnProperty('isNotarization') && String(res.isNotarization) === 'true') { 
                 vm.isNotarization = true
 
               } else {
@@ -1039,6 +1039,10 @@ export default {
                   feeAmount: Number(vm.payments['feeAmount'].toString().replace(/\./g, '')),
                   serviceAmount: Number(vm.payments['serviceAmount'].toString().replace(/\./g, '')),
                   shipAmount: Number(vm.payments['shipAmount'].toString().replace(/\./g, ''))
+                }
+                if (vm.isNotarization) {
+                  let dataNotarization = vm.$refs.tailieuchungthuc.dataExport()
+                  paymentsOut.feeAmount = dataNotarization.feeTotal
                 }
               }
               var payloadDate = {

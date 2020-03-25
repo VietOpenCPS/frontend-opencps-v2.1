@@ -364,10 +364,11 @@ export const store = new Vuex.Store({
         store.dispatch('loadInitResource').then(function (result) {
           let param = {
             headers: {
-              groupId: state.initData.groupId
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
             },
             params: {
-              state: filter.state
+              state: filter.state,
+              redirectURL: filter.redirectURL
             }
           }
           axios.get('/o/rest/v2/dvcqgsso/authurl', param).then(function (response) {
@@ -375,6 +376,24 @@ export const store = new Vuex.Store({
             resolve(serializable)
           }).catch(function (error) {
             console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    mappingDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: window.themeDisplay ? window.themeDisplay.getScopeGroupId() : ''
+            },
+            params: {}
+          }
+          let data = filter.dataMapping
+          axios.post('/o/rest/v2/dvcqgsso/auth', data, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
             reject(error)
           })
         })

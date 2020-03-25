@@ -923,7 +923,7 @@ export default {
         }
         /* eslint-disable */
         if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-          console.log('eformEmbed', eformScript)
+          // console.log('eformEmbed', eformScript)
           item.embed = true
           let userId = window.themeDisplay.getUserId()
           let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
@@ -934,7 +934,7 @@ export default {
           let deliverableType = item.deliverableType ? item.deliverableType : ''
 
           let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-          console.log('urlEmbed', urlEmbed)
+          // console.log('urlEmbed', urlEmbed)
           setTimeout(function () {
             document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
           }, 300)
@@ -1216,7 +1216,7 @@ export default {
       console.log('eformScript', eformScript)
       /* eslint-disable */
       if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
-        console.log('eformEmbed', eformScript)
+        // console.log('eformEmbed', eformScript)
         item.embed = true
         let userId = window.themeDisplay.getUserId()
         let userEmail = vm.originality === 1 ? vm.userLoginInfomation.applicantContactEmail : vm.userLoginInfomation.employeeEmail
@@ -1227,7 +1227,7 @@ export default {
         let deliverableType = item.deliverableType ? item.deliverableType : ''
 
         let urlEmbed = eformScript.eformEmbed + '/' + item.fileTemplateNo + '___' + deliverableType + '?userId=' + userId + '&userEmail=' + userEmail + '&code=' + referenceUid + '&dossierStatus=' + dossierStatus + '&dossierSubStatus=' + dossierSubStatus + '&tp=' + templateNo
-        console.log('urlEmbed', urlEmbed)
+        // console.log('urlEmbed', urlEmbed)
         setTimeout(function () {
           document.getElementById('formAlpaca' + item.partNo + vm.id).src = urlEmbed
         }, 300)
@@ -1321,7 +1321,7 @@ export default {
           if (!vm.onlyView) {
             //
             let eformScript = eval('(' + file.formScript + ')')
-            console.log('eformScript preview', eformScript)
+            // console.log('eformScript preview', eformScript)
             if (eformScript && eformScript.hasOwnProperty('eformEmbed') && eformScript.eformEmbed) {
               item['editForm'] = false
               setTimeout(function () {

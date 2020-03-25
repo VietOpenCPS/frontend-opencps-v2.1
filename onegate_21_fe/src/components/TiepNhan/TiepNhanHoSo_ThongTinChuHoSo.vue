@@ -382,7 +382,7 @@
                         <v-text-field
                         v-else
                         v-model="thongTinNguoiNopHoSo.delegateEmail"
-                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : [rules.email]"
+                        :rules="requiredOptions['delegateEmail'] ? [rules.email, rules.required] : (thongTinNguoiNopHoSo.delegateEmail ? [rules.email] : '')"
                         :required="requiredOptions['delegateEmail']"
                         ></v-text-field>
                       </v-flex>

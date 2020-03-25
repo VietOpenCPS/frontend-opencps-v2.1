@@ -19,7 +19,7 @@
     >
       <v-progress-linear slot="progress" color="blue" indeterminate v-if="loading"></v-progress-linear>
       <template slot="items" slot-scope="props">
-        <td width="50" class="text-xs-center pt-3"> {{props.index + 1}}</td>
+        <td width="50" class="text-xs-center" :class="onlyView ? 'pt-1' : 'pt-3'"> {{props.index + 1}}</td>
         <td class="text-xs-left py-1">
           <content-placeholders v-if="loading">
             <content-placeholders-text :lines="1" />
@@ -96,57 +96,6 @@
         </td>
       </template>
     </v-data-table>
-    <!--  -->
-    <v-dialog v-model="dialog_notarization" scrollable persistent max-width="700px">
-      <v-card>
-        <v-toolbar flat dark color="primary">
-          <v-toolbar-title>Tài liệu chứng thực</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon dark @click.native="cancelAdd">
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-text>
-          <v-form ref="formAdd" v-model="validAdd" lazy-validation>
-            <v-layout wrap class="py-1 align-center row-list-style">
-              <v-flex xs12 class="px-2">
-                <v-text-field
-                  single-line
-                  placeholder="Tên tài liệu"
-                  v-model="fileName"
-                  clearable
-                  autofocus
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs12 class="px-2">
-                
-              </v-flex>
-              <v-flex xs12 class="px-2">
-                
-              </v-flex>
-              <v-flex xs12 class="px-2">
-                
-              </v-flex>
-            </v-layout>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="mr-3" color="primary" @click="addNotarization"
-          :loading="loading"
-          :disabled="loading">
-            <v-icon>save</v-icon> &nbsp;
-            Thêm mới
-          </v-btn>
-          <v-btn class="mr-3" color="primary" @click="cancelAdd"
-          :loading="loading"
-          :disabled="loading">
-            <v-icon>clear</v-icon> &nbsp;
-            Hủy
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-card>
 
 </template>
@@ -224,7 +173,7 @@ export default {
   created () {
     let vm = this
     if (vm.onlyView) {
-      vm.headers = vm.headers.pop()
+      vm.headers.pop()
     }
     vm.loading = true
     let filter = {
@@ -233,11 +182,18 @@ export default {
     vm.$store.dispatch('getNotarization', filter).then(function (result) {
       vm.loading = false
       vm.notarizationList = result
-      let initialValue = 0
-      vm.fee = vm.notarizationList.reduce(
-        (accumulator, currentValue) => accumulator + Number(currentValue.totalFee.toString().replace(/\./g, ''))
-        ,initialValue
-      )
+      if (vm.notarizationList.length > 0) {
+        let initialValue = 0
+        vm.fee = vm.notarizationList.reduce(
+          (accumulator, currentValue) => accumulator + Number(currentValue.totalFee.toString().replace(/\./g, ''))
+          ,initialValue
+        )
+        if (!vm.onlyView) {
+          for (let key in vm.notarizationList) {
+            vm.notarizationList[key].totalFee = vm.convertCurrency(vm.notarizationList[key].totalFee)
+          }
+        }
+      }
     }).catch(function () {
       vm.loading = false
     })
@@ -306,6 +262,11 @@ export default {
       if (x) {
         vm.$store.dispatch('deleteNotarization', item).then(function (result) {
           vm.notarizationList.splice(index, 1)
+          let initialValue = 0
+          vm.fee = vm.notarizationList.reduce(
+            (accumulator, currentValue) => accumulator + Number(currentValue.totalFee.toString().replace(/\./g, ''))
+            ,initialValue
+          )
         }).catch(function (){
         })
       }
@@ -354,8 +315,12 @@ export default {
         vm.notarizationList[key].totalPage = Number(vm.notarizationList[key].totalPage)
         vm.notarizationList[key].totalFee = Number(vm.notarizationList[key].totalFee.toString().replace(/\./g, ''))
       }
-      console.log('notarizationListOut', vm.notarizationList)
-      return vm.notarizationList
+      let dataExport = {
+        notarizationList: vm.notarizationList,
+        feeTotal: vm.fee
+      }
+      console.log('dataExport', dataExport)
+      return dataExport
     },
     cancelAdd () {
       let vm = this
@@ -372,6 +337,13 @@ export default {
         return copies*pages*2000
       }
     },
+    convertCurrency (value) {
+      if (value) {
+        let moneyCur = (value / 1).toFixed(0).replace('.', ',')
+        return moneyCur.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      }
+      return ''
+    }
   },
   filters: {
     currency (value) {

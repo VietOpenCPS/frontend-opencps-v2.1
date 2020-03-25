@@ -2,7 +2,7 @@
   <v-app>
     <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app width="240" dark>
       <div class="sidebar-background" style="background-image: url(&quot;/o/vue-admin/images/bg_menu.jpg&quot;);"></div>
-      <v-list dense>
+      <v-list dense v-if="!scopeAdmin">
         <template v-for="item in items">
             <v-layout
               v-if="item.heading"
@@ -61,8 +61,39 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-</template>
+        </template>
       </v-list>
+      <v-list dense v-else>
+        <v-list-tile :to="'/table/opencps_applicant?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>group_add</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Người làm thủ tục
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile :to="'/table/opencps_employee?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1">
+          <v-list-tile-action>
+            <v-icon>group_add</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Cán bộ
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+      <!-- <div>
+        <v-btn class="ml-1 mr-1 my-0 white--text" color="#0b72ba"
+          @click="thongKeTruyCap"
+        >
+          <v-icon>how_to_reg</v-icon>&nbsp;
+          Thống kê truy cập hệ thống
+        </v-btn>
+      </div> -->
     </v-navigation-drawer>
     <v-toolbar
       :clipped-left="$vuetify.breakpoint.lgAndUp"
@@ -156,22 +187,35 @@
     </v-snackbar>
   </v-app>
 </template>
-
 <script>
   export default {
     data: () => ({
       dialog: false,
       drawer: null,
-      dataSocket: {}
+      dataSocket: {},
+      scopeAdmin: false
     }),
     props: {
       tableName: String
+    },
+    created () {
+      let vm = this
+      vm.$nextTick(function () {
+        try {
+          // let adminData = vm.getUser('Administrator_data')
+          vm.scopeAdmin = scopeAdminConfig
+        } catch (error) {
+        }
+      })
     },
     computed: {
       items() {
         return this.$store.getters.getlistTableMenu
       },
       loginUser() {
+        return this.$store.getters.getloginUser
+      },
+      userRoles () {
         return this.$store.getters.getloginUser
       },
       snackbarerror: {
@@ -196,6 +240,15 @@
       }
     },
     methods: {
+      getUser (roleItem) {
+        let vm = this
+        let roles = vm.userRoles
+        if (!roles) {
+          return false
+        }
+        let roleExits = roles.findIndex(item => item.role === roleItem)
+        return (roleExits >= 0)
+      },
       redirectFilter(val) {
         this.$router.push(val + '?state_change=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1)
       },
@@ -224,6 +277,9 @@
       },
       doLogOut() {
         window.location.href = '/o/portal/logout'
+      },
+      thongKeTruyCap () {
+        window.location.href = 'https://analytics.google.com'
       }
     }
   }
