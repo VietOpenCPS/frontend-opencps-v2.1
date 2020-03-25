@@ -33,9 +33,9 @@
     "mermaid": "^8.0.0-rc.8",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
+    "toastr": "^2.1.4",
     "vue-cli-plugin-vuetify": "^0.2.1",
-    "vue-template-compiler": "^2.5.17",
-    "toastr": "^2.1.4"
+    "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
     "root": true,
