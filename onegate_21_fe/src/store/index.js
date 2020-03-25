@@ -350,10 +350,16 @@ export const store = new Vuex.Store({
             filter.queryParams = filter.queryParams.replace('&order=true', '')
           }
           let splitUrl = filter.queryParams.split('?')
-          if (splitUrl[1].charAt(0) === '&') {
-            filter.queryParams = splitUrl[0] + '?' + splitUrl[1].slice(1)
+          if (splitUrl.length !== 0) {
+            if (splitUrl[1]) {
+              if (splitUrl[1].charAt(0) === '&') {
+                filter.queryParams = splitUrl[1].slice(1) ? splitUrl[0] + '?' + splitUrl[1].slice(1) : splitUrl[0]
+              }
+            } else {
+              filter.queryParams = splitUrl[0]
+            }
           }
-          console.log('paramSearch dossier 000', filter.queryParams, paramSearch)
+          console.log('paramSearch_dossier_5', filter.queryParams, paramSearch)
           // 
           let param = {
             headers: {
@@ -1663,6 +1669,7 @@ export const store = new Vuex.Store({
               if (field[prop].isRequired() && field[prop].getValue() === '') {
                 toastr.clear()
                 toastr.error(field[prop].options.title ? field[prop].options.title + ' là trường dữ liệu bắt buộc' : field[prop].options['name'] + ' là trường dữ liệu bắt buộc')
+                reject('valid')
                 return
               }
             }
@@ -3823,7 +3830,7 @@ export const store = new Vuex.Store({
             emailNotify: filter['emailNotify']
           }
           let formData = new URLSearchParams()
-          formData.append('data', JSON.stringify(data))
+          formData.append('metaData', JSON.stringify(data))
           axios.put('/o/rest/v2/dossiers/' + filter['dossierId'] + '/metadata' ,formData , param).then(function (response) {
             let serializable = response.data
             resolve(serializable)
@@ -3865,7 +3872,11 @@ export const store = new Vuex.Store({
         axios.get('/o/rest/v2/notarizations', config).then(function (response) {
           let serializable = response.data
           if (serializable.data) {
-            resolve(serializable.data)
+            if (Array.isArray(serializable.data)) {
+              resolve(serializable.data)
+            } else {
+              resolve([serializable.data])
+            }
           } else {
             resolve([])
           }
@@ -3919,7 +3930,7 @@ export const store = new Vuex.Store({
           dataPut.append('totalPage', Number(filter.totalPage))
           dataPut.append('totalFee', filter.totalFee.toString().replace(/\./g, ''))
           dataPut.append('totalCopy', 0)
-          axios.put('/o/rest/v2/notarizations/' + filter.notarizationNo, dataPut, param).then(function (response) {
+          axios.put('/o/rest/v2/notarizations/' + filter.notarizationId, dataPut, param).then(function (response) {
             resolve(response)
           }).catch(function (error) {
             reject(error)
@@ -3935,7 +3946,7 @@ export const store = new Vuex.Store({
               groupId: state.initData.groupId
             }
           }
-          axios.delete('/o/rest/v2/notarizations/' + filter.notarizationNo, dataPut, param).then(function (response) {
+          axios.delete('/o/rest/v2/notarizations/' + filter.notarizationId, param).then(function (response) {
             resolve(response)
           }).catch(function (error) {
             reject(error)

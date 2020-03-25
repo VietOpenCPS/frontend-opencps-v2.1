@@ -122,38 +122,51 @@ export const store = new Vuex.Store({
       })
     },
     goToDangNhap({ commit, state }, filter) {
-      store.dispatch('loadInitResource').then(function (result) {
-        let configs = {
-          headers: {
-            'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
-          }
-        }
-        var dataPostApplicant = new URLSearchParams()
-        commit('setLoading', true)
-        // dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
-        axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
-          commit('setLoading', false)
-          if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
-            if (response.data === 'pending') {
-              window.location.href = window.themeDisplay.getURLHome() +
-              "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
-                "&redirectURL=" + window.themeDisplay.getURLHome()
-            } else {
-              window.location.href = response.data
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let configs = {
+            headers: {
+              'Authorization': 'BASIC ' + window.btoa(filter['npmreactlogin_login'] + ":" + filter['npmreactlogin_password']),
             }
-          } else if (response.data === 'ok') {
-            let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
-            window.location.href = urlDvc + '/dich-vu-cong'
-          } else if (response.data === 'captcha') {
-            toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
-          } else if (response.data === "lockout") {
-            toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
-          } else {
-            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
           }
-        }).catch(function (error) {
-          commit('setLoading', false)
-          toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          var dataPostApplicant = new URLSearchParams()
+          if (filter.j_captcha_response) {
+            dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          }
+          commit('setLoading', true)
+          axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
+            console.log('responseLogin', response)
+            commit('setLoading', false)
+            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
+              if (response.data === 'pending') {
+                window.location.href = window.themeDisplay.getURLHome() +
+                "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
+                  "&redirectURL=" + window.themeDisplay.getURLHome()
+              } else {
+                window.location.href = response.data
+              }
+            } else if (response.data === 'ok') {
+              resolve('success')
+              setTimeout(function () {
+                let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+                window.location.href = urlDvc + '/dich-vu-cong'
+              },200)
+            } else if (response.data === 'captcha') {
+              if (response['status'] !== undefined && response['status'] === 203) {
+                toastr.error("Mã captcha không chính xác")
+              }
+              resolve('captcha')
+            } else if (response.data === "lockout") {
+              resolve('lockout')
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
+            } else {
+              toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+            }
+          }).catch(function (error) {
+            reject(error)
+            commit('setLoading', false)
+            toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
+          })
         })
       })
     },
@@ -333,6 +346,63 @@ export const store = new Vuex.Store({
             reject(errorRes)
             // toastr.error('Yêu cầu thất bại. Vui lòng nhập lại mã bảo mật')
           })
+        })
+      })
+    },
+    // sử dụng dvcqg
+    getVNConect ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              state: filter.state,
+              redirectURL: filter.redirectURL
+            }
+          }
+          axios.get('/o/rest/v2/dvcqgsso/authurl', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        })
+      })
+    },
+    mappingDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {}
+          }
+          let data = filter.dataMapping
+          axios.post('/o/rest/v2/dvcqgsso/auth', data, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    putContactEmail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataAdd = new URLSearchParams()
+        dataAdd.append('email', filter.email ? filter.email : '')
+        axios.put('/o/rest/v2', dataAdd, param).then(response => {
+          resolve(response)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     }

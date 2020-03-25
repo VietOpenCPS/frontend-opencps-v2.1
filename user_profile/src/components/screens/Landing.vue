@@ -671,6 +671,8 @@
       'tiny-pagination': TinyPagination
     },
     data: () => ({
+      mapping: false,
+      dataMapping: '',
       hasSSo: false,
       dialog_loginDVCQG: false,
       tempDVCQG: '',
@@ -890,6 +892,9 @@
       window.callback_dvcqg = vm.callback_dvcqg
       try {
         vm.hasSSo = ssoConect
+        if (rulesConfig) {
+          vm.rules = Object.assign({}, vm.rules, rulesConfig)
+        }
       } catch (error) {
       }
       vm.$nextTick(function() {
@@ -1004,8 +1009,21 @@
           } catch (error) {
           }
           // Tự động đồng bộ thông tin Cổng DVC Quốc gia
-          if (currentQuery.hasOwnProperty('sync') && currentQuery.sync) {
-            vm.checkVNConect()
+          // if (currentQuery.hasOwnProperty('sync') && currentQuery.sync) {
+          //   vm.checkVNConect()
+          // }
+          let searchParams = window.location.href.split("?")
+          if (searchParams[1]) {
+            let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams[1], "data")))
+            // console.log('dataDVCQG', dataDVCQG)
+            if (dataDVCQG) {
+              let dataObj = JSON.parse(atob(dataDVCQG))
+              if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+                vm.mapping = true
+                vm.dataMapping = dataObj
+                vm.doMappingDvcqg()
+              }
+            }
           }
         })
       })
@@ -1345,18 +1363,26 @@
       },
       checkVNConect () {
         let vm = this
-        let current = vm.$router.history.current
-        let query = vm.$router.history.current.query
         let filter = {
-          state: 'mapping'
+          state: '',
+          redirectURL: window.location.href.split("?")[0]
         }
         vm.$store.dispatch('getVNConect', filter).then(function (result) {
           if (result) {
-            vm.dialog_loginDVCQG = true
-            setTimeout(function () {
-              vm.tempDVCQG = result
-            }, 200)
+            window.location.href = result
+          } else {
+            alert('Chức năng đang cập nhật')
           }
+        }).catch(function () {
+          alert('Chức năng đang cập nhật')
+        })
+      },
+      doMappingDvcqg () {
+        let vm = this
+        let filter = {
+          dataMapping: vm.dataMapping
+        }
+        vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
         }).catch(function () {
         })
       },

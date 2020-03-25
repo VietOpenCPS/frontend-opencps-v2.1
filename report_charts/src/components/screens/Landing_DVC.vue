@@ -226,7 +226,7 @@
                 </template>
               </v-select>
             </v-flex>
-            <v-flex class="" style="width:80px;border: 1px solid #0054a6; border-radius: 3px; height:36px;background: #fff">
+            <v-flex v-if="isOnegate" class="" style="width:80px;border: 1px solid #0054a6; border-radius: 3px; height:36px;background: #fff">
               <v-tooltip bottom class="ml-1">
                 <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
                   <v-icon size="16" :color="String(index) === '0' ? 'blue' : 'grey'">pie_chart</v-icon>
@@ -293,7 +293,7 @@
                     </template>
                   </v-select>
                 </v-flex>
-                <v-flex class="" style="width:80px;border: 1px solid #0054a6; border-radius: 3px; height:36px;background: #fff">
+                <v-flex v-if="isOnegate" class="" style="width:80px;border: 1px solid #0054a6; border-radius: 3px; height:36px;background: #fff">
                   <v-tooltip bottom class="ml-1">
                     <v-btn icon class="mx-0 my-0" slot="activator" v-on:click.native="toNativeView(0)">
                       <v-icon size="16" :color="String(index) === '0' ? 'blue' : 'grey'">pie_chart</v-icon>
@@ -575,13 +575,10 @@
 
 <script>
 
-import { PieChartReport, PieChartReportPublic } from '@/components'
 import $ from 'jquery'
 export default {
   props: ['index', 'id'],
   components: {
-    PieChartReport,
-    PieChartReportPublic
   },
   data: () => ({
     systemReport: '',
@@ -927,9 +924,6 @@ export default {
     showTableTotal: false
   }),
   computed: {
-    loadingMenuConfigToDo () {
-      return this.$store.getters.loadingMenuConfigToDo
-    },
     options () {
       return {
         duration: 300,
@@ -1012,51 +1006,105 @@ export default {
           vm.systemReport = currentQuerys.system
         }
         vm.doStaticsReport()
-        vm.$store.dispatch('getLevelList').then(function (result) {
-          let totalXXX = 0
-          for (let key in result) {
-            totalXXX = totalXXX + parseInt(result[key]['count'])
-            if (result[key]['level'] === 2) {
-              vm.levelList[0]['count'] = result[key]['count']
-            } else if (result[key]['level'] === 3) {
-              vm.levelList[1]['count'] = result[key]['count']
-            } else if (result[key]['level'] === 4) {
-              vm.levelList[2]['count'] = result[key]['count']
+        if (vm.isOnegate) {
+          vm.$store.dispatch('getLevelListMC').then(function (result) {
+            let totalXXX = 0
+            for (let key in result) {
+              totalXXX = totalXXX + parseInt(result[key]['count'])
+              if (result[key]['level'] === 2) {
+                vm.levelList[0]['count'] = result[key]['count']
+              } else if (result[key]['level'] === 3) {
+                vm.levelList[1]['count'] = result[key]['count']
+              } else if (result[key]['level'] === 4) {
+                vm.levelList[2]['count'] = result[key]['count']
+              }
             }
-          }
-          vm.totalTTHC = totalXXX
-        })
+            vm.totalTTHC = totalXXX
+          })
+        } else {
+          vm.$store.dispatch('getLevelList').then(function (result) {
+            let totalXXX = 0
+            for (let key in result) {
+              totalXXX = totalXXX + parseInt(result[key]['count'])
+              if (result[key]['level'] === 2) {
+                vm.levelList[0]['count'] = result[key]['count']
+              } else if (result[key]['level'] === 3) {
+                vm.levelList[1]['count'] = result[key]['count']
+              } else if (result[key]['level'] === 4) {
+                vm.levelList[2]['count'] = result[key]['count']
+              }
+            }
+            vm.totalTTHC = totalXXX
+          })
+        }
+        
         vm.showTableTotal = false
         vm.itemTotal = ''
-        vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
-          let agencyListsTotal = result
-          for (let key in agencyListsTotal) {
-            let currentData = agencyListsTotal[key]
-            if (currentData.domainName === '' && currentData.domainName === '') {
-              vm.itemTotal = currentData
-              vm.showTableTotal = true
-              break
+        if (vm.isOnegate) {
+          vm.$store.dispatch('getReportTotalMC', vm.year).then(function (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.itemTotal = currentData
+                vm.showTableTotal = true
+                break
+              }
             }
-          }
-          if (vm.itemTotal === '') {
-            vm.showTableTotal = false
-          }
-        })
-        vm.$store.dispatch('getReportTotal', '0').then(function (result) {
-          let agencyListsTotal = result
-          for (let key in agencyListsTotal) {
-            let currentData = agencyListsTotal[key]
-            if (currentData.domainName === '' && currentData.govAgencyName === '') {
-              vm.itemTotalAllYear = currentData
-              console.log('itemTotalAllYear', vm.itemTotalAllYear)
-              vm.showTableTotal = true
-              break
+            if (vm.itemTotal === '') {
+              vm.showTableTotal = false
             }
-          }
-          if (vm.itemTotal === '') {
-            vm.showTableTotal = false
-          }
-        })
+          })
+        } else {
+          vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.itemTotal = currentData
+                vm.showTableTotal = true
+                break
+              }
+            }
+            if (vm.itemTotal === '') {
+              vm.showTableTotal = false
+            }
+          })
+        }
+        if (vm.isOnegate) {
+          vm.$store.dispatch('getReportTotalMC', '0').then(function (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.govAgencyName === '') {
+                vm.itemTotalAllYear = currentData
+                console.log('itemTotalAllYear', vm.itemTotalAllYear)
+                vm.showTableTotal = true
+                break
+              }
+            }
+            if (vm.itemTotal === '') {
+              vm.showTableTotal = false
+            }
+          })
+        } else {
+          vm.$store.dispatch('getReportTotal', '0').then(function (result) {
+            let agencyListsTotal = result
+            for (let key in agencyListsTotal) {
+              let currentData = agencyListsTotal[key]
+              if (currentData.domainName === '' && currentData.govAgencyName === '') {
+                vm.itemTotalAllYear = currentData
+                console.log('itemTotalAllYear', vm.itemTotalAllYear)
+                vm.showTableTotal = true
+                break
+              }
+            }
+            if (vm.itemTotal === '') {
+              vm.showTableTotal = false
+            }
+          })
+        }
+        
       }
     })
   },
@@ -1283,48 +1331,94 @@ export default {
       vm.totalCounter['total_24'] = 0
       vm.totalCounter['total_25'] = 0
       vm.showTable = false
-      vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-        if (result === null || result === undefined || result === 'undefined') {
-          vm.noReportData = true
-          vm.agencyLists = []
-        } else {
-          vm.noReportData = false
-          vm.agencyLists = result
-        }
-        // console.log('agencyLists', vm.agencyLists)
-        if (!vm.noReportData) {
-          vm.doProcessReport2(vm.agencyLists)
-          vm.doProcessReportTypeDossiers(vm.agencyLists)
-          for (let key in vm.agencyLists) {
-            let currentData = vm.agencyLists[key]
-            // console.log('currentData', currentData)
-            if (currentData.domainName === '' && currentData.domainName === '') {
-              vm.totalCounter['total_3'] = currentData.processCount
-              vm.totalCounter['total_4'] = currentData.remainingCount
-              vm.totalCounter['total_5'] = currentData.receivedCount
-              vm.totalCounter['total_6'] = currentData.onegateCount
-              vm.totalCounter['total_7'] = currentData.onlineCount
-              vm.totalCounter['total_8'] = currentData.releaseCount
-              vm.totalCounter['total_9'] = currentData.betimesCount
-              vm.totalCounter['total_10'] = currentData.ontimeCount
-              vm.totalCounter['total_11'] = currentData.overtimeCount
-              vm.totalCounter['total_12'] = currentData.unresolvedCount
-              vm.totalCounter['total_13'] = currentData.doneCount
-              vm.totalCounter['total_14'] = currentData.releasingCount
-              vm.totalCounter['total_15'] = currentData.processingCount
-              vm.totalCounter['total_16'] = currentData.undueCount
-              vm.totalCounter['total_17'] = currentData.overdueCount
-              vm.totalCounter['total_18'] = currentData.waitingCount
-              vm.totalCounter['total_19'] = currentData.cancelledCount
-              vm.totalCounter['total_20'] = currentData.ontimePercentage
-              vm.showTable = true
-              break
+      if (vm.isOnegate) {
+        vm.$store.dispatch('getAgencyReportListsMC', filter).then(function (result) {
+          if (result === null || result === undefined || result === 'undefined') {
+            vm.noReportData = true
+            vm.agencyLists = []
+          } else {
+            vm.noReportData = false
+            vm.agencyLists = result
+          }
+          // console.log('agencyLists', vm.agencyLists)
+          if (!vm.noReportData) {
+            vm.doProcessReport2(vm.agencyLists)
+            vm.doProcessReportTypeDossiers(vm.agencyLists)
+            for (let key in vm.agencyLists) {
+              let currentData = vm.agencyLists[key]
+              // console.log('currentData', currentData)
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.totalCounter['total_3'] = currentData.processCount
+                vm.totalCounter['total_4'] = currentData.remainingCount
+                vm.totalCounter['total_5'] = currentData.receivedCount
+                vm.totalCounter['total_6'] = currentData.onegateCount
+                vm.totalCounter['total_7'] = currentData.onlineCount
+                vm.totalCounter['total_8'] = currentData.releaseCount
+                vm.totalCounter['total_9'] = currentData.betimesCount
+                vm.totalCounter['total_10'] = currentData.ontimeCount
+                vm.totalCounter['total_11'] = currentData.overtimeCount
+                vm.totalCounter['total_12'] = currentData.unresolvedCount
+                vm.totalCounter['total_13'] = currentData.doneCount
+                vm.totalCounter['total_14'] = currentData.releasingCount
+                vm.totalCounter['total_15'] = currentData.processingCount
+                vm.totalCounter['total_16'] = currentData.undueCount
+                vm.totalCounter['total_17'] = currentData.overdueCount
+                vm.totalCounter['total_18'] = currentData.waitingCount
+                vm.totalCounter['total_19'] = currentData.cancelledCount
+                vm.totalCounter['total_20'] = currentData.ontimePercentage
+                vm.showTable = true
+                break
+              }
             }
           }
-        }
-        
-        vm.reloadPie = true
-      })
+          
+          vm.reloadPie = true
+        })
+      } else {
+        vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+          if (result === null || result === undefined || result === 'undefined') {
+            vm.noReportData = true
+            vm.agencyLists = []
+          } else {
+            vm.noReportData = false
+            vm.agencyLists = result
+          }
+          // console.log('agencyLists', vm.agencyLists)
+          if (!vm.noReportData) {
+            vm.doProcessReport2(vm.agencyLists)
+            vm.doProcessReportTypeDossiers(vm.agencyLists)
+            for (let key in vm.agencyLists) {
+              let currentData = vm.agencyLists[key]
+              // console.log('currentData', currentData)
+              if (currentData.domainName === '' && currentData.domainName === '') {
+                vm.totalCounter['total_3'] = currentData.processCount
+                vm.totalCounter['total_4'] = currentData.remainingCount
+                vm.totalCounter['total_5'] = currentData.receivedCount
+                vm.totalCounter['total_6'] = currentData.onegateCount
+                vm.totalCounter['total_7'] = currentData.onlineCount
+                vm.totalCounter['total_8'] = currentData.releaseCount
+                vm.totalCounter['total_9'] = currentData.betimesCount
+                vm.totalCounter['total_10'] = currentData.ontimeCount
+                vm.totalCounter['total_11'] = currentData.overtimeCount
+                vm.totalCounter['total_12'] = currentData.unresolvedCount
+                vm.totalCounter['total_13'] = currentData.doneCount
+                vm.totalCounter['total_14'] = currentData.releasingCount
+                vm.totalCounter['total_15'] = currentData.processingCount
+                vm.totalCounter['total_16'] = currentData.undueCount
+                vm.totalCounter['total_17'] = currentData.overdueCount
+                vm.totalCounter['total_18'] = currentData.waitingCount
+                vm.totalCounter['total_19'] = currentData.cancelledCount
+                vm.totalCounter['total_20'] = currentData.ontimePercentage
+                vm.showTable = true
+                break
+              }
+            }
+          }
+          
+          vm.reloadPie = true
+        })
+      }
+      
       // report line
       if (vm.year !== '0') {
         setTimeout(() => {
@@ -1348,19 +1442,35 @@ export default {
             }
           }
           vm.reloadLine = true
-          vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
-            let dataReport1 = []
-            if (result === null || result === undefined || result === 'undefined') {
-              vm.noReportDataLine = true
-              vm.reloadLine = false
-            } else {
-              vm.noReportDataLine = false
-              dataReport1 = result
-            }
-            if (!vm.noReportDataLine) {
-              vm.doProcessReport1(dataReport1)
-            }
-          })
+          if (vm.isOnegate) {
+            vm.$store.dispatch('getAgencyReportListsMC', filter).then(function (result) {
+              let dataReport1 = []
+              if (result === null || result === undefined || result === 'undefined') {
+                vm.noReportDataLine = true
+                vm.reloadLine = false
+              } else {
+                vm.noReportDataLine = false
+                dataReport1 = result
+              }
+              if (!vm.noReportDataLine) {
+                vm.doProcessReport1(dataReport1)
+              }
+            })
+          } else {
+            vm.$store.dispatch('getAgencyReportLists', filter).then(function (result) {
+              let dataReport1 = []
+              if (result === null || result === undefined || result === 'undefined') {
+                vm.noReportDataLine = true
+                vm.reloadLine = false
+              } else {
+                vm.noReportDataLine = false
+                dataReport1 = result
+              }
+              if (!vm.noReportDataLine) {
+                vm.doProcessReport1(dataReport1)
+              }
+            })
+          }
         }, 200)
       } else {
         vm.reloadLine = false
@@ -1374,20 +1484,38 @@ export default {
       vm.year = item
       vm.showTableTotal = false
       vm.itemTotal = ''
-      vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
-        let agencyListsTotal = result
-        for (let key in agencyListsTotal) {
-          let currentData = agencyListsTotal[key]
-          if (currentData.domainName === '' && currentData.domainName === '') {
-            vm.itemTotal = currentData
-            vm.showTableTotal = true
-            break
+      if (vm.isOnegate) {
+        vm.$store.dispatch('getReportTotalMC', vm.year).then(function (result) {
+          let agencyListsTotal = result
+          for (let key in agencyListsTotal) {
+            let currentData = agencyListsTotal[key]
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.itemTotal = currentData
+              vm.showTableTotal = true
+              break
+            }
           }
-        }
-        if (vm.itemTotal === '') {
-          vm.showTableTotal = false
-        }
-      })
+          if (vm.itemTotal === '') {
+            vm.showTableTotal = false
+          }
+        })
+      } else {
+        vm.$store.dispatch('getReportTotal', vm.year).then(function (result) {
+          let agencyListsTotal = result
+          for (let key in agencyListsTotal) {
+            let currentData = agencyListsTotal[key]
+            if (currentData.domainName === '' && currentData.domainName === '') {
+              vm.itemTotal = currentData
+              vm.showTableTotal = true
+              break
+            }
+          }
+          if (vm.itemTotal === '') {
+            vm.showTableTotal = false
+          }
+        })
+      }
+      
       vm.$router.push({
         path: '/bao-cao/' + vm.index,
         query: {

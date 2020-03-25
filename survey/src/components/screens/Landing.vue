@@ -283,34 +283,44 @@ export default {
       }
       vm.btnLoading = true
       let arrAction = []
+      let valid = false
       for (var key in vm.votingItems) {
         vm.votingItems[key]['className'] = 'survey'
         vm.votingItems[key]['classPk'] = 0
-        arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
-      }
-      Promise.all(arrAction).then(results => {
-        toastr.success('Yêu cầu của bạn được thực hiện thành công.')
-        vm.btnLoading = false
-        if (vm.$refs.captcha) {
-          vm.$refs.captcha.makeRandomString()
+        if (String(vm.votingItems[key]['selected']) !== '0') {
+          valid = true
+          arrAction.push(vm.$store.dispatch('submitVoting', vm.votingItems[key]))
         }
-        vm.$store.dispatch('loadVoting', {
-          className: 'survey',
-          classPk: 0
-        }).then(result => {
-          vm.votingItems = result
-          vm.totalAnswer = 0
-          for (let i = 0; i < vm.votingItems.length; i++) {
-            vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
-            vm.getPercentItem(vm.votingItems[i], i)
+      }
+      if (valid) {
+        Promise.all(arrAction).then(results => {
+          toastr.success('Yêu cầu của bạn được thực hiện thành công.')
+          vm.btnLoading = false
+          if (vm.$refs.captcha) {
+            vm.$refs.captcha.makeRandomString()
           }
-          // vm.getPercentTotal(vm.votingItems)
-        }).catch( function () {
+          vm.$store.dispatch('loadVoting', {
+            className: 'survey',
+            classPk: 0
+          }).then(result => {
+            vm.votingItems = result
+            vm.totalAnswer = 0
+            for (let i = 0; i < vm.votingItems.length; i++) {
+              vm.totalAnswer += Number(vm.votingItems[i]['answersCount'])
+              vm.getPercentItem(vm.votingItems[i], i)
+            }
+            // vm.getPercentTotal(vm.votingItems)
+          }).catch( function () {
+          })
+        }).catch(xhr => {
+          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+          vm.btnLoading = false
         })
-      }).catch(xhr => {
-        toastr.error('Yêu cầu của bạn thực hiện thất bại.')
+      } else {
         vm.btnLoading = false
-      })
+        toastr.error('Bạn chưa chọn đánh giá nào')
+      }
+      
     },
     showVotingResult () {
       let vm = this

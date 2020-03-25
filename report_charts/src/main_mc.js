@@ -2,8 +2,8 @@ import 'idempotent-babel-polyfill'
 import Vue from 'vue'
 import './plugins/vuetify'
 import App from './AppMC.vue'
-import router from './router_dev/index_mc'
-import { store } from './store/index_mc'
+import router from './router_dev'
+import { store } from './store/index'
 import VueContentPlaceholders from 'vue-content-placeholders'
 import axios from 'axios'
 import VueApexCharts from 'vue-apexcharts'
@@ -19,6 +19,9 @@ axios.defaults.headers.common['groupId'] = groupId
 Vue.config.productionTip = true
 
 Vue.mixin({
+  data: () => ({
+    isOnegate: true
+  }),
   methods: {
     getScopeGroupId: function () {
       if (window.themeDisplay !== null && window.themeDisplay !== undefined) {

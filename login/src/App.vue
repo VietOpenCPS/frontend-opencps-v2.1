@@ -531,6 +531,11 @@ export default {
           }
         )
         .then(function(response) {
+          if (response.headers['jwt-token']) {
+            if (typeof(Storage) !== "undefined") {
+              localStorage.setItem("jwt_token", "response.headers['jwt-token']");
+            }
+          }
           if (
             response.data !== "" &&
             response.data !== "ok" &&
@@ -578,6 +583,11 @@ export default {
           )
           .then(function(response) {
             console.log(response.data);
+            if (response.headers['jwt-token']) {
+              if (typeof(Storage) !== "undefined") {
+                localStorage.setItem("jwt_token", "response.headers['jwt-token']");
+              }
+            }
             if (
               response.data !== "" &&
               response.data !== "ok" &&

@@ -404,7 +404,14 @@ export default {
       let filter = {
         questionId: item['questionId'],
         publish: vm.questionList[index]['publish'],
-        content: vm.questionList[index]['content']
+        content: vm.questionList[index]['content'],
+        email: vm.questionList[index]['email'],
+        fullname: vm.questionList[index]['fullname'],
+        govAgencyCode: vm.questionList[index]['govAgencyCode'],
+        govAgencyName: vm.questionList[index]['govAgencyName'],
+        domainCode: vm.questionList[index]['domainCode'],
+        domainName: vm.questionList[index]['domainName'],
+        questionType: vm.questionList[index]['questionType']
       }
       vm.$store.dispatch('putQuestion', filter).then(function (result) {
         toastr.success('Cập nhật thành công')
