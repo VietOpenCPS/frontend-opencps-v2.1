@@ -30,6 +30,12 @@
           <v-icon>reply</v-icon> &nbsp;
           {{backTableName}}
         </v-btn>
+        <v-btn dark flat v-if="tableName === 'opencps_applicant'" @click="filterApplicantType('citizen')" v-bind:style="{ background: applicantType === 'citizen' ? '#f1eeee6e': 'none'}">
+          Tài khoản cá nhân
+        </v-btn>
+        <v-btn dark flat v-if="tableName === 'opencps_applicant'" @click="filterApplicantType('business')" v-bind:style="{ background: applicantType === 'business' ? '#f1eeee6e': 'none'}">
+          Tài khỏa tổ chức
+        </v-btn>
         <v-btn dark icon v-on:click.native="rePullData">
           <v-icon>refresh</v-icon>
         </v-btn>
@@ -112,6 +118,7 @@
     },
     data () {
       return {
+        applicantType: '',
         backTableName: '',
         depen: false,
         showLoadingTable: true,
@@ -331,8 +338,9 @@
         })
       },
       getData () {
+        console.log('aaaaaa')
         let vm = this
-        if (!vm.showFilter) {
+        if (!vm.showFilter && vm.applicantType === '') {
           vm.columnsDataFilter = []
         } else {
           for (var key in vm.filterData) {
@@ -681,6 +689,26 @@
       cloneServiceProcess () {
         let currentProcess = this.dataSocket['tableData'][this.currentIndex]
         this.$emit('cloneProcess', currentProcess[0], currentProcess[1], currentProcess[2])
+      },
+      filterApplicantType (type) {
+        let vm = this
+        vm.applicantType = type
+        vm.filterData[1] = type
+        let current = vm.$router.history.current
+        let newQuery = current.query
+        let queryString = '?'
+        newQuery['page'] = 1
+        newQuery['state_change'] = '0'
+        newQuery['renew'] = ''
+        for (let key in newQuery) {
+          if (newQuery[key] !== '' && newQuery[key] !== 'undefined' && newQuery[key] !== undefined) {
+            queryString += key + '=' + newQuery[key] + '&'
+          }
+        }
+        queryString += 'renew=' + Math.floor(Math.random() * (100 - 1 + 1)) + 1
+        vm.$router.push({
+          path: current.path + queryString
+        })
       }
     }
   }
