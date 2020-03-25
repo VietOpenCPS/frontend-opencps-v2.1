@@ -3071,6 +3071,96 @@ export const store = new Vuex.Store({
         }).catch(function (){})
       })
     },
+    getServiceConfigs ({commit, state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              start: data.start ? data.start : 0,
+              end: data.end ? data.end : 10,
+              agency: data.agency ? data.agency : '',
+              keyword: data.keyword ? data.keyword : '',
+              domain: data.domain ? data.domain : '',
+              // level: data.level ? data.level : '3,4',
+              service: data.service ? data.service : ''
+            }
+          }
+          axios.get('/o/rest/v2/serviceconfigs', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })
+    },
+    getServiceAdminisTration ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictgroups', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })     
+    },
+    getAgencys ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+            }
+          }
+          console.log('data', data)
+          axios.get('/o/rest/v2/dictcollections/REPORT_GROUP/dictgroups/' + data.administration + '/dictitems', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })     
+    },
+    getDomains ({commit,state}, data) {
+      return new Promise((resolve, reject)=>{
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {
+              agency: data.agency ? data.agency : '',
+              sort: 'siblingSearch'
+            }
+          }
+          axios.get('/o/rest/v2/serviceinfos/statistics/domains', param).then(function (response) {
+            let serializable = response.data
+            resolve(serializable.data)
+          }).catch(function (error) {
+            console.log(error)
+            reject(error)
+          })
+        }).catch(function (){})     
+      })     
+    },
     processCheckNextActions ({commit, state}, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
