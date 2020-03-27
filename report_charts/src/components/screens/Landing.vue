@@ -56,13 +56,13 @@
       </div>
     </div>
     <v-layout row wrap style="margin: 0;" v-if="String(index) === '0'">
-      <v-flex xs12 sm4 class="mt-4" style="    padding-left: 15px;">
-        <v-card class="wrap_report" style="border-radius: 0;">
+      <v-flex xs12 sm4 class="mt-4" style="">
+        <v-card class="wrap_report report_service" style="border-radius: 0;">
           <v-card-title class="headline">
             Thống kê thủ tục hành chính
           </v-card-title>
-          <v-card-text class="pt-2 py-0 px-0">
-            <v-list class="pt-0">
+          <v-card-text class="py-0 px-0">
+            <!-- <v-list class="pt-0">
               <v-list-tile v-for="item in levelList" :key="item.level">
                 <v-list-tile-content>
                   <v-list-tile-title>Mức độ {{item.level}}</v-list-tile-title>
@@ -79,7 +79,9 @@
                   </span>
                 </v-list-tile-content>
               </v-list-tile>
-            </v-list>
+            </v-list> -->
+
+            <apexchart type="donut" :options="chartDonutOptions" :series="seriesDonut" height="250"></apexchart>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -102,7 +104,7 @@
           <v-card-title class="headline">
             Tình hình xử lý hồ sơ năm {{year}}
           </v-card-title>
-          <v-card-text class="pt-2 pb-0 px-0" v-if="showTableTotal">
+          <v-card-text class="pb-0 px-0" v-if="showTableTotal" style="padding-top: 30px;">
             <div>
               <div class="numbers align-space-between" style="margin: 5px 0px;overflow: hidden;">
                 <div class="tiepnhan" style="width: 50%; text-align: center; float: left;">
@@ -123,7 +125,7 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <v-card v-if="showDetailReport" class="wrap_report xs12 flex" style="border-radius: 0;">
+      <v-card v-if="showDetailReport" class="row_2 wrap_report xs12 flex" style="border-radius: 0;">
         <v-card-text class="py-2 px-1 layout row wrap" style="
             background: #fafafa;
             margin: 0;
@@ -133,7 +135,7 @@
           </v-flex>
         </v-card-text>
       </v-card>
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
+      <v-flex xs12 class="row_3 mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
@@ -142,19 +144,22 @@
             Tình hình giải quyết hồ sơ năm {{year}}
           </v-card-title>
           <v-card-text class="pt-2 pb-0 px-0">
-            <apexchart type="bar" height="350"
+            <apexchart type="bar" height="350"  v-if="typeMonthChart === 'stacked'"
               :options="chartOptionsBarTotal" 
               :series="seriesChartBarTotal" 
               :stacked="true"
             ></apexchart>
+            <!--  -->
+            <apexchart type="bar" height="400" v-else
+              :options="chartOptionColumn" 
+              :series="seriesChartColumn" 
+            ></apexchart>
+
           </v-card-text>
         </v-card>
       </v-flex>
-      <!-- <content-placeholders class="my-4 flex xs12 px-2" v-else>
-        <content-placeholders-heading />
-        <content-placeholders-img />
-      </content-placeholders> -->
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadBar">
+
+      <v-flex xs12 class="row_4 mt-4 ml-2 mr-2" v-if="!reloadBar">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline" v-if="String(month) !== '0'">
             Tình hình giải quyết hồ sơ tháng {{month}} năm {{year}}
@@ -170,11 +175,8 @@
           </v-card-text>
         </v-card>
       </v-flex>
-      <!-- <content-placeholders class="my-4 flex xs12 px-2" v-else>
-        <content-placeholders-heading />
-        <content-placeholders-img />
-      </content-placeholders> -->
-      <v-flex xs12 class="mt-4 ml-2 mr-2" v-if="!reloadLine" id="lineChartID">
+
+      <v-flex xs12 class="row_5 mt-4 ml-2 mr-2" v-if="!reloadLine" id="lineChartID">
         <v-card class="wrap_report" style="border-radius: 0;">
           <v-card-title class="headline">
             Tình hình giải quyết hồ sơ năm {{year}}
@@ -471,7 +473,39 @@ export default {
     },
     seriesChartBarTotal: [],
     labelOfLine: [],
-    showTableTotal: false
+    showTableTotal: false,
+    typeMonthChart: 'stacked',
+    chartOptionColumn: {},
+    seriesChartColumn: [],
+    chartDonutOptions: {
+      labels: ['Mức độ 2', 'Mức độ 3', 'Mức độ 4'],
+      colors: ['#8BC34A', '#FFC107', '#FF4560'],
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: 'Tổng số',
+                color: '#ff5c24'
+              }
+            }
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function(value, { seriesIndex, dataPointIndex, w }) {
+          return w.config.series[seriesIndex]
+        }
+      },
+      legend: {
+        position: 'bottom',
+        bottom: 0
+      }
+    },
+    seriesDonut: [0, 0, 0]
   }),
   computed: {
     loadingMenuConfigToDo () {
@@ -487,6 +521,10 @@ export default {
   },
   created () {
     var vm = this
+    try {
+      vm.typeMonthChart = typeMonthChartConfig ? typeMonthChartConfig : 'stacked'
+    } catch (error) {
+    }
     vm.$nextTick(function () {
       let currentParams = vm.$router.history.current.params
       let currentQuerys = vm.$router.history.current.query
@@ -516,10 +554,23 @@ export default {
         vm.$store.dispatch('getLevelList').then(function (result) {
           vm.levelList = result
           let totalXXX = 0
+          let level2 = 0 
+          let level3 = 0
+          let level4 = 0  
           for (let key in vm.levelList) {
+            if (vm.levelList[key]['level'] === 2) {
+              level2 = parseInt(vm.levelList[key]['count'])
+            }
+            if (vm.levelList[key]['level'] === 3) {
+              level3 = parseInt(vm.levelList[key]['count'])
+            }
+            if (vm.levelList[key]['level'] === 4) {
+              level4 = parseInt(vm.levelList[key]['count'])
+            }
             totalXXX = totalXXX + parseInt(vm.levelList[key]['count'])
           }
           vm.totalTTHC = totalXXX
+          vm.seriesDonut = [level2, level3, level4]
         })
         vm.showTableTotal = false
         vm.itemTotal = null
@@ -924,7 +975,7 @@ export default {
             overdueCountData.push(data[key].overdueCount)
             waitingCountData.push(data[key].waitingCount)
             betimesCountData.push(data[key].betimesCount)
-            ontimeCountData.push(data[key].ontimeCount)
+            ontimeCountData.push(Number(data[key].betimesCount) + data[key].ontimeCount)
             overtimeCountData.push(data[key].overtimeCount)
           // }
         }
@@ -1087,6 +1138,49 @@ export default {
                 return ''
               }
             }
+          }
+        }
+      }
+      // for report month type column 
+      vm.seriesChartColumn = []
+      vm.seriesChartColumn = [{
+        name: 'Đã giải quyết đúng hạn',
+        data: ontimeCountData
+      },{
+        name: 'Đang xử lý còn hạn',
+        data: undueCountData
+      },{
+        name: 'Đang xử lý quá hạn',
+        data: overdueCountData
+      }]
+      vm.chartOptionColumn = {}
+      vm.chartOptionColumn = {
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            columnWidth: '70%',
+            type: 'bar'
+          },
+        },
+        chart: {
+          stacked: false
+        },
+        colors: ['#00E396', '#FEB019', '#FF4560'],
+        stroke: {
+          width: 1,
+          colors: ['#fff']
+        },
+        xaxis: {
+          categories: vm.labelOfLine,
+          labels: {
+            formatter: function(val) {
+              return val
+            }
+          }
+        },
+        yaxis: {
+          title: {
+            text: undefined
           }
         }
       }

@@ -202,8 +202,10 @@
       let vm = this
       vm.$nextTick(function () {
         try {
-          // let adminData = vm.getUser('Administrator_data')
-          vm.scopeAdmin = scopeAdminConfig
+          let isAdmin = vm.getUser('Administrator')
+          if (scopeAdminConfig && !isAdmin) {
+            vm.scopeAdmin = true
+          }
         } catch (error) {
         }
       })
@@ -216,7 +218,7 @@
         return this.$store.getters.getloginUser
       },
       userRoles () {
-        return this.$store.getters.getloginUser
+        return this.$store.getters.getUserRoles
       },
       snackbarerror: {
         // getter
@@ -236,6 +238,21 @@
         // setter
         set: function(newValue) {
           this.$store.commit('setsnackbarsocket', newValue)
+        }
+      }
+    },
+    watch: {
+      userRoles () {
+        let vm = this
+        try {
+          let isAdmin = vm.getUser('Administrator')
+          if (scopeAdminConfig && !isAdmin) {
+            vm.scopeAdmin = true
+          } else {
+            vm.scopeAdmin = false
+          }
+        } catch (error) {
+          vm.scopeAdmin = false
         }
       }
     },
@@ -276,7 +293,7 @@
         }
       },
       doLogOut() {
-        window.location.href = '/o/portal/logout'
+        window.location.href = '/c/portal/logout'
       },
       thongKeTruyCap () {
         window.location.href = 'https://analytics.google.com'

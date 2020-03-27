@@ -198,12 +198,16 @@ export default {
       var vm = this
       $('body').addClass('body_login')
       $('#banner .container').css('display', 'none')
+      if ( typeof(Storage) !== 'undefined') {
+        sessionStorage.removeItem('isbot')
+        sessionStorage.setItem('isbot', '0')
+      }
       let current = vm.$router.history.current
       let currentQuery = current.query
       vm.makeImageCap()
       try {
-        vm.captcha = hasCaptcha ? hasCaptcha : false
         vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
+        vm.captcha = hasCaptcha ? hasCaptcha : false
       } catch (error) {
       }
       // 
@@ -272,9 +276,34 @@ export default {
           if (vm.mapping && result === 'success') {
             vm.doMappingDvcqg()
           }
+          if (result !== 'success') {
+            if ( typeof(Storage) !== 'undefined') {
+              let count = Number(sessionStorage.getItem('isbot'))
+              count+=1
+              sessionStorage.setItem('isbot', String(count))
+              if (count === 5) {
+                vm.captcha = true
+                vm.makeImageCap()
+              }
+            }
+          } else {
+            if ( typeof(Storage) !== 'undefined') {
+              sessionStorage.setItem('isbot', '0')
+            }
+          }
           if (result === 'captcha') {
             vm.captcha = true
             vm.makeImageCap()
+          }
+        }).catch(function () {
+          if ( typeof(Storage) !== 'undefined') {
+            let count = Number(sessionStorage.getItem('isbot'))
+            count+=1
+            sessionStorage.setItem('isbot', String(count))
+            if (count === 5) {
+              vm.captcha = true
+              vm.makeImageCap()
+            }
           }
         })
       }
