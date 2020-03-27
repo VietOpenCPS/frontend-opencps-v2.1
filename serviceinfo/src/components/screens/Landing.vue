@@ -549,7 +549,8 @@ export default {
     keyCodeDvcqg: '',
     userInfoDvcqg: '',
     mapping: false,
-    dataMapping: ''
+    dataMapping: '',
+    doCreateDossier: false
   }),
   computed: {
     govAgencyList () {
@@ -1078,6 +1079,7 @@ export default {
             window.open(url, '_self') 
           }
         } else {
+          vm.doCreateDossier = true
           vm.dialogLogin = true
           // alert('Vui lòng đăng nhập để nộp hồ sơ trực tuyến')
         }

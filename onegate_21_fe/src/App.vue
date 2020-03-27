@@ -219,6 +219,10 @@
             vm.loading = false
           }
         })
+        // 
+        setInterval(function () {
+          vm.loadingCounter()
+        }, 5*60*1000)
       })
     },
     updated () {
