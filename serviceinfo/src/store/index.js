@@ -284,6 +284,25 @@ export const store = new Vuex.Store({
         })
       })
     },
+    makeImageCapLogin ({commit, state}) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: state.initData.groupId ? state.initData.groupId : '',
+            'Accept': 'application/json'
+          },
+          responseType: 'blob'
+        }
+        // test local
+        var url = '/o/v1/opencps/users/login/jcaptcha'
+        axios.get(url, param).then(response => {
+          var url = window.URL.createObjectURL(response.data)
+          resolve(url)
+        }).catch(xhr => {
+          reject(xhr)
+        })
+      })
+    },
     goToDangNhap({ commit, state }, filter) {
       return new Promise((resolve, reject) => {
         store.dispatch('loadInitResource').then(function (result) {
@@ -293,8 +312,11 @@ export const store = new Vuex.Store({
             }
           }
           let dataPostApplicant = new URLSearchParams()
+          if (filter.j_captcha_response) {
+            dataPostApplicant.append('j_captcha_response', filter.j_captcha_response)
+          }
           axios.post('/o/v1/opencps/login', dataPostApplicant, configs).then(function (response) {
-            if (response.data !== '' && response.data !== 'ok') {
+            if (response.data !== '' && response.data !== 'ok' && response.data !== 'captcha' && response.data !== "lockout") {
               if (response.data === 'pending') {
                 window.location.href = window.themeDisplay.getURLHome() +
                 "/register#/xac-thuc-tai-khoan?active_user_id=" + window.themeDisplay.getUserId() +
@@ -304,6 +326,14 @@ export const store = new Vuex.Store({
               }
             } else if (response.data === 'ok') {
               resolve('success')
+            } else if (response.data === 'captcha') {
+              if (response['status'] !== undefined && response['status'] === 203) {
+                toastr.error("Mã captcha không chính xác")
+              }
+              resolve('captcha')
+            } else if (response.data === "lockout") {
+              resolve('lockout')
+              toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
             } else {
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 })
               resolve('error')

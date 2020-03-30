@@ -143,7 +143,12 @@ export const store = new Vuex.Store({
                 window.location.href = response.data
               }
             } else if (response.data === 'ok') {
-              window.location.href = window.themeDisplay.getURLHome()
+              resolve('success')
+              setTimeout(function () {
+                let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+                window.location.href = urlDvc + '/dich-vu-cong'
+              }, 200)
+              
             } else if (response.data === 'captcha') {
               toastr.error("Nhập sai mã Captcha.", { autoClose: 2000 });
             } else if (response.data === "lockout") {
@@ -356,6 +361,40 @@ export const store = new Vuex.Store({
             console.log(error)
             reject(error)
           })
+        })
+      })
+    },
+    mappingDvcqg ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        store.dispatch('loadInitResource').then(function (result) {
+          let param = {
+            headers: {
+              groupId: state.initData.groupId
+            },
+            params: {}
+          }
+          let data = filter.dataMapping
+          axios.post('/o/rest/v2/dvcqgsso/auth', data, param).then(function (response) {
+            resolve(response)
+          }).catch(function (error) {
+            reject(error)
+          })
+        })
+      })
+    },
+    putContactEmail ({commit, state}, filter) {
+      return new Promise((resolve, reject) => {
+        let param = {
+          headers: {
+            groupId: window.themeDisplay.getScopeGroupId()
+          }
+        }
+        let dataAdd = new URLSearchParams()
+        dataAdd.append('email', filter.email ? filter.email : '')
+        axios.put('/o/rest/v2', dataAdd, param).then(response => {
+          resolve(response)
+        }).catch(xhr => {
+          reject(xhr)
         })
       })
     }

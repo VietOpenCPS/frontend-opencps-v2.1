@@ -496,7 +496,15 @@
           passWord: (value) => {
             const pattern = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])([0-9a-zA-Z@$!%*#?&]{8,}))$/
             return pattern.test(value) || 'Ít nhất 8 ký tự và có chữ hoa, chữ thường, ký tự đặc biệt @$!%*#?&'
-          }
+          },
+          telNo: (value) => {
+            const pattern = /^0([1-9]{1}\d{8})$/
+            if (value) {
+              return pattern.test(value) || 'Số điện thoại gồm 10 ký tự 0-9, eg: 0989123456, ...'
+            } else {
+              return []
+            }
+          },
         }
       }
     },
@@ -591,6 +599,13 @@
             })
           }).catch(function (error) {
           })
+        }
+        // 
+        try {
+          if (rulesConfig) {
+            vm.rules = Object.assign({}, vm.rules, rulesConfig)
+          }
+        } catch (error) {
         }
       })
     },

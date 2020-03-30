@@ -160,6 +160,7 @@ export const store = new Vuex.Store({
               resolve('lockout')
               toastr.error("Bạn đã đăng nhập sai quá 5 lần. Tài khoản bị tạm khóa trong 10 phút.")
             } else {
+              resolve('fail')
               toastr.error("Tên đăng nhập hoặc mật khẩu không chính xác.", { autoClose: 2000 });
             }
           }).catch(function (error) {
