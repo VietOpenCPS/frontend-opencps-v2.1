@@ -517,6 +517,27 @@
                     </div>
                   </v-flex>
                 </v-layout>
+                <!--  -->
+                <v-flex v-if="captcha" class="py-2 text-xs-center" xs12 style="
+                  align-items: center;
+                  background: #dedede;
+                  justify-content: center;
+                ">
+                  <img :src="chapchablob" alt="capcha" style="border-radius: 5px;">
+                  <v-btn flat icon v-on:click.native="makeImageCap">
+                    <v-icon color="white" size="26">refresh</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs12 class="mt-2 text-xs-center" v-if="captcha">
+                  <v-text-field
+                    box
+                    v-model="j_captcha_response"
+                    placeholder="Nhập captcha"
+                    :rules="[v => !!v || 'Mã captcha là bắt buộc']"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <!--  -->
                 <v-flex xs12 class="text-xs-left text-xs-center">
                   <v-btn class="ml-0 mr-1 my-0 white--text" color="primary"
                     :loading="loadingLogin"
@@ -590,7 +611,10 @@ export default {
     userInfoDvc: '',
     userInfoDvcqg: '',
     mapping: false,
-    dataMapping: ''
+    dataMapping: '',
+    captcha: false,
+    j_captcha_response: '',
+    chapchablob: ''
   }),
   computed: {
     isMobile () {
@@ -611,6 +635,17 @@ export default {
       vm.verificationApplicantCreateDossier = hasVerificationCreateDossier
     } catch (error) {
     }
+    // 
+    if ( typeof(Storage) !== 'undefined') {
+      let count = sessionStorage.getItem('isbot')
+      if (window.themeDisplay.isSignedIn() || !count) {
+        sessionStorage.setItem('isbot', '0')
+      }
+      if (Number(sessionStorage.getItem('isbot')) >= 5) {
+        vm.captcha = true
+      }
+    }
+    vm.makeImageCap()
     // 
     vm.$nextTick(function () {
       let current = vm.$router.history.current
@@ -691,9 +726,10 @@ export default {
       let current = vm.$router.history.current
       let filter = {
         npmreactlogin_login: vm.userName,
-        npmreactlogin_password: vm.passWord
+        npmreactlogin_password: vm.passWord,
+        j_captcha_response: vm.j_captcha_response
       }
-      if (vm.userName && vm.passWord) {
+      if (vm.$refs.form.validate() && vm.userName && vm.passWord) {
         vm.loadingLogin = true
         vm.$store.dispatch('goToDangNhap', filter).then(function(result) {
           vm.loadingLogin = false
@@ -716,8 +752,36 @@ export default {
               // }, 100)
             }
           } 
+          if (result !== 'success') {
+            if ( typeof(Storage) !== 'undefined') {
+              let count = Number(sessionStorage.getItem('isbot'))
+              count+=1
+              sessionStorage.setItem('isbot', String(count))
+              if (count === 5) {
+                vm.captcha = true
+                vm.makeImageCap()
+              }
+            }
+          } else {
+            if ( typeof(Storage) !== 'undefined') {
+              sessionStorage.setItem('isbot', '0')
+            }
+          }
+          if (result === 'captcha') {
+            vm.captcha = true
+            vm.makeImageCap()
+          }
         }).catch(function(){
           vm.loadingLogin = false
+          if ( typeof(Storage) !== 'undefined') {
+            let count = Number(sessionStorage.getItem('isbot'))
+            count+=1
+            sessionStorage.setItem('isbot', String(count))
+            if (count === 5) {
+              vm.captcha = true
+              vm.makeImageCap()
+            }
+          }
         })
       }
     },
@@ -828,6 +892,15 @@ export default {
         }).catch(function () {
         })
       }, 300)
+    },
+    makeImageCap () {
+      var vm = this
+      vm.chapchablob = ''
+      vm.$store.dispatch('makeImageCapLogin').then(function (result) {
+        vm.chapchablob = result
+      }).catch(function (reject) {
+        vm.chapchablob = ''
+      })
     },
     doMappingDvcqg () {
       let vm = this

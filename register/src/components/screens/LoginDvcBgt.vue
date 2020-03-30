@@ -199,8 +199,13 @@ export default {
       $('body').addClass('body_login')
       $('#banner .container').css('display', 'none')
       if ( typeof(Storage) !== 'undefined') {
-        sessionStorage.removeItem('isbot')
-        sessionStorage.setItem('isbot', '0')
+        let count = sessionStorage.getItem('isbot')
+        if (window.themeDisplay.isSignedIn() || !count) {
+          sessionStorage.setItem('isbot', '0')
+        }
+        if (Number(sessionStorage.getItem('isbot')) >= 5) {
+          vm.captcha = true
+        }
       }
       let current = vm.$router.history.current
       let currentQuery = current.query
