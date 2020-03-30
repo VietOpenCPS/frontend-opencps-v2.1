@@ -87,7 +87,7 @@
               <v-icon>reply</v-icon>&nbsp;
               Quay lại
             </v-btn>
-            <v-btn v-if="conectDvcqg" class="px-2 my-0" color="#913938"
+            <v-btn v-if="conectDvcqg && !mapping" class="px-2 my-0" color="#913938"
               :loading="loading"
               :disabled="loading"
               @click="loginDVCQG"
@@ -111,6 +111,33 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!--  -->
+    <v-dialog v-model="dialogContact" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">
+          <span>Cập nhật email sử dụng trên hệ thống</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="formContact" v-model="validContact" lazy-validation class="mt-2">
+            <v-flex xs12>
+              <v-text-field
+                box
+                placeholder="Nhập email"
+                v-model="contactEmail"
+                :rules="contactEmail ? [rules.required, rules.email] : [rules.required]"
+                required
+                prepend-inner-icon="person_outline"
+              ></v-text-field>
+            </v-flex>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="cancelContact">Bỏ qua</v-btn>
+          <v-btn color="green darken-1" flat @click="submitContact">Đồng ý</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -132,6 +159,18 @@ export default {
     pinCode: '',
     isSigned: window.themeDisplay ? window.themeDisplay.isSignedIn() : false,
     conectDvcqg: false,
+    dataMapping: '',
+    dialogContact: false,
+    validContact: false,
+    contactEmail: '',
+    hasEmail: false,
+    rules: {
+      required: (value) => !!value || 'Email là bắt buộc',
+      email: (value) => {
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return pattern.test(value) || 'Địa chỉ Email không hợp lệ'
+      }
+    },
     dialog_loginDVCQG: false,
     tempDVCQG: ''
   }),
@@ -148,8 +187,23 @@ export default {
         vm.conectDvcqg = ssoConfig ? ssoConfig['active'] : false
       } catch (error) {
       }
-      if (vm.conectDvcqg) {
-        window.callback_dvcqg = vm.callback_dvcqg
+      
+      // 
+      let searchParams = window.location.href.split("?")[1]
+      if (searchParams) {
+        let dataDVCQG = decodeURIComponent(String(vm.getSearchParams(searchParams, "data")))
+        if (dataDVCQG) {
+          let dataObj = JSON.parse(atob(dataDVCQG))
+          console.log('dataObj', dataObj)
+          vm.dataMapping = dataObj
+          if (dataObj && dataObj.hasOwnProperty('userId') && String(dataObj.userId) === '0') {
+            vm.mapping = true
+          }
+          if (dataObj && dataObj.hasOwnProperty('state') && dataObj.state === 'create') {
+            vm.contactEmail = dataObj['ThuDienTu'] ? dataObj['ThuDienTu'] : ''
+            vm.dialogContact = true
+          }
+        }
       }
       // vm.makeImageCap()
     })
@@ -181,7 +235,11 @@ export default {
         j_captcha_response: vm.j_captcha_response
       }
       if (vm.npmreactlogin_login && vm.npmreactlogin_password) {
-        vm.$store.dispatch('goToDangNhap', filter)
+        vm.$store.dispatch('goToDangNhap', filter).then(function (result) {
+          if (vm.mapping && result === 'success') {
+            vm.doMappingDvcqg()
+          }
+        })
       }
     },
     doLogOut () {
@@ -202,11 +260,9 @@ export default {
     },
     loginDVCQG () {
       let vm = this
-      // window.location.href = window.themeDisplay.getPortalURL() + '/web/cong-dich-vu-cong/dang-nhap-dvcqg'
-      // new version
       let filter = {
-        state: 'auth',
-        redirectURL: window.location.origin
+        state: '',
+        redirectURL: window.location.href.split("?")[0]
       }
       vm.$store.dispatch('getVNConect', filter).then(function (result) {
         if (result) {
@@ -217,6 +273,73 @@ export default {
       }).catch(function () {
         alert('Chức năng đang cập nhật')
       })
+    },
+    doMappingDvcqg () {
+      let vm = this
+      let filter = {
+        dataMapping: vm.dataMapping
+      }
+      vm.$store.dispatch('mappingDvcqg', filter).then(function (result) {
+      }).catch(function () {
+      })
+    },
+    submitContact () {
+      let vm = this
+      if (vm.$refs.formContact.validate()) {
+        // call cập nhật email user
+        let oldEmail = vm.dataMapping['ThuDienTu'] ? vm.dataMapping['ThuDienTu'] : vm.dataMapping['TechID'] + '@dvcqg.gov.vn'
+        $.ajax({
+          url: '/o/rest/v2/dvcqgsso/changeemail?oldEmail=' + oldEmail + '&newEmail=' + vm.contactEmail + '&techId=' + vm.dataMapping['TechID'],
+          data: {},
+          type: 'POST',
+          async: false,
+          headers: {
+            'groupId': window.themeDisplay.getScopeGroupId(),
+            'Token': window.Liferay.authToken
+          },
+          success: function (result, status, xhr) {
+            vm.dataMapping.state = 'auth'
+            vm.doAuth(vm.dataMapping)
+            setTimeout(function () {
+              let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+              window.location.href = urlDvc
+            }, 100)
+          },
+          error: function (xhr) {
+          }
+        })
+      }
+      
+    },
+    doAuth (dataIn) {
+      $.ajaxSetup({
+        headers: {
+          'groupId': window.themeDisplay.getScopeGroupId(),
+          'Token': window.Liferay.authToken,
+          'Content-Type': 'application/json'
+        }
+      });
+      $.post('/o/rest/v2/dvcqgsso/auth', JSON.stringify(dataIn))
+      .done(function() {				
+      })
+    },
+    getSearchParams (prams, key) {
+      let value = ""
+      let headers = prams.split("&")
+      headers.forEach(function (header) {
+        header = header.split("=");
+        let keyHeader = header[0];
+        if (keyHeader === key) {
+          value = header[1]
+        }
+      });
+      return value
+    },
+    cancelContact () {
+      let vm = this
+      vm.dialogContact = false
+      let urlDvc = window.themeDisplay.getSiteAdminURL().split('/~/')[0].replace('group','web')
+      window.location.href = urlDvc
     },
     callback_dvcqg (data) {
       let vm = this

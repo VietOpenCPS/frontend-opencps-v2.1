@@ -996,14 +996,13 @@ export default {
           vm.dossierTemplateItems[index]['passRequired'] = true
         }).catch(reject => {
           vm.loadingApacal = false
-          toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       } else {
         item['dossierId'] = vm.thongTinHoSo.dossierId
         item['id'] = vm.id
         vm.loadingApacal = true
         vm.$store.dispatch('postEform', item).then(resPostEform => {
+          console.log('resole', resPostEform)
           setTimeout(function () {
             vm.loadingApacal = false
             toastr.clear()
@@ -1019,8 +1018,6 @@ export default {
           })
         }).catch(reject => {
           vm.loadingApacal = false
-          toastr.clear()
-          toastr.error('Yêu cầu của bạn thực hiện thất bại.')
         })
       }
     },
