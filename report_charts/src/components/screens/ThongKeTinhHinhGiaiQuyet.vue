@@ -29,6 +29,7 @@
                             v-model="employeeName"
                             class="input-outline"
                             placeholder="Tên cán bộ"
+                            @change="changeEmployeeName"
                         >
                         </v-text-field>
                     </v-flex>
@@ -62,6 +63,7 @@
                 :loading="loading"
                 class="table-landing table-bordered mt-4 mx-3"
                 style="border-left: 1px solid #dedede;"
+                no-data-text="Không có hồ sơ giải quyết"
                 >
                 <template slot="items" slot-scope="props">
                     <tr>
@@ -254,6 +256,7 @@ export default {
     },
     changeAgency () {
       let vm = this
+      vm.employeeName = ''
       setTimeout(function () {
           vm.getReportDossierEmployee()
       }, 200)
@@ -261,7 +264,14 @@ export default {
     changeEmployeeName () {
       let vm = this
       setTimeout(function () {
-          vm.getReportDossierEmployee()
+        if (vm.employeeName.length > 0) {
+          vm.listDossierEmployeeFilter = vm.listDossierEmployee.filter(function (item) {
+            return vm.stringConvert(item.fullName).indexOf(vm.stringConvert(vm.employeeName)) >= 0
+          })
+        } else {
+          vm.pageNumber = 1
+          vm.listDossierEmployeeFilter = vm.listDossierEmployee.slice(0, 10)
+        }
       }, 200)
     },
     getReportDossierEmployee () {
@@ -271,13 +281,19 @@ export default {
         let filter = {
           groupId: vm.govAgency ? vm.govAgency : window.themeDisplay.getScopeGroupId(),
           from: vm.data['fromStatisticDate'],
-          to: vm.data['toStatisticDate'],
-          employeeName: vm.employeeName
+          to: vm.data['toStatisticDate']
         }
         vm.$store.dispatch('getReportDossierEmployee', filter).then(function (result) {
           vm.listDossierEmployee = result
+          if (vm.employeeName) {
+            vm.listDossierEmployeeFilter = vm.listDossierEmployee.filter(function (item) {
+              return vm.stringConvert(item.fullName).indexOf(vm.stringConvert(vm.employeeName)) >= 0
+            })
+          } else {
+            vm.listDossierEmployeeFilter = vm.listDossierEmployee
+          }
           vm.pageNumber = 1
-          vm.listDossierEmployeeFilter = vm.listDossierEmployee.slice(0, 10)
+          vm.listDossierEmployeeFilter = vm.listDossierEmployeeFilter.slice(0, 10)
           vm.loading = false
         }).catch(function () {
           vm.listDossierEmployee = []
@@ -285,6 +301,24 @@ export default {
           vm.loading = false
         })
       }, 200)
+    },
+    stringConvert (str) {
+      str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+      str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+      str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+      str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+      str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+      str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+      str = str.replace(/đ/g, "d");
+      str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+      str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+      str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+      str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+      str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+      str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+      str = str.replace(/Đ/g, "D");
+      str = str.replace(/ /g, "");
+      return str.toLowerCase();
     },
     paggingData (config) {
       let vm = this

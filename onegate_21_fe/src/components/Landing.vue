@@ -916,6 +916,7 @@ export default {
     listThuTuc: [],
     thuTucHanhChinhSelected: null,
     thuTucHanhChinhSelectedGuide: null,
+    docTypePrint: '',
     listLinhVuc: [],
     linhVucSelected: null,
     listDichVuGuide: [],
@@ -1856,9 +1857,11 @@ export default {
           vm.dichVuSelectedGuide = vm.dichVuSelected ? vm.dichVuSelected : ''
           vm.templateNoGuide = vm.dichVuSelectedGuide ? vm.dichVuSelectedGuide.templateNo : ''
         }
+        vm.docTypePrint = item.document
         vm.dialog_printGuide = true
         vm.$refs.formGuide.resetValidation()
       } else if (String(item.form) === 'DENIED') {
+        vm.docTypePrint = item.document
         vm.thuTucHanhChinhSelectedGuide = ''
         vm.dichVuSelectedGuide = ''
         if (vm.thuTucHanhChinhSelected) {
@@ -2033,7 +2036,7 @@ export default {
           applicantTelNo: vm.applicantTelNoGuide,
           govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
           govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
-          typeCode: 'DOC_03',
+          typeCode: vm.docTypePrint ? vm.docTypePrint : 'DOC_03',
           partNo: partNoRequired.toString(),
           applicantNote: vm.applicantNoteGuide,
           type: 'completed',
@@ -2073,7 +2076,7 @@ export default {
           applicantTelNo: vm.applicantTelNoGuide,
           govAgencyCode: vm.thuTucHanhChinhSelectedGuide.govAgencyCode,
           govAgencyName: vm.thuTucHanhChinhSelectedGuide.govAgencyName,
-          typeCode: 'DOC_03',
+          typeCode: vm.docTypePrint ? vm.docTypePrint : 'DOC_03',
           applicantNote: vm.applicantNoteGuide,
           type: 'denied',
           applicantType: vm.applicantTypeGuide ? 'citizen' : 'business'
